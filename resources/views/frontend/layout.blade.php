@@ -1,0 +1,629 @@
+<?php
+// include(app_path() . '/ShopFumaco/fumdata.php');
+
+if(empty($_SESSION["buyer_id"])) {
+$_SESSION["buyer_id"] = uniqid();
+}
+else {
+  //echo $_SESSION["buyer_id"];
+}
+
+?>
+
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="">
+        <meta name="author" content="Fumaco Website">
+        <title>{{ $website_settings->set_sitename }}</title>
+        <link href="{{ asset('/assets/dist/css/bootstrap.css') }}" rel="stylesheet">
+        <link rel="preconnect" href="https://fonts.gstatic.com">
+        <script src="https://kit.fontawesome.com/ec0415ab92.js"></script>
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+        <link href="<?php echo url('/'); ?>/assets/fumaco.css" rel="stylesheet">
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+        <style>
+            .fumacoFont1 {
+                font-family: 'Montserrat', sans-serif !important; font-weight:400 !important; font-size: 1.75rem!important;
+            }
+            .fumacoFont2 {
+                font-family: 'Montserrat', sans-serif !important; font-weight:200 !important;
+            }
+            .fumacoFont_btn {
+                font-family: 'Montserrat', sans-serif !important; font-weight:200 !important; font-size: 16px !important;
+            }
+            .fumacoFont_card_title {
+                font-family: 'Montserrat', sans-serif !important; font-weight:600 !important; font-size: 16px !important;
+            }
+            .fumacoFont_card_caption {
+                font-family: 'Roboto', sans-serif !important; font-weight:200 !important; font-size: 16px !important;
+            }
+            .fumacoFont_card_readmore {
+                font-family: 'Montserrat', sans-serif !important; font-weight:200 !important; font-size: 16px !important; text-decoration: none !important;
+            }
+            .fumacoFont_card_price {
+                font-family: 'Montserrat', sans-serif !important; font-weight:600 !important; font-size: 16px !important; text-decoration: none !important;
+            }
+            .carousel-item > img {
+                position: absolute !important;
+                top: 0 !important;
+                left: 0 !important;
+                max-width: 100% !important;
+                height: 100% !important;
+            }
+            .spinner-wrapper {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: #2e343a;
+                z-index: 999999;
+                padding-top: 15%;
+            }
+            .spinner {
+                width: 40px;
+                height: 40px;
+                background-color: #0062A5;
+                margin: 100px auto;
+                -webkit-animation: sk-rotateplane 1.2s infinite ease-in-out;
+                animation: sk-rotateplane 1.2s infinite ease-in-out;
+                color: #ffffff;
+            }
+            @-webkit-keyframes sk-rotateplane {
+                0% { -webkit-transform: perspective(120px) }
+                50% { -webkit-transform: perspective(120px) rotateY(180deg) }
+                100% { -webkit-transform: perspective(120px) rotateY(180deg)  rotateX(180deg) }
+            }
+            @keyframes sk-rotateplane {
+                0% {
+                    transform: perspective(120px) rotateX(0deg) rotateY(0deg);
+                    -webkit-transform: perspective(120px) rotateX(0deg) rotateY(0deg)
+                } 50% {
+                    transform: perspective(120px) rotateX(-180.1deg) rotateY(0deg);
+                    -webkit-transform: perspective(120px) rotateX(-180.1deg) rotateY(0deg)
+                } 100% {
+                    transform: perspective(120px) rotateX(-180deg) rotateY(-179.9deg);
+                    -webkit-transform: perspective(120px) rotateX(-180deg) rotateY(-179.9deg);
+                }
+            }
+            /*Cookie Consent Begin*/
+            #cookieConsent {
+                background-color: rgb(28 54 72);
+                min-height: 66px;
+                font-size: 14px;
+                color: #ccc;
+                line-height: 26px;
+                padding: 8px 0 8px 30px;
+                font-family: "Trebuchet MS",Helvetica,sans-serif;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                display: none;
+                z-index: 9999;
+                padding-right: 20px;
+            }
+            #cookieConsent a {
+                color: #78c1e4;
+                text-decoration: none;
+            }
+            #closeCookieConsent {
+                float: right;
+                display: inline-block;
+                cursor: pointer;
+                height: 20px;
+                width: 20px;
+                margin: -15px 0 0 0;
+                font-weight: bold;
+            }
+            #closeCookieConsent:hover {
+                color: #FFF;
+            }
+            #cookieConsent a.cookieConsentOK {
+                background-color: #ffffff;
+                color: #0062a5;
+                display: inline-block;
+                border-radius: 15px;
+                padding: 0 50px;
+                cursor: pointer;
+                float: right;
+                margin: 0 80px 0 20px;
+            }
+            #cookieConsent a.cookieConsentOK:hover {
+                background-color: #feefc6;
+            }
+            /*Cookie Consent End*/
+            @media only screen and (max-width: 600px) {
+                #cookieConsent a.cookieConsentOK {
+                    background-color: #ffffff;
+                    color: #0062a5;
+                    display: inline-block;
+                    border-radius: 15px;
+                    padding: 0 50px;
+                    cursor: pointer;
+                    float: left;
+                    margin: 0 80px 0 0px;
+                    margin-top: 20px;
+                }
+            }
+            /* Animation */
+            @keyframes fadeInUp {
+                from {
+                    transform: translate3d(0,40px,0)
+                }
+                to {
+                    transform: translate3d(0,0,0);
+                    opacity: 1
+                }
+            }
+            @-webkit-keyframes fadeInUp {
+                from {
+                    transform: translate3d(0,40px,0)
+                }
+                to {
+                    transform: translate3d(0,0,0);
+                    opacity: 1
+                }
+            }
+            .animated {
+                animation-duration: 1s;
+                animation-fill-mode: both;
+                -webkit-animation-duration: 1s;
+                -webkit-animation-fill-mode: both
+            }
+            .animatedFadeInUp {
+                opacity: 0
+            }
+            .fadeInUp {
+                opacity: 0;
+                animation-name: fadeInUp;
+                -webkit-animation-name: fadeInUp;
+            }
+        </style>
+    </head>
+    <body>
+
+    <div class="spinner-wrapper">
+        <div class="spinner"></div>
+    </div>
+  <header>
+    <nav class="navbar navbar-expand-md navbar-light fixed-top bg-light" style="padding-left: 10px; padding-right: 10px; padding-bottom:0px; border-bottom: 1px solid #e4e4e4;">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="{{ $website_settings->set_value }}">
+            <img src="{{ asset('/assets/site-img/logo-sm.png') }}" alt="">
+          </a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse nav_fumaco_res" id="navbarCollapse">
+            <ul class="navbar-nav me-auto mb-2 mb-md-0 navbar-header">
+      
+      
+      
+      
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDarkDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  PRODUCTS
+                </a>
+                <ul class="dropdown-menu dropdown-menu-light navbar-header" style="font-weight: 300 !important;" aria-labelledby="navbarDarkDropdownMenuLink">
+      @foreach ($item_categories as $category)
+      <li><a class="dropdown-item" style="font-weight: 300 !important;" href="products?id={{ $category->id }}">
+      <img src="{{ asset('assets/site-img/icon/' . $category->image) }}" alt="'{{ $category->name }}" width="30">{{ $category->name }}</a></li>
+      @endforeach
+               
+      
+                </ul>
+              </li>
+      
+      
+      
+              <li class="nav-item">
+                <a class="nav-link" href="about">ABOUT FUMACO</a>
+              </li>
+      
+              <li class="nav-item">
+                <a class="nav-link" href="journals">JOURNALS</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="contact">CONTACTS</a>
+              </li>
+            </ul>
+      
+      
+      
+      
+          <div class="input-group mb-0 searchbar" style="width: unset !important;">
+            <input type="text" placeholder="Search" class="form-control searchstyle" aria-label="Text input with dropdown button">
+            <button class="btn btn-outline-secondary dropdown-toggle searchstyle" type="button" data-bs-toggle="dropdown" aria-expanded="false">All&nbsp;&nbsp;</button>
+            <ul class="dropdown-menu dropdown-menu-end navbar-header">
+              <li><a class="dropdown-item searchstyle" href="#">All</a></li>
+              <li><a class="dropdown-item searchstyle" href="#">Products</a></li>
+              <li><a class="dropdown-item searchstyle" href="#">Blogs</a></li>
+            <!--
+            <li>All</li>
+              <li>Products</li>
+              <li>Blogs</li>
+            -->
+      
+            </ul>
+              <button class="btn btn-outline-secondary searchstyle" type="button"><i class="fas fa-search"></i></button>
+          </div>
+      
+          <ul class="navbar-nav">
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle navbar-header" href="#" id="navbarDarkDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+      
+      
+                <?php
+      
+      
+                if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
+      
+      
+                  if(!empty($_SESSION["shopping_cart"])) {
+      
+      
+                    $xLL = 0;
+      
+                    foreach ($_SESSION["shopping_cart"] as $product){
+      
+      
+                      $total = $product["quantity"];
+      
+                      $xLL += $total;
+      
+                    }
+      
+      
+                  $cart_count = count(array_keys($_SESSION["shopping_cart"]));
+      
+                   //$xLL =  $cart_count;
+      
+                  }
+                  else {
+      
+      
+      
+                    $xLL = '0';
+                  }
+      
+      
+      
+      
+      
+                echo 'Welcome, Guest <i class="fa" style="font-size:24px; color:#126cb6;">&#xf07a;</i>
+          <span class="badge badge-warning" id="lblCartCount" style="background-color: red;
+          font-size: 12px;
+          background: #ff0000;
+          color: #fff;
+          padding: 4px 7px;
+          vertical-align: top;
+          margin-left: -10px;
+          display: unset !important;
+          font-weight: 500 !important;
+              border-radius: 1rem !important;"> '.$xLL.' </span>';
+      
+      
+                }
+                else {
+      
+                  $fumaco_users_conn = new mysqli($DB_SERVER, $DB_USERNAME, $DB_PASSWORD, $DB_NAME);
+                  if ($fumaco_users_conn->connect_error) {
+                    die();
+                  }
+      
+                  $user_id = $_SESSION["id"];
+      
+      
+                  if(!empty($_SESSION["shopping_cart"])) {
+      
+      
+                    $xLL = 0;
+      
+                    foreach ($_SESSION["shopping_cart"] as $product){
+      
+      
+                      $total = $product["quantity"];
+      
+                      $xLL += $total;
+      
+                    }
+      
+      
+                  $cart_count = count(array_keys($_SESSION["shopping_cart"]));
+      
+                   //$xLL =  $cart_count;
+      
+                  }
+                  else {
+      
+      
+      
+                    $xLL = '0';
+                  }
+      
+      
+                  $users_sql = "SELECT * FROM fumaco_users WHERE id = '$user_id' LIMIT 1";
+                  $data_display_users = $fumaco_users_conn ->query($users_sql);
+                  if ($data_display_users->num_rows > 0) {
+                  while($data_users_1 = $data_display_users ->fetch_assoc())
+                      {
+                        $users_data0_fumaco = $data_users_1["id"];
+                        $users_data1_fumaco = $data_users_1["username"];
+                        $users_data2_fumaco = $data_users_1["f_name"];
+                        $users_data3_fumaco = $data_users_1["f_lname"];
+      
+                        echo 'Welcome, ' . $users_data2_fumaco . '&nbsp;<i class="fa" style="font-size:24px; color:#126cb6;">&#xf07a;</i>
+                  <span class="badge badge-warning" id="lblCartCount" style="background-color: red;
+                  font-size: 12px;
+                  background: #ff0000;
+                  color: #fff;
+                  padding: 4px 7px;
+                  vertical-align: top;
+                  margin-left: -10px;
+                  display: unset !important;
+                  font-weight: 500 !important;
+                      border-radius: 1rem !important;"> '.$xLL.' </span>';
+      
+                      }
+                    }
+                  else {
+                  //die();
+                  }
+      
+      
+                }
+      
+      
+                ?>
+      
+      
+              </a>
+      
+      
+              <ul class="dropdown-menu dropdown-menu-light navbar-header" aria-labelledby="navbarDarkDropdownMenuLink" style="right: 14px !important; left: auto !important;">
+                <li><a class="dropdown-item" style="font-weight: 300 !important;" href="cart">
+                <img src="<?php echo url('/'); ?>/assets/site-img/icon/nav11.jpg" alt="Troffers & Luminaires" width="30">&nbsp;&nbsp;My Cart <span class="badge badge-primary" style="background-color:#186eaa; vertical-align: top;">&nbsp;&nbsp;
+      
+      
+                <?php
+      
+      
+                if(!empty($_SESSION["shopping_cart"])) {
+      
+      
+                  $xLL = 0;
+      
+                  foreach ($_SESSION["shopping_cart"] as $product){
+      
+      
+                    $total = $product["quantity"];
+      
+                    $xLL += $total;
+      
+                  }
+      
+      
+                $cart_count = count(array_keys($_SESSION["shopping_cart"]));
+      
+                 //$xLL =  $cart_count;
+      
+                }
+                else {
+      
+      
+      
+                  $xLL = '0';
+                }
+      
+      
+      
+                echo $xLL;
+      
+      
+      
+                ?>&nbsp;&nbsp;</span></a></li>
+      
+      
+      
+      
+      
+      
+      
+      
+                <?php
+                if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
+      
+                  echo '<li><a class="dropdown-item" style="font-weight: 300 !important;" href="order"><img src="';?><?php echo url('/'); ?><?php echo'/assets/site-img/icon/nav13.jpg" alt="Troffers & Luminaires" width="30">&nbsp;&nbsp;Track My Order</a></li>';
+      
+      
+      
+                    echo '<li><a class="dropdown-item" style="font-weight: 300 !important;" href="login"><img src="';?><?php echo url('/'); ?><?php echo'/assets/site-img/icon/nav15.jpg" alt="Troffers & Luminaires" width="30">&nbsp;&nbsp;Login | Sign Up</a></li>';
+      
+                }
+                else {
+      
+                  echo '<li><a class="dropdown-item" style="font-weight: 300 !important;" href="wishlist"><img src="';?><?php echo url('/'); ?><?php echo'/assets/site-img/icon/nav12.jpg" alt="Troffers & Luminaires" width="30">&nbsp;&nbsp;Wishlist</a></li>';
+      
+      
+                  echo '<li><a class="dropdown-item" style="font-weight: 300 !important;" href="order_user"><img src="';?><?php echo url('/'); ?><?php echo'/assets/site-img/icon/nav13.jpg" alt="Troffers & Luminaires" width="30">&nbsp;&nbsp;My Orders</a></li>';
+      
+                 echo '<li><a class="dropdown-item" style="font-weight: 300 !important;" href="myprofile"><img src="';?><?php echo url('/'); ?><?php echo'/assets/site-img/icon/nav14.jpg" alt="Troffers & Luminaires" width="30">&nbsp;&nbsp;My Profile</a></li>';
+      
+                  echo '<li><a class="dropdown-item" style="font-weight: 300 !important;" href="server/logout.php"><img src="';?><?php echo url('/'); ?><?php echo '/assets/site-img/icon/nav15.jpg" alt="Troffers & Luminaires" width="30">&nbsp;&nbsp;Log Out</a></li>';
+      
+                }
+      
+                ?>
+      
+      
+      
+      
+      
+              </ul>
+            </li>
+          </ul>
+        </div>
+      
+      </div>
+      </nav>
+      
+    
+  </header>
+
+  @yield('content')
+
+
+    <main style="background-color:#0062A5;"><br></main>
+    <div id="myModal_policy" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Modal Header</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Some text in the modal.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="cookieConsent">
+        <p style="text-align: justify; padding-bottom: -10px !important; padding-top: 0px !important;">Fumaco Web Site uses cookies to ensure you get the best experience while browsing the site.<br>By continued use, you agree to our privacy policy and accept our use of such cookies. For further information, click <a href="privacy_policy" target="_blank">More info</a>. <a class="cookieConsentOK">I AGREE</a></p>
+    </div>
+
+
+<?php // include(app_path() . '/ShopFumaco/Footer/footer.php');?>
+
+
+<main style="background-color:#000000;">
+
+    <div class="container marketing">
+      <section class="py-5 text-center container" style="    padding-top: 0rem !important;
+      padding-bottom: 3rem !important;">
+    </section>
+      <div class="row">
+  
+  
+  
+        <div class="col-lg-3" style="text-align: left !important;">
+          <h6 class="footer1st" style="color:#ffffff !important;">ABOUT FUMACO</h6>
+          <table class="table" style="border-style: unset !important;">
+            <tbody style="font-size: 12px; color: #ffffff; border-style: unset !important;">
+              <tr>
+                <td class="tdfooter footer2nd" style="border-style: unset !important;"><a href="https://test.fumaco.com.ph/about" style="text-decoration: none; color: #0062A5;">Company Info</a></td>
+                <td class="tdfooter footer2nd" style="border-style: unset !important;">&nbsp;</td>
+              </tr>
+  
+              <tr>
+                <td class="tdfooter footer2nd" style="border-style: unset !important;"><a href="https://test.fumaco.com.ph/journals" style="text-decoration: none; color: #0062A5;">News</a></td>
+                <td class="tdfooter footer2nd" style="border-style: unset !important;">&nbsp;</td>
+              </tr>
+  
+              <tr>
+                <td class="tdfooter footer2nd" style="border-style: unset !important;"><a href="https://test.fumaco.com.ph/privacy_policy" style="text-decoration: none;     color: #0062A5;">Privacy & Policy</a></td>
+                <td class="tdfooter footer2nd" style="border-style: unset !important;">&nbsp;</td>
+              </tr>
+  
+  
+              <tr>
+                <td class="tdfooter footer2nd" style="border-style: unset !important;"><a href="https://test.fumaco.com.ph/terms_condition" style="text-decoration: none;     color: #0062A5;">Terms & Conditions</a></td>
+                <td class="tdfooter footer2nd" style="border-style: unset !important;">&nbsp;</td>
+              </tr>
+  
+  
+  
+            </tbody>
+          </table>
+  
+  
+        </div>
+  
+  
+  
+        <div class="col-lg-5" style="text-align: left !important;">
+          <h6 class="footer1st" style="color:#ffffff !important;">PRODUCTS</h6>
+  
+          <table class="table" style="border-style: unset !important;">
+  
+            <tbody style="font-size: 12px; color: #ffffff; border-style: unset !important;">
+                @foreach ($item_categories as $category)
+                <tr style="border-style: unset !important;">
+                    <td class="tdfooter footer2nd" style="border-style: unset !important;"><a style="text-decoration:none; color: #0062A5;" href="products?id={{ $category->id }}">{{ $category->name }}</a></td>
+                  </tr>
+                @endforeach
+                         
+            
+            </tbody>
+          </table>
+  
+      </div>
+  
+  
+  
+  
+  
+        <div class="col-lg-4" style="text-align: right !important;">
+          <h6 class="footer1st" style="color:#ffffff !important;">SUBSCRIBE TO OUR NEWSLETTER</h6>
+          <div class="input-group mb-3">
+            <input type="text" class="form-control" placeholder="Email Address" aria-label="Recipient's username" aria-describedby="basic-addon2">
+            <span class="input-group-text" id="basic-addon2">Subscribe</span>
+          </div>
+  
+  
+        </div>
+  
+      </div>
+  
+  
+    </div>
+  
+  
+  <br>
+  <br>
+  
+  
+  </main>
+  
+<script src="{{ asset('/assets/dist/js/bootstrap.bundle.js') }}"></script>
+<script>
+
+$(document).ready(function() {
+    //Preloader
+    preloaderFadeOutTime = 800;
+    function hidePreloader() {
+        var preloader = $('.spinner-wrapper');
+        preloader.fadeOut(preloaderFadeOutTime);
+    }
+    hidePreloader();
+
+    setTimeout(function () {
+        $("#cookieConsent").fadeIn(200);
+    }, 2000);
+    $("#closeCookieConsent, .cookieConsentOK").click(function() {
+        $("#cookieConsent").fadeOut(200);
+    });
+});
+
+
+
+</script>
+
+
+</body>
+
+
+</html>
