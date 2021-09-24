@@ -506,9 +506,6 @@ else {
     </div>
 
 
-<?php // include(app_path() . '/ShopFumaco/Footer/footer.php');?>
-
-
 <main style="background-color:#000000;">
 
     <div class="container marketing">
