@@ -14,7 +14,8 @@ Instructions using GUI and Commands - For Development Site
         DB_USERNAME=root
         DB_PASSWORD=
     Type php artisan key:generate
-    Type php artisan optimize
+    Type php artisan optimize:clear
+    Type php artisan route:clear
     Type php artisan serve
     Access it via URL using your IP or localhost with default port = 8000
     Open VSCode
