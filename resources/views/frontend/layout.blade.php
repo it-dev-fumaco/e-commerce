@@ -215,7 +215,7 @@ else {
                 </a>
                 <ul class="dropdown-menu dropdown-menu-light navbar-header" style="font-weight: 300 !important;" aria-labelledby="navbarDarkDropdownMenuLink">
       @foreach ($item_categories as $category)
-      <li><a class="dropdown-item" style="font-weight: 300 !important;" href="products?id={{ $category->id }}">
+      <li><a class="dropdown-item" style="font-weight: 300 !important;" href="/products/{{ $category->id }}">
       <img src="{{ asset('assets/site-img/icon/' . $category->image) }}" alt="'{{ $category->name }}" width="30">{{ $category->name }}</a></li>
       @endforeach
                
@@ -226,14 +226,14 @@ else {
       
       
               <li class="nav-item">
-                <a class="nav-link" href="about">ABOUT FUMACO</a>
+                <a class="nav-link" href="/about">ABOUT FUMACO</a>
               </li>
       
               <li class="nav-item">
-                <a class="nav-link" href="journals">JOURNALS</a>
+                <a class="nav-link" href="/journals">JOURNALS</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="contact">CONTACTS</a>
+                <a class="nav-link" href="/contact">CONTACTS</a>
               </li>
             </ul>
       
@@ -559,7 +559,7 @@ else {
             <tbody style="font-size: 12px; color: #ffffff; border-style: unset !important;">
                 @foreach ($item_categories as $category)
                 <tr style="border-style: unset !important;">
-                    <td class="tdfooter footer2nd" style="border-style: unset !important;"><a style="text-decoration:none; color: #0062A5;" href="products?id={{ $category->id }}">{{ $category->name }}</a></td>
+                    <td class="tdfooter footer2nd" style="border-style: unset !important;"><a style="text-decoration:none; color: #0062A5;" href="/products/{{ $category->id }}">{{ $category->name }}</a></td>
                   </tr>
                 @endforeach
                          
