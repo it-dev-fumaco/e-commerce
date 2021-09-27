@@ -9,14 +9,41 @@ class FrontendController extends Controller
 {
     public function index() {
         $website_settings = DB::table('fumaco_settings')->first();
-
         $item_categories = DB::table('fumaco_categories')->get();
-
-
         $carousel_data = DB::table('fumaco_header')->where('fumaco_status', 1)->orderBy('fumaco_active', 'desc')->get();
-        
 
-        return view('frontend.homepage', compact('website_settings', 'item_categories', 'carousel_data'));
+        $blogs = DB::table('fumaco_blog')->where('blog_featured', 1)->where('blog_enable', 1)->take(3)->get();
+        $display = DB::table('fumaco_items')->where('f_status', 1);
+        $best_selling = Clone $display->take(4)->get();
+        $on_sale = Clone $display->where('f_onsale', 1)->take(4)->get();
+        $best_selling_arr = [];
+        $on_sale_arr = [];
+
+        foreach($best_selling as $bs){
+            $bs_img = DB::table('fumaco_items_image_v1')->where('idcode', $bs->f_idcode)->first();
+
+            $best_selling_arr[] = [
+                'item_code' => $bs->f_idcode,
+                'item_name' => $bs->f_name_name,
+                'orig_price' => $bs->f_original_price,
+                'new_price' => $bs->f_price,
+                'bs_img' => ($bs_img) ? $bs_img->imgprimayx : 'test.jpg'
+            ];
+        }
+
+        foreach($on_sale as $os){
+            $os_img = DB::table('fumaco_items_image_v1')->where('idcode', $os->f_idcode)->first();
+
+            $on_sale_arr[] = [
+                'item_code' => $os->f_idcode,
+                'item_name' => $os->f_name_name,
+                'orig_price' => $os->f_original_price,
+                'new_price' => $os->f_price,
+                'os_img' => ($os_img) ? $os_img->imgprimayx : 'test.jpg'
+            ];
+        }
+
+        return view('frontend.homepage', compact('website_settings', 'item_categories', 'carousel_data', 'blogs', 'best_selling_arr', 'on_sale_arr'));
     }
 
     public function viewAboutPage() {
