@@ -222,7 +222,7 @@
                 <div class="row">
                     <div class="col-sm-3 animated animatedFadeInUp fadeInUp" style="text-align: center;">
                         <p class="font1color about-number">
-                            <img src="https://test.fumaco.com.ph/assets/About/30plus.png" alt="" class="responsive">
+                            <img src="/assets/About/30plus.png" alt="" class="responsive">
                         </p>
                     </div>
                     <div class="col-sm-8 animated animatedFadeInUp fadeInUp">
@@ -235,7 +235,7 @@
                 <div class="row">
                     <div class="col-sm-3 animated animatedFadeInUp fadeInUp" style="text-align: center;">
                         <p class="font1color about-number">
-                            <img src="https://test.fumaco.com.ph/assets/About/7companies.png" alt="" class="responsive">
+                            <img src="/assets/About/7companies.png" alt="" class="responsive">
                         </p>
                     </div>
                     <div class="col-sm-8 animated animatedFadeInUp fadeInUp">
@@ -287,7 +287,7 @@
                 <div class="row">
                     <div class="col-sm-3 animated animatedFadeInUp fadeInUp" style="text-align: center;">
                         <p class="font1color about-number">
-                            <img src="https://test.fumaco.com.ph/assets/About/28percent.png" alt="" class="responsive">
+                            <img src="/assets/About/28percent.png" alt="" class="responsive">
                         </p>
                     </div>
                     <div class="col-sm-8 animated animatedFadeInUp fadeInUp">
@@ -341,7 +341,7 @@
                 </div>
                 <div class="row">
                     <div class="col-sm-3 animated animatedFadeInUp fadeInUp" style="text-align: center;">
-                        <p class="font1color about-number"><img src="https://test.fumaco.com.ph/assets/About/13companies.png" alt="" class="responsive"></p>
+                        <p class="font1color about-number"><img src="/assets/About/13companies.png" alt="" class="responsive"></p>
                     </div>
                     <div class="col-sm-8 animated animatedFadeInUp fadeInUp">
                         <p class="font1color fumacoFont_about_caption" style="vertical-align: baseline; padding: 30px 0;">{{ $about_data->{'3_year_1_details'} }}</p>
