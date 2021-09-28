@@ -17,5 +17,7 @@ Route::get('/', 'FrontendController@index');
 
 
 Route::get('/about', 'FrontendController@viewAboutPage');
+Route::get('/journals', 'FrontendController@viewJournalsPage');
+Route::get('/contact', 'FrontendController@viewContactPage');
 Route::get('/products/{id}', 'FrontendController@viewProducts');
 Route::get('/product/{item_code}', 'FrontendController@viewProduct');

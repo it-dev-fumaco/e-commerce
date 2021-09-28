@@ -58,6 +58,47 @@ class FrontendController extends Controller
         return view('frontend.about_page', compact('website_settings', 'item_categories', 'about_data', 'partners'));
     }
 
+    public function viewJournalsPage(Request $request) {
+        $website_settings = DB::table('fumaco_settings')->first();
+
+        $item_categories = DB::table('fumaco_categories')->get();
+
+        $about_data = DB::table('fumaco_about')->first();
+        
+        $blog_carousel = DB::table('fumaco_blog')->where('blog_enable', 1)->where('blog_featured', 1)->orderBy('blog_active', 'desc')->get();
+
+        $blog_count = DB::table('fumaco_blog')->where('blog_enable', 1)->get();
+
+        $app_count = DB::table('fumaco_blog')->where('blog_enable', 1)->where('blogtype', 'In Applications')->get();
+
+        $soln_count = DB::table('fumaco_blog')->where('blog_enable', 1)->where('blogtype', 'Solutions')->get();
+
+        $prod_count = DB::table('fumaco_blog')->where('blog_enable', 1)->where('blogtype', 'Products')->get();
+
+        if($request->type != ''){
+            $blog_list = DB::table('fumaco_blog')->where('blog_enable', 1)->where('blogtype', $request->type)->get();
+        }else{
+            $blog_list = DB::table('fumaco_blog')->where('blog_enable', 1)->get();
+        }
+
+        return view('frontend.journals', compact('website_settings', 'item_categories', 'about_data', 'blog_carousel', 'blog_count', 'app_count', 'soln_count', 'prod_count', 'blog_list'));
+    }
+
+    public function viewContactPage() {
+        $website_settings = DB::table('fumaco_settings')->first();
+
+        $item_categories = DB::table('fumaco_categories')->get();
+
+        $about_data = DB::table('fumaco_about')->first();
+
+        // "SELECT * FROM fumaco_contact";
+        $fumaco_info = DB::table('fumaco_contact')->get();
+
+        return $fumaco_info;
+
+        return view('frontend.contact', compact('website_settings', 'item_categories', 'about_data'));
+    }
+
     public function viewProducts($category_id) {
         $website_settings = DB::table('fumaco_settings')->first();
 
