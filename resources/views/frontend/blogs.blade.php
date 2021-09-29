@@ -41,7 +41,7 @@
 
         <div class="row">
             <div class="col-lg-12 animated animatedFadeInUp fadeInUp">
-                <p class="blog-font-a fumacoFont_card_caption">{{ $blog->datepublish }} | 0 Comments</p>
+                <p class="blog-font-a fumacoFont_card_caption">{{ $blog->datepublish }} | {{ $comment_count->count() }} Comment(s)</p>
             </div>
         </div>
 
