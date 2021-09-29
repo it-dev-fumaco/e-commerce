@@ -446,7 +446,7 @@ else {
       
       
       
-                    echo '<li><a class="dropdown-item" style="font-weight: 300 !important;" href="login"><img src="';?><?php echo url('/'); ?><?php echo'/assets/site-img/icon/nav15.jpg" alt="Troffers & Luminaires" width="30">&nbsp;&nbsp;Login | Sign Up</a></li>';
+                    echo '<li><a class="dropdown-item" style="font-weight: 300 !important;" href="/login"><img src="';?><?php echo url('/'); ?><?php echo'/assets/site-img/icon/nav15.jpg" alt="Troffers & Luminaires" width="30">&nbsp;&nbsp;Login | Sign Up</a></li>';
       
                 }
                 else {

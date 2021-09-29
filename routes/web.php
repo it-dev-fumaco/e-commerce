@@ -15,6 +15,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', 'FrontendController@index');
 
+Route::get('/login', 'FrontendController@viewLoginPage');
+Route::post('/user_register', 'FrontendController@userRegistration');
 
 Route::get('/about', 'FrontendController@viewAboutPage');
 Route::get('/journals', 'FrontendController@viewJournalsPage');

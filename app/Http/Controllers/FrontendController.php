@@ -47,6 +47,54 @@ class FrontendController extends Controller
         return view('frontend.homepage', compact('website_settings', 'item_categories', 'carousel_data', 'blogs', 'best_selling_arr', 'on_sale_arr'));
     }
 
+    public function viewLoginPage(){
+        $website_settings = DB::table('fumaco_settings')->first();
+
+        $item_categories = DB::table('fumaco_categories')->get();
+
+        $about_data = DB::table('fumaco_about')->first();
+
+        return view('frontend.login', compact('website_settings', 'item_categories', 'about_data'));
+    }
+
+    public function userRegistration(Request $request){
+        DB::beginTransaction();
+        try{
+            $user_check = DB::table('fumaco_users')->where('username', $request->username)->get();
+            
+            if(count($user_check) > 0){
+                return redirect()->back()->with('exists_error', 'Record not created, username already exists.');
+            }
+
+            if($request->password != $request->confirm_password){
+                return redirect()->back()->with('pass_error', 'Record not created, password/s do not match.');
+            }
+
+            $new_user = [
+                'username' => trim($request->username),
+                'password' => password_hash($request->password, PASSWORD_DEFAULT),
+                'f_address1' => $request->address_line1,
+                'f_address2' => $request->address_line2,
+                'f_province' => $request->province,
+                'f_barangay' => $request->Barangay,
+                'f_city' => $request->City_Municipality,
+                'f_postalcode' => $request->postal,
+                'f_country' => $request->country_region,
+                'f_name' => $request->first_name,
+                'f_lname' => $request->last_name,
+                'f_mobilenumber' => $request->mobile,
+                'f_email' => 'fumacoco_dev',
+                'f_temp_passcode' => 'fumaco12345'
+            ];
+
+            $insert = DB::table('fumaco_users')->insert($new_user);
+            DB::commit();
+            return redirect()->back()->with('success', 'New record created successfully. You can login now!');
+        }catch(Exception $e){
+            DB::rollback();
+        }
+    }
+
     public function viewAboutPage() {
         $website_settings = DB::table('fumaco_settings')->first();
 
@@ -132,33 +180,45 @@ class FrontendController extends Controller
     }
 
     public function addComment(Request $request){
-        $add_comment = [
-            'blog_type' => '1',
-            'reply_id' => '0',
-            'blog_id' => $request->idcode,
-            'blog_name' => $request->fullname,
-            'blog_email' => $request->fullemail,
-            'blog_ip' => $request->ip(),
-            'blog_comments' => $request->comment
-        ];
+        DB::beginTransaction();
+        try{
+            $add_comment = [
+                'blog_type' => '1',
+                'reply_id' => '0',
+                'blog_id' => $request->idcode,
+                'blog_name' => $request->fullname,
+                'blog_email' => $request->fullemail,
+                'blog_ip' => $request->ip(),
+                'blog_comments' => $request->comment
+            ];
 
-        $insert = DB::table('fumaco_comments')->insert($add_comment);
-        return redirect()->back()->with('comment_message', 'Hello! Your comment has been received, please wait for approval.');
+            $insert = DB::table('fumaco_comments')->insert($add_comment);
+            DB::commit();
+            return redirect()->back()->with('comment_message', 'Hello! Your comment has been received, please wait for approval.');
+        }catch(Exception $e){
+            DB::rollback();
+        }
     }
 
     public function addReply(Request $request){
-        $add_reply = [
-            'blog_type' => '2',
-            'reply_id' => $request->reply_replyId,
-            'blog_id' => $request->reply_blogId,
-            'blog_name' => $request->reply_name,
-            'blog_email' => $request->reply_email,
-            'blog_ip' => $request->ip(),
-            'blog_comments' => $request->reply_comment
-        ];
+        DB::beginTransaction();
+        try{
+            $add_reply = [
+                'blog_type' => '2',
+                'reply_id' => $request->reply_replyId,
+                'blog_id' => $request->reply_blogId,
+                'blog_name' => $request->reply_name,
+                'blog_email' => $request->reply_email,
+                'blog_ip' => $request->ip(),
+                'blog_comments' => $request->reply_comment
+            ];
 
-        $insert = DB::table('fumaco_comments')->insert($add_reply);
-        return redirect()->back()->with('reply_message', 'Hello! Your reply has been received, please wait for approval.');
+            $insert = DB::table('fumaco_comments')->insert($add_reply);
+            DB::commit();
+            return redirect()->back()->with('reply_message', 'Hello! Your reply has been received, please wait for approval.');
+        }catch(Exception $e){
+            DB::rollback();
+        }
     }
 
     public function viewContactPage() {
@@ -176,24 +236,29 @@ class FrontendController extends Controller
     }
 
     public function addContact(Request $request){
-        $new_contact = [
-            'name' => $request->name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'subject' => $request->subject,
-            'message' => $request->comment,
-            'ip_address' => $request->ip(),
-            'xstatus' => 'Sent'
-        ];
+        DB::beginTransaction();
+        try{
+            $new_contact = [
+                'name' => $request->name,
+                'email' => $request->email,
+                'phone' => $request->phone,
+                'subject' => $request->subject,
+                'message' => $request->comment,
+                'ip_address' => $request->ip(),
+                'xstatus' => 'Sent'
+            ];
 
-        $to = $request->email;
-        $from = 'contact@fumaco.com';
-        $subject = 'Fumaco Contact Us';
-        $headers = '';
+            $to = $request->email;
+            $from = 'contact@fumaco.com';
+            $subject = 'Fumaco Contact Us';
+            $headers = '';
 
-        $insert = DB::table('fumaco_contact_list')->insert($new_contact);
-
-        return redirect()->back()->with('message', 'Thank you for contacting us!. We have recieved your message.');
+            $insert = DB::table('fumaco_contact_list')->insert($new_contact);
+            DB::commit();
+            return redirect()->back()->with('message', 'Thank you for contacting us!. We have recieved your message.');
+        }catch(Exception $e){
+            DB::rollback();
+        }
     }
 
     public function viewProducts($category_id) {
