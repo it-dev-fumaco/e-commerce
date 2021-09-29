@@ -15,7 +15,22 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', 'FrontendController@index');
 
-Route::get('/login', 'FrontendController@viewLoginPage');
+Route::namespace('Auth')->group(function(){
+    //Login Routes
+    Route::get('/login','LoginController@viewLoginPage')->name('login');
+    Route::post('/login','LoginController@login');
+    Route::get('/logout','LoginController@logout')->name('logout');
+
+    //Forgot Password Routes
+    Route::get('/password/reset','ForgotPasswordController@showLinkRequestForm')->name('password.request');
+    Route::post('/password/email','ForgotPasswordController@sendResetLinkEmail')->name('password.email');
+
+    //Reset Password Routes
+    Route::get('/password/reset/{token}','ResetPasswordController@showResetForm')->name('password.reset');
+    Route::post('/password/reset','ResetPasswordController@reset')->name('password.update');
+
+});
+
 Route::post('/user_register', 'FrontendController@userRegistration');
 
 Route::get('/about', 'FrontendController@viewAboutPage');
@@ -29,7 +44,6 @@ Route::get('/contact', 'FrontendController@viewContactPage');
 Route::post('/add_contact', 'FrontendController@addContact');
 Route::get('/products/{id}', 'FrontendController@viewProducts');
 Route::get('/product/{item_code}', 'FrontendController@viewProduct');
-
 
 // SHOPPING CART ROUTES
 Route::get('/cart', 'CartController@viewCart');

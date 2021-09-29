@@ -67,27 +67,17 @@ class FrontendController extends Controller
         return view('frontend.homepage', compact('website_settings', 'item_categories', 'carousel_data', 'blogs', 'best_selling_arr', 'on_sale_arr'));
     }
 
-    public function viewLoginPage(){
-        $website_settings = DB::table('fumaco_settings')->first();
-
-        $item_categories = DB::table('fumaco_categories')->get();
-
-        $about_data = DB::table('fumaco_about')->first();
-
-        return view('frontend.login', compact('website_settings', 'item_categories', 'about_data'));
-    }
-
     public function userRegistration(Request $request){
         DB::beginTransaction();
         try{
             $user_check = DB::table('fumaco_users')->where('username', $request->username)->get();
             
             if(count($user_check) > 0){
-                return redirect()->back()->with('exists_error', 'Record not created, username already exists.');
+                return redirect()->back()->with('error', 'Record not created, username already exists.');
             }
 
             if($request->password != $request->confirm_password){
-                return redirect()->back()->with('pass_error', 'Record not created, password/s do not match.');
+                return redirect()->back()->with('error', 'Record not created, password/s do not match.');
             }
 
             $new_user = [

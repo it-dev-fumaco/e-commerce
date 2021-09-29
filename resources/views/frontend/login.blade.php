@@ -8,7 +8,7 @@
     <div id="myCarousel" class="carousel slide" data-bs-ride="carousel">
         <div class="carousel-inner">
             <div class="carousel-item active" style="height: 13rem !important;">
-            <img src="<?php echo url('/'); ?>/assets/site-img/header3-sm.png"alt="" style="position: absolute; top: 0;left: 0;min-width: 100%; height: unset !important; ">
+            <img src="{{ asset('/assets/site-img/header3-sm.png') }}" alt="" style="position: absolute; top: 0;left: 0;min-width: 100%; height: unset !important; ">
                 <div class="container">
                     <div class="carousel-caption text-start" style="bottom: 1rem !important; right: 25% !important; left: 25%; !important;">
                         <center><h3 class="carousel-header-font">LOGIN | REGISTER </h3></center>
@@ -31,18 +31,14 @@
                         </div>
                     @endif
 
-                    @if(session()->has('pass_error'))
+                    @if(session()->has('error'))
                         <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            {{ session()->get('pass_error') }}
+                            {{ session()->get('error') }}
                         </div>
                     @endif
 
-                    @if(session()->has('exists_error'))
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            {{ session()->get('exists_error') }}
-                        </div>
-                    @endif
-                    <form class="form-signin" action="server/user-login.php" method="post" style="border-color: #efefef; border-style: solid; border-width: 1px; border-top: 8px solid #186eaa; ">
+                    <form class="form-signin" action="/login" method="POST" style="border-color: #efefef; border-style: solid; border-width: 1px; border-top: 8px solid #186eaa; ">
+                        @csrf
                         <ul class="nav nav-tabs">
                             <li class="nav-item active" style="width: 50%;">
                             <a class="nav-link" href="#"><center><span class="login_2">Sign in</span></center></a>
@@ -58,7 +54,7 @@
                         <label for="InputUsername" class="login_1">&nbsp;</label>
                         <br>
 
-                        <input type="email" id="username" name="username" class="form-control" required="" autofocus="">
+                        <input type="email" id="username" name="username" class="form-control" required="" autofocus="" value="{{ old('username') }}">
                         <br>
                         <label for="InputPassword" class="login_1" style="padding-bottom:10px;">Password *</label>
                         <label for="InputPassword" class="login_1">&nbsp;</label>
