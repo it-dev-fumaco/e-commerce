@@ -277,10 +277,16 @@ class FrontendController extends Controller
                 'xstatus' => 'Sent'
             ];
 
-            $to = $request->email;
-            $from = 'contact@fumaco.com';
-            $subject = 'Fumaco Contact Us';
-            $headers = '';
+            $request->validate([
+                'name' => ['required', 'string', 'max:255'],
+                'email' => ['required', 'string', 'email', 'max:255'],
+                'phone' => ['required', 'string', 'max:255'],
+                'subject' => ['required', 'string', 'max:255'],
+                'message' => ['required', 'string', 'max:255'],
+                'ip_address' => ['required', 'string', 'max:255'],
+                'xstatus' => ['required', 'string', 'max:255'],
+                'g-recaptcha-response' => 'recaptcha'
+            ]);
 
             $insert = DB::table('fumaco_contact_list')->insert($new_contact);
             DB::commit();

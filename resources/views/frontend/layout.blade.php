@@ -176,6 +176,7 @@
           -webkit-animation-name: fadeInUp;
       }
     </style>
+    {!! ReCaptcha::htmlScriptTagJsApi() !!}
   </head>
   <body>
     <div class="spinner-wrapper">
