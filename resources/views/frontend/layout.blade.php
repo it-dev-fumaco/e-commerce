@@ -187,6 +187,30 @@ else {
                 animation-name: fadeInUp;
                 -webkit-animation-name: fadeInUp;
             }
+
+            .text {
+              position: relative;
+              font-size: 14px;
+              color: black;
+              width: 100%; /* Could be anything you like. */
+            }
+            .text-concat {
+              position: relative;
+              display: inline-block;
+              word-wrap: break-word;
+              overflow: hidden;
+              max-height: 4.8em; /* (Number of lines you want visible) * (line-height) */
+              line-height: 1.2em;
+              text-align:justify;
+            }
+
+            .text.ellipsis::after {
+              /* content: "..."; */
+              position: absolute;
+              right: -12px; 
+              bottom: 4px;
+            }
+
         </style>
     </head>
     <body>

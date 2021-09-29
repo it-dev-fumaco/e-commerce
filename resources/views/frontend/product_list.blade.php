@@ -152,7 +152,9 @@
                                 <div class="equal-column-content">
                                     <img src="{{ asset('/item/images/'.$product['item_code'].'/gallery/preview/'.$product['image']) }}" class="card-img-top">
                                     <div class="card-body">
-                                        <p class="card-text fumacoFont_card_title" style="color:#0062A5 !important; height: 80px;">{{ $product['item_name'] }}</p>
+                                        <div class="text ellipsis">
+                                            <p class="card-text fumacoFont_card_title text-concat" style="color:#0062A5 !important; height: 80px;">{{ $product['item_name'] }}</p>
+                                        </div>
                                         <p class="card-text fumacoFont_card_price" style="color:#000000 !important;">
                                             @if($product['is_discounted'])
                                             <s style="color: #c5c5c5;">₱ {{ $product['price'] }}</s>₱ {{ $product['discounted_price'] }}

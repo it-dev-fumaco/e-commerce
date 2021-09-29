@@ -83,7 +83,9 @@
                   <div class="equal-column-content">
                     <img src="{{ asset('/item/images/'. $bs['item_code'] .'/gallery/preview/'. $bs['bs_img']) }}" alt="" class="img-responsive" style="width: 100% !important;">
                     <div class="card-body">
-                      <p class="card-text product-head fumacoFont_card_title" style="color:#0062A5 !important;  height: 80px; ">{{ $bs['item_name'] }}</p>
+                      <div class="text ellipsis">
+                        <p class="card-text product-head fumacoFont_card_title text-concat" style="color:#0062A5 !important;  height: 80px; ">{{ $bs['item_name'] }}</p>
+                      </div>
                       <p class="card-text fumacoFont_card_price" style="color:#000000 !important; ">
                         <s style="color: #c5c5c5;">₱ {{ $bs['orig_price'] }}</s>&nbsp;&nbsp; ₱ {{ $bs['new_price'] }}</p>
                       <div class="d-flex justify-content-between align-items-center">
@@ -125,7 +127,9 @@
                   <div class="equal-column-content">
                     <img src="{{ asset('/item/images/'. $os['item_code'] .'/gallery/preview/'. $os['os_img']) }}" alt="" class="img-responsive" style="width: 100% !important;">
                     <div class="card-body">
-                      <p class="card-text product-head fumacoFont_card_title" style="color:#0062A5 !important;  height: 80px; ">{{ $os['item_name'] }}</p>
+                      <div class="text ellipsis">
+                        <p class="card-text product-head fumacoFont_card_title text-concat" style="color:#0062A5 !important; height: 80px;">{{ $os['item_name'] }}</p>
+                      </div>
                       <p class="card-text fumacoFont_card_price" style="color:#000000 !important; ">
                         <s style="color: #c5c5c5;">₱ {{ $os['orig_price'] }}</s>&nbsp;&nbsp; ₱ {{ $os['new_price'] }}</p>
                       <div class="d-flex justify-content-between align-items-center">

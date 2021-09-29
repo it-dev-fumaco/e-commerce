@@ -24,14 +24,14 @@ class FrontendController extends Controller
             $bs_img = DB::table('fumaco_items_image_v1')->where('idcode', $bs->f_idcode)->first();
 
             $bs_item_name = $bs->f_name_name;
-            if (strlen($bs_item_name) > 114) {
-                // truncate string
-                $stringCut = substr($bs_item_name, 0, 114);
-                $endPoint = strrpos($stringCut, ' ');
-                //if the string doesn't contain any space then it will cut without word basis.
-                $bs_item_name = $endPoint? substr($stringCut, 0, $endPoint) : substr($stringCut, 0);
-                $bs_item_name .= '...';
-            }
+            // if (strlen($bs_item_name) > 114) {
+            //     // truncate string
+            //     $stringCut = substr($bs_item_name, 0, 114);
+            //     $endPoint = strrpos($stringCut, ' ');
+            //     //if the string doesn't contain any space then it will cut without word basis.
+            //     $bs_item_name = $endPoint? substr($stringCut, 0, $endPoint) : substr($stringCut, 0);
+            //     $bs_item_name .= '...';
+            // }
 
             $best_selling_arr[] = [
                 'item_code' => $bs->f_idcode,
@@ -46,14 +46,14 @@ class FrontendController extends Controller
             $os_img = DB::table('fumaco_items_image_v1')->where('idcode', $os->f_idcode)->first();
 
             $os_item_name = $os->f_name_name;
-            if (strlen($os_item_name) > 114) {
-                // truncate string
-                $stringCut = substr($os_item_name, 0, 114);
-                $endPoint = strrpos($stringCut, ' ');
-                //if the string doesn't contain any space then it will cut without word basis.
-                $os_item_name = $endPoint? substr($stringCut, 0, $endPoint) : substr($stringCut, 0);
-                $os_item_name .= '...';
-            }
+            // if (strlen($os_item_name) > 114) {
+            //     // truncate string
+            //     $stringCut = substr($os_item_name, 0, 114);
+            //     $endPoint = strrpos($stringCut, ' ');
+            //     //if the string doesn't contain any space then it will cut without word basis.
+            //     $os_item_name = $endPoint? substr($stringCut, 0, $endPoint) : substr($stringCut, 0);
+            //     $os_item_name .= '...';
+            // }
 
             $on_sale_arr[] = [
                 'item_code' => $os->f_idcode,
@@ -315,14 +315,14 @@ class FrontendController extends Controller
             $item_image = DB::table('fumaco_items_image_v1')->where('idcode', $product->f_idcode)->first();
 
             $item_name = strip_tags($product->f_name_name);
-            if (strlen($item_name) > 150) {
-                // truncate string
-                $stringCut = substr($item_name, 0, 150);
-                $endPoint = strrpos($stringCut, ' ');
-                //if the string doesn't contain any space then it will cut without word basis.
-                $item_name = $endPoint? substr($stringCut, 0, $endPoint) : substr($stringCut, 0);
-                $item_name .= '...';
-            }
+            // if (strlen($item_name) > 150) {
+            //     // truncate string
+            //     $stringCut = substr($item_name, 0, 150);
+            //     $endPoint = strrpos($stringCut, ' ');
+            //     //if the string doesn't contain any space then it will cut without word basis.
+            //     $item_name = $endPoint? substr($stringCut, 0, $endPoint) : substr($stringCut, 0);
+            //     $item_name .= '...';
+            // }
 
             $products_arr[] = [
                 'item_code' => $product->f_idcode,
