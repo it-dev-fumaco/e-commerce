@@ -159,14 +159,14 @@
                             </div>
                             <div class="d-flex justify-content-between align-items-center">
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="shipping_fee" id="Free Shipping" value="0" required checked>
+                                    <input class="form-check-input" type="radio" name="shipping_fee" id="Free Shipping" value="0" data-name="Free Delivery" required checked>
                                     <label class="form-check-label" for="Free Shipping">Free Shipping</label>
                                 </div>
                                 <small class="text-muted stylecap he1x">P 0.00</small>
                             </div>
                             <div class="d-flex justify-content-between align-items-center">
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="shipping_fee" id="Standard" value="500" required>
+                                    <input class="form-check-input" type="radio" name="shipping_fee" id="Standard" value="500" data-name="Standard Delivery" required>
                                     <label class="form-check-label" for="Standard">Standard</label>
                                 </div>
                                 <small class="text-muted stylecap he1x">P 500.00</small>
@@ -178,7 +178,7 @@
                             </div>
                         </div>
                         <div class="card-body">
-                            <a href="cart-ZnVtYWNhcnQx" class="btn btn-outline-primary" role="button" style="width:100% !important;" {{ (count($cart_arr) > 0) ? '' : 'disabled' }}>PROCEED TO CHECKOUT</a>
+                            <button id="checkout-btn" class="btn btn-outline-primary" role="button" style="width:100% !important;" {{ (count($cart_arr) > 0) ? '' : 'disabled' }}>PROCEED TO CHECKOUT</button>
                         </div>
                     </div>
                     <br>
@@ -226,6 +226,56 @@
             updateTotal();
         });
 
+        $(document).on('click', '.remove-from-cart-btn', function(e){
+            e.preventDefault();
+            var tr = $(this);
+            var data = {
+                'id': $(this).data('id'),
+                '_token': "{{ csrf_token() }}",
+            }
+
+            $.ajax({
+                type:'DELETE',
+                url:'/removefromcart',
+                data: data,
+                success: function (response) {
+                    tr.closest("tr").remove();
+                    var countTr = $('#cart-items tbody tr').length;
+                    if(countTr < 1) {
+                        tr = '<tr>' +
+                            '<td style="border-bottom: 0; padding: 10px 0;" colspan="7">' +
+                                '<div class="alert alert-danger alert-dismissible fade show" role="alert">Your cart is empty!</div>' +
+                            '</td>' +
+                        '</tr>';
+
+                        $('#cart-items tbody').append(tr);
+
+                        $('#checkout-btn').attr('disabled', true);
+                    }
+
+                    updateTotal();
+                }
+            });
+        });
+
+        $('#checkout-btn').click(function(e){
+            e.preventDefault();
+            var data = {
+                'shipping_fee': $("input[name='shipping_fee']:checked").val(),
+                'shipping_name': $("input[name='shipping_fee']:checked").data('name'),
+                '_token': "{{ csrf_token() }}",
+            }
+
+            $.ajax({
+                type:'POST',
+                url:'/addshipping',
+                data: data,
+                error: function () {
+                    alert('An error occured.');
+                }
+            });
+        });
+
         function updateTotal() {
             var subtotal = 0;
             $('#cart-items tbody tr').each(function(){
@@ -235,6 +285,8 @@
 
             var shipping_fee = $("input[name='shipping_fee']:checked").val();
             var total = parseFloat(shipping_fee) + subtotal;
+
+            total = (isNaN(total)) ? 0 : total;
 
             $('#cart-subtotal').text('P ' + total.toFixed(2));
             $('#grand-total').text('P ' + total.toFixed(2));
@@ -263,24 +315,6 @@
                 data: data,
             });
         }
-
-        $(document).on('click', '.remove-from-cart-btn', function(e){
-            e.preventDefault();
-            var tr = $(this);
-            var data = {
-                'id': $(this).data('id'),
-                '_token': "{{ csrf_token() }}",
-            }
-
-            $.ajax({
-                type:'DELETE',
-                url:'/removefromcart',
-                data: data,
-                success: function (response) {
-                    tr.closest("tr").remove();
-                }
-            });
-        });
     });
 </script>
 @endsection

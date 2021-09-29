@@ -8,7 +8,6 @@ use DB;
 class CartController extends Controller
 {
     public function addToCart(Request $request) {
-
         $id = $request->item_code;
 
         $product_details = DB::table('fumaco_items')->where('f_idcode', $id)->first();
@@ -18,17 +17,16 @@ class CartController extends Controller
         // if cart is empty then this the first product
         $cart = session()->get('fumCart');
         if(!$cart) {
- 
             $cart = [
-                    $id => [
-                        "item_code" => $product_details->f_idcode,
-                        "quantity" => $request->quantity,
-                        "price" => $product_details->f_price,
-                    ]
+                $id => [
+                    "item_code" => $product_details->f_idcode,
+                    "quantity" => $request->quantity,
+                    "price" => $product_details->f_price,
+                ]
             ];
  
             session()->put('fumCart', $cart);
-
+            
             return redirect()->back()->with('success', 'Product added to your cart!');
         }
         // if cart not empty then check if this product exist then increment quantity
@@ -109,5 +107,19 @@ class CartController extends Controller
 
             return response()->json(['status' => 1, 'message' => 'Cart updated!']);
         }
+    }
+
+    // add shipping details in cart sessions
+    public function addShippingDetails(Request $request) {
+        $cart = session()->get('fumCart');
+
+        $cart['shipping'] = [
+            "shipping_name" => $request->shipping_name,
+            "shipping_fee" => $request->shipping_fee,
+        ];
+
+        session()->put('fumCart', $cart);
+
+        return response()->json(['status' => 1, 'message' => 'Cart updated!']);
     }
 }

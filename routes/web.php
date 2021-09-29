@@ -50,3 +50,4 @@ Route::get('/cart', 'CartController@viewCart');
 Route::post('/addtocart', 'CartController@addToCart');
 Route::patch('/updatecart', 'CartController@updateCart');
 Route::delete('/removefromcart', 'CartController@removeFromCart');
+Route::post('/addshipping', 'CartController@addShippingDetails');
