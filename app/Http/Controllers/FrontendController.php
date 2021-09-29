@@ -309,7 +309,7 @@ class FrontendController extends Controller
                 'item_name' => $item_name,
                 'image' => ($item_image) ? $item_image->imgprimayx : 'test.jpg',
                 'price' => $product->f_original_price,
-                'discounted_price' => number_format(str_replace(",","",$product->f_price),2),
+                'discounted_price' => number_format(str_replace(",","",$product->f_price), 2),
                 'is_discounted' => $product->f_discount_trigger
             ];
         }

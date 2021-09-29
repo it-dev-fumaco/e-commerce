@@ -534,20 +534,24 @@
         }
     </style>
 
-    <link type="text/css" rel="stylesheet" href="{{ asset('/assets/loading.css') }}" />
-    <script type="text/javascript" src="{{ asset('/assets/loading.js') }}"></script>
+	<link type="text/css" rel="stylesheet" media="all" href="{{ asset('/item/fancybox/source/jquery.fancybox.css') }}" />
+	<link type="text/css" rel="stylesheet" media="all" href="{{ asset('/item/magnific-popup/css/magnific-popup.css') }}" />
+	<link rel="stylesheet" type="text/css" href="{{ asset('/item/dist/xzoom.css') }}" media="all" />
+	<link type="text/css" rel="stylesheet" href="{{ asset('/assets/loading.css') }}" />
     
-    <main style="background-color:#ffffff;" class="products-head">
-        <nav>
-            <ol class="breadcrumb" style="font-weight: 300 !important; font-size: 14px !important;">
-                <li class="breadcrumb-item"><a href="/" style="color: #000000 !important; text-decoration: none;">Home</a></li>
-                <li class="breadcrumb-item active"><a href="/products/{{ $product_details->f_cat_id }}" style="color: #000000 !important; text-decoration: none;">{{ $product_details->f_category }}</a></li>
-                <li class="breadcrumb-item active"><a href="#" style="color: #000000 !important; text-decoration: underline;">{{ $product_details->f_brand }}</a></li>
-            </ol>
-        </nav>
-    </main>
-    <br>
-    <div class="container"></div>
+	<main style="background-color:#ffffff;" class="products-head">
+		<nav>
+			<ol class="breadcrumb" style="font-weight: 300 !important; font-size: 14px !important;">
+					<li class="breadcrumb-item"><a href="/" style="color: #000000 !important; text-decoration: none;">Home</a></li>
+					<li class="breadcrumb-item active"><a href="/products/{{ $product_details->f_cat_id }}" style="color: #000000 !important; text-decoration: none;">{{ $product_details->f_category }}</a></li>
+					<li class="breadcrumb-item active"><a href="#" style="color: #000000 !important; text-decoration: underline;">{{ $product_details->f_brand }}</a></li>
+			</ol>
+		</nav>
+	</main>
+	<br>
+	<div class="container"></div>
+	<form action="/addtocart" method="POST" autocomplete="off">
+	@csrf
 	<main style="background-color:#ffffff;">
         <div class="container marketing">
             <div class="single_product" style="padding-bottom: 0px !important;">
@@ -559,9 +563,7 @@
                                 <br><br>
                                 <div class="xzoom-thumbs">
                                     @foreach ($product_images as $image)
-                                    <a href="{{ asset('/item/images/'. $image->idcode.'/gallery/original/'. $image->imgoriginalx) }}">
-                                        <img class="xzoom-gallery4" width="60" src="{{ asset('/item/images/'. $image->idcode.'/gallery/preview/'. $image->imgprimayx) }}">
-                                    </a>
+                                    <a href="{{ asset('/item/images/'. $image->idcode.'/gallery/original/'. $image->imgoriginalx) }}"><img class="xzoom-gallery4" width="60" src="{{ asset('/item/images/'. $image->idcode.'/gallery/preview/'. $image->imgprimayx) }}" /></a>
                                     @endforeach
                                 </div>
                             </div>
@@ -569,8 +571,10 @@
                         <div class="col-lg-8 order-3">
                             <div class="product_description">
                                 <div class="message_box" style="margin:10px 0px;">
-                                    <div class="alert alert-success alert-dismissible fade show" role="alert">Product is added to your cart!</div>
-                                </div>
+											@if ($message = Session::get('success'))
+											<div class="alert alert-success alert-dismissible fade show" role="alert">{{ $message }}</div>
+											@endif
+											</div>
                                 <div class="product_name fumacoFont_item_title">{{ $product_details->f_name_name }}</div>
                                 <div class="product-rating">
                                     <div class="d-flex justify-content-between align-items-center">
@@ -617,7 +621,8 @@
                                     </li>
                                 </ul>
                             </p>
-                            <p class="card-text">QTY&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;   <input type="number" value="1" id="quantity" name="quantity" min="1" max="{{ $product_details->f_qty }}" style="width: 70px;" onchange="get_cnt()"></p>
+									 <input type="hidden" name="item_code" value="{{ $product_details->f_idcode }}">
+                            <p class="card-text">QTY&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;   <input type="number" value="1" id="quantity" name="quantity" min="1" max="{{ $product_details->f_qty }}" style="width: 70px;"></p>
 	                        <p class="card-text">In-Stocks :
                                 @if($product_details->f_qty < 1)
                                 <span style='color:red;';>Not Available</span>
@@ -636,12 +641,11 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="order_info d-flex flex-row">
-                            <form action="#">
-                        </div>
+                        
 	                    <div class="row" id="product_details">
                             <div class="col-xs-6">
-                                <a onclick="LoadView1()" class="btn btn-lg btn-outline-primary fumacoFont_card_readmore" style="padding: 1rem 1.5rem !important; color: #ffffff;background-color: #0062A5;border-color: #7cc;border-radius: 0 !important; {{ ($product_details->f_qty < 1) ? 'display: none;' : '' }}" href="#" role="button"><i class="fas fa-shopping-cart"></i> Add to Cart</a>
+										 <button type="submit" class="btn btn-lg btn-outline-primary fumacoFont_card_readmore" name="addtocart" style="padding: 1rem 1.5rem !important; color: #ffffff;background-color: #0062A5;border-color: #7cc;border-radius: 0 !important; {{ ($product_details->f_qty < 1) ? 'display: none;' : '' }}" href="#" role="button" value="1"><i class="fas fa-shopping-cart"></i> Add to Cart</button>
+                               
                                 <a class="btn btn-lg btn-outline-primary fumacoFont_card_readmore" style="padding: 1rem 1.5rem !important; color: #ffffff;background-color: #0062A5;border-color: #7cc;border-radius: 0 !important; {{ ($product_details->f_qty < 1) ? 'display: none;' : '' }}" href="#" role="button"><i class="fas fa-wallet"></i> Buy Now</a>
                                 <a class="btn btn-lg btn-outline-primary fumacoFont_card_readmore" style="padding: 1rem 1.5rem !important; color: #ffffff;background-color: #0062A5;border-color: #7cc;border-radius: 0 !important;" href="#" role="button"><i class="fas fa-heart"></i> Add to Wish List</a>
 
@@ -657,6 +661,7 @@
         </div>
     </div>
 </main>
+</form>
 
 <main  style="background-color:#ffffff;" class="products-head2" style=" margin-top: 0px !important; padding-left: 40px !important; padding-right: 40px !important; margin-left: : 40px !important; margin-right: 40px !important;">
     <div class="row">
@@ -708,13 +713,11 @@
   <br><br><br><br><br>
 </main>
 
+<script type="text/javascript" src="{{ asset('/assets/loading.js') }}"></script>
 <script src="{{ asset('/item/js/foundation.min.js') }}"></script>
 <script src="{{ asset('/item/js/setup.js') }}"></script>
 <script type="text/javascript" src="{{ asset('/item/dist/xzoom.min.js') }}"></script>
-<link rel="stylesheet" type="text/css" href="{{ asset('/item/dist/xzoom.css') }}" media="all" />
 <script type="text/javascript" src="{{ asset('/item/hammer.js/1.0.5/jquery.hammer.min.js') }}"></script>
-<link type="text/css" rel="stylesheet" media="all" href="{{ asset('/item/fancybox/source/jquery.fancybox.css') }}" />
-<link type="text/css" rel="stylesheet" media="all" href="{{ asset('/item/magnific-popup/css/magnific-popup.css') }}" />
 <script type="text/javascript" src="{{ asset('/item/fancybox/source/jquery.fancybox.js') }}"></script>
 <script type="text/javascript" src="{{ asset('/item/magnific-popup/js/magnific-popup.js') }}"></script>
 

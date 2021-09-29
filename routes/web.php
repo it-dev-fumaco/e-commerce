@@ -29,3 +29,10 @@ Route::get('/contact', 'FrontendController@viewContactPage');
 Route::post('/add_contact', 'FrontendController@addContact');
 Route::get('/products/{id}', 'FrontendController@viewProducts');
 Route::get('/product/{item_code}', 'FrontendController@viewProduct');
+
+
+// SHOPPING CART ROUTES
+Route::get('/cart', 'CartController@viewCart');
+Route::post('/addtocart', 'CartController@addToCart');
+Route::patch('/updatecart', 'CartController@updateCart');
+Route::delete('/removefromcart', 'CartController@removeFromCart');
