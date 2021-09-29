@@ -89,15 +89,15 @@
     <br>
     <div class="container">
         <div class="row">
-            @foreach($blog_list as $blogs)
+            @foreach($blogs_arr as $blogs)
                 <div class="col-lg-4 animated animatedFadeInUp fadeInUp">
                     <div class="card" style="border: 0px solid rgba(0, 0, 0, 0.125) !important;">
-                        <img class="card-img-top" src="{{ asset('/assets/journal/'. $blogs->{'blogprimayimage-journal'}) }}" alt="">
+                        <img class="card-img-top" src="{{ asset('/assets/journal/'. $blogs['image']) }}" alt="">
                         <div class="card-body">
-                            <p style="color:#b2b2b2 !important;" class="fumacoFont_card_caption">{{ $blogs->datepublish }} | 0 Comments</p>
-                            <a href="blog?id={{ $blogs->id }}" style="text-decoration: none !important;">
-                                <p style="color:#373b3e !important;" class="fumacoFont_card_title">{{ $blogs->blogtitle }}</p></a>
-                            <p style="color:#b2b2b2 !important;" class="fumacoFont_card_caption">{{ $blogs->blogtype }}</p>
+                            <p style="color:#b2b2b2 !important;" class="fumacoFont_card_caption">{{ $blogs['publish_date'] }} | {{ $blogs['comment_count'] }} Comment(s)</p>
+                            <a href="blog?id={{ $blogs['id'] }}" style="text-decoration: none !important;">
+                                <p style="color:#373b3e !important;" class="fumacoFont_card_title">{{ $blogs['title'] }}</p></a>
+                            <p style="color:#b2b2b2 !important;" class="fumacoFont_card_caption">{{ $blogs['type'] }}</p>
                         </div>
                     </div>
                 </div>

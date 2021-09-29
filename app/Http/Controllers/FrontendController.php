@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 use DB;
 
 class FrontendController extends Controller
@@ -81,7 +82,81 @@ class FrontendController extends Controller
             $blog_list = DB::table('fumaco_blog')->where('blog_enable', 1)->get();
         }
 
-        return view('frontend.journals', compact('website_settings', 'item_categories', 'about_data', 'blog_carousel', 'blog_count', 'app_count', 'soln_count', 'prod_count', 'blog_list'));
+        $blogs_arr = [];
+        foreach($blog_list as $blogs){
+            $blog_comment = DB::table('fumaco_comments')->where('blog_id', $blogs->id)->where('blog_status', 1)->get();
+
+            $blogs_arr[] = [
+                'id' => $blogs->id,
+                'comment_count' => $blog_comment->count(),
+                'image' => $blogs->{'blogprimayimage-journal'},
+                'publish_date' => $blogs->datepublish,
+                'title' => $blogs->blogtitle,
+                'type' => $blogs->blogtype
+            ];
+        }
+
+        return view('frontend.journals', compact('website_settings', 'item_categories', 'about_data', 'blog_carousel', 'blog_count', 'app_count', 'soln_count', 'prod_count', 'blog_list', 'blogs_arr'));
+    }
+
+    public function viewBlogPage(Request $request) {
+        $website_settings = DB::table('fumaco_settings')->first();
+
+        $item_categories = DB::table('fumaco_categories')->get();
+
+        $about_data = DB::table('fumaco_about')->first();
+
+        $blog = DB::table('fumaco_blog')->where('id', $request->id)->first();
+
+        $blog_comment = DB::table('fumaco_comments')->where('blog_id', $request->id)->where('blog_type', 1)->where('blog_status', 1)->get();
+
+        $comments_arr = [];
+        foreach($blog_comment as $comment){
+            $blog_reply = DB::table('fumaco_comments')->where('blog_id', $request->id)->where('blog_type', 2)->where('reply_id', $comment->id)->where('blog_status', 1)->get();
+
+            $comments_arr[] = [
+                'id' => $comment->id,
+                'email' => $comment->blog_email,
+                'name' => $comment->blog_name,
+                'comment' => $comment->blog_comments,
+                'reply_comment' => $blog_reply
+            ];
+        }
+
+        $id = $request->id;
+        $date = Carbon::now();
+
+        return view('frontend.blogs', compact('website_settings', 'item_categories', 'about_data', 'blog', 'comments_arr', 'id', 'date'));
+    }
+
+    public function addComment(Request $request){
+        $add_comment = [
+            'blog_type' => '1',
+            'reply_id' => '0',
+            'blog_id' => $request->idcode,
+            'blog_name' => $request->fullname,
+            'blog_email' => $request->fullemail,
+            'blog_ip' => $request->ip(),
+            'blog_comments' => $request->comment
+        ];
+
+        $insert = DB::table('fumaco_comments')->insert($add_comment);
+        return redirect()->back()->with('comment_message', 'Hello! Your comment has been received, please wait for approval.');
+    }
+
+    public function addReply(Request $request){
+        $add_reply = [
+            'blog_type' => '2',
+            'reply_id' => $request->reply_replyId,
+            'blog_id' => $request->reply_blogId,
+            'blog_name' => $request->reply_name,
+            'blog_email' => $request->reply_email,
+            'blog_ip' => $request->ip(),
+            'blog_comments' => $request->reply_comment
+        ];
+
+        $insert = DB::table('fumaco_comments')->insert($add_reply);
+        return redirect()->back()->with('reply_message', 'Hello! Your reply has been received, please wait for approval.');
     }
 
     public function viewContactPage() {
@@ -91,12 +166,32 @@ class FrontendController extends Controller
 
         $about_data = DB::table('fumaco_about')->first();
 
-        // "SELECT * FROM fumaco_contact";
-        $fumaco_info = DB::table('fumaco_contact')->get();
+        $fumaco_contact = DB::table('fumaco_contact')->get();
 
-        return $fumaco_info;
+        $fumaco_map = DB::table('fumaco_map_1')->first();
 
-        return view('frontend.contact', compact('website_settings', 'item_categories', 'about_data'));
+        return view('frontend.contact', compact('website_settings', 'item_categories', 'about_data', 'fumaco_contact', 'fumaco_map'));
+    }
+
+    public function addContact(Request $request){
+        $new_contact = [
+            'name' => $request->name,
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'subject' => $request->subject,
+            'message' => $request->comment,
+            'ip_address' => $request->ip(),
+            'xstatus' => 'Sent'
+        ];
+
+        $to = $request->email;
+        $from = 'contact@fumaco.com';
+        $subject = 'Fumaco Contact Us';
+        $headers = '';
+
+        $insert = DB::table('fumaco_contact_list')->insert($new_contact);
+
+        return redirect()->back()->with('message', 'Thank you for contacting us!. We have recieved your message.');
     }
 
     public function viewProducts($category_id) {
