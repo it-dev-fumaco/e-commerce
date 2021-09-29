@@ -390,7 +390,7 @@ else {
       
       
               <ul class="dropdown-menu dropdown-menu-light navbar-header" aria-labelledby="navbarDarkDropdownMenuLink" style="right: 14px !important; left: auto !important;">
-                <li><a class="dropdown-item" style="font-weight: 300 !important;" href="cart">
+                <li><a class="dropdown-item" style="font-weight: 300 !important;" href="/cart">
                 <img src="<?php echo url('/'); ?>/assets/site-img/icon/nav11.jpg" alt="Troffers & Luminaires" width="30">&nbsp;&nbsp;My Cart <span class="badge badge-primary" style="background-color:#186eaa; vertical-align: top;">&nbsp;&nbsp;
       
       
@@ -617,8 +617,10 @@ $(document).ready(function() {
 
 
 
+
 </script>
 
+@yield('script')
 
 </body>
 
