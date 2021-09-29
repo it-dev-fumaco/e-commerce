@@ -521,23 +521,23 @@ else {
           <table class="table" style="border-style: unset !important;">
             <tbody style="font-size: 12px; color: #ffffff; border-style: unset !important;">
               <tr>
-                <td class="tdfooter footer2nd" style="border-style: unset !important;"><a href="https://test.fumaco.com.ph/about" style="text-decoration: none; color: #0062A5;">Company Info</a></td>
+                <td class="tdfooter footer2nd" style="border-style: unset !important;"><a href="/about" style="text-decoration: none; color: #0062A5;">Company Info</a></td>
                 <td class="tdfooter footer2nd" style="border-style: unset !important;">&nbsp;</td>
               </tr>
   
               <tr>
-                <td class="tdfooter footer2nd" style="border-style: unset !important;"><a href="https://test.fumaco.com.ph/journals" style="text-decoration: none; color: #0062A5;">News</a></td>
+                <td class="tdfooter footer2nd" style="border-style: unset !important;"><a href="/journals" style="text-decoration: none; color: #0062A5;">News</a></td>
                 <td class="tdfooter footer2nd" style="border-style: unset !important;">&nbsp;</td>
               </tr>
   
               <tr>
-                <td class="tdfooter footer2nd" style="border-style: unset !important;"><a href="https://test.fumaco.com.ph/privacy_policy" style="text-decoration: none;     color: #0062A5;">Privacy & Policy</a></td>
+                <td class="tdfooter footer2nd" style="border-style: unset !important;"><a href="/privacy_policy" style="text-decoration: none; color: #0062A5;">Privacy & Policy</a></td>
                 <td class="tdfooter footer2nd" style="border-style: unset !important;">&nbsp;</td>
               </tr>
   
   
               <tr>
-                <td class="tdfooter footer2nd" style="border-style: unset !important;"><a href="https://test.fumaco.com.ph/terms_condition" style="text-decoration: none;     color: #0062A5;">Terms & Conditions</a></td>
+                <td class="tdfooter footer2nd" style="border-style: unset !important;"><a href="/terms_condition" style="text-decoration: none; color: #0062A5;">Terms & Conditions</a></td>
                 <td class="tdfooter footer2nd" style="border-style: unset !important;">&nbsp;</td>
               </tr>
   

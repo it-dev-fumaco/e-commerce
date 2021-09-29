@@ -20,6 +20,8 @@ Route::post('/user_register', 'FrontendController@userRegistration');
 
 Route::get('/about', 'FrontendController@viewAboutPage');
 Route::get('/journals', 'FrontendController@viewJournalsPage');
+Route::get('/privacy_policy', 'FrontendController@viewPrivacyPage');
+Route::get('/terms_condition', 'FrontendController@viewTermsPage');
 Route::get('/blog', 'FrontendController@viewBlogPage');
 Route::post('/add_comment', 'FrontendController@addComment');
 Route::post('/add_reply', 'FrontendController@addReply');

@@ -107,6 +107,25 @@ class FrontendController extends Controller
         return view('frontend.about_page', compact('website_settings', 'item_categories', 'about_data', 'partners'));
     }
 
+    public function viewPrivacyPage(){
+        $website_settings = DB::table('fumaco_settings')->first();
+
+        $item_categories = DB::table('fumaco_categories')->get();
+
+        $about_data = DB::table('fumaco_about')->first();
+
+        return view('frontend.privacy', compact('website_settings', 'item_categories', 'about_data'));
+    }
+    public function viewTermsPage(){
+        $website_settings = DB::table('fumaco_settings')->first();
+
+        $item_categories = DB::table('fumaco_categories')->get();
+
+        $about_data = DB::table('fumaco_about')->first();
+
+        return view('frontend.terms_conditions', compact('website_settings', 'item_categories', 'about_data'));
+    }
+
     public function viewJournalsPage(Request $request) {
         $website_settings = DB::table('fumaco_settings')->first();
 
