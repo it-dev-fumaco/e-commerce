@@ -37,7 +37,7 @@
                         </div>
                     @endif
 
-                    <form class="form-signin" action="/login" method="POST" style="border-color: #efefef; border-style: solid; border-width: 1px; border-top: 8px solid #186eaa; ">
+                    <form class="form-signin" action="/login" method="POST" style="max-width: 1000px !important; border-color: #efefef; border-style: solid; border-width: 1px; border-top: 8px solid #186eaa; ">
                         @csrf
                         <ul class="nav nav-tabs">
                             <li class="nav-item active" style="width: 50%;">
@@ -48,26 +48,29 @@
                             <a class="nav-link" href="#" type="button" id="btn-signup"><center><span class="login_2">Register</span></center></a>
                             </li>
                         </ul>
-                        
-                        <br>
-                        <label for="InputUsername" class="login_1" style="padding-bottom:10px;">Username or email address *<br></label>
-                        <label for="InputUsername" class="login_1">&nbsp;</label>
-                        <br>
+                        <center>
+                        <div class="col-lg-4" style="text-align: left;">
+                            <br>
+                            <label for="InputUsername" class="login_1" style="padding-bottom:10px;">Username or email address *<br></label>
+                            <label for="InputUsername" class="login_1">&nbsp;</label>
+                            <br>
 
-                        <input type="email" id="username" name="username" class="form-control" required="" autofocus="" value="{{ old('username') }}">
-                        <br>
-                        <label for="InputPassword" class="login_1" style="padding-bottom:10px;">Password *</label>
-                        <label for="InputPassword" class="login_1">&nbsp;</label>
-                        <br>
+                            <input type="email" id="username" name="username" class="form-control" required="" autofocus="" value="{{ old('username') }}">
+                            <br>
+                            <label for="InputPassword" class="login_1" style="padding-bottom:10px;">Password *</label>
+                            <label for="InputPassword" class="login_1">&nbsp;</label>
+                            <br>
 
-                        <input type="password" id="password" name="password" class="form-control" required="">
+                            <input type="password" id="password" name="password" class="form-control" required="">
 
-                        <br>
-                        <input type="submit" class="btn btn-primary" value="&nbsp;&nbsp;LOGIN&nbsp;&nbsp;">
+                            <br>
+                            <input type="submit" class="btn btn-primary" value="&nbsp;&nbsp;LOGIN&nbsp;&nbsp;">
 
-                        <a href="forgot" id="forgot_pswdx" class="forgot-1">Forgot password?</a>
-                        <br>
-                        <label for="InputPassword" class="status-1"></label>
+                            <a href="forgot" id="forgot_pswdx" class="forgot-1">Forgot password?</a>
+                            <br>
+                            <label for="InputPassword" class="status-1"></label>
+                        </div>
+                        </center>
                     </form>
 
                     <form action="/reset/password/" class="form-reset" style="border-color: #efefef; border-style: solid; border-width: 1px; border-top: 8px solid #186eaa; ">
@@ -76,7 +79,7 @@
                         <a href="#" id="cancel_reset"><i class="fas fa-angle-left"></i> Back</a>
                     </form>
 
-                    <form action="user_register" class="form-signup" method="post" style="max-width: 800px !important; border-color: #efefef; border-style: solid; border-width: 1px; border-top: 8px solid #186eaa; ">
+                    <form action="user_register" class="form-signup" method="post" style="max-width: 1000px !important; border-color: #efefef; border-style: solid; border-width: 1px; border-top: 8px solid #186eaa; ">
                         @csrf
                         <ul class="nav nav-tabs">
                             <li class="nav-item" style="width: 50%;">
@@ -91,42 +94,30 @@
                         <br>
 
                         <div class="row">
-                            <div class="col-lg-4">
+                            <div class="col-lg-6">
+                                <label for="mobile_1" class="myprofile-font-form login_1">First Name : *</label>
+                                <input type="text" class="form-control caption_1" id="fname" name="first_name" required>
+                            </div>
+                            
+                            <div class="col-lg-6">
+                                <label for="mobile_1" class="myprofile-font-form login_1">Last Name : *</label>
+                                <input type="text" class="form-control caption_1" id="lname" name="last_name" required>
+                            </div> 
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-6">
                                 <label class="login_1">Username or email address *</label>
                                 <input type="email" name="username" id="username" class="form-control caption_1" value="" required>
                                 <span class="help-block"></span>
                             </div>
 
-
-                            <div class="col-lg-4">
-                                <label class="login_1">Password *</label>
-                                <input type="password" name="password" id="password" class="form-control caption_1" value="" required>
-                                <span class="help-block"></span>
-                            </div>
-
-
-                            <div class="col-lg-4">
-                                <label class="login_1">Confirm Password *</label>
-                                <input type="password" name="confirm_password" id="confirm_password"  class="form-control caption_1" value="" required>
-                                <span class="help-block"></span>
-                            </div>
-                        </div>
-
-
-                        <div class="row">
-                            <div class="col-lg-4">
-                                <label for="mobile_1" class="myprofile-font-form login_1">First Name : *</label>
-                                <input type="text" class="form-control caption_1" id="fname" name="first_name" required>
-                            </div>
-                            <div class="col-lg-4">
-                                <label for="mobile_1" class="myprofile-font-form login_1">Last Name : *</label>
-                                <input type="text" class="form-control caption_1" id="lname" name="last_name" required>
-                            </div>
-                            <div class="col-lg-4">
+                            <div class="col-lg-6">
                                 <label for="mobile_1" class="myprofile-font-form login_1">Mobile Number : *</label>
                                 <input type="number" class="form-control caption_1" id="mobile_1" name="mobile" required>
                             </div>
                         </div>
+                        
                         <div class="form-group">
                             <label for="Address1_1" class="myprofile-font-form login_1">Address Line 1 : *</label>
                             <input type="text" class="form-control caption_1" id="Address1_1" name="address_line1" required>
@@ -415,10 +406,26 @@
                                 </select>
                             </div>
                         </div>
-                      <br>
-                      <div class="form-group">
-                          <input type="submit" class="btn btn-primary" value="REGISTER">
-                      </div>
+
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <label class="login_1">Password *</label>
+                                <input type="password" name="password" id="password" class="form-control caption_1" value="" required>
+                                <span class="help-block"></span>
+                            </div>
+
+                            <div class="col-lg-6">
+                                <label class="login_1">Confirm Password *</label>
+                                <input type="password" name="confirm_password" id="confirm_password"  class="form-control caption_1" value="" required>
+                                <span class="help-block"></span>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="form-group">
+                            <p class="reg_link" style=""><input type="checkbox" checked> &nbsp;Yes, I want to receive email updates and notifications.</p>
+                            <p class="reg_link" style="">By signing up you agree to our Privacy Policy and Terms.</p>
+                            <input type="submit" class="btn btn-primary" value="REGISTER"><br/>
+                        </div>
                     </form>
                     <br>
                 </div>
@@ -451,7 +458,10 @@
     <br>
 </main>
 <style>
-
+    .reg_link{
+        font-size: 9pt;
+        white-space: nowrap;
+    }
 
     /* sign in FORM */
     #logreg-forms{
@@ -586,7 +596,7 @@
       }
   
       .caption_1 {
-        font-weight: 200 !important;
+        font-weight: 400 !important;
         font-size: 14px !important;
       }
   
