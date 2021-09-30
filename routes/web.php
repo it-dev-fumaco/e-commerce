@@ -45,6 +45,11 @@ Route::post('/add_contact', 'FrontendController@addContact');
 Route::get('/products/{id}', 'FrontendController@viewProducts');
 Route::get('/product/{item_code}', 'FrontendController@viewProduct');
 
+Route::group(['middleware' => 'auth'], function(){
+    Route::get('/mywishlist', 'FrontendController@viewWishlist');
+    Route::delete('/mywishlist/{id}/delete', 'FrontendController@deleteWishlist');
+});
+
 // SHOPPING CART ROUTES
 Route::get('/cart', 'CartController@viewCart');
 Route::post('/addtocart', 'CartController@addToCart');

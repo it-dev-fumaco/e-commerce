@@ -17,6 +17,8 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
     <style>
       .fumacoFont1 {
           font-family: 'Montserrat', sans-serif !important; font-weight:400 !important; font-size: 1.75rem!important;
@@ -275,23 +277,7 @@
   @yield('content')
   
     <main style="background-color:#0062A5;"><br></main>
-    <div id="myModal_policy" class="modal fade" role="dialog">
-      <div class="modal-dialog">
-        <!-- Modal content-->
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal">&times;</button>
-            <h4 class="modal-title">Modal Header</h4>
-          </div>
-          <div class="modal-body">
-            <p>Some text in the modal.</p>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          </div>
-        </div>
-      </div>
-    </div>
+
     <div id="cookieConsent">
       <p style="text-align: justify; padding-bottom: -10px !important; padding-top: 0px !important;">Fumaco Web Site uses cookies to ensure you get the best experience while browsing the site.<br>By continued use, you agree to our privacy policy and accept our use of such cookies. For further information, click <a href="privacy_policy" target="_blank">More info</a>. <a class="cookieConsentOK">I AGREE</a></p>
     </div>

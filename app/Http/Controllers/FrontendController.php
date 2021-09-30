@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use DB;
+use Auth;
 
 class FrontendController extends Controller
 {
@@ -347,5 +348,43 @@ class FrontendController extends Controller
         $attributes = DB::table('fumaco_items_attributes')->where('idcode', $item_code)->orderBy('idx', 'asc')->get();
 
         return view('frontend.product_page', compact('website_settings', 'item_categories', 'product_details', 'product_images', 'attributes'));
+    }
+
+    public function viewWishlist() {
+        $website_settings = DB::table('fumaco_settings')->first();
+
+        $item_categories = DB::table('fumaco_categories')->get();
+
+        $wishlist_query = DB::table('datawishlist')
+            ->where('userid', Auth::user()->id)->paginate(10);
+        $wishlist_arr = [];
+        foreach ($wishlist_query as $wishlist) {
+            $item_image = DB::table('fumaco_items_image_v1')
+                ->where('idcode', $wishlist->item_code)->first();
+            $wishlist_arr[] = [
+                'wishlist_id' => $wishlist->id,
+                'item_code' => $wishlist->item_code,
+                'item_name' => $wishlist->item_name,
+                'item_price' => $wishlist->item_price,
+                'image' => ($item_image) ? $item_image->imgprimayx : 'test.jpg',
+            ];
+        }
+
+        return view('frontend.wishlist', compact('website_settings', 'item_categories', 'wishlist_arr', 'wishlist_query'));
+    }
+
+    public function deleteWishlist($id) {
+        DB::beginTransaction();
+        try {
+            DB::table('datawishlist')->where('id', $id)->delete();
+
+            DB::commit();
+
+            return redirect()->back()->with('success', 'Product has been removed from your wishlist.');
+        } catch (Exception $e) {
+            DB::rollback();
+
+            return redirect()->back()->with('error', 'An error occured. Please try again.');
+        }
     }
 }
