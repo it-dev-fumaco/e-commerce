@@ -48,6 +48,8 @@ Route::get('/product/{item_code}', 'FrontendController@viewProduct');
 Route::group(['middleware' => 'auth'], function(){
     Route::get('/mywishlist', 'FrontendController@viewWishlist');
     Route::delete('/mywishlist/{id}/delete', 'FrontendController@deleteWishlist');
+    Route::get('/myorders', 'FrontendController@viewOrders');
+    Route::get('/myorder/{order_id}', 'FrontendController@viewOrder');
 });
 
 // SHOPPING CART ROUTES

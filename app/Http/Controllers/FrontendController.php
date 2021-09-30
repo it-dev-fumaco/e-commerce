@@ -357,6 +357,7 @@ class FrontendController extends Controller
 
         $wishlist_query = DB::table('datawishlist')
             ->where('userid', Auth::user()->id)->paginate(10);
+
         $wishlist_arr = [];
         foreach ($wishlist_query as $wishlist) {
             $item_image = DB::table('fumaco_items_image_v1')
@@ -386,5 +387,42 @@ class FrontendController extends Controller
 
             return redirect()->back()->with('error', 'An error occured. Please try again.');
         }
+    }
+
+    public function viewOrders() {
+        $website_settings = DB::table('fumaco_settings')->first();
+
+        $item_categories = DB::table('fumaco_categories')->get();
+
+        $orders = DB::table('track_order')
+            ->where('transaction_member', Auth::user()->id)
+            ->orderBy('track_date_update', 'desc')->paginate(10);
+
+        return view('frontend.orders', compact('website_settings', 'item_categories', 'orders'));
+    }
+
+    public function viewOrder($order_id) {
+        $website_settings = DB::table('fumaco_settings')->first();
+
+        $item_categories = DB::table('fumaco_categories')->get();
+
+        $ordered_items = DB::table('fumaco_order_items')->where('order_number', $order_id)->get();
+        $items = [];
+        foreach ($ordered_items as $item) {
+            $item_image = DB::table('fumaco_items_image_v1')
+                ->where('idcode', $item->item_code)->first();
+            $items[] = [
+                'order_number' => $item->order_number,
+                'item_name' => $item->item_name,
+                'item_code' => $item->item_code,
+                'item_price' => $item->item_price,
+                'image' => ($item_image) ? $item_image->imgprimayx : 'test.jpg',
+                'quantity' => $item->item_qty,
+                'price' => $item->item_price,
+                'amount' => $item->item_total_price
+            ];
+        }
+        
+        return view('frontend.view_order', compact('website_settings', 'item_categories', 'items'));
     }
 }
