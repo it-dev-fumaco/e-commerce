@@ -50,6 +50,16 @@ Route::group(['middleware' => 'auth'], function(){
     Route::delete('/mywishlist/{id}/delete', 'FrontendController@deleteWishlist');
     Route::get('/myorders', 'FrontendController@viewOrders');
     Route::get('/myorder/{order_id}', 'FrontendController@viewOrder');
+
+    Route::get('/myprofile/account_details', 'FrontendController@viewAccountDetails');
+    Route::post('/myprofile/account_details/{id}/update', 'FrontendController@updateAccountDetails');
+    Route::get('/myprofile/change_password', 'FrontendController@viewChangePassword');
+    Route::post('/myprofile/change_password/{id}/update', 'FrontendController@updatePassword');
+    Route::get('/myprofile/address', 'FrontendController@viewAddresses');
+    Route::delete('/myprofile/address/{id}/{type}/delete', 'FrontendController@deleteAddress');
+    Route::get('/myprofile/address/{id}/{type}/change_default', 'FrontendController@setDefaultAddress');
+    Route::get('/myprofile/address/{type}/new', 'FrontendController@addAddressForm');
+    Route::post('/myprofile/address/{type}/save', 'FrontendController@saveAddress');
 });
 
 // SHOPPING CART ROUTES

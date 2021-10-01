@@ -245,7 +245,7 @@
                     </a>
                   </li>
                   <li>
-                    <a class="dropdown-item" style="font-weight: 300 !important;" href="/myprofile">
+                    <a class="dropdown-item" style="font-weight: 300 !important;" href="/myprofile/account_details">
                       <img src="{{ asset('/assets/site-img/icon/nav14.jpg') }}" alt="myprofile" width="30">&nbsp;&nbsp;My Profile
                     </a>
                   </li>

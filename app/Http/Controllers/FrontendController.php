@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Hash;
 use DB;
 use Auth;
 
@@ -424,5 +425,237 @@ class FrontendController extends Controller
         }
         
         return view('frontend.view_order', compact('website_settings', 'item_categories', 'items'));
+    }
+
+    public function viewAccountDetails() {
+        $website_settings = DB::table('fumaco_settings')->first();
+
+        $item_categories = DB::table('fumaco_categories')->get();
+
+        return view('frontend.profile.account_details', compact('website_settings', 'item_categories'));
+    }
+
+    public function updateAccountDetails($id, Request $request) {
+        DB::beginTransaction();
+        try {
+
+            $this->validate($request, [
+                'first_name' => 'required',
+                'last_name' => 'required',
+                'mobile_no' => 'required',
+                'email_address' => 'required|email'
+            ]);
+
+            DB::table('fumaco_users')->where('id', $id)->update(
+                [
+                    'f_name' => $request->first_name,
+                    'f_lname' => $request->last_name,
+                    'username' => $request->email_address,
+                    'f_mobilenumber' => $request->mobile_no,
+                    'f_business' => $request->business_name,
+                    'f_website' => $request->website,
+                    'f_job_position' => $request->job_position,
+                ]
+            );
+
+            DB::commit();
+
+            return redirect()->back()->with('success', 'Account has been updated.');
+        } catch (Exception $e) {
+            DB::rollback();
+
+            return redirect()->back()->with('error', 'An error occured. Please try again.'); 
+        }
+    }
+
+    public function viewChangePassword() {
+        $website_settings = DB::table('fumaco_settings')->first();
+
+        $item_categories = DB::table('fumaco_categories')->get();
+
+        return view('frontend.profile.change_password', compact('website_settings', 'item_categories'));
+    }
+
+    public function updatePassword($id, Request $request) {
+        DB::beginTransaction();
+        try {
+            if (!(Hash::check($request->get('current_password'), Auth::user()->password))) {
+                // The passwords matches
+                return redirect()->back()->with("error","Your current password does not matches with the password you provided. Please try again.");
+            }
+    
+            if(strcmp($request->get('current_password'), $request->get('new_password')) == 0){
+                //Current password and new password are same
+                return redirect()->back()->with("error","New password cannot be same as your current password. Please choose a different password.");
+            }
+    
+            $validatedData = $request->validate([
+                'current_password' => 'required',
+                'new_password' => 'required|string|min:6|confirmed',
+                'new_password_confirmation' => 'required|string'
+            ]);
+    
+            //Change Password
+             DB::table('fumaco_users')->where('id', $id)
+                ->update(['password'=> Hash::make($request->new_password)]);
+
+            DB::commit();
+    
+            return redirect()->back()->with("success", "Password changed successfully!");
+        } catch (Exception $e) {
+            DB::rollback();
+    
+            return redirect()->back()->with("error", "An error occured. Please try again.");
+        }
+    }
+
+    public function viewAddresses() {
+        $website_settings = DB::table('fumaco_settings')->first();
+
+        $item_categories = DB::table('fumaco_categories')->get();
+
+        $default_billing_address = DB::table('fumaco_users')
+            ->where('id', Auth::user()->id)->first();
+
+        $billing_addresses = DB::table('fumaco_user_add_bill')
+            ->where('user_idx_b', Auth::user()->id)->get();
+
+        $shipping_addresses = DB::table('fumaco_user_add')
+            ->where('user_idx', Auth::user()->id)->get();
+
+        return view('frontend.profile.address_list', compact('website_settings', 'item_categories', 'default_billing_address', 'billing_addresses', 'shipping_addresses'));
+    }
+
+    public function deleteAddress($id, $type) {
+        DB::beginTransaction();
+        try {
+            $table = ($type == 'billing') ? 'fumaco_user_add_bill' : 'fumaco_user_add';
+            
+            $address_details = DB::table($table)->where('id', $id)->first();
+            if($address_details) {
+                $is_default = ($type == 'billing') ? $address_details->xdefault_b : $address_details->xdefault;
+                if ($is_default) {
+                    return redirect()->back()->with('error', 'Cannot delete default billing address.');
+                }
+    
+                DB::table($table)->where('id', $id)->delete();
+
+                DB::commit();
+            }
+           
+            return redirect()->back()->with('success', 'Address has been deleted.');
+        } catch (Exception $e) {
+            DB::rollback();
+
+            return redirect()->back()->with('error', 'An error occured. Please try again.');
+        }
+    }
+
+    public function setDefaultAddress($id, $type) {
+        DB::beginTransaction();
+        try {
+            $table = ($type == 'billing') ? 'fumaco_user_add_bill' : 'fumaco_user_add';
+            $user_col = ($type == 'billing') ? 'user_idx_b' : 'user_idx';
+            $default_col = ($type == 'billing') ? 'xdefault_b' : 'xdefault';
+            
+            $address_details = DB::table($table)->where('id', $id)->first();
+            if($address_details) {
+                $is_default = ($type == 'billing') ? $address_details->xdefault_b : $address_details->xdefault;
+                
+                if (!$is_default) {
+                    DB::table($table)->where($user_col, Auth::user()->id)
+                        ->where('id', '!=', $id)->update([$default_col => 0]);
+
+                    DB::table($table)->where($user_col, Auth::user()->id)
+                        ->where('id', $id)->update([$default_col => 1]);
+
+                    DB::commit();
+
+                    return redirect()->back()->with('success', 'Default ' . $type .' address has been changed.');
+                }
+            }
+
+            return redirect()->back();
+        } catch (Exception $e) {
+            DB::rollback();
+
+            return redirect()->back()->with('error', 'An error occured. Please try again.');
+        }
+    }
+
+    public function addAddressForm($type) {
+        $website_settings = DB::table('fumaco_settings')->first();
+
+        $item_categories = DB::table('fumaco_categories')->get();
+
+        return view('frontend.profile.address_form', compact('website_settings', 'item_categories', 'type'));
+    }
+
+    public function saveAddress($type, Request $request) {
+        DB::beginTransaction();
+        try {
+            $table = ($type == 'billing') ? 'fumaco_user_add_bill' : 'fumaco_user_add';
+
+            $validator = $this->validate($request, [
+                'first_name' => 'required',
+                'last_name' => 'required',
+                'contact_no' => 'required',
+                'email_address' => 'required|email',
+                'address_line1' => 'required',
+                'province' => 'required',
+                'city' => 'required',
+                'barangay' => 'required',
+                'postal_code' => 'required',
+                'country' => 'required',
+                'address_type' => 'required',
+            ]);
+
+            $data = [];
+            if ($type == 'billing') {
+                $data = [
+                    'xadd1_b' => $request->address_line1,
+                    'xadd2_b' => $request->address_line2,
+                    'xprov_b' => $request->province,
+                    'xcity_b' => $request->city,
+                    'xbrgy_b' => $request->barangay,
+                    'xpostal_b' => $request->postal_code,
+                    'xcountry_b' => $request->country,
+                    'user_idx_b' => Auth::user()->id,
+                    'add_type_b' => $request->address_type,
+                    'xcontactname1_b' => $request->first_name,
+                    'xcontactlastname1_b' => $request->last_name,
+                    'xcontactnumber1_b' => $request->contact_no,
+                    'xcontactemail1_b' => $request->email_address
+                ];
+            }
+
+            if ($type == 'shipping') {
+                $data = [
+                    'xadd1' => $request->address_line1,
+                    'xadd2' => $request->address_line2,
+                    'xprov' => $request->province,
+                    'xcity' => $request->city,
+                    'xbrgy' => $request->barangay,
+                    'xpostal' => $request->postal_code,
+                    'xcountry' => $request->country,
+                    'user_idx' => Auth::user()->id,
+                    'add_type' => $request->address_type,
+                    'xcontactname1' => $request->first_name,
+                    'xcontactlastname1' => $request->last_name,
+                    'xcontactnumber1' => $request->contact_no,
+                    'xcontactemail1' => $request->email_address
+                ];
+            }
+
+            DB::table($table)->insert($data);
+
+            DB::commit();
+
+            return redirect('/myprofile/address')->with('success', ucfirst($type) .' address has been saved.');
+        } catch (Exception $e) {
+            DB::rollback();
+
+            return redirect('/myprofile/address')->with('error', 'An error occured. Please try again.');
+        }
     }
 }
