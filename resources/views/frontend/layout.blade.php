@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
     <meta name="author" content="Fumaco Website">
-    <title>{{ $website_settings->set_sitename }}</title>
+    <title>Fumaco</title>
     <link href="{{ asset('/assets/dist/css/bootstrap.css') }}" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <script src="https://kit.fontawesome.com/ec0415ab92.js"></script>
@@ -187,7 +187,7 @@
     <header>
       <nav class="navbar navbar-expand-md navbar-light fixed-top bg-light" style="padding-left: 10px; padding-right: 10px; padding-bottom:0px; border-bottom: 1px solid #e4e4e4;">
         <div class="container-fluid">
-          <a class="navbar-brand" href="{{ $website_settings->set_value }}">
+          <a class="navbar-brand" href="/" id="navbar-brand">
             <img src="{{ asset('/assets/site-img/logo-sm.png') }}" alt="">
           </a>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
@@ -197,11 +197,7 @@
             <ul class="navbar-nav me-auto mb-2 mb-md-0 navbar-header">
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDarkDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">PRODUCTS</a>
-                <ul class="dropdown-menu dropdown-menu-light navbar-header" style="font-weight: 300 !important;" aria-labelledby="navbarDarkDropdownMenuLink">
-                  @foreach ($item_categories as $category)
-                  <li><a class="dropdown-item" style="font-weight: 300 !important;" href="/products/{{ $category->id }}">
-                  <img src="{{ asset('assets/site-img/icon/' . $category->image) }}" alt="'{{ $category->name }}" width="30">{{ $category->name }}</a></li>
-                  @endforeach              
+                <ul class="dropdown-menu dropdown-menu-light navbar-header" style="font-weight: 300 !important;" aria-labelledby="navbarDarkDropdownMenuLink" id="product-category-dropdown">
                 </ul>
               </li>    
               <li class="nav-item">
@@ -313,15 +309,7 @@
           <div class="col-lg-5" style="text-align: left !important;">
             <h6 class="footer1st" style="color:#ffffff !important;">PRODUCTS</h6>
             <table class="table" style="border-style: unset !important;">
-              <tbody style="font-size: 12px; color: #ffffff; border-style: unset !important;">
-                @foreach ($item_categories as $category)
-                <tr style="border-style: unset !important;">
-                  <td class="tdfooter footer2nd" style="border-style: unset !important;">
-                    <a style="text-decoration:none; color: #0062A5;" href="/products/{{ $category->id }}">{{ $category->name }}</a>
-                  </td>
-                </tr>
-                @endforeach
-              </tbody>
+              <tbody style="font-size: 12px; color: #ffffff; border-style: unset !important;" id="product-category-footer"></tbody>
             </table>    
           </div>
           <div class="col-lg-4" style="text-align: right !important;">
@@ -340,20 +328,60 @@
   <script src="{{ asset('/assets/dist/js/bootstrap.bundle.js') }}"></script>
   <script>
     $(document).ready(function() {
-        //Preloader
-        preloaderFadeOutTime = 800;
-        function hidePreloader() {
-            var preloader = $('.spinner-wrapper');
-            preloader.fadeOut(preloaderFadeOutTime);
-        }
-        hidePreloader();
+      websiteSettings();
+      productCategories();
+      //Preloader
+      preloaderFadeOutTime = 800;
+      function hidePreloader() {
+          var preloader = $('.spinner-wrapper');
+          preloader.fadeOut(preloaderFadeOutTime);
+      }
+      hidePreloader();
 
-        setTimeout(function () {
-            $("#cookieConsent").fadeIn(200);
-        }, 2000);
-        $("#closeCookieConsent, .cookieConsentOK").click(function() {
-            $("#cookieConsent").fadeOut(200);
+      setTimeout(function () {
+          $("#cookieConsent").fadeIn(200);
+      }, 2000);
+      $("#closeCookieConsent, .cookieConsentOK").click(function() {
+          $("#cookieConsent").fadeOut(200);
+      });
+
+      // set product category dropdown in navbar and links in footer
+      function productCategories() {
+        $('#product-category-dropdown').empty();
+        $('#product-category-footer').empty();
+        $.ajax({
+          type:'GET',
+          url:'/categories',
+          success: function (response) {
+            var l = '';
+            var f = '';
+            $(response).each(function(i, d){
+              // for navbar dropdown
+              l += '<li><a class="dropdown-item" style="font-weight: 300 !important;" href="/products/' + d.id +'">' +
+              '<img src="{{ asset("assets/site-img/icon/") }}/' + d.image + '" alt="' + d.name +'" width="30">' + d.name +'</a></li>';
+              // for footer links
+              f += '<tr style="border-style: unset !important;">' +
+                '<td class="tdfooter footer2nd" style="border-style: unset !important;">' +
+                '<a style="text-decoration:none; color: #0062A5;" href="/products/' + d.id +'">' + d.name +'</a>' +
+              '</td></tr>';
+            });
+            
+            $('#product-category-footer').append(f);
+            $('#product-category-dropdown').append(l);
+          }
         });
+      }
+
+      function websiteSettings() {
+        $.ajax({
+          type:'GET',
+          url:'/website_settings',
+          success: function (response) {
+            $('#navbar-brand').attr('href', response.set_value);
+            $('title').text(response.set_sitename);
+          }
+        });
+      }
     });
   </script>
 

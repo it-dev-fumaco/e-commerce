@@ -46,6 +46,8 @@ Route::get('/products/{id}', 'FrontendController@viewProducts');
 Route::get('/product/{item_code}', 'FrontendController@viewProduct');
 Route::get('/track_order', 'FrontendController@viewOrderTracking');
 
+Route::get('/categories', 'FrontendController@getProductCategories');
+Route::get('/website_settings', 'FrontendController@websiteSettings');
 
 
 Route::group(['middleware' => 'auth'], function(){
@@ -67,7 +69,8 @@ Route::group(['middleware' => 'auth'], function(){
 
 // SHOPPING CART ROUTES
 Route::get('/cart', 'CartController@viewCart');
-Route::post('/addtocart', 'CartController@addToCart');
+Route::post('/product_actions', 'CartController@productActions');
 Route::patch('/updatecart', 'CartController@updateCart');
 Route::delete('/removefromcart', 'CartController@removeFromCart');
 Route::post('/addshipping', 'CartController@addShippingDetails');
+Route::post('/addtowishlist', 'CartController@addToWishlist');

@@ -4,15 +4,34 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use DB;
+use Auth;
 
 class CartController extends Controller
 {
-    public function addToCart(Request $request) {
-        $id = $request->item_code;
+    public function productActions(Request $request) {
+        $data = $request->all();
+
+        if (isset($data['addtocart']) && $data['addtocart']) {
+            return $this->addToCart($data);
+        }
+
+        if (isset($data['addtowishlist']) && $data['addtowishlist']) {
+            return $this->addToWishlist($data);
+        }
+
+        if (isset($data['buynow']) && $data['buynow']) {
+            return $this->addToCart($data);
+        }
+
+        return redirect('/');
+    }
+
+    public function addToCart($data) {
+        $id = $data['item_code'];
 
         $product_details = DB::table('fumaco_items')->where('f_idcode', $id)->first();
         if (!$product_details) {
-            return 'Item not found.';
+            return redirect()->back()->with('error', 'Product not found.');
         }
         // if cart is empty then this the first product
         $cart = session()->get('fumCart');
@@ -20,12 +39,16 @@ class CartController extends Controller
             $cart = [
                 $id => [
                     "item_code" => $product_details->f_idcode,
-                    "quantity" => $request->quantity,
+                    "quantity" => $data['quantity'],
                     "price" => $product_details->f_price,
                 ]
             ];
  
             session()->put('fumCart', $cart);
+
+            if (isset($data['buynow']) && $data['buynow']) {
+                return redirect('/cart');
+            }
             
             return redirect()->back()->with('success', 'Product added to your cart!');
         }
@@ -34,6 +57,10 @@ class CartController extends Controller
             $cart[$id]['quantity']++;
 
             session()->put('fumCart', $cart);
+
+            if (isset($data['buynow']) && $data['buynow']) {
+                return redirect('/cart');
+            }
 
             return redirect()->back()->with('success', 'Product added to your cart!');
         }
@@ -45,6 +72,10 @@ class CartController extends Controller
         ];
 
         session()->put('fumCart', $cart);
+
+        if (isset($data['buynow']) && $data['buynow']) {
+            return redirect('/cart');
+        }
 
         return redirect()->back()->with('success', 'Product added to your cart!');
     }
@@ -71,11 +102,7 @@ class CartController extends Controller
             ];
         }
 
-        $website_settings = DB::table('fumaco_settings')->first();
-
-        $item_categories = DB::table('fumaco_categories')->get();
-
-        return view('frontend.cart', compact('website_settings', 'item_categories', 'cart_arr'));
+        return view('frontend.cart', compact('cart_arr'));
     }
 
     public function updateCart(Request $request) {
@@ -121,5 +148,38 @@ class CartController extends Controller
         session()->put('fumCart', $cart);
 
         return response()->json(['status' => 1, 'message' => 'Cart updated!']);
+    }
+
+    public function addToWishlist($data) {
+        DB::beginTransaction();
+        try {
+            if (!Auth::check()) {
+                return redirect('/login');
+            }
+
+            $id = $data['item_code'];
+
+            $product_details = DB::table('fumaco_items')->where('f_idcode', $id)->first();
+            if (!$product_details) {
+                return redirect()->back()->with('error', 'Product not found.');
+            }
+
+            DB::table('datawishlist')->insert(
+                [
+                    'userid' => Auth::user()->id,
+                    'item_code' => $id,
+                    'item_name' => $product_details->f_name_name,
+                    'item_price' => $product_details->f_price
+                ]
+            );
+
+            DB::commit();
+
+            return redirect()->back()->with('success', 'Product added to your wishlist!');
+        } catch (Exception $e) {
+            DB::rollback();
+
+            return redirect()->back()->with('error', 'An error occured. Please try again.'); 
+        }
     }
 }

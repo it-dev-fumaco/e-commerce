@@ -550,7 +550,7 @@
 	</main>
 	<br>
 	<div class="container"></div>
-	<form action="/addtocart" method="POST" autocomplete="off">
+	<form action="/product_actions" method="POST" autocomplete="off">
 	@csrf
 	<main style="background-color:#ffffff;">
         <div class="container marketing">
@@ -627,7 +627,7 @@
                                 @if($product_details->f_qty < 1)
                                 <span style='color:red;';>Not Available</span>
                                 @else
-                                Available
+                                <span style='color:green;';>Available</span>
                                 @endif
                                 &nbsp;&nbsp; <i class="fas fa-bell"></i>
                             </p>
@@ -644,14 +644,11 @@
                         
 	                    <div class="row" id="product_details">
                             <div class="col-xs-6">
-										 <button type="submit" class="btn btn-lg btn-outline-primary fumacoFont_card_readmore" name="addtocart" style="padding: 1rem 1.5rem !important; color: #ffffff;background-color: #0062A5;border-color: #7cc;border-radius: 0 !important; {{ ($product_details->f_qty < 1) ? 'display: none;' : '' }}" href="#" role="button" value="1"><i class="fas fa-shopping-cart"></i> Add to Cart</button>
+								<button type="submit" class="btn btn-lg btn-outline-primary fumacoFont_card_readmore" name="addtocart" style="padding: 1rem 1.5rem !important; color: #ffffff;background-color: #0062A5;border-color: #7cc;border-radius: 0 !important; {{ ($product_details->f_qty < 1) ? 'display: none;' : '' }}" value="1"><i class="fas fa-shopping-cart"></i> Add to Cart</button>
                                
-                                <a class="btn btn-lg btn-outline-primary fumacoFont_card_readmore" style="padding: 1rem 1.5rem !important; color: #ffffff;background-color: #0062A5;border-color: #7cc;border-radius: 0 !important; {{ ($product_details->f_qty < 1) ? 'display: none;' : '' }}" href="#" role="button"><i class="fas fa-wallet"></i> Buy Now</a>
-                                <a class="btn btn-lg btn-outline-primary fumacoFont_card_readmore" style="padding: 1rem 1.5rem !important; color: #ffffff;background-color: #0062A5;border-color: #7cc;border-radius: 0 !important;" href="#" role="button"><i class="fas fa-heart"></i> Add to Wish List</a>
+                                <button type="submit" class="btn btn-lg btn-outline-primary fumacoFont_card_readmore" name="buynow" style="padding: 1rem 1.5rem !important; color: #ffffff;background-color: #0062A5;border-color: #7cc;border-radius: 0 !important; {{ ($product_details->f_qty < 1) ? 'display: none;' : '' }}"  value="1"><i class="fas fa-wallet"></i> Buy Now</button>
 
-	                            <div class="message_box" style="margin:10px 0px;">
-                                    <div class="alert alert-success alert-dismissible fade show" role="alert">Product is added to your wishlist!</div>
-                                </div>
+                                <button type="submit" class="btn btn-lg btn-outline-primary fumacoFont_card_readmore" style="padding: 1rem 1.5rem !important; color: #ffffff;background-color: #0062A5;border-color: #7cc;border-radius: 0 !important;" name="addtowishlist" value="1"><i class="fas fa-heart"></i> Add to Wish List</button>
                             </div>
                             <div class="row"><br></div>
                         </div>
@@ -712,7 +709,9 @@
 <main style="background-color:#ffffff;">
   <br><br><br><br><br>
 </main>
+@endsection
 
+@section('script')
 <script type="text/javascript" src="{{ asset('/assets/loading.js') }}"></script>
 <script src="{{ asset('/item/js/foundation.min.js') }}"></script>
 <script src="{{ asset('/item/js/setup.js') }}"></script>
@@ -720,5 +719,4 @@
 <script type="text/javascript" src="{{ asset('/item/hammer.js/1.0.5/jquery.hammer.min.js') }}"></script>
 <script type="text/javascript" src="{{ asset('/item/fancybox/source/jquery.fancybox.js') }}"></script>
 <script type="text/javascript" src="{{ asset('/item/magnific-popup/js/magnific-popup.js') }}"></script>
-
 @endsection

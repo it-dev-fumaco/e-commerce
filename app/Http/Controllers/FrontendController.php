@@ -11,11 +11,11 @@ use Auth;
 class FrontendController extends Controller
 {
     public function index() {
-        $website_settings = DB::table('fumaco_settings')->first();
-        $item_categories = DB::table('fumaco_categories')->get();
-        $carousel_data = DB::table('fumaco_header')->where('fumaco_status', 1)->orderBy('fumaco_active', 'desc')->get();
+        $carousel_data = DB::table('fumaco_header')->where('fumaco_status', 1)
+            ->orderBy('fumaco_active', 'desc')->get();
 
-        $blogs = DB::table('fumaco_blog')->where('blog_featured', 1)->where('blog_enable', 1)->take(3)->get();
+        $blogs = DB::table('fumaco_blog')->where('blog_featured', 1)
+            ->where('blog_enable', 1)->take(3)->get();
         $display = DB::table('fumaco_items')->where('f_status', 1);
         $best_selling = Clone $display->take(4)->get();
         $on_sale = Clone $display->where('f_onsale', 1)->take(4)->get();
@@ -66,7 +66,19 @@ class FrontendController extends Controller
             ];
         }
 
-        return view('frontend.homepage', compact('website_settings', 'item_categories', 'carousel_data', 'blogs', 'best_selling_arr', 'on_sale_arr'));
+        return view('frontend.homepage', compact('carousel_data', 'blogs', 'best_selling_arr', 'on_sale_arr'));
+    }
+
+    // returns an array of product category
+    public function getProductCategories() {
+        $item_categories = DB::table('fumaco_categories')->get();
+
+        return response()->json($item_categories);
+    }
+
+    // get website settings
+    public function websiteSettings() {
+        return DB::table('fumaco_settings')->first();
     }
 
     public function userRegistration(Request $request){
@@ -108,52 +120,36 @@ class FrontendController extends Controller
     }
 
     public function viewAboutPage() {
-        $website_settings = DB::table('fumaco_settings')->first();
-
-        $item_categories = DB::table('fumaco_categories')->get();
-
         $about_data = DB::table('fumaco_about')->first();
 
-        $partners = DB::table('fumaco_about_partners')->where('xstatus', 1)->orderBy('partners_sort', 'asc')->get();
+        $partners = DB::table('fumaco_about_partners')->where('xstatus', 1)
+            ->orderBy('partners_sort', 'asc')->get();
 
-        return view('frontend.about_page', compact('website_settings', 'item_categories', 'about_data', 'partners'));
+        return view('frontend.about_page', compact('about_data', 'partners'));
     }
 
     public function viewPrivacyPage(){
-        $website_settings = DB::table('fumaco_settings')->first();
-
-        $item_categories = DB::table('fumaco_categories')->get();
-
-        $about_data = DB::table('fumaco_about')->first();
-
-        return view('frontend.privacy', compact('website_settings', 'item_categories', 'about_data'));
+        return view('frontend.privacy');
     }
+
     public function viewTermsPage(){
-        $website_settings = DB::table('fumaco_settings')->first();
-
-        $item_categories = DB::table('fumaco_categories')->get();
-
-        $about_data = DB::table('fumaco_about')->first();
-
-        return view('frontend.terms_conditions', compact('website_settings', 'item_categories', 'about_data'));
+        return view('frontend.terms_conditions');
     }
 
     public function viewJournalsPage(Request $request) {
-        $website_settings = DB::table('fumaco_settings')->first();
-
-        $item_categories = DB::table('fumaco_categories')->get();
-
-        $about_data = DB::table('fumaco_about')->first();
-        
-        $blog_carousel = DB::table('fumaco_blog')->where('blog_enable', 1)->where('blog_featured', 1)->orderBy('blog_active', 'desc')->get();
+        $blog_carousel = DB::table('fumaco_blog')->where('blog_enable', 1)
+            ->where('blog_featured', 1)->orderBy('blog_active', 'desc')->get();
 
         $blog_count = DB::table('fumaco_blog')->where('blog_enable', 1)->get();
 
-        $app_count = DB::table('fumaco_blog')->where('blog_enable', 1)->where('blogtype', 'In Applications')->get();
+        $app_count = DB::table('fumaco_blog')->where('blog_enable', 1)
+            ->where('blogtype', 'In Applications')->get();
 
-        $soln_count = DB::table('fumaco_blog')->where('blog_enable', 1)->where('blogtype', 'Solutions')->get();
+        $soln_count = DB::table('fumaco_blog')->where('blog_enable', 1)
+            ->where('blogtype', 'Solutions')->get();
 
-        $prod_count = DB::table('fumaco_blog')->where('blog_enable', 1)->where('blogtype', 'Products')->get();
+        $prod_count = DB::table('fumaco_blog')->where('blog_enable', 1)
+            ->where('blogtype', 'Products')->get();
 
         if($request->type != ''){
             $blog_list = DB::table('fumaco_blog')->where('blog_enable', 1)->where('blogtype', $request->type)->get();
@@ -175,16 +171,10 @@ class FrontendController extends Controller
             ];
         }
 
-        return view('frontend.journals', compact('website_settings', 'item_categories', 'about_data', 'blog_carousel', 'blog_count', 'app_count', 'soln_count', 'prod_count', 'blog_list', 'blogs_arr'));
+        return view('frontend.journals', compact('blog_carousel', 'blog_count', 'app_count', 'soln_count', 'prod_count', 'blog_list', 'blogs_arr'));
     }
 
     public function viewBlogPage(Request $request) {
-        $website_settings = DB::table('fumaco_settings')->first();
-
-        $item_categories = DB::table('fumaco_categories')->get();
-
-        $about_data = DB::table('fumaco_about')->first();
-
         $blog = DB::table('fumaco_blog')->where('id', $request->id)->first();
 
         $blog_comment = DB::table('fumaco_comments')->where('blog_id', $request->id)->where('blog_type', 1)->where('blog_status', 1)->get();
@@ -207,7 +197,7 @@ class FrontendController extends Controller
         $id = $request->id;
         $date = Carbon::now();
 
-        return view('frontend.blogs', compact('website_settings', 'item_categories', 'about_data', 'blog', 'comments_arr', 'id', 'date', 'comment_count'));
+        return view('frontend.blogs', compact('blog', 'comments_arr', 'id', 'date', 'comment_count'));
     }
 
     public function addComment(Request $request){
@@ -253,17 +243,11 @@ class FrontendController extends Controller
     }
 
     public function viewContactPage() {
-        $website_settings = DB::table('fumaco_settings')->first();
-
-        $item_categories = DB::table('fumaco_categories')->get();
-
-        $about_data = DB::table('fumaco_about')->first();
-
         $fumaco_contact = DB::table('fumaco_contact')->get();
 
         $fumaco_map = DB::table('fumaco_map_1')->first();
 
-        return view('frontend.contact', compact('website_settings', 'item_categories', 'about_data', 'fumaco_contact', 'fumaco_map'));
+        return view('frontend.contact', compact('fumaco_contact', 'fumaco_map'));
     }
 
     public function addContact(Request $request){
@@ -299,10 +283,6 @@ class FrontendController extends Controller
     }
 
     public function viewProducts($category_id) {
-        $website_settings = DB::table('fumaco_settings')->first();
-
-        $item_categories = DB::table('fumaco_categories')->get();
-
         $product_category = DB::table('fumaco_categories')->where('id', $category_id)->first();
 
         $products = DB::table('fumaco_items')->where('f_cat_id', $category_id)
@@ -332,30 +312,20 @@ class FrontendController extends Controller
             ];
         }
 
-        // return $products;
-
-        return view('frontend.product_list', compact('website_settings', 'item_categories', 'product_category', 'products_arr', 'products'));
+        return view('frontend.product_list', compact('product_category', 'products_arr', 'products'));
     }
 
     public function viewProduct($item_code) {
-        $website_settings = DB::table('fumaco_settings')->first();
-
-        $item_categories = DB::table('fumaco_categories')->get();
-
         $product_details = DB::table('fumaco_items')->where('f_idcode', $item_code)->first();
 
         $product_images = DB::table('fumaco_items_image_v1')->where('idcode', $item_code)->get();
 
         $attributes = DB::table('fumaco_items_attributes')->where('idcode', $item_code)->orderBy('idx', 'asc')->get();
 
-        return view('frontend.product_page', compact('website_settings', 'item_categories', 'product_details', 'product_images', 'attributes'));
+        return view('frontend.product_page', compact('product_details', 'product_images', 'attributes'));
     }
 
     public function viewWishlist() {
-        $website_settings = DB::table('fumaco_settings')->first();
-
-        $item_categories = DB::table('fumaco_categories')->get();
-
         $wishlist_query = DB::table('datawishlist')
             ->where('userid', Auth::user()->id)->paginate(10);
 
@@ -372,7 +342,7 @@ class FrontendController extends Controller
             ];
         }
 
-        return view('frontend.wishlist', compact('website_settings', 'item_categories', 'wishlist_arr', 'wishlist_query'));
+        return view('frontend.wishlist', compact('wishlist_arr', 'wishlist_query'));
     }
 
     public function deleteWishlist($id) {
@@ -391,22 +361,14 @@ class FrontendController extends Controller
     }
 
     public function viewOrders() {
-        $website_settings = DB::table('fumaco_settings')->first();
-
-        $item_categories = DB::table('fumaco_categories')->get();
-
         $orders = DB::table('track_order')
             ->where('transaction_member', Auth::user()->id)
             ->orderBy('track_date_update', 'desc')->paginate(10);
 
-        return view('frontend.orders', compact('website_settings', 'item_categories', 'orders'));
+        return view('frontend.orders', compact('orders'));
     }
 
     public function viewOrder($order_id) {
-        $website_settings = DB::table('fumaco_settings')->first();
-
-        $item_categories = DB::table('fumaco_categories')->get();
-
         $ordered_items = DB::table('fumaco_order_items')->where('order_number', $order_id)->get();
         $items = [];
         foreach ($ordered_items as $item) {
@@ -424,15 +386,11 @@ class FrontendController extends Controller
             ];
         }
         
-        return view('frontend.view_order', compact('website_settings', 'item_categories', 'items'));
+        return view('frontend.view_order', compact('items'));
     }
 
     public function viewAccountDetails() {
-        $website_settings = DB::table('fumaco_settings')->first();
-
-        $item_categories = DB::table('fumaco_categories')->get();
-
-        return view('frontend.profile.account_details', compact('website_settings', 'item_categories'));
+        return view('frontend.profile.account_details');
     }
 
     public function updateAccountDetails($id, Request $request) {
@@ -469,11 +427,7 @@ class FrontendController extends Controller
     }
 
     public function viewChangePassword() {
-        $website_settings = DB::table('fumaco_settings')->first();
-
-        $item_categories = DB::table('fumaco_categories')->get();
-
-        return view('frontend.profile.change_password', compact('website_settings', 'item_categories'));
+        return view('frontend.profile.change_password');
     }
 
     public function updatePassword($id, Request $request) {
@@ -510,10 +464,6 @@ class FrontendController extends Controller
     }
 
     public function viewAddresses() {
-        $website_settings = DB::table('fumaco_settings')->first();
-
-        $item_categories = DB::table('fumaco_categories')->get();
-
         $default_billing_address = DB::table('fumaco_users')
             ->where('id', Auth::user()->id)->first();
 
@@ -523,7 +473,7 @@ class FrontendController extends Controller
         $shipping_addresses = DB::table('fumaco_user_add')
             ->where('user_idx', Auth::user()->id)->get();
 
-        return view('frontend.profile.address_list', compact('website_settings', 'item_categories', 'default_billing_address', 'billing_addresses', 'shipping_addresses'));
+        return view('frontend.profile.address_list', compact('default_billing_address', 'billing_addresses', 'shipping_addresses'));
     }
 
     public function deleteAddress($id, $type) {
@@ -584,11 +534,7 @@ class FrontendController extends Controller
     }
 
     public function addAddressForm($type) {
-        $website_settings = DB::table('fumaco_settings')->first();
-
-        $item_categories = DB::table('fumaco_categories')->get();
-
-        return view('frontend.profile.address_form', compact('website_settings', 'item_categories', 'type'));
+        return view('frontend.profile.address_form', compact('type'));
     }
 
     public function saveAddress($type, Request $request) {
@@ -660,11 +606,6 @@ class FrontendController extends Controller
     }
 
     public function viewOrderTracking(Request $request) {
-        
-        $website_settings = DB::table('fumaco_settings')->first();
-
-        $item_categories = DB::table('fumaco_categories')->get();
-
         $order_details = DB::table('track_order')->where('track_code', $request->id)->get();
 
         $ordered_items = DB::table('fumaco_order_items')->where('order_number', $request->id)->get();
@@ -684,6 +625,6 @@ class FrontendController extends Controller
             ];
         }
 
-        return view('frontend.track_order', compact('website_settings', 'item_categories', 'order_details', 'items'));
+        return view('frontend.track_order', compact('order_details', 'items'));
     }
 }
