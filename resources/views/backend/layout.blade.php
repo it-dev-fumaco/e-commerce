@@ -846,8 +846,6 @@
 <script src="{{ asset('/assets/admin/plugins/chart.js/Chart.min.js') }}"></script>
 <!-- Sparkline -->
 <script src="{{ asset('/assets/admin/plugins/sparklines/sparkline.js') }}"></script>
-<!-- jQuery Knob Chart -->
-<script src="{{ asset('/assets/admin/plugins/jquery-knob/jquery.knob.min.js') }}"></script>
 <!-- daterangepicker -->
 <script src="{{ asset('/assets/admin/plugins/moment/moment.min.js') }}"></script>
 <script src="{{ asset('/assets/admin/plugins/daterangepicker/daterangepicker.js') }}"></script>
