@@ -32,7 +32,6 @@ Route::namespace('Auth')->group(function(){
 });
 
 Route::post('/user_register', 'FrontendController@userRegistration');
-
 Route::get('/about', 'FrontendController@viewAboutPage');
 Route::get('/journals', 'FrontendController@viewJournalsPage');
 Route::get('/privacy_policy', 'FrontendController@viewPrivacyPage');
@@ -49,13 +48,11 @@ Route::get('/track_order', 'FrontendController@viewOrderTracking');
 Route::get('/categories', 'FrontendController@getProductCategories');
 Route::get('/website_settings', 'FrontendController@websiteSettings');
 
-
 Route::group(['middleware' => 'auth'], function(){
     Route::get('/mywishlist', 'FrontendController@viewWishlist');
     Route::delete('/mywishlist/{id}/delete', 'FrontendController@deleteWishlist');
     Route::get('/myorders', 'FrontendController@viewOrders');
     Route::get('/myorder/{order_id}', 'FrontendController@viewOrder');
-
     Route::get('/myprofile/account_details', 'FrontendController@viewAccountDetails');
     Route::post('/myprofile/account_details/{id}/update', 'FrontendController@updateAccountDetails');
     Route::get('/myprofile/change_password', 'FrontendController@viewChangePassword');
@@ -74,3 +71,22 @@ Route::patch('/updatecart', 'CartController@updateCart');
 Route::delete('/removefromcart', 'CartController@removeFromCart');
 Route::post('/addshipping', 'CartController@addShippingDetails');
 Route::post('/addtowishlist', 'CartController@addToWishlist');
+
+
+
+// CMS Routes
+Route::get('/admin', function () {
+    return redirect('/admin/login');
+});
+
+Route::prefix('admin')->group(function () {
+    Route::get('/login', 'Admin\Auth\LoginController@showLoginForm');
+    Route::post('/login_user', 'Admin\Auth\LoginController@login');
+    Route::get('/logout', 'Admin\Auth\LoginController@logout');
+
+    Route::group(['middleware' => 'auth:admin'], function(){
+        Route::get('/dashboard', 'DashboardController@index');
+
+        
+    });
+});

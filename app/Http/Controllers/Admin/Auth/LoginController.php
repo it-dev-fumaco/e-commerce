@@ -17,11 +17,7 @@ class LoginController extends Controller
      */
     public function showLoginForm()
     {
-        return view('auth.login',[
-            'title' => 'Admin Login',
-            'loginRoute' => 'admin.login',
-            'forgotPasswordRoute' => 'admin.password.request',
-        ]);
+        return view('backend.login');
     }
 
     /**
@@ -30,24 +26,18 @@ class LoginController extends Controller
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function login(Request $request)
-    {
-        //Validation...
-        
-        //Login the admin...
-        
+    public function login(Request $request) {
+        //Validation...     
         $this->validator($request);
-    
-    if(Auth::guard('admin')->attempt($request->only('email','password'),$request->filled('remember'))){
-        //Authentication passed...
-        return redirect()
-            ->intended(route('admin.home'))
-            ->with('status','You are Logged in as Admin!');
-    }
+        //Login the admin...
+        if(Auth::guard('admin')->attempt(['username' => $request->username,'password' => $request->password], 0)){
+            //Authentication passed...
+            return redirect('/admin/dashboard');
+        }
 
-    //Authentication failed...
-    return $this->loginFailed();
-        //Redirect the admin...
+        //Authentication failed...
+        //Redirect to admin login page...
+        return $this->loginFailed();
     }
 
     /**
@@ -59,9 +49,7 @@ class LoginController extends Controller
     {
       //logout the admin...
       Auth::guard('admin')->logout();
-      return redirect()
-          ->route('admin.login')
-          ->with('status','Admin has been logged out!');
+      return redirect('/admin/login')->with('info','Admin has been logged out!');
     }
 
     /**
@@ -75,13 +63,13 @@ class LoginController extends Controller
       //validate the form...
       //validation rules.
         $rules = [
-            'email'    => 'required|email|exists:admins|min:5|max:191',
+            'username' => 'required|email|exists:fumaco_admin_user|min:5|max:191',
             'password' => 'required|string|min:4|max:255',
         ];
 
-        //custom validation error messages.
+        // custom validation error messages.
         $messages = [
-            'email.exists' => 'These credentials do not match our records.',
+            'username.exists' => 'These credentials do not match our records.',
         ];
 
         //validate the request.
@@ -96,9 +84,6 @@ class LoginController extends Controller
     private function loginFailed()
     {
       //Login failed...
-      return redirect()
-        ->back()
-        ->withInput()
-        ->with('error','Login failed, please try again!');
+      return redirect()->back()->withInput()->with('error','Login failed, please try again!');
     }
 }

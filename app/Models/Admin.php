@@ -9,13 +9,15 @@ class Admin extends Authenticatable
 {
     use Notifiable;
 
+    protected $table = 'fumaco_admin_user';
+
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
     protected $fillable = [
-        'username', 'email', 'password',
+        'username', 'password',
     ];
 
     /**
