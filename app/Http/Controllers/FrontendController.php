@@ -658,4 +658,32 @@ class FrontendController extends Controller
             return redirect('/myprofile/address')->with('error', 'An error occured. Please try again.');
         }
     }
+
+    public function viewOrderTracking(Request $request) {
+        
+        $website_settings = DB::table('fumaco_settings')->first();
+
+        $item_categories = DB::table('fumaco_categories')->get();
+
+        $order_details = DB::table('track_order')->where('track_code', $request->id)->get();
+
+        $ordered_items = DB::table('fumaco_order_items')->where('order_number', $request->id)->get();
+        $items = [];
+        foreach ($ordered_items as $item) {
+            $item_image = DB::table('fumaco_items_image_v1')
+                ->where('idcode', $item->item_code)->first();
+            $items[] = [
+                'order_number' => $item->order_number,
+                'item_code' => $item->item_code,
+                'item_name' => $item->item_name,
+                'item_price' => $item->item_price,
+                'image' => ($item_image) ? $item_image->imgprimayx : 'test.jpg',
+                'quantity' => $item->item_qty,
+                'price' => $item->item_price,
+                'amount' => $item->item_total_price
+            ];
+        }
+
+        return view('frontend.track_order', compact('website_settings', 'item_categories', 'order_details', 'items'));
+    }
 }
