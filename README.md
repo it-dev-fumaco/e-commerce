@@ -8,11 +8,11 @@ Instructions using GUI and Commands - For Development Site
     Type copy .env.example .env
     Setup database connections in .env file
         DB_CONNECTION=mysql
-        DB_HOST=127.0.0.1
+        DB_HOST=10.0.48.125
         DB_PORT=3306
-        DB_DATABASE=laravel
-        DB_USERNAME=root
-        DB_PASSWORD=
+        DB_DATABASE=fumacoco_db
+        DB_USERNAME=web
+        DB_PASSWORD=fumaco
     Type php artisan key:generate
     Type php artisan optimize:clear
     Type php artisan route:clear
