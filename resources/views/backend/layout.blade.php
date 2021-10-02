@@ -29,7 +29,7 @@
 
   <!-- Preloader -->
   <div class="preloader flex-column justify-content-center align-items-center">
-    <img class="animation__shake" src="{{ asset('/assets/admin/logo-md.png') }}" alt="FumacoLogo" height="50" width="130">
+    <img class="animation__shake" src="{{ asset('/assets/admin/logo-md.png') }}" alt="FumacoLogo" height="45" width="160">
   </div>
 
   <!-- Navbar -->

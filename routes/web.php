@@ -72,7 +72,7 @@ Route::delete('/removefromcart', 'CartController@removeFromCart');
 Route::post('/addshipping', 'CartController@addShippingDetails');
 Route::post('/addtowishlist', 'CartController@addToWishlist');
 
-
+Auth::routes();
 
 // CMS Routes
 Route::get('/admin', function () {
@@ -80,7 +80,7 @@ Route::get('/admin', function () {
 });
 
 Route::prefix('admin')->group(function () {
-    Route::get('/login', 'Admin\Auth\LoginController@showLoginForm');
+    Route::get('/login', 'Admin\Auth\LoginController@showLoginForm')->name('admin.login');
     Route::post('/login_user', 'Admin\Auth\LoginController@login');
     Route::get('/logout', 'Admin\Auth\LoginController@logout');
 

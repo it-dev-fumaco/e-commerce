@@ -9,7 +9,6 @@ use Illuminate\Foundation\Auth\ThrottlesLogins;
 
 class LoginController extends Controller
 {
-
     /**
      * Show the login form.
      * 
@@ -17,6 +16,10 @@ class LoginController extends Controller
      */
     public function showLoginForm()
     {
+        if (Auth::guard('admin')->check()) {
+            return redirect('/admin/dashboard');
+        }
+
         return view('backend.login');
     }
 
