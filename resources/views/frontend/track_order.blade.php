@@ -103,11 +103,13 @@
 					</table>
 				</div>
 				@else
+				@if(request()->get('id'))
 				<div class="col-md-6 offset-md-3">
 					<div class="alert alert-warning fade show text-center mt-5 p-2" role="alert">
 						<h5 class="p-2 m-0">Sorry, transaction code "<b>{{ request()->get('id') }}</b>" not found.</h5>
 					</div>
 				</div>
+				@endif
 				@endif
 			</div>
 			
