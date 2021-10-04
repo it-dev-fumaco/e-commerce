@@ -98,6 +98,7 @@ class CartController extends Controller
                 'price' => $item->f_price,
                 'amount' => ($item->f_price * $cart[$item->f_idcode]['quantity']),
                 'quantity' => $cart[$item->f_idcode]['quantity'],
+                'stock_qty' => $item->f_qty,
                 'item_image' => ($item_image) ? $item_image->imgprimayx : 'test.jpg'
             ];
         }
@@ -181,5 +182,19 @@ class CartController extends Controller
 
             return redirect()->back()->with('error', 'An error occured. Please try again.'); 
         }
+    }
+
+    public function countCartItems() {
+        $session_cart = session()->get('fumCart');
+
+        unset($session_cart['shipping']);
+
+        $count = count($session_cart);
+
+        if (Auth::check()) {
+            $count += DB::table('fumaco_cart')->where('f_account_id', Auth::user()->id)->count();
+        }
+
+        return $count;
     }
 }

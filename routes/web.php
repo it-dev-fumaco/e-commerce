@@ -71,6 +71,12 @@ Route::patch('/updatecart', 'CartController@updateCart');
 Route::delete('/removefromcart', 'CartController@removeFromCart');
 Route::post('/addshipping', 'CartController@addShippingDetails');
 Route::post('/addtowishlist', 'CartController@addToWishlist');
+Route::get('/countcartitems', 'CartController@countCartItems');
+
+// CHECKOUT ROUTES
+Route::get('/checkout/review_order', 'CheckoutController@reviewOrder');
+Route::get('/checkout/billing', 'CheckoutController@billingForm');
+
 
 Auth::routes();
 

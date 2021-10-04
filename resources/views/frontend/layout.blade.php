@@ -222,11 +222,11 @@
             </div>
             <ul class="navbar-nav">
               <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle navbar-header" href="#" id="navbarDarkDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">Welcome, {{ (Auth::check()) ? Auth::user()->f_name : 'Guest' }} <i class="fa" style="font-size:24px; color:#126cb6;">&#xf07a;</i><span class="badge badge-warning" id="lblCartCount" style="font-size: 12px; background: #ff0000; color: #fff; padding: 4px 7px; vertical-align: top; margin-left: -10px;display: unset !important; font-weight: 500 !important; border-radius: 1rem !important;">0</span></a>
+                <a class="nav-link dropdown-toggle navbar-header" href="#" id="navbarDarkDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">Welcome, {{ (Auth::check()) ? Auth::user()->f_name : 'Guest' }} <i class="fa" style="font-size:24px; color:#126cb6;">&#xf07a;</i><span class="badge badge-warning count-cart-items" id="lblCartCount" style="font-size: 12px; background: #ff0000; color: #fff; padding: 4px 7px; vertical-align: top; margin-left: -10px;display: unset !important; font-weight: 500 !important; border-radius: 1rem !important;">0</span></a>
                 <ul class="dropdown-menu dropdown-menu-light navbar-header" aria-labelledby="navbarDarkDropdownMenuLink" style="right: 14px !important; left: auto !important;">
                   <li>
                     <a class="dropdown-item" style="font-weight: 300 !important;" href="/cart">
-                      <img src="{{ asset('/assets/site-img/icon/nav11.jpg') }}" alt="cart" width="30">&nbsp;&nbsp;My Cart <span class="badge badge-primary" style="background-color:#186eaa; vertical-align: top;">0</span>
+                      <img src="{{ asset('/assets/site-img/icon/nav11.jpg') }}" alt="cart" width="30">&nbsp;&nbsp;My Cart <span class="badge badge-primary count-cart-items" style="background-color:#186eaa; vertical-align: top;">0</span>
                     </a>
                   </li>    
                   @if(Auth::check())
@@ -330,6 +330,7 @@
     $(document).ready(function() {
       websiteSettings();
       productCategories();
+      countCartItems();
       //Preloader
       preloaderFadeOutTime = 800;
       function hidePreloader() {
@@ -379,6 +380,16 @@
           success: function (response) {
             $('#navbar-brand').attr('href', response.set_value);
             $('title').text(response.set_sitename);
+          }
+        });
+      }
+
+      function countCartItems() {
+        $.ajax({
+          type:'GET',
+          url:'/countcartitems',
+          success: function (response) {
+            $('.count-cart-items').text(response);
           }
         });
       }

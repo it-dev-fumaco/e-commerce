@@ -113,14 +113,14 @@
                                 <img src="{{ asset('/item/images/'.$cart['item_code'].'/gallery/preview/'.$cart['item_image']) }}" class="img-responsive" alt="" width="55" height="55">
                             </td>
                             <td class="tbls" style="width:40% !important;">{{ $cart['item_description'] }}</td>
-                            <td class="tbls">P <span class="formatted-price">{{ number_format($cart['price'], 2) }}</span><span class="price d-none">{{ $cart['price'] }}</span></td>
+                            <td class="tbls">P <span class="formatted-price">{{ number_format($cart['price'], 2, '.', ',') }}</span><span class="price d-none">{{ $cart['price'] }}</span></td>
                             <td class="tbls">
                                 <div class="input-group">
                                     <span class="input-group-btn">
                                         <a href="#" class="quantity-left-minus btn btn-number" style="background-color: #ccc !important; height: 100% !important; border-radius: 0px !important;"> - </a>
                                     </span>
                                     <div>&nbsp;</div>
-                                    <input type="text" name="quantity[]" class="form-control input-number " value="{{ $cart['quantity'] }}" min="1" max="10" style="width: 5px !important; text-align: center !important;" data-id="{{ $cart['item_code'] }}">
+                                    <input type="text" name="quantity[]" class="form-control input-number " value="{{ $cart['quantity'] }}" min="1" max="{{ $cart['stock_qty'] }}" style="width: 5px !important; text-align: center !important;" data-id="{{ $cart['item_code'] }}">
                                     <div>&nbsp;</div>
                                     <span class="input-group-btn">
                                         <a href="#" class="quantity-right-plus btn btn-number" style="background-color: #ccc !important; height: 100% !important; border-radius: 0px !important;"> + </a>
@@ -128,7 +128,7 @@
                                 </div>
                             </td>
                             <td class="tbls">&nbsp;</td>
-                            <td class="tbls">P <span class="formatted-amount">{{ number_format($cart['amount'], 2) }}</span><span class="amount d-none">{{ $cart['amount'] }}</span></td>
+                            <td class="tbls">P <span class="formatted-amount">{{ number_format($cart['amount'], 2, '.', ',') }}</span><span class="amount d-none">{{ $cart['amount'] }}</span></td>
                             <td class="tbls">
                                 <a class="btn btn-sm btn-outline-primary remove-from-cart-btn" href="#" role="button" data-id="{{ $cart['item_code'] }}">&#x2715;</a>
                             </td>
@@ -149,7 +149,7 @@
                     <div class="card-body he1x" style="padding-bottom: 0px !important;">Cart Total<hr></div>
                     <div class="card-body he1x" style="padding-top: 0px !important; padding-bottom: 0px !important;">
                         <div class="d-flex justify-content-between align-items-center">
-                            Subtotal <small class="text-muted stylecap he1x" id="cart-subtotal">P {{ number_format(collect($cart_arr)->sum('amount'), 2) }}</small>
+                            Subtotal <small class="text-muted stylecap he1x" id="cart-subtotal">P {{ number_format(collect($cart_arr)->sum('amount'), 2, '.', ',') }}</small>
                         </div>
                         <hr>
                     </div>
@@ -213,13 +213,16 @@
             e.preventDefault();
             var row = $(this).closest('tr');
             var input_name = row.find('input[name="quantity[]"]').eq(0);
+            var max = input_name.attr('max');
             var id = input_name.data('id');
 
             var current_qty = input_name.val();
-            current_qty++;
-            input_name.val(current_qty);
-            updateAmount(row);
-            updateCart('increment', id, current_qty);
+            if (current_qty < max) {
+                current_qty++;
+                input_name.val(current_qty);
+                updateAmount(row);
+                updateCart('increment', id, current_qty);
+            }
         });
 
         $(document).on('change', 'input[name="shipping_fee"]', function(){
@@ -270,6 +273,9 @@
                 type:'POST',
                 url:'/addshipping',
                 data: data,
+                success: function (response) {
+                    window.location.href = "/checkout/review_order";
+                },
                 error: function () {
                     alert('An error occured.');
                 }
@@ -288,8 +294,8 @@
 
             total = (isNaN(total)) ? 0 : total;
 
-            $('#cart-subtotal').text('P ' + total.toFixed(2));
-            $('#grand-total').text('P ' + total.toFixed(2));
+            $('#cart-subtotal').text('P ' + total.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,"));
+            $('#grand-total').text('P ' + total.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,"));
         }
 
         function updateAmount(row) {
@@ -297,7 +303,7 @@
             var qty = row.find('input[name="quantity[]"]').eq(0).val();
             var amount = (price * qty).toFixed(2);
             row.find('.amount').eq(0).text(amount);
-            row.find('.formatted-amount').eq(0).text(amount);
+            row.find('.formatted-amount').eq(0).text(parseFloat(amount).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,"));
             updateTotal();
         }
 
