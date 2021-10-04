@@ -334,8 +334,8 @@
           </li>
 
           <li class="nav-header">SETTINGS</li>
-          <li class="nav-item">
-            <a href="#" class="nav-link">
+          <li class="nav-item {{ (in_array($activePage, ['erp_api_setup']) ? 'menu-open' : '') }}">
+            <a href="#" class="nav-link {{ (in_array($activePage, ['erp_api_setup']) ? 'active' : '') }}">
               <i class="nav-icon fas fa-cogs"></i>
               <p>API Management <i class="fas fa-angle-left right"></i></p>
             </a>
@@ -347,7 +347,7 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a href="/admin/dashboard" class="nav-link">
+                <a href="/admin/api_setup/erp" class="nav-link {{ $activePage == 'erp_api_setup' ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Fumaco Backend</p>
                 </a>

@@ -98,5 +98,8 @@ Route::prefix('admin')->group(function () {
         Route::post('/set_active', 'HomeCRUDController@set_header_active');
         Route::post('/remove_active', 'HomeCRUDController@remove_header_active');
         Route::post('/delete_header', 'HomeCRUDController@remove_header');
+
+        Route::get('/api_setup/erp', 'SettingsController@erpApiSetup');
+        Route::post('/api_setup/save', 'SettingsController@saveApiCredentials');
     });
 });
