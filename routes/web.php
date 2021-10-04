@@ -100,6 +100,7 @@ Route::prefix('admin')->group(function () {
         Route::post('/delete_header', 'HomeCRUDController@remove_header');
 
         Route::get('/api_setup/erp', 'SettingsController@erpApiSetup');
+        Route::get('/api_setup/payment', 'SettingsController@paymentApiSetup');
         Route::post('/api_setup/save', 'SettingsController@saveApiCredentials');
     });
 });

@@ -1,6 +1,6 @@
 @extends('backend.layout', [
 	'namePage' => 'Settings',
-	'activePage' => 'erp_api_setup'
+	'activePage' => 'payment_api_setup'
 ])
 
 @section('content')
@@ -15,7 +15,7 @@
 				<div class="col-sm-6">
 					<ol class="breadcrumb float-sm-right">
 						<li class="breadcrumb-item"><a href="#">Home</a></li>
-						<li class="breadcrumb-item active">ERP API Setup</li>
+						<li class="breadcrumb-item active">Payment API Setup</li>
 					</ol>
 				</div><!-- /.col -->
 			</div><!-- /.row -->
@@ -49,26 +49,30 @@
 					<!-- general form elements -->
 					<div class="card card-primary">
 						<div class="card-header">
-							<h3 class="card-title">ERP API Setup</h3>
+							<h3 class="card-title">Payment API Setup</h3>
 						</div>
 						<!-- /.card-header -->
 						<!-- form start -->
 						<form action="/admin/api_setup/save" method="POST" autocomplete="off">
 							@csrf
-							<input type="hidden" name="api_type" value="erp_api">
+                            <input type="hidden" name="api_type" value="payment_api">
 							<div class="card-body">
-								<div class="form-group">
-									<label for="base-url">Base URL</label>
-									<input type="text" class="form-control" id="base-url" name="base_url" value="{{ ($api_details) ? $api_details->base_url : old('base_url') }}" required>
-								</div>
-								<div class="form-group">
-									<label for="api-key">API Key</label>
-									<input type="text" class="form-control" id="api-key" name="api_key" value="{{ ($api_details) ? $api_details->api_key : old('api_key') }}" required>
-								</div>
-								<div class="form-group">
-									<label for="api-secret-key">API Secret Key</label>
-									<input type="text" class="form-control" id="api-secret-key" name="api_secret_key" value="{{ ($api_details) ? $api_details->api_secret_key : old('api_secret_key') }}" required>
-								</div>
+                                <div class="form-group">
+                                    <label for="base-url">Base URL</label>
+                                    <input type="text" class="form-control" id="base-url" name="base_url" value="{{ ($api_details) ? $api_details->base_url : old('base_url') }}" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="merchant-type">Merchant Type</label>
+                                    <input type="text" class="form-control" id="merchant-type" name="merchant_type" value="{{ ($api_details) ? $api_details->merchant_type : old('merchant_type') }}" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="service-id">Service ID</label>
+                                    <input type="text" class="form-control" id="service-id" name="service_id" value="{{ ($api_details) ? $api_details->service_id : old('service_id') }}" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="password">Password</label>
+                                    <input type="text" class="form-control" id="password" name="password" value="{{ ($api_details) ? $api_details->password : old('password') }}" required>
+                                </div>
 							</div>
 							<!-- /.card-body -->
 							<div class="card-footer">
