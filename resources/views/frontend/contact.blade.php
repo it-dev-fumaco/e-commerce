@@ -137,14 +137,9 @@
         <br>
        <div class="row animated animatedFadeInUp fadeInUp">
           <div class="col">
-            <div class="g-recaptcha" data-sitekey="6Lcw9rwaAAAAAONDrp4NO2ej4jkig9je_uq6cyK2"></div>
+            <div class="g-recaptcha" data-sitekey="6LfbWpwcAAAAAEPssgZuCMj8MKeVy7UVAXFkIbME"></div>
           </div>
         </div>
-
-
-
-        Testing captcha below
-      <div class="g-recaptcha" data-sitekey="6LfbWpwcAAAAAEPssgZuCMj8MKeVy7UVAXFkIbME"></div>
 
        <center>
           <button type="submit" class="btn btn-primary mt-3 fumacoFont_btn animated animatedFadeInUp fadeInUp">&nbsp;&nbsp;&nbsp;Submit&nbsp;&nbsp;&nbsp;</button>
