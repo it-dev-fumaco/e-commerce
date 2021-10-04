@@ -75,7 +75,7 @@
 				<div class="col-lg-2">
 					<p class="caption_2" style="color:#186EA9 !important; font-weight:400 !important;"><i class="fas fa-angle-double-right"></i> <span style="margin-left: 8px;">Account Details</span></p>
 					<hr>
-					<p class="caption_2"><a href="/myprofile/change_password" style="text-decoration: none; color: #000000;">Password</a></p>
+					<p class="caption_2"><a href="/myprofile/change_password" style="text-decoration: none; color: #000000;">Change Password</a></p>
 					<hr>
 					<p class="caption_2"><a href="/myprofile/address" style="text-decoration: none; color: #000000;">Address</a></p>
 					<hr>
