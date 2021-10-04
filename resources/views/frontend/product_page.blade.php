@@ -622,7 +622,7 @@
                                 </ul>
                             </p>
 									 <input type="hidden" name="item_code" value="{{ $product_details->f_idcode }}">
-                            <p class="card-text">QTY&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;   <input type="number" value="1" id="quantity" name="quantity" min="1" max="{{ $product_details->f_qty }}" style="width: 70px;"></p>
+                            <p class="card-text">QTY&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;   <input type="number" value="1" id="quantity" name="quantity" min="1" max="{{ ($product_details->f_qty > 0) ? $product_details->f_qty : 1 }}" style="width: 70px;"></p>
 	                        <p class="card-text">In-Stocks :
                                 @if($product_details->f_qty < 1)
                                 <span style='color:red;';>Not Available</span>
