@@ -140,11 +140,13 @@
             <div class="g-recaptcha" data-sitekey="6Lcw9rwaAAAAAONDrp4NO2ej4jkig9je_uq6cyK2"></div>
           </div>
         </div>
-        <div class="form-group row">
-          {{-- <label class="col-md-4 col-form-label text-md-right">Laravel Google Recaptcha</label> --}}
-          <div class="col-md-6"> {!! htmlFormSnippet() !!} </div>
-        </div>
-        <center>
+
+
+
+        Testing captcha below
+      <div class="g-recaptcha" data-sitekey="6LfbWpwcAAAAAEPssgZuCMj8MKeVy7UVAXFkIbME"></div>
+
+       <center>
           <button type="submit" class="btn btn-primary mt-3 fumacoFont_btn animated animatedFadeInUp fadeInUp">&nbsp;&nbsp;&nbsp;Submit&nbsp;&nbsp;&nbsp;</button>
         </center>
       </form>

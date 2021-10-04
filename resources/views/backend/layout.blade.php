@@ -334,20 +334,23 @@
           </li>
 
           <li class="nav-header">SETTINGS</li>
-          <li class="nav-item">
-            <a href="#" class="nav-link">
+          @php
+            $settings_pages = ['erp_api_setup', 'payment_api_setup'];
+          @endphp
+          <li class="nav-item {{ (in_array($activePage, $settings_pages) ? 'menu-open' : '') }}">
+            <a href="#" class="nav-link {{ (in_array($activePage, $settings_pages) ? 'active' : '') }}">
               <i class="nav-icon fas fa-cogs"></i>
               <p>API Management <i class="fas fa-angle-left right"></i></p>
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="/admin/dashboard" class="nav-link">
+                <a href="/admin/api_setup/payment" class="nav-link {{ $activePage == 'payment_api_setup' ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Payment API</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="/admin/dashboard" class="nav-link">
+                <a href="/admin/api_setup/erp" class="nav-link {{ $activePage == 'erp_api_setup' ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Fumaco Backend</p>
                 </a>

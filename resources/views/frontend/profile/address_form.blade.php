@@ -78,7 +78,7 @@
 					</p>
 					<hr>
 					<p class="caption_2">
-						<a href="/myprofile/change_password" style="text-decoration: none; color: #000000;">Password</a>
+						<a href="/myprofile/change_password" style="text-decoration: none; color: #000000;">Change Password</a>
 					</p>
 					<hr>
 					<p class="caption_2" style="color:#186EA9 !important; font-weight:400 !important;">
