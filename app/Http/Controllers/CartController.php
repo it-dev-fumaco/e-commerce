@@ -165,16 +165,22 @@ class CartController extends Controller
                 return redirect()->back()->with('error', 'Product not found.');
             }
 
-            DB::table('datawishlist')->insert(
-                [
-                    'userid' => Auth::user()->id,
-                    'item_code' => $id,
-                    'item_name' => $product_details->f_name_name,
-                    'item_price' => $product_details->f_price
-                ]
-            );
-
-            DB::commit();
+            // check if item is in the list of existing wishlist
+            $existing_wishlist = DB::table('datawishlist')->where('userid', Auth::user()->id)
+                ->where('item_code', $id)->exists();
+            // add item to wishlist if npt existing
+            if(!$existing_wishlist) {
+                DB::table('datawishlist')->insert(
+                    [
+                        'userid' => Auth::user()->id,
+                        'item_code' => $id,
+                        'item_name' => $product_details->f_name_name,
+                        'item_price' => $product_details->f_price
+                    ]
+                );
+    
+                DB::commit();
+            }
 
             return redirect()->back()->with('success', 'Product added to your wishlist!');
         } catch (Exception $e) {
