@@ -103,10 +103,15 @@ Route::prefix('admin')->group(function () {
         Route::get('/api_setup/payment', 'SettingsController@paymentApiSetup');
         Route::post('/api_setup/save', 'SettingsController@saveApiCredentials');
 
+        Route::get('/product/list', 'ProductController@viewList');
         Route::get('/product/add', 'ProductController@viewAddForm');
         Route::post('/product/save', 'ProductController@saveItem');
 
         Route::get('/product/search', 'ProductController@searchItem');
         Route::get('/product/{item_code}', 'ProductController@getItemDetails');
+
+        Route::post('/product/{item_code}/disable', 'ProductController@disableItem');
+        Route::post('/product/{item_code}/enable', 'ProductController@enableItem');
+        Route::delete('/product/{item_code}/delete', 'ProductController@deleteItem');
     });
 });

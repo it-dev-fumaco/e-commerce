@@ -17,7 +17,7 @@ class ProductController extends Controller
                 return response()->json(['status' => 0, 'ERP API not configured.']);
             }
     
-            $params = '?filters=[["name","LIKE","%25' . $request->q . '%25"],["show_in_website","=","1"]]';
+            $params = '?filters=[["name","LIKE","%25' . $request->q . '%25"],["show_in_website","=","1"],["has_variants","=","0"]]';
     
             $response = Http::withHeaders([
                 'Content-Type' => 'application/json',
@@ -74,7 +74,8 @@ class ProductController extends Controller
                 'item_name' => $response['data'][0]['item_name'],
                 'product_name' => $response['data'][0]['product_name'],
                 'item_classification' => $response['data'][0]['item_classification'],
-                'item_description' => $response['data'][0]['web_long_description'],
+                'item_description' => $response['data'][0]['description'],
+                'web_long_description' => $response['data'][0]['web_long_description'],
                 'brand' => $response['data'][0]['brand'],
                 'stock_uom' => $response['data'][0]['stock_uom'],
                 'warehouse' => $response['data'][0]['website_warehouse'],
@@ -253,9 +254,75 @@ class ProductController extends Controller
         }
     }
 
+    public function deleteItem($item_code) {
+        DB::beginTransaction();
+        try {
+            DB::table('fumaco_items')->where('f_idcode', $item_code)->delete();
+
+            DB::table('fumaco_items_attributes')->where('idcode', $item_code)->delete();
+
+            DB::commit();
+
+            return redirect()->back()->with('success', 'Product <b>' . $item_code . '</b> has been deleted.');
+        } catch (Exception $e) {
+            DB::rollback();
+
+            return redirect()->back()->with('error', 'An error occured. Please try again.');
+        }
+    }
+
+    public function disableItem($item_code) {
+        DB::beginTransaction();
+        try {
+            DB::table('fumaco_items')->where('f_idcode', $item_code)->update(['f_status' => 0]);
+
+            DB::commit();
+
+            return redirect()->back()->with('success', 'Product code <b>' . $item_code . '</b> has been disabled.');
+        } catch (Exception $e) {
+            DB::rollback();
+
+            return redirect()->back()->with('error', 'An error occured. Please try again.');
+        }
+    }
+
+    public function enableItem($item_code) {
+        DB::beginTransaction();
+        try {
+            DB::table('fumaco_items')->where('f_idcode', $item_code)->update(['f_status' => 1]);
+
+            DB::commit();
+
+            return redirect()->back()->with('success', 'Product code <b>' . $item_code . '</b> has been enabled.');
+        } catch (Exception $e) {
+            DB::rollback();
+
+            return redirect()->back()->with('error', 'An error occured. Please try again.');
+        }
+    }
+
 	public function viewAddForm() {
         $item_categories = DB::table('fumaco_categories')->get();
 
 		return view('backend.products.add', compact('item_categories'));
 	}
+
+    public function viewList(Request $request) {
+        $q_string = $request->q;
+        $search_str = explode(' ', $q_string);
+        $list = DB::table('fumaco_items')
+            ->when($q_string, function ($query) use ($search_str, $q_string) {
+                return $query->where(function($q) use ($search_str, $q_string) {
+                    foreach ($search_str as $str) {
+                        $q->where('f_description', 'LIKE', "%".$str."%");
+                    }
+
+                    $q->orWhere('f_idcode', 'LIKE', "%".$q_string."%")
+                        ->orWhere('f_item_classification', 'LIKE', "%".$q_string."%");
+                });
+            })
+            ->orderBy('f_date', 'desc')->paginate(10);
+
+        return view('backend.products.list', compact('list'));
+    }
 }

@@ -225,7 +225,7 @@
             </ul>
           </li>
           @php
-            $product_pages = ['add_product_form'];
+            $product_pages = ['add_product_form', 'product_list'];
           @endphp
           <li class="nav-item {{ (in_array($activePage, $product_pages) ? 'menu-open' : '') }}">
             <a href="#" class="nav-link {{ (in_array($activePage, $product_pages) ? 'active' : '') }}">
@@ -234,7 +234,7 @@
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="/admin/product/list" class="nav-link">
+                <a href="/admin/product/list" class="nav-link {{ $activePage == 'product_list' ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>List Products</p>
                 </a>
@@ -248,7 +248,7 @@
               <li class="nav-item">
                 <a href="/admin/product/add" class="nav-link {{ $activePage == 'add_product_form' ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Add Products</p>
+                  <p>Add Product</p>
                 </a>
               </li>
             </ul>
