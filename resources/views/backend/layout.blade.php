@@ -13,6 +13,9 @@
   <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
   <!-- Tempusdominus Bootstrap 4 -->
   <link rel="stylesheet" href="{{ asset('/assets/admin/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css') }}">
+  <!-- Select2 -->
+  <link rel="stylesheet" href="{{ asset('/assets/admin/plugins/select2/css/select2.min.css') }}">
+  <link rel="stylesheet" href="{{ asset('/assets/admin/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css') }}">
   <!-- iCheck -->
   <link rel="stylesheet" href="{{ asset('/assets/admin/plugins/icheck-bootstrap/icheck-bootstrap.min.css') }}">
   <!-- Theme style -->
@@ -45,7 +48,7 @@
     <ul class="navbar-nav ml-auto">
 
       <!-- Messages Dropdown Menu -->
-      <li class="nav-item dropdown" hidden>
+      {{-- <li class="nav-item dropdown" hidden>
         <a class="nav-link" data-toggle="dropdown" href="#">
           <i class="far fa-comments"></i>
           <span class="badge badge-danger navbar-badge">3</span>
@@ -101,9 +104,9 @@
           <div class="dropdown-divider"></div>
           <a href="#" class="dropdown-item dropdown-footer">See All Messages</a>
         </div>
-      </li>
+      </li> --}}
       <!-- Notifications Dropdown Menu -->
-      <li class="nav-item dropdown" hidden>
+      {{-- <li class="nav-item dropdown" hidden>
         <a class="nav-link" data-toggle="dropdown" href="#">
           <i class="far fa-bell"></i>
           <span class="badge badge-warning navbar-badge">15</span>
@@ -128,7 +131,7 @@
           <div class="dropdown-divider"></div>
           <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
         </div>
-      </li>
+      </li> --}}
       <li class="nav-item">
         <a class="nav-link" data-widget="fullscreen" href="#" role="button">
           <i class="fas fa-expand-arrows-alt"></i>
@@ -221,8 +224,11 @@
               </li>
             </ul>
           </li>
-          <li class="nav-item">
-            <a href="#" class="nav-link">
+          @php
+            $product_pages = ['add_product_form'];
+          @endphp
+          <li class="nav-item {{ (in_array($activePage, $product_pages) ? 'menu-open' : '') }}">
+            <a href="#" class="nav-link {{ (in_array($activePage, $product_pages) ? 'active' : '') }}">
               <i class="nav-icon fas fa-boxes"></i>
               <p>Products <i class="fas fa-angle-left right"></i></p>
             </a>
@@ -240,7 +246,7 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a href="/admin/product/add" class="nav-link">
+                <a href="/admin/product/add" class="nav-link {{ $activePage == 'add_product_form' ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Add Products</p>
                 </a>
@@ -346,7 +352,7 @@
               <li class="nav-item">
                 <a href="/admin/api_setup/payment" class="nav-link {{ $activePage == 'payment_api_setup' ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Payment API</p>
+                  <p>EGHL Payment API</p>
                 </a>
               </li>
               <li class="nav-item">
@@ -414,5 +420,9 @@
 <script src="{{ asset('/assets/admin/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js') }}"></script>
 <!-- AdminLTE App -->
 <script src="{{ asset('/assets/admin/dist/js/adminlte.js') }}"></script>
+<!-- Select2 -->
+<script src="{{ asset('/assets/admin/plugins/select2/js/select2.full.min.js') }}"></script>
+
+@yield('script')
 </body>
 </html>

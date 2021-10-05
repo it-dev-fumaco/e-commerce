@@ -1,0 +1,325 @@
+@extends('backend.layout', [
+	'namePage' => 'Products',
+	'activePage' => 'add_product_form'
+])
+
+@section('content')
+<div class="content-wrapper">
+	<!-- Content Header (Page header) -->
+	<div class="content-header">
+		<div class="container-fluid">
+			<div class="row mb-2">
+				<div class="col-sm-6">
+					<h1 class="m-0">Add Product</h1>
+				</div><!-- /.col -->
+				<div class="col-sm-6">
+					<ol class="breadcrumb float-sm-right">
+						<li class="breadcrumb-item"><a href="/admin/dashboard">Home</a></li>
+            <li class="breadcrumb-item"><a href="/admin/product/list">Products</a></li>
+						<li class="breadcrumb-item active">Add Product</li>
+					</ol>
+				</div><!-- /.col -->
+			</div><!-- /.row -->
+		</div><!-- /.container-fluid -->
+	</div>
+	<!-- /.content-header -->
+
+	<!-- Main content -->
+	<section class="content">
+		<div class="container-fluid">
+			<div class="row">
+        <form action="/admin/product/save" method="POST">
+          @csrf
+          <!-- left column -->
+          <div class="col-md-12">
+            @if(session()->has('success'))
+              <div class="alert alert-success alert-dismissible fade show text-center" role="alert">
+                {!! session()->get('success') !!}
+              </div>
+            @endif
+            @if(session()->has('error'))
+              <div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
+                {!! session()->get('error') !!}
+              </div>
+            @endif
+            @if(count($errors->all()) > 0)
+              <div class="alert alert-warning alert-dismissible fade show text-center" role="alert">
+                @foreach ($errors->all() as $error)
+                  <span class="d-block">{{ $error }}</span>
+                @endforeach 
+              </div>
+            @endif
+            <!-- general form elements -->
+            <div class="card card-primary">
+              {{-- <div class="card-header">
+                <h3 class="card-title">Search Item from ERP</h3>
+              </div> --}}
+              <!-- /.card-header -->
+              <div class="card-body">
+                <h4>Search Item from ERP</h4>
+                <hr>
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="search-item-code">ERP Item Code</label>
+                      <select class="form-control select2" id="search-item-code" style="width: 100%;" required></select>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="parent-item-code">Parent Item Code</label>
+                      <input type="text" class="form-control" id="parent-item-code" name="parent_item_code" value="{{ old('parent_item_code') }}" readonly required>
+                    </div>
+                  </div>
+                </div>
+                <h5>Product Information</h5>
+                <hr>
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="item-code">Item Code</label>
+                      <input type="text" class="form-control" id="item-code" name="item_code" value="{{ old('item_code') }}" readonly required>
+                    </div>
+                    <div class="form-group">
+                      <label for="item-name">Item Name</label>
+                      <input type="text" class="form-control" id="item-name" name="item_name" value="{{ old('item_name') }}" readonly required>
+                    </div>
+                    <div class="form-group">
+                      <label for="product-name">Product Name</label>
+                      <input type="text" class="form-control" id="product-name" name="product_name" value="{{ old('product_name') }}" required>
+                    </div>
+                    <div class="form-group">
+                      <label for="product-category">Category</label>
+                      <select name="product_category" id="product-category" class="form-control" required>
+                        <option>Select Category</option>
+                        @forelse ($item_categories as $item_category)
+                        <option value="{{ $item_category->id }}">{{ $item_category->name }}</option>
+                        @empty
+                        <option>No categories found.</option>
+                        @endforelse
+                    </select>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="item-classification">Item Classification</label>
+                      <input type="text" class="form-control" id="item-classification" name="item_classification" value="{{ old('item_classification') }}" readonly required>
+                    </div>
+                    <div class="form-group">
+                      <label for="item-brand">Brand</label>
+                      <input type="text" class="form-control" id="item-brand" name="brand" value="{{ old('brand') }}" readonly required>
+                    </div>
+                    <div class="form-group">
+                      <label for="product-price">Product Price</label>
+                      <input type="text" class="form-control" id="product-price" name="price" value="{{ old('price') }}" readonly required>
+                    </div>
+                    <div class="form-group">
+                      <label for="stock-uom">Stock UoM</label>
+                      <input type="text" class="form-control" id="stock-uom" name="stock_uom" value="{{ old('stock_uom') }}" readonly required>
+                    </div>
+                  </div>
+                </div>
+                <h5>Product Weight & Dimensions</h5>
+                <hr>
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="row">
+                      <div class="col-md-6">
+                        <div class="form-group">
+                          <label for="weight-uom">Weight UoM</label>
+                          <input type="text" class="form-control" id="weight-uom" name="weight_uom" value="{{ old('weight_uom') }}" readonly required>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="form-group">
+                          <label for="weight-per-unit">Weight per Unit</label>
+                          <input type="text" class="form-control" id="weight-per-unit" name="weight_per_unit" value="{{ old('weight_per_unit') }}" readonly required>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="form-group">
+                          <label for="package-weight">Package Weight</label>
+                          <input type="text" class="form-control" id="package-weight" name="package_weight" value="{{ old('package_weight') }}" readonly required>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="row">
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="package-length">Package Length</label>
+                          <input type="text" class="form-control" id="package-length" name="package_length" value="{{ old('package_length') }}" readonly required>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="package-width">Package Width</label>
+                          <input type="text" class="form-control" id="package-width" name="package_width" value="{{ old('package_width') }}" readonly required>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="package-height">Package Height</label>
+                          <input type="text" class="form-control" id="package-height" name="package_height" value="{{ old('package_height') }}" readonly required>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="package-dimension-uom">Package Dimension UoM</label>
+                          <input type="text" class="form-control" id="package-dimension-uom" name="package_dimension_uom" value="{{ old('package_dimension_uom') }}" readonly required>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <h5>Inventory Details</h5>
+                <hr>
+                <div class="row">
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label for="warehouse">Warehouse</label>
+                      <input type="text" class="form-control" id="warehouse" name="warehouse" value="{{ old('warehouse') }}" readonly required>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label for="stock-qty">Stock Quantity (from website warehouse)</label>
+                      <input type="number" class="form-control" id="stock-qty" name="stock_qty" value="{{ old('stock_qty') }}" readonly required>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label for="alert-qty">Min. Stock Quantity</label>
+                      <input type="number" class="form-control" id="alert-qty" name="alert_qty" value="{{ old('alert_qty') }}" required>
+                    </div>
+                  </div>
+                </div>
+                <h5>Product Details</h5>
+                <hr>
+                <div class="form-group">
+                  <label for="website-caption">Website Caption (more information section)</label>
+                  <textarea class="form-control" rows="6" id="website-caption" name="website_caption">{{ old('website_caption') }}</textarea>
+                </div>
+                <div class="form-group">
+                  <label for="item-description">Description</label>
+                  <textarea class="form-control" rows="6" id="item-description" name="item_description" readonly>{{ old('item_description') }}</textarea>
+                </div>
+                <div class="form-group">
+                  <label for="full-detail">Full Detail</label>
+                  <textarea class="form-control" rows="6" id="full-detail" name="full_detail">{{ old('full_detail') }}</textarea>
+                </div>
+                <h5>Product Specifications / Attributes</h5>
+                <hr>
+                <table class="table table-striped table-bordered" id="attributes-table">
+                  <thead>
+                    <tr>
+                      <th style="width: 10%;">No.</th>
+                      <th style="width: 50%;">Specification / Attribute Name</th>
+                      <th style="width: 40%;">Value</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+              <!-- /.card-body -->
+              <div class="card-footer">
+                <button type="submit" class="btn btn-primary">Save</button>
+              </div>
+            </div>
+          <!-- /.card -->
+          </div>
+        </form>
+			</div>
+			<!-- /.row -->
+		</div><!-- /.container-fluid -->
+	</section>
+	<!-- /.content -->
+ </div>
+@endsection
+
+@section('script')
+
+<script>
+  (function() {
+    $('#search-item-code').select2({
+      placeholder: 'Search Item',
+      ajax: {
+        url: '/admin/product/search',
+        method: 'GET',
+        dataType: 'json',
+        data: function (data) {
+          return {
+            q: data.term // search term
+          };
+        },
+        processResults: function (response) {
+          return {
+            results: response
+          };
+        },
+        error: function () {
+          //console.log('error');
+        },
+        cache: true
+      }
+    });
+
+    $(document).on('select2:select', '#search-item-code', function(e){
+      var data = e.params.data;
+
+      $('#attributes-table tbody').empty();
+      $.ajax({
+        type:"GET",
+        url:"/admin/product/" + data.id,
+        success:function(response){
+          console.log(response);
+          // if status = 0 (error)
+          if (response.status || response.status === 0) {
+            console.log(response);
+          } else {
+            $('#parent-item-code').val(response.parent_item_code);
+            $('#item-code').val(response.item_code);
+            $('#item-name').val(response.item_name);
+            $('#item-classification').val(response.item_classification);
+            $('#brand').val(response.brand);
+            $('#stock-uom').val(response.stock_uom);
+            $('#warehouse').val(response.warehouse);
+            $('#item-description').text(response.item_description);
+            $('#stock-qty').val(response.stock_qty);
+            $('#product-price').val(response.item_price);
+            $('#weight-uom').val(response.weight_uom);
+            $('#ewight-per-unit').val(response.weight_per_unit);
+            $('#package-weight').val(response.package_weight);
+            $('#package-length').val(response.package_length);
+            $('#package-width').val(response.package_width);
+            $('#package-height').val(response.package_height);
+            $('#package-dimension-uom').val(response.package_dimension_uom);
+            $('#product-name').val(response.product_name);
+
+            var tbl_row = '';
+            $(response.attributes).each(function(i, d) {
+              tbl_row += '<tr><td>' + d.idx + '</td><td>' + d.attribute + '</td><td>' + d.attribute_value + '</td></tr>'
+            });
+
+            $('#attributes-table tbody').append(tbl_row);
+          }
+        }
+      });
+    });
+
+    $("#website-caption").summernote({
+			dialogsInBody: true,
+			dialogsFade: true,
+			height: "200px",
+		});
+
+    $("#full-detail").summernote({
+			dialogsInBody: true,
+			dialogsFade: true,
+			height: "200px",
+		});
+  })();
+
+</script>
+@endsection

@@ -102,5 +102,11 @@ Route::prefix('admin')->group(function () {
         Route::get('/api_setup/erp', 'SettingsController@erpApiSetup');
         Route::get('/api_setup/payment', 'SettingsController@paymentApiSetup');
         Route::post('/api_setup/save', 'SettingsController@saveApiCredentials');
+
+        Route::get('/product/add', 'ProductController@viewAddForm');
+        Route::post('/product/save', 'ProductController@saveItem');
+
+        Route::get('/product/search', 'ProductController@searchItem');
+        Route::get('/product/{item_code}', 'ProductController@getItemDetails');
     });
 });
