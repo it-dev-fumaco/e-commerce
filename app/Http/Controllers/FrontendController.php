@@ -97,16 +97,8 @@ class FrontendController extends Controller
             $new_user = [
                 'username' => trim($request->username),
                 'password' => password_hash($request->password, PASSWORD_DEFAULT),
-                'f_address1' => $request->address_line1,
-                'f_address2' => $request->address_line2,
-                'f_province' => $request->province,
-                'f_barangay' => $request->Barangay,
-                'f_city' => $request->City_Municipality,
-                'f_postalcode' => $request->postal,
-                'f_country' => $request->country_region,
                 'f_name' => $request->first_name,
                 'f_lname' => $request->last_name,
-                'f_mobilenumber' => $request->mobile,
                 'f_email' => 'fumacoco_dev',
                 'f_temp_passcode' => 'fumaco12345'
             ];
