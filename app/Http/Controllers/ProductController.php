@@ -168,7 +168,7 @@ class ProductController extends Controller
                 return redirect()->back()->withInput($request->all())->with('error', 'Product code <b>' . $request->item_code . '</b> already exists.');
             }
 
-           $item = $this->getItemDetails($request->item_code);
+            $item = $this->getItemDetails($request->item_code);
 
             $request->validate(
                 [
@@ -254,9 +254,50 @@ class ProductController extends Controller
         }
     }
 
+    public function updateItem($id, Request $request) {
+        DB::beginTransaction();
+        try {
+            $request->validate(
+                [
+                    'product_name' => 'required',
+                    'product_category' => 'required',
+                    'alert_qty' => 'required|integer',
+                    'website_caption' => 'required',
+                    'full_detail' => 'required',
+                ]
+            );
+
+            $item_category = DB::table('fumaco_categories')->where('id', $request->product_category)->first();
+            $item_category = ($item_category) ? $item_category->name : null;
+
+            DB::table('fumaco_items')->where('id', $id)->update([
+                'f_name_name' => $request->product_name,
+                'f_cat_id' => $request->product_category,
+                'f_category' => $item_category,
+                'f_alert_qty' => $request->alert_qty,
+                'f_caption' => $request->website_caption,
+                'f_full_description' => $request->full_detail,
+                'f_status' => ($request->is_disabled) ? 0 : 1
+            ]);
+
+            DB::commit();
+
+            return redirect()->back()->with('success', 'Product has been updated.');
+        } catch (Exception $e) {
+            DB::rollback();
+
+            return redirect()->back()->with('error', 'An error occured. Please try again.');
+        }
+    }
+
     public function deleteItem($item_code) {
         DB::beginTransaction();
         try {
+            $has_existing_transaction = DB::table('fumaco_order_items')->where('item_code', $item_code)->exists();
+            if ($has_existing_transaction) {
+                return redirect()->back()->with('error', 'Cannot delete product with transactions.');
+            }
+
             DB::table('fumaco_items')->where('f_idcode', $item_code)->delete();
 
             DB::table('fumaco_items_attributes')->where('idcode', $item_code)->delete();
@@ -324,5 +365,16 @@ class ProductController extends Controller
             ->orderBy('f_date', 'desc')->paginate(10);
 
         return view('backend.products.list', compact('list'));
+    }
+
+    public function viewProduct($id) {
+        $item_categories = DB::table('fumaco_categories')->get();
+
+        $details = DB::table('fumaco_items')->where('id', $id)->first();
+
+        $attributes = DB::table('fumaco_items_attributes')
+            ->where('idcode', $details->f_idcode)->orderBy('idx', 'asc')->get();
+        
+        return view('backend.products.view', compact('details', 'item_categories', 'attributes'));
     }
 }

@@ -225,7 +225,7 @@
             </ul>
           </li>
           @php
-            $product_pages = ['add_product_form', 'product_list'];
+            $product_pages = ['add_product_form', 'product_list', 'view_product_form'];
           @endphp
           <li class="nav-item {{ (in_array($activePage, $product_pages) ? 'menu-open' : '') }}">
             <a href="#" class="nav-link {{ (in_array($activePage, $product_pages) ? 'active' : '') }}">

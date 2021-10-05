@@ -15,7 +15,7 @@
 				<div class="col-sm-6">
 					<ol class="breadcrumb float-sm-right">
 						<li class="breadcrumb-item"><a href="/admin/dashboard">Home</a></li>
-						<li class="breadcrumb-item active">Product List</li>
+						<li class="breadcrumb-item active">Products</li>
 					</ol>
 				</div><!-- /.col -->
 			</div><!-- /.row -->
@@ -104,7 +104,7 @@
 												<button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Action
 												</button>
 												<div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
-												  <a class="dropdown-item" href="#">View Details</a>
+												  <a class="dropdown-item" href="/admin/product/{{ $item->id }}/edit">View Details</a>
 												  @if($item->f_status == 1)
 												  <a class="dropdown-item" href="#" data-toggle="modal" data-target="#d{{ $item->id }}"><small>Disable</small></a>
 												  @else

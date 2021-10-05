@@ -110,7 +110,9 @@ Route::prefix('admin')->group(function () {
 
         Route::get('/product/search', 'ProductController@searchItem');
         Route::get('/product/{item_code}', 'ProductController@getItemDetails');
-
+        Route::get('/product/{id}/edit', 'ProductController@viewProduct');
+        
+        Route::post('/product/{id}/update', 'ProductController@updateItem');
         Route::post('/product/{item_code}/disable', 'ProductController@disableItem');
         Route::post('/product/{item_code}/enable', 'ProductController@enableItem');
         Route::delete('/product/{item_code}/delete', 'ProductController@deleteItem');

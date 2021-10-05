@@ -170,7 +170,7 @@
                   </div>
                   <div class="col-md-4">
                     <div class="form-group">
-                      <label for="alert-qty">Min. Stock Quantity</label>
+                      <label for="alert-qty">Min. Stock Level</label>
                       <input type="number" class="form-control" id="alert-qty" name="alert_qty" value="{{ old('alert_qty') }}" required>
                     </div>
                   </div>
@@ -340,7 +340,7 @@
 
             var tbl_row = '';
             $(response.attributes).each(function(i, d) {
-              tbl_row += '<tr><td>' + d.idx + '</td><td>' + d.attribute + '</td><td>' + d.attribute_value + '</td></tr>'
+              tbl_row += '<tr><td>' + d.idx + '</td><td>' + d.attribute + '</td><td>' + d.attribute_value + '</td></tr>';
             });
 
             $('#attributes-table tbody').append(tbl_row);
