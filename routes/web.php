@@ -76,6 +76,7 @@ Route::get('/countcartitems', 'CartController@countCartItems');
 // CHECKOUT ROUTES
 Route::get('/checkout/review_order', 'CheckoutController@reviewOrder');
 Route::get('/checkout/billing', 'CheckoutController@billingForm');
+Route::post('/checkout/summary', 'CheckoutController@checkoutSummary');
 
 
 Auth::routes();

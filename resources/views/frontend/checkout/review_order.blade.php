@@ -95,8 +95,10 @@
 							<tr class="he2x2">
 								<td class="text-center align-middle">
 									<img src="{{ asset('/item/images/'.$item['item_code'].'/gallery/preview/'.$item['item_image']) }}" class="img-responsive" alt="" width="55" height="55">
+									<input type="text" name="item_code" id="item_code" value="{{$item['item_code']}}" hidden/>
 								</td>
 								<td class="tbls">{{ $item['item_description'] }}</td>
+								<input type="text" name="item_desc" id="item_desc" value="{{ $item['item_description'] }}" hidden/>
 								<td class="tbls text-center">P {{ number_format($item['price'], 2, '.', ',') }}</td>
 								<td class="tbls text-center">{{ $item['quantity'] }}</td>
 								<td class="tbls" style="text-align: right;">P {{ number_format($item['amount'], 2, '.', ',') }}</td>
@@ -133,14 +135,26 @@
 						<br>
 						<div style="padding-left:5%; padding-right:5%;">
 							@if (!Auth::check())
-							<a href="/checkout/form" class="btn btn-lg btn-outline-primary" style="width:100%; font-size: 14px;">CHECKOUT AS GUEST</a>
+							<a href="/checkout/billing" class="btn btn-lg btn-outline-primary" style="width:100%; font-size: 14px;">CHECKOUT AS GUEST</a>
 							<br><br>
 							<a href="/login" class="btn btn-lg btn-outline-primary" style="width:100%; font-size: 14px;">MEMBER LOGIN</a>
 							<br><br>
 							@else
-							<a href="/checkout/set_address" class="btn btn-lg btn-outline-primary" style="font-size: 14px; width:100%">CHECKOUT</a>
+							<form action="/checkout/summary" method="post">
+								@csrf
+								<div style="display: none;">
+									<input type="text" name="price" value="{{ number_format($item['price'], 2, '.', ',') }}" />
+									<input type="text" name="qty" value="{{ $item['quantity'] }}" />
+									<input type="text" name="subtotal" value="{{ number_format($item['amount'], 2, '.', ',') }}" />
+									<input type="text" name="shipping" value="{{ number_format($shipping_fee, 2, '.', ',') }}" />
+									<input type="text" name="grand_total" value="{{ number_format($grand_total, 2, '.', ',') }}" />
+									<input type="text" name="form_item_code" id="form_item_code" value="" />
+									<input type="text" name="form_item_desc" id="form_item_desc" value="" />
+								</div>
+								<button type="submit" class="btn btn-lg btn-outline-primary" style="width:100%; font-size: 14px;">CHECKOUT</button>
+							</form>
 							<br><br><br>
-							<a href="#" class="btn btn-lg btn-outline-primary" style="font-size: 14px; width:100%">UPDATE YOUR ADDRESS</a>
+							<a href="/myprofile/address" class="btn btn-lg btn-outline-primary" style="font-size: 14px; width:100%">UPDATE YOUR ADDRESS</a>
 							<br><br>
 							@endif
 						</div>
@@ -155,4 +169,12 @@
 		</div>
 	</div>
 </main>
+
+<script>
+	$(document).ready(function() {
+		$('#form_item_code').val($('#item_code').val());
+		$('#form_item_desc').val($('#item_desc').val());
+	});
+</script>
+
 @endsection
