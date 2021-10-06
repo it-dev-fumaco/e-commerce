@@ -227,8 +227,14 @@
 								<input name="orderpayment_type" value="payment_eghl">
 								<input name="task" value="confirmPayment">
 							</div>
-
-							<a href="cart" class="btn btn-lg btn-outline-primary" role="button" style="background-color: #777575 !important; border-color: #777575 !important;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BACK&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+							@php
+								if(Auth::check()){
+									$back_btn = "/checkout/review_order";
+								}else{
+									$back_btn = "/checkout/billing";
+								}
+							@endphp
+							<a href="{{ $back_btn }}" class="btn btn-lg btn-outline-primary" role="button" style="background-color: #777575 !important; border-color: #777575 !important;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BACK&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
 
 							<input class="btn btn-lg btn-outline-primary" value="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PROCEED&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" type="submit">
 						</form>
