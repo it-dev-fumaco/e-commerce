@@ -205,8 +205,13 @@ class CartController extends Controller
     }
 
     public function countWishlist(){
-        $wishlist = DB::table('datawishlist')->where('userid', Auth::user()->id)->count();
+        if(Auth::check()){
+            $wishlist = DB::table('datawishlist')->where('userid', Auth::user()->id)->count();
 
-        return $wishlist;
+            return $wishlist;
+        }else{
+            $wishlist = 0;
+            return $wishlist;
+        }
     }
 }
