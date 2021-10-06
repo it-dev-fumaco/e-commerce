@@ -30,7 +30,7 @@
 		font-size: 10px !important;
 	}
 	.order-font {
-		font-weight: 200 !important;
+		font-weight: 500 !important;
 		font-size: 14px !important;
 	}
 	.order-font-sub {
@@ -59,7 +59,7 @@
 		</div>
 	</div>
 </main>
-<main style="background-color:#ffffff;" class="products-head">
+<main style="background-color:#ffffff; min-height: 300px;" class="products-head">
 	<div class="container-fluid">
 		<div class="row">
 			<div class="col-lg-12">

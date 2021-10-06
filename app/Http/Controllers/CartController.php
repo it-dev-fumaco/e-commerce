@@ -203,4 +203,10 @@ class CartController extends Controller
 
         return $count;
     }
+
+    public function countWishlist(){
+        $wishlist = DB::table('datawishlist')->where('userid', Auth::user()->id)->count();
+
+        return $wishlist;
+    }
 }

@@ -234,7 +234,7 @@
                   @if(Auth::check())
                   <li>
                     <a class="dropdown-item" style="font-weight: 300 !important;" href="/mywishlist">
-                      <img src="{{ asset('/assets/site-img/icon/nav12.jpg') }}" alt="mywishlist" width="30">&nbsp;&nbsp;Wishlist
+                      <img src="{{ asset('/assets/site-img/icon/nav12.jpg') }}" alt="mywishlist" width="30">&nbsp;&nbsp;Wishlist <span class="badge badge-primary count-wish-items" style="background-color:#186eaa; vertical-align: top;">0</span>
                     </a>
                   </li>
                   <li>
@@ -273,13 +273,12 @@
     </header>
 
   @yield('content')
-  
+  <footer>
     <main style="background-color:#0062A5;"><br></main>
 
     <div id="cookieConsent">
       <p style="text-align: justify; padding-bottom: -10px !important; padding-top: 0px !important;">Fumaco Web Site uses cookies to ensure you get the best experience while browsing the site.<br>By continued use, you agree to our privacy policy and accept our use of such cookies. For further information, click <a href="privacy_policy" target="_blank">More info</a>. <a class="cookieConsentOK">I AGREE</a></p>
     </div>
-
     <main style="background-color:#000000;">
       <div class="container marketing">
         <section class="py-5 text-center container" style="padding-top: 0rem !important; padding-bottom: 3rem !important;">
@@ -326,13 +325,14 @@
       <br>
       <br>
     </main>
-  
+  </footer>
   <script src="{{ asset('/assets/dist/js/bootstrap.bundle.js') }}"></script>
   <script>
     $(document).ready(function() {
       websiteSettings();
       productCategories();
       countCartItems();
+      countWishItems();
       //Preloader
       preloaderFadeOutTime = 800;
       function hidePreloader() {
@@ -392,6 +392,16 @@
           url:'/countcartitems',
           success: function (response) {
             $('.count-cart-items').text(response);
+          }
+        });
+      }
+
+      function countWishItems() {
+        $.ajax({
+          type:'GET',
+          url:'/countwishlist',
+          success: function (response) {
+            $('.count-wish-items').text(response);
           }
         });
       }

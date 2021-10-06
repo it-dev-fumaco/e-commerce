@@ -72,6 +72,7 @@ Route::delete('/removefromcart', 'CartController@removeFromCart');
 Route::post('/addshipping', 'CartController@addShippingDetails');
 Route::post('/addtowishlist', 'CartController@addToWishlist');
 Route::get('/countcartitems', 'CartController@countCartItems');
+Route::get('/countwishlist', 'CartController@countWishlist');
 
 // CHECKOUT ROUTES
 Route::get('/checkout/review_order', 'CheckoutController@reviewOrder');
