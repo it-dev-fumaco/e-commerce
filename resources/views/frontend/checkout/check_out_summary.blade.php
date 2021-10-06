@@ -50,6 +50,7 @@
 								$shipping_postal = $summary_arr[0]['address'][0]['xpostal'];
 								$shipping_country = $summary_arr[0]['address'][0]['xcountry'];
 								$shipping_address_type = $summary_arr[0]['address'][0]['xaddresstype'];
+								$shipping_mobile = $summary_arr[0]['bill_mobile'];
 							}else{
 								$shipping_address1 = $summary_arr[0]['address'][0]['xshippadd1'];
 								$shipping_address2 = $summary_arr[0]['address'][0]['xshippadd2'];
@@ -59,6 +60,7 @@
 								$shipping_postal = $summary_arr[0]['address'][0]['xshippostalcode'];
 								$shipping_country = $summary_arr[0]['address'][0]['xshipcountry'];
 								$shipping_address_type = $summary_arr[0]['address'][0]['xshiptype'];
+								$shipping_mobile = $summary_arr[0]['ship_mobile'];
 							}
 						@endphp
 						<div class="card-body he1x" style="padding-bottom: 0px !important;"><strong>Your Order ID : # {{ $summary_arr[0]['address'][0]['order_tracker_code'] }}</strong>
@@ -86,7 +88,7 @@
 													</div>
 		
 													<div class="card-body he1x" style="padding-bottom: 0px !important;">Address Type :  {{ $summary_arr[0]['address'][0]['xaddresstype'] }}</div>
-													<div class="card-body he1x" style="padding-bottom: 0px !important;">Contact Number :  {{ $summary_arr[0]['address'][0]['xcontact'] }}<br/>&nbsp;</div>
+													<div class="card-body he1x" style="padding-bottom: 0px !important;">Contact Number :  {{ $summary_arr[0]['bill_mobile'] }}<br/>&nbsp;</div>
 												</div>
 											</div>
 										</div>
@@ -108,7 +110,7 @@
 														{{ $shipping_address1." ".$shipping_address2.", ".$shipping_brgy.", ".$shipping_city.", ".$shipping_province.", ".$shipping_country." ".$shipping_postal }}
 													</div>
 													<div class="card-body he1x" style="padding-bottom: 0px !important;">Address Type :  {{ $shipping_address_type }}</div>
-													<div class="card-body he1x" style="padding-bottom: 0px !important;">Contact Number :  {{ $summary_arr[0]['ship_contact'] }}<br/>&nbsp;</div>
+													<div class="card-body he1x" style="padding-bottom: 0px !important;">Contact Number :  {{ $shipping_mobile }}<br/>&nbsp;</div>
 												</div>
 											</div>
 										</div>

@@ -120,7 +120,8 @@ class CheckoutController extends Controller
 				'xcountry' => $request->country_region1_1,
 				'xcontactname1' => $request->fname,
 				'xcontactlastname1' => $request->lname,
-				'xcontactnumber1' => $request->contactnumber1_1,
+				'xcontactnumber1' => ($request->contactnumber1_1) ? $request->contactnumber1_1 : 0,
+				'xmobile_number' => $request->mobilenumber1_1,
 				'xcontactemail1' => $request->email,
 				'xdefault' => 1
 			];
@@ -138,7 +139,8 @@ class CheckoutController extends Controller
 					'xcountry' => $request->country_region1_1,
 					'xcontactname1' => $request->fname,
 					'xcontactlastname1' => $request->lname,
-					'xcontactnumber1' => $request->contactnumber1_1,
+					'xcontactnumber1' => ($request->contactnumber1_1) ? $request->contactnumber1_1 : 0,
+					'xmobile_number' => $request->mobilenumber1_1,
 					'xcontactemail1' => $request->email,
 					'xdefault' => 1
 				];
@@ -156,7 +158,8 @@ class CheckoutController extends Controller
 					'xcountry' => $request->ship_country_region1_1,
 					'xcontactname1' => $request->fname,
 					'xcontactlastname1' => $request->lname,
-					'xcontactnumber1' => $request->ship_contactnumber1_1,
+					'xcontactnumber1' => ($request->ship_contactnumber1_1) ? $request->ship_contactnumber1_1 : 0,
+					'xmobile_number' => $request->ship_mobilenumber1_1,
 					'xcontactemail1' => $request->ship_email,
 					'xdefault' => 1
 				];
@@ -220,6 +223,7 @@ class CheckoutController extends Controller
 					$ship_address_type = $request->Address_type1_1;
 					$ship_email = $request->email;
 					$ship_contact = $request->contactnumber1_1;
+					$ship_mobile = $request->mobilenumber1_1;
 				}else{
 					$same_address = 0;
 					$ship_address1 = $request->ship_Address1_1;
@@ -232,6 +236,7 @@ class CheckoutController extends Controller
 					$ship_address_type = $request->ship_Address_type1_1;
 					$ship_email = $request->ship_email;
 					$ship_contact = $request->ship_contactnumber1_1;
+					$ship_mobile = $request->ship_mobilenumber1_1;
 				}				
 			}else{
 				$o_email = Auth::user()->username;
@@ -248,8 +253,8 @@ class CheckoutController extends Controller
 				$user_type = 'Member';
 				$item_code = $request->form_item_code;
 				$item_desc = $request->form_item_desc;
-				$ship_mobile = $user->f_mobilenumber;
-				$bill_mobile = (!empty($user->f_mobilenumber) ? $user->f_mobilenumber : 0 );
+				$ship_mobile = (!empty($user_ship_address->xmobile_number) ? $user_ship_address->xmobile_number : 0 );
+				$bill_mobile = (!empty($user_bill_address->xmobile_number) ? $user_bill_address->xmobile_number : 0 );
 
 				$email = $user_bill_address->xcontactemail1;
 				$bill_address1 = $user_bill_address->xadd1;
@@ -272,6 +277,7 @@ class CheckoutController extends Controller
 				$ship_country = $user_ship_address->xcountry;
 				$ship_address_type = $user_ship_address->add_type;
 				$ship_contact = $user_ship_address->xcontactnumber1;
+				$ship_mobile = $user_ship_address->xmobile_number;
 			}
 			$temp_arr[] = [
 				'xtempcode' => uniqid(),
@@ -287,7 +293,7 @@ class CheckoutController extends Controller
 				'xaddresstype' => $bill_address_type,
 				'xemail' => $email,
 				'xmobile' => $bill_mobile,
-				'xcontact' => $bill_contact,
+				'xcontact' => ($bill_contact) ? $bill_contact : 0,
 				'xshippadd1' => $ship_address1,
 				'xshippadd2' => $ship_address2,
 				'xshiprov' => $ship_province,
@@ -317,7 +323,8 @@ class CheckoutController extends Controller
 				'grand_total' => $request->grand_total,
 				'same_address' => $same_address,
 				'base_url' => $base_url->set_value,
-				'ship_contact' => $ship_contact,
+				'ship_mobile' => $ship_mobile,
+				'bill_mobile' => $bill_mobile,
 				'address' => $temp_arr
 			];
 

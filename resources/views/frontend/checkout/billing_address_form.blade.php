@@ -419,13 +419,13 @@
 				</div>
 				<br/>
 				
-				<div id="shipAddress" style="display: none;">
+				<div id="shipAddress" style="display: none;">{{-- SHIPPING FORM --}}
 					<p style="color:#212529 !important; letter-spacing: 1px !important; font-size:16px !important;  text-align: justify !important; font-weight: 600 !important;">Shipping Information</p>
 
 					<div class="row">
 						<div class="col">
 							<label for="Address1_1" class="formslabelfnt">Address Line 1 : *</label>
-							<input type="text" class="form-control formslabelfnt" id="Address1_1" name="ship_Address1_1">
+							<input type="text" class="form-control formslabelfnt" id="ship_Address1_1" name="ship_Address1_1">
 						</div>
 						<div class="col">
 							<label for="Address2_1" class="formslabelfnt">Address Line 2 : </label>
@@ -436,26 +436,26 @@
 					<div class="row">
 						<div class="col">
 							<label for="province1_1" class="formslabelfnt">Province : *</label>
-							<input type="text" class="form-control formslabelfnt" id="province1_1" name="ship_province1_1">
+							<input type="text" class="form-control formslabelfnt" id="ship_province1_1" name="ship_province1_1">
 						</div>
 						<div class="col">
 							<label for="City_Municipality1_1" class="formslabelfnt">City / Municipality : *</label>
-							<input type="text" class="form-control formslabelfnt" id="City_Municipality1_1" name="ship_City_Municipality1_1">
+							<input type="text" class="form-control formslabelfnt" id="ship_City_Municipality1_1" name="ship_City_Municipality1_1">
 						</div>
 						<div class="col">
 							<label for="Barangay1_1" class="formslabelfnt">Barangay : *</label>
-							<input type="text" class="form-control formslabelfnt" id="Barangay1_1" name="ship_Barangay1_1">
+							<input type="text" class="form-control formslabelfnt" id="ship_Barangay1_1" name="ship_Barangay1_1">
 						</div>
 					</div>
 					<br>
 					<div class="row">
 						<div class="col">
 							<label for="postal1_1" class="formslabelfnt">Postal Code : *</label>
-							<input type="text" class="form-control formslabelfnt" id="postal1_1" name="ship_postal1_1">
+							<input type="text" class="form-control formslabelfnt" id="ship_postal1_1" name="ship_postal1_1">
 						</div>
 						<div class="col">
 							<label for="country_region1_1" class="formslabelfnt">Country / Region : *</label>
-							<select class="form-control formslabelfnt" id="country_region1_1" name="ship_country_region1_1">
+							<select class="form-control formslabelfnt" id="ship_country_region1_1" name="ship_country_region1_1">
 								<option selected disabled value="">Choose...</option>
 								<option value="Afghanistan">Afghanistan</option>
 								<option value="Aland Islands">Aland Islands</option>
@@ -713,7 +713,7 @@
 						</div>
 						<div class="col">
 							<label for="Address_type1_1" class="formslabelfnt">Address Type : *</label>
-							<select class="form-control formslabelfnt" id="Address_type1_1" name="ship_Address_type1_1">
+							<select class="form-control formslabelfnt" id="ship_Address_type1_1" name="ship_Address_type1_1">
 								<option selected disabled value="">Choose...</option>
 								<option value="Business Address">Business Address</option>
 								<option value="Home Address">Home Address</option>
@@ -724,11 +724,11 @@
 					<div class="row">
 						<div class="col">
 							<label for="email1_1" class="formslabelfnt">Email Address : *</label>
-							<input type="email" class="form-control formslabelfnt" id="email" name="ship_email">
+							<input type="email" class="form-control formslabelfnt" id="ship_email" name="ship_email">
 						</div>
 						<div class="col">
-							<label for="contactnumber1_1" class="formslabelfnt">Contact Number : </label>
-							<input type="number" class="form-control formslabelfnt" id="contactnumber1_1" name="ship_contactnumber1_1">
+							<label for="contactnumber1_1" class="formslabelfnt">Mobile Number : *</label>
+							<input type="number" class="form-control formslabelfnt" id="ship_mobilenumber1_1" name="ship_mobilenumber1_1">
 						</div>
 					</div>
 				</div>
@@ -757,8 +757,33 @@
 	</main>
 	
 	<script>
-		$('#myCheck').change(function() {
-			$('#shipAddress').toggle();
-		});
+		$(document).ready(function() {
+          $('input[type="checkbox"]').click(function() {
+              if($(this).prop("checked") == false) {
+				$('#shipAddress').slideDown();
+				$("#ship_email").prop('required',true);
+				$("#ship_province1_1").prop('required',true);
+				$("#ship_City_Municipality1_1").prop('required',true);
+				$("#ship_Barangay1_1").prop('required',true);
+				$("#ship_postal1_1").prop('required',true);
+				$("#ship_country_region1_1").prop('required',true);
+				$("#ship_Address_type1_1").prop('required',true);
+				$("#ship_email").prop('required',true);
+				$("#ship_mobilenumber1_1").prop('required',true);
+              }else{
+				$('#shipAddress').slideUp();
+				$("#ship_email").prop('required',false);
+				$("#ship_province1_1").prop('required',false);
+				$("#ship_City_Municipality1_1").prop('required',false);
+				$("#ship_Barangay1_1").prop('required',false);
+				$("#ship_postal1_1").prop('required',false);
+				$("#ship_country_region1_1").prop('required',false);
+				$("#ship_Address_type1_1").prop('required',false);
+				$("#ship_email").prop('required',false);
+				$("#ship_mobilenumber1_1").prop('required',false);
+			  }
+            });
+        });
+
 	</script>
 @endsection
