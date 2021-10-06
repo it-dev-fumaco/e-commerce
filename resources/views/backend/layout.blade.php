@@ -236,19 +236,13 @@
               <li class="nav-item">
                 <a href="/admin/product/list" class="nav-link {{ $activePage == 'product_list' ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>List Products</p>
+                  <p>Products List</p>
                 </a>
               </li>
               <li class="nav-item">
                 <a href="/admin/product/category" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>List by Category Products</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="/admin/product/add" class="nav-link {{ $activePage == 'add_product_form' ? 'active' : '' }}">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Add Product</p>
+                  <p>Products by Category</p>
                 </a>
               </li>
             </ul>

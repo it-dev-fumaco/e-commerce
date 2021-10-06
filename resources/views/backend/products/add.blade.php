@@ -1,6 +1,6 @@
 @extends('backend.layout', [
 	'namePage' => 'Products',
-	'activePage' => 'add_product_form'
+	'activePage' => 'product_list'
 ])
 
 @section('content')
