@@ -84,51 +84,6 @@
 				<hr>
 			</div>
 			<div class="col-lg-10">
-				<strong><h4>Default Billing Address :</h4></strong>
-				<br>
-				<form action="/" method="post">
-					<div class="row">
-						<div class="col">
-							<label for="Address1_1" class="myprofile-font-form">Address Line 1 : *</label>
-							<input type="text" class="form-control caption_1" id="Address1_1" value="{{ $default_billing_address->f_address1 }}">
-						</div>
-						<div class="col">
-							<label for="Address2_1" class="myprofile-font-form">Address Line 2 : </label>
-							<input type="text" class="form-control caption_1" id="Address2_1" value="{{ $default_billing_address->f_address2 }}">
-						</div>
-					</div>
-					<br>
-					<div class="row">
-						<div class="col">
-							<label for="province1_1" class="myprofile-font-form">Province : *</label>
-							<input type="text" class="form-control caption_1" id="province1_1" value="{{ $default_billing_address->f_province }}">
-						</div>
-						<div class="col">
-							<label for="City_Municipality1_1" class="myprofile-font-form">City / Municipality : *</label>
-							<input type="text" class="form-control caption_1" id="City_Municipality1_1" value="{{ $default_billing_address->f_city }}">
-						</div>
-						<div class="col">
-							<label for="Barangay1_1" class="myprofile-font-form">Barangay : *</label>
-							<input type="text" class="form-control caption_1" id="Barangay1_1" value="{{ $default_billing_address->f_barangay }}">
-						</div>
-					</div>
-					<br>
-					<div class="row">
-						<div class="col">
-							<label for="postal1_1" class="myprofile-font-form">Postal Code : *</label>
-							<input type="text" class="form-control caption_1" id="postal1_1" value="{{ $default_billing_address->f_postalcode }}">
-						</div>
-						<div class="col">
-							<label for="country_region1_1" class="myprofile-font-form">Country / Region : *</label>
-							<input type="text" class="form-control caption_1" id="postal1_1" value="{{ $default_billing_address->f_country }}">
-						</div>
-						<div class="col">
-							<label for="Address_type1_1" class="myprofile-font-form">Address Type :</label>
-							<input type="text" class="form-control caption_1" id="Address_type1_1_type" value="{{ $default_billing_address->f_addtype }}">
-						</div>
-					</div>
-				</form>
-				<br><br><br>
 				@if(session()->has('success'))
 				<div class="row">
 					<div class="col">
@@ -164,16 +119,16 @@
 						<tr>
 							<td>
 								<a href="/myprofile/address/{{ $billing_address->id }}/billing/change_default">
-								@if ($billing_address->xdefault_b)
+								@if ($billing_address->xdefault)
 									<i class="fas fa-check-circle" style="font-size: 24px;"></i>
 								@else
 									<i class="far fa-check-circle" style="font-size: 24px; color:#ada8a8;"></i>
 								@endif
 								</a>
 							</td>
-							<td>{{ $billing_address->xadd1_b . ' ' . $billing_address->xadd2_b .' '. $billing_address->xprov_b}}</td>
-							<td>{{ $billing_address->xcontactlastname1_b . ', ' . $billing_address->xcontactname1_b}}</td>
-							<td>{{ $billing_address->add_type_b }}</td>
+							<td>{{ $billing_address->xadd1 . ' ' . $billing_address->xadd2 .' '. $billing_address->xprov}}</td>
+							<td>{{ $billing_address->xcontactlastname1 . ', ' . $billing_address->xcontactname1 }}</td>
+							<td>{{ $billing_address->add_type }}</td>
 							<td>
 								<button type="button" class="btn btn-success btn-xs" data-toggle="modal" data-target="#myadd{{ $billing_address->id }}">
 									<i class="fas fa-eye"></i>
@@ -195,22 +150,22 @@
 												<div class="row">
 													<div class="col">
 														<label for="Address1_1" class="myprofile-font-form">First Name : </label>
-														<input type="text" class="form-control caption_1" id="Address1_1" value="{{ $billing_address->xcontactname1_b }}">
+														<input type="text" class="form-control caption_1" id="Address1_1" value="{{ $billing_address->xcontactname1 }}">
 													</div>
 													<div class="col">
 														<label for="Address2_1" class="myprofile-font-form">Last Name : </label>
-														<input type="text" class="form-control caption_1" id="Address2_1" value="{{ $billing_address->xcontactlastname1_b }}">
+														<input type="text" class="form-control caption_1" id="Address2_1" value="{{ $billing_address->xcontactlastname1 }}">
 													</div>
 												</div>
 												<div class="row"><br></div>
 												<div class="row">
 													<div class="col">
 														<label for="Address1_1" class="myprofile-font-form">Contact Number : </label>
-														<input type="text" class="form-control caption_1" id="Address1_1" value="{{ $billing_address->xcontactnumber1_b }}">
+														<input type="text" class="form-control caption_1" id="Address1_1" value="{{ $billing_address->xcontactnumber1 }}">
 													</div>
 													<div class="col">
 														<label for="Address2_1" class="myprofile-font-form">Contact Email : </label>
-														<input type="text" class="form-control caption_1" id="Address2_1" value="{{ $billing_address->xcontactemail1_b }}">
+														<input type="text" class="form-control caption_1" id="Address2_1" value="{{ $billing_address->xcontactemail1 }}">
 													</div>
 												</div>
 												<div class="row">
@@ -223,41 +178,41 @@
 												<div class="row">
 													<div class="col">
 														<label for="Address1_1" class="myprofile-font-form">Address Line 1 : </label>
-														<input type="text" class="form-control caption_1" id="Address1_1" value="{{ $billing_address->xadd1_b }}">
+														<input type="text" class="form-control caption_1" id="Address1_1" value="{{ $billing_address->xadd1 }}">
 													</div>
 													<div class="col">
 														<label for="Address2_1" class="myprofile-font-form">Address Line 2 : </label>
-														<input type="text" class="form-control caption_1" id="Address2_1" value="{{ $billing_address->xadd2_b }}">
+														<input type="text" class="form-control caption_1" id="Address2_1" value="{{ $billing_address->xadd2 }}">
 													</div>
 												</div>
 												<br>
 												<div class="row">
 													<div class="col">
 														<label for="province1_1" class="myprofile-font-form">Province : </label>
-														<input type="text" class="form-control caption_1" id="province1_1" value="{{ $billing_address->xprov_b }}">
+														<input type="text" class="form-control caption_1" id="province1_1" value="{{ $billing_address->xprov }}">
 													</div>
 													<div class="col">
 														<label for="City_Municipality1_1" class="myprofile-font-form">City / Municipality : </label>
-														<input type="text" class="form-control caption_1" id="City_Municipality1_1" value="{{ $billing_address->xcity_b }}">
+														<input type="text" class="form-control caption_1" id="City_Municipality1_1" value="{{ $billing_address->xcity }}">
 													</div>
 													<div class="col">
 														<label for="Barangay1_1" class="myprofile-font-form">Barangay : </label>
-														<input type="text" class="form-control caption_1" id="Barangay1_1" value="{{ $billing_address->xbrgy_b }}">
+														<input type="text" class="form-control caption_1" id="Barangay1_1" value="{{ $billing_address->xbrgy }}">
 													</div>
 												</div>
 												<br>
 												<div class="row">
 													<div class="col">
 														<label for="postal1_1" class="myprofile-font-form">Postal Code : </label>
-														<input type="text" class="form-control caption_1" id="postal1_1" value="{{ $billing_address->xpostal_b }}">
+														<input type="text" class="form-control caption_1" id="postal1_1" value="{{ $billing_address->xpostal }}">
 													</div>
 													<div class="col">
 														<label for="country_region1_1" class="myprofile-font-form">Country / Region : </label>
-														<input type="text" class="form-control caption_1" id="ctounry_1" value="{{ $billing_address->xcountry_b }}">
+														<input type="text" class="form-control caption_1" id="ctounry_1" value="{{ $billing_address->xcountry }}">
 													</div>
 													<div class="col">
 														<label for="Address_type1_1" class="myprofile-font-form">Address Type :</label>
-														<input type="text" class="form-control caption_1" id="Address_type1_1_type" value="{{ $billing_address->add_type_b }}">
+														<input type="text" class="form-control caption_1" id="Address_type1_1_type" value="{{ $billing_address->add_type }}">
 													</div>
 												</div>
 											</div>
@@ -271,7 +226,7 @@
 								<button type="button" class="btn btn-danger btn-xs" data-toggle="modal" data-target="#myDelete{{ $billing_address->id }}">
 									<i class="fas fa-trash-alt"></i>
 								</button>
-								@if ($billing_address->xdefault_b)
+								@if ($billing_address->xdefault)
 								<div id="myDelete{{ $billing_address->id }}" class="modal fade" role="dialog">
 									<div class="modal-dialog">
 											<div class="modal-content">

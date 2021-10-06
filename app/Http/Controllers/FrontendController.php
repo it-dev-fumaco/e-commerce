@@ -459,11 +459,11 @@ class FrontendController extends Controller
         $default_billing_address = DB::table('fumaco_users')
             ->where('id', Auth::user()->id)->first();
 
-        $billing_addresses = DB::table('fumaco_user_add_bill')
-            ->where('user_idx_b', Auth::user()->id)->get();
+        $billing_addresses = DB::table('fumaco_user_add')
+            ->where('user_idx', Auth::user()->id)->where('address_class', 'Billing')->get();
 
         $shipping_addresses = DB::table('fumaco_user_add')
-            ->where('user_idx', Auth::user()->id)->get();
+            ->where('user_idx', Auth::user()->id)->where('address_class', 'Shipping')->get();
 
         return view('frontend.profile.address_list', compact('default_billing_address', 'billing_addresses', 'shipping_addresses'));
     }
@@ -471,16 +471,13 @@ class FrontendController extends Controller
     public function deleteAddress($id, $type) {
         DB::beginTransaction();
         try {
-            $table = ($type == 'billing') ? 'fumaco_user_add_bill' : 'fumaco_user_add';
-            
-            $address_details = DB::table($table)->where('id', $id)->first();
+            $address_details = DB::table('fumaco_user_add')->where('id', $id)->first();
             if($address_details) {
-                $is_default = ($type == 'billing') ? $address_details->xdefault_b : $address_details->xdefault;
-                if ($is_default) {
+                if ($address_details->xdefault) {
                     return redirect()->back()->with('error', 'Cannot delete default billing address.');
                 }
     
-                DB::table($table)->where('id', $id)->delete();
+                DB::table('fumaco_user_add')->where('id', $id)->delete();
 
                 DB::commit();
             }
@@ -496,20 +493,16 @@ class FrontendController extends Controller
     public function setDefaultAddress($id, $type) {
         DB::beginTransaction();
         try {
-            $table = ($type == 'billing') ? 'fumaco_user_add_bill' : 'fumaco_user_add';
-            $user_col = ($type == 'billing') ? 'user_idx_b' : 'user_idx';
-            $default_col = ($type == 'billing') ? 'xdefault_b' : 'xdefault';
-            
-            $address_details = DB::table($table)->where('id', $id)->first();
+            $address_class = ($type == 'billing') ? 'Billing' : 'Shipping';
+            $address_details = DB::table('fumaco_user_add')->where('id', $id)->first();
             if($address_details) {
-                $is_default = ($type == 'billing') ? $address_details->xdefault_b : $address_details->xdefault;
-                
-                if (!$is_default) {
-                    DB::table($table)->where($user_col, Auth::user()->id)
-                        ->where('id', '!=', $id)->update([$default_col => 0]);
+                if (!$address_details->xdefault) {
+                    DB::table('fumaco_user_add')->where('user_idx', Auth::user()->id)
+                        ->where('id', '!=', $id)->where('address_class', $address_class)
+                        ->update(['xdefault' => 0]);
 
-                    DB::table($table)->where($user_col, Auth::user()->id)
-                        ->where('id', $id)->update([$default_col => 1]);
+                    DB::table('fumaco_user_add')->where('user_idx', Auth::user()->id)
+                        ->where('id', $id)->update(['xdefault' => 1]);
 
                     DB::commit();
 
@@ -532,8 +525,6 @@ class FrontendController extends Controller
     public function saveAddress($type, Request $request) {
         DB::beginTransaction();
         try {
-            $table = ($type == 'billing') ? 'fumaco_user_add_bill' : 'fumaco_user_add';
-
             $validator = $this->validate($request, [
                 'first_name' => 'required',
                 'last_name' => 'required',
@@ -548,27 +539,11 @@ class FrontendController extends Controller
                 'address_type' => 'required',
             ]);
 
-            $data = [];
-            if ($type == 'billing') {
-                $data = [
-                    'xadd1_b' => $request->address_line1,
-                    'xadd2_b' => $request->address_line2,
-                    'xprov_b' => $request->province,
-                    'xcity_b' => $request->city,
-                    'xbrgy_b' => $request->barangay,
-                    'xpostal_b' => $request->postal_code,
-                    'xcountry_b' => $request->country,
-                    'user_idx_b' => Auth::user()->id,
-                    'add_type_b' => $request->address_type,
-                    'xcontactname1_b' => $request->first_name,
-                    'xcontactlastname1_b' => $request->last_name,
-                    'xcontactnumber1_b' => $request->contact_no,
-                    'xcontactemail1_b' => $request->email_address
-                ];
-            }
+            $address_class = ($type == 'billing') ? 'Billing' : 'Shipping';            
 
-            if ($type == 'shipping') {
-                $data = [
+            DB::table('fumaco_user_add')->insert(
+                [
+                    'address_class' => $address_class,
                     'xadd1' => $request->address_line1,
                     'xadd2' => $request->address_line2,
                     'xprov' => $request->province,
@@ -582,10 +557,8 @@ class FrontendController extends Controller
                     'xcontactlastname1' => $request->last_name,
                     'xcontactnumber1' => $request->contact_no,
                     'xcontactemail1' => $request->email_address
-                ];
-            }
-
-            DB::table($table)->insert($data);
+                ]
+            );
 
             DB::commit();
 
