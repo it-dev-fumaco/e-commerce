@@ -59,7 +59,7 @@
 		</div>
 	</div>
 </main>
-<main style="background-color:#ffffff; min-height: 300px;" class="products-head">
+<main style="background-color:#ffffff; min-height: 600px;" class="products-head">
 	<div class="container-fluid">
 		<div class="row">
 			<div class="col-lg-12">
