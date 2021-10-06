@@ -76,7 +76,14 @@
 	
 	<main style="background-color:#ffffff; min-height: 700px;" class="products-head">
 		<div class="container" style="padding-left:5% !important; padding-right:5% !important;">
-			<form action="/checkout/summary" method="post">
+			@php
+				if(!Auth::check()){
+					$action = '/checkout/summary';
+				}else{
+					$action = '/checkout/set_address';
+				}
+			@endphp
+			<form action="{{ $action }}" method="post">
 				@csrf
 				<p style="color:#212529 !important; letter-spacing: 1px !important; font-size:16px !important;  text-align: justify !important; font-weight: 600 !important;">Billing Information</p>
 				<hr>

@@ -75,6 +75,11 @@
 			<div class="row">
 				<!--products-->
 				<div class="col-lg-8">
+					@if(session()->has('add_success'))
+                                <div class="alert alert-success">
+                                    {{ session()->get('add_success') }}
+                                </div>
+                            @endif
 					<table class="table">
 						<col style="width: 10%;">
 						<col style="width: 45%;">
@@ -140,8 +145,24 @@
 							<a href="/login" class="btn btn-lg btn-outline-primary" style="width:100%; font-size: 14px;">MEMBER LOGIN</a>
 							<br><br>
 							@else
-							<form action="/checkout/summary" method="post">
+							@php
+								if(count($bill_address) < 1){
+									$action = '/checkout/billing';
+									$method = 'get';
+									$msg = "You have no saved billing/shipping address";
+									$display = 'd-none';
+									$btn = "SET YOUR ADDRESS";
+								}else{
+									$action = '/checkout/summary';
+									$method = 'post';
+									$display = 'd-block';
+									$msg = '';
+									$btn = "CHECKOUT";
+								}
+							@endphp
+							<form action="{{ $action }}" method="{{ $method }}">
 								@csrf
+								<p class="text-center" >{{ $msg }}</p>
 								<div style="display: none;">
 									<input type="text" name="price" value="{{ number_format($item['price'], 2, '.', ',') }}" />
 									<input type="text" name="qty" value="{{ $item['quantity'] }}" />
@@ -151,10 +172,10 @@
 									<input type="text" name="form_item_code" id="form_item_code" value="" />
 									<input type="text" name="form_item_desc" id="form_item_desc" value="" />
 								</div>
-								<button type="submit" class="btn btn-lg btn-outline-primary" style="width:100%; font-size: 14px;">CHECKOUT</button>
+								<button type="submit" class="btn btn-lg btn-outline-primary" style="width:100%; font-size: 14px;">{{ $btn }}</button>
 							</form>
 							<br><br><br>
-							<a href="/myprofile/address" class="btn btn-lg btn-outline-primary" style="font-size: 14px; width:100%">UPDATE YOUR ADDRESS</a>
+							<a href="/myprofile/address" class="btn btn-lg btn-outline-primary {{ $display }}" style="font-size: 14px; width:100%">UPDATE YOUR ADDRESS</a>
 							<br><br>
 							@endif
 						</div>
