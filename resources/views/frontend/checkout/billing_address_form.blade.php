@@ -761,6 +761,7 @@
           $('input[type="checkbox"]').click(function() {
               if($(this).prop("checked") == false) {
 				$('#shipAddress').slideDown();
+				$("#ship_Address1_1").prop('required',true);
 				$("#ship_email").prop('required',true);
 				$("#ship_province1_1").prop('required',true);
 				$("#ship_City_Municipality1_1").prop('required',true);
@@ -772,6 +773,7 @@
 				$("#ship_mobilenumber1_1").prop('required',true);
               }else{
 				$('#shipAddress').slideUp();
+				$("#ship_Address1_1").prop('required',false);
 				$("#ship_email").prop('required',false);
 				$("#ship_province1_1").prop('required',false);
 				$("#ship_City_Municipality1_1").prop('required',false);

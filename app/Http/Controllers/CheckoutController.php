@@ -112,7 +112,7 @@ class CheckoutController extends Controller
 				'user_idx' => $user_id,
 				'add_type' => $request->Address_type1_1,
 				'xadd1' => $request->Address1_1,
-				'xadd2' => $request->Address2_1,
+				'xadd2' => ($request->Address2_1) ? $request->Address2_1 : " ",
 				'xprov' => $request->province1_1,
 				'xcity' => $request->City_Municipality1_1,
 				'xbrgy' => $request->Barangay1_1,
@@ -131,7 +131,7 @@ class CheckoutController extends Controller
 					'user_idx' => $user_id,
 					'add_type' => $request->Address_type1_1,
 					'xadd1' => $request->Address1_1,
-					'xadd2' => $request->Address2_1,
+					'xadd2' => ($request->Address2_1) ? $request->Address2_1 : " ",
 					'xprov' => $request->province1_1,
 					'xcity' => $request->City_Municipality1_1,
 					'xbrgy' => $request->Barangay1_1,
@@ -150,7 +150,7 @@ class CheckoutController extends Controller
 					'user_idx' => $user_id,
 					'add_type' => $request->ship_Address_type1_1,
 					'xadd1' => $request->ship_Address1_1,
-					'xadd2' => $request->ship_Address2_1,
+					'xadd2' => ($request->ship_Address2_1) ? $request->ship_Address2_1 : " ",
 					'xprov' => $request->ship_province1_1,
 					'xcity' => $request->ship_City_Municipality1_1,
 					'xbrgy' => $request->ship_Barangay1_1,
@@ -196,7 +196,7 @@ class CheckoutController extends Controller
 				$last_name = $request->lname;
 				$email = $request->email;
 				$bill_address1 = $request->Address1_1;
-				$bill_address2 = $request->Address2_1;
+				$bill_address2 = ($request->Address2_1) ? $request->Address2_1 : " ";
 				$bill_province = $request->province1_1;
 				$bill_city = $request->City_Municipality1_1;
 				$bill_brgy = $request->Barangay1_1;
@@ -214,7 +214,7 @@ class CheckoutController extends Controller
 				if (isset($request->myCheck)){
 					$same_address = 1;
 					$ship_address1 = $request->Address1_1;
-					$ship_address2 = $request->Address2_1;
+					$ship_address2 = ($request->Address2_1) ? $request->Address2_1 : " ";
 					$ship_province = $request->province1_1;
 					$ship_city = $request->City_Municipality1_1;
 					$ship_brgy = $request->Barangay1_1;
@@ -227,7 +227,7 @@ class CheckoutController extends Controller
 				}else{
 					$same_address = 0;
 					$ship_address1 = $request->ship_Address1_1;
-					$ship_address2 = $request->ship_Address2_1;
+					$ship_address2 = ($request->ship_Address2_1) ? $request->ship_Address2_1 : " ";
 					$ship_province = $request->ship_province1_1;
 					$ship_city = $request->ship_City_Municipality1_1;
 					$ship_brgy = $request->ship_Barangay1_1;
@@ -284,7 +284,7 @@ class CheckoutController extends Controller
 				'xfname' => $first_name,
 				'xlname' => $last_name,
 				'xadd1' => $bill_address1,
-				'xadd2' => $bill_address2,
+				'xadd2' => ($bill_address2) ? $bill_address2 : " ",
 				'xprov' => $bill_province,
 				'xcity' => $bill_city,
 				'xbrgy' => $bill_brgy,
@@ -295,7 +295,7 @@ class CheckoutController extends Controller
 				'xmobile' => $bill_mobile,
 				'xcontact' => ($bill_contact) ? $bill_contact : 0,
 				'xshippadd1' => $ship_address1,
-				'xshippadd2' => $ship_address2,
+				'xshippadd2' => ($ship_address2) ? $ship_address2 : " ",
 				'xshiprov' => $ship_province,
 				'xshipcity' => $ship_city,
 				'xshipbrgy' => $ship_brgy,
