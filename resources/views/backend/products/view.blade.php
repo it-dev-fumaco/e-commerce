@@ -55,7 +55,10 @@
                         <h4>Product Information</h4>
                         <hr>
                         <div class="row">
-                           <div class="col-md-6">
+                           <div class="col-md-2">
+                              <img src="{{ asset('/item/images/'. $details->f_idcode .'/gallery/original/'.$item_image) }}" class="img-responsive rounded img-thumbnail" alt="" width="250" height="250">
+                           </div>
+                           <div class="col-md-4">
                               <div class="row">
                                  <div class="col-md-8">
                                     <div class="form-group">
@@ -72,7 +75,7 @@
                               </div>
                               <div class="form-group">
                                  <label for="item-description">Description</label>
-                                 <textarea rows="4" class="form-control" id="item-description" readonly>{{ $details->f_description }}</textarea>
+                                 <textarea rows="6" class="form-control" id="item-description" readonly>{{ $details->f_description }}</textarea>
                               </div>
                            </div>
 

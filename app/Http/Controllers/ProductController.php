@@ -201,7 +201,7 @@ class ProductController extends Controller
             $item_category = DB::table('fumaco_categories')->where('id', $request->product_category)->first();
             $item_category = ($item_category) ? $item_category->name : null;
     
-            DB::table('fumaco_items')->insert([
+            $id = DB::table('fumaco_items')->insertGetId([
                 'f_idcode' => $item['item_code'],
                 'f_parent_code' => $item['parent_item_code'],
                 'f_name' => $item['item_code'],
@@ -246,7 +246,7 @@ class ProductController extends Controller
 
             DB::commit();
 
-            return redirect()->back()->with('success', 'Product has been saved.');
+            return redirect('/admin/product/' . $id . '/edit')->with('success', 'Product has been saved.');
         } catch (Exception $e) {
             DB::rollback();
 
@@ -371,10 +371,15 @@ class ProductController extends Controller
         $item_categories = DB::table('fumaco_categories')->get();
 
         $details = DB::table('fumaco_items')->where('id', $id)->first();
+        
+        $item_image = DB::table('fumaco_items_image_v1')
+            ->where('idcode', $details->f_idcode)->first();
+
+        $item_image = ($item_image) ? $item_image->imgoriginalx : 'test.jpg';
 
         $attributes = DB::table('fumaco_items_attributes')
             ->where('idcode', $details->f_idcode)->orderBy('idx', 'asc')->get();
         
-        return view('backend.products.view', compact('details', 'item_categories', 'attributes'));
+        return view('backend.products.view', compact('details', 'item_categories', 'attributes', 'item_image'));
     }
 }
