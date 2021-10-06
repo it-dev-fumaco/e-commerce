@@ -79,6 +79,8 @@ Route::get('/checkout/review_order', 'CheckoutController@reviewOrder');
 Route::get('/checkout/billing', 'CheckoutController@billingForm');
 Route::post('/checkout/summary', 'CheckoutController@checkoutSummary');
 Route::post('/checkout/set_address', 'CheckoutController@setAddress');
+Route::get('/checkout/set_shipping_form', 'CheckoutController@setShippingForm');
+Route::post('/checkout/set_shipping', 'CheckoutController@setShipping');
 
 
 Auth::routes();

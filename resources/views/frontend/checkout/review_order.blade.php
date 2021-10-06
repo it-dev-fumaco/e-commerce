@@ -76,10 +76,10 @@
 				<!--products-->
 				<div class="col-lg-8">
 					@if(session()->has('add_success'))
-                                <div class="alert alert-success">
-                                    {{ session()->get('add_success') }}
-                                </div>
-                            @endif
+						<div class="alert alert-success">
+							{{ session()->get('add_success') }}
+						</div>
+					@endif
 					<table class="table">
 						<col style="width: 10%;">
 						<col style="width: 45%;">
@@ -146,10 +146,22 @@
 							<br><br>
 							@else
 							@php
-								if(count($bill_address) < 1){
+								if(count($bill_address) < 1 and count($ship_address) < 1 ){
 									$action = '/checkout/billing';
 									$method = 'get';
 									$msg = "You have no saved billing/shipping address";
+									$display = 'd-none';
+									$btn = "SET YOUR ADDRESS";
+								}else if(count($bill_address) < 1){
+									$action = '/checkout/billing';
+									$method = 'get';
+									$msg = "You have no saved billing address";
+									$display = 'd-none';
+									$btn = "SET YOUR ADDRESS";
+								}else if(count($ship_address) < 1){
+									$action = '/checkout/set_shipping_form';
+									$method = 'get';
+									$msg = "You have no saved shipping address";
 									$display = 'd-none';
 									$btn = "SET YOUR ADDRESS";
 								}else{

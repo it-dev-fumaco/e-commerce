@@ -74,6 +74,81 @@ class CheckoutController extends Controller
 		return view('frontend.checkout.billing_address_form', compact('cart_arr', 'cart'));
 	}
 
+	public function setShippingForm(){
+		return view('frontend.checkout.set_shipping');
+	}
+
+	public function setShipping(Request $request){
+		DB::beginTransaction();
+		try{
+			$o_email = Auth::user()->username;
+
+			$user = DB::table('fumaco_users')->where('username', $o_email)->first();
+			$user_id = $user->id;
+
+			$ship_address_arr = [
+				'address_class' => 'Delivery',
+				'user_idx' => $user_id,
+				'add_type' => $request->Address_type1_1,
+				'xadd1' => $request->Address1_1,
+				'xadd2' => ($request->Address2_1) ? $request->Address2_1 : " ",
+				'xprov' => $request->province1_1,
+				'xcity' => $request->City_Municipality1_1,
+				'xbrgy' => $request->Barangay1_1,
+				'xpostal' => $request->postal1_1,
+				'xcountry' => $request->country_region1_1,
+				'xcontactname1' => $request->fname,
+				'xcontactlastname1' => $request->lname,
+				'xcontactnumber1' => ($request->contactnumber1_1) ? $request->contactnumber1_1 : 0,
+				'xmobile_number' => $request->mobilenumber1_1,
+				'xcontactemail1' => $request->email,
+				'xdefault' => 1
+			];
+
+			DB::table('fumaco_user_add')->insert($ship_address_arr);
+
+			DB::commit();
+			$cart = session()->get('fumCart');
+			$cart = (!$cart) ? [] : $cart;
+			if(count($cart) <= 0) {
+				return redirect('/cart');
+			}
+
+			$cart_items = DB::table('fumaco_items')
+				->whereIn('f_idcode', array_column($cart, 'item_code'))->get();
+			
+			$cart_arr = [];
+			foreach ($cart_items as $n => $item) {
+				$item_image = DB::table('fumaco_items_image_v1')
+					->where('idcode', $item->f_idcode)->first();
+
+				$cart_arr[] = [
+					'item_code' => $item->f_idcode,
+					'item_description' => $item->f_name_name,
+					'price' => $item->f_price,
+					'amount' => ($item->f_price * $cart[$item->f_idcode]['quantity']),
+					'quantity' => $cart[$item->f_idcode]['quantity'],
+					'stock_qty' => $item->f_qty,
+					'item_image' => ($item_image) ? $item_image->imgprimayx : 'test.jpg'
+				];
+			}
+			$bill_address = "";
+			$ship_address = "";
+			if(Auth::check()){
+				$user_id = DB::table('fumaco_users')->where('username', Auth::user()->username)->first();
+
+				$bill_address = DB::table('fumaco_user_add')->where('xdefault', 1)->where('user_idx', $user_id->id)->where('address_class', 'Billing')->get();
+				$ship_address = DB::table('fumaco_user_add')->where('xdefault', 1)->where('user_idx', $user_id->id)->where('address_class', 'Delivery')->get();
+			}
+
+			return redirect('/checkout/review_order')->with('add_success', 'Record Updated');
+		}catch(Exception $e){
+			DB::rollback();
+			return redirect()->back()->with('error', 'An error occured. Please try again.');
+		}	
+		
+	}
+
 	public function setAddress(Request $request){
 		DB::beginTransaction();
 		try{
@@ -165,15 +240,23 @@ class CheckoutController extends Controller
 				];
 			}
 
+			$bill_address = DB::table('fumaco_user_add')->where('xdefault', 1)->where('user_idx', $user_id)->where('address_class', 'Billing')->get();
+			$ship_address = DB::table('fumaco_user_add')->where('xdefault', 1)->where('user_idx', $user_id)->where('address_class', 'Delivery')->get();
+
+			if(count($bill_address) > 1){
+				DB::table('fumaco_user_add')->where('user_idx', $user_id)->where('address_class', 'Billing')->update(['xdefault' => 0]);
+			}
+
+			if(count($ship_address) > 1){
+				DB::table('fumaco_user_add')->where('user_idx', $user_id)->where('address_class', 'Delivery')->update(['xdefault' => 0]);
+			}
+
 			$bill_insert = DB::table('fumaco_user_add')->insert($bill_address_arr);
 			$ship_insert = DB::table('fumaco_user_add')->insert($ship_address_arr);
 
 			DB::commit();
 
-			$bill_address = DB::table('fumaco_user_add')->where('xdefault', 1)->where('user_idx', $user_id)->where('address_class', 'Billing')->get();
-			$ship_address = DB::table('fumaco_user_add')->where('xdefault', 1)->where('user_idx', $user_id)->where('address_class', 'Delivery')->get();
-
-			return view('frontend.checkout.review_order', compact('cart_arr', 'cart', 'bill_address', 'ship_address'));
+			return redirect('/checkout/review_order')->with('add_success', 'Record Updated');
 		}catch(Exception $e){
 			DB::rollback();
 			return redirect()->back()->with('error', 'An error occured. Please try again.');
