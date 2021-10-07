@@ -52,7 +52,10 @@
                   <!-- general form elements -->
                   <div class="card">
                      <div class="card-body">
-                        <h4>Product Information</h4>
+                        <h4 class="d-inline-block">Product Information</h4>
+                        <div class="float-right">
+                           <a href="/admin/product/add" class="btn btn-primary">Add Product</a>
+                        </div>
                         <hr>
                         <div class="row">
                            <div class="col-md-2">
