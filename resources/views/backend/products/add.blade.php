@@ -298,7 +298,7 @@
           };
         },
         error: function () {
-          alert('An error occured.');
+          console.log('An error occured.');
         },
         cache: true
       }
@@ -314,14 +314,14 @@
         success:function(response){
           // if status = 0 (error)
           if (response.status || response.status === 0) {
-            alert('An error occured.');
+            console.log('An error occured.');
           } else {
             $('#parent-item-code').val(response.parent_item_code);
             $('#item-code').val(response.item_code);
             $('#item-code-text').text(response.item_code);
             $('#item-name').val(response.item_name);
             $('#item-classification').val(response.item_classification);
-            $('#brand').val(response.brand);
+            $('#item-brand').val(response.brand);
             $('#stock-uom').val(response.stock_uom);
             $('#warehouse').val(response.warehouse);
             $('#item-description').text(response.item_description);
@@ -329,7 +329,7 @@
             $('#stock-qty').val(response.stock_qty);
             $('#product-price').val(response.item_price);
             $('#weight-uom').val(response.weight_uom);
-            $('#ewight-per-unit').val(response.weight_per_unit);
+            $('#weight-per-unit').val(response.weight_per_unit);
             $('#package-weight').val(response.package_weight);
             $('#package-length').val(response.package_length);
             $('#package-width').val(response.package_width);
