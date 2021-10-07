@@ -139,4 +139,5 @@ class HomeCRUDController extends Controller
 			DB::rollback();
 		}
     }
+
 }
