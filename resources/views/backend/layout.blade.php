@@ -308,11 +308,13 @@
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
+                <a href="/admin/order_lists" class="nav-link {{ $activePage == 'order_list' ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>New Orders</p>
                 </a>
               </li>
               <li class="nav-item">
+                <a href="/admin/cancel_orders" class="nav-link {{ $activePage == 'order_cancel' ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Cancel Orders</p>
                 </a>
