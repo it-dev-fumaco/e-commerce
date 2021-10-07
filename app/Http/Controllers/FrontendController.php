@@ -309,6 +309,9 @@ class FrontendController extends Controller
 
     public function viewProduct($item_code) {
         $product_details = DB::table('fumaco_items')->where('f_idcode', $item_code)->first();
+        if (!$product_details) {
+            return view('error');
+        }
 
         $product_images = DB::table('fumaco_items_image_v1')->where('idcode', $item_code)->get();
 

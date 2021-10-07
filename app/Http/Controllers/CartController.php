@@ -193,9 +193,12 @@ class CartController extends Controller
     public function countCartItems() {
         $session_cart = session()->get('fumCart');
 
-        unset($session_cart['shipping']);
+        $count = 0;
+        if (isset($session_cart)) {
+            $count = count($session_cart);
+        }
 
-        $count = count($session_cart);
+        unset($session_cart['shipping']);
 
         if (Auth::check()) {
             $count += DB::table('fumaco_cart')->where('f_account_id', Auth::user()->id)->count();
