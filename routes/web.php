@@ -110,6 +110,10 @@ Route::prefix('admin')->group(function () {
         Route::get('/api_setup/payment', 'SettingsController@paymentApiSetup');
         Route::post('/api_setup/save', 'SettingsController@saveApiCredentials');
 
+        Route::get('/product/settings', 'ProductController@viewParentCodeList');
+        Route::post('/attribute_status/{parent}/update', 'ProductController@updateProductAttribute');
+        
+
         Route::get('/product/list', 'ProductController@viewList');
         Route::get('/product/add', 'ProductController@viewAddForm');
         Route::post('/product/save', 'ProductController@saveItem');

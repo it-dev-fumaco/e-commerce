@@ -68,7 +68,22 @@ class ProductController extends Controller
                 return response()->json(['status' => 0, 'message' => 'Product ' . $item_code . ' not found.']);
             }
 
+            // get parent item code
+            $fields = '?fields=["item_name"]';
+            $filter = '&filters=[["item_code","=","' . $response['data'][0]['variant_of'] . '"]]';
+
+            $params = $fields . '' . $filter;
+            
+            $variant_of = Http::withHeaders([
+                'Content-Type' => 'application/json',
+                'Authorization' => 'token '. $erp_api->api_key. ':' . $erp_api->api_secret_key . '',
+                'Accept-Language' => 'en'
+            ])->get($erp_api->base_url . '/api/resource/Item' . $params);
+            
+            $parent_item_name = (isset($variant_of['data'][0])) ? $variant_of['data'][0]['item_name'] : null;
+
             $result = [
+                'parent_item_name' => $parent_item_name,
                 'parent_item_code' => $response['data'][0]['variant_of'],
                 'item_code' => $response['data'][0]['name'],
                 'item_name' => $response['data'][0]['item_name'],
@@ -204,6 +219,7 @@ class ProductController extends Controller
             $id = DB::table('fumaco_items')->insertGetId([
                 'f_idcode' => $item['item_code'],
                 'f_parent_code' => $item['parent_item_code'],
+                'f_parent_item_name' => $item['parent_item_name'],
                 'f_name' => $item['item_code'],
                 'f_name_name'	 => $item['product_name'],
                 'f_item_name' => $item['item_name'],
@@ -381,5 +397,49 @@ class ProductController extends Controller
             ->where('idcode', $details->f_idcode)->orderBy('idx', 'asc')->get();
         
         return view('backend.products.view', compact('details', 'item_categories', 'attributes', 'item_image'));
+    }
+
+    public function viewParentCodeList(Request $request) {
+        $list = DB::table('fumaco_items')->whereNotNull('f_parent_code')
+            ->select('f_parent_code', 'f_parent_item_name')->groupBy('f_parent_code', 'f_parent_item_name')->paginate(10);
+
+        $attributes = [];
+        $parent = $request->parent;
+        if(isset($parent)) {
+            $variant_codes = DB::table('fumaco_items')
+                ->where('f_parent_code', $parent)->pluck('f_idcode');
+
+            $attributes = DB::table('fumaco_items_attributes')
+                ->whereIn('idcode', $variant_codes)->select('attribute_name', 'attribute_status')
+                ->orderBy('idx', 'asc')->groupBy('attribute_name', 'attribute_status')->get();
+        }
+
+        return view('backend.products.parent_code_list', compact('list', 'attributes'));
+    }
+
+    // update parent variant attribute status
+    public function updateProductAttribute($parent, Request $request) {
+        DB::beginTransaction();
+        try {
+            $attr_names = $request->attribute_name;
+            $status = $request->show_in_website;
+            foreach($attr_names as $i => $attr_name) {
+                $variant_codes = DB::table('fumaco_items')
+                    ->where('f_parent_code', $parent)->pluck('f_idcode');
+
+                $attributes = DB::table('fumaco_items_attributes')
+                    ->whereIn('idcode', $variant_codes)->where('attribute_name', $attr_name)
+                    ->update(['attribute_status' => $status[$i]]);
+            }
+
+            DB::commit();
+
+            return redirect()->back()->with('attr_success', 'Product Attribute has been updated.');
+        } catch (Exception $e) {
+            DB::rollback();
+            
+            return redirect()->back()->with('attr_error', 'An error occured. Please try again.');
+        }
+        return $request->all();
     }
 }

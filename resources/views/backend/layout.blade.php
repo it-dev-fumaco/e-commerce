@@ -225,7 +225,7 @@
             </ul>
           </li>
           @php
-            $product_pages = ['add_product_form', 'product_list', 'view_product_form'];
+            $product_pages = ['add_product_form', 'product_list', 'view_product_form', 'product_attribute_settings'];
           @endphp
           <li class="nav-item {{ (in_array($activePage, $product_pages) ? 'menu-open' : '') }}">
             <a href="#" class="nav-link {{ (in_array($activePage, $product_pages) ? 'active' : '') }}">
@@ -243,6 +243,12 @@
                 <a href="/admin/product/category" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Products by Category</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="/admin/product/settings" class="nav-link {{ $activePage == 'product_attribute_settings' ? 'active' : '' }}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Product Settings</p>
                 </a>
               </li>
             </ul>

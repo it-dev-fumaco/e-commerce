@@ -643,7 +643,8 @@
                             @foreach ($row as $attr_value => $items)
                             @php
                                 $x++;
-                                $is_active = (array_intersect($items, $active_variants));
+                                // $is_active = (array_intersect($items, $active_variants));
+                                $is_active = [1];
                             @endphp
                             <input type="radio" class="btn-check attr-radio" {{ ($attributes[$attr] == $attr_value) ? 'checked' : '' }} name="{{ $opt_name }}" id="{{ $opt_name . $x }}" autocomplete="off" value="{{ $attr_value }}" data-attribute="{{ $attr }}" {{ (count($is_active) > 0) ? '' : 'disabled' }}>
                             <label class="btn btn-outline-{{ (count($is_active) > 0) ? 'info' : 'secondary' }} btn-sm mb-2 mt-2" for="{{ $opt_name . $x }}">
