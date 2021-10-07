@@ -275,21 +275,24 @@
               </li>
             </ul>
           </li>
+          @php
+            $media_pages = ['list_media', 'add_media'];
+          @endphp
           <li class="nav-header">MEDIA FILES</li>
-          <li class="nav-item">
+          <li class="nav-item {{ (in_array($activePage, $media_pages) ? 'menu-open' : '') }}">
             <a href="#" class="nav-link">
               <i class="nav-icon fas fa-photo-video"></i>
               <p>Files <i class="fas fa-angle-left right"></i></p>
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="/admin/media/list" class="nav-link">
+                <a href="/admin/media/list" class="nav-link {{ $activePage == 'list_media' ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>List Files</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="/admin/media/add" class="nav-link">
+                <a href="/admin/media/add" class="nav-link {{ $activePage == 'add_media' ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Add Media</p>
                 </a>
@@ -305,13 +308,11 @@
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="/admin/dashboard" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>New Orders</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="/admin/dashboard" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Cancel Orders</p>
                 </a>
@@ -325,7 +326,6 @@
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="/admin/dashboard" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>List Order Delivered</p>
                 </a>

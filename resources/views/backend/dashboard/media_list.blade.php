@@ -1,5 +1,5 @@
 @extends('backend.layout', [
-	'namePage' => 'Dashboard',
+	'namePage' => 'Media',
 	'activePage' => 'list_media'
 ])
 
