@@ -309,7 +309,7 @@ class FrontendController extends Controller
 
         // get items with the same parent item code
         $variant_items = DB::table('fumaco_items')
-            ->whereNotNull('f_parent_code')->where('f_parent_code', $product_details->f_parent_code)->pluck('f_idcode');
+            ->where('f_parent_code', $product_details->f_parent_code)->pluck('f_idcode');
 
         // get attributes of all variant items
         $variant_attributes = DB::table('fumaco_items_attributes')
@@ -320,7 +320,7 @@ class FrontendController extends Controller
         $attributes = DB::table('fumaco_items_attributes')
             ->where('idcode', $item_code)->orderBy('idx', 'asc')->pluck('attribute_value', 'attribute_name');
 
-        // $active_attr = [];
+        $active_attr = [];
         $variant_attr_arr = [];
         foreach ($variant_attributes as $attr => $value) {
             $values = collect($value)->groupBy('attribute_value')->map(function($d, $i) {
@@ -329,23 +329,17 @@ class FrontendController extends Controller
 
             $variant_attr_arr[$attr] = $values;
 
-            // if (count($variant_attr_arr[$attr][$attributes[$attr]]) > 1) {
-            //    $active_attr[] = $variant_attr_arr[$attr][$attributes[$attr]];
-            // }
+            if (count($variant_attr_arr[$attr][$attributes[$attr]]) > 1) {
+                $active_attr[] = $variant_attr_arr[$attr][$attributes[$attr]];
+            }
         }
 
         $product_images = DB::table('fumaco_items_image_v1')->where('idcode', $item_code)->get();
-        // if(count($active_attr) > 1) {
-        //    // get common item code to set attribute button as active
-        //     $active_variants = call_user_func_array('array_intersect', $active_attr);
-        // } else {
-        //     $active_variants = $active_attr;
-        // }
 
-        // return $active_variants;
+        // get common item code to set attribute button as active
+        $active_variants = call_user_func_array('array_intersect', $active_attr);
 
-
-        return view('frontend.product_page', compact('product_details', 'product_images', 'attributes', 'variant_attr_arr'));
+        return view('frontend.product_page', compact('product_details', 'product_images', 'attributes', 'variant_attr_arr', 'active_variants'));
     }
 
     public function viewWishlist() {
