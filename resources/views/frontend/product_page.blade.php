@@ -633,22 +633,37 @@
                             </p>
                         </div>
                         <hr class="singleline">
-                        <div>
-                            <div class="row" style="margin-top: 15px;">
-                                <div class="col-xs-6"><span class="product_options"></span></div>
-                                <div class="col-xs-6">
-                                    <div class="form-check form-check-inline"></div>
-                                </div>
-                            </div>
-                        </div>
-                        
-	                    <div class="row" id="product_details">
+                        @foreach ($variant_attr_arr as $attr => $row)
+                        @php
+                            $x = 0;
+                            $opt_name = preg_replace('/\s+/', '', strtolower($attr));
+                        @endphp
+                        <label style="margin-left: 3%;">{{ $attr }} : </label>
+                        <div class="btn-group" role="group" aria-label="Select Variants" style="display: unset !important;">
+                            @foreach ($row as $attr_value => $items)
+                            @php
+                                $x++;
+                                $is_active = (array_intersect($items, $active_variants));
+                            @endphp
+                            <input type="radio" class="btn-check attr-radio" {{ ($attributes[$attr] == $attr_value) ? 'checked' : '' }} name="{{ $opt_name }}" id="{{ $opt_name . $x }}" autocomplete="off" value="{{ $attr_value }}" data-attribute="{{ $attr }}" {{ (count($is_active) > 0) ? '' : 'disabled' }}>
+                            <label class="btn btn-outline-{{ (count($is_active) > 0) ? 'info' : 'secondary' }} btn-sm mb-2 mt-2" for="{{ $opt_name . $x }}">
+                                @if(count($is_active) > 0)
+                                {{ $attr_value }}
+                                @else
+                                <del>{{ $attr_value }}</del>
+                                @endif
+                            </label>
+                            @endforeach
+                        </div><br>
+                        @endforeach
+	                    <div class="row mt-5" id="product_details">
                             <div class="col-xs-6">
 								<button type="submit" class="btn btn-lg btn-outline-primary fumacoFont_card_readmore" name="addtocart" style="padding: 1rem 1.5rem !important; color: #ffffff;background-color: #0062A5;border-color: #7cc;border-radius: 0 !important; {{ ($product_details->f_qty < 1) ? 'display: none;' : '' }}" value="1"><i class="fas fa-shopping-cart"></i> Add to Cart</button>
                                
                                 <button type="submit" class="btn btn-lg btn-outline-primary fumacoFont_card_readmore" name="buynow" style="padding: 1rem 1.5rem !important; color: #ffffff;background-color: #0062A5;border-color: #7cc;border-radius: 0 !important; {{ ($product_details->f_qty < 1) ? 'display: none;' : '' }}"  value="1"><i class="fas fa-wallet"></i> Buy Now</button>
-
+                                @if($product_details->f_qty < 1)
                                 <button type="submit" class="btn btn-lg btn-outline-primary fumacoFont_card_readmore" style="padding: 1rem 1.5rem !important; color: #ffffff;background-color: #0062A5;border-color: #7cc;border-radius: 0 !important;" name="addtowishlist" value="1"><i class="fas fa-heart"></i> Add to Wish List</button>
+                                @endif
                             </div>
                             <div class="row"><br></div>
                         </div>
@@ -677,10 +692,10 @@
                             <p class="card-text">
                                 <table class="table">
                                     <tbody style="border-style: inset !important;" class="fumacoFont_collapse_caption">
-                                        @foreach ($attributes as $attr)
+                                        @foreach ($attributes as $attr => $value)
                                         <tr>
-                                            <td>{{ $attr->attribute_name }}</td>
-                                            <td>{{ $attr->attribute_value }}</td>
+                                            <td>{{ $attr }}</td>
+                                            <td>{{ $value }}</td>
                                         </tr>
                                         @endforeach
                                     </tbody>
@@ -719,4 +734,27 @@
 <script type="text/javascript" src="{{ asset('/item/hammer.js/1.0.5/jquery.hammer.min.js') }}"></script>
 <script type="text/javascript" src="{{ asset('/item/fancybox/source/jquery.fancybox.js') }}"></script>
 <script type="text/javascript" src="{{ asset('/item/magnific-popup/js/magnific-popup.js') }}"></script>
+
+<script>
+   (function() {
+		$(document).on('change', '.attr-radio', function(){
+			var selected_attr = {};
+			$('.attr-radio:checked').each(function() {
+				var lbl = $(this).data('attribute');
+				var r_value = $(this).val();
+				selected_attr[lbl] = r_value;
+			});
+
+			$.ajax({
+				type:"POST",
+				url:"/getvariantcode",
+				data: {attr: selected_attr, _token: '{{ csrf_token() }}', parent: '{{ $product_details->f_parent_code }}', id: '{{ $product_details->f_idcode }}'},
+				success:function(response){
+					window.location.href = "/product/" + response;
+					console.log(response);
+				}
+      	});
+		});
+  	})();
+</script>
 @endsection

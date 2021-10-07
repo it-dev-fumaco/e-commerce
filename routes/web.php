@@ -48,6 +48,8 @@ Route::get('/track_order', 'FrontendController@viewOrderTracking');
 Route::get('/categories', 'FrontendController@getProductCategories');
 Route::get('/website_settings', 'FrontendController@websiteSettings');
 
+Route::post('/getvariantcode', 'FrontendController@getVariantItemCode');
+
 Route::group(['middleware' => 'auth'], function(){
     Route::get('/mywishlist', 'FrontendController@viewWishlist');
     Route::delete('/mywishlist/{id}/delete', 'FrontendController@deleteWishlist');

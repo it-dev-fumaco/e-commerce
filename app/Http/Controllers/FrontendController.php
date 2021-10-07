@@ -36,6 +36,7 @@ class FrontendController extends Controller
             // }
 
             $best_selling_arr[] = [
+                'id' => $bs->id,
                 'item_code' => $bs->f_idcode,
                 'item_name' => $bs_item_name,
                 'orig_price' => $bs->f_original_price,
@@ -58,6 +59,7 @@ class FrontendController extends Controller
             // }
 
             $on_sale_arr[] = [
+                'id' => $os->id,
                 'item_code' => $os->f_idcode,
                 'item_name' => $os_item_name,
                 'orig_price' => $os->f_original_price,
@@ -285,16 +287,8 @@ class FrontendController extends Controller
             $item_image = DB::table('fumaco_items_image_v1')->where('idcode', $product->f_idcode)->first();
 
             $item_name = strip_tags($product->f_name_name);
-            // if (strlen($item_name) > 150) {
-            //     // truncate string
-            //     $stringCut = substr($item_name, 0, 150);
-            //     $endPoint = strrpos($stringCut, ' ');
-            //     //if the string doesn't contain any space then it will cut without word basis.
-            //     $item_name = $endPoint? substr($stringCut, 0, $endPoint) : substr($stringCut, 0);
-            //     $item_name .= '...';
-            // }
-
             $products_arr[] = [
+                'id' => $product->id,
                 'item_code' => $product->f_idcode,
                 'item_name' => $item_name,
                 'image' => ($item_image) ? $item_image->imgprimayx : 'test.jpg',
@@ -313,11 +307,39 @@ class FrontendController extends Controller
             return view('error');
         }
 
+        // get items with the same parent item code
+        $variant_items = DB::table('fumaco_items')
+            ->where('f_parent_code', $product_details->f_parent_code)->pluck('f_idcode');
+
+        // get attributes of all variant items
+        $variant_attributes = DB::table('fumaco_items_attributes')
+            ->whereIn('idcode', $variant_items)->where('attribute_status', 1)->orderBy('idx', 'asc')->get();
+        $variant_attributes = collect($variant_attributes)->groupBy('attribute_name');
+
+        // get item attributes for display 
+        $attributes = DB::table('fumaco_items_attributes')
+            ->where('idcode', $item_code)->orderBy('idx', 'asc')->pluck('attribute_value', 'attribute_name');
+
+        $active_attr = [];
+        $variant_attr_arr = [];
+        foreach ($variant_attributes as $attr => $value) {
+            $values = collect($value)->groupBy('attribute_value')->map(function($d, $i) {
+                return array_unique(array_column($d->toArray(), 'idcode'));
+            });
+
+            $variant_attr_arr[$attr] = $values;
+
+            if (count($variant_attr_arr[$attr][$attributes[$attr]]) > 1) {
+                $active_attr[] = $variant_attr_arr[$attr][$attributes[$attr]];
+            }
+        }
+
         $product_images = DB::table('fumaco_items_image_v1')->where('idcode', $item_code)->get();
 
-        $attributes = DB::table('fumaco_items_attributes')->where('idcode', $item_code)->orderBy('idx', 'asc')->get();
+        // get common item code to set attribute button as active
+        $active_variants = call_user_func_array('array_intersect', $active_attr);
 
-        return view('frontend.product_page', compact('product_details', 'product_images', 'attributes'));
+        return view('frontend.product_page', compact('product_details', 'product_images', 'attributes', 'variant_attr_arr', 'active_variants'));
     }
 
     public function viewWishlist() {
@@ -594,5 +616,38 @@ class FrontendController extends Controller
         }
 
         return view('frontend.track_order', compact('order_details', 'items'));
+    }
+
+    // get item code based on variants selected in product page
+    public function getVariantItemCode(Request $request) {
+        $attr_collection = collect($request->attr);
+        $attr_names = array_keys($attr_collection->toArray());
+        $attr_values = $attr_collection->values();
+
+        // get variant items based on $request->parent
+        $variant_codes = DB::table('fumaco_items')
+            ->where('f_parent_code', $request->parent)->pluck('f_idcode');
+
+        // get attributes of all variant items
+        $variant_attributes = DB::table('fumaco_items_attributes')
+            ->whereIn('idcode', $variant_codes)
+            ->whereIn('attribute_name', $attr_names)
+            ->whereIn('attribute_value', $attr_values)
+            ->where('attribute_status', 1)
+            ->orderBy('idx', 'asc')->get();
+        // group variant attributes by item code
+        $grouped_attr = collect($variant_attributes)->groupBy('idcode');
+        foreach ($grouped_attr as $item_code => $values) {
+            $attr_values = collect($values)->mapWithKeys(function($e){
+                return [$e->attribute_name => $e->attribute_value];
+            });
+            // get difference between two arrays
+            $diff = array_diff_assoc($attr_collection->toArray(),$attr_values->toArray());
+            if (count($diff) <= 0) {
+                return $item_code;
+            }
+        }
+
+        return $request->id;
     }
 }
