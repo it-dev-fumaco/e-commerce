@@ -46,19 +46,19 @@
               <div class="alert alert-warning alert-dismissible fade show text-center" role="alert">
                 @foreach ($errors->all() as $error)
                   <span class="d-block">{{ $error }}</span>
-                @endforeach 
+                @endforeach
               </div>
             @endif
             <!-- general form elements -->
             <div class="card">
               <!-- /.card-header -->
               <div class="card-body">
-                <h4>Search Item from ERP <span class="float-right" id="item-code-text"></span></h4>
+                <h4>Register New Product <span class="float-right" id="item-code-text"></span></h4>
                 <hr>
                 <div class="row">
                   <div class="col-md-6">
                     <div class="form-group">
-                      <label for="search-item-code">ERP Item Code</label>
+                      <label for="search-item-code">Search ERP Item Code</label>
                       <select class="form-control select2" id="search-item-code" style="width: 100%;" required></select>
                     </div>
                     <div class="form-group">
@@ -78,11 +78,11 @@
                           <input type="text" class="form-control" id="parent-item-code" name="parent_item_code" value="{{ old('parent_item_code') }}" readonly required>
                         </div>
                         <div class="form-group">
-                          <label for="item-brand">Brand</label>
+                          <label for="item-brand">* Brand</label>
                           <input type="text" class="form-control" id="item-brand" name="brand" value="{{ old('brand') }}" readonly required>
                         </div>
                         <div class="form-group">
-                          <label for="product-price">Product Price</label>
+                          <label for="product-price">Product Price (ERP Website Price List)</label>
                           <input type="text" class="form-control" id="product-price" name="price" value="{{ old('price') }}" readonly required>
                         </div>
                       </div>
@@ -106,19 +106,19 @@
                     <div class="row">
                       <div class="col-md-6">
                         <div class="form-group">
-                          <label for="weight-uom">Weight UoM</label>
+                          <label for="weight-uom">* Weight UoM</label>
                           <input type="text" class="form-control" id="weight-uom" name="weight_uom" value="{{ old('weight_uom') }}" readonly required>
                         </div>
                       </div>
                       <div class="col-md-6">
                         <div class="form-group">
-                          <label for="weight-per-unit">Weight per Unit</label>
+                          <label for="weight-per-unit">* Weight per Unit</label>
                           <input type="text" class="form-control" id="weight-per-unit" name="weight_per_unit" value="{{ old('weight_per_unit') }}" readonly required>
                         </div>
                       </div>
                       <div class="col-md-6">
                         <div class="form-group">
-                          <label for="package-weight">Package Weight</label>
+                          <label for="package-weight">* Package Weight</label>
                           <input type="text" class="form-control" id="package-weight" name="package_weight" value="{{ old('package_weight') }}" readonly required>
                         </div>
                       </div>
@@ -128,25 +128,25 @@
                     <div class="row">
                       <div class="col-md-4">
                         <div class="form-group">
-                          <label for="package-length">Package Length</label>
+                          <label for="package-length">* Package Length</label>
                           <input type="text" class="form-control" id="package-length" name="package_length" value="{{ old('package_length') }}" readonly required>
                         </div>
                       </div>
                       <div class="col-md-4">
                         <div class="form-group">
-                          <label for="package-width">Package Width</label>
+                          <label for="package-width">* Package Width</label>
                           <input type="text" class="form-control" id="package-width" name="package_width" value="{{ old('package_width') }}" readonly required>
                         </div>
                       </div>
                       <div class="col-md-4">
                         <div class="form-group">
-                          <label for="package-height">Package Height</label>
+                          <label for="package-height">* Package Height</label>
                           <input type="text" class="form-control" id="package-height" name="package_height" value="{{ old('package_height') }}" readonly required>
                         </div>
                       </div>
                       <div class="col-md-4">
                         <div class="form-group">
-                          <label for="package-dimension-uom">Package Dimension UoM</label>
+                          <label for="package-dimension-uom">* Package Dimension UoM</label>
                           <input type="text" class="form-control" id="package-dimension-uom" name="package_dimension_uom" value="{{ old('package_dimension_uom') }}" readonly required>
                         </div>
                       </div>
@@ -158,19 +158,19 @@
                 <div class="row">
                   <div class="col-md-4">
                     <div class="form-group">
-                      <label for="warehouse">Warehouse</label>
+                      <label for="warehouse">* Warehouse</label>
                       <input type="text" class="form-control" id="warehouse" name="warehouse" value="{{ old('warehouse') }}" readonly required>
                     </div>
                   </div>
                   <div class="col-md-4">
                     <div class="form-group">
-                      <label for="stock-qty">Stock Quantity (from website warehouse)</label>
+                      <label for="stock-qty"> * Stock Quantity (Website Reserved Quantity)</label>
                       <input type="number" class="form-control" id="stock-qty" name="stock_qty" value="{{ old('stock_qty') }}" readonly required>
                     </div>
                   </div>
                   <div class="col-md-4">
                     <div class="form-group">
-                      <label for="alert-qty">Min. Stock Level</label>
+                      <label for="alert-qty">* Min. Stock Level</label>
                       <input type="number" class="form-control" id="alert-qty" name="alert_qty" value="{{ old('alert_qty') }}" required>
                     </div>
                   </div>
@@ -180,13 +180,13 @@
                 <div class="row">
                   <div class="col-md-8">
                     <div class="form-group">
-                      <label for="product-name">Product Name</label>
+                      <label for="product-name">* Product Name</label>
                       <input type="text" class="form-control" id="product-name" name="product_name" value="{{ old('product_name') }}" required>
                     </div>
                   </div>
                   <div class="col-md-4">
                     <div class="form-group">
-                      <label for="product-category">Category</label>
+                      <label for="product-category">* Category</label>
                       <select name="product_category" id="product-category" class="form-control" required>
                         <option>Select Category</option>
                         @forelse ($item_categories as $item_category)
@@ -198,14 +198,14 @@
                     </div>
                   </div>
                 </div>
-                
-                
+
+
                 <div class="form-group">
-                  <label for="website-caption">Website Caption (more information section)</label>
+                  <label for="website-caption">* Website Caption (more information section)</label>
                   <textarea class="form-control" rows="6" id="website-caption" name="website_caption">{{ old('website_caption') }}</textarea>
                 </div>
                 <div class="form-group">
-                  <label for="full-detail">Full Detail</label>
+                  <label for="full-detail">* Full Detail</label>
                   <textarea class="form-control" rows="6" id="full-detail" name="full_detail">{{ old('full_detail') }}</textarea>
                 </div>
                 <h5>Product Specifications / Attributes</h5>
@@ -303,7 +303,7 @@
         cache: true
       }
     });
-    
+
     $(document).on('select2:select', '#search-item-code', function(e){
       var data = e.params.data;
       $('#custom-overlay').fadeIn();
