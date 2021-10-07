@@ -61,7 +61,8 @@
 								</div>
 							</form>
 							<table class="table table-bordered table-hover">
-								<col style="width: 42%;">
+								<col style="width: 35%;">
+								<col style="width: 7%;">
 								<col style="width: 7%;">
 								<col style="width: 7%;">
 								<col style="width: 8%;">
@@ -73,6 +74,7 @@
 								<thead>
 									<tr>
 										<th class="text-center">Item Name</th>
+										<th class="text-center">Parent Item</th>
 										<th class="text-center">Price</th>
 										<th class="text-center">Qty</th>
 										<th class="text-center">Reserved Qty</th>
@@ -87,6 +89,7 @@
 									@forelse ($list as $item)
 									<tr>
 										<td><span class="d-block font-weight-bold">{{ $item->f_idcode }}</span> {{ $item->f_name_name }}</td>
+										<td class="text-center">{{ $item->f_parent_code }}</td>
 										<td class="text-center">{{ 'P ' . number_format((float)$item->f_price, 2, '.', ',') }}</td>
 										<td class="text-center">{{ number_format($item->f_qty) }}</td>
 										<td class="text-center">{{ number_format($item->f_reserved_qty) }}</td>
