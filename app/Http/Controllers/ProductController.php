@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Validator;
 use Auth;
 use DB;
 
@@ -441,5 +442,112 @@ class ProductController extends Controller
             return redirect()->back()->with('attr_error', 'An error occured. Please try again.');
         }
         return $request->all();
+    }
+
+    public function uploadImagesForm($id){
+        $details = DB::table('fumaco_items')->where('id', $id)->first();
+        
+        $item_image = DB::table('fumaco_items_image_v1')->where('idcode', $details->f_idcode)->get();
+
+        $img_arr = [];
+        foreach($item_image as $img){
+            $img_zoom = ($img->imgoriginalx) ? $img->imgoriginalx : 'test.jpg';
+            $img_primary = ($img->imgprimayx) ? $img->imgprimayx : 'test.jpg';
+
+            $img_arr[] = [
+                'img_id' => $img->id,
+                'item_code' => $img->idcode,
+                'primary' => $img_primary,
+                'zoom' => $img_zoom 
+            ];
+        }
+
+        return view('backend.products.images', compact('img_arr'));
+    }
+
+    public function deleteProductImage(Request $request){
+        DB::beginTransaction();
+		try{
+            DB::table('fumaco_items_image_v1')->where('id', $request->img_id)->delete();
+            DB::commit();
+			return redirect()->back()->with('success', 'Media Successfully Deleted');
+		}catch(Exception $e){
+			DB::rollback();
+			return redirect()->back()->with('image_error', 'Error');
+		}
+    }
+
+    public function uploadImages(Request $request){
+        DB::beginTransaction();
+		try{
+			$checker = DB::table('fumaco_items_image_v1')->where('idcode', $request->item_code)->get();
+
+			$img_primary = $request->file('img_primary'); //400
+			$img_zoom = $request->file('img_zoom');//1024
+
+			$p_filename = pathinfo($img_primary->getClientOriginalName(), PATHINFO_FILENAME);//400
+			$z_filename = pathinfo($img_zoom->getClientOriginalName(), PATHINFO_FILENAME);//1024
+			$p_extension = pathinfo($img_primary->getClientOriginalName(), PATHINFO_EXTENSION);//400
+			$z_extension = pathinfo($img_zoom->getClientOriginalName(), PATHINFO_EXTENSION);//1024
+
+			$request->file('img_zoom')->store('/item/images/'.$request->item_code.'/gallery/original');//1024
+			$request->file('img_primary')->store('/item/images/'.$request->item_code.'/gallery/preview');//400
+
+			$p_name = "(400p) " .$p_filename.".".$p_extension;//400
+			$z_name = "(1024p) " .$z_filename.".".$z_extension;//1024
+
+            // dd($p_name. " : ".$z_name);
+
+			$image_error = '';
+			$rules = array(
+				'uploadFile' => 'image|max:500000'
+			);
+
+			$validation = Validator::make($request->all(), $rules);
+
+			if ($validation->fails()){
+				$image_error = "Sorry, your file is too large.";
+				return redirect()->back()->with('image_error', $image_error);
+			}
+
+			if($p_extension != "jpg" and $p_extension != "png" and $p_extension != "jpeg" and $p_extension != "gif"){
+				$image_error = "Sorry, only JPG, JPEG, PNG, and GIF files are allowed.";
+				return redirect()->back()->with('image_error', $image_error);
+			}
+
+			foreach($checker as $c){
+				if($c->imgprimayx == $p_name){
+					$image_error = "Sorry, file already exists.";
+					return redirect()->back()->with('image_error', $image_error);
+				}
+                if($c->imgoriginalx == $z_name){
+                    $image_error = "Sorry, file already exists.";
+					return redirect()->back()->with('image_error', $image_error);
+                }
+			}
+
+			$z_destinationPath = public_path('/item/images/'.$request->item_code.'/gallery/original');
+			$p_destinationPath = public_path('/item/images/'.$request->item_code.'/gallery/preview');
+			$img_primary->move($p_destinationPath, $p_name);
+			// $img_primary->move($z_destinationPath, $z_name);
+			$img_zoom->move($z_destinationPath, $z_name);
+
+			$images_arr[] = [
+				'idcode' => $request->item_code,
+                'imgnum' => " ",
+                'img_name' => " ",
+                'imgprimayx' => $p_name,
+                'imgoriginalx' => $z_name,
+                'img_status' => 1
+			];
+
+            DB::table('fumaco_items_image_v1')->insert($images_arr);
+            DB::commit();
+			return redirect()->back()->with('success', 'Media Successfully Added');
+		}catch(Exception $e){
+			DB::rollback();
+			return redirect()->back()->with('image_error', 'Error');
+		}
+
     }
 }

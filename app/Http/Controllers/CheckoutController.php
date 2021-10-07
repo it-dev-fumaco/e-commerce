@@ -392,7 +392,7 @@ class CheckoutController extends Controller
 				'order_ip' => $request->ip(),
 				'xusertype' => $user_type,
 				'xusernamex' => $username,
-				'xstatus' => 1,
+				'xstatus' => 2,
 				'xuser_id' => $user_id
 			];
 
@@ -411,7 +411,17 @@ class CheckoutController extends Controller
 				'address' => $temp_arr
 			];
 
+			$orders_arr[] = [
+				'order_number' => $order_no,
+				'item_code' => $item_code,
+				'item_name' => $item_desc,
+				'item_qty' => $request->quantity,
+				'item_price' => $request->price,
+				'item_total_price' => $request->grand_total
+			];
+
 			// dd($summary_arr);
+			DB::table('fumaco_order_items')-insert($orders_arr);
 			$insert = DB::table('fumaco_temp')->insert($temp_arr);
 			DB::commit();
 			return view('frontend.checkout.check_out_summary', compact('summary_arr'));

@@ -283,10 +283,11 @@
           </li>
           @php
             $media_pages = ['list_media', 'add_media'];
+            $order_pages = ['order_list', 'order_cancel', 'order_delivered'];
           @endphp
           <li class="nav-header">MEDIA FILES</li>
           <li class="nav-item {{ (in_array($activePage, $media_pages) ? 'menu-open' : '') }}">
-            <a href="#" class="nav-link">
+            <a href="#" class="nav-link {{ (in_array($activePage, $media_pages) ? 'active' : '') }}">
               <i class="nav-icon fas fa-photo-video"></i>
               <p>Files <i class="fas fa-angle-left right"></i></p>
             </a>
@@ -307,14 +308,14 @@
           </li>
      
           <li class="nav-header">ORDERS</li>
-          <li class="nav-item">
-            <a href="#" class="nav-link">
+          <li class="nav-item {{ (in_array($activePage, $order_pages) ? 'menu-open' : '') }}">
+            <a href="#" class="nav-link {{ (in_array($activePage, $order_pages) ? 'active' : '') }}">
               <i class="nav-icon fas fa-dolly-flatbed"></i>
               <p>Orders <i class="fas fa-angle-left right"></i></p>
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="/admin/order_lists" class="nav-link {{ $activePage == 'order_list' ? 'active' : '' }}">
+                <a href="/admin/order/order_lists" class="nav-link {{ $activePage == 'order_list' ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>New Orders</p>
                 </a>
@@ -334,6 +335,7 @@
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
+                <a href="/admin/orders_delivered" class="nav-link {{ $activePage == 'order_delivered' ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>List Order Delivered</p>
                 </a>

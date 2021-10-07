@@ -121,16 +121,22 @@ Route::prefix('admin')->group(function () {
         Route::get('/product/search', 'ProductController@searchItem');
         Route::get('/product/{item_code}', 'ProductController@getItemDetails');
         Route::get('/product/{id}/edit', 'ProductController@viewProduct');
+        Route::get('/product/images/{id}', 'ProductController@uploadImagesForm');
+        Route::post('/add_product_images', 'ProductController@uploadImages');
+        Route::post('/delete_product_image', 'ProductController@deleteProductImage');
         
         Route::post('/product/{id}/update', 'ProductController@updateItem');
         Route::post('/product/{item_code}/disable', 'ProductController@disableItem');
         Route::post('/product/{item_code}/enable', 'ProductController@enableItem');
+        
         Route::delete('/product/{item_code}/delete', 'ProductController@deleteItem');
 
         Route::get('/media/add', 'MediaController@add_media_form');
         Route::get('/media/list', 'MediaController@list_media');
         Route::post('/add_media_records', 'MediaController@add_media_record');
         Route::post('/delete_media', 'MediaController@delete_media_record');
+
+        Route::get('/order/order_lists', 'OrderController@order_list');
 
     });
 });
