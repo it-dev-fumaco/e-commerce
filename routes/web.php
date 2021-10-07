@@ -122,5 +122,11 @@ Route::prefix('admin')->group(function () {
         Route::post('/product/{item_code}/disable', 'ProductController@disableItem');
         Route::post('/product/{item_code}/enable', 'ProductController@enableItem');
         Route::delete('/product/{item_code}/delete', 'ProductController@deleteItem');
+
+        Route::get('/media/add', 'MediaController@add_media_form');
+        Route::get('/media/list', 'MediaController@list_media');
+        Route::post('/add_media_records', 'MediaController@add_media_record');
+        Route::post('/delete_media', 'MediaController@delete_media_record');
+
     });
 });
