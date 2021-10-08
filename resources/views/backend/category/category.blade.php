@@ -55,7 +55,7 @@
                                                 <tr>
                                                     <td>{{ $c->id }}</td>
                                                     <td>{{ $c->name }}</td>
-                                                    <td>{{ $c->image }}</td>
+                                                    <td><img src="{{ asset('assets/site-img/icon/')."/".$c->image }}" width="30" ></td>
                                                     <td>{{ $c->slug }}</td>
                                                     <td>
                                                         <button type="button" class="btn btn-info btn-sm active" data-toggle="modal" data-target="#PPPEdit{{ $c->id }}">Edit</button>
