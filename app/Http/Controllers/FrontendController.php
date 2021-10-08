@@ -26,15 +26,6 @@ class FrontendController extends Controller
             $bs_img = DB::table('fumaco_items_image_v1')->where('idcode', $bs->f_idcode)->first();
 
             $bs_item_name = $bs->f_name_name;
-            // if (strlen($bs_item_name) > 114) {
-            //     // truncate string
-            //     $stringCut = substr($bs_item_name, 0, 114);
-            //     $endPoint = strrpos($stringCut, ' ');
-            //     //if the string doesn't contain any space then it will cut without word basis.
-            //     $bs_item_name = $endPoint? substr($stringCut, 0, $endPoint) : substr($stringCut, 0);
-            //     $bs_item_name .= '...';
-            // }
-
             $best_selling_arr[] = [
                 'id' => $bs->id,
                 'item_code' => $bs->f_idcode,
@@ -49,15 +40,6 @@ class FrontendController extends Controller
             $os_img = DB::table('fumaco_items_image_v1')->where('idcode', $os->f_idcode)->first();
 
             $os_item_name = $os->f_name_name;
-            // if (strlen($os_item_name) > 114) {
-            //     // truncate string
-            //     $stringCut = substr($os_item_name, 0, 114);
-            //     $endPoint = strrpos($stringCut, ' ');
-            //     //if the string doesn't contain any space then it will cut without word basis.
-            //     $os_item_name = $endPoint? substr($stringCut, 0, $endPoint) : substr($stringCut, 0);
-            //     $os_item_name .= '...';
-            // }
-
             $on_sale_arr[] = [
                 'id' => $os->id,
                 'item_code' => $os->f_idcode,
@@ -276,11 +258,65 @@ class FrontendController extends Controller
         }
     }
 
-    public function viewProducts($category_id) {
-        $product_category = DB::table('fumaco_categories')->where('id', $category_id)->first();
+    public function viewProducts($category_id, Request $request) {
+        // return request()->fullUrlWithQuery();
+        // if(request()->isMethod('post')) {
+        //     // return $request->all();
+        //     $test_url = '';
 
+        //     $test1 = [];
+        //     foreach($request->attr as $attr => $values) {
+        //         $test = [
+        //             $attr => implode(",", $values)
+        //         ];
+        //         $test_url .= http_build_query($test) . '&';
+
+        //         $test1[$attr] = implode(",", $values);
+        //     }
+
+        //     $test1['sortby'] = $request->sortby;
+
+
+        //     return redirect(request()->fullUrlWithQuery($test1));
+
+        //     return $test_url;
+
+        //     // return ;
+        // }
+
+        $product_category = DB::table('fumaco_categories')->where('id', $category_id)->first();
+        if(!$product_category) {
+            return view('error');
+        }
+
+        // get item attributes based on item category
+        $filters = DB::table('fumaco_items as a')
+            ->join('fumaco_items_attributes as b', 'a.f_idcode', 'b.idcode')
+            ->where('a.f_cat_id', $category_id)->where('a.f_status', 1)
+            ->where('b.attribute_status', 1)->select('b.attribute_name', 'b.attribute_value')
+            ->groupBy('b.attribute_name', 'b.attribute_value')->get();
+
+        $filters = collect($filters)->groupBy('attribute_name')->map(function($r, $d){
+            return array_unique(array_column($r->toArray(), 'attribute_value'));
+        });
+
+        // get sorting value 
+        $sortby = $request->sortby;
+        switch ($sortby) {
+            case 'Price':
+                $sortby = 'f_price';
+                break;
+            case 'Product Name':
+                $sortby = 'f_name_name';
+                break;
+            default:
+                $sortby = 'f_order_by';
+                break;
+        }
+
+        // get items based on category id
         $products = DB::table('fumaco_items')->where('f_cat_id', $category_id)
-            ->where('f_status', 1)->orderBy('f_order_by', 'asc')->paginate(15);
+            ->where('f_status', 1)->orderBy($sortby, 'asc')->paginate(15);
 
         $products_arr = [];
         foreach ($products as $product) {
@@ -298,7 +334,7 @@ class FrontendController extends Controller
             ];
         }
 
-        return view('frontend.product_list', compact('product_category', 'products_arr', 'products'));
+        return view('frontend.product_list', compact('product_category', 'products_arr', 'products', 'filters'));
     }
 
     public function viewProduct($item_code) {

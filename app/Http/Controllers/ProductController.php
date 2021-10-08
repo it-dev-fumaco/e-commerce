@@ -18,7 +18,7 @@ class ProductController extends Controller
                 return response()->json(['status' => 0, 'ERP API not configured.']);
             }
     
-            $params = '?filters=[["name","LIKE","%25' . $request->q . '%25"],["show_in_website","=","1"],["has_variants","=","0"]]';
+            $params = '?filters=[["name","LIKE","%25' . $request->q . '%25"],["custom_show_in_website","=","1"],["has_variants","=","0"]]';
     
             $response = Http::withHeaders([
                 'Content-Type' => 'application/json',
@@ -50,7 +50,7 @@ class ProductController extends Controller
                 return response()->json(['status' => 0, 'message' => 'ERP API not configured.']);
             }
             
-            $fields = '?fields=["item_name","website_warehouse","web_long_description","item_code","description","name","show_in_website","weight_per_unit","weight_uom","website_warehouse","variant_of","brand","is_stock_item","stock_uom","item_classification","item_group","package_weight","package_length","package_width","package_height","package_dimension_uom","weight_uom","product_name"]';
+            $fields = '?fields=["item_name","website_warehouse","web_long_description","item_code","description","name","custom_show_in_website","weight_per_unit","weight_uom","website_warehouse","variant_of","brand","is_stock_item","stock_uom","item_classification","item_group","package_weight","package_length","package_width","package_height","package_dimension_uom","weight_uom","product_name"]';
             $filter = '&filters=[["item_code","=","' . $item_code . '"]]';
     
             $params = $fields . '' . $filter;
