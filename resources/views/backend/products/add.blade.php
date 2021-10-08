@@ -10,13 +10,13 @@
 		<div class="container-fluid">
 			<div class="row mb-2">
 				<div class="col-sm-6">
-					<h1 class="m-0">Add Product</h1>
+					<h1 class="m-0">Create New Product</h1>
 				</div><!-- /.col -->
 				<div class="col-sm-6">
 					<ol class="breadcrumb float-sm-right">
 						<li class="breadcrumb-item"><a href="/admin/dashboard">Home</a></li>
             <li class="breadcrumb-item"><a href="/admin/product/list">Products</a></li>
-						<li class="breadcrumb-item active">Add Product</li>
+						<li class="breadcrumb-item active">Create New Product</li>
 					</ol>
 				</div><!-- /.col -->
 			</div><!-- /.row -->
@@ -53,12 +53,12 @@
             <div class="card">
               <!-- /.card-header -->
               <div class="card-body">
-                <h4>Register New Product <span class="float-right" id="item-code-text"></span></h4>
+                <h4>Get Product Code From ERP <span class="float-right" id="item-code-text"></span></h4>
                 <hr>
                 <div class="row">
                   <div class="col-md-6">
                     <div class="form-group">
-                      <label for="search-item-code">Search ERP Item Code</label>
+                      <label for="search-item-code">Search Item Code</label>
                       <select class="form-control select2" id="search-item-code" style="width: 100%;" required></select>
                     </div>
                     <div class="form-group">

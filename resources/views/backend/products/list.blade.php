@@ -55,7 +55,7 @@
 									</div>
 									<div class="col-md-8">
 										<div class="float-right">
-											<a href="/admin/product/add" class="btn btn-primary">Add Product</a>
+											<a href="/admin/product/add" class="btn btn-primary">Create New Product</a>
 										</div>
 									</div>
 								</div>
