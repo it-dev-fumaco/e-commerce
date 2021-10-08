@@ -105,7 +105,7 @@
                                 </div>
                                 <br/>
                                 <div class="row">
-                                    <label class="login_1">Username or email address *</label>
+                                    <label class="login_1">Email address *</label>
                                     <input type="email" name="username" id="username" class="form-control caption_1" value="" required>
                                     <span class="help-block"></span>
                                 </div>
@@ -123,9 +123,9 @@
                                 </div>
                                 <br>
                                 <div class="row">
-                                    <p class="reg_link" style="white-space: wrap;"><input type="checkbox" checked> &nbsp;Yes, I want to receive email updates and notifications.</p>
-                                    <p class="reg_link" style="">By signing up you agree to our Privacy Policy and Terms.</p>
-                                    <input type="submit" class="btn btn-primary" value="REGISTER"><br/>
+                                    <p class="reg_link" style="white-space: wrap;"><input type="checkbox"> &nbsp;Yes, I want to receive email updates and notifications.</p>
+                                    <p class="reg_link" style=""><input type="checkbox" id="terms_checkbox"> I agree to <a href="/privacy_policy" style="display: inline-block !important;">Privacy Policy</a> and <a href="/terms_condition" style="display: inline-block !important;">Terms</a>.</p>
+                                    <input type="submit" id="reg_btn" class="btn btn-primary" value="REGISTER" disabled><br/>
                                 </div>
                             </div>
                         </center>
@@ -163,7 +163,8 @@
 <style>
     .reg_link{
         font-size: 9pt;
-        white-space: nowrap;
+        white-space: nowrap !important;
+        display: inline-block !important;
     }
 
     /* sign in FORM */
@@ -399,6 +400,15 @@
         $('#logreg-forms #cancel_signup').click(toggleSignUp);
     })
     
-    
-</script>
+    $(document).ready(function() {
+        $('#terms_checkbox').click(function() {
+            if($(this).prop("checked") == false) {
+                $("#reg_btn").prop('disabled',true);
+            }else{
+                $("#reg_btn").prop('disabled',false);
+            }
+        });
+    });
+
+	</script>
 @endsection
