@@ -46,7 +46,7 @@
                   <div class="alert alert-warning alert-dismissible fade show text-center" role="alert">
                      @foreach ($errors->all() as $error)
                      <span class="d-block">{{ $error }}</span>
-                     @endforeach 
+                     @endforeach
                   </div>
                   @endif
                   <!-- general form elements -->
@@ -54,7 +54,7 @@
                      <div class="card-body">
                         <h4 class="d-inline-block">Product Information</h4>
                         <div class="float-right">
-                           <a href="/admin/product/add" class="btn btn-primary">Add Product</a>
+                           <a href="/admin/product/add" class="btn btn-primary">Create New Product</a>
                         </div>
                         <hr>
                         <div class="row">
