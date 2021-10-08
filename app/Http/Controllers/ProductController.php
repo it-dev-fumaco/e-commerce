@@ -457,6 +457,7 @@ class ProductController extends Controller
             $img_arr[] = [
                 'img_id' => $img->id,
                 'item_code' => $img->idcode,
+                'item_name' => $details->f_name_name,
                 'primary' => $img_primary,
                 'zoom' => $img_zoom 
             ];

@@ -30,46 +30,55 @@
                             <div class="card-header">
                                 <h3 class="card-title">Multiple Images</h3>
                             </div>
-
-                            <form role="form" action="/admin/add_product_images" method="post" enctype="multipart/form-data">
-                                @csrf
-                                <div class="card-body">
-                                    @if(session()->has('success'))
-                                        <div class="alert alert-success">
-                                            {{ session()->get('success') }}
-                                        </div>
-                                    @endif
-                                    @if(session()->has('image_error'))
-                                        <div class="alert alert-danger">
-                                            {{ session()->get('image_error') }}
-                                        </div>
-                                    @endif
-                                    <div class="form-group">
-                                        <label for="img_primary">Image Primary</label>
-                                        <div class="input-group">
-                                            <div class="custom-file">
-                                                <input type="file" class="custom-file-input" name="img_primary" id="img_primary" required>
-                                                <label class="custom-file-label">Choose file</label>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="img_zoom">Image Zoom</label>
-                                        <div class="input-group">
-                                            <div class="custom-file">
-                                                <input type="file" class="custom-file-input" name="img_zoom" id="img_zoom" required>
-                                                <label class="custom-file-label">Choose file</label>
-                                            </div>
-                                        </div>
+                            <div class="row">
+                                <div class="col-12 col-sm-6">
+                                    <div class="card-body">
+                                        <p><b>Item Code:</b> {{ $img_arr[0]['item_code'] }}</p>
+                                        <p><b>Item Name:</b> {{ $img_arr[0]['item_name'] }}</p>
                                     </div>
                                 </div>
-                                <!-- /.card-body -->
-                                <div class="card-footer">
-                                    <input type="text" value="{{ $img_arr[0]['item_code'] }}" name="item_code" hidden/>
-                                    <input type="submit" class="btn btn-primary" value="Upload">
+                                <div class="col-12 col-sm-6">
+                                    <form role="form" action="/admin/add_product_images" method="post" enctype="multipart/form-data">
+                                        @csrf
+                                        <div class="card-body">
+                                            @if(session()->has('success'))
+                                                <div class="alert alert-success">
+                                                    {{ session()->get('success') }}
+                                                </div>
+                                            @endif
+                                            @if(session()->has('image_error'))
+                                                <div class="alert alert-danger">
+                                                    {{ session()->get('image_error') }}
+                                                </div>
+                                            @endif
+                                            <div class="form-group">
+                                                <label for="img_primary">Image Primary</label>
+                                                <div class="input-group">
+                                                    <div class="custom-file">
+                                                        <input type="file" class="custom-file-input" name="img_primary" id="img_primary" required>
+                                                        <label class="custom-file-label">Choose file</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+        
+                                            <div class="form-group">
+                                                <label for="img_zoom">Image Zoom</label>
+                                                <div class="input-group">
+                                                    <div class="custom-file">
+                                                        <input type="file" class="custom-file-input" name="img_zoom" id="img_zoom" required>
+                                                        <label class="custom-file-label">Choose file</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- /.card-body -->
+                                        <div class="card-footer">
+                                            <input type="text" value="{{ $img_arr[0]['item_code'] }}" name="item_code" hidden/>
+                                            <input type="submit" class="btn btn-primary" value="Upload">
+                                        </div>
+                                    </form>
                                 </div>
-                            </form>
+                            </div>
                         </div>
                     <!-- /.card -->
                     </div>
