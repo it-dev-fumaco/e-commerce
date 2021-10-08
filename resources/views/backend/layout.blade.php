@@ -226,6 +226,9 @@
           </li>
           @php
             $product_pages = ['add_product_form', 'product_list', 'view_product_form', 'product_attribute_settings'];
+            $media_pages = ['list_media', 'add_media'];
+            $order_pages = ['order_list', 'order_cancel', 'order_delivered'];
+            $category_pages = ['product_category'];
           @endphp
           <li class="nav-item {{ (in_array($activePage, $product_pages) ? 'menu-open' : '') }}">
             <a href="#" class="nav-link {{ (in_array($activePage, $product_pages) ? 'active' : '') }}">
@@ -253,14 +256,14 @@
               </li>
             </ul>
           </li>
-          <li class="nav-item">
-            <a href="#" class="nav-link">
+          <li class="nav-item {{ (in_array($activePage, $category_pages) ? 'menu-open' : '') }}">
+            <a href="#" class="nav-link {{ (in_array($activePage, $category_pages) ? 'active' : '') }}">
               <i class="nav-icon far fa-list-alt"></i>
               <p>Category <i class="fas fa-angle-left right"></i></p>
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="/admin/category/list" class="nav-link">
+                <a href="/admin/category/list" class="nav-link {{ $activePage == 'product_category' ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>List Categories</p>
                 </a>
@@ -281,10 +284,7 @@
               </li>
             </ul>
           </li>
-          @php
-            $media_pages = ['list_media', 'add_media'];
-            $order_pages = ['order_list', 'order_cancel', 'order_delivered'];
-          @endphp
+
           <li class="nav-header">MEDIA FILES</li>
           <li class="nav-item {{ (in_array($activePage, $media_pages) ? 'menu-open' : '') }}">
             <a href="#" class="nav-link {{ (in_array($activePage, $media_pages) ? 'active' : '') }}">

@@ -131,6 +131,11 @@ Route::prefix('admin')->group(function () {
         
         Route::delete('/product/{item_code}/delete', 'ProductController@deleteItem');
 
+        Route::get('/category/list', 'CategoryController@viewCategories');
+        Route::post('/category/edit/{id}', 'CategoryController@editCategory');
+        Route::post('/category/add', 'CategoryController@addCategory');
+        Route::get('/category/delete/{id}', 'CategoryController@deleteCategory');
+
         Route::get('/media/add', 'MediaController@add_media_form');
         Route::get('/media/list', 'MediaController@list_media');
         Route::post('/add_media_records', 'MediaController@add_media_record');

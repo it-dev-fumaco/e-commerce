@@ -168,40 +168,44 @@
                 <!--products-->
                 <div class="col-lg-10">
                     <div class="row g-6">
-                        @foreach ($products_arr as $product)
-                        <div class="col-md-4 btmp animated animatedFadeInUp fadeInUp equal-height-columns">
-                            <div class="card">
-                                <div class="equal-column-content">
-                                    <img src="{{ asset('/item/images/'.$product['item_code'].'/gallery/preview/'.$product['image']) }}" class="card-img-top">
-                                    <div class="card-body">
-                                        <div class="text ellipsis">
-                                            <p class="card-text fumacoFont_card_title text-concat" style="color:#0062A5 !important; height: 80px;">{{ $product['item_name'] }}</p>
-                                        </div>
-                                        <p class="card-text fumacoFont_card_price" style="color:#000000 !important;">
-                                            @if($product['is_discounted'])
-                                            <s style="color: #c5c5c5;">₱ {{ $product['price'] }}</s>₱ {{ $product['discounted_price'] }}
-                                            @else
-                                            ₱ {{ $product['price'] }}
-                                            @endif
-                                        </p>
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <div class="btn-group stylecap">
-                                                <span class="fa fa-star checked starcolor"></span>
-                                                <span class="fa fa-star checked starcolor"></span>
-                                                <span class="fa fa-star checked starcolor"></span>
-                                                <span class="fa fa-star starcolorgrey"></span>
-                                                <span class="fa fa-star starcolorgrey"></span>
+                        @if (count($products_arr) > 0)
+                            @foreach ($products_arr as $product)
+                            <div class="col-md-4 btmp animated animatedFadeInUp fadeInUp equal-height-columns">
+                                <div class="card">
+                                    <div class="equal-column-content">
+                                        <img src="{{ asset('/item/images/'.$product['item_code'].'/gallery/preview/'.$product['image']) }}" class="card-img-top">
+                                        <div class="card-body">
+                                            <div class="text ellipsis">
+                                                <p class="card-text fumacoFont_card_title text-concat" style="color:#0062A5 !important; height: 80px;">{{ $product['item_name'] }}</p>
                                             </div>
-                                            <small class="text-muted stylecap" style="color:#c4cad0 !important; font-weight:100 !important;">( 0 Reviews )</small>
+                                            <p class="card-text fumacoFont_card_price" style="color:#000000 !important;">
+                                                @if($product['is_discounted'])
+                                                <s style="color: #c5c5c5;">₱ {{ $product['price'] }}</s>₱ {{ $product['discounted_price'] }}
+                                                @else
+                                                ₱ {{ $product['price'] }}
+                                                @endif
+                                            </p>
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div class="btn-group stylecap">
+                                                    <span class="fa fa-star checked starcolor"></span>
+                                                    <span class="fa fa-star checked starcolor"></span>
+                                                    <span class="fa fa-star checked starcolor"></span>
+                                                    <span class="fa fa-star starcolorgrey"></span>
+                                                    <span class="fa fa-star starcolorgrey"></span>
+                                                </div>
+                                                <small class="text-muted stylecap" style="color:#c4cad0 !important; font-weight:100 !important;">( 0 Reviews )</small>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="card-body">
-                                        <a href="/product/{{ $product['item_code'] }}" class="btn btn-outline-primary fumacoFont_card_readmore" role="button" style="width:100% !important;">View</a>
+                                        <div class="card-body">
+                                            <a href="/product/{{ $product['item_code'] }}" class="btn btn-outline-primary fumacoFont_card_readmore" role="button" style="width:100% !important;">View</a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        @endforeach
+                            @endforeach
+                        @else
+                            <center>No Product(s) Available</center>
+                        @endif
                     </div>
                 </div>
                 <!--products-->
