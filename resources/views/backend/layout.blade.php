@@ -165,6 +165,7 @@
               <p>Dashboard</p>
             </a>
           </li>
+          <li class="nav-header">CONTENT MANAGEMENT</li>
           <li class="nav-item">
             <a href="#" class="nav-link">
               <i class="nav-icon fas fa-book"></i>
@@ -180,46 +181,47 @@
               <li class="nav-item">
                 <a href="/admin/pages/about" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>About Page</p>
+                  <p>About Us</p>
                 </a>
               </li>
               <li class="nav-item">
                 <a href="/admin/pages/contact" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Contact Page</p>
+                  <p>Contact Us</p>
                 </a>
               </li>
               <li class="nav-item">
                 <a href="/admin/pages/messages" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>List Contacts</p>
+                  <p>Contact List</p>
                 </a>
               </li>
-              <li class="nav-item">
-                <a href="/admin/pages/subscribers" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>List Subscribe</p>
-                </a>
-              </li>
+
             </ul>
           </li>
 
           <li class="nav-item">
             <a href="#" class="nav-link">
               <i class="nav-icon fab fa-blogger"></i>
-              <p>Blog <i class="fas fa-angle-left right"></i></p>
+              <p>Blog Content<i class="fas fa-angle-left right"></i></p>
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
                 <a href="/admin/blog/list" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>List Blogs</p>
+                  <p>Blog List</p>
                 </a>
               </li>
               <li class="nav-item">
                 <a href="/admin/blog/comments" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Comments Blogs</p>
+                  <p>Blog Comments</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="/admin/pages/subscribers" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Subscriber</p>
                 </a>
               </li>
             </ul>
@@ -230,6 +232,7 @@
             $order_pages = ['order_list', 'order_cancel', 'order_delivered'];
             $category_pages = ['product_category'];
           @endphp
+          <li class="nav-header">PRODUCT CATALOGUE</li>
           <li class="nav-item {{ (in_array($activePage, $product_pages) ? 'menu-open' : '') }}">
             <a href="#" class="nav-link {{ (in_array($activePage, $product_pages) ? 'active' : '') }}">
               <i class="nav-icon fas fa-boxes"></i>
@@ -243,9 +246,9 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a href="/admin/product/category" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Products by Category</p>
+                <a href="/admin/category/list" class="nav-link">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>Category List</p>
                 </a>
               </li>
               <li class="nav-item">
@@ -256,20 +259,7 @@
               </li>
             </ul>
           </li>
-          <li class="nav-item {{ (in_array($activePage, $category_pages) ? 'menu-open' : '') }}">
-            <a href="#" class="nav-link {{ (in_array($activePage, $category_pages) ? 'active' : '') }}">
-              <i class="nav-icon far fa-list-alt"></i>
-              <p>Category <i class="fas fa-angle-left right"></i></p>
-            </a>
-            <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="/admin/category/list" class="nav-link {{ $activePage == 'product_category' ? 'active' : '' }}">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>List Categories</p>
-                </a>
-              </li>
-            </ul>
-          </li>
+          <li class="nav-header">CUSTOMERS</li>
           <li class="nav-item">
             <a href="#" class="nav-link">
               <i class="nav-icon fas fa-users"></i>
@@ -279,35 +269,13 @@
               <li class="nav-item">
                 <a href="/admin/customer/list" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>List Customers</p>
+                  <p>Customer List</p>
                 </a>
               </li>
             </ul>
           </li>
 
-          <li class="nav-header">MEDIA FILES</li>
-          <li class="nav-item {{ (in_array($activePage, $media_pages) ? 'menu-open' : '') }}">
-            <a href="#" class="nav-link {{ (in_array($activePage, $media_pages) ? 'active' : '') }}">
-              <i class="nav-icon fas fa-photo-video"></i>
-              <p>Files <i class="fas fa-angle-left right"></i></p>
-            </a>
-            <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="/admin/media/list" class="nav-link {{ $activePage == 'list_media' ? 'active' : '' }}">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>List Files</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="/admin/media/add" class="nav-link {{ $activePage == 'add_media' ? 'active' : '' }}">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Add Media</p>
-                </a>
-              </li>
-            </ul>
-          </li>
-     
-          <li class="nav-header">ORDERS</li>
+          <li class="nav-header">ORDERS / SHIPPING</li>
           <li class="nav-item {{ (in_array($activePage, $order_pages) ? 'menu-open' : '') }}">
             <a href="#" class="nav-link {{ (in_array($activePage, $order_pages) ? 'active' : '') }}">
               <i class="nav-icon fas fa-dolly-flatbed"></i>
@@ -337,13 +305,35 @@
               <li class="nav-item">
                 <a href="/admin/orders_delivered" class="nav-link {{ $activePage == 'order_delivered' ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>List Order Delivered</p>
+                  <p>Delivered Orders</p>
                 </a>
               </li>
             </ul>
           </li>
 
-          <li class="nav-header">SETTINGS</li>
+          <li class="nav-header">MEDIA FILES</li>
+          <li class="nav-item {{ (in_array($activePage, $media_pages) ? 'menu-open' : '') }}">
+            <a href="#" class="nav-link {{ (in_array($activePage, $media_pages) ? 'active' : '') }}">
+              <i class="nav-icon fas fa-photo-video"></i>
+              <p>Files <i class="fas fa-angle-left right"></i></p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="/admin/media/list" class="nav-link {{ $activePage == 'list_media' ? 'active' : '' }}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>List Files</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="/admin/media/add" class="nav-link {{ $activePage == 'add_media' ? 'active' : '' }}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Add Media</p>
+                </a>
+              </li>
+            </ul>
+          </li>
+
+          <li class="nav-header">SYSTEM SETTINGS</li>
           @php
             $settings_pages = ['erp_api_setup', 'payment_api_setup'];
           @endphp
@@ -366,19 +356,55 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a href="/admin/dashboard" class="nav-link">
+                <a href=" " class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Social Media API</p>
+                </a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-item {{ (in_array($activePage, $settings_pages) ? 'menu-open' : '') }}">
+            <a href="#" class="nav-link {{ (in_array($activePage, $settings_pages) ? 'active' : '') }}">
+              <i class="nav-icon fas fa-cogs"></i>
+
+              <p>Email Settings <i class="fas fa-angle-left right"></i></p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href=" " class="nav-link {{ $activePage == 'payment_api_setup' ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Email Setup</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="/admin/dashboard" class="nav-link">
+                <a href=" " class="nav-link {{ $activePage == 'erp_api_setup' ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Facebook Setup</p>
+                  <p>Email Templates</p>
                 </a>
               </li>
             </ul>
-          </li>  
+          </li>
+          <li class="nav-header">User Management</li>
+          <li class="nav-item {{ (in_array($activePage, $settings_pages) ? 'menu-open' : '') }}">
+            <a href="#" class="nav-link {{ (in_array($activePage, $settings_pages) ? 'active' : '') }}">
+                <i class="fas fa-users"></i>
+              <p>Users <i class="fas fa-angle-left right"></i></p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href=" " class="nav-link {{ $activePage == 'payment_api_setup' ? 'active' : '' }}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Admin</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href=" " class="nav-link {{ $activePage == 'erp_api_setup' ? 'active' : '' }}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>User</p>
+                </a>
+              </li>
+            </ul>
+          </li>
         </ul>
       </nav>
       <!-- /.sidebar-menu -->
