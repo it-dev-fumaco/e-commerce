@@ -164,7 +164,6 @@
 						@endforeach
 						<hr>
 						@endforeach
-						@if (request()->sortby)
 						<input type="hidden" name="sortby" value="{{ request()->sortby }}">
 					</form>
 				</div>
