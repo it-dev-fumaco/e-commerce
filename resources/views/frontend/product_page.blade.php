@@ -696,7 +696,7 @@
                         <div class="card-body">
                             <p class="card-text">
                                 <table class="table">
-                                    <tbody style="border-style: inset !important;" class="fumacoFont_collapse_caption">
+                                    <tbody style="border-style: inset !important;">
                                         @foreach ($attributes as $attr => $value)
                                         <tr>
                                             <td>{{ $attr }}</td>
@@ -717,7 +717,7 @@
                     </div>
                     <div id="collapseTwo" class="collapse show" aria-labelledby="headingTwo" data-parent="#accordionExample">
                         <div class="card-body">
-                            <p class="card-text fumacoFont_collapse_caption">{!! $product_details->f_full_description !!}</p>
+                            <p class="card-text">{!! $product_details->f_full_description !!}</p>
                         </div>
                     </div>
                 </div>
