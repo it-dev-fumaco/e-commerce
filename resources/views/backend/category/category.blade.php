@@ -60,8 +60,6 @@
                                                     <td>
                                                         <button type="button" class="btn btn-info btn-sm active" data-toggle="modal" data-target="#PPPEdit{{ $c->id }}">Edit</button>
 
-                                                        <a href="/admin/category/delete/{{ $c->id }}" class="btn btn-danger btn-sm active" role="button" aria-pressed="true">Delete</a>
-
                                                         <div id="PPPEdit{{ $c->id }}" class="modal fade" role="dialog">
                                                             <div class="modal-dialog">
                                                                 <div class="modal-content">
@@ -297,6 +295,9 @@
                                                             </div>
                                                         </div>
                                                         <a href="/admin/category/settings/{{ $c->id }}" class="btn btn-success btn-sm active" role="button" aria-pressed="true">Sort Items</a>
+
+                                                        <a href="/admin/category/delete/{{ $c->id }}" class="float-right btn btn-danger btn-sm active" role="button" aria-pressed="true">Delete</a>
+
                                                     </td>
                                                 </tr>
                                             @endforeach
