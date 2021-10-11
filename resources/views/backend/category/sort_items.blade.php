@@ -10,12 +10,12 @@
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1>Item Sorting Page</h1>
+                            <h1>Sort Products per Category</h1>
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
                                 <li class="breadcrumb-item"><a href="/admin/dashboard">Home</a></li>
-                                <li class="breadcrumb-item active">Categories List Page</li>
+                                <li class="breadcrumb-item active">Product Categories</li>
                             </ol>
                         </div>
                     </div>
