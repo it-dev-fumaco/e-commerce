@@ -259,37 +259,41 @@ class FrontendController extends Controller
     }
 
     public function viewProducts($category_id, Request $request) {
-        // return request()->fullUrlWithQuery();
-        // if(request()->isMethod('post')) {
-        //     // return $request->all();
-        //     $test_url = '';
+        if(request()->isMethod('post')) {
+            $variables = [];
+            if ($request->attr) {
+                foreach($request->attr as $attr => $values) {
+                    $variables[$attr] = implode("+", $values);
+                }
+            }
 
-        //     $test1 = [];
-        //     foreach($request->attr as $attr => $values) {
-        //         $test = [
-        //             $attr => implode(",", $values)
-        //         ];
-        //         $test_url .= http_build_query($test) . '&';
+            $variables['sortby'] = $request->sortby;
 
-        //         $test1[$attr] = implode(",", $values);
-        //     }
-
-        //     $test1['sortby'] = $request->sortby;
-
-
-        //     return redirect(request()->fullUrlWithQuery($test1));
-
-        //     return $test_url;
-
-        //     // return ;
-        // }
+            return redirect(request()->fullUrlWithQuery($variables));
+        }
 
         $product_category = DB::table('fumaco_categories')->where('id', $category_id)->first();
         if(!$product_category) {
             return view('error');
         }
 
-        // get item attributes based on item category
+        // get requested filters
+        $request_data = $request->all();
+        $attribute_name_filter = array_keys($request_data);
+        $attribute_value_filter = [];
+        foreach($request_data as $data) {
+            foreach (explode('+', $data) as $value) {
+                $attribute_value_filter[] = $value;
+            }
+        }
+
+        // get items based on filters
+        $filtered_items = DB::table('fumaco_items as a')
+            ->join('fumaco_items_attributes as b', 'a.f_idcode', 'b.idcode')
+            ->whereIn('b.slug', $attribute_name_filter)->whereIn('b.attribute_value', $attribute_value_filter)
+            ->where('a.f_status', 1)->pluck('a.f_idcode');
+
+        // get item attributes based on item category (sidebar)
         $filters = DB::table('fumaco_items as a')
             ->join('fumaco_items_attributes as b', 'a.f_idcode', 'b.idcode')
             ->where('a.f_cat_id', $category_id)->where('a.f_status', 1)
@@ -316,6 +320,9 @@ class FrontendController extends Controller
 
         // get items based on category id
         $products = DB::table('fumaco_items')->where('f_cat_id', $category_id)
+            ->when(count($request_data) > 0, function($c) use ($filtered_items) {
+                $c->whereIn('f_idcode', $filtered_items);
+            })
             ->where('f_status', 1)->orderBy($sortby, 'asc')->paginate(15);
 
         $products_arr = [];

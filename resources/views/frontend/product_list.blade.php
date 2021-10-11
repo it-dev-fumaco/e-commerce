@@ -109,7 +109,7 @@
 					<img src="{{ asset('/assets/site-img/header3-sm.png') }}" alt="" style="position: absolute; top: 0;left: 0;min-width: 100%; height: unset !important;">
 					<div class="container">
 						<div class="carousel-caption text-start" style="bottom: 1rem !important; right: 25% !important; left: 25%; !important;">
-								<center><h3 class="carousel-header-font">{{ $product_category->name }}</h3></center>
+							<center><h3 class="carousel-header-font">{{ $product_category->name }}</h3></center>
 						</div>
 					</div>
 				</div>
@@ -120,8 +120,12 @@
 	<main style="background-color:#ffffff;" class="products-head">
 		<nav>
 			<ol class="breadcrumb" style="font-weight: 300 !important; font-size: 14px !important;">
-				<li class="breadcrumb-item"><a href="/" style="color: #000000 !important; text-decoration: none;">Home</a></li>
-				<li class="breadcrumb-item active"><a href="#" style="color: #000000 !important; text-decoration: underline;">{{ $product_category->name }}</a></li>
+				<li class="breadcrumb-item">
+					<a href="/" style="color: #000000 !important; text-decoration: none;">Home</a>
+				</li>
+				<li class="breadcrumb-item active">
+					<a href="#" style="color: #000000 !important; text-decoration: underline;">{{ $product_category->name }}</a>
+				</li>
 			</ol>
 		</nav>
 		<hr class="singleline">
@@ -131,43 +135,40 @@
 		<div class="container marketing"><br></div>
 		<div class="container" style="max-width: 100% !important;">
 			<div class="row">
-					<!--sidebar-->
-				
-					<div class="col-lg-2 checkersxx">
-						<div class="d-flex justify-content-between align-items-center he1">Filters <a href="/products/{{ $product_category->id }}" style="text-decoration: none;"><small class="stylecap he2 text-dark" style="font-weight:100 !important;">Clear All</small></a></div>
-						<hr>
-						<form action="/products/{{ $product_category->id }}">
-						{{-- @csrf --}}
-							@php
-									$x = 0;
-							@endphp
-							@foreach ($filters as $id => $row)
-							<h6 class="mt-3"><small>{{ strtoupper($id) }}</small></h6>
-							@foreach ($row as $attr_val)
-							@php
-								$x++;
-								$filter_attr = strtolower(str_replace(" ", "", preg_replace('/[^A-Za-z0-9\-]/', '', $id)));
-								$filter_values = explode(',', request()->$filter_attr);
-								if (in_array($attr_val, $filter_values)){
-									$s = 'checked';
-								} else {
-									$s = '';
-								}
-							@endphp
-							<div class="form-check">
-									<input type="checkbox" class="form-check-input" id="{{ 'cb' . $x }}">
-									<label class="form-check-label" for="{{ 'cb' . $x }}" style="font-size: 0.8rem;">{{ $attr_val }}</label>
-							</div>
-							@endforeach
-							@endforeach
-							<input type="hidden" name="sortby" value="{{ request()->sortby }}">
-							<hr>
-							<div class="form-group">
-									<input type="submit" class="btn btn-outline-dark btn-sm btn-block" value="Update">
-							</div>
-						</form>
+				<!--sidebar-->
+				<div class="col-lg-2 checkersxx">
+					<div class="d-flex justify-content-between align-items-center he1">Filters 
+						<a href="/products/{{ $product_category->id }}" style="text-decoration: none;">
+							<small class="stylecap he2 text-dark" style="font-weight:100 !important;">Clear All</small>
+						</a>
 					</div>
-					<!--sidebar-->
+					<hr>
+					<form action="/products/{{ $product_category->id }}" method="POST" id="filter-form" class="mb-5">
+					@csrf
+						@php
+								$x = 0;
+						@endphp
+						@foreach ($filters as $id => $row)
+						<h6 class="mt-3"><small>{{ strtoupper($id) }}</small></h6>
+						@foreach ($row as $attr_val)
+						@php
+							$x++;
+							$filter_attr = Str::slug($id, '-');
+							$filter_values = explode('+', request()->$filter_attr);
+							$status = (in_array($attr_val, $filter_values)) ? 'checked' : '';
+						@endphp
+						<div class="form-check">
+							<input type="checkbox" class="form-check-input product-cb-filter" id="{{ 'cb' . $x }}" name="{{ 'attr[' .$filter_attr.'][]' }}" value="{{ $attr_val }}" {{ $status }}>
+							<label class="form-check-label" for="{{ 'cb' . $x }}" style="font-size: 0.8rem;">{{ $attr_val }}</label>
+						</div>
+						@endforeach
+						<hr>
+						@endforeach
+						<input type="hidden" name="sortby" value="{{ request()->sortby }}">
+						
+					</form>
+				</div>
+				<!--sidebar-->
 					
 					<!--products-->
 					<div class="col-lg-10">
@@ -191,7 +192,7 @@
 							</div>
 						</form>
 							
-							@foreach ($products_arr as $product)
+							@forelse ($products_arr as $product)
 							<div class="col-md-4 btmp animated animatedFadeInUp fadeInUp equal-height-columns">
 									<div class="card">
 										<div class="equal-column-content">
@@ -224,7 +225,9 @@
 										</div>
 									</div>
 							</div>
-							@endforeach
+							@empty
+							<h4 class="text-center text-muted p-5 text-uppercase">No products found</h4>
+							@endforelse
 						</div>
 					</div>
 					<!--products-->
@@ -246,6 +249,10 @@
    $(document).on('change', 'select[name="sortby"]', function(){
 		window.location.href = $(this).find(':selected').data('loc');
    });
+
+	$(document).on('change', '.product-cb-filter', function(){
+		$('#filter-form').submit();
+	});
   })();
 
 </script>

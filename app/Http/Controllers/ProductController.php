@@ -42,7 +42,7 @@ class ProductController extends Controller
         }
     }
 
-     // function to get item details from ERP via API
+    // function to get item details from ERP via API
     public function getItemDetails($item_code) {
         try {
             $erp_api = DB::table('api_setup')->where('type', 'erp_api')->first();

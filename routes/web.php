@@ -42,6 +42,7 @@ Route::post('/add_reply', 'FrontendController@addReply');
 Route::get('/contact', 'FrontendController@viewContactPage');
 Route::post('/add_contact', 'FrontendController@addContact');
 Route::get('/products/{id}', 'FrontendController@viewProducts');
+Route::post('/products/{id}', 'FrontendController@viewProducts');
 Route::get('/product/{item_code}', 'FrontendController@viewProduct');
 Route::get('/track_order', 'FrontendController@viewOrderTracking');
 
