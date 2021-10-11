@@ -33,8 +33,8 @@
                             <div class="row">
                                 <div class="col-12 col-sm-6">
                                     <div class="card-body">
-                                        <p><b>Item Code:</b> {{ $img_arr[0]['item_code'] }}</p>
-                                        <p><b>Item Name:</b> {{ $img_arr[0]['item_name'] }}</p>
+                                        <p><b>Item Code:</b> {{ $details->f_idcode }}</p>
+                                        <p><b>Item Name:</b> {{ $details->f_name_name }}</p>
                                     </div>
                                 </div>
                                 <div class="col-12 col-sm-6">
@@ -73,7 +73,7 @@
                                         </div>
                                         <!-- /.card-body -->
                                         <div class="card-footer">
-                                            <input type="text" value="{{ $img_arr[0]['item_code'] }}" name="item_code" hidden/>
+                                            <input type="text" value="{{ $details->f_idcode }}" name="item_code" hidden/>
                                             <input type="submit" class="btn btn-primary" value="Upload">
                                         </div>
                                     </form>

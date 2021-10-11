@@ -537,7 +537,7 @@ class ProductController extends Controller
             ];
         }
 
-        return view('backend.products.images', compact('img_arr'));
+        return view('backend.products.images', compact('img_arr', 'details'));
     }
 
     public function deleteProductImage(Request $request){
