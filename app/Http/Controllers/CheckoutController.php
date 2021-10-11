@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 use Auth;
 use DB;
 
@@ -74,11 +75,11 @@ class CheckoutController extends Controller
 		return view('frontend.checkout.billing_address_form', compact('cart_arr', 'cart'));
 	}
 
-	public function setShippingForm(){
-		return view('frontend.checkout.set_shipping');
+	public function setBillingForm(){
+		return view('frontend.checkout.set_billing');
 	}
 
-	public function setShipping(Request $request){
+	public function setBilling(Request $request){
 		DB::beginTransaction();
 		try{
 			$o_email = Auth::user()->username;
@@ -86,8 +87,8 @@ class CheckoutController extends Controller
 			$user = DB::table('fumaco_users')->where('username', $o_email)->first();
 			$user_id = $user->id;
 
-			$ship_address_arr = [
-				'address_class' => 'Delivery',
+			$bill_address_arr = [
+				'address_class' => 'Billing',
 				'user_idx' => $user_id,
 				'add_type' => $request->Address_type1_1,
 				'xadd1' => $request->Address1_1,
@@ -105,7 +106,7 @@ class CheckoutController extends Controller
 				'xdefault' => 1
 			];
 
-			DB::table('fumaco_user_add')->insert($ship_address_arr);
+			DB::table('fumaco_user_add')->insert($bill_address_arr);
 
 			DB::commit();
 			$cart = session()->get('fumCart');
@@ -182,27 +183,47 @@ class CheckoutController extends Controller
 			$user = DB::table('fumaco_users')->where('username', $o_email)->first();
 			$user_id = $user->id;
 
-			$bill_address_arr = [
-				'address_class' => 'Billing',
+			$ship_address_arr = [
+				'address_class' => 'Delivery',
 				'user_idx' => $user_id,
-				'add_type' => $request->Address_type1_1,
-				'xadd1' => $request->Address1_1,
-				'xadd2' => ($request->Address2_1) ? $request->Address2_1 : " ",
-				'xprov' => $request->province1_1,
-				'xcity' => $request->City_Municipality1_1,
-				'xbrgy' => $request->Barangay1_1,
-				'xpostal' => $request->postal1_1,
-				'xcountry' => $request->country_region1_1,
+				'add_type' => $request->ship_Address_type1_1,
+				'xadd1' => $request->ship_Address1_1,
+				'xadd2' => ($request->ship_Address2_1) ? $request->ship_Address2_1 : " ",
+				'xprov' => $request->ship_province1_1,
+				'xcity' => $request->ship_City_Municipality1_1,
+				'xbrgy' => $request->ship_Barangay1_1,
+				'xpostal' => $request->ship_postal1_1,
+				'xcountry' => $request->ship_country_region1_1,
 				'xcontactname1' => $request->fname,
 				'xcontactlastname1' => $request->lname,
 				'xcontactnumber1' => ($request->contactnumber1_1) ? $request->contactnumber1_1 : 0,
-				'xmobile_number' => $request->mobilenumber1_1,
-				'xcontactemail1' => $request->email,
+				'xmobile_number' => $request->ship_mobilenumber1_1,
+				'xcontactemail1' => $request->ship_email,
 				'xdefault' => 1
 			];
+
 			if (isset($request->myCheck)){
-				$ship_address_arr = [
-					'address_class' => 'Delivery',
+				$bill_address_arr = [
+					'address_class' => 'Billing',
+					'user_idx' => $user_id,
+					'add_type' => $request->ship_Address_type1_1,
+					'xadd1' => $request->ship_Address1_1,
+					'xadd2' => ($request->ship_Address2_1) ? $request->ship_Address2_1 : " ",
+					'xprov' => $request->ship_province1_1,
+					'xcity' => $request->ship_City_Municipality1_1,
+					'xbrgy' => $request->ship_Barangay1_1,
+					'xpostal' => $request->ship_postal1_1,
+					'xcountry' => $request->ship_country_region1_1,
+					'xcontactname1' => $request->fname,
+					'xcontactlastname1' => $request->lname,
+					'xcontactnumber1' => ($request->contactnumber1_1) ? $request->contactnumber1_1 : 0,
+					'xmobile_number' => $request->ship_mobilenumber1_1,
+					'xcontactemail1' => $request->ship_email,
+					'xdefault' => 1
+				];
+			}else{
+				$bill_address_arr = [
+					'address_class' => 'Billing',
 					'user_idx' => $user_id,
 					'add_type' => $request->Address_type1_1,
 					'xadd1' => $request->Address1_1,
@@ -219,35 +240,17 @@ class CheckoutController extends Controller
 					'xcontactemail1' => $request->email,
 					'xdefault' => 1
 				];
-			}else{
-				$ship_address_arr = [
-					'address_class' => 'Delivery',
-					'user_idx' => $user_id,
-					'add_type' => $request->ship_Address_type1_1,
-					'xadd1' => $request->ship_Address1_1,
-					'xadd2' => ($request->ship_Address2_1) ? $request->ship_Address2_1 : " ",
-					'xprov' => $request->ship_province1_1,
-					'xcity' => $request->ship_City_Municipality1_1,
-					'xbrgy' => $request->ship_Barangay1_1,
-					'xpostal' => $request->ship_postal1_1,
-					'xcountry' => $request->ship_country_region1_1,
-					'xcontactname1' => $request->fname,
-					'xcontactlastname1' => $request->lname,
-					'xcontactnumber1' => ($request->ship_contactnumber1_1) ? $request->ship_contactnumber1_1 : 0,
-					'xmobile_number' => $request->ship_mobilenumber1_1,
-					'xcontactemail1' => $request->ship_email,
-					'xdefault' => 1
-				];
+				
 			}
 
 			$bill_address = DB::table('fumaco_user_add')->where('xdefault', 1)->where('user_idx', $user_id)->where('address_class', 'Billing')->get();
 			$ship_address = DB::table('fumaco_user_add')->where('xdefault', 1)->where('user_idx', $user_id)->where('address_class', 'Delivery')->get();
-
-			if(count($bill_address) > 1){
+			dd(count($bill_address));
+			if(count($bill_address) > 0){
 				DB::table('fumaco_user_add')->where('user_idx', $user_id)->where('address_class', 'Billing')->update(['xdefault' => 0]);
 			}
 
-			if(count($ship_address) > 1){
+			if(count($ship_address) > 0){
 				DB::table('fumaco_user_add')->where('user_idx', $user_id)->where('address_class', 'Delivery')->update(['xdefault' => 0]);
 			}
 
@@ -277,17 +280,19 @@ class CheckoutController extends Controller
 			if(!Auth::check()){
 				$first_name = $request->fname;
 				$last_name = $request->lname;
-				$email = $request->email;
-				$bill_address1 = $request->Address1_1;
-				$bill_address2 = ($request->Address2_1) ? $request->Address2_1 : " ";
-				$bill_province = $request->province1_1;
-				$bill_city = $request->City_Municipality1_1;
-				$bill_brgy = $request->Barangay1_1;
-				$bill_postal = $request->postal1_1;
-				$bill_country = $request->country_region1_1;
-				$bill_address_type = $request->Address_type1_1;
-				$bill_mobile = $request->mobilenumber1_1;
-				$bill_contact = $request->contactnumber1_1;
+				$email = $request->ship_email;
+				$ship_address1 = $request->ship_Address1_1;
+				$ship_address2 = ($request->ship_Address2_1) ? $request->ship_Address2_1 : " ";
+				$ship_province = $request->ship_province1_1;
+				$ship_city = $request->ship_City_Municipality1_1;
+				$ship_brgy = $request->ship_Barangay1_1;
+				$ship_postal = $request->ship_postal1_1;
+				$ship_country = $request->ship_country_region1_1;
+				$ship_address_type = $request->ship_Address_type1_1;
+				$ship_email = $request->ship_email;
+				$ship_contact = ($request->contactnumber1_1) ? $request->contactnumber1_1 : " ";
+				$ship_mobile = $request->ship_mobilenumber1_1;
+				
 				$user_type = 'Guest';
 				$username= ' ';
 				$user_id = 0;
@@ -296,30 +301,30 @@ class CheckoutController extends Controller
 
 				if (isset($request->myCheck)){
 					$same_address = 1;
-					$ship_address1 = $request->Address1_1;
-					$ship_address2 = ($request->Address2_1) ? $request->Address2_1 : " ";
-					$ship_province = $request->province1_1;
-					$ship_city = $request->City_Municipality1_1;
-					$ship_brgy = $request->Barangay1_1;
-					$ship_postal = $request->postal1_1;
-					$ship_country = $request->country_region1_1;
-					$ship_address_type = $request->Address_type1_1;
-					$ship_email = $request->email;
-					$ship_contact = $request->contactnumber1_1;
-					$ship_mobile = $request->mobilenumber1_1;
+					$bill_address1 = $request->ship_Address1_1;
+					$bill_address2 = ($request->ship_Address2_1) ? $request->ship_Address2_1 : " ";
+					$bill_province = $request->ship_province1_1;
+					$bill_city = $request->ship_City_Municipality1_1;
+					$bill_brgy = $request->ship_Barangay1_1;
+					$bill_postal = $request->ship_postal1_1;
+					$bill_country = $request->ship_country_region1_1;
+					$bill_address_type = $request->ship_Address_type1_1;
+					$bill_email = $request->ship_email;
+					// $bill_contact = $request->ship_contactnumber1_1;
+					$bill_mobile = $request->ship_mobilenumber1_1;
 				}else{
 					$same_address = 0;
-					$ship_address1 = $request->ship_Address1_1;
-					$ship_address2 = ($request->ship_Address2_1) ? $request->ship_Address2_1 : " ";
-					$ship_province = $request->ship_province1_1;
-					$ship_city = $request->ship_City_Municipality1_1;
-					$ship_brgy = $request->ship_Barangay1_1;
-					$ship_postal = $request->ship_postal1_1;
-					$ship_country = $request->ship_country_region1_1;
-					$ship_address_type = $request->ship_Address_type1_1;
-					$ship_email = $request->ship_email;
-					$ship_contact = $request->ship_contactnumber1_1;
-					$ship_mobile = $request->ship_mobilenumber1_1;
+					$bill_address1 = $request->Address1_1;
+					$bill_address2 = ($request->Address2_1) ? $request->Address2_1 : " ";
+					$bill_province = $request->province1_1;
+					$bill_city = $request->City_Municipality1_1;
+					$bill_brgy = $request->Barangay1_1;
+					$bill_postal = $request->postal1_1;
+					$bill_country = $request->country_region1_1;
+					$bill_address_type = $request->Address_type1_1;
+					$bill_mobile = $request->mobilenumber1_1;
+					$bill_email = $request->email;
+					// $bill_contact = $request->contactnumber1_1;
 				}				
 			}else{
 				$o_email = Auth::user()->username;
@@ -376,7 +381,7 @@ class CheckoutController extends Controller
 				'xaddresstype' => $bill_address_type,
 				'xemail' => $email,
 				'xmobile' => $bill_mobile,
-				'xcontact' => ($bill_contact) ? $bill_contact : 0,
+				'xcontact' => ($ship_contact) ? $ship_contact : 0,
 				'xshippadd1' => $ship_address1,
 				'xshippadd2' => ($ship_address2) ? $ship_address2 : " ",
 				'xshiprov' => $ship_province,
@@ -386,7 +391,7 @@ class CheckoutController extends Controller
 				'xshipcountry' => $ship_country,
 				'xshiptype' => $ship_address_type,
 				'xlogs' => $order_no,
-				'order_status' => 'Item Purchase',
+				'order_status' => 'Order Placed',
 				'order_tracker_code' => $order_no,
 				'order_shipping_type' => '', 
 				'order_ip' => $request->ip(),
@@ -402,7 +407,7 @@ class CheckoutController extends Controller
 				'shipping' => $request->shipping,
 				'price' => $request->price,
 				'subtotal' =>$request->subtotal,
-				'quantity' => $request->quantity,
+				'quantity' => $request->qty,
 				'grand_total' => $request->grand_total,
 				'same_address' => $same_address,
 				'base_url' => $base_url->set_value,
@@ -415,13 +420,16 @@ class CheckoutController extends Controller
 				'order_number' => $order_no,
 				'item_code' => $item_code,
 				'item_name' => $item_desc,
-				'item_qty' => $request->quantity,
+				'item_qty' => $request->qty,
 				'item_price' => $request->price,
+				'item_status' => 2,
+				'date_update' => Carbon::now()->toDateTimeString(),
+				'ip_address' => $request->ip(),
 				'item_total_price' => $request->grand_total
 			];
 
-			// dd($summary_arr);
-			DB::table('fumaco_order_items')-insert($orders_arr);
+			// dd($temp_arr);
+			DB::table('fumaco_order_items')->insert($orders_arr);
 			$insert = DB::table('fumaco_temp')->insert($temp_arr);
 			DB::commit();
 			return view('frontend.checkout.check_out_summary', compact('summary_arr'));

@@ -219,7 +219,7 @@
 								<input name="CustIP" value="{{ $summary_arr[0]['address'][0]['order_ip'] }}">
 								<input name="CustName" value="{{ $summary_arr[0]['address'][0]['xfname']. " " .$summary_arr[0]['address'][0]['xlname'] }}">
 								<input name="CustEmail" value="{{ $summary_arr[0]['address'][0]['xemail'] }}">
-								<input name="CustPhone" value="{{ $summary_arr[0]['address'][0]['xcontact'] }}">
+								<input name="CustPhone" value="{{ $summary_arr[0]['ship_mobile'] }}">
 								<input name="PageTimeout" value="600">
 								<input name="HashValue" value="{{ $hash }}">
 								<input name="order_id" value="FUMAC02020">

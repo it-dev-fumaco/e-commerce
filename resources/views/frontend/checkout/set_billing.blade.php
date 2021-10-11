@@ -76,9 +76,9 @@
 	
 	<main style="background-color:#ffffff; min-height: 700px;" class="products-head">
 		<div class="container" style="padding-left:5% !important; padding-right:5% !important;">
-			<form action="/checkout/set_shipping" method="post">
+			<form action="/checkout/set_billing" method="post">
 				@csrf
-				<p style="color:#212529 !important; letter-spacing: 1px !important; font-size:16px !important;  text-align: justify !important; font-weight: 600 !important;">Shipping Information</p>
+				<p style="color:#212529 !important; letter-spacing: 1px !important; font-size:16px !important;  text-align: justify !important; font-weight: 600 !important;">Billing Information</p>
 				<hr>
 				<div class="row">
 					<div class="col">

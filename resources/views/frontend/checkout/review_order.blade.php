@@ -153,13 +153,13 @@
 									$display = 'd-none';
 									$btn = "SET YOUR ADDRESS";
 								}else if(count($bill_address) < 1){
-									$action = '/checkout/billing';
+									$action = '/checkout/set_billing_form';
 									$method = 'get';
 									$msg = "You have no saved billing address";
 									$display = 'd-none';
 									$btn = "SET YOUR ADDRESS";
 								}else if(count($ship_address) < 1){
-									$action = '/checkout/set_shipping_form';
+									$action = '/checkout/billing';
 									$method = 'get';
 									$msg = "You have no saved shipping address";
 									$display = 'd-none';
