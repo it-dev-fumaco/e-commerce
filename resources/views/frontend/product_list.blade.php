@@ -196,7 +196,10 @@
 							<div class="col-md-4 btmp animated animatedFadeInUp fadeInUp equal-height-columns">
 									<div class="card">
 										<div class="equal-column-content">
-											<img src="{{ asset('/item/images/'.$product['item_code'].'/gallery/preview/'.$product['image']) }}" class="card-img-top">
+											@php
+												$image = ($product['image']) ? '/item/images/'.$product['item_code'].'/gallery/preview/'.$product['image'] : '/storage/no-photo-available.png';
+											@endphp
+											<img src="{{ asset($image) }}" class="card-img-top">
 											<div class="card-body">
 													<div class="text ellipsis">
 														<p class="card-text fumacoFont_card_title text-concat" style="color:#0062A5 !important; height: 80px;">{{ $product['item_name'] }}</p>
