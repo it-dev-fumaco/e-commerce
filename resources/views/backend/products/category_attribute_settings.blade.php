@@ -68,7 +68,7 @@
 									<tr>
 										<td class="text-center">{{ $item->name }}</td>
 										<td class="text-center">
-											<a href="{{ request()->fullUrlWithQuery(['cat_id' =>  $item->id, 'parent' => $item->name]) }} " class="btn btn-secondary">Edit</a>
+											<a href="{{ request()->fullUrlWithQuery(['cat_id' =>  $item->id, 'parent' => $item->name]) }} " class="btn btn-secondary btn-sm">Edit</a>
 										</td>
 									</tr>
 									@empty
@@ -133,7 +133,7 @@
 									</tbody>
 								</table>
 								<div class="m-3 text-center">
-									<button type="submit" class="btn btn-primary">UPDATE</button>
+									<button type="submit" class="btn btn-primary btn-lg">UPDATE</button>
 								</div>
 							</div>
 						</form>
