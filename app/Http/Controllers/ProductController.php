@@ -289,6 +289,11 @@ class ProductController extends Controller
     public function updateItem($id, Request $request) {
         DB::beginTransaction();
         try {
+            $detail = DB::table('fumaco_items')->where('id', $id)->first();
+            if(!$detail) {
+                return redirect()->back()->with('error', 'Item not found.');
+            }
+
             $request->validate(
                 [
                     'product_name' => 'required',
@@ -311,6 +316,35 @@ class ProductController extends Controller
                 'f_full_description' => $request->full_detail,
                 'f_status' => ($request->is_disabled) ? 0 : 1
             ]);
+
+            if($detail->f_cat_id != $request->product_category) {
+                // update attributes per category
+                $attributes = DB::table('fumaco_items_attributes as a')
+                    ->join('fumaco_attributes_per_category as b', 'a.attribute_name_id', 'b.id')
+                    ->select('a.id', 'b.attribute_name')->where('a.idcode', $detail->f_idcode)->get();
+
+                foreach($attributes as $attr) {
+                    $existing_attribute = DB::table('fumaco_attributes_per_category')
+                        ->where('category_id', $request->product_category)
+                        ->where('attribute_name', $attr->attribute_name)->first();
+
+                    if (!$existing_attribute) {
+                        // insert attribute names
+                        $attr_id = DB::table('fumaco_attributes_per_category')->insertGetId([
+                            'category_id' => $request->product_category,
+                            'attribute_name' => $attr->attribute_name,
+                            'slug' => Str::slug($attr->attribute_name, '-')
+                        ]);
+                    }
+                    // get attribute name id
+                    $attr_name_id = ($existing_attribute) ? $existing_attribute->id : $attr_id;
+                    DB::table('fumaco_items_attributes')->where('id', $attr->id)->update(
+                        [
+                            'attribute_name_id' => $attr_name_id,
+                        ]
+                    );
+                }
+            }
 
             DB::commit();
 
