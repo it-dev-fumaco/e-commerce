@@ -56,7 +56,7 @@
                                                 <div class="input-group">
                                                     <div class="custom-file">
                                                         <input type="file" class="custom-file-input" name="img_primary" id="img_primary" required>
-                                                        <label class="custom-file-label">Choose file</label>
+                                                        <label id="primary_label" class="custom-file-label">Choose file</label>
                                                     </div>
                                                 </div>
                                             </div>
@@ -66,7 +66,7 @@
                                                 <div class="input-group">
                                                     <div class="custom-file">
                                                         <input type="file" class="custom-file-input" name="img_zoom" id="img_zoom" required>
-                                                        <label class="custom-file-label">Choose file</label>
+                                                        <label id="zoom_label" class="custom-file-label">Choose file</label>
                                                     </div>
                                                 </div>
                                             </div>
@@ -125,5 +125,15 @@
 @endsection
 
 @section('script')
+<script>
+    $(document).ready(function() {
+        $('#img_zoom').change(function(){
+            $('#zoom_label').text($('#img_zoom').val().slice(12));
+        });
 
+        $('#img_primary').change(function(){
+            $('#primary_label').text($('#img_primary').val().slice(12));
+        });
+	});
+</script>
 @endsection

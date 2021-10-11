@@ -568,8 +568,8 @@ class ProductController extends Controller
 			$request->file('img_zoom')->store('/item/images/'.$request->item_code.'/gallery/original');//1024
 			$request->file('img_primary')->store('/item/images/'.$request->item_code.'/gallery/preview');//400
 
-			$p_name = "(400p) " .$p_filename.".".$p_extension;//400
-			$z_name = "(1024p) " .$z_filename.".".$z_extension;//1024
+			$p_name = $p_filename.".".$p_extension;//400
+			$z_name = $z_filename.".".$z_extension;//1024
 
             // dd($p_name. " : ".$z_name);
 
