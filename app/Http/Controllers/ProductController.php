@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Auth;
 use DB;
 
@@ -222,7 +223,7 @@ class ProductController extends Controller
                 'f_parent_code' => $item['parent_item_code'],
                 'f_parent_item_name' => $item['parent_item_name'],
                 'f_name' => $item['item_code'],
-                'f_name_name'	 => $item['product_name'],
+                'f_name_name'	 => $request->product_name,
                 'f_item_name' => $item['item_name'],
                 'f_cat_id' => $request->product_category,
                 'f_category' => $item_category,
@@ -250,15 +251,29 @@ class ProductController extends Controller
 
             $item_attr = [];
             foreach($item['attributes'] as $attr) {
+                $existing_attribute = DB::table('fumaco_attributes_per_category')
+                    ->where('category_id', $request->product_category)
+                    ->where('attribute_name', $attr['attribute'])->first();
+
+                if (!$existing_attribute) {
+                    // insert attribute names
+                    $attr_id = DB::table('fumaco_attributes_per_category')->insertGetId([
+                        'category_id' => $request->product_category,
+                        'attribute_name' => $attr['attribute'],
+                        'slug' => Str::slug($attr['attribute'], '-')
+                    ]);
+                }
+                // get attribute name id
+                $attr_name_id = ($existing_attribute) ? $existing_attribute->id : $attr_id;
+
                 $item_attr[] = [
                     'idx' => $attr['idx'],
                     'idcode' => $attr['parent'],
-                    'attribute_name' => $attr['attribute'],
+                    'attribute_name_id' => $attr_name_id,
                     'attribute_value' => $attr['attribute_value'],
-                    'attribute_status' => 1
                 ];
             }
-
+            
             DB::table('fumaco_items_attributes')->insert($item_attr);
 
             DB::commit();
@@ -319,6 +334,8 @@ class ProductController extends Controller
 
             DB::table('fumaco_items_attributes')->where('idcode', $item_code)->delete();
 
+            DB::table('fumaco_items_image_v1')->where('idcode', $item_code)->delete();
+
             DB::commit();
 
             return redirect()->back()->with('success', 'Product <b>' . $item_code . '</b> has been deleted.');
@@ -368,7 +385,7 @@ class ProductController extends Controller
     public function viewList(Request $request) {
         $q_string = $request->q;
         $search_str = explode(' ', $q_string);
-        $list = DB::table('fumaco_items')
+        $product_list = DB::table('fumaco_items')
             ->when($q_string, function ($query) use ($search_str, $q_string) {
                 return $query->where(function($q) use ($search_str, $q_string) {
                     foreach ($search_str as $str) {
@@ -379,9 +396,31 @@ class ProductController extends Controller
                         ->orWhere('f_item_classification', 'LIKE', "%".$q_string."%");
                 });
             })
-            ->orderBy('f_date', 'desc')->paginate(10);
+            ->orderBy('f_date', 'desc')->paginate(15);
 
-        return view('backend.products.list', compact('list'));
+        $list = [];
+        foreach ($product_list as $product) {
+            $item_image = DB::table('fumaco_items_image_v1')->where('idcode', $product->f_idcode)->first();
+
+            $item_name = strip_tags($product->f_name_name);
+            $list[] = [
+                'id' => $product->id,
+                'product_code' => $product->f_parent_code,
+                'item_code' => $product->f_idcode,
+                'product_name' => $product->f_name_name,
+                'item_name' => $item_name,
+                'image' => ($item_image) ? $item_image->imgprimayx : 'test.jpg',
+                'price' => $product->f_original_price,
+                'qty' => $product->f_qty,
+                'reserved_qty' => $product->f_reserved_qty,
+                'product_category' => $product->f_category,
+                'brand' => $product->f_brand,
+                'on_sale' => $product->f_onsale,
+                'status' => $product->f_status,
+            ];
+        }
+
+        return view('backend.products.list', compact('list', 'product_list'));
     }
 
     public function viewProduct($id) {
@@ -394,8 +433,9 @@ class ProductController extends Controller
 
         $item_image = ($item_image) ? $item_image->imgoriginalx : 'test.jpg';
 
-        $attributes = DB::table('fumaco_items_attributes')
-            ->where('idcode', $details->f_idcode)->orderBy('idx', 'asc')->get();
+        $attributes = DB::table('fumaco_items_attributes as a')
+            ->join('fumaco_attributes_per_category as b', 'a.attribute_name_id', 'b.id')
+            ->where('a.idcode', $details->f_idcode)->orderBy('a.idx', 'asc')->get();
         
         return view('backend.products.view', compact('details', 'item_categories', 'attributes', 'item_image'));
     }

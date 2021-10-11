@@ -61,7 +61,8 @@
 								</div>
 							</form>
 							<table class="table table-bordered table-hover">
-								<col style="width: 35%;">
+								<col style="width: 5%;">
+								<col style="width: 30%;">
 								<col style="width: 7%;">
 								<col style="width: 7%;">
 								<col style="width: 7%;">
@@ -73,6 +74,7 @@
 								<col style="width: 6%;">
 								<thead>
 									<tr>
+										<th class="text-center">Image</th>
 										<th class="text-center">Item Name</th>
 										<th class="text-center">Parent Item</th>
 										<th class="text-center">Price</th>
@@ -88,20 +90,25 @@
 								<tbody>
 									@forelse ($list as $item)
 									<tr>
-										<td><span class="d-block font-weight-bold">{{ $item->f_idcode }}</span> {{ $item->f_name_name }}</td>
-										<td class="text-center">{{ $item->f_parent_code }}</td>
-										<td class="text-center">{{ 'P ' . number_format((float)$item->f_price, 2, '.', ',') }}</td>
-										<td class="text-center">{{ number_format($item->f_qty) }}</td>
-										<td class="text-center">{{ number_format($item->f_reserved_qty) }}</td>
-										<td class="text-center">{{ $item->f_category }}</td>
-										<td class="text-center">{{ $item->f_brand }}</td>
+										<td class="align-middle">
+											<img src="{{ asset('/item/images/'. $item['item_code'] .'/gallery/original/'.$item['image']) }}" class="img-responsive rounded img-thumbnail d-inline-block" alt="" width="70" height="70">
+										</td>
+										<td>
+											<span class="d-block font-weight-bold">{{ $item['item_code'] }}</span> {{ $item['product_name'] }}
+										</td>
+										<td class="text-center">{{ $item['product_code'] }}</td>
+										<td class="text-center">{{ 'P ' . number_format((float)$item['price'], 2, '.', ',') }}</td>
+										<td class="text-center">{{ number_format($item['qty']) }}</td>
+										<td class="text-center">{{ number_format($item['reserved_qty']) }}</td>
+										<td class="text-center">{{ $item['product_category'] }}</td>
+										<td class="text-center">{{ $item['brand'] }}</td>
 										<td class="text-center">
-											@if ($item->f_onsale == 1)
+											@if ($item['on_sale'] == 1)
 												 <span class="badge badge-success">On Sale</span>
 											@endif
 										</td>
 										<td class="text-center">
-											@if ($item->f_status == 1)
+											@if ($item['status'] == 1)
 												<span class="badge badge-primary">Active</span>
 											@else
 												<span class="badge badge-secondary">Disabled</span>
@@ -112,19 +119,19 @@
 												<button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Action
 												</button>
 												<div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
-												  <a class="dropdown-item" href="/admin/product/{{ $item->id }}/edit">View Details</a>
-												  @if($item->f_status == 1)
-												  <a class="dropdown-item" href="#" data-toggle="modal" data-target="#d{{ $item->id }}"><small>Disable</small></a>
+												  <a class="dropdown-item" href="/admin/product/{{ $item['id'] }}/edit">View Details</a>
+												  @if($item['status'] == 1)
+												  <a class="dropdown-item" href="#" data-toggle="modal" data-target="#d{{ $item['id'] }}"><small>Disable</small></a>
 												  @else
-												  <a class="dropdown-item" href="#" data-toggle="modal" data-target="#e{{ $item->id }}">Enable</a>
+												  <a class="dropdown-item" href="#" data-toggle="modal" data-target="#e{{ $item['id'] }}">Enable</a>
 												  @endif
-												  <a class="dropdown-item" href="#" data-toggle="modal" data-target="#dm{{ $item->id }}"><small>Delete</small></a>
-												  <a class="dropdown-item" href="/admin/product/images/{{ $item->id }}"><small>Images</small></a>
+												  <a class="dropdown-item" href="#" data-toggle="modal" data-target="#dm{{ $item['id'] }}"><small>Delete</small></a>
+												  <a class="dropdown-item" href="/admin/product/images/{{ $item['id'] }}"><small>Images</small></a>
 												</div>
 											</div>
 
-											<div class="modal fade" id="d{{ $item->id }}" tabindex="-1" role="dialog" aria-labelledby="delItemModal" aria-hidden="true">
-												<form action="/admin/product/{{ $item->f_idcode }}/disable" method="POST">
+											<div class="modal fade" id="d{{ $item['id'] }}" tabindex="-1" role="dialog" aria-labelledby="delItemModal" aria-hidden="true">
+												<form action="/admin/product/{{ $item['item_code'] }}/disable" method="POST">
 													@csrf
 													<div class="modal-dialog" role="document">
 														<div class="modal-content">
@@ -132,7 +139,7 @@
 																<h5 class="modal-title" id="delItemModal">Disable Product</h5>
 															</div>
 															<div class="modal-body">
-																<p>Disable <b>{{ $item->f_idcode }}</b>?</p>
+																<p>Disable <b>{{ $item['item_code'] }}</b>?</p>
 															</div>
 															<div class="modal-footer">
 															<button type="submit" class="btn btn-primary">Confirm</button>
@@ -143,8 +150,8 @@
 												</form>
 											</div>
 
-											<div class="modal fade" id="e{{ $item->id }}" tabindex="-1" role="dialog" aria-labelledby="delItemModal" aria-hidden="true">
-												<form action="/admin/product/{{ $item->f_idcode }}/enable" method="POST">
+											<div class="modal fade" id="e{{ $item['id'] }}" tabindex="-1" role="dialog" aria-labelledby="delItemModal" aria-hidden="true">
+												<form action="/admin/product/{{ $item['item_code'] }}/enable" method="POST">
 													@csrf
 													<div class="modal-dialog" role="document">
 														<div class="modal-content">
@@ -152,7 +159,7 @@
 																<h5 class="modal-title" id="delItemModal">Set Product as Active</h5>
 															</div>
 															<div class="modal-body">
-																<p>Set <b>{{ $item->f_idcode }}</b> as "Active"?</p>
+																<p>Set <b>{{ $item['item_code'] }}</b> as "Active"?</p>
 															</div>
 															<div class="modal-footer">
 															<button type="submit" class="btn btn-primary">Confirm</button>
@@ -163,8 +170,8 @@
 												</form>
 											</div>
 
-											<div class="modal fade" id="dm{{ $item->id }}" tabindex="-1" role="dialog" aria-labelledby="delItemModal" aria-hidden="true">
-												<form action="/admin/product/{{ $item->f_idcode }}/delete" method="POST">
+											<div class="modal fade" id="dm{{ $item['id'] }}" tabindex="-1" role="dialog" aria-labelledby="delItemModal" aria-hidden="true">
+												<form action="/admin/product/{{ $item['item_code'] }}/delete" method="POST">
 													@csrf
 													@method('delete')
 													<div class="modal-dialog" role="document">
@@ -173,7 +180,7 @@
 																<h5 class="modal-title" id="delItemModal">Delete Product</h5>
 															</div>
 															<div class="modal-body">
-																<p>Delete item <b>{{ $item->f_idcode }}</b>?</p>
+																<p>Delete item <b>{{ $item['item_code'] }}</b>?</p>
 															</div>
 															<div class="modal-footer">
 															<button type="submit" class="btn btn-primary">Confirm</button>
@@ -193,7 +200,7 @@
 								</tbody>
 							</table>
 							<div class="float-right mt-4">
-								{{ $list->withQueryString()->links('pagination::bootstrap-4') }}
+								{{ $product_list->withQueryString()->links('pagination::bootstrap-4') }}
 							</div>
 						</div>
 					  	<!-- /.card-body -->
