@@ -560,8 +560,8 @@
                         <div class="col-lg-4">
                             <div class="xzoom-container" style="width: 100% !important;">
                                 @php
-                                    $src = (array_key_exists(0, $product_images)) ? '/item/images/'. $product_images[0]->idcode.'/gallery/preview/'. $product_images[0]->imgprimayx : '/storage/no-photo-available.png';
-                                    $xoriginal = (array_key_exists(0, $product_images))  ? '/item/images/'. $product_images[0]->idcode.'/gallery/original/'. $product_images[0]->imgoriginalx : '/storage/no-photo-available.png';
+                                    $src = (count($product_images) > 0) ? '/item/images/'. $product_images[0]->idcode.'/gallery/preview/'. $product_images[0]->imgprimayx : '/storage/no-photo-available.png';
+                                    $xoriginal = (count($product_images) > 0)  ? '/item/images/'. $product_images[0]->idcode.'/gallery/original/'. $product_images[0]->imgoriginalx : '/storage/no-photo-available.png';
                                 @endphp
                                 <img style="width: 100% !important;" class="xzoom4 imgx" id="xzoom-fancy" src="{{ asset($src) }}" xoriginal="{{ asset($xoriginal) }}" />
                                 <br><br>
