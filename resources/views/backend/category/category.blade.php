@@ -296,6 +296,7 @@
                                                                 </div>
                                                             </div>
                                                         </div>
+                                                        <a href="/admin/category/settings/{{ $c->id }}" class="btn btn-success btn-sm active" role="button" aria-pressed="true">Sort Items</a>
                                                     </td>
                                                 </tr>
                                             @endforeach

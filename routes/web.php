@@ -136,6 +136,8 @@ Route::prefix('admin')->group(function () {
         Route::post('/category/edit/{id}', 'CategoryController@editCategory');
         Route::post('/category/add', 'CategoryController@addCategory');
         Route::get('/category/delete/{id}', 'CategoryController@deleteCategory');
+        Route::get('/category/settings/{id}', 'CategoryController@sortItems');
+        Route::post('/category/set_row/{id}', 'CategoryController@changeSort');
 
         Route::get('/media/add', 'MediaController@add_media_form');
         Route::get('/media/list', 'MediaController@list_media');

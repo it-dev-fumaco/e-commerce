@@ -227,7 +227,7 @@
             </ul>
           </li>
           @php
-            $product_pages = ['add_product_form', 'product_list', 'view_product_form', 'product_attribute_settings', 'product_category_settings'];
+            $product_pages = ['add_product_form', 'product_list', 'view_product_form', 'product_attribute_settings', 'product_category', 'product_category_settings'];
             $media_pages = ['list_media', 'add_media'];
             $order_pages = ['order_list', 'order_cancel', 'order_delivered'];
             $category_pages = ['product_category'];
@@ -246,7 +246,7 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a href="/admin/category/list" class="nav-link">
+                <a href="/admin/category/list" class="nav-link {{ $activePage == 'product_category' ? 'active' : '' }}">
                     <i class="far fa-circle nav-icon"></i>
                     <p>Category List</p>
                 </a>
@@ -257,12 +257,12 @@
                   <p>Product Settings</p>
                 </a>
               </li>
-              <li class="nav-item">
+              {{-- <li class="nav-item">
                 <a href="/admin/product/settings" class="nav-link {{ $activePage == 'product_category_settings' ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Product Category Settings</p>
                 </a>
-              </li>
+              </li> --}}
             </ul>
           </li>
           <li class="nav-header">CUSTOMERS</li>
