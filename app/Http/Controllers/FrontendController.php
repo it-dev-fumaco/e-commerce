@@ -369,16 +369,18 @@ class FrontendController extends Controller
 
         // $active_attr = [];
         $variant_attr_arr = [];
-        foreach ($variant_attributes as $attr => $value) {
-            $values = collect($value)->groupBy('attribute_value')->map(function($d, $i) {
-                return array_unique(array_column($d->toArray(), 'idcode'));
-            });
-
-            $variant_attr_arr[$attr] = $values;
-
-            // if (count($variant_attr_arr[$attr][$attributes[$attr]]) > 1) {
-            //     $active_attr[] = $variant_attr_arr[$attr][$attributes[$attr]];
-            // }
+        if (count($variant_items) > 1) {
+            foreach ($variant_attributes as $attr => $value) {
+                $values = collect($value)->groupBy('attribute_value')->map(function($d, $i) {
+                    return array_unique(array_column($d->toArray(), 'idcode'));
+                });
+    
+                $variant_attr_arr[$attr] = $values;
+    
+                // if (count($variant_attr_arr[$attr][$attributes[$attr]]) > 1) {
+                //     $active_attr[] = $variant_attr_arr[$attr][$attributes[$attr]];
+                // }
+            }
         }
 
         $product_images = DB::table('fumaco_items_image_v1')->where('idcode', $item_code)->get();
