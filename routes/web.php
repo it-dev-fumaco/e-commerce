@@ -111,8 +111,8 @@ Route::prefix('admin')->group(function () {
         Route::get('/api_setup/payment', 'SettingsController@paymentApiSetup');
         Route::post('/api_setup/save', 'SettingsController@saveApiCredentials');
 
-        Route::get('/product/settings', 'ProductController@viewParentCodeList');
-        Route::post('/attribute_status/{parent}/update', 'ProductController@updateProductAttribute');
+        Route::get('/product/settings', 'ProductController@viewCategoryAttr');
+        Route::post('/attribute_status/{cat_id}/update', 'ProductController@updateCategoryAttr');
         
 
         Route::get('/product/list', 'ProductController@viewList');

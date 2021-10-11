@@ -484,37 +484,28 @@ class ProductController extends Controller
         return view('backend.products.view', compact('details', 'item_categories', 'attributes', 'item_image'));
     }
 
-    public function viewParentCodeList(Request $request) {
-        $list = DB::table('fumaco_items')->whereNotNull('f_parent_code')
-            ->select('f_parent_code', 'f_parent_item_name')->groupBy('f_parent_code', 'f_parent_item_name')->paginate(10);
+    public function viewCategoryAttr(Request $request) {
+        $list = DB::table('fumaco_categories')->paginate(10);
 
         $attributes = [];
-        $parent = $request->parent;
-        if(isset($parent)) {
-            $variant_codes = DB::table('fumaco_items')
-                ->where('f_parent_code', $parent)->pluck('f_idcode');
-
-            $attributes = DB::table('fumaco_items_attributes')
-                ->whereIn('idcode', $variant_codes)->select('attribute_name', 'attribute_status')
-                ->orderBy('idx', 'asc')->groupBy('attribute_name', 'attribute_status')->get();
+        $cat_id = $request->cat_id;
+        if(isset($cat_id)) {
+            $attributes = DB::table('fumaco_attributes_per_category')->where('category_id', $cat_id)->get();
         }
 
-        return view('backend.products.parent_code_list', compact('list', 'attributes'));
+        return view('backend.products.category_attribute_settings', compact('list', 'attributes'));
     }
 
     // update parent variant attribute status
-    public function updateProductAttribute($parent, Request $request) {
+    public function updateCategoryAttr($cat_id, Request $request) {
         DB::beginTransaction();
         try {
             $attr_names = $request->attribute_name;
             $status = $request->show_in_website;
             foreach($attr_names as $i => $attr_name) {
-                $variant_codes = DB::table('fumaco_items')
-                    ->where('f_parent_code', $parent)->pluck('f_idcode');
-
-                $attributes = DB::table('fumaco_items_attributes')
-                    ->whereIn('idcode', $variant_codes)->where('attribute_name', $attr_name)
-                    ->update(['attribute_status' => $status[$i]]);
+                DB::table('fumaco_attributes_per_category')
+                    ->where('category_id', $cat_id)->where('attribute_name', $attr_name)
+                    ->update(['status' => $status[$i]]);
             }
 
             DB::commit();
@@ -525,7 +516,6 @@ class ProductController extends Controller
             
             return redirect()->back()->with('attr_error', 'An error occured. Please try again.');
         }
-        return $request->all();
     }
 
     public function uploadImagesForm($id){
