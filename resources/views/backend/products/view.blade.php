@@ -215,11 +215,11 @@
                         </div>
                         <div class="form-group">
                            <label for="website-caption">Website Caption (more information section)</label>
-                           <textarea class="form-control" rows="6" id="website-caption" name="website_caption">{{ old('website_caption') }}</textarea>
+                           <textarea class="form-control" rows="6" id="website-caption" name="website_caption">{{ old('website_caption') }}{{ $details->f_caption }}</textarea>
                         </div>
                         <div class="form-group">
                            <label for="full-detail">Full Detail</label>
-                           <textarea class="form-control" rows="6" id="full-detail" name="full_detail">{{ old('full_detail') }}</textarea>
+                           <textarea class="form-control" rows="6" id="full-detail" name="full_detail">{{ old('website_caption') }}{{ $details->f_full_description }}</textarea>
                         </div>
                         <h5>Product Specifications / Attributes</h5>
                         <hr>
@@ -306,8 +306,6 @@
 @section('script')
 <script>
   (function() {
-    $('#website-caption').summernote('code', '{!! $details->f_caption !!}');
-    $('#full-detail').summernote('code', '{!! $details->f_full_description !!}');
     $("#website-caption").summernote({
 			dialogsInBody: true,
 			dialogsFade: true,
