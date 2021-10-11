@@ -104,7 +104,10 @@
               <div class="col animated animatedFadeInUp fadeInUp equal-height-columns">
                 <div class="card shadow-sm">
                   <div class="equal-column-content">
-                    <img src="{{ asset('/item/images/'. $bs['item_code'] .'/gallery/preview/'. $bs['bs_img']) }}" alt="" class="img-responsive" style="width: 100% !important;">
+                    @php
+                      $img = ($bs['bs_img']) ? '/item/images/'. $bs['item_code'] .'/gallery/preview/'. $bs['bs_img'] : '/storage/no-photo-available.png';
+                    @endphp
+                    <img src="{{ asset($img) }}" alt="" class="img-responsive" style="width: 100% !important;">
                     <div class="card-body">
                       <div class="text ellipsis">
                         <p class="card-text product-head fumacoFont_card_title text-concat" style="color:#0062A5 !important;  height: 80px; ">{{ $bs['item_name'] }}</p>
@@ -148,7 +151,10 @@
               <div class="col animated animatedFadeInUp fadeInUp equal-height-columns">
                 <div class="card shadow-sm">
                   <div class="equal-column-content">
-                    <img src="{{ asset('/item/images/'. $os['item_code'] .'/gallery/preview/'. $os['os_img']) }}" alt="" class="img-responsive" style="width: 100% !important;">
+                    @php
+                    $img_os = ($os['os_img']) ? '/item/images/'. $os['item_code'] .'/gallery/preview/'. $os['os_img'] : '/storage/no-photo-available.png';
+                  @endphp
+                    <img src="{{ asset($img_os) }}" alt="" class="img-responsive" style="width: 100% !important;">
                     <div class="card-body">
                       <div class="text ellipsis">
                         <p class="card-text product-head fumacoFont_card_title text-concat" style="color:#0062A5 !important; height: 80px;">{{ $os['item_name'] }}</p>
