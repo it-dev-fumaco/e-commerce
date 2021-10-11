@@ -95,7 +95,7 @@
 
 		.text.ellipsis::after {
 			position: absolute;
-			right: -12px; 
+			right: -12px;
 			bottom: 4px;
 		}
 	</style>
@@ -130,14 +130,14 @@
 		</nav>
 		<hr class="singleline">
 	</main>
-    
+
 	<main style="background-color:#ffffff;" class="products-head">
 		<div class="container marketing"><br></div>
 		<div class="container" style="max-width: 100% !important;">
 			<div class="row">
 				<!--sidebar-->
 				<div class="col-lg-2 checkersxx">
-					<div class="d-flex justify-content-between align-items-center he1">Filters 
+					<div class="d-flex justify-content-between align-items-center he1">Filters
 						<a href="/products/{{ $product_category->id }}" style="text-decoration: none;">
 							<small class="stylecap he2 text-dark" style="font-weight:100 !important;">Clear All</small>
 						</a>
@@ -165,25 +165,25 @@
 						<hr>
 						@endforeach
 						<input type="hidden" name="sortby" value="{{ request()->sortby }}">
-						
+
 					</form>
 				</div>
 				<!--sidebar-->
-					
+
 					<!--products-->
 					<div class="col-lg-10">
-						
+
 						<div class="row g-6">
 							<form id="sortForm" class="d-inline-block">
 							<div class="col-md-4 offset-md-8">
 									<div class="row mb-2">
-										
+
 										<div class="col-md-6" style="text-align: right;">
 											<label class="m-2"><small>Sort By</small></label>
 										</div>
 										<div class="col-md-6">
 											<select name="sortby" class="form-control">
-													<option value="Position" data-loc="{{ request()->fullUrlWithQuery(['sortby' => 'Position']) }}" {{ (request()->sortby == 'Position') ? 'selected' : '' }}>Position</option>
+													<option value="Position" data-loc="{{ request()->fullUrlWithQuery(['sortby' => 'Position']) }}" {{ (request()->sortby == 'Position') ? 'selected' : '' }}>Recommended</option>
 													<option value="Product Name" data-loc="{{ request()->fullUrlWithQuery(['sortby' => 'Product Name']) }}" {{ (request()->sortby == 'Product Name') ? 'selected' : '' }}>Product Name</option>
 													<option value="Price" data-loc="{{ request()->fullUrlWithQuery(['sortby' => 'Price']) }}" {{ (request()->sortby == 'Price') ? 'selected' : '' }}>Price</option>
 											</select>
@@ -191,7 +191,7 @@
 									</div>
 							</div>
 						</form>
-							
+
 							@forelse ($products_arr as $product)
 							<div class="col-md-4 btmp animated animatedFadeInUp fadeInUp equal-height-columns">
 									<div class="card">
@@ -236,7 +236,7 @@
 					<!--products-->
 			</div>
 		</div>
-		
+
 		{{-- pagination --}}
 		<div class="container" style="max-width: 100% !important;">
 			<div class="row">
