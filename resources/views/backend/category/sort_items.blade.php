@@ -55,6 +55,7 @@
                                     <table class="table table-bordered table-hover">
                                         <thead>
                                             <tr>
+                                                <th class="text-center">Order No.</th>
                                                 <th class="text-center">Item Code</th>
                                                 <th class="text-center">Item Name</th>
                                                 <th class="text-center">Row</th>
@@ -65,30 +66,27 @@
                                             <tr>
                                                 <form action="/admin/category/set_row/{{ $item->f_cat_id }}" method="post">
                                                     @csrf
+                                                    <td class="text-center" style="width: 10%;" >{{ $item->f_order_by }}</td>
                                                     <td class="text-center" style="width: 20%;" >{{ $item->f_idcode }}</td>
-                                                    <td class="text-center" style="width: 50%;" >{{ $item->f_name_name }}</td>
+                                                    <td class="text-center" style="width: 40%;" >{{ $item->f_name_name }}</td>
                                                     <td class="text-center" style="width: 30%;" >
                                                         <div class="form-group row">
                                                             <div class="col-md-8">
                                                                 <select class="form-control formslabelfnt" id="row_select" aria-label="Default select example" name="item_row" required>
-                                                                    @php
-                                                                        if($item->f_order_by == 'P'){
-                                                                            $select = 'Select Row';
-                                                                        }else{
-                                                                            $select = 'Currently in: Row '.$item->f_order_by;
-                                                                        }
-                                                                    @endphp
-                                                                    <option selected disabled value="">{{ $select }}</option>
-                                                                    <option value="A">Row A</option>
+                                                                    <option selected disabled value="">Select Order No.</option>
+                                                                    {{-- <option value="A">Row A</option>
                                                                     <option value="B">Row B</option>
                                                                     <option value="C">Row C</option>
                                                                     <option value="D">Row D</option>
-                                                                    <option value="E">Row E</option>
+                                                                    <option value="E">Row E</option> --}}
+                                                                    @for ($i = 0; $i < $count; $i++)
+                                                                        <option value="{{ $i + 1 }}">{{ $i + 1 }}</option>
+                                                                    @endfor
                                                                 </select>
                                                             </div>
                                                             <div class="col-md-4">
                                                                 <input type="text" name="item_code" id="item_code" value="{{ $item->f_idcode }}" required hidden/>
-                                                                <button type="submit" id="send" class="btn btn-primary">Change Row</button>
+                                                                <button type="submit" id="send" class="btn btn-primary">Update</button>
                                                             </div>
                                                         </div>
                                                     </td>

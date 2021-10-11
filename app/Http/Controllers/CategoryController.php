@@ -68,9 +68,13 @@ class CategoryController extends Controller
     }
 
     public function sortItems($id){
+
         $items = DB::table('fumaco_items')->where('f_cat_id', $id)->orderBy('f_order_by', 'asc')->paginate(10);
 
-        return view('backend.category.sort_items', compact('items'));
+        $count = DB::table('fumaco_items')->where('f_cat_id', $id)->count();
+        // dd($count);
+
+        return view('backend.category.sort_items', compact('items', 'count'));
     }
 
     public function changeSort(Request $request, $id){
@@ -78,12 +82,12 @@ class CategoryController extends Controller
         try {
             $checker = DB::table('fumaco_items')->where('f_cat_id', $id)->where('f_order_by', $request->item_row)->get();
             // dd(count($checker));
-            if(count($checker) == 3){
-                return redirect()->back()->with('error', 'Sorry, no more than 3 items are allowed in Row '.$request->item_row.'.');
+            if(count($checker) > 0){
+                return redirect()->back()->with('error', 'Sorry, order number '.$request->item_row.' is taken.');
             }
             DB::table('fumaco_items')->where('f_idcode', $request->item_code)->update(['f_order_by' => $request->item_row]);
             DB::commit();
-            return redirect()->back()->with('success', 'Row Changed.');
+            return redirect()->back()->with('success', 'Order No. Changed.');
         } catch (Exception $e) {
             DB::rollback();
             return redirect()->back()->with('error', 'An error occured. Please try again.');
