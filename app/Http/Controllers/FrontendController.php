@@ -32,7 +32,7 @@ class FrontendController extends Controller
                 'item_name' => $bs_item_name,
                 'orig_price' => $bs->f_original_price,
                 'new_price' => $bs->f_price,
-                'bs_img' => ($bs_img) ? $bs_img->imgprimayx : 'test.jpg'
+                'bs_img' => ($bs_img) ? $bs_img->imgprimayx : null
             ];
         }
 
@@ -46,7 +46,7 @@ class FrontendController extends Controller
                 'item_name' => $os_item_name,
                 'orig_price' => $os->f_original_price,
                 'new_price' => $os->f_price,
-                'os_img' => ($os_img) ? $os_img->imgprimayx : 'test.jpg'
+                'os_img' => ($os_img) ? $os_img->imgprimayx : null
             ];
         }
 
@@ -336,7 +336,7 @@ class FrontendController extends Controller
                 'id' => $product->id,
                 'item_code' => $product->f_idcode,
                 'item_name' => $item_name,
-                'image' => ($item_image) ? $item_image->imgprimayx : 'test.jpg',
+                'image' => ($item_image) ? $item_image->imgprimayx : null,
                 'price' => $product->f_original_price,
                 'discounted_price' => number_format(str_replace(",","",$product->f_price), 2),
                 'is_discounted' => $product->f_discount_trigger
@@ -402,7 +402,7 @@ class FrontendController extends Controller
                 'item_code' => $wishlist->item_code,
                 'item_name' => $wishlist->item_name,
                 'item_price' => $wishlist->item_price,
-                'image' => ($item_image) ? $item_image->imgprimayx : 'test.jpg',
+                'image' => ($item_image) ? $item_image->imgprimayx : null,
             ];
         }
 
@@ -443,7 +443,7 @@ class FrontendController extends Controller
                 'item_name' => $item->item_name,
                 'item_code' => $item->item_code,
                 'item_price' => $item->item_price,
-                'image' => ($item_image) ? $item_image->imgprimayx : 'test.jpg',
+                'image' => ($item_image) ? $item_image->imgprimayx : null,
                 'quantity' => $item->item_qty,
                 'price' => $item->item_price,
                 'amount' => $item->item_total_price
@@ -655,7 +655,7 @@ class FrontendController extends Controller
                 'item_code' => $item->item_code,
                 'item_name' => $item->item_name,
                 'item_price' => $item->item_price,
-                'image' => ($item_image) ? $item_image->imgprimayx : 'test.jpg',
+                'image' => ($item_image) ? $item_image->imgprimayx : null,
                 'quantity' => $item->item_qty,
                 'price' => $item->item_price,
                 'amount' => $item->item_total_price
