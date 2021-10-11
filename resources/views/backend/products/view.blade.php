@@ -59,7 +59,10 @@
                         <hr>
                         <div class="row">
                            <div class="col-md-2">
-                              <img src="{{ asset('/item/images/'. $details->f_idcode .'/gallery/original/'.$item_image) }}" class="img-responsive rounded img-thumbnail" alt="" width="250" height="250">
+                              @php
+                                 $image = ($item_image) ? '/item/images/'. $details->f_idcode .'/gallery/original/'.$item_image : '/storage/no-photo-available.png';
+                              @endphp
+                              <img src="{{ asset($image) }}" class="img-responsive rounded img-thumbnail" alt="" width="250" height="250">
                            </div>
                            <div class="col-md-4">
                               <div class="row">

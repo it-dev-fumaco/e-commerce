@@ -91,7 +91,10 @@
 									@forelse ($list as $item)
 									<tr>
 										<td class="align-middle">
-											<img src="{{ asset('/item/images/'. $item['item_code'] .'/gallery/original/'.$item['image']) }}" class="img-responsive rounded img-thumbnail d-inline-block" alt="" width="70" height="70">
+											@php
+												$image = ($item['image']) ? '/item/images/'. $item['item_code'] .'/gallery/original/'.$item['image'] : '/storage/no-photo-available.png';
+											@endphp
+											<img src="{{ asset($image) }}" class="img-responsive rounded img-thumbnail d-inline-block" alt="" width="70" height="70">
 										</td>
 										<td>
 											<span class="d-block font-weight-bold">{{ $item['item_code'] }}</span> {{ $item['product_name'] }}

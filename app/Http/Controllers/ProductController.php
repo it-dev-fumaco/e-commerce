@@ -215,9 +215,12 @@ class ProductController extends Controller
                 ]
             );
     
-            $item_category = DB::table('fumaco_categories')->where('id', $request->product_category)->first();
+            $item_category = DB::table('fumaco_categories')->where('id', $request->product_category)->first(); 
             $item_category = ($item_category) ? $item_category->name : null;
-    
+            if(!$item_category) {
+                return redirect()->back()->withInput($request->all())->with('error', 'Please select product category.');
+            }
+            
             $id = DB::table('fumaco_items')->insertGetId([
                 'f_idcode' => $item['item_code'],
                 'f_parent_code' => $item['parent_item_code'],
@@ -249,6 +252,7 @@ class ProductController extends Controller
                 'f_original_price' => $item['item_price'],
             ]);
 
+            // insert item attributes
             $item_attr = [];
             foreach($item['attributes'] as $attr) {
                 $existing_attribute = DB::table('fumaco_attributes_per_category')
@@ -272,6 +276,12 @@ class ProductController extends Controller
                     'attribute_name_id' => $attr_name_id,
                     'attribute_value' => $attr['attribute_value'],
                 ];
+            }
+
+            // insert brand
+            $existing_brand = DB::table('fumaco_brands')->where('brandname', $item['brand'])->exists();
+            if(!$existing_brand) {
+                DB::table('fumaco_brands')->insert(['brandname' => $item['brand'], 'slug' => Str::slug($item['brand'], '-')]);
             }
             
             DB::table('fumaco_items_attributes')->insert($item_attr);
@@ -443,7 +453,7 @@ class ProductController extends Controller
                 'item_code' => $product->f_idcode,
                 'product_name' => $product->f_name_name,
                 'item_name' => $item_name,
-                'image' => ($item_image) ? $item_image->imgprimayx : 'test.jpg',
+                'image' => ($item_image) ? $item_image->imgprimayx : null,
                 'price' => $product->f_original_price,
                 'qty' => $product->f_qty,
                 'reserved_qty' => $product->f_reserved_qty,
@@ -465,7 +475,7 @@ class ProductController extends Controller
         $item_image = DB::table('fumaco_items_image_v1')
             ->where('idcode', $details->f_idcode)->first();
 
-        $item_image = ($item_image) ? $item_image->imgoriginalx : 'test.jpg';
+        $item_image = ($item_image) ? $item_image->imgoriginalx : null;
 
         $attributes = DB::table('fumaco_items_attributes as a')
             ->join('fumaco_attributes_per_category as b', 'a.attribute_name_id', 'b.id')

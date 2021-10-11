@@ -188,7 +188,7 @@
                     <div class="form-group">
                       <label for="product-category">* Category</label>
                       <select name="product_category" id="product-category" class="form-control" required>
-                        <option>Select Category</option>
+                        <option value="">Select Category</option>
                         @forelse ($item_categories as $item_category)
                         <option value="{{ $item_category->id }}">{{ $item_category->name }}</option>
                         @empty
