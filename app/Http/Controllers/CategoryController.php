@@ -67,14 +67,34 @@ class CategoryController extends Controller
         }
     }
 
-    public function sortItems($id){
+    public function sortItems(Request $request, $id){
+        $search = '';
+        if(request()->isMethod('post')) {
+            $search = $request->q;
+        }
 
-        $items = DB::table('fumaco_items')->where('f_cat_id', $id)->orderBy('f_order_by', 'asc')->paginate(10);
+        $items = DB::table('fumaco_items')->where('f_cat_id', $id)->where('f_idcode', 'LIKE', '%'.$search.'%')->orderBy('f_order_by', 'asc')->paginate(10);
+
+        $category = DB::table('fumaco_categories')->where('id', $id)->first();
 
         $count = DB::table('fumaco_items')->where('f_cat_id', $id)->count();
-        // dd($count);
 
-        return view('backend.category.sort_items', compact('items', 'count'));
+        $order_no = DB::table('fumaco_items')->where('f_cat_id', $id)->select('f_order_by')->groupBy('f_order_by')->get();
+        $order = collect($order_no);
+
+        return view('backend.category.sort_items', compact('items', 'count', 'order', 'id', 'category'));
+    }
+
+    public function resetOrder($id){
+        DB::beginTransaction();
+        try {
+            DB::table('fumaco_items')->where('f_idcode', $id)->update(['f_order_by' => 'P']);
+            DB::commit();
+            return redirect()->back()->with('success', 'Order No. Changed.');
+        } catch (Exception $e) {
+            DB::rollback();
+            return redirect()->back()->with('error', 'An error occured. Please try again.');
+        }
     }
 
     public function changeSort(Request $request, $id){
