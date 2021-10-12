@@ -281,20 +281,27 @@ class FrontendController extends Controller
         }
 
         // get requested filters
-        $request_data = $request->except(['page', 'sel_attr', 'sortby']);
+        $request_data = $request->except(['page', 'sel_attr', 'sortby', 'brand']);
         $attribute_name_filter = array_keys($request_data);
         $attribute_value_filter = [];
+        $brand_filter = $request->brand;
         foreach($request_data as $data) {
             foreach (explode('+', $data) as $value) {
                 $attribute_value_filter[] = $value;
             }
         }
 
+        $brand_filter = array_values(explode('+', $brand_filter));
         // get items based on filters
         $filtered_items = DB::table('fumaco_items as a')
             ->join('fumaco_items_attributes as b', 'a.f_idcode', 'b.idcode')
             ->join('fumaco_attributes_per_category as c', 'c.id', 'b.attribute_name_id')
-            ->whereIn('c.slug', $attribute_name_filter)->whereIn('b.attribute_value', $attribute_value_filter)
+            ->when(count($brand_filter) > 0, function($c) use ($brand_filter) {
+                $c->whereIn('a.f_brand', $brand_filter);
+            })
+            ->when(count($request_data) > 0, function($c) use ($attribute_name_filter, $attribute_value_filter) {
+                $c->whereIn('c.slug', $attribute_name_filter)->whereIn('b.attribute_value', $attribute_value_filter);
+            })
             ->where('a.f_status', 1)->select('c.slug', 'b.attribute_value', 'a.f_idcode')->pluck('a.f_idcode');
 
         // get item attributes based on item category (sidebar)
@@ -311,6 +318,15 @@ class FrontendController extends Controller
         $filters = collect($filters)->groupBy('attribute_name')->map(function($r, $d){
             return array_unique(array_column($r->toArray(), 'attribute_value'));
         });
+
+        // get distinct brands for filtering
+        $brands = DB::table('fumaco_items')->where('f_cat_id', $category_id)
+            ->when(count($request_data) > 0, function($c) use ($filtered_items) {
+                $c->whereIn('f_idcode', $filtered_items);
+            })
+            ->where('f_status', 1)->whereNotNull('f_brand')->distinct('f_brand')->pluck('f_brand');
+
+        $filters['Brand'] = $brands;
 
         if(isset($request->sel_attr)) {
             // get item attributes of selected checkbox in filters (sidebar)

@@ -147,7 +147,30 @@
 						@php
 							$x = 0;
 						@endphp
+						@if (count($filters['Brand']) > 1)
+						<div class="card mb-3">
+							<div class="card-header text-white font-weight-bold" style="font-size: 0.75rem; background-color: rgb(0, 98, 165);">Brand</div>
+							<div class="card-body">
+								@foreach ($filters['Brand'] as $brand)
+								@php
+									$x++;
+									$filter_attr = Str::slug('brand', '-');
+									$filter_values = explode('+', request()->brand);
+									$status = (in_array($brand, $filter_values)) ? 'checked' : '';
+								@endphp
+								<div class="form-check">
+									<input type="checkbox" class="form-check-input product-cb-filter" id="{{ 'cb' . $x }}" name="{{ 'attr[' .$filter_attr.'][]' }}" value="{{ $brand }}" data-attrname="{{ $filter_attr }}" {{ $status }}>
+									<label class="form-check-label" for="{{ 'cb' . $x }}" style="font-size: 0.8rem;">{{ $brand }}</label>
+								</div>
+							@endforeach
+							</div>
+						</div>
+						@endif
+						@php
+							$x = 0;
+						@endphp
 						@foreach ($filters as $id => $row)
+						@if ($id != 'Brand')
 						@if (count($row) > 1)
 						<div class="card mb-3">
 							<div class="card-header text-white font-weight-bold" style="font-size: 0.75rem; background-color: rgb(0, 98, 165);">{{ strtoupper($id) }}</div>
@@ -167,6 +190,8 @@
 							</div>
 						</div>
 						@endif
+						@endif
+						
 						@endforeach
 						<input type="hidden" name="sortby" value="{{ request()->sortby }}">
 						<input type="hidden" name="sel_attr" value="{{ request()->sel_attr }}">

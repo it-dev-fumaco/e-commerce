@@ -300,18 +300,24 @@
                   <p>Cancel Orders</p>
                 </a>
               </li>
+              <li class="nav-item">
+                <a href="/admin/orders_delivered" class="nav-link {{ $activePage == 'order_delivered' ? 'active' : '' }}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Delivered Orders</p>
+                </a>
+              </li>
             </ul>
           </li>
           <li class="nav-item">
             <a href="#" class="nav-link">
               <i class="nav-icon fas fa-clipboard-check"></i>
-              <p>Order Complete <i class="fas fa-angle-left right"></i></p>
+              <p>Shipping <i class="fas fa-angle-left right"></i></p>
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="/admin/orders_delivered" class="nav-link {{ $activePage == 'order_delivered' ? 'active' : '' }}">
+                <a href="/admin/shipping/list" class="nav-link {{ $activePage == 'order_delivered' ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Delivered Orders</p>
+                  <p>Shipping List</p>
                 </a>
               </li>
             </ul>
