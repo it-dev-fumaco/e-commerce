@@ -132,114 +132,116 @@
 	</main>
 
 	<main style="background-color:#ffffff;" class="products-head">
-		<div class="container marketing"><br></div>
 		<div class="container" style="max-width: 100% !important;">
 			<div class="row">
 				<!--sidebar-->
 				<div class="col-lg-2 checkersxx">
-					<div class="d-flex justify-content-between align-items-center he1">Filters
+					<div class="d-flex justify-content-between align-items-center he1">Filter Results
 						<a href="/products/{{ $product_category->id }}" style="text-decoration: none;">
 							<small class="stylecap he2 text-dark" style="font-weight:100 !important;">Clear All</small>
 						</a>
 					</div>
 					<hr>
 					<form action="/products/{{ $product_category->id }}" method="POST" id="filter-form" class="mb-5">
-					@csrf
+						@csrf
 						@php
-								$x = 0;
+							$x = 0;
 						@endphp
 						@foreach ($filters as $id => $row)
-						<h6 class="mt-3"><small>{{ strtoupper($id) }}</small></h6>
-						@foreach ($row as $attr_val)
-						@php
-							$x++;
-							$filter_attr = Str::slug($id, '-');
-							$filter_values = explode('+', request()->$filter_attr);
-							$status = (in_array($attr_val, $filter_values)) ? 'checked' : '';
-						@endphp
-						<div class="form-check">
-							<input type="checkbox" class="form-check-input product-cb-filter" id="{{ 'cb' . $x }}" name="{{ 'attr[' .$filter_attr.'][]' }}" value="{{ $attr_val }}" data-attrname="{{ $filter_attr }}" {{ $status }}>
-							<label class="form-check-label" for="{{ 'cb' . $x }}" style="font-size: 0.8rem;">{{ $attr_val }}</label>
+						@if (count($row) > 1)
+						<div class="card mb-3">
+							<div class="card-header text-white font-weight-bold" style="font-size: 0.75rem; background-color: rgb(0, 98, 165);">{{ strtoupper($id) }}</div>
+							<div class="card-body">
+								@foreach ($row as $attr_val)
+								@php
+									$x++;
+									$filter_attr = Str::slug($id, '-');
+									$filter_values = explode('+', request()->$filter_attr);
+									$status = (in_array($attr_val, $filter_values)) ? 'checked' : '';
+								@endphp
+								<div class="form-check">
+									<input type="checkbox" class="form-check-input product-cb-filter" id="{{ 'cb' . $x }}" name="{{ 'attr[' .$filter_attr.'][]' }}" value="{{ $attr_val }}" data-attrname="{{ $filter_attr }}" {{ $status }}>
+									<label class="form-check-label" for="{{ 'cb' . $x }}" style="font-size: 0.8rem;">{{ $attr_val }}</label>
+								</div>
+								@endforeach
+							</div>
 						</div>
-						@endforeach
-						<hr>
+						@endif
 						@endforeach
 						<input type="hidden" name="sortby" value="{{ request()->sortby }}">
+						<input type="hidden" name="sel_attr" value="{{ request()->sel_attr }}">
 					</form>
 				</div>
 				<!--sidebar-->
 
-					<!--products-->
-					<div class="col-lg-10">
-
-						<div class="row g-6">
-							<form id="sortForm" class="d-inline-block">
+				<!--products-->
+				<div class="col-lg-10">
+					<div class="row g-6">
+						<form id="sortForm" class="d-inline-block">
 							<div class="col-md-4 offset-md-8">
-									<div class="row mb-2">
-
-										<div class="col-md-6" style="text-align: right;">
-											<label class="m-2"><small>Sort By</small></label>
-										</div>
-										<div class="col-md-6">
-											<select name="sortby" class="form-control">
-													<option value="Position" data-loc="{{ request()->fullUrlWithQuery(['sortby' => 'Position']) }}" {{ (request()->sortby == 'Position') ? 'selected' : '' }}>Recommended</option>
-													<option value="Product Name" data-loc="{{ request()->fullUrlWithQuery(['sortby' => 'Product Name']) }}" {{ (request()->sortby == 'Product Name') ? 'selected' : '' }}>Product Name</option>
-													<option value="Price" data-loc="{{ request()->fullUrlWithQuery(['sortby' => 'Price']) }}" {{ (request()->sortby == 'Price') ? 'selected' : '' }}>Price</option>
-											</select>
-										</div>
+								<div class="row mb-2">
+									<div class="col-md-9 pr-1" style="text-align: right;">
+										<label class="mt-1 mb-1 mr-0" style="font-size: 0.75rem;">Sort By</label>
 									</div>
+									<div class="col-md-3" style="padding-left: 0;">
+										<select name="sortby" class="form-control form-control-sm" style="font-size: 0.75rem;">
+											<option value="Position" data-loc="{{ request()->fullUrlWithQuery(['sortby' => 'Position']) }}" {{ (request()->sortby == 'Position') ? 'selected' : '' }}>Recommended</option>
+											<option value="Product Name" data-loc="{{ request()->fullUrlWithQuery(['sortby' => 'Product Name']) }}" {{ (request()->sortby == 'Product Name') ? 'selected' : '' }}>Product Name</option>
+											<option value="Price" data-loc="{{ request()->fullUrlWithQuery(['sortby' => 'Price']) }}" {{ (request()->sortby == 'Price') ? 'selected' : '' }}>Price</option>
+										</select>
+									</div>
+								</div>
 							</div>
 						</form>
 
-							@forelse ($products_arr as $product)
-							<div class="col-md-4 btmp animated animatedFadeInUp fadeInUp equal-height-columns">
-									<div class="card">
-										<div class="equal-column-content">
-											@php
-												$image = ($product['image']) ? '/item/images/'.$product['item_code'].'/gallery/preview/'.$product['image'] : '/storage/no-photo-available.png';
-											@endphp
-											<img src="{{ asset($image) }}" class="card-img-top">
-											<div class="card-body">
-													<div class="text ellipsis">
-														<p class="card-text fumacoFont_card_title text-concat" style="color:#0062A5 !important; height: 80px;">{{ $product['item_name'] }}</p>
-													</div>
-													<p class="card-text fumacoFont_card_price" style="color:#000000 !important;">
-														@if($product['is_discounted'])
-														<s style="color: #c5c5c5;">₱ {{ $product['price'] }}</s>₱ {{ $product['discounted_price'] }}
-														@else
-														₱ {{ $product['price'] }}
-														@endif
-													</p>
-													<div class="d-flex justify-content-between align-items-center">
-														<div class="btn-group stylecap">
-															<span class="fa fa-star checked starcolor"></span>
-															<span class="fa fa-star checked starcolor"></span>
-															<span class="fa fa-star checked starcolor"></span>
-															<span class="fa fa-star starcolorgrey"></span>
-															<span class="fa fa-star starcolorgrey"></span>
-														</div>
-														<small class="text-muted stylecap" style="color:#c4cad0 !important; font-weight:100 !important;">( 0 Reviews )</small>
-													</div>
+						@forelse ($products_arr as $product)
+						<div class="col-md-4 btmp animated animatedFadeInUp fadeInUp equal-height-columns">
+							<div class="card">
+								<div class="equal-column-content">
+									@php
+										$image = ($product['image']) ? '/item/images/'.$product['item_code'].'/gallery/preview/'.$product['image'] : '/storage/no-photo-available.png';
+									@endphp
+									<img src="{{ asset($image) }}" class="card-img-top">
+									<div class="card-body">
+										<div class="text ellipsis">
+											<p class="card-text fumacoFont_card_title text-concat" style="color:#0062A5 !important; height: 80px;">{{ $product['item_name'] }}</p>
+										</div>
+										<p class="card-text fumacoFont_card_price" style="color:#000000 !important;">
+											@if($product['is_discounted'])
+											<s style="color: #c5c5c5;">₱ {{ $product['price'] }}</s>₱ {{ $product['discounted_price'] }}
+											@else
+											₱ {{ $product['price'] }}
+											@endif
+										</p>
+										<div class="d-flex justify-content-between align-items-center">
+											<div class="btn-group stylecap">
+												<span class="fa fa-star checked starcolor"></span>
+												<span class="fa fa-star checked starcolor"></span>
+												<span class="fa fa-star checked starcolor"></span>
+												<span class="fa fa-star starcolorgrey"></span>
+												<span class="fa fa-star starcolorgrey"></span>
 											</div>
-											<div class="card-body">
-													<a href="/product/{{ $product['item_code'] }}" class="btn btn-outline-primary fumacoFont_card_readmore" role="button" style="width:100% !important;">View</a>
-											</div>
+											<small class="text-muted stylecap" style="color:#c4cad0 !important; font-weight:100 !important;">( 0 Reviews )</small>
 										</div>
 									</div>
+									<div class="card-body">
+										<a href="/product/{{ $product['item_code'] }}" class="btn btn-outline-primary fumacoFont_card_readmore" role="button" style="width:100% !important;">View</a>
+									</div>
+								</div>
 							</div>
-							@empty
-							<h4 class="text-center text-muted p-5 text-uppercase">No products found</h4>
-							@endforelse
 						</div>
+						@empty
+						<h4 class="text-center text-muted p-5 text-uppercase">No products found</h4>
+						@endforelse
 					</div>
-					<!--products-->
+				</div>
+				<!--products-->
 			</div>
 		</div>
-
 		{{-- pagination --}}
 		<div class="container" style="max-width: 100% !important;">
 			<div class="row">
-					{{ $products->links('frontend.product_pagination') }}
+				{{ $products->withQueryString()->links('frontend.product_pagination') }}
 			</div>
 		</div>
 	</main>
@@ -253,6 +255,7 @@
    });
 
 	$(document).on('change', '.product-cb-filter', function(){
+		$('#filter-form').find('input[name="sel_attr"]').eq(0).val($(this).data('attrname'));
 		$('#filter-form').submit();
 	});
   })();

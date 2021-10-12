@@ -270,6 +270,7 @@ class FrontendController extends Controller
             }
 
             $variables['sortby'] = $request->sortby;
+            $variables['sel_attr'] = $request->sel_attr;
 
             return redirect(request()->fullUrlWithQuery($variables));
         }
@@ -280,7 +281,7 @@ class FrontendController extends Controller
         }
 
         // get requested filters
-        $request_data = $request->all();
+        $request_data = $request->except(['page', 'sel_attr', 'sortby']);
         $attribute_name_filter = array_keys($request_data);
         $attribute_value_filter = [];
         foreach($request_data as $data) {
@@ -294,12 +295,17 @@ class FrontendController extends Controller
             ->join('fumaco_items_attributes as b', 'a.f_idcode', 'b.idcode')
             ->join('fumaco_attributes_per_category as c', 'c.id', 'b.attribute_name_id')
             ->whereIn('c.slug', $attribute_name_filter)->whereIn('b.attribute_value', $attribute_value_filter)
-            ->where('a.f_status', 1)->pluck('a.f_idcode');
+            ->where('a.f_status', 1)->select('c.slug', 'b.attribute_value', 'a.f_idcode')
+            // ->get();
+            ->pluck('a.f_idcode');
 
         // get item attributes based on item category (sidebar)
         $filters = DB::table('fumaco_items as a')
             ->join('fumaco_items_attributes as b', 'a.f_idcode', 'b.idcode')
             ->join('fumaco_attributes_per_category as c', 'c.id', 'b.attribute_name_id')
+            // ->when(count($request_data) > 0, function($c) use ($filtered_items) {
+            //     $c->whereIn('a.f_idcode', $filtered_items);
+            // })
             ->where('a.f_cat_id', $category_id)->where('a.f_status', 1)
             ->where('c.status', 1)->select('c.attribute_name', 'b.attribute_value')
             ->groupBy('c.attribute_name', 'b.attribute_value')->get();
