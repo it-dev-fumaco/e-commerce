@@ -159,8 +159,8 @@
 									$status = (in_array($brand, $filter_values)) ? 'checked' : '';
 								@endphp
 								<div class="form-check">
-									<input type="checkbox" class="form-check-input product-cb-filter" id="{{ 'cb' . $a }}" name="{{ 'attr[' .$filter_attr.'][]' }}" value="{{ $brand }}" data-attrname="{{ $filter_attr }}" {{ $status }}>
-									<label class="form-check-label" for="{{ 'cb' . $a }}" style="font-size: 0.8rem;">{{ $brand }}</label>
+									<input type="checkbox" class="form-check-input product-cb-filter" id="{{ 'cbb' . $a }}" name="{{ 'attr[' .$filter_attr.'][]' }}" value="{{ $brand }}" data-attrname="{{ $filter_attr }}" {{ $status }}>
+									<label class="form-check-label" for="{{ 'cbb' . $a }}" style="font-size: 0.8rem;">{{ $brand }}</label>
 								</div>
 							@endforeach
 							</div>
