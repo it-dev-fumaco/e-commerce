@@ -295,9 +295,7 @@ class FrontendController extends Controller
             ->join('fumaco_items_attributes as b', 'a.f_idcode', 'b.idcode')
             ->join('fumaco_attributes_per_category as c', 'c.id', 'b.attribute_name_id')
             ->whereIn('c.slug', $attribute_name_filter)->whereIn('b.attribute_value', $attribute_value_filter)
-            ->where('a.f_status', 1)->select('c.slug', 'b.attribute_value', 'a.f_idcode')
-            // ->get();
-            ->pluck('a.f_idcode');
+            ->where('a.f_status', 1)->select('c.slug', 'b.attribute_value', 'a.f_idcode')->pluck('a.f_idcode');
 
         // get item attributes based on item category (sidebar)
         $filters = DB::table('fumaco_items as a')
@@ -703,12 +701,13 @@ class FrontendController extends Controller
             ->where('f_parent_code', $request->parent)->pluck('f_idcode');
 
         // get attributes of all variant items
-        $variant_attributes = DB::table('fumaco_items_attributes')
-            ->whereIn('idcode', $variant_codes)
-            ->whereIn('attribute_name', $attr_names)
-            ->whereIn('attribute_value', $attr_values)
-            ->where('attribute_status', 1)
-            ->orderBy('idx', 'asc')->get();
+        $variant_attributes = DB::table('fumaco_items as a')
+            ->join('fumaco_items_attributes as b', 'a.f_idcode', 'b.idcode')
+            ->join('fumaco_attributes_per_category as c', 'c.id', 'b.attribute_name_id')
+            ->whereIn('c.attribute_name', $attr_names)->whereIn('b.attribute_value', $attr_values)
+            ->where('a.f_status', 1)->select('c.attribute_name', 'b.attribute_value')
+            ->orderBy('b.idx', 'asc')->get();
+
         // group variant attributes by item code
         $grouped_attr = collect($variant_attributes)->groupBy('idcode');
         foreach ($grouped_attr as $item_code => $values) {
