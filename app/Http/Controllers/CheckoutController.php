@@ -335,6 +335,11 @@ class CheckoutController extends Controller
 				// $user_ship_address = DB::table('fumaco_user_add_bill')->where('xdefault_b', 1)->where('user_idx_b', $user_id)->first();
 				$user_bill_address = DB::table('fumaco_user_add')->where('xdefault', 1)->where('user_idx', $user_id)->where('address_class', 'Billing')->first();
 				$user_ship_address = DB::table('fumaco_user_add')->where('xdefault', 1)->where('user_idx', $user_id)->where('address_class', 'Delivery')->first();
+				$bill = collect($user_bill_address);
+				$ship = collect($user_ship_address);
+				// dd($bill);
+				$add_check = count($bill->diff($ship));
+				$same_address = ($add_check > 3) ? 0 : 1;
 
 				$first_name = $user->f_name;
 				$last_name = $user->f_lname;
@@ -428,7 +433,7 @@ class CheckoutController extends Controller
 				'item_total_price' => $request->grand_total
 			];
 
-			// dd($temp_arr);
+			// dd($summary_arr);
 			DB::table('fumaco_order_items')->insert($orders_arr);
 			$insert = DB::table('fumaco_temp')->insert($temp_arr);
 			DB::commit();

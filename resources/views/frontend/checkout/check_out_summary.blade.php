@@ -51,6 +51,10 @@
 								$shipping_country = $summary_arr[0]['address'][0]['xcountry'];
 								$shipping_address_type = $summary_arr[0]['address'][0]['xaddresstype'];
 								$shipping_mobile = $summary_arr[0]['bill_mobile'];
+								$display = "d-none";
+								$checkbox = 'd-block';
+								$col = "12";
+								$ship_text = " & Billing";
 							}else{
 								$shipping_address1 = $summary_arr[0]['address'][0]['xshippadd1'];
 								$shipping_address2 = $summary_arr[0]['address'][0]['xshippadd2'];
@@ -61,6 +65,10 @@
 								$shipping_country = $summary_arr[0]['address'][0]['xshipcountry'];
 								$shipping_address_type = $summary_arr[0]['address'][0]['xshiptype'];
 								$shipping_mobile = $summary_arr[0]['ship_mobile'];
+								$display = "d-block";
+								$checkbox = "d-none";
+								$col = "6";
+								$ship_text = '';
 							}
 						@endphp
 						<div class="card-body he1x" style="padding-bottom: 0px !important;"><strong>Your Order ID : # {{ $summary_arr[0]['address'][0]['order_tracker_code'] }}</strong>
@@ -71,7 +79,40 @@
 						<div class="card-body he1x" style="padding-bottom: 0px !important;">
 							<div class="accordion" id="accordionExample">
 								<div class="row">
-									<div class="col-md-6 d-flex align-items-stretch">
+
+									<div class="col-md-{{ $col }} d-flex align-items-stretch">
+										<div class="card" style="width: 100%">
+											<div class="card-header" id="headingOne">
+												<h2 class="mb-0">
+													<button class="btn btn-link he1x" type="button" data-toggle="collapse" data-target="" aria-expanded="true" aria-controls="collapseOne" style="text-decoration: none; color:#2c2c2d;">
+														<b>Shipping{{ $ship_text }} Address</b>
+													</button>
+												</h2>
+											</div>
+											
+											<div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample">
+												<div class="card-body">
+													<div class="card-body he1x" style="padding-bottom: 0px !important;">
+														{{ $shipping_address1." ".$shipping_address2.", ".$shipping_brgy.", ".$shipping_city.", ".$shipping_province.", ".$shipping_country." ".$shipping_postal }}
+													</div>
+													<div class="card-body he1x" style="padding-bottom: 0px !important;">Address Type :  {{ $shipping_address_type }}</div>
+													<div class="card-body he1x" style="padding-bottom: 0px !important;">Contact Number :  {{ $shipping_mobile }}<br/>&nbsp;</div>
+
+													@if (Auth::check())
+														<a href="/myprofile/address" style="font-size: 14px; width:100%; text-decoration: none;">UPDATE YOUR ADDRESS</a>
+														<br/>&nbsp;
+													@endif
+
+													<div class="form-check {{ $checkbox }} ">
+														<input class="form-check-input" type="checkbox"  checked disabled>
+														<label class="form-check-label" class="formslabelfnt">Billing address is the same as above</label>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+
+									<div class="col-md-6 d-flex align-items-stretch {{ $display }}">
 										<div class="card" style="width: 100%">
 											<div class="card-header" id="headingOne1">
 												<h2 class="mb-0">
@@ -89,32 +130,17 @@
 		
 													<div class="card-body he1x" style="padding-bottom: 0px !important;">Address Type :  {{ $summary_arr[0]['address'][0]['xaddresstype'] }}</div>
 													<div class="card-body he1x" style="padding-bottom: 0px !important;">Contact Number :  {{ $summary_arr[0]['bill_mobile'] }}<br/>&nbsp;</div>
+
+													@if (Auth::check())
+													<br/>
+													<a href="/myprofile/address" style="font-size: 14px; width:100%; text-decoration: none;">UPDATE YOUR ADDRESS</a>
+													@endif
 												</div>
 											</div>
 										</div>
 									</div>
 
-									<div class="col-md-6 d-flex align-items-stretch">
-										<div class="card" style="width: 100%">
-											<div class="card-header" id="headingOne">
-												<h2 class="mb-0">
-													<button class="btn btn-link he1x" type="button" data-toggle="collapse" data-target="" aria-expanded="true" aria-controls="collapseOne" style="text-decoration: none; color:#2c2c2d;">
-														<b>Shipping Address</b>
-													</button>
-												</h2>
-											</div>
-											
-											<div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample">
-												<div class="card-body">
-													<div class="card-body he1x" style="padding-bottom: 0px !important;">
-														{{ $shipping_address1." ".$shipping_address2.", ".$shipping_brgy.", ".$shipping_city.", ".$shipping_province.", ".$shipping_country." ".$shipping_postal }}
-													</div>
-													<div class="card-body he1x" style="padding-bottom: 0px !important;">Address Type :  {{ $shipping_address_type }}</div>
-													<div class="card-body he1x" style="padding-bottom: 0px !important;">Contact Number :  {{ $shipping_mobile }}<br/>&nbsp;</div>
-												</div>
-											</div>
-										</div>
-									</div>
+									
 								</div>
 								<br/>
 								<div class="card col-md-12">
