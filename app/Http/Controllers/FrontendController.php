@@ -31,6 +31,7 @@ class FrontendController extends Controller
                 'item_code' => $bs->f_idcode,
                 'item_name' => $bs_item_name,
                 'orig_price' => $bs->f_original_price,
+                'is_discounted' => $bs->f_discount_trigger,
                 'new_price' => $bs->f_price,
                 'bs_img' => ($bs_img) ? $bs_img->imgprimayx : null
             ];
@@ -45,6 +46,7 @@ class FrontendController extends Controller
                 'item_code' => $os->f_idcode,
                 'item_name' => $os_item_name,
                 'orig_price' => $os->f_original_price,
+                'is_discounted' => $os->f_discount_trigger,
                 'new_price' => $os->f_price,
                 'os_img' => ($os_img) ? $os_img->imgprimayx : null
             ];

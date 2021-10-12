@@ -113,7 +113,12 @@
                         <p class="card-text product-head fumacoFont_card_title text-concat" style="color:#0062A5 !important;  height: 80px; ">{{ $bs['item_name'] }}</p>
                       </div>
                       <p class="card-text fumacoFont_card_price" style="color:#000000 !important; ">
-                        <s style="color: #c5c5c5;">₱ {{ $bs['orig_price'] }}</s>&nbsp;&nbsp; ₱ {{ $bs['new_price'] }}</p>
+                        @if ($bs['is_discounted'])
+                        <s style="color: #c5c5c5;">₱ {{ $bs['orig_price'] }}</s>&nbsp;&nbsp; ₱ {{ $bs['new_price'] }}
+                        @else
+                        ₱ {{ $bs['new_price'] }}
+                        @endif
+                        </p>
                       <div class="d-flex justify-content-between align-items-center">
                         <div class="btn-group stylecap">
                           <span class="fa fa-star checked starcolor"></span>
@@ -160,7 +165,11 @@
                         <p class="card-text product-head fumacoFont_card_title text-concat" style="color:#0062A5 !important; height: 80px;">{{ $os['item_name'] }}</p>
                       </div>
                       <p class="card-text fumacoFont_card_price" style="color:#000000 !important; ">
-                        <s style="color: #c5c5c5;">₱ {{ $os['orig_price'] }}</s>&nbsp;&nbsp; ₱ {{ $os['new_price'] }}</p>
+                        @if ($os['is_discounted'])
+                        <s style="color: #c5c5c5;">₱ {{ $os['orig_price'] }}</s>&nbsp;&nbsp; ₱ {{ $os['new_price'] }}
+                        @else
+                        ₱ {{ $os['new_price'] }}
+                        @endif</p>
                       <div class="d-flex justify-content-between align-items-center">
                         <div class="btn-group stylecap">
                           <span class="fa fa-star checked starcolor"></span>
