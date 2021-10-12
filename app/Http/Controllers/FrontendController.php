@@ -303,9 +303,9 @@ class FrontendController extends Controller
         $filters = DB::table('fumaco_items as a')
             ->join('fumaco_items_attributes as b', 'a.f_idcode', 'b.idcode')
             ->join('fumaco_attributes_per_category as c', 'c.id', 'b.attribute_name_id')
-            // ->when(count($request_data) > 0, function($c) use ($filtered_items) {
-            //     $c->whereIn('a.f_idcode', $filtered_items);
-            // })
+            ->when(count($request_data) > 0, function($c) use ($filtered_items) {
+                $c->whereIn('a.f_idcode', $filtered_items);
+            })
             ->where('a.f_cat_id', $category_id)->where('a.f_status', 1)
             ->where('c.status', 1)->select('c.attribute_name', 'b.attribute_value')
             ->groupBy('c.attribute_name', 'b.attribute_value')->get();
@@ -313,6 +313,23 @@ class FrontendController extends Controller
         $filters = collect($filters)->groupBy('attribute_name')->map(function($r, $d){
             return array_unique(array_column($r->toArray(), 'attribute_value'));
         });
+
+        if(isset($request->sel_attr)) {
+            // get item attributes of selected checkbox in filters (sidebar)
+            $selected_attr = DB::table('fumaco_items as a')
+                ->join('fumaco_items_attributes as b', 'a.f_idcode', 'b.idcode')
+                ->join('fumaco_attributes_per_category as c', 'c.id', 'b.attribute_name_id')
+                ->where('a.f_cat_id', $category_id)->where('a.f_status', 1)
+                ->where('c.slug', $request->sel_attr)
+                ->where('c.status', 1)->select('c.attribute_name', 'b.attribute_value')
+                ->groupBy('c.attribute_name', 'b.attribute_value')->get();
+
+            $selected_attr = collect($selected_attr)->groupBy('attribute_name')->map(function($r, $d){
+                return array_unique(array_column($r->toArray(), 'attribute_value'));
+            });
+
+            $filters = array_merge($filters->toArray(), $selected_attr->toArray());
+        }
 
         // get sorting value 
         $sortby = $request->sortby;
