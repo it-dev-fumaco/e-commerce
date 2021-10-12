@@ -637,7 +637,13 @@
                             </p>
                         </div>
                         <hr class="singleline">
-                        @foreach ($variant_attr_arr as $attr => $row)
+								@php
+									 $variant_diff = array_diff(array_keys($variant_attr_arr), array_keys($attributes->toArray()));
+								@endphp
+								@if (count($variant_diff) > 0)
+								<div class="alert alert-danger fade show mb-0" role="alert">Error in Variants.</div>
+								@else
+								@foreach ($variant_attr_arr as $attr => $row)
                         @php
                             $x = 0;
                             $opt_name = preg_replace('/\s+/', '', strtolower($attr));
@@ -647,9 +653,9 @@
                             @foreach ($row as $attr_value => $items)
                             @php
                                 $x++;
-                                // $is_active = (array_intersect($items, $active_variants));
                                 $is_active = [1];
                             @endphp
+                            @if (isset($attributes[$attr]))
                             <input type="radio" class="btn-check attr-radio" {{ ($attributes[$attr] == $attr_value) ? 'checked' : '' }} name="{{ $opt_name }}" id="{{ $opt_name . $x }}" autocomplete="off" value="{{ $attr_value }}" data-attribute="{{ $attr }}" {{ (count($is_active) > 0) ? '' : 'disabled' }}>
                             <label class="btn btn-outline-{{ (count($is_active) > 0) ? 'info' : 'secondary' }} btn-sm mb-2 mt-2" for="{{ $opt_name . $x }}">
                                 @if(count($is_active) > 0)
@@ -658,9 +664,14 @@
                                 <del>{{ $attr_value }}</del>
                                 @endif
                             </label>
+                            @else
+                                error
+                            @endif
+                           
                             @endforeach
                         </div><br>
                         @endforeach
+								@endif
 	                    <div class="row mt-5" id="product_details">
                             <div class="col-xs-6">
 								<button type="submit" class="btn btn-lg btn-outline-primary fumacoFont_card_readmore" name="addtocart" style="padding: 1rem 1.5rem !important; color: #ffffff;background-color: #0062A5;border-color: #7cc;border-radius: 0 !important; {{ ($product_details->f_qty < 1) ? 'display: none;' : '' }}" value="1"><i class="fas fa-shopping-cart"></i> Add to Cart</button>
