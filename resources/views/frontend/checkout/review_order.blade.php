@@ -136,7 +136,7 @@
 				<!--sidebar-->
 				<div class="col-lg-4">
 					<div class="card" style="background-color: #f4f4f4 !important; border-radius: 0rem !important;">
-						<div class="card-body he1x" style="padding-bottom: 0px !important;">CHECKOUT USING<hr></div>
+						<div class="card-body he1x" style="padding-bottom: 0px !important;">CHECKOUT{{ (!Auth::check()) ? ' USING' : '' }}<hr></div>
 						<br>
 						<div style="padding-left:5%; padding-right:5%;">
 							@if (!Auth::check())
@@ -187,7 +187,7 @@
 								<button type="submit" class="btn btn-lg btn-outline-primary" style="width:100%; font-size: 14px;">{{ $btn }}</button>
 							</form>
 							<br><br><br>
-							<a href="/myprofile/address" class="btn btn-lg btn-outline-primary {{ $display }}" style="font-size: 14px; width:100%">UPDATE YOUR ADDRESS</a>
+							{{-- <a href="/myprofile/address" class="btn btn-lg btn-outline-primary {{ $display }}" style="font-size: 14px; width:100%">UPDATE YOUR ADDRESS</a> --}}
 							<br><br>
 							@endif
 						</div>
