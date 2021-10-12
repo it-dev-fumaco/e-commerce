@@ -92,7 +92,7 @@
 									<tr>
 										<td class="align-middle">
 											@php
-												$image = ($item['image']) ? '/storage/item/images/'. $item['item_code'] .'/gallery/original/'.$item['image'] : '/storage/no-photo-available.png';
+												$image = ($item['image']) ? '/storage/item/images/'. $item['item_code'] .'/gallery/preview/'.$item['image'] : '/storage/no-photo-available.png';
 											@endphp
 											<img src="{{ asset($image) }}" class="img-responsive rounded img-thumbnail d-inline-block" alt="" width="70" height="70">
 										</td>
