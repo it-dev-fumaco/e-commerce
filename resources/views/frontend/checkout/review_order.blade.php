@@ -99,7 +99,7 @@
 							@forelse ($cart_arr as $item)
 							<tr class="he2x2">
 								<td class="text-center align-middle">
-									<img src="{{ asset('/item/images/'.$item['item_code'].'/gallery/preview/'.$item['item_image']) }}" class="img-responsive" alt="" width="55" height="55">
+									<img src="{{ asset('/storage/item/images/'.$item['item_code'].'/gallery/preview/'.$item['item_image']) }}" class="img-responsive" alt="" width="55" height="55">
 									<input type="text" name="item_code" id="item_code" value="{{$item['item_code']}}" hidden/>
 								</td>
 								<td class="tbls">{{ $item['item_description'] }}</td>

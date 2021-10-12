@@ -224,7 +224,7 @@
 							<div class="card">
 								<div class="equal-column-content">
 									@php
-										$image = ($product['image']) ? '/item/images/'.$product['item_code'].'/gallery/preview/'.$product['image'] : '/storage/no-photo-available.png';
+										$image = ($product['image']) ? '/storage/item/images/'.$product['item_code'].'/gallery/preview/'.$product['image'] : '/storage/no-photo-available.png';
 									@endphp
 									<img src="{{ asset($image) }}" class="card-img-top">
 									<div class="card-body">

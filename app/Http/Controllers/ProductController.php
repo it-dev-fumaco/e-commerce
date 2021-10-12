@@ -565,13 +565,8 @@ class ProductController extends Controller
 			$p_extension = pathinfo($img_primary->getClientOriginalName(), PATHINFO_EXTENSION);//400
 			$z_extension = pathinfo($img_zoom->getClientOriginalName(), PATHINFO_EXTENSION);//1024
 
-			$request->file('img_zoom')->store('/item/images/'.$request->item_code.'/gallery/original');//1024
-			$request->file('img_primary')->store('/item/images/'.$request->item_code.'/gallery/preview');//400
-
 			$p_name = $p_filename.".".$p_extension;//400
 			$z_name = $z_filename.".".$z_extension;//1024
-
-            // dd($p_name. " : ".$z_name);
 
 			$image_error = '';
 			$rules = array(
@@ -601,11 +596,8 @@ class ProductController extends Controller
                 }
 			}
 
-			$z_destinationPath = public_path('/item/images/'.$request->item_code.'/gallery/original');
-			$p_destinationPath = public_path('/item/images/'.$request->item_code.'/gallery/preview');
-			$img_primary->move($p_destinationPath, $p_name);
-			// $img_primary->move($z_destinationPath, $z_name);
-			$img_zoom->move($z_destinationPath, $z_name);
+            $request->file('img_zoom')->storeAs('/public/item/images/'.$request->item_code.'/gallery/original', $z_name);//1024
+			$request->file('img_primary')->storeAs('/public/item/images/'.$request->item_code.'/gallery/preview', $p_name);//400
 
 			$images_arr[] = [
 				'idcode' => $request->item_code,

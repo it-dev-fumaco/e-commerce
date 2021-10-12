@@ -105,7 +105,7 @@
                 <div class="card shadow-sm">
                   <div class="equal-column-content">
                     @php
-                      $img = ($bs['bs_img']) ? '/item/images/'. $bs['item_code'] .'/gallery/preview/'. $bs['bs_img'] : '/storage/no-photo-available.png';
+                      $img = ($bs['bs_img']) ? '/storage/item/images/'. $bs['item_code'] .'/gallery/preview/'. $bs['bs_img'] : '/storage/no-photo-available.png';
                     @endphp
                     <img src="{{ asset($img) }}" alt="" class="img-responsive" style="width: 100% !important;">
                     <div class="card-body">
@@ -157,7 +157,7 @@
                 <div class="card shadow-sm">
                   <div class="equal-column-content">
                     @php
-                    $img_os = ($os['os_img']) ? '/item/images/'. $os['item_code'] .'/gallery/preview/'. $os['os_img'] : '/storage/no-photo-available.png';
+                    $img_os = ($os['os_img']) ? '/storage/item/images/'. $os['item_code'] .'/gallery/preview/'. $os['os_img'] : '/storage/no-photo-available.png';
                   @endphp
                     <img src="{{ asset($img_os) }}" alt="" class="img-responsive" style="width: 100% !important;">
                     <div class="card-body">

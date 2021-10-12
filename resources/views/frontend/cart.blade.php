@@ -110,7 +110,7 @@
                         @forelse ($cart_arr as $cart)
                         <tr class="he2x2">
                             <td>
-                                <img src="{{ asset('/item/images/'.$cart['item_code'].'/gallery/preview/'.$cart['item_image']) }}" class="img-responsive" alt="" width="55" height="55">
+                                <img src="{{ asset('/storage/item/images/'.$cart['item_code'].'/gallery/preview/'.$cart['item_image']) }}" class="img-responsive" alt="" width="55" height="55">
                             </td>
                             <td class="tbls" style="width:40% !important;">{{ $cart['item_description'] }}</td>
                             <td class="tbls">P <span class="formatted-price">{{ number_format($cart['price'], 2, '.', ',') }}</span><span class="price d-none">{{ $cart['price'] }}</span></td>

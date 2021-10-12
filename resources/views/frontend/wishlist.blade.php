@@ -93,7 +93,7 @@
 						@forelse ($wishlist_arr as $wishlist)
 						<tr class="order-font">
 							<td class="text-center">
-								<img src="{{ asset('/item/images/'.$wishlist['item_code'].'/gallery/preview/'.$wishlist['image']) }}" class="img-responsive" alt="" width="55" height="55">
+								<img src="{{ asset('/storage/item/images/'.$wishlist['item_code'].'/gallery/preview/'.$wishlist['image']) }}" class="img-responsive" alt="" width="55" height="55">
 							</td>
 							<td class="tbls">{{ $wishlist['item_name'] }}</td>
 							<td class="tbls text-center">P {{ number_format($wishlist['item_price'], 2) }}</td>
