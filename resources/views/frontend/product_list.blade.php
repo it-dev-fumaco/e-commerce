@@ -145,7 +145,7 @@
 					<form action="/products/{{ $product_category->id }}" method="POST" id="filter-form" class="mb-5">
 						@csrf
 						@php
-							$x = 0;
+							$a = 0;
 						@endphp
 						@if (count($filters['Brand']) > 1)
 						<div class="card mb-3">
@@ -153,14 +153,14 @@
 							<div class="card-body">
 								@foreach ($filters['Brand'] as $brand)
 								@php
-									$x++;
+									$a++;
 									$filter_attr = Str::slug('brand', '-');
 									$filter_values = explode('+', request()->brand);
 									$status = (in_array($brand, $filter_values)) ? 'checked' : '';
 								@endphp
 								<div class="form-check">
-									<input type="checkbox" class="form-check-input product-cb-filter" id="{{ 'cb' . $x }}" name="{{ 'attr[' .$filter_attr.'][]' }}" value="{{ $brand }}" data-attrname="{{ $filter_attr }}" {{ $status }}>
-									<label class="form-check-label" for="{{ 'cb' . $x }}" style="font-size: 0.8rem;">{{ $brand }}</label>
+									<input type="checkbox" class="form-check-input product-cb-filter" id="{{ 'cb' . $a }}" name="{{ 'attr[' .$filter_attr.'][]' }}" value="{{ $brand }}" data-attrname="{{ $filter_attr }}" {{ $status }}>
+									<label class="form-check-label" for="{{ 'cb' . $a }}" style="font-size: 0.8rem;">{{ $brand }}</label>
 								</div>
 							@endforeach
 							</div>
