@@ -681,43 +681,45 @@
 </form>
 
 <main  style="background-color:#ffffff;" class="products-head2" style=" margin-top: 0px !important; padding-left: 40px !important; padding-right: 40px !important; margin-left: : 40px !important; margin-right: 40px !important;">
-    <div class="row">
-        <br>
-        <div class="col-lg-12">
+    <div class="container">
+        <div class="row">
             <br>
-            <div class="accordion" id="accordionExample">
-                <div class="card">
-                    <div class="card-header" id="headingOne">
-                        <h2 class="mb-0">
-                            <button  class="btn btn-link collapsed fumacoFont_collapse_title" type="button" data-toggle="collapse" data-target="" aria-expanded="false" aria-controls="collapseOne">PRODUCT DETAIL</button>
-                        </h2>
-                    </div>
-                    <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample">
-                        <div class="card-body">
-                            <p class="card-text">
-                                <table class="table">
-                                    <tbody style="border-style: inset !important;">
-                                        @foreach ($attributes as $attr => $value)
-                                        <tr>
-                                            <td>{{ $attr }}</td>
-                                            <td>{{ $value }}</td>
-                                        </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </p>
+            <div class="col-lg-12">
+                <br>
+                <div class="accordion" id="accordionExample">
+                    <div class="card">
+                        <div class="card-header" id="headingOne">
+                            <h2 class="mb-0">
+                                <button  class="btn btn-link collapsed fumacoFont_collapse_title" type="button" data-toggle="collapse" data-target="" aria-expanded="false" aria-controls="collapseOne">PRODUCT DETAIL</button>
+                            </h2>
+                        </div>
+                        <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample">
+                            <div class="card-body">
+                                <p class="card-text">
+                                    <table class="table">
+                                        <tbody style="border-style: inset !important;">
+                                            @foreach ($attributes as $attr => $value)
+                                            <tr>
+                                                <td>{{ $attr }}</td>
+                                                <td>{{ $value }}</td>
+                                            </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </p>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="card">
-                    <div class="card-header" id="headingTwo">
-                        <h2 class="mb-0">
-                            <button class="btn btn-link collapsed fumacoFont_collapse_title" type="button" data-toggle="collapse" data-target="" aria-expanded="false" aria-controls="collapseTwo">ADDITIONAL INFORMATION</button>
-                        </h2>
-                    </div>
-                    <div id="collapseTwo" class="collapse show" aria-labelledby="headingTwo" data-parent="#accordionExample">
-                        <div class="card-body">
-                            <p class="card-text">{!! $product_details->f_full_description !!}</p>
+                    <div class="card">
+                        <div class="card-header" id="headingTwo">
+                            <h2 class="mb-0">
+                                <button class="btn btn-link collapsed fumacoFont_collapse_title" type="button" data-toggle="collapse" data-target="" aria-expanded="false" aria-controls="collapseTwo">ADDITIONAL INFORMATION</button>
+                            </h2>
+                        </div>
+                        <div id="collapseTwo" class="collapse show" aria-labelledby="headingTwo" data-parent="#accordionExample">
+                            <div class="card-body">
+                                <p class="card-text">{!! $product_details->f_full_description !!}</p>
+                            </div>
                         </div>
                     </div>
                 </div>
