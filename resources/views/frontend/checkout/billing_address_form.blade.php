@@ -62,7 +62,7 @@
 		<nav>
 			<ol class="breadcrumb" style="font-weight: 300 !important; font-size: 14px !important;">
 				<li class="breadcrumb-item">
-					<a href="#" style="color: #000000 !important; text-decoration: none;">Review Your Orders</a>
+					<a href="/cart" style="color: #000000 !important; text-decoration: none;">Shopping Cart</a>
 				</li>
 				<li class="breadcrumb-item">
 					<a href="#" style="color: #000000 !important; text-decoration: underline;">Billing & Shipping Address</a>
@@ -87,14 +87,14 @@
 			<form action="{{ $action }}" method="post">
 				@csrf
 				<div class="row">
-					<div class="col-md-8">
+					<div class="col-md-7 mx-auto">
 						<table class="table">
 							<tr>
 								<td class='col-md-9'>
 									<p style="color:#212529 !important; letter-spacing: 1px !important; font-size:16px !important;  text-align: justify !important; font-weight: 600 !important;">Shipping Information</p>
 								</td>
 								@if(!Auth::check())
-									<td>
+									<td style="text-align: right">
 										Already a member? <a href="">Log in</a>
 									</td>
 								@endif
@@ -755,56 +755,36 @@
 								</div>
 							</div>
 						</div>
-
-						<div class="container">
-							<div class="row">
-								<div class="col-lg-12">
-									<br>
-									<center>
-										{{-- <div style="display: none !important;">
-											<input type="text" name="item_code" value="{{ $cart_arr[0]['item_code'] }}"/>
-											<input type="text" name="item_desc" value="{{ $cart_arr[0]['item_desc'] }}"/>
-											<input type="text" name="price" value="{{ $cart_arr[0]['price'] }}"/>
-											<input type="text" name="subtotal" value="{{ $cart_arr[0]['subtotal'] }}"/>
-											<input type="text" name="qty" value="{{ $cart_arr[0]['quantity'] }}"/>
-											<input type="text" name="shipping" value="{{ $cart_arr[0]['shipping'] }}"/>
-											<input type="text" name="grand_total" value="{{ $cart_arr[0]['grand_total'] }}"/>
-										</div> --}}
-										
-									</center>
-								</div>
-							</div>
-						</div>
-
 					</div>
 
-					<div class="col-md-4">
+					<div class="col-md-4 mx-auto">
 						<div class="card" style="margin-left: 5%; background-color: #f4f4f4 !important; border-radius: 0rem !important;">
 							<div class="card-body he1x" style="padding-bottom: 0px !important;">Cart Total<hr></div>
 							<table class="table" id="cart-items">
 								<thead>
-								<tr>
-									<th></th>
+								<tr style="text-align: center">
+									<th class="col-md-2"></th>
 									<th>Product</th>
 									<th>Qty</th>
-									<th>Total</th>
+									<th class="col-md-2">Total</th>
 								</tr>
 								</thead>
 								<tbody>
 									@foreach ($cart_arr as $cart)
 										<tr>
-											<td class="col-md-2">
+											<td class="col-md-2" style="padding-top: 20px;padding-bottom: 20px;">
 												<center>
 													<img src="{{ asset('/storage/item/images/'.$cart['item_code'].'/gallery/preview/'.$cart['item_image']) }}" class="img-responsive" alt="" width="55" height="55">
 												</center>
 											</td>
-											<td>{{ $cart['item_description'] }}</td>
-											<td>{{ $cart['quantity'] }}</td>
-											<td><span class="amount">{{ $cart['amount'] }}</span></td>
+											<td style="font-size: 12px; padding-top: 20px;padding-bottom: 20px;">{{ $cart['item_description'] }}</td>
+											<td style="text-align: center; padding-top: 20px;padding-bottom: 20px;">{{ $cart['quantity'] }}</td>
+											<td class="col-md-2" style="text-align: center;padding-top: 20px;padding-bottom: 20px;"><span class="amount">{{ $cart['amount'] }}</span></td>
 										</tr>
 									@endforeach
 								</tbody>
 							</table>
+							
 							<div class="card-body he1x" style="padding-top: 0px !important; padding-bottom: 0px !important;">
 								<div class="d-flex justify-content-between align-items-center">
 									Subtotal <small class="text-muted stylecap he1x" id="cart-subtotal">P {{ number_format(collect($cart_arr)->sum('amount'), 2, '.', ',') }}</small>
@@ -841,7 +821,7 @@
 
 					<div class="row">
 						<div class="col-md-4">
-							<a href="/cart" class="btn btn-lg btn-outline-primary col-md-10 mx-auto" role="button" style="background-color: #777575 !important; border-color: #777575 !important;">BACK</a>
+							<a href="{{ url()->previous() }}" class="btn btn-lg btn-outline-primary col-md-10 mx-auto" role="button" style="background-color: #777575 !important; border-color: #777575 !important;">BACK</a>
 						</div>
 						
 						<div class="col-md-4">

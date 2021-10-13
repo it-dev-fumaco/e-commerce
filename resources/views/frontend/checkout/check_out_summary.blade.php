@@ -22,9 +22,9 @@
 	<main style="background-color:#ffffff;" class="products-head">
 		<nav>
 			<ol class="breadcrumb" style="font-weight: 300 !important; font-size: 14px !important;">
-				<li class="breadcrumb-item"><a href="/checkout/review_order" style="color: #000000 !important; text-decoration: none;">Review Your Orders</a></li>
-				<li class="breadcrumb-item"><a href="{{ url()->previous() }}" style="color: #000000 !important; text-decoration: underline;">Billing / Shipping Address</a></li>
-				<li class="breadcrumb-item active"><a href="#" style="color: #c1bdbd !important; text-decoration: none;">Place Order</a></li>
+				<li class="breadcrumb-item"><a href="/cart" style="color: #000000 !important; text-decoration: none;">Shopping Cart</a></li>
+				<li class="breadcrumb-item"><a href="{{ url()->previous() }}" style="color: #000000 !important; text-decoration: none;">Billing / Shipping Address</a></li>
+				<li class="breadcrumb-item active"><a href="#" style="color: #000000 !important; text-decoration: underline;">Place Order</a></li>
 			</ol>
 		</nav>  
 	</main>

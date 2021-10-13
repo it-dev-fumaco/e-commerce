@@ -86,6 +86,23 @@
         </div>
     </div>
 </main>
+
+<main style="background-color:#ffffff;" class="products-head">
+    <nav>
+        <ol class="breadcrumb" style="font-weight: 300 !important; font-size: 14px !important;">
+            <li class="breadcrumb-item">
+                <a href="#" style="color: #000000 !important; text-decoration: underline;">Shopping Cart</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="#" style="color: #c1bdbd !important; text-decoration: none;">Billing & Shipping Address</a>
+            </li>
+            <li class="breadcrumb-item active">
+                <a href="#" style="color: #c1bdbd !important; text-decoration: none;">Place Order</a>
+            </li>
+        </ol>
+    </nav>
+</main>
+
 <main style="background-color:#ffffff;" class="products-head">
     <div class="container marketing">
         <br>
@@ -149,6 +166,7 @@
                         <td><small class="text-muted stylecap he1x" id="cart-subtotal">P {{ number_format(collect($cart_arr)->sum('amount'), 2, '.', ',') }}</small></td>
                     </tr>
                 </table>
+                <br/>
                 <table class="table">
                     <tr>
                         <td class="col-md-6">
