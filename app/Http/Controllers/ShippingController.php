@@ -94,7 +94,7 @@ class ShippingController extends Controller
 
                         $output= json_decode($location);
 
-                        if ($output->error_message) {
+                        if ($output->status != "OK" && isset($output->status)) {
                             return response()->json([
                                 'status' => 0, 
                                 'message' => 'An error occured. Google Maps API not properly configured.', 
@@ -265,7 +265,7 @@ class ShippingController extends Controller
 
                         $output= json_decode($location);
 
-                        if ($output->error_message) {
+                        if ($output->status != "OK" && isset($output->status)) {
                             return response()->json([
                                 'status' => 0, 
                                 'message' => 'An error occured. Google Maps API not properly configured.', 
