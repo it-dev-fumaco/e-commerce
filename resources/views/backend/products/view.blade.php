@@ -54,8 +54,8 @@
                      <div class="card-body">
                         <h4 class="d-inline-block">Product Information</h4>
                         <div class="float-right">
-                           <button type="submit" class="btn btn-primary mr-2">Update</button>
-                           <a href="/admin/product/add" class="btn btn-secondary">Create New Product</a>
+                           <a href="/admin/product/add" class="btn btn-secondary mr-2">Create New Product</a>
+                           <button type="submit" class="btn btn-primary">Update</button>
                         </div>
                         <hr>
                         <div class="row">
