@@ -344,6 +344,21 @@
               </li>
             </ul>
           </li>
+          <li class="nav-header">MARKETING</li>
+          <li class="nav-item {{ (in_array($activePage, $media_pages) ? 'menu-open' : '') }}">
+            <a href="#" class="nav-link {{ (in_array($activePage, $media_pages) ? 'active' : '') }}">
+              <i class="nav-icon fas fa-photo-video"></i>
+              <p>Promotions <i class="fas fa-angle-left right"></i></p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="#" class="nav-link {{ $activePage == 'Price Rule/Discounts' ? 'active' : '' }}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Price Rule/Discounts</p>
+                </a>
+              </li>
+            </ul>
+          </li>
 
           <li class="nav-header">SYSTEM SETTINGS</li>
           @php
