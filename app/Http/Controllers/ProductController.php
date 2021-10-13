@@ -181,9 +181,9 @@ class ProductController extends Controller
         DB::beginTransaction();
         try {
             $existing_item = DB::table('fumaco_items')->where('f_idcode', $request->item_code)->exists();
-            // if ($existing_item) {
-            //     return redirect()->back()->withInput($request->all())->with('error', 'Product code <b>' . $request->item_code . '</b> already exists.');
-            // }
+            if ($existing_item) {
+                return redirect()->back()->withInput($request->all())->with('error', 'Product code <b>' . $request->item_code . '</b> already exists.');
+            }
 
             $item = $this->getItemDetails($request->item_code);
 
