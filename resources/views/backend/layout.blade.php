@@ -308,14 +308,14 @@
               </li>
             </ul>
           </li>
-          <li class="nav-item">
-            <a href="#" class="nav-link">
+          <li class="nav-item {{ $activePage == 'shipping_list' ? 'menu-open' : '' }}">
+            <a href="#" class="nav-link {{ $activePage == 'shipping_list' ? 'active' : '' }}">
               <i class="nav-icon fas fa-clipboard-check"></i>
               <p>Shipping <i class="fas fa-angle-left right"></i></p>
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="/admin/shipping/list" class="nav-link {{ $activePage == 'order_delivered' ? 'active' : '' }}">
+                <a href="/admin/shipping/list" class="nav-link {{ $activePage == 'shipping_list' ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Shipping List</p>
                 </a>

@@ -35,8 +35,8 @@ class ComposerStaticInit0f1e38f3feaf9a00f758a56db0972401
         '9cdd7b9056abc3081735233ba9dd9c7f' => __DIR__ . '/..' . '/facade/flare-client-php/src/helpers.php',
         '6124b4c8570aa390c21fafd04a26c69f' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/deep_copy.php',
         'b6b991a57620e2fb6b2f66f03fe9ddc2' => __DIR__ . '/..' . '/symfony/string/Resources/functions.php',
-        'ed962a97bd972bc82007176b647d4e36' => __DIR__ . '/..' . '/facade/ignition/src/helpers.php',
         '5f2edeb18ca19ebd9ee6da72dc9f4292' => __DIR__ . '/..' . '/biscolab/laravel-recaptcha/src/helpers.php',
+        'ed962a97bd972bc82007176b647d4e36' => __DIR__ . '/..' . '/facade/ignition/src/helpers.php',
     );
 
     public static $prefixLengthsPsr4 = array (
@@ -140,6 +140,8 @@ class ComposerStaticInit0f1e38f3feaf9a00f758a56db0972401
             'GuzzleHttp\\Promise\\' => 19,
             'GuzzleHttp\\' => 11,
             'GrahamCampbell\\ResultType\\' => 26,
+            'GoogleMaps\\' => 11,
+            'GeometryLibrary\\' => 16,
         ),
         'F' => 
         array (
@@ -184,6 +186,7 @@ class ComposerStaticInit0f1e38f3feaf9a00f758a56db0972401
         'voku\\' => 
         array (
             0 => __DIR__ . '/..' . '/voku/portable-ascii/src/voku',
+            1 => __DIR__ . '/..' . '/voku/stop-words/src/voku',
         ),
         'phpDocumentor\\Reflection\\' => 
         array (
@@ -433,6 +436,14 @@ class ComposerStaticInit0f1e38f3feaf9a00f758a56db0972401
         array (
             0 => __DIR__ . '/..' . '/graham-campbell/result-type/src',
         ),
+        'GoogleMaps\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/alexpechkarev/google-maps/src',
+        ),
+        'GeometryLibrary\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/alexpechkarev/geometry-library',
+        ),
         'Fruitcake\\Cors\\' => 
         array (
             0 => __DIR__ . '/..' . '/fruitcake/laravel-cors/src',
@@ -512,6 +523,13 @@ class ComposerStaticInit0f1e38f3feaf9a00f758a56db0972401
     );
 
     public static $prefixesPsr0 = array (
+        'U' => 
+        array (
+            'URLify' => 
+            array (
+                0 => __DIR__ . '/..' . '/jbroadway/urlify',
+            ),
+        ),
         'M' => 
         array (
             'Mockery' => 
@@ -534,8 +552,17 @@ class ComposerStaticInit0f1e38f3feaf9a00f758a56db0972401
         'App\\Http\\Controllers\\Auth\\ResetPasswordController' => __DIR__ . '/../..' . '/app/Http/Controllers/Auth/ResetPasswordController.php',
         'App\\Http\\Controllers\\Auth\\VerificationController' => __DIR__ . '/../..' . '/app/Http/Controllers/Auth/VerificationController.php',
         'App\\Http\\Controllers\\CartController' => __DIR__ . '/../..' . '/app/Http/Controllers/CartController.php',
+        'App\\Http\\Controllers\\CategoryController' => __DIR__ . '/../..' . '/app/Http/Controllers/CategoryController.php',
+        'App\\Http\\Controllers\\CheckoutController' => __DIR__ . '/../..' . '/app/Http/Controllers/CheckoutController.php',
         'App\\Http\\Controllers\\Controller' => __DIR__ . '/../..' . '/app/Http/Controllers/Controller.php',
+        'App\\Http\\Controllers\\DashboardController' => __DIR__ . '/../..' . '/app/Http/Controllers/DashboardController.php',
         'App\\Http\\Controllers\\FrontendController' => __DIR__ . '/../..' . '/app/Http/Controllers/FrontendController.php',
+        'App\\Http\\Controllers\\HomeCRUDController' => __DIR__ . '/../..' . '/app/Http/Controllers/HomeCRUDController.php',
+        'App\\Http\\Controllers\\MediaController' => __DIR__ . '/../..' . '/app/Http/Controllers/MediaController.php',
+        'App\\Http\\Controllers\\OrderController' => __DIR__ . '/../..' . '/app/Http/Controllers/OrderController.php',
+        'App\\Http\\Controllers\\ProductController' => __DIR__ . '/../..' . '/app/Http/Controllers/ProductController.php',
+        'App\\Http\\Controllers\\SettingsController' => __DIR__ . '/../..' . '/app/Http/Controllers/SettingsController.php',
+        'App\\Http\\Controllers\\ShippingController' => __DIR__ . '/../..' . '/app/Http/Controllers/ShippingController.php',
         'App\\Http\\Kernel' => __DIR__ . '/../..' . '/app/Http/Kernel.php',
         'App\\Http\\Middleware\\Authenticate' => __DIR__ . '/../..' . '/app/Http/Middleware/Authenticate.php',
         'App\\Http\\Middleware\\EncryptCookies' => __DIR__ . '/../..' . '/app/Http/Middleware/EncryptCookies.php',
@@ -546,6 +573,9 @@ class ComposerStaticInit0f1e38f3feaf9a00f758a56db0972401
         'App\\Http\\Middleware\\TrustProxies' => __DIR__ . '/../..' . '/app/Http/Middleware/TrustProxies.php',
         'App\\Http\\Middleware\\VerifyCsrfToken' => __DIR__ . '/../..' . '/app/Http/Middleware/VerifyCsrfToken.php',
         'App\\Models\\Admin' => __DIR__ . '/../..' . '/app/Models/Admin.php',
+        'App\\Models\\ShippingCondition' => __DIR__ . '/../..' . '/app/Models/ShippingCondition.php',
+        'App\\Models\\ShippingService' => __DIR__ . '/../..' . '/app/Models/ShippingService.php',
+        'App\\Models\\ShippingZoneRate' => __DIR__ . '/../..' . '/app/Models/ShippingZoneRate.php',
         'App\\Models\\User' => __DIR__ . '/../..' . '/app/Models/User.php',
         'App\\Providers\\AppServiceProvider' => __DIR__ . '/../..' . '/app/Providers/AppServiceProvider.php',
         'App\\Providers\\AuthServiceProvider' => __DIR__ . '/../..' . '/app/Providers/AuthServiceProvider.php',
@@ -1462,6 +1492,15 @@ class ComposerStaticInit0f1e38f3feaf9a00f758a56db0972401
         'Faker\\ValidGenerator' => __DIR__ . '/..' . '/fakerphp/faker/src/Faker/ValidGenerator.php',
         'Fruitcake\\Cors\\CorsServiceProvider' => __DIR__ . '/..' . '/fruitcake/laravel-cors/src/CorsServiceProvider.php',
         'Fruitcake\\Cors\\HandleCors' => __DIR__ . '/..' . '/fruitcake/laravel-cors/src/HandleCors.php',
+        'GeometryLibrary\\MathUtil' => __DIR__ . '/..' . '/alexpechkarev/geometry-library/MathUtil.php',
+        'GeometryLibrary\\PolyUtil' => __DIR__ . '/..' . '/alexpechkarev/geometry-library/PolyUtil.php',
+        'GeometryLibrary\\SphericalUtil' => __DIR__ . '/..' . '/alexpechkarev/geometry-library/SphericalUtil.php',
+        'GoogleMaps\\Directions' => __DIR__ . '/..' . '/alexpechkarev/google-maps/src/Directions.php',
+        'GoogleMaps\\Facade\\GoogleMapsFacade' => __DIR__ . '/..' . '/alexpechkarev/google-maps/src/Facade/GoogleMapsFacade.php',
+        'GoogleMaps\\GoogleMaps' => __DIR__ . '/..' . '/alexpechkarev/google-maps/src/GoogleMaps.php',
+        'GoogleMaps\\Parameters' => __DIR__ . '/..' . '/alexpechkarev/google-maps/src/Parameters.php',
+        'GoogleMaps\\ServiceProvider\\GoogleMapsServiceProvider' => __DIR__ . '/..' . '/alexpechkarev/google-maps/src/ServiceProvider/GoogleMapsServiceProvider.php',
+        'GoogleMaps\\WebService' => __DIR__ . '/..' . '/alexpechkarev/google-maps/src/WebService.php',
         'GrahamCampbell\\ResultType\\Error' => __DIR__ . '/..' . '/graham-campbell/result-type/src/Error.php',
         'GrahamCampbell\\ResultType\\Result' => __DIR__ . '/..' . '/graham-campbell/result-type/src/Result.php',
         'GrahamCampbell\\ResultType\\Success' => __DIR__ . '/..' . '/graham-campbell/result-type/src/Success.php',
@@ -5256,6 +5295,7 @@ class ComposerStaticInit0f1e38f3feaf9a00f758a56db0972401
         'TijsVerkoyen\\CssToInlineStyles\\Css\\Property\\Property' => __DIR__ . '/..' . '/tijsverkoyen/css-to-inline-styles/src/Css/Property/Property.php',
         'TijsVerkoyen\\CssToInlineStyles\\Css\\Rule\\Processor' => __DIR__ . '/..' . '/tijsverkoyen/css-to-inline-styles/src/Css/Rule/Processor.php',
         'TijsVerkoyen\\CssToInlineStyles\\Css\\Rule\\Rule' => __DIR__ . '/..' . '/tijsverkoyen/css-to-inline-styles/src/Css/Rule/Rule.php',
+        'URLify' => __DIR__ . '/..' . '/jbroadway/urlify/URLify.php',
         'UnhandledMatchError' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/UnhandledMatchError.php',
         'ValueError' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/ValueError.php',
         'Webmozart\\Assert\\Assert' => __DIR__ . '/..' . '/webmozart/assert/src/Assert.php',
@@ -5371,6 +5411,8 @@ class ComposerStaticInit0f1e38f3feaf9a00f758a56db0972401
         'phpDocumentor\\Reflection\\Types\\Void_' => __DIR__ . '/..' . '/phpdocumentor/type-resolver/src/Types/Void_.php',
         'phpDocumentor\\Reflection\\Utils' => __DIR__ . '/..' . '/phpdocumentor/reflection-docblock/src/Utils.php',
         'voku\\helper\\ASCII' => __DIR__ . '/..' . '/voku/portable-ascii/src/voku/helper/ASCII.php',
+        'voku\\helper\\StopWords' => __DIR__ . '/..' . '/voku/stop-words/src/voku/helper/StopWords.php',
+        'voku\\helper\\StopWordsLanguageNotExists' => __DIR__ . '/..' . '/voku/stop-words/src/voku/helper/StopWordsLanguageNotExists.php',
     );
 
     public static function getInitializer(ClassLoader $loader)

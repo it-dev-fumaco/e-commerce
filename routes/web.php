@@ -129,7 +129,6 @@ Route::prefix('admin')->group(function () {
         Route::post('/product/{id}/update', 'ProductController@updateItem');
         Route::post('/product/{item_code}/disable', 'ProductController@disableItem');
         Route::post('/product/{item_code}/enable', 'ProductController@enableItem');
-        
         Route::delete('/product/{item_code}/delete', 'ProductController@deleteItem');
 
         Route::get('/category/list', 'CategoryController@viewCategories');
@@ -148,5 +147,12 @@ Route::prefix('admin')->group(function () {
 
         Route::get('/order/order_lists', 'OrderController@order_list');
 
+        // SHIPPING SERVICES ROUTES CMS
+        Route::get('/shipping/list', 'ShippingController@viewList');
+        Route::get('/shipping/add', 'ShippingController@viewAddForm');
+        Route::post('/shipping/save', 'ShippingController@saveShipping');
+        Route::post('/shipping/{id}/update', 'ShippingController@updateShipping');
+        Route::get('/shipping/{id}/edit', 'ShippingController@viewShipping');
+        Route::delete('/shipping/{id}/delete', 'ShippingController@deleteShipping');
     });
 });
