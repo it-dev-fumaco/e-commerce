@@ -214,9 +214,9 @@ class ShippingController extends Controller
             }
 
             if(!isset($request->store)){
-                DB::table('shipping_service_store')->where('shipping_service_id', $id)->delete();
+                DB::table('fumaco_shipping_service_store')->where('shipping_service_id', $id)->delete();
             }else{
-                DB::table('shipping_service_store')->where('shipping_service_id', $id)->whereNotIn('shipping_service_store_id', $request->shipping_service_store_id)->delete();
+                DB::table('fumaco_shipping_service_store')->where('shipping_service_id', $id)->whereNotIn('shipping_service_store_id', $request->shipping_service_store_id)->delete();
             }
 
             if($request->shipping_service_type == 'Store Pickup'){
@@ -288,7 +288,6 @@ class ShippingController extends Controller
                                 'city_code' => $request->city[$e],
                                 'province_name' => $request->province_text[$e],
                                 'city_name' => $request->city_text[$e],
-                                'rate' => $request->shipping_zone_rate[$e],
                                 'latitude' => $latitude,
                                 'longitude' => $longitude,
                             ];
@@ -301,7 +300,6 @@ class ShippingController extends Controller
                                 'city_code' => $request->city[$e],
                                 'province_name' => $request->province_text[$e],
                                 'city_name' => $request->city_text[$e],
-                                'rate' => $request->shipping_zone_rate[$e],
                                 'latitude' => $latitude,
                                 'longitude' => $longitude,
                             ];
