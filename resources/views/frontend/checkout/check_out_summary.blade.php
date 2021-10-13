@@ -22,9 +22,9 @@
 	<main style="background-color:#ffffff;" class="products-head">
 		<nav>
 			<ol class="breadcrumb" style="font-weight: 300 !important; font-size: 14px !important;">
-				<li class="breadcrumb-item"><a href="/checkout/review_order" style="color: #000000 !important; text-decoration: none;">Review Your Orders</a></li>
-				<li class="breadcrumb-item"><a href="{{ url()->previous() }}" style="color: #000000 !important; text-decoration: underline;">Billing / Shipping Address</a></li>
-				<li class="breadcrumb-item active"><a href="#" style="color: #c1bdbd !important; text-decoration: none;">Place Order</a></li>
+				<li class="breadcrumb-item"><a href="/cart" style="color: #000000 !important; text-decoration: none;">Shopping Cart</a></li>
+				<li class="breadcrumb-item"><a href="{{ url()->previous() }}" style="color: #000000 !important; text-decoration: none;">Billing / Shipping Address</a></li>
+				<li class="breadcrumb-item active"><a href="#" style="color: #000000 !important; text-decoration: underline;">Place Order</a></li>
 			</ol>
 		</nav>  
 	</main>
@@ -41,31 +41,23 @@
 				<div class="col-lg-12">
 					<div class="card" style="background-color: #f4f4f4 !important; border-radius: 0rem !important;">
 						@php
+							$shipping_fname = $summary_arr[0]['address'][0]['xfname'];
+							$shipping_lname = $summary_arr[0]['address'][0]['xlname'];
+							$shipping_address1 = $summary_arr[0]['address'][0]['xshippadd1'];
+							$shipping_address2 = $summary_arr[0]['address'][0]['xshippadd2'];
+							$shipping_province = $summary_arr[0]['address'][0]['xshiprov'];
+							$shipping_city = $summary_arr[0]['address'][0]['xshipcity'];
+							$shipping_brgy = $summary_arr[0]['address'][0]['xshipbrgy'];
+							$shipping_postal = $summary_arr[0]['address'][0]['xshippostalcode'];
+							$shipping_country = $summary_arr[0]['address'][0]['xshipcountry'];
+							$shipping_address_type = $summary_arr[0]['address'][0]['xshiptype'];
+							$shipping_mobile = $summary_arr[0]['ship_mobile'];
+
 							if($summary_arr[0]['same_address'] == 1){
-								$shipping_address1 = $summary_arr[0]['address'][0]['xadd1'];
-								$shipping_address2 = $summary_arr[0]['address'][0]['xadd2'];
-								$shipping_province = $summary_arr[0]['address'][0]['xprov'];
-								$shipping_city = $summary_arr[0]['address'][0]['xcity'];
-								$shipping_brgy = $summary_arr[0]['address'][0]['xbrgy'];
-								$shipping_postal = $summary_arr[0]['address'][0]['xpostal'];
-								$shipping_country = $summary_arr[0]['address'][0]['xcountry'];
-								$shipping_address_type = $summary_arr[0]['address'][0]['xaddresstype'];
-								$shipping_mobile = $summary_arr[0]['bill_mobile'];
-								$display = "d-none";
 								$checkbox = 'd-block';
 								$col = "12";
 								$ship_text = " & Billing";
 							}else{
-								$shipping_address1 = $summary_arr[0]['address'][0]['xshippadd1'];
-								$shipping_address2 = $summary_arr[0]['address'][0]['xshippadd2'];
-								$shipping_province = $summary_arr[0]['address'][0]['xshiprov'];
-								$shipping_city = $summary_arr[0]['address'][0]['xshipcity'];
-								$shipping_brgy = $summary_arr[0]['address'][0]['xshipbrgy'];
-								$shipping_postal = $summary_arr[0]['address'][0]['xshippostalcode'];
-								$shipping_country = $summary_arr[0]['address'][0]['xshipcountry'];
-								$shipping_address_type = $summary_arr[0]['address'][0]['xshiptype'];
-								$shipping_mobile = $summary_arr[0]['ship_mobile'];
-								$display = "d-block";
 								$checkbox = "d-none";
 								$col = "6";
 								$ship_text = '';
@@ -84,24 +76,31 @@
 										<div class="card" style="width: 100%">
 											<div class="card-header" id="headingOne">
 												<h2 class="mb-0">
-													<button class="btn btn-link he1x" type="button" data-toggle="collapse" data-target="" aria-expanded="true" aria-controls="collapseOne" style="text-decoration: none; color:#2c2c2d;">
-														<b>Shipping{{ $ship_text }} Address</b>
-													</button>
+													<div class="row">
+														<div class="col-md-6">
+															<button class="btn btn-link he1x" type="button" data-toggle="collapse" data-target="" aria-expanded="true" aria-controls="collapseOne" style="text-decoration: none; color:#2c2c2d;">
+																<b>Shipping{{ $ship_text }} Address</b>
+															</button>
+														</div>
+														<div class="col-md-6" style="text-align: right;">
+															@if (Auth::check())
+																<a href="/myprofile/address" style="font-size: 14px; width:100%; text-decoration: none;">UPDATE YOUR ADDRESS</a>
+															@endif
+														</div>
+													</div>
 												</h2>
 											</div>
 											
 											<div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample">
 												<div class="card-body">
+													<div class="card-body he1x" style="padding-bottom: 0px !important;">Contact Person :  {{ $shipping_fname. " " .$shipping_lname }}</div>
+
+													<div class="card-body he1x" style="padding-bottom: 0px !important;">Address Type :  {{ $shipping_address_type }}</div>
+
 													<div class="card-body he1x" style="padding-bottom: 0px !important;">
 														{{ $shipping_address1." ".$shipping_address2.", ".$shipping_brgy.", ".$shipping_city.", ".$shipping_province.", ".$shipping_country." ".$shipping_postal }}
 													</div>
-													<div class="card-body he1x" style="padding-bottom: 0px !important;">Address Type :  {{ $shipping_address_type }}</div>
 													<div class="card-body he1x" style="padding-bottom: 0px !important;">Contact Number :  {{ $shipping_mobile }}<br/>&nbsp;</div>
-
-													@if (Auth::check())
-														<a href="/myprofile/address" style="font-size: 14px; width:100%; text-decoration: none;">UPDATE YOUR ADDRESS</a>
-														<br/>&nbsp;
-													@endif
 
 													<div class="form-check {{ $checkbox }} ">
 														<input class="form-check-input" type="checkbox"  checked disabled>
@@ -111,34 +110,43 @@
 											</div>
 										</div>
 									</div>
+									@if ($summary_arr[0]['same_address'] == 0)
+										<div class="col-md-6 d-flex align-items-stretch">
+											<div class="card" style="width: 100%">
+												<div class="card-header" id="headingOne1">
+													<h2 class="mb-0">
+														<div class="row">
+															<div class="col-md-6">
+																<button class="btn btn-link he1x" type="button" data-toggle="collapse" data-target="" aria-expanded="true" aria-controls="collapseOne" style="text-decoration: none; color:#2c2c2d;">
+																	<b>Billing Address</b>
+																</button>
+															</div>
+															<div class="col-md-6" style="text-align: right;">
+																@if (Auth::check())
+																	<a href="/myprofile/address" style="font-size: 14px; width:100%; text-decoration: none;">UPDATE YOUR ADDRESS</a>
+																@endif
+															</div>
+														</div>
+													</h2>
+												</div>
+			
+												<div id="collapseOne1" class="collapse show" aria-labelledby="headingOne1" data-parent="#accordionExample">
+													<div class="card-body">
+														<div class="card-body he1x" style="padding-bottom: 0px !important;">Contact Person :  {{ $summary_arr[0]['address'][0]['xcontact_person'] }}</div>
 
-									<div class="col-md-6 d-flex align-items-stretch {{ $display }}">
-										<div class="card" style="width: 100%">
-											<div class="card-header" id="headingOne1">
-												<h2 class="mb-0">
-													<button class="btn btn-link he1x" type="button" data-toggle="collapse" data-target="" aria-expanded="true" aria-controls="collapseOne1" style="text-decoration: none; color:#2c2c2d;">
-														<b>Billing Address</b>
-													</button>
-												</h2>
-											</div>
-		
-											<div id="collapseOne1" class="collapse show" aria-labelledby="headingOne1" data-parent="#accordionExample">
-												<div class="card-body">
-													<div class="card-body he1x" style="padding-bottom: 0px !important;">
-														{{ $summary_arr[0]['address'][0]['xadd1']." ".$summary_arr[0]['address'][0]['xadd2'].", ".$summary_arr[0]['address'][0]['xbrgy'].", ".$summary_arr[0]['address'][0]['xcity'].", ".$summary_arr[0]['address'][0]['xprov'].", ".$summary_arr[0]['address'][0]['xcountry']." ".$summary_arr[0]['address'][0]['xpostal'] }}
+														<div class="card-body he1x" style="padding-bottom: 0px !important;">Address Type :  {{ $summary_arr[0]['address'][0]['xaddresstype'] }}</div>
+
+														<div class="card-body he1x" style="padding-bottom: 0px !important;">
+															{{ $summary_arr[0]['address'][0]['xadd1']." ".$summary_arr[0]['address'][0]['xadd2'].", ".$summary_arr[0]['address'][0]['xbrgy'].", ".$summary_arr[0]['address'][0]['xcity'].", ".$summary_arr[0]['address'][0]['xprov'].", ".$summary_arr[0]['address'][0]['xcountry']." ".$summary_arr[0]['address'][0]['xpostal'] }}
+														</div>
+			
+														<div class="card-body he1x" style="padding-bottom: 0px !important;">Contact Number :  {{ $summary_arr[0]['bill_mobile'] }}<br/>&nbsp;</div>
 													</div>
-		
-													<div class="card-body he1x" style="padding-bottom: 0px !important;">Address Type :  {{ $summary_arr[0]['address'][0]['xaddresstype'] }}</div>
-													<div class="card-body he1x" style="padding-bottom: 0px !important;">Contact Number :  {{ $summary_arr[0]['bill_mobile'] }}<br/>&nbsp;</div>
-
-													@if (Auth::check())
-													<br/>
-													<a href="/myprofile/address" style="font-size: 14px; width:100%; text-decoration: none;">UPDATE YOUR ADDRESS</a>
-													@endif
 												</div>
 											</div>
 										</div>
-									</div>
+									@endif
+									
 
 									
 								</div>
@@ -156,17 +164,24 @@
 										<div class="card-body">
 											<div class="card-body he1x" style="padding-top: 0px !important; padding-bottom: 0px !important;">
 												<div class="d-flex justify-content-between align-items-center">
-
-													<div class="col-lg-10">
-														Products<br/><br/>
-														{{ $summary_arr[0]['item_desc'] }}
-													</div>
-													<div class="col-lg-2">
-														<small class="stylecap he1x">
-															Total<br/>
-															{{ $summary_arr[0]['subtotal'] }}
-														</small>
-													</div>
+													<table class="table">
+														<tr>
+															<th></th>
+															<th>Products</th>
+															<th>Total</th>
+														</tr>
+														@foreach($cart_arr as $orders)
+															<tr>
+																<td class="col-md-1">
+																	<center>
+																		<img src="{{ asset('/storage/item/images/'.$orders['item_code'].'/gallery/preview/'.$orders['item_image']) }}" class="img-responsive" alt="" width="55" height="55">
+																	</center>
+																</td>
+																<td>{{ $orders['item_description'] }}</td>
+																<td>{{ $orders['subtotal'] }}</td>
+															</tr>
+														@endforeach
+													</table>
 												</div>
 											</div>
 										</div>
@@ -174,43 +189,21 @@
 								</div>
 							</div>
 							<div class="card-body he1x" style="padding-top: 0px !important; padding-bottom: 0px !important;">
-								<br/><br/>
-								<div class="d-flex justify-content-between align-items-center">
-									<div class="col-lg-10">
-										Subtotal
-									</div>
-									<div class="col-lg-2">
-										<small class="stylecap he1x">
-											{{ $summary_arr[0]['subtotal'] }}
-										</small>
-									</div>
-								</div>
-								<hr>
-							</div>
-
-							<div class="card-body he1x" style="padding-top: 0px !important; padding-bottom: 0px !important;">
-								<div class="d-flex justify-content-between align-items-center">
-									<div class="col-lg-10">
-										Shipping
-									</div>
-									<div class="col-lg-2">
-										<small class="stylecap he1x">
-											{{ $summary_arr[0]['shipping'] }}
-										</small>
-									</div>
-								</div>
-								<hr>
-							</div>
-
-							<div class="card-body he1x" style="padding-top: 0px !important; padding-bottom: 0px !important;">
-								<div class="d-flex justify-content-between align-items-center he1x" style="color:#CBA04F !important;">
-									<div class="col-lg-10">TOTAL</div>
-									<div class="col-lg-2">
-										<small class="stylecap he1x" style="color:#CBA04F !important;">{{ $summary_arr[0]['grand_total'] }}</small>
-									</div>
-								</div>
-								<br>
-								<br>
+								<br/>
+								<table class="table">
+									<tr>
+										<td style="width: 90%;">Subtotal<br/></td>
+										<td>{{ $summary_arr[0]['subtotal'] }}</td>
+									</tr>
+									<tr>
+										<td style="width: 90%;">Shipping<br/></td>
+										<td>{{ $summary_arr[0]['shipping'] }}</td>
+									</tr>
+									<tr style="color:#CBA04F !important;">
+										<td style="width: 90%;">Total<br/></td>
+										<td>{{ $summary_arr[0]['grand_total'] }}</td>
+									</tr>
+								</table>
 							</div>
 						</div>
 					</div>
@@ -230,7 +223,7 @@
 					<center>
 						<form action="https://pay.e-ghl.com/IPGSG/Payment.aspx" method="post" name="adminForm" enctype="multipart/form-data">
 							@csrf
-							<div style="display: none;">
+							<div style="display: none">
 								<input name="TransactionType" value="SALE">
 								<input name="PymtMethod" value="ANY">
 								<input name="ServiceID" value="Q5M">

@@ -102,8 +102,18 @@ class CartController extends Controller
                 'item_image' => ($item_image) ? $item_image->imgprimayx : 'test.jpg'
             ];
         }
+        // dd($cart);
+        $bill_address = "";
+		$ship_address = "";
+		if(Auth::check()){
+			$user_id = DB::table('fumaco_users')->where('username', Auth::user()->username)->first();
 
-        return view('frontend.cart', compact('cart_arr'));
+			$bill_address = DB::table('fumaco_user_add')->where('xdefault', 1)->where('user_idx', $user_id->id)->where('address_class', 'Billing')->count();
+
+			$ship_address = DB::table('fumaco_user_add')->where('xdefault', 1)->where('user_idx', $user_id->id)->where('address_class', 'Delivery')->count();
+		}
+
+        return view('frontend.cart', compact('cart_arr', 'bill_address', 'ship_address'));
     }
 
     public function updateCart(Request $request) {
