@@ -181,9 +181,9 @@ class ProductController extends Controller
         DB::beginTransaction();
         try {
             $existing_item = DB::table('fumaco_items')->where('f_idcode', $request->item_code)->exists();
-            if ($existing_item) {
-                return redirect()->back()->withInput($request->all())->with('error', 'Product code <b>' . $request->item_code . '</b> already exists.');
-            }
+            // if ($existing_item) {
+            //     return redirect()->back()->withInput($request->all())->with('error', 'Product code <b>' . $request->item_code . '</b> already exists.');
+            // }
 
             $item = $this->getItemDetails($request->item_code);
 
@@ -214,7 +214,19 @@ class ProductController extends Controller
                     'price' => 'required|numeric',
                 ]
             );
-    
+
+            // validate if item attributes matches the current attributes registered in database based on parent item code
+            $mismatch_attr_query = DB::table('fumaco_items as a')
+                ->join('fumaco_items_attributes as b', 'a.f_idcode', 'b.idcode')
+                ->join('fumaco_attributes_per_category as c', 'c.id', 'b.attribute_name_id')
+                ->where('a.f_parent_code', $item['parent_item_code'])
+                ->whereNotIn('attribute_name', array_column($item['attributes'], 'attribute'))
+                ->distinct()->count();
+
+            if ($mismatch_attr_query > 0) {
+                return redirect()->back()->withInput($request->all())->with('error', 'Some of the attributes of this item did not exists in the parent attributes <b>' . $item['parent_item_code'] . '</b>.');
+            }
+
             $item_category = DB::table('fumaco_categories')->where('id', $request->product_category)->first(); 
             $item_category = ($item_category) ? $item_category->name : null;
             if(!$item_category) {
