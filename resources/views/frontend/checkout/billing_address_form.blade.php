@@ -770,8 +770,7 @@
 											<input type="text" name="shipping" value="{{ $cart_arr[0]['shipping'] }}"/>
 											<input type="text" name="grand_total" value="{{ $cart_arr[0]['grand_total'] }}"/>
 										</div> --}}
-										<a href="/checkout/review_order" class="btn btn-lg btn-outline-primary" role="button" style="background-color: #777575 !important; border-color: #777575 !important;">BACK</a>
-										<input type="submit" class="btn btn-lg btn-outline-primary" value="PROCEED"><br>&nbsp;
+										
 									</center>
 								</div>
 							</div>
@@ -779,14 +778,14 @@
 
 					</div>
 
-					<div class="col-md-3">
+					<div class="col-md-4">
 						<div class="card" style="margin-left: 5%; background-color: #f4f4f4 !important; border-radius: 0rem !important;">
 							<div class="card-body he1x" style="padding-bottom: 0px !important;">Cart Total<hr></div>
 							<table class="table" id="cart-items">
 								<thead>
 								<tr>
 									<th></th>
-									<th>Item Code</th>
+									<th>Product</th>
 									<th>Qty</th>
 									<th>Total</th>
 								</tr>
@@ -794,12 +793,12 @@
 								<tbody>
 									@foreach ($cart_arr as $cart)
 										<tr>
-											<td>
+											<td class="col-md-2">
 												<center>
 													<img src="{{ asset('/storage/item/images/'.$cart['item_code'].'/gallery/preview/'.$cart['item_image']) }}" class="img-responsive" alt="" width="55" height="55">
 												</center>
 											</td>
-											<td>{{ $cart['item_code'] }}</td>
+											<td>{{ $cart['item_description'] }}</td>
 											<td>{{ $cart['quantity'] }}</td>
 											<td><span class="amount">{{ $cart['amount'] }}</span></td>
 										</tr>
@@ -836,6 +835,21 @@
 								<div class="d-flex justify-content-between align-items-center" style="color:#FF9D00 !important;">Total <small class="text-muted stylecap he1x" style="color:#FF9D00 !important;" id="grand-total">0.00</small>
 								</div>
 							</div>
+						</div>
+
+					</div>
+
+					<div class="row">
+						<div class="col-md-4">
+							<a href="/cart" class="btn btn-lg btn-outline-primary col-md-10 mx-auto" role="button" style="background-color: #777575 !important; border-color: #777575 !important;">BACK</a>
+						</div>
+						
+						<div class="col-md-4">
+							&nbsp;
+						</div>
+						
+						<div class="col-md-4">
+							<input type="submit" class="btn btn-lg btn-outline-primary col-md-10 mx-auto" style="float: right;" value="PROCEED">
 						</div>
 					</div>
 				</div>

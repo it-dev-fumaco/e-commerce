@@ -166,13 +166,19 @@
 												<div class="d-flex justify-content-between align-items-center">
 													<table class="table">
 														<tr>
+															<th></th>
 															<th>Products</th>
 															<th>Total</th>
 														</tr>
-														@foreach($orders_arr as $orders)
+														@foreach($cart_arr as $orders)
 															<tr>
-																<td>{{ $orders['item_name'] }}</td>
-																<td>{{ ($orders['item_qty'] * $orders['item_price'] ) }}</td>
+																<td class="col-md-1">
+																	<center>
+																		<img src="{{ asset('/storage/item/images/'.$orders['item_code'].'/gallery/preview/'.$orders['item_image']) }}" class="img-responsive" alt="" width="55" height="55">
+																	</center>
+																</td>
+																<td>{{ $orders['item_description'] }}</td>
+																<td>{{ $orders['subtotal'] }}</td>
 															</tr>
 														@endforeach
 													</table>

@@ -428,9 +428,17 @@ class CheckoutController extends Controller
 			
 			$cart_arr = [];
 			foreach ($cart_items as $n => $item) {
+				$item_image = DB::table('fumaco_items_image_v1')
+					->where('idcode', $item->f_idcode)->first();
+
 				$cart_arr[] = [
+					'item_code' => $item->f_idcode,
+					'item_description' => $item->f_name_name,
+					'price' => $item->f_price,
 					'subtotal' => ($item->f_price * $cart[$item->f_idcode]['quantity']),
-					'grand_total' => ($cart['shipping']['shipping_fee'] + ($item->f_price * $cart[$item->f_idcode]['quantity']))
+					'quantity' => $cart[$item->f_idcode]['quantity'],
+					'stock_qty' => $item->f_qty,
+					'item_image' => ($item_image) ? $item_image->imgprimayx : 'test.jpg'
 				];
 
 				$orders_arr[] = [
@@ -447,6 +455,7 @@ class CheckoutController extends Controller
 
 				DB::table('fumaco_order_items')->insert($orders_arr);
 			}
+			// dd($cart_arr);
 
 			$summary_arr[] = [
 				'shipping' => $cart['shipping']['shipping_fee'],
@@ -463,7 +472,7 @@ class CheckoutController extends Controller
 			// dd($summary_arr);
 			$insert = DB::table('fumaco_temp')->insert($temp_arr);
 			DB::commit();
-			return view('frontend.checkout.check_out_summary', compact('summary_arr', 'orders_arr', 'cart'));
+			return view('frontend.checkout.check_out_summary', compact('summary_arr', 'orders_arr', 'cart', 'cart_arr'));
 		}catch(Exception $e){
 			DB::rollback();
 			return redirect()->back()->with('error', 'An error occured. Please try again.');

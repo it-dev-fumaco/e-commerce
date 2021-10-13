@@ -91,7 +91,7 @@
         <br>
         <div class="row"></div>
     </div>
-    <div class="container" style="max-width: 100% !important;">
+    <div class="container" style="max-width: 100% !important; min-height: 600px;">
         <div class="row">
             <div class="col-lg-8 animated animatedFadeInUp fadeInUp mx-auto">
                 <table class="table animated animatedFadeInUp fadeInUp" id="cart-items">
@@ -144,41 +144,42 @@
                 </table>
                 <table class="table">
                     <tr>
-                        <td class="col-md-10">Subtotal</td>
+                        <td class="col-md-8">&nbsp</td>
+                        <td class="col-md-2">Subtotal</td>
                         <td><small class="text-muted stylecap he1x" id="cart-subtotal">P {{ number_format(collect($cart_arr)->sum('amount'), 2, '.', ',') }}</small></td>
                     </tr>
                 </table>
                 <table class="table">
                     <tr>
                         <td class="col-md-6">
-                            <div class="card-body col-md-8">
-                                <a href="/" class="btn btn-outline-primary" style="width:100% !important;" role="button">CONTINUE SHOPPING</a>
+                            <div class="card-body col-md-8 mx-auto">
+                                <a href="/" class="btn btn-secondary" style="width:100% !important;" role="button"><span style="font-size: 12pt; font-weight: 700">˂ </span> CONTINUE SHOPPING</a>
                             </div>
                         </td>
                         <td class="col-md-6">
                             @if(Auth::check())
                                 @if($bill_address > 0 and $ship_address > 0)
-                                    <div class="card-body col-md-8">
+                                    <div class="card-body col-md-8 mx-auto">
                                         <button id="checkout-btn" class="btn btn-outline-primary" role="button" style="width:100% !important;" {{ (count($cart_arr) > 0) ? '' : 'disabled' }}>PROCEED TO CHECKOUT</button>
                                     </div>
                                 @elseif($ship_address < 1)
-                                    <div class="card-body col-md-8">
+                                    <div class="card-body col-md-8 mx-auto">
                                         <p class="text-center">You have no saved shipping address</p>
                                         <a href="/checkout/billing" class="btn btn-outline-primary" role="button" style="width:100% !important;">SET YOUR ADDRESS</a>
                                     </div>
                                 @elseif($bill_address < 1)
-                                    <div class="card-body col-md-8">
+                                    <div class="card-body col-md-8 mx-auto">
                                         <p class="text-center">You have no saved billing address</p>
                                         <a href="/checkout/set_billing_form" class="btn btn-outline-primary" role="button" style="width:100% !important;">SET YOUR ADDRESS</a>
                                     </div>
                                 @else
-                                    <div class="card-body col-md-8">
+                                    <div class="card-body col-md-8 mx-auto">
                                         <p class="text-center">You have no saved shipping/billing address</p>
                                         <a href="/checkout/billing" class="btn btn-outline-primary" role="button" style="width:100% !important;">SET YOUR ADDRESS</a>
                                     </div>
                                 @endif
                             @else
-                                <div class="card-body col-md-8">
+                                <div class="card-body col-md-8 mx-auto">
                                     <button id="checkout-btn" class="btn btn-outline-primary" role="button" style="width:100% !important;" {{ (count($cart_arr) > 0) ? '' : 'disabled' }}>PROCEED TO CHECKOUT</button>
                                 </div>
                             @endif
