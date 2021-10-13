@@ -424,10 +424,31 @@ class FrontendController extends Controller
 
         $product_images = DB::table('fumaco_items_image_v1')->where('idcode', $item_code)->get();
 
+        $related_products_query = DB::table('fumaco_items as a')
+            ->join('fumaco_items_relation as b', 'a.f_idcode', 'b.related_item_code')
+            ->where('b.item_code', $item_code)
+            ->select('a.id', 'a.f_idcode', 'a.f_original_price', 'a.f_discount_trigger', 'a.f_price', 'a.f_name_name')
+            ->get();
+
+        $related_products = [];
+        foreach($related_products_query as $row) {
+            $image = DB::table('fumaco_items_image_v1')->where('idcode', $row->f_idcode)->first();
+
+            $related_products[] = [
+                'id' => $row->id,
+                'item_code' => $row->f_idcode,
+                'item_name' => $row->f_name_name,
+                'orig_price' => $row->f_original_price,
+                'is_discounted' => $row->f_discount_trigger,
+                'new_price' => $row->f_price,
+                'image' => ($image) ? $image->imgprimayx : null
+            ];
+        }
+        
         // get common item code to set attribute button as active
         // $active_variants = call_user_func_array('array_intersect', $active_attr);
 
-        return view('frontend.product_page', compact('product_details', 'product_images', 'attributes', 'variant_attr_arr'));
+        return view('frontend.product_page', compact('product_details', 'product_images', 'attributes', 'variant_attr_arr', 'related_products'));
     }
 
     public function viewWishlist() {

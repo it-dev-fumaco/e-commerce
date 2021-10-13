@@ -54,7 +54,8 @@
                      <div class="card-body">
                         <h4 class="d-inline-block">Product Information</h4>
                         <div class="float-right">
-                           <a href="/admin/product/add" class="btn btn-primary">Create New Product</a>
+                           <button type="submit" class="btn btn-primary mr-2">Update</button>
+                           <a href="/admin/product/add" class="btn btn-secondary">Create New Product</a>
                         </div>
                         <hr>
                         <div class="row">
@@ -245,11 +246,48 @@
                               @endforelse
                            </tbody>
                         </table>
+                        <h5 class="mt-3">Related Product(s)</h5>
+                        <hr>
+                        <div class="float-left mb-2">
+                           <button type="button" class="btn btn-primary btn-sm" id="show-srpm">Add Related Product(s)</button>
+                        </div>
+                        <table class="table table-bordered table-hover">
+                           <thead>
+                              <tr>
+                                 <th style="width: 5%;" class="text-center">#</th>
+                                 <th style="width: 10%;" class="text-center">Image</th>
+                                 <th style="width: 55%;" class="text-center">Item Description</th>
+                                 <th style="width: 15%;" class="text-center">Price</th>
+                                 <th style="width: 15%;" class="text-center">Action</th>
+                              </tr>
+                           </thead>
+                           <tbody>
+                              @forelse ($related_products as $a => $related_product)
+                              @php
+                                 $image_r = ($related_product['image']) ? '/storage/item/images/'. $related_product['item_code'] .'/gallery/preview/'.$related_product['image'] : '/storage/no-photo-available.png';
+                              @endphp
+                              <tr>
+                                 <td class="text-center align-middle">
+                                    {{ $a + 1 }}
+                                 </td>
+                                 <td class="text-center align-middle">
+                                    <img src="{{ asset($image_r) }}" class="img-responsive rounded img-thumbnail d-inline-block" width="70" height="70">
+                                 </td>
+                                 <td><span class="d-block font-weight-bold">{{ $related_product['item_code'] }}</span>{{ $related_product['item_description'] }}</td>
+                                 <td class="text-center align-middle">P {{ number_format($related_product['original_price'], 2) }}</td>
+                                 <td class="text-center align-middle">
+                                    <button class="btn btn-danger btn-sm remove-rel" data-id="{{ $related_product['id'] }}">Remove</button>
+                                 </td>
+                              </tr>
+                              @empty
+                              <tr>
+                                 <td colspan="4" class="text-center text-muted">No products found.</td>
+                              </tr>
+                              @endforelse
+                           </tbody>
+                        </table>
                      </div>
                      <!-- /.card-body -->
-                     <div class="card-footer text-center">
-                        <button type="submit" class="btn btn-primary btn-lg">UPDATE</button>
-                     </div>
                   </div>
                <!-- /.card -->
                </div>
@@ -261,7 +299,54 @@
 	<!-- /.content -->
  </div>
 
- <div id="custom-overlay" style="display: none;">
+{{-- modal related products --}}
+ <div class="modal fade" id="related-products-modal">
+   <div class="modal-dialog modal-xl" style="min-width: 80%;">
+      <form action="/admin/product/{{ $details->f_idcode }}/save_related_products" method="POST">
+      @csrf
+   
+     <div class="modal-content">
+       <div class="modal-header">
+         <h4 class="modal-title">Select Related Product(s)</h4>
+         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+           <span aria-hidden="true">&times;</span>
+         </button>
+       </div>
+       <div class="modal-body"></div>
+       <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Add Selected</button>
+         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+       </div>
+     </div>
+   </form>
+     <!-- /.modal-content -->
+   </div>
+   <!-- /.modal-dialog -->
+ </div>
+ <!-- /.modal -->
+
+ <div class="modal fade" id="remove-related-product" tabindex="-1" role="dialog" aria-labelledby="delItemModal" aria-hidden="true">
+   <form action="#" method="POST">
+      @csrf
+      @method('delete')
+      <div class="modal-dialog" role="document">
+         <div class="modal-content">
+            <div class="modal-header">
+               <h5 class="modal-title" id="delItemModal">Remove Related Product</h5>
+            </div>
+            <div class="modal-body text-center">
+               <p>Remove this item from related products?</p>
+            </div>
+            <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">Confirm</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+         </div>
+      </div>
+   </form>
+</div>
+
+<div id="custom-overlay" style="display: none;">
   <div class="custom-spinner"></div>
   <br/>
   Loading...
@@ -269,55 +354,86 @@
 
 <style>
   #custom-overlay {
-  background: #ffffff;
-  color: #666666;
-  position: fixed;
-  height: 100%;
-  width: 100%;
-  z-index: 5000;
-  top: 0;
-  left: 0;
-  float: left;
-  text-align: center;
-  padding-top: 25%;
-  opacity: .80;
-}
+   background: #ffffff;
+   color: #666666;
+   position: fixed;
+   height: 100%;
+   width: 100%;
+   z-index: 5000;
+   top: 0;
+   left: 0;
+   float: left;
+   text-align: center;
+   padding-top: 25%;
+   opacity: .80;
+   }
 
-.custom-spinner {
-    margin: 0 auto;
-    height: 64px;
-    width: 64px;
-    animation: rotate 0.8s infinite linear;
-    border: 5px solid firebrick;
-    border-right-color: transparent;
-    border-radius: 50%;
-}
-@keyframes rotate {
-    0% {
-        transform: rotate(0deg);
-    }
-    100% {
-        transform: rotate(360deg);
-    }
-}
+   .custom-spinner {
+      margin: 0 auto;
+      height: 64px;
+      width: 64px;
+      animation: rotate 0.8s infinite linear;
+      border: 5px solid firebrick;
+      border-right-color: transparent;
+      border-radius: 50%;
+   }
+   @keyframes rotate {
+      0% {
+         transform: rotate(0deg);
+      }
+      100% {
+         transform: rotate(360deg);
+      }
+   }
 </style>
 @endsection
 
 @section('script')
 <script>
-  (function() {
-    $("#website-caption").summernote({
+   (function() {
+      $("#website-caption").summernote({
+         dialogsInBody: true,
+         dialogsFade: true,
+         height: "200px",
+      });
+
+      $("#full-detail").summernote({
 			dialogsInBody: true,
 			dialogsFade: true,
 			height: "200px",
 		});
 
-    $("#full-detail").summernote({
-			dialogsInBody: true,
-			dialogsFade: true,
-			height: "200px",
-		});
-  })();
+      $('#show-srpm').click(function (e) {
+         e.preventDefault();
+         load_select_related_products();
+      });
 
+      $(document).on('click', '.remove-rel', function(e){
+         e.preventDefault();
+         var id = $(this).data('id');
+         $('#remove-related-product form').attr('action', '/admin/product/remove_related/' + id);
+         $('#remove-related-product').modal('show');
+      });
+
+      function load_select_related_products() {
+         $('#custom-overlay').fadeIn();
+         var data = {
+            parent: '{{ $details->f_idcode }}'
+         }
+         $.ajax({
+				url: '/admin/select_related_products/{{ $details->f_cat_id }}',
+				type:"GET",
+            data: data,
+				success:function(data){
+               $('#custom-overlay').fadeOut();
+               $('#related-products-modal .modal-body').html(data);
+               $('#related-products-modal').modal('show');
+				},
+				error : function(data) {
+					alert('An error occured.');
+				}
+			});
+      }
+   })();
 </script>
 @endsection

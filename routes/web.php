@@ -125,6 +125,12 @@ Route::prefix('admin')->group(function () {
         Route::get('/product/images/{id}', 'ProductController@uploadImagesForm');
         Route::post('/add_product_images', 'ProductController@uploadImages');
         Route::post('/delete_product_image', 'ProductController@deleteProductImage');
+
+        Route::get('/select_related_products/{category_id}', 'ProductController@selectProductsRelated');
+        Route::post('/product/{parent_code}/save_related_products', 'ProductController@saveRelatedProducts');
+        Route::delete('/product/remove_related/{id}', 'ProductController@removeRelatedProduct');
+        
+        
         
         Route::post('/product/{id}/update', 'ProductController@updateItem');
         Route::post('/product/{item_code}/disable', 'ProductController@disableItem');

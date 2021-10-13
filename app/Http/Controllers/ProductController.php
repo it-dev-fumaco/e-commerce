@@ -492,8 +492,26 @@ class ProductController extends Controller
         $attributes = DB::table('fumaco_items_attributes as a')
             ->join('fumaco_attributes_per_category as b', 'a.attribute_name_id', 'b.id')
             ->where('a.idcode', $details->f_idcode)->orderBy('a.idx', 'asc')->get();
-        
-        return view('backend.products.view', compact('details', 'item_categories', 'attributes', 'item_image'));
+
+        $related_products_query = DB::table('fumaco_items as a')
+            ->join('fumaco_items_relation as b', 'a.f_idcode', 'b.related_item_code')
+            ->where('b.item_code', $details->f_idcode)
+            ->get();
+
+        $related_products = [];
+        foreach($related_products_query as $row) {
+            $image = DB::table('fumaco_items_image_v1')->where('idcode', $row->related_item_code)->first();
+
+            $related_products[] = [
+                'id' => $row->id_related,
+                'item_code' => $row->related_item_code,
+                'item_description' => $row->f_name_name,
+                'image' => ($image) ? $image->imgprimayx : null,
+                'original_price' => $row->f_original_price,
+            ];
+        }
+
+        return view('backend.products.view', compact('details', 'item_categories', 'attributes', 'item_image', 'related_products'));
     }
 
     public function viewCategoryAttr(Request $request) {
@@ -628,5 +646,76 @@ class ProductController extends Controller
 			return redirect()->back()->with('image_error', 'Error');
 		}
 
+    }
+
+    // ajax get products based on item category
+    public function selectProductsRelated($category_id, Request $request) {
+        if ($request->ajax()) {
+            $existing_related_products = DB::table('fumaco_items_relation')
+                ->where('item_code', $request->parent)->distinct()->pluck('related_item_code');
+
+            $query = DB::table('fumaco_items')->where('f_cat_id', $category_id)
+                ->whereNotIn('f_idcode', $existing_related_products)
+                ->orderBy('f_order_by', 'asc')->get();
+
+            $list = [];
+            foreach($query as $row) {
+                $item_image = DB::table('fumaco_items_image_v1')->where('idcode', $row->f_idcode)->first();
+
+                $list[] = [
+                    'item_code' => $row->f_idcode,
+                    'item_description' => $row->f_name_name,
+                    'image' => ($item_image) ? $item_image->imgprimayx : null,
+                    'original_price' => $row->f_original_price,
+                ];
+            }
+
+            return view('backend.products.select_related_products', compact('list'));
+        }
+    }
+
+    public function saveRelatedProducts($parent_code, Request $request) {
+        DB::beginTransaction();
+        try {
+            $items = $request->selected_products;
+            $values = [];
+            foreach ($items as $item) {
+                $existing = DB::table('fumaco_items_relation')
+                    ->where('item_code', $parent_code)->where('related_item_code', $item)
+                    ->exists();
+
+                if (!$existing) {
+                    $values[] = [
+                        'item_code' => $parent_code,
+                        'related_item_code' => $item
+                    ];
+                }
+            }
+
+            DB::table('fumaco_items_relation')->insert($values);
+
+            DB::commit();
+
+            return redirect()->back()->with('success', 'Related Products has been updated.');
+        } catch (Exception $e) {
+            DB::rollback();
+
+            return redirect()->back()->with('error', 'An error occured. Please try again.');
+        }
+    }
+
+    public function removeRelatedProduct($id) {
+        DB::beginTransaction();
+        try {
+            DB::table('fumaco_items_relation')->where('id_related', $id)->delete();
+
+            DB::commit();
+
+            return redirect()->back()->with('success', 'Product has been removed from related products.');
+        } catch (Exception $e) {
+            DB::rollback();
+
+            return redirect()->back()->with('error', 'An error occured. Please try again.');
+        }
     }
 }
