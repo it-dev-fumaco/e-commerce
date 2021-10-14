@@ -151,7 +151,7 @@ class ProductController extends Controller
 
             // get item attribute / specification
             $fields = '?fields=["parent","attribute","idx","attribute_value"]';
-            $filter = '&filters=[["parent","=","' . $item_code . '"]]&order_by=idx';
+            $filter = '&filters=[["parent","=","' . $item_code . '"]]&limit_page_length=50&order_by=idx';
 
             $params = $fields . '' . $filter;
             
