@@ -407,7 +407,8 @@ class FrontendController extends Controller
 
         // get items with the same parent item code
         $variant_items = DB::table('fumaco_items')
-            ->whereNotNull('f_parent_code')->where('f_parent_code', $product_details->f_parent_code)->pluck('f_idcode');
+            ->where('f_status', 1)->whereNotNull('f_parent_code')
+            ->where('f_parent_code', $product_details->f_parent_code)->pluck('f_idcode');
 
         // get attributes of all variant items
         $variant_attributes = DB::table('fumaco_items_attributes as a')
@@ -440,7 +441,7 @@ class FrontendController extends Controller
 
         $related_products_query = DB::table('fumaco_items as a')
             ->join('fumaco_items_relation as b', 'a.f_idcode', 'b.related_item_code')
-            ->where('b.item_code', $item_code)
+            ->where('b.item_code', $item_code)->where('a.f_status', 1)
             ->select('a.id', 'a.f_idcode', 'a.f_original_price', 'a.f_discount_trigger', 'a.f_price', 'a.f_name_name')
             ->get();
 

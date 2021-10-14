@@ -4,6 +4,7 @@
 ])
 
 @section('content')
+	<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/>
 	<style>
 	._1yv {
 			box-shadow: 0 0px 0px rgb(0 0 0 / 30%), 0 0 0 1px rgb(0 0 0) !important;
@@ -664,19 +665,22 @@
 									@endphp
 									@if (count($variant_diff) > 0)
 									<div class="alert alert-danger fade show mb-0" role="alert">Error in Variants.</div>
-									@else
+									@endif
 									@foreach ($variant_attr_arr as $attr => $row)
+									@if (count($row) > 1)
 									@php
 										$x = 0;
 										$opt_name = preg_replace('/\s+/', '', strtolower($attr));
 									@endphp
 									<label style="margin-left: 3%;">{{ $attr }} : </label>
 									<div class="btn-group" role="group" aria-label="Select Variants" style="display: unset !important;">
+										
 										@foreach ($row as $attr_value => $items)
 										@php
 											$x++;
 											$is_active = [1];
 										@endphp
+										@if (isset($attributes[$attr]))
 										<input type="radio" class="btn-check attr-radio" {{ ($attributes[$attr] == $attr_value) ? 'checked' : '' }} name="{{ $opt_name }}" id="{{ $opt_name . $x }}" autocomplete="off" value="{{ $attr_value }}" data-attribute="{{ Str::slug($attr, '-') }}" {{ (count($is_active) > 0) ? '' : 'disabled' }}>
 										<label class="btn btn-outline-{{ (count($is_active) > 0) ? 'info' : 'secondary' }} btn-sm mb-2 mt-2" for="{{ $opt_name . $x }}">
 											@if(count($is_active) > 0)
@@ -685,10 +689,13 @@
 											<del>{{ $attr_value }}</del>
 											@endif
 										</label>
+										@else
+										error
+										@endif
 										@endforeach
 									</div><br>
-									@endforeach
 									@endif
+									@endforeach
 									<div class="row mt-5" id="product_details">
 										<div class="col-xs-6">
 											<button type="submit" class="btn btn-lg btn-outline-primary fumacoFont_card_readmore" name="addtocart" style="padding: 1rem 1.5rem !important; color: #ffffff;background-color: #0062A5;border-color: #7cc;border-radius: 0 !important; {{ ($product_details->f_qty < 1) ? 'display: none;' : '' }}" value="1"><i class="fas fa-shopping-cart"></i> Add to Cart</button>
@@ -821,6 +828,8 @@
 <script type="text/javascript" src="{{ asset('/item/fancybox/source/jquery.fancybox.js') }}"></script>
 <script type="text/javascript" src="{{ asset('/item/magnific-popup/js/magnific-popup.js') }}"></script>
 
+<script type="text/javascript" src="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
+				
 <script>
    (function() {
 		$(document).on('change', '.attr-radio', function(){
