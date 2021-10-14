@@ -23,12 +23,14 @@ class CheckoutController extends Controller
 		foreach ($cart_items as $n => $item) {
 			$item_image = DB::table('fumaco_items_image_v1')
 				->where('idcode', $item->f_idcode)->first();
+			 
+			$price = ($item->f_price > 0) ? $item->f_price : $item->f_original_price;
 
 			$cart_arr[] = [
 				'item_code' => $item->f_idcode,
 				'item_description' => $item->f_name_name,
-				'price' => $item->f_price,
-				'amount' => ($item->f_price * $cart[$item->f_idcode]['quantity']),
+				'price' => $price,
+				'amount' => ($price * $cart[$item->f_idcode]['quantity']),
 				'quantity' => $cart[$item->f_idcode]['quantity'],
 				'stock_qty' => $item->f_qty,
 				'item_image' => ($item_image) ? $item_image->imgprimayx : 'test.jpg'
@@ -60,22 +62,51 @@ class CheckoutController extends Controller
 		foreach ($cart_items as $n => $item) {
 			$item_image = DB::table('fumaco_items_image_v1')->where('idcode', $item->f_idcode)->first();
 
+			$price = ($item->f_price > 0) ? $item->f_price : $item->f_original_price;
+
 			$cart_arr[] = [
-                'item_code' => $item->f_idcode,
-                'item_description' => $item->f_name_name,
-                'price' => $item->f_price,
-                'amount' => ($item->f_price * $cart[$item->f_idcode]['quantity']),
-                'quantity' => $cart[$item->f_idcode]['quantity'],
-                'stock_qty' => $item->f_qty,
+				'item_code' => $item->f_idcode,
+				'item_description' => $item->f_name_name,
+				'price' => $price,
+				'amount' => ($price * $cart[$item->f_idcode]['quantity']),
+				'quantity' => $cart[$item->f_idcode]['quantity'],
+				'stock_qty' => $item->f_qty,
 				'item_image' => ($item_image) ? $item_image->imgprimayx : 'test.jpg'
-            ];
+			];
 		}
 
 		return view('frontend.checkout.billing_address_form', compact('cart_arr', 'cart'));
 	}
 
 	public function setBillingForm(){
-		return view('frontend.checkout.set_billing');
+		$cart = session()->get('fumCart');
+		$cart = (!$cart) ? [] : $cart;
+		if(count($cart) <= 0) {
+			return redirect('/cart');
+		}
+
+		$cart_items = DB::table('fumaco_items')
+			->whereIn('f_idcode', array_column($cart, 'item_code'))->get();
+		
+		$cart_arr = [];
+		foreach ($cart_items as $n => $item) {
+			$item_image = DB::table('fumaco_items_image_v1')
+				->where('idcode', $item->f_idcode)->first();
+
+			$price = ($item->f_price > 0) ? $item->f_price : $item->f_original_price;
+
+			$cart_arr[] = [
+				'item_code' => $item->f_idcode,
+				'item_description' => $item->f_name_name,
+				'price' => $price,
+				'amount' => ($price * $cart[$item->f_idcode]['quantity']),
+				'quantity' => $cart[$item->f_idcode]['quantity'],
+				'stock_qty' => $item->f_qty,
+				'item_image' => ($item_image) ? $item_image->imgprimayx : 'test.jpg'
+			];
+		}
+
+		return view('frontend.checkout.set_billing', compact('cart', 'cart_arr'));
 	}
 
 	public function setBilling(Request $request){
@@ -122,11 +153,13 @@ class CheckoutController extends Controller
 				$item_image = DB::table('fumaco_items_image_v1')
 					->where('idcode', $item->f_idcode)->first();
 
+				$price = ($item->f_price > 0) ? $item->f_price : $item->f_original_price;
+
 				$cart_arr[] = [
 					'item_code' => $item->f_idcode,
 					'item_description' => $item->f_name_name,
-					'price' => $item->f_price,
-					'amount' => ($item->f_price * $cart[$item->f_idcode]['quantity']),
+					'price' => $price,
+					'amount' => ($price * $cart[$item->f_idcode]['quantity']),
 					'quantity' => $cart[$item->f_idcode]['quantity'],
 					'stock_qty' => $item->f_qty,
 					'item_image' => ($item_image) ? $item_image->imgprimayx : 'test.jpg'
@@ -141,7 +174,7 @@ class CheckoutController extends Controller
 				$ship_address = DB::table('fumaco_user_add')->where('xdefault', 1)->where('user_idx', $user_id->id)->where('address_class', 'Delivery')->get();
 			}
 
-			return redirect('/cart')->with('add_success', 'Record Updated');
+			return redirect('/checkout/summary')->with('add_success', 'Record Updated');
 		}catch(Exception $e){
 			DB::rollback();
 			return redirect()->back()->with('error', 'An error occured. Please try again.');
@@ -152,6 +185,22 @@ class CheckoutController extends Controller
 	public function setAddress(Request $request){
 		DB::beginTransaction();
 		try{
+			$o_email = Auth::user()->username;
+
+			$user = DB::table('fumaco_users')->where('username', $o_email)->first();
+			$user_id = $user->id;
+
+			$bill_address = DB::table('fumaco_user_add')->where('xdefault', 1)->where('user_idx', $user_id)->where('address_class', 'Billing')->get();
+			$ship_address = DB::table('fumaco_user_add')->where('xdefault', 1)->where('user_idx', $user_id)->where('address_class', 'Delivery')->get();
+			// dd(count($bill_address));
+			if(count($bill_address) > 0){
+				DB::table('fumaco_user_add')->where('user_idx', $user_id)->where('address_class', 'Billing')->update(['xdefault' => 0]);
+			}
+
+			if(count($ship_address) > 0){
+				DB::table('fumaco_user_add')->where('user_idx', $user_id)->where('address_class', 'Delivery')->update(['xdefault' => 0]);
+			}
+
 			$cart = session()->get('fumCart');
 			$cart = (!$cart) ? [] : $cart;
 			if(count($cart) <= 0) {
@@ -166,21 +215,18 @@ class CheckoutController extends Controller
 				$item_image = DB::table('fumaco_items_image_v1')
 					->where('idcode', $item->f_idcode)->first();
 
+				$price = ($item->f_price > 0) ? $item->f_price : $item->f_original_price;
+
 				$cart_arr[] = [
 					'item_code' => $item->f_idcode,
 					'item_description' => $item->f_name_name,
-					'price' => $item->f_price,
-					'amount' => ($item->f_price * $cart[$item->f_idcode]['quantity']),
+					'price' => $price,
+					'amount' => ($price * $cart[$item->f_idcode]['quantity']),
 					'quantity' => $cart[$item->f_idcode]['quantity'],
 					'stock_qty' => $item->f_qty,
 					'item_image' => ($item_image) ? $item_image->imgprimayx : 'test.jpg'
 				];
 			}
-
-			$o_email = Auth::user()->username;
-
-			$user = DB::table('fumaco_users')->where('username', $o_email)->first();
-			$user_id = $user->id;
 
 			$ship_address_arr = [
 				'address_class' => 'Delivery',
@@ -242,23 +288,14 @@ class CheckoutController extends Controller
 				
 			}
 
-			$bill_address = DB::table('fumaco_user_add')->where('xdefault', 1)->where('user_idx', $user_id)->where('address_class', 'Billing')->get();
-			$ship_address = DB::table('fumaco_user_add')->where('xdefault', 1)->where('user_idx', $user_id)->where('address_class', 'Delivery')->get();
-			// dd(count($bill_address));
-			if(count($bill_address) > 0){
-				DB::table('fumaco_user_add')->where('user_idx', $user_id)->where('address_class', 'Billing')->update(['xdefault' => 0]);
-			}
-
-			if(count($ship_address) > 0){
-				DB::table('fumaco_user_add')->where('user_idx', $user_id)->where('address_class', 'Delivery')->update(['xdefault' => 0]);
-			}
-
 			$bill_insert = DB::table('fumaco_user_add')->insert($bill_address_arr);
 			$ship_insert = DB::table('fumaco_user_add')->insert($ship_address_arr);
 
+			$request->session()->put('order_no', 'FUM-'.random_int(10000000, 99999999));
+
 			DB::commit();
 
-			return redirect('/checkout/cart')->with('add_success', 'Record Updated');
+			return redirect('/checkout/summary')->with('add_success', 'Record Updated');
 		}catch(Exception $e){
 			DB::rollback();
 			return redirect()->back()->with('error', 'An error occured. Please try again.');
@@ -272,12 +309,13 @@ class CheckoutController extends Controller
 
 			$same_address = 0;
 
-			// $order_no = 'FUM-'.uniqid();
-			$order_no = 'FUM-'.random_int(10000000, 99999999);
-			// dd($order_no);
 			$user_type = '';
+			$order_no = '';
 
-			if(!Auth::check()){
+			// if(!Auth::check()){
+			if(!Auth::check() and request()->isMethod('post')) {
+				$order_no = $request->order_no;
+
 				$first_name = $request->fname;
 				$last_name = $request->lname;
 				$email = $request->ship_email;
@@ -332,6 +370,7 @@ class CheckoutController extends Controller
 				}				
 			}else{
 				$o_email = Auth::user()->username;
+				$order_no = $request->session()->get('order_no');
 
 				$user = DB::table('fumaco_users')->where('username', $o_email)->first();
 				$user_id = $user->id;
@@ -354,6 +393,8 @@ class CheckoutController extends Controller
 				$bill_mobile = (!empty($user_bill_address->xmobile_number) ? $user_bill_address->xmobile_number : 0 );
 
 				$email = $user_bill_address->xcontactemail1;
+				$bill_firstname = $user_bill_address->xcontactname1;
+				$bill_lastname = $user_bill_address->xcontactlastname1;
 				$bill_address1 = $user_bill_address->xadd1;
 				$bill_address2 = $user_bill_address->xadd2;
 				$bill_province = $user_bill_address->xprov;
@@ -431,11 +472,13 @@ class CheckoutController extends Controller
 				$item_image = DB::table('fumaco_items_image_v1')
 					->where('idcode', $item->f_idcode)->first();
 
+				$price = ($item->f_price > 0) ? $item->f_price : $item->f_original_price;
+
 				$cart_arr[] = [
 					'item_code' => $item->f_idcode,
 					'item_description' => $item->f_name_name,
-					'price' => $item->f_price,
-					'subtotal' => ($item->f_price * $cart[$item->f_idcode]['quantity']),
+					'price' => $price,
+					'subtotal' => ($price * $cart[$item->f_idcode]['quantity']),
 					'quantity' => $cart[$item->f_idcode]['quantity'],
 					'stock_qty' => $item->f_qty,
 					'item_image' => ($item_image) ? $item_image->imgprimayx : 'test.jpg'
@@ -446,11 +489,11 @@ class CheckoutController extends Controller
 					'item_code' => $item->f_idcode,
 					'item_name' => $item->f_name_name,
 					'item_qty' => $cart[$item->f_idcode]['quantity'],
-					'item_price' => $item->f_price,
+					'item_price' => $price,
 					'item_status' => 2,
 					'date_update' => Carbon::now()->toDateTimeString(),
 					'ip_address' => $request->ip(),
-					'item_total_price' => ($cart['shipping']['shipping_fee'] + ($item->f_price * $cart[$item->f_idcode]['quantity']))
+					'item_total_price' => ($cart['shipping']['shipping_fee'] + ($price * $cart[$item->f_idcode]['quantity']))
 				];
 
 				DB::table('fumaco_order_items')->insert($orders_arr);
@@ -470,7 +513,10 @@ class CheckoutController extends Controller
 
 			// dd($orders_arr);
 			// dd($summary_arr);
-			$insert = DB::table('fumaco_temp')->insert($temp_arr);
+			$checker = DB::table('fumaco_temp')->where('order_tracker_code', $order_no)->count();
+			if($checker < 1){
+				$insert = DB::table('fumaco_temp')->insert($temp_arr);
+			}
 			DB::commit();
 			return view('frontend.checkout.check_out_summary', compact('summary_arr', 'orders_arr', 'cart', 'cart_arr'));
 		}catch(Exception $e){

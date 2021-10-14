@@ -175,7 +175,28 @@
                             </div>
                         </td>
                         <td class="col-md-6">
-                            @if(Auth::check())
+                            @php
+                                $action = '';
+
+                                if(Auth::check()){//member
+                                    if($bill_address > 0 and $ship_address > 0){
+                                        $action = '/checkout/summary';
+                                    }else if($ship_address < 1){
+                                        $action = '/checkout/billing';
+                                    }else if($bill_address < 1){
+                                        $action = '/checkout/set_billing_form';
+                                    }else{
+                                        $action = '/checkout/billing';
+                                    }
+                                }else{// guest
+                                    $action = '/checkout/billing';
+                                }
+                            @endphp
+
+                            <div class="card-body col-md-8 mx-auto">
+                                <button id="checkout-btn" class="btn btn-outline-primary" role="button" style="width:100% !important;" {{ (count($cart_arr) > 0) ? '' : 'disabled' }}>PROCEED TO CHECKOUT</button>
+                            </div>
+                            {{-- @if(Auth::check())
                                 @if($bill_address > 0 and $ship_address > 0)
                                     <div class="card-body col-md-8 mx-auto">
                                         <button id="checkout-btn" class="btn btn-outline-primary" role="button" style="width:100% !important;" {{ (count($cart_arr) > 0) ? '' : 'disabled' }}>PROCEED TO CHECKOUT</button>
@@ -200,7 +221,7 @@
                                 <div class="card-body col-md-8 mx-auto">
                                     <button id="checkout-btn" class="btn btn-outline-primary" role="button" style="width:100% !important;" {{ (count($cart_arr) > 0) ? '' : 'disabled' }}>PROCEED TO CHECKOUT</button>
                                 </div>
-                            @endif
+                            @endif --}}
                         </td>
                     </tr>
                 </table>
@@ -358,7 +379,7 @@
                 url:'/addshipping',
                 data: data,
                 success: function (response) {
-                    window.location.href = "/checkout/billing";
+                    window.location.href = "{{ $action }}";
                     // window.location.href = "/checkout/review_order";
                 },
                 error: function () {
