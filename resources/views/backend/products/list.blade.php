@@ -107,7 +107,7 @@
 										<td class="text-center">{{ $item['brand'] }}</td>
 										<td class="text-center">
 											@if ($item['on_sale'] == 1)
-												 <span class="badge badge-success">On Sale</span>
+												 <span class="badge badge-danger">On Sale</span>
 											@endif
 										</td>
 										<td class="text-center">
