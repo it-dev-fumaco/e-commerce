@@ -81,6 +81,7 @@ Route::get('/countwishlist', 'CartController@countWishlist');
 Route::get('/checkout/review_order', 'CheckoutController@reviewOrder');
 Route::get('/checkout/billing', 'CheckoutController@billingForm');
 Route::post('/checkout/summary', 'CheckoutController@checkoutSummary');
+Route::get('/checkout/summary', 'CheckoutController@checkoutSummary');
 Route::post('/checkout/set_address', 'CheckoutController@setAddress');
 Route::get('/checkout/set_billing_form', 'CheckoutController@setBillingForm');
 Route::post('/checkout/set_billing', 'CheckoutController@setBilling');

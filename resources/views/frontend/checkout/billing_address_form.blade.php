@@ -95,7 +95,7 @@
 								</td>
 								@if(!Auth::check())
 									<td style="text-align: right; font-size: 14px;">
-										Already a member? <a href="">Log in</a>
+										Already a member? <a href="#" data-toggle="modal" data-target="#loginModal">Log in</a>
 									</td>
 								@endif
 							</tr>
@@ -826,6 +826,7 @@
 							<a href="/cart" class="btn btn-lg btn-outline-primary col-md-3 mx-auto" role="button" style="background-color: #777575 !important; border-color: #777575 !important;">BACK</a>
 
 							<input type="submit" class="btn btn-lg btn-outline-primary col-md-3 mx-auto" role="button" style="float: right;" value="PROCEED">
+							<input type="text" name="order_no" class="p" value="{{ 'FUM-'.random_int(10000000, 99999999) }}" hidden readonly/>
 						</div>
 						{{-- <div class="col-md-6 border bordder-secondary" style="float: left!important">
 							<a href="/cart" class="btn btn-lg btn-outline-primary col-md-7 mx-auto border bordder-secondary" role="button" style="background-color: #777575 !important; border-color: #777575 !important;">BACK</a>
@@ -838,6 +839,41 @@
 					
 				</div>
 			</form>
+
+			<!-- Login Modal -->
+			<div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel" aria-hidden="true">
+				<div class="modal-dialog" role="document">
+					<form action="/login" method="post">
+						@csrf
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title" id="loginModalLabel">Login</h5>
+							</div>
+							<div class="modal-body">
+								<div class="row">
+									<div class="col">
+										<label for="username" class="formslabelfnt">Username</label>
+										<input type="text" class="form-control formslabelfnt" name="username" required>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col">
+										<label for="password" class="formslabelfnt">Password</label>
+										<input type="password" class="form-control formslabelfnt" name="password" required>
+									</div>
+								</div>
+								<br/>
+								<a href="/password/reset">Forgot Password?</a>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+								<input type="checkbox" name="summary" readonly checked hidden>
+								<button type="submit" class="btn btn-primary">Login</button>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
 			<br/>&nbsp;
 		</div>
 	</main>

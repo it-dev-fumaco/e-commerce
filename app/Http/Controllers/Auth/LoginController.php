@@ -48,6 +48,9 @@ class LoginController extends Controller
         ]);
         
         if (Auth::attempt(['username' => $request->username,'password' => $request->password], $request->remember)) {
+            if ($request->has('summary')){
+                return redirect('/checkout/summary');
+            }
             return redirect('/');
         }
 

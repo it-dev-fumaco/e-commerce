@@ -40,7 +40,7 @@ class CartController extends Controller
                 $id => [
                     "item_code" => $product_details->f_idcode,
                     "quantity" => $data['quantity'],
-                    "price" => $product_details->f_price,
+                    "price" => ($product_details->f_price > 0) ? $product_details->f_price : $product_details->f_original_price,
                 ]
             ];
  
@@ -68,7 +68,7 @@ class CartController extends Controller
         $cart[$id] = [
             "item_code" => $product_details->f_idcode,
             "quantity" => 1,
-            "price" => $product_details->f_price,
+            "price" => ($product_details->f_price > 0) ? $product_details->f_price : $product_details->f_original_price,
         ];
 
         session()->put('fumCart', $cart);
@@ -92,11 +92,13 @@ class CartController extends Controller
             $item_image = DB::table('fumaco_items_image_v1')
                 ->where('idcode', $item->f_idcode)->first();
 
+            $price = ($item->f_price > 0) ? $item->f_price : $item->f_original_price;
+
             $cart_arr[] = [
                 'item_code' => $item->f_idcode,
                 'item_description' => $item->f_name_name,
-                'price' => $item->f_price,
-                'amount' => ($item->f_price * $cart[$item->f_idcode]['quantity']),
+                'price' => $price,
+                'amount' => ($price * $cart[$item->f_idcode]['quantity']),
                 'quantity' => $cart[$item->f_idcode]['quantity'],
                 'stock_qty' => $item->f_qty,
                 'item_image' => ($item_image) ? $item_image->imgprimayx : 'test.jpg'
@@ -106,6 +108,7 @@ class CartController extends Controller
         $bill_address = "";
 		$ship_address = "";
 		if(Auth::check()){
+            request()->session()->put('order_no', 'FUM-'.random_int(10000000, 99999999));
 			$user_id = DB::table('fumaco_users')->where('username', Auth::user()->username)->first();
 
 			$bill_address = DB::table('fumaco_user_add')->where('xdefault', 1)->where('user_idx', $user_id->id)->where('address_class', 'Billing')->count();
@@ -185,7 +188,7 @@ class CartController extends Controller
                         'userid' => Auth::user()->id,
                         'item_code' => $id,
                         'item_name' => $product_details->f_name_name,
-                        'item_price' => $product_details->f_price
+                        'item_price' => ($product_details->f_price > 0) ? $product_details->f_price : $product_details->f_original_price
                     ]
                 );
     
