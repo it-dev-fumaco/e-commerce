@@ -467,6 +467,8 @@ class ProductController extends Controller
                 'item_name' => $item_name,
                 'image' => ($item_image) ? $item_image->imgprimayx : null,
                 'price' => $product->f_original_price,
+                'new_price' => $product->f_price,
+                'discount_percentage' => $product->f_discount_percent,
                 'qty' => $product->f_qty,
                 'reserved_qty' => $product->f_reserved_qty,
                 'product_category' => $product->f_category,

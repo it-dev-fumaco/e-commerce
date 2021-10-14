@@ -148,6 +148,9 @@
 															</div>
 															<div class="modal-body">
 																<p>Disable <b>{{ $item['item_code'] }}</b> on sale?</p>
+																<p>Original Price: <b>{{ 'P ' . number_format((float)$item['price'], 2, '.', ',') }}</b></p>
+																<p>Discount (%): <b>{{ $item['discount_percentage'] }}%</b></p>
+																<p>Discounted Price: <b>{{ 'P ' . number_format((float)$item['new_price'], 2, '.', ',') }}</b></p>
 															</div>
 															<div class="modal-footer">
 																<button type="submit" class="btn btn-primary">Submit</button>
