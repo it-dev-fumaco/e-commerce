@@ -87,14 +87,14 @@
 			<form action="{{ $action }}" method="post">
 				@csrf
 				<div class="row">
-					<div class="col-md-7 mx-auto">
+					<div class="col-md-8 mx-auto">
 						<table class="table">
 							<tr>
 								<td class='col-md-9'>
 									<p style="color:#212529 !important; letter-spacing: 1px !important; font-size:16px !important;  text-align: justify !important; font-weight: 600 !important;">Shipping Information</p>
 								</td>
 								@if(!Auth::check())
-									<td style="text-align: right">
+									<td style="text-align: right; font-size: 14px;">
 										Already a member? <a href="">Log in</a>
 									</td>
 								@endif
@@ -428,7 +428,7 @@
 						<br><br>
 						<div class="form-check">
 							<input class="form-check-input" type="checkbox" id="myCheck" name="myCheck"  checked onclick="shipp_function()">
-							<label class="form-check-label" for="flexCheckChecked" class="formslabelfnt">Billing address is the same as above</label>
+							<label class="form-check-label" for="flexCheckChecked" class="formslabelfnt" style="font-size: 14px;">Billing address is the same as above</label>
 						</div>
 						<br/>
 						
