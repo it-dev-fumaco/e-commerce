@@ -273,7 +273,7 @@ class CheckoutController extends Controller
 			$same_address = 0;
 
 			// $order_no = 'FUM-'.uniqid();
-			$order_no = random_int(100000000000000, 999999999999999);
+			$order_no = 'FUM-'.random_int(10000000, 99999999);
 			// dd($order_no);
 			$user_type = '';
 

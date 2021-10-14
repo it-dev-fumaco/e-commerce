@@ -754,6 +754,7 @@
 									<input type="number" class="form-control formslabelfnt" id="mobilenumber1_1" name="mobilenumber1_1">
 								</div>
 							</div>
+							<br/>&nbsp;
 						</div>
 					</div>
 
@@ -820,21 +821,24 @@
 					</div>
 
 					<div class="row">
-						<div class="col-md-4">
-							<a href="{{ url()->previous() }}" class="btn btn-lg btn-outline-primary col-md-10 mx-auto" role="button" style="background-color: #777575 !important; border-color: #777575 !important;">BACK</a>
+						<br/>&nbsp;
+						<div class="col-md-12 mx-auto">
+							<a href="/cart" class="btn btn-lg btn-outline-primary col-md-3 mx-auto" role="button" style="background-color: #777575 !important; border-color: #777575 !important;">BACK</a>
+
+							<input type="submit" class="btn btn-lg btn-outline-primary col-md-3 mx-auto" role="button" style="float: right;" value="PROCEED">
+						</div>
+						{{-- <div class="col-md-6 border bordder-secondary" style="float: left!important">
+							<a href="/cart" class="btn btn-lg btn-outline-primary col-md-7 mx-auto border bordder-secondary" role="button" style="background-color: #777575 !important; border-color: #777575 !important;">BACK</a>
 						</div>
 						
-						<div class="col-md-4">
-							&nbsp;
-						</div>
-						
-						<div class="col-md-4">
-							<input type="submit" class="btn btn-lg btn-outline-primary col-md-10 mx-auto" style="float: right;" value="PROCEED">
-						</div>
+						<div class="col-md-6 border bordder-secondary" style="float: right !important">
+							<input type="submit" class="btn btn-lg btn-outline-primary col-md-7 mx-auto border bordder-secondary" role="button" style="float: right;" value="PROCEED">
+						</div> --}}
 					</div>
+					
 				</div>
 			</form>
-
+			<br/>&nbsp;
 		</div>
 	</main>
 	
