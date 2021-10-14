@@ -4,7 +4,6 @@
 ])
 
 @section('content')
-	<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/>
 	<style>
 	._1yv {
 			box-shadow: 0 0px 0px rgb(0 0 0 / 30%), 0 0 0 1px rgb(0 0 0) !important;
@@ -827,8 +826,6 @@
 <script type="text/javascript" src="{{ asset('/item/hammer.js/1.0.5/jquery.hammer.min.js') }}"></script>
 <script type="text/javascript" src="{{ asset('/item/fancybox/source/jquery.fancybox.js') }}"></script>
 <script type="text/javascript" src="{{ asset('/item/magnific-popup/js/magnific-popup.js') }}"></script>
-
-<script type="text/javascript" src="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
 				
 <script>
    (function() {
