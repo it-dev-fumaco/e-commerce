@@ -123,6 +123,8 @@
 												</button>
 												<div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
 												  <a class="dropdown-item" href="/admin/product/{{ $item['id'] }}/edit">View Details</a>
+												  <a class="dropdown-item" href="#" data-toggle="modal" data-target="#s{{ $item['id'] }}"><small>Set On Sale</small></a>
+												  <a class="dropdown-item" href="#" data-toggle="modal" data-target="#sd{{ $item['id'] }}"><small>Disable On Sale</small></a>
 												  @if($item['status'] == 1)
 												  <a class="dropdown-item" href="#" data-toggle="modal" data-target="#d{{ $item['id'] }}"><small>Disable</small></a>
 												  @else
@@ -133,13 +135,61 @@
 												</div>
 											</div>
 
-											<div class="modal fade" id="d{{ $item['id'] }}" tabindex="-1" role="dialog" aria-labelledby="delItemModal" aria-hidden="true">
+											<div class="modal fade" id="sd{{ $item['id'] }}" tabindex="-1" role="dialog" aria-labelledby="onsalemodal" aria-hidden="true">
+												<form action="/admin/product/{{ $item['item_code'] }}/disable_on_sale" method="POST">
+													@csrf
+													<div class="modal-dialog" role="document">
+														<div class="modal-content">
+															<div class="modal-header">
+																<h5 class="modal-title">Disable Product On Sale</h5>
+															</div>
+															<div class="modal-body">
+																<p>Disable <b>{{ $item['item_code'] }}</b> on sale?</p>
+															</div>
+															<div class="modal-footer">
+																<button type="submit" class="btn btn-primary">Submit</button>
+																<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+															</div>
+														</div>
+													</div>
+												</form>
+											</div>
+
+											<div class="modal fade" id="s{{ $item['id'] }}" tabindex="-1" role="dialog" aria-labelledby="onsalemodal" aria-hidden="true">
+												<form action="/admin/product/{{ $item['item_code'] }}/enable_on_sale" method="POST">
+													@csrf
+													<div class="modal-dialog" role="document">
+														<div class="modal-content">
+															<div class="modal-header">
+																<h5 class="modal-title">Set Product On Sale</h5>
+															</div>
+															<div class="modal-body">
+																<p>Original Price: <b>{{ 'P ' . number_format((float)$item['price'], 2, '.', ',') }}</b></p>
+																<div class="row">
+																	<div class="col-md-8 offset-md-2">
+																		<div class="form-group">
+																			<label>Enter Discount Percentage (%)</label>
+																			<input type="number" class="form-control" name="discount_percentage" placeholder="Discount %" required>
+																		</div>
+																	</div>
+																</div>
+															</div>
+															<div class="modal-footer">
+																<button type="submit" class="btn btn-primary">Submit</button>
+																<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+															</div>
+														</div>
+													</div>
+												</form>
+											</div>
+
+											<div class="modal fade" id="d{{ $item['id'] }}" tabindex="-1" role="dialog" aria-labelledby="disablemodal" aria-hidden="true">
 												<form action="/admin/product/{{ $item['item_code'] }}/disable" method="POST">
 													@csrf
 													<div class="modal-dialog" role="document">
 														<div class="modal-content">
 															<div class="modal-header">
-																<h5 class="modal-title" id="delItemModal">Disable Product</h5>
+																<h5 class="modal-title">Disable Product</h5>
 															</div>
 															<div class="modal-body">
 																<p>Disable <b>{{ $item['item_code'] }}</b>?</p>
@@ -153,13 +203,13 @@
 												</form>
 											</div>
 
-											<div class="modal fade" id="e{{ $item['id'] }}" tabindex="-1" role="dialog" aria-labelledby="delItemModal" aria-hidden="true">
+											<div class="modal fade" id="e{{ $item['id'] }}" tabindex="-1" role="dialog" aria-labelledby="enablemodal" aria-hidden="true">
 												<form action="/admin/product/{{ $item['item_code'] }}/enable" method="POST">
 													@csrf
 													<div class="modal-dialog" role="document">
 														<div class="modal-content">
 															<div class="modal-header">
-																<h5 class="modal-title" id="delItemModal">Set Product as Active</h5>
+																<h5 class="modal-title">Set Product as Active</h5>
 															</div>
 															<div class="modal-body">
 																<p>Set <b>{{ $item['item_code'] }}</b> as "Active"?</p>
@@ -173,14 +223,14 @@
 												</form>
 											</div>
 
-											<div class="modal fade" id="dm{{ $item['id'] }}" tabindex="-1" role="dialog" aria-labelledby="delItemModal" aria-hidden="true">
+											<div class="modal fade" id="dm{{ $item['id'] }}" tabindex="-1" role="dialog" aria-labelledby="deletemodel" aria-hidden="true">
 												<form action="/admin/product/{{ $item['item_code'] }}/delete" method="POST">
 													@csrf
 													@method('delete')
 													<div class="modal-dialog" role="document">
 														<div class="modal-content">
 															<div class="modal-header">
-																<h5 class="modal-title" id="delItemModal">Delete Product</h5>
+																<h5 class="modal-title">Delete Product</h5>
 															</div>
 															<div class="modal-body">
 																<p>Delete item <b>{{ $item['item_code'] }}</b>?</p>

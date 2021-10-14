@@ -718,4 +718,51 @@ class ProductController extends Controller
             return redirect()->back()->with('error', 'An error occured. Please try again.');
         }
     }
+
+    public function setProductOnSale($item_code, Request $request) {
+        DB::beginTransaction();
+        try {
+            $discount_percentage = $request->discount_percentage;
+            if (!$discount_percentage && $discount_percentage <= 0) {
+                return redirect()->back()->with('error', 'Discount percentage cannot be less than or equal to zero.');
+            }
+            
+            $item = DB::table('fumaco_items')->where('f_idcode', $item_code)->first();
+            if (!$item) {
+                return redirect()->back()->with('error', 'Product not found.');
+            }
+
+            $discounted_price = $item->f_original_price - ($item->f_original_price * $discount_percentage / 100);
+
+            DB::table('fumaco_items')->where('f_idcode', $item_code)->update([
+                'f_price' => $discounted_price,
+                'f_onsale' => 1,
+                'f_discount_percent' => $discount_percentage,
+                'f_discount_trigger' => 1
+            ]);
+
+            DB::commit();
+
+            return redirect()->back()->with('success', 'Product has been set "On Sale".');
+        } catch (Exception $e) {
+            DB::rollback();
+
+            return redirect()->back()->with('error', 'An error occured. Please try again.');
+        }
+    }
+
+    public function disableProductOnSale($item_code) {
+        DB::beginTransaction();
+        try {
+            DB::table('fumaco_items')->where('f_idcode', $item_code)->update(['f_onsale' => 0, 'f_discount_trigger' => 0]);
+
+            DB::commit();
+
+            return redirect()->back()->with('success', 'Product code <b>' . $item_code . '</b> has been updated.');
+        } catch (Exception $e) {
+            DB::rollback();
+
+            return redirect()->back()->with('error', 'An error occured. Please try again.');
+        }
+    }
 }

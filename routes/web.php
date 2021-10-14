@@ -136,6 +136,10 @@ Route::prefix('admin')->group(function () {
         Route::post('/product/{item_code}/disable', 'ProductController@disableItem');
         Route::post('/product/{item_code}/enable', 'ProductController@enableItem');
         Route::delete('/product/{item_code}/delete', 'ProductController@deleteItem');
+        Route::post('/product/{item_code}/enable_on_sale', 'ProductController@setProductOnSale');
+        Route::post('/product/{item_code}/disable_on_sale', 'ProductController@disableProductOnSale');
+        
+        
 
         Route::get('/category/list', 'CategoryController@viewCategories');
         Route::post('/category/edit/{id}', 'CategoryController@editCategory');

@@ -235,9 +235,10 @@
 										</div>
 										<p class="card-text fumacoFont_card_price" style="color:#000000 !important;">
 											@if($product['is_discounted'])
-											<s style="color: #c5c5c5;">₱ {{ $product['price'] }}</s>₱ {{ $product['discounted_price'] }}
+											<s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$product['price']), 2) }}</s> ₱ {{ number_format(str_replace(",","",$product['discounted_price']), 2) }}
+											<span class="badge badge-danger" style="vertical-align: middle;background-color: red; display: {{ ($product['on_sale']) ? 'inline' : 'none' }} !important;">{{ $product['discount_percent'] }}% OFF</span>
 											@else
-											₱ {{ $product['price'] }}
+											₱ {{ number_format(str_replace(",","",$product['price']), 2) }}
 											@endif
 										</p>
 										<div class="d-flex justify-content-between align-items-center">

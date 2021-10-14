@@ -166,10 +166,12 @@
                       </div>
                       <p class="card-text fumacoFont_card_price" style="color:#000000 !important; ">
                         @if ($os['is_discounted'])
-                        <s style="color: #c5c5c5;">₱ {{ $os['orig_price'] }}</s>&nbsp;&nbsp; ₱ {{ $os['new_price'] }}
+                        <s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$os['orig_price']), 2) }}</s>&nbsp;&nbsp; ₱ {{ number_format(str_replace(",","",$os['new_price']), 2) }}
                         @else
-                        ₱ {{ $os['new_price'] }}
-                        @endif</p>
+                        ₱ {{ number_format(str_replace(",","",$os['orig_price']), 2) }}
+                        @endif
+                        <span class="badge badge-danger" style="vertical-align: middle;background-color: red;">{{ $os['discount_percent'] }}% OFF</span>
+                      </p>
                       <div class="d-flex justify-content-between align-items-center">
                         <div class="btn-group stylecap">
                           <span class="fa fa-star checked starcolor"></span>

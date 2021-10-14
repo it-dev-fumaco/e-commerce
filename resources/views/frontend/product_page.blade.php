@@ -627,10 +627,14 @@
 										<div class="fb-like" data-href="{{ \Request::fullUrl() }}" data-width="" data-layout="standard" data-action="like" data-size="small" data-share="true"></div>
 									</div>
 									<div>
-										<s class="product_discount" style="display: {{ ($product_details->f_discount_trigger) ? 'inline' : 'none' }} !important;">
-											<span style='color:black; '>₱ {{ $product_details->f_price }}<span>
+										@if ($product_details->f_discount_trigger)
+										<s class="product_discount">
+											<span style='color:black; '>₱ {{ number_format(str_replace(",","",$product_details->f_original_price), 2) }}<span>
 										</s>
+										<span class="product_price fumacoFont_item_price">₱ {{ number_format(str_replace(",","",$product_details->f_price), 2) }}</span>
+										@else
 										<span class="product_price fumacoFont_item_price">₱ {{ number_format(str_replace(",","",$product_details->f_original_price), 2) }}</span>
+										@endif
 										<span class="badge badge-danger" style="vertical-align: middle;background-color: red; display: {{ ($product_details->f_discount_trigger) ? 'inline' : 'none' }} !important;">{{ $product_details->f_discount_percent }}% OFF</span>
 									</div>
 									<div>

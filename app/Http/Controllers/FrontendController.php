@@ -48,7 +48,8 @@ class FrontendController extends Controller
                 'orig_price' => $os->f_original_price,
                 'is_discounted' => $os->f_discount_trigger,
                 'new_price' => $os->f_price,
-                'os_img' => ($os_img) ? $os_img->imgprimayx : null
+                'os_img' => ($os_img) ? $os_img->imgprimayx : null,
+                'discount_percent' => $os->f_discount_percent
             ];
         }
 
@@ -389,7 +390,9 @@ class FrontendController extends Controller
                 'image' => ($item_image) ? $item_image->imgprimayx : null,
                 'price' => $product->f_original_price,
                 'discounted_price' => number_format(str_replace(",","",$product->f_price), 2),
-                'is_discounted' => $product->f_discount_trigger
+                'is_discounted' => $product->f_discount_trigger,
+                'on_sale' => $product->f_onsale,
+                'discount_percent' => $product->f_discount_percent,
             ];
         }
 
