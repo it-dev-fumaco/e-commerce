@@ -149,7 +149,7 @@
 						@endphp
 						@if (count($filters['Brand']) > 1)
 						<div class="card mb-3">
-							<div class="card-header text-white font-weight-bold" style="font-size: 0.75rem; background-color: rgb(0, 98, 165);">Brand</div>
+							<div class="card-header text-white font-weight-bold" style="font-size: 0.75rem; background-color: rgb(0, 98, 165);">BRAND</div>
 							<div class="card-body">
 								@foreach ($filters['Brand'] as $brand)
 								@php
@@ -170,15 +170,17 @@
 							$x = 0;
 						@endphp
 						@foreach ($filters as $id => $row)
+						@php
+							$filter_attr = Str::slug($id, '-');
+						@endphp
 						@if ($id != 'Brand')
-						@if (count($row) > 1)
+						@if (count($row) > 1 || request()->$filter_attr)
 						<div class="card mb-3">
 							<div class="card-header text-white font-weight-bold" style="font-size: 0.75rem; background-color: rgb(0, 98, 165);">{{ strtoupper($id) }}</div>
 							<div class="card-body">
 								@foreach ($row as $attr_val)
 								@php
 									$x++;
-									$filter_attr = Str::slug($id, '-');
 									$filter_values = explode('+', request()->$filter_attr);
 									$status = (in_array($attr_val, $filter_values)) ? 'checked' : '';
 								@endphp

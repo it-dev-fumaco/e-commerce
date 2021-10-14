@@ -290,8 +290,9 @@ class FrontendController extends Controller
                 $attribute_value_filter[] = $value;
             }
         }
+        
+        $brand_filter = ($brand_filter) ? array_values(explode('+', $brand_filter)) : [];
 
-        $brand_filter = array_values(explode('+', $brand_filter));
         // get items based on filters
         $filtered_items = DB::table('fumaco_items as a')
             ->join('fumaco_items_attributes as b', 'a.f_idcode', 'b.idcode')
@@ -302,7 +303,17 @@ class FrontendController extends Controller
             ->when(count($request_data) > 0, function($c) use ($attribute_name_filter, $attribute_value_filter) {
                 $c->whereIn('c.slug', $attribute_name_filter)->whereIn('b.attribute_value', $attribute_value_filter);
             })
-            ->where('a.f_status', 1)->select('c.slug', 'b.attribute_value', 'a.f_idcode')->pluck('a.f_idcode');
+            ->where('a.f_status', 1)->select('c.slug', 'b.attribute_value', 'a.f_idcode')->get();
+            // ->pluck('a.f_idcode');
+
+        $filtered_items = collect($filtered_items)->groupBy('f_idcode')->map(function($i, $q) use ($attribute_name_filter){
+            $diff = array_diff($attribute_name_filter, array_column($i->toArray(), 'slug'));
+            if (count($diff) == 0) {
+                return array_column($i->toArray(), 'attribute_value');
+            }
+        });
+
+        $filtered_items = array_keys(array_filter($filtered_items->toArray()));
 
         // get item attributes based on item category (sidebar)
         $filters = DB::table('fumaco_items as a')
