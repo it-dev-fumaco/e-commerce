@@ -752,15 +752,16 @@ class FrontendController extends Controller
         $variant_attributes = DB::table('fumaco_items as a')
             ->join('fumaco_items_attributes as b', 'a.f_idcode', 'b.idcode')
             ->join('fumaco_attributes_per_category as c', 'c.id', 'b.attribute_name_id')
-            ->whereIn('c.attribute_name', $attr_names)->whereIn('b.attribute_value', $attr_values)
-            ->where('a.f_status', 1)->select('c.attribute_name', 'b.attribute_value')
+            ->whereIn('c.slug', $attr_names)->whereIn('b.attribute_value', $attr_values)
+            ->where('a.f_status', 1)->where('c.status', 1)
+            ->select('c.slug', 'b.attribute_value', 'b.idcode')
             ->orderBy('b.idx', 'asc')->get();
 
         // group variant attributes by item code
         $grouped_attr = collect($variant_attributes)->groupBy('idcode');
         foreach ($grouped_attr as $item_code => $values) {
             $attr_values = collect($values)->mapWithKeys(function($e){
-                return [$e->attribute_name => $e->attribute_value];
+                return [$e->slug => $e->attribute_value];
             });
             // get difference between two arrays
             $diff = array_diff_assoc($attr_collection->toArray(),$attr_values->toArray());
@@ -769,6 +770,12 @@ class FrontendController extends Controller
             }
         }
 
-        return $request->id;
+        $selected_cb = $request->selected_cb;
+        $item_code = DB::table('fumaco_items as a')
+            ->join('fumaco_items_attributes as b', 'a.f_idcode', 'b.idcode')
+            ->join('fumaco_attributes_per_category as c', 'c.id', 'b.attribute_name_id')
+            ->where('c.slug', $selected_cb)->where('b.attribute_value', $attr_collection[$selected_cb])->where('a.f_status', 1)->first();
+
+        return ($item_code) ? $item_code->f_idcode : $request->id;
     }
 }
