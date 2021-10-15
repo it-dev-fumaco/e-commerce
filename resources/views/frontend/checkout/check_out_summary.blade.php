@@ -16,7 +16,7 @@
 					</div>
 				</div>
 			</div>
-		</div>		
+		</div>
 	</main>
 
 	<main style="background-color:#ffffff;" class="products-head">
@@ -26,7 +26,7 @@
 				<li class="breadcrumb-item"><a href="{{ url()->previous() }}" style="color: #000000 !important; text-decoration: none;">Billing & Shipping Address</a></li>
 				<li class="breadcrumb-item active"><a href="#" style="color: #000000 !important; text-decoration: underline;">Place Order</a></li>
 			</ol>
-		</nav>  
+		</nav>
 	</main>
 
 	<main style="background-color:#ffffff;" class="products-head">
@@ -63,13 +63,13 @@
 								$ship_text = '';
 							}
 						@endphp
-						<div class="card-body he1x" style="padding-bottom: 0px !important;">
-							<strong>Your Order ID : # {{ $summary_arr[0]['address'][0]['order_tracker_code'] }}</strong>
+						<div class="card-body he1x" style="padding-bottom: 0px !important; font-size:1rem !important;" >
+							<strong>Order ID : # {{ $summary_arr[0]['address'][0]['order_tracker_code'] }}</strong>
 						</div>
 						<div class="card-body he1x" style="padding-bottom: 0px !important;">
-							Your Customer Name :  {{ $summary_arr[0]['address'][0]['xfname']." ".$summary_arr[0]['address'][0]['xlname'] }}
+							Customer Name :  {{ $summary_arr[0]['address'][0]['xfname']." ".$summary_arr[0]['address'][0]['xlname'] }}
 						</div>
-						<div class="card-body he1x" style="padding-bottom: 0px !important;">Your Customer Email Address :  {{ $summary_arr[0]['address'][0]['xemail'] }}
+						<div class="card-body he1x" style="padding-bottom: 0px !important;">Email Address :  {{ $summary_arr[0]['address'][0]['xemail'] }}
 							<div class="card-body he1x" style="padding-bottom: 0px !important;">
 								<div class="accordion" id="accordionExample">
 									<div class="row">
@@ -91,13 +91,11 @@
 														</div>
 													</h2>
 												</div>
-												
+
 												<div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample">
 													<div class="card-body">
+                                                        <div class="card-body he1x" style="padding-bottom: 0px !important;"><b>{{ $shipping_address_type }}</b></div>
 														<div class="card-body he1x" style="padding-bottom: 0px !important;">Contact Person :  {{ $shipping_fname. " " .$shipping_lname }}</div>
-
-														<div class="card-body he1x" style="padding-bottom: 0px !important;">Address Type :  {{ $shipping_address_type }}</div>
-
 														<div class="card-body he1x" style="padding-bottom: 0px !important;">
 															{{ $shipping_address1." ".$shipping_address2.", ".$shipping_brgy.", ".$shipping_city.", ".$shipping_province.", ".$shipping_country." ".$shipping_postal }}
 														</div>
@@ -130,17 +128,15 @@
 															</div>
 														</h2>
 													</div>
-				
+
 													<div id="collapseOne1" class="collapse show" aria-labelledby="headingOne1" data-parent="#accordionExample">
 														<div class="card-body">
+                                                            <div class="card-body he1x" style="padding-bottom: 0px !important;"><b>{{ $summary_arr[0]['address'][0]['xaddresstype'] }}</b></div>
 															<div class="card-body he1x" style="padding-bottom: 0px !important;">Contact Person :  {{ $summary_arr[0]['address'][0]['xcontact_person'] }}</div>
-
-															<div class="card-body he1x" style="padding-bottom: 0px !important;">Address Type :  {{ $summary_arr[0]['address'][0]['xaddresstype'] }}</div>
-
 															<div class="card-body he1x" style="padding-bottom: 0px !important;">
 																{{ $summary_arr[0]['address'][0]['xadd1']." ".$summary_arr[0]['address'][0]['xadd2'].", ".$summary_arr[0]['address'][0]['xbrgy'].", ".$summary_arr[0]['address'][0]['xcity'].", ".$summary_arr[0]['address'][0]['xprov'].", ".$summary_arr[0]['address'][0]['xcountry']." ".$summary_arr[0]['address'][0]['xpostal'] }}
 															</div>
-				
+
 															<div class="card-body he1x" style="padding-bottom: 0px !important;">Contact Number :  {{ $summary_arr[0]['bill_mobile'] }}<br/>&nbsp;</div>
 														</div>
 													</div>
@@ -183,7 +179,7 @@
 								@endforeach
 							</tbody>
 						</table>
-						
+
 						<div class="card-body he1x" style="padding-top: 0px !important; padding-bottom: 0px !important;">
 							<div class="d-flex justify-content-between align-items-center">
 								Subtotal <small class="text-muted stylecap he1x" id="cart-subtotal">P {{ number_format(collect($cart_arr)->sum('subtotal'), 2, '.', ',') }}</small>
@@ -232,7 +228,7 @@
 
 						$string = $password . $serviceid .  $summary_arr[0]['address'][0]['order_tracker_code'] . $summary_arr[0]['base_url']."/cart" . $merchantapprovalurl . $merchantunapprovalurl . $summary_arr[0]['grand_total'] . "PHP" . $summary_arr[0]['address'][0]['order_ip'] . "600";
 
-						$hash = hash('sha256', $string);	
+						$hash = hash('sha256', $string);
 					@endphp
 					<center>
 						<form action="/checkout/place_order" method="post" name="adminForm" enctype="multipart/form-data">
@@ -259,7 +255,7 @@
 								<input name="orderpayment_id" value="FUMAC02020">
 								<input name="orderpayment_type" value="payment_eghl">
 								<input name="task" value="confirmPayment">
-								
+
 								{{-- place order --}}
 								<input type="text" name="order_no" value="{{ $summary_arr[0]['address'][0]['order_tracker_code'] }}" id="order_no">
 								<input id="total_amount" name="total_amount" value=""/>
@@ -281,81 +277,81 @@
 	<style>
 
 		.products-head {
-	
+
 		 	margin-top: 10px !important;
 			padding-left: 40px !important;
 			padding-right: 40px !important;
-	
+
 		}
-	
-	
+
+
 		.he1 {
-	
+
 			font-weight: 300 !important;
 			font-size: 12px !important;
-	
+
 		}
-	
-	
+
+
 		.he2 {
-	
+
 			font-weight: 200 !important;
 			font-size: 10px !important;
-	
+
 		}
-	
-	
+
+
 		.he1x {
-	
+
 			font-weight: 500 !important;
 			font-size: 15px !important;
-	
+
 		}
-	
-	
+
+
 		.he2x {
-	
+
 			font-weight: 200 !important;
 			font-size: 12px !important;
-	
+
 		}
-	
-	
-	
+
+
+
 		.he2x2 {
-	
+
 			font-weight: 200 !important;
 			font-size: 14px !important;
-	
+
 		}
-	
-	
+
+
 		.he2x2x {
-	
+
 			font-weight: 200 !important;
 			font-size: 10px !important;
-	
+
 		}
-	
-	
+
+
 		.he3x1x {
-	
+
 			font-weight: 200 !important;
 			font-size: 14px !important;
-	
+
 		}
-	
-	
+
+
 		.btmp {
 			margin-bottom: 15px !important;
-	
+
 		}
-	
+
 		.tbls {
 			padding-bottom: 25px !important;
 			padding-top: 25px !important;
 		}
-		
+
 		.flex-1 {
 			flex: 1 !important;
 			display: flex !important;
@@ -371,14 +367,14 @@
 					var amount = $(this).find('.amount').eq(0).text();
 					subtotal += parseFloat(amount);
 				});
-					
+
 				var shipping_fee = $("input[name='shipping_fee']:checked").val();
 				var total = parseFloat(shipping_fee) + subtotal;
 
 				total = (isNaN(total)) ? 0 : total;
 
 				$('#grand-total').text('P ' + total.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,"));
-				
+
 				$("#total_amount").val($('#grand-total').text());
 				$('#shipping_id').val($("input[name='shipping_fee']:checked").data('name'));
 				$('#shipping_fee').val($("input[name='shipping_fee']:checked").val());
