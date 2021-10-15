@@ -165,5 +165,13 @@ Route::prefix('admin')->group(function () {
         Route::post('/shipping/{id}/update', 'ShippingController@updateShipping');
         Route::get('/shipping/{id}/edit', 'ShippingController@viewShipping');
         Route::delete('/shipping/{id}/delete', 'ShippingController@deleteShipping');
+
+        // STORE ROUTES CMS
+        Route::get('/store/list', 'StoreController@viewList');
+        Route::get('/store/add', 'StoreController@viewAddForm');
+        Route::post('/store/save', 'StoreController@saveStore');
+        Route::post('/store/{id}/update', 'StoreController@updateStore');
+        Route::get('/store/{id}/edit', 'StoreController@viewStore');
+        Route::delete('/store/{id}/delete', 'StoreController@deleteStore');
     });
 });

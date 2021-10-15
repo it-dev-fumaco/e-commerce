@@ -308,9 +308,9 @@
               </li>
             </ul>
           </li>
-          <li class="nav-item {{ $activePage == 'shipping_list' ? 'menu-open' : '' }}">
-            <a href="#" class="nav-link {{ $activePage == 'shipping_list' ? 'active' : '' }}">
-              <i class="nav-icon fas fa-clipboard-check"></i>
+          <li class="nav-item {{ (in_array($activePage, ['shipping_list', 'store_list']) ? 'menu-open' : '') }}">
+            <a href="#" class="nav-link {{ (in_array($activePage, ['shipping_list', 'store_list'])) ? 'active' : '' }}">
+              <i class="nav-icon fas fa-truck"></i>
               <p>Shipping <i class="fas fa-angle-left right"></i></p>
             </a>
             <ul class="nav nav-treeview">
@@ -318,6 +318,12 @@
                 <a href="/admin/shipping/list" class="nav-link {{ $activePage == 'shipping_list' ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Shipping List</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="/admin/store/list" class="nav-link {{ $activePage == 'store_list' ? 'active' : '' }}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Store Location</p>
                 </a>
               </li>
             </ul>
