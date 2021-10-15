@@ -37,7 +37,11 @@
 					<div class="card">
 					<!-- /.card-header -->
 						<div class="card-body">
-							<h4>Shipping Service Details</h4>
+							<h4 class="d-inline-block">Shipping Service Details</h4>
+								<div class="float-right">
+									<a href="/admin/shipping/add" class="btn btn-secondary mr-2">Create New Shipping</a>
+									<button type="submit" class="btn btn-primary">Update</button>
+								</div>
 							<hr>
 							<div class="row">
 								<div class="col-md-6">
@@ -235,9 +239,6 @@
 							</div>
 						</div>
 						<!-- /.card-body -->
-						<div class="card-footer text-center">
-							<button type="submit" class="btn btn-primary btn-lg">UPDATE</button>
-						</div>
 					</div>
 					<!-- /.card -->
 				</div>
