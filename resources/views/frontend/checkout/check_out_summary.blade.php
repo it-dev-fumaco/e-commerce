@@ -64,7 +64,7 @@
 							}
 						@endphp
 						<div class="card-body he1x" style="padding-bottom: 0px !important; font-size:1rem !important;" >
-							<strong>Order No. : # {{ $summary_arr[0]['address'][0]['order_tracker_code'] }}</strong>
+							<strong>Your Order No : {{ $summary_arr[0]['address'][0]['order_tracker_code'] }}</strong>
 						</div>
 						<div class="card-body he1x" style="padding-bottom: 0px !important;">
 							Customer Name :  {{ $summary_arr[0]['address'][0]['xfname']." ".$summary_arr[0]['address'][0]['xlname'] }}
