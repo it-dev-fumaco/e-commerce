@@ -201,7 +201,7 @@
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDarkDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">PRODUCTS</a>
                 <ul class="dropdown-menu dropdown-menu-light navbar-header" style="font-weight: 300 !important;" aria-labelledby="navbarDarkDropdownMenuLink" id="product-category-dropdown">
                 </ul>
-              </li>    
+              </li>
               <li class="nav-item">
                 <a class="nav-link" href="/about">ABOUT FUMACO</a>
               </li>
@@ -230,7 +230,7 @@
                     <a class="dropdown-item" style="font-weight: 300 !important;" href="/cart">
                       <img src="{{ asset('/assets/site-img/icon/nav11.jpg') }}" alt="cart" width="30">&nbsp;&nbsp;My Cart <span class="badge badge-primary count-cart-items" style="background-color:#186eaa; vertical-align: top;">0</span>
                     </a>
-                  </li>    
+                  </li>
                   @if(Auth::check())
                   <li>
                     <a class="dropdown-item" style="font-weight: 300 !important;" href="/mywishlist">
@@ -276,9 +276,9 @@
   <footer>
     <main style="background-color:#0062A5;"><br></main>
 
-    <div id="cookieConsent">
+    {{-- <div id="cookieConsent">
       <p style="text-align: justify; padding-bottom: -10px !important; padding-top: 0px !important;">Fumaco Web Site uses cookies to ensure you get the best experience while browsing the site.<br>By continued use, you agree to our privacy policy and accept our use of such cookies. For further information, click <a href="privacy_policy" target="_blank">More info</a>. <a class="cookieConsentOK">I AGREE</a></p>
-    </div>
+    </div> --}}
     <main style="background-color:#000000;">
       <div class="container marketing">
         <section class="py-5 text-center container" style="padding-top: 0rem !important; padding-bottom: 3rem !important;">
@@ -311,7 +311,7 @@
             <h6 class="footer1st" style="color:#ffffff !important;">PRODUCTS</h6>
             <table class="table" style="border-style: unset !important;">
               <tbody style="font-size: 12px; color: #ffffff; border-style: unset !important;" id="product-category-footer"></tbody>
-            </table>    
+            </table>
           </div>
           <div class="col-lg-4" style="text-align: right !important;">
             <h6 class="footer1st" style="color:#ffffff !important;">SUBSCRIBE TO OUR NEWSLETTER</h6>
@@ -368,7 +368,7 @@
                 '<a style="text-decoration:none; color: #0062A5;" href="/products/' + d.id +'">' + d.name +'</a>' +
               '</td></tr>';
             });
-            
+
             $('#product-category-footer').append(f);
             $('#product-category-dropdown').append(l);
           }
