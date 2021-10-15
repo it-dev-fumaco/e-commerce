@@ -276,6 +276,11 @@
                                                                                             <label for="edit_cat_slug">Slug : </label>
                                                                                             <input type="text" class="form-control" id="edit_cat_slug" name="edit_cat_slug" value="{{ $c->slug }}">
                                                                                         </div>
+
+                                                                                        <div class="form-group text-right">
+                                                                                          <input class="form-check-input" name="hide_na" type="checkbox" {{ ($c->hide_none == 1) ? 'checked' : '' }}/>
+                                                                                          <label for="edit_cat_slug">Hide "N/A" Attribute Values </label>
+                                                                                        </div>
                                                                                     </div>
                                                                                     <!-- /.card-body -->
 

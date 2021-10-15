@@ -22,7 +22,8 @@ class CategoryController extends Controller
             $edit = [
                 'name' => $request->edit_cat_name,
                 'image' => $request->edit_cat_icon,
-                'slug' => $request->edit_cat_slug
+                'slug' => $request->edit_cat_slug,
+                'hide_none' => (isset($request->hide_na)) ? 1 : 0
             ];
 
             DB::table('fumaco_categories')->where('id', $id)->update($edit);

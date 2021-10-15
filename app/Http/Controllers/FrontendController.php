@@ -417,9 +417,21 @@ class FrontendController extends Controller
         $variant_attributes = collect($variant_attributes)->groupBy('attribute_name');
 
         // get item attributes for display 
-        $attributes = DB::table('fumaco_items_attributes as a')
+        // $attributes = DB::table('fumaco_items_attributes as a')
+        //     ->join('fumaco_attributes_per_category as c', 'c.id', 'a.attribute_name_id')
+        //     ->where('idcode', $item_code)->orderBy('idx', 'asc')->pluck('a.attribute_value', 'c.attribute_name');
+
+        $attrib = DB::table('fumaco_items_attributes as a')
             ->join('fumaco_attributes_per_category as c', 'c.id', 'a.attribute_name_id')
-            ->where('idcode', $item_code)->orderBy('idx', 'asc')->pluck('a.attribute_value', 'c.attribute_name');
+            ->where('idcode', $item_code);
+        // dd($product_details);
+        $na_check = DB::table('fumaco_categories')->where('name', $product_details->f_category)->first();
+        // dd($na_check);
+        if($na_check->hide_none == 1){
+            $attributes = $attrib->where('a.attribute_value', 'NOT LIKE', '%n/a%')->orderBy('idx', 'asc')->pluck('a.attribute_value', 'c.attribute_name');
+        }else{
+            $attributes = $attrib->orderBy('idx', 'asc')->pluck('a.attribute_value', 'c.attribute_name');
+        }
 
         // $active_attr = [];
         $variant_attr_arr = [];
