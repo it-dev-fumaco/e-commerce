@@ -129,7 +129,7 @@
                             <td>
                                 <img src="{{ asset('/storage/item/images/'.$cart['item_code'].'/gallery/preview/'.$cart['item_image']) }}" class="img-responsive" alt="" width="55" height="55">
                             </td>
-                            <td class="tbls" style="width:40% !important;">{{ $cart['item_description'] }}</td>
+                            <td class="tbls" style="width:40% !important;"><a href="/product/{{ $cart['item_code'] }}" style="text-decoration: none !important; color: #000;">{{ $cart['item_description'] }}</a></td>
                             <td class="tbls">P <span class="formatted-price">{{ number_format($cart['price'], 2, '.', ',') }}</span><span class="price d-none">{{ $cart['price'] }}</span></td>
                             <td class="tbls">
                                 <div class="input-group">

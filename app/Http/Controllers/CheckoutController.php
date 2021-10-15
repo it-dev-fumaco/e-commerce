@@ -9,104 +9,104 @@ use DB;
 
 class CheckoutController extends Controller
 {
-	public function reviewOrder() {
-		$cart = session()->get('fumCart');
-		$cart = (!$cart) ? [] : $cart;
-		if(count($cart) <= 0) {
-			return redirect('/cart');
-		}
+	// public function reviewOrder() {
+	// 	$cart = session()->get('fumCart');
+	// 	$cart = (!$cart) ? [] : $cart;
+	// 	if(count($cart) <= 0) {
+	// 		return redirect('/cart');
+	// 	}
 
-		$cart_items = DB::table('fumaco_items')
-			->whereIn('f_idcode', array_column($cart, 'item_code'))->get();
+	// 	$cart_items = DB::table('fumaco_items')
+	// 		->whereIn('f_idcode', array_column($cart, 'item_code'))->get();
 		
-		$cart_arr = [];
-		foreach ($cart_items as $n => $item) {
-			$item_image = DB::table('fumaco_items_image_v1')
-				->where('idcode', $item->f_idcode)->first();
+	// 	$cart_arr = [];
+	// 	foreach ($cart_items as $n => $item) {
+	// 		$item_image = DB::table('fumaco_items_image_v1')
+	// 			->where('idcode', $item->f_idcode)->first();
 			 
-			$price = ($item->f_price > 0) ? $item->f_price : $item->f_original_price;
+	// 		$price = ($item->f_price > 0) ? $item->f_price : $item->f_original_price;
 
-			$cart_arr[] = [
-				'item_code' => $item->f_idcode,
-				'item_description' => $item->f_name_name,
-				'price' => $price,
-				'amount' => ($price * $cart[$item->f_idcode]['quantity']),
-				'quantity' => $cart[$item->f_idcode]['quantity'],
-				'stock_qty' => $item->f_qty,
-				'item_image' => ($item_image) ? $item_image->imgprimayx : 'test.jpg'
-			];
-		}
-		$bill_address = "";
-		$ship_address = "";
-		if(Auth::check()){
-			$user_id = DB::table('fumaco_users')->where('username', Auth::user()->username)->first();
+	// 		$cart_arr[] = [
+	// 			'item_code' => $item->f_idcode,
+	// 			'item_description' => $item->f_name_name,
+	// 			'price' => $price,
+	// 			'amount' => ($price * $cart[$item->f_idcode]['quantity']),
+	// 			'quantity' => $cart[$item->f_idcode]['quantity'],
+	// 			'stock_qty' => $item->f_qty,
+	// 			'item_image' => ($item_image) ? $item_image->imgprimayx : 'test.jpg'
+	// 		];
+	// 	}
+	// 	$bill_address = "";
+	// 	$ship_address = "";
+	// 	if(Auth::check()){
+	// 		$user_id = DB::table('fumaco_users')->where('username', Auth::user()->username)->first();
 
-			$bill_address = DB::table('fumaco_user_add')->where('xdefault', 1)->where('user_idx', $user_id->id)->where('address_class', 'Billing')->get();
-			$ship_address = DB::table('fumaco_user_add')->where('xdefault', 1)->where('user_idx', $user_id->id)->where('address_class', 'Delivery')->get();
-		}
+	// 		$bill_address = DB::table('fumaco_user_add')->where('xdefault', 1)->where('user_idx', $user_id->id)->where('address_class', 'Billing')->get();
+	// 		$ship_address = DB::table('fumaco_user_add')->where('xdefault', 1)->where('user_idx', $user_id->id)->where('address_class', 'Delivery')->get();
+	// 	}
 
-		return view('frontend.checkout.review_order', compact('cart_arr', 'cart', 'bill_address', 'ship_address'));
-	}
+	// 	return view('frontend.checkout.review_order', compact('cart_arr', 'cart', 'bill_address', 'ship_address'));
+	// }
 
 	public function billingForm() {
-		$cart = session()->get('fumCart');
-		$cart = (!$cart) ? [] : $cart;
-		if(count($cart) <= 0) {
-			return redirect('/cart');
-		}
+		// $cart = session()->get('fumCart');
+		// $cart = (!$cart) ? [] : $cart;
+		// if(count($cart) <= 0) {
+		// 	return redirect('/cart');
+		// }
 
-		$cart_items = DB::table('fumaco_items')
-			->whereIn('f_idcode', array_column($cart, 'item_code'))->get();
+		// $cart_items = DB::table('fumaco_items')
+		// 	->whereIn('f_idcode', array_column($cart, 'item_code'))->get();
 		
-		$cart_arr = [];
-		foreach ($cart_items as $n => $item) {
-			$item_image = DB::table('fumaco_items_image_v1')->where('idcode', $item->f_idcode)->first();
+		// $cart_arr = [];
+		// foreach ($cart_items as $n => $item) {
+		// 	$item_image = DB::table('fumaco_items_image_v1')->where('idcode', $item->f_idcode)->first();
 
-			$price = ($item->f_price > 0) ? $item->f_price : $item->f_original_price;
+		// 	$price = ($item->f_price > 0) ? $item->f_price : $item->f_original_price;
 
-			$cart_arr[] = [
-				'item_code' => $item->f_idcode,
-				'item_description' => $item->f_name_name,
-				'price' => $price,
-				'amount' => ($price * $cart[$item->f_idcode]['quantity']),
-				'quantity' => $cart[$item->f_idcode]['quantity'],
-				'stock_qty' => $item->f_qty,
-				'item_image' => ($item_image) ? $item_image->imgprimayx : 'test.jpg'
-			];
-		}
+		// 	$cart_arr[] = [
+		// 		'item_code' => $item->f_idcode,
+		// 		'item_description' => $item->f_name_name,
+		// 		'price' => $price,
+		// 		'amount' => ($price * $cart[$item->f_idcode]['quantity']),
+		// 		'quantity' => $cart[$item->f_idcode]['quantity'],
+		// 		'stock_qty' => $item->f_qty,
+		// 		'item_image' => ($item_image) ? $item_image->imgprimayx : 'test.jpg'
+		// 	];
+		// }
 
-		return view('frontend.checkout.billing_address_form', compact('cart_arr', 'cart'));
+		return view('frontend.checkout.billing_address_form');
 	}
 
 	public function setBillingForm(){
-		$cart = session()->get('fumCart');
-		$cart = (!$cart) ? [] : $cart;
-		if(count($cart) <= 0) {
-			return redirect('/cart');
-		}
+		// $cart = session()->get('fumCart');
+		// $cart = (!$cart) ? [] : $cart;
+		// if(count($cart) <= 0) {
+		// 	return redirect('/cart');
+		// }
 
-		$cart_items = DB::table('fumaco_items')
-			->whereIn('f_idcode', array_column($cart, 'item_code'))->get();
+		// $cart_items = DB::table('fumaco_items')
+		// 	->whereIn('f_idcode', array_column($cart, 'item_code'))->get();
 		
-		$cart_arr = [];
-		foreach ($cart_items as $n => $item) {
-			$item_image = DB::table('fumaco_items_image_v1')
-				->where('idcode', $item->f_idcode)->first();
+		// $cart_arr = [];
+		// foreach ($cart_items as $n => $item) {
+		// 	$item_image = DB::table('fumaco_items_image_v1')
+		// 		->where('idcode', $item->f_idcode)->first();
 
-			$price = ($item->f_price > 0) ? $item->f_price : $item->f_original_price;
+		// 	$price = ($item->f_price > 0) ? $item->f_price : $item->f_original_price;
 
-			$cart_arr[] = [
-				'item_code' => $item->f_idcode,
-				'item_description' => $item->f_name_name,
-				'price' => $price,
-				'amount' => ($price * $cart[$item->f_idcode]['quantity']),
-				'quantity' => $cart[$item->f_idcode]['quantity'],
-				'stock_qty' => $item->f_qty,
-				'item_image' => ($item_image) ? $item_image->imgprimayx : 'test.jpg'
-			];
-		}
+		// 	$cart_arr[] = [
+		// 		'item_code' => $item->f_idcode,
+		// 		'item_description' => $item->f_name_name,
+		// 		'price' => $price,
+		// 		'amount' => ($price * $cart[$item->f_idcode]['quantity']),
+		// 		'quantity' => $cart[$item->f_idcode]['quantity'],
+		// 		'stock_qty' => $item->f_qty,
+		// 		'item_image' => ($item_image) ? $item_image->imgprimayx : 'test.jpg'
+		// 	];
+		// }
 
-		return view('frontend.checkout.set_billing', compact('cart', 'cart_arr'));
+		return view('frontend.checkout.set_billing');
 	}
 
 	public function setBilling(Request $request){
@@ -139,32 +139,32 @@ class CheckoutController extends Controller
 			DB::table('fumaco_user_add')->insert($bill_address_arr);
 
 			DB::commit();
-			$cart = session()->get('fumCart');
-			$cart = (!$cart) ? [] : $cart;
-			if(count($cart) <= 0) {
-				return redirect('/cart');
-			}
+			// $cart = session()->get('fumCart');
+			// $cart = (!$cart) ? [] : $cart;
+			// if(count($cart) <= 0) {
+			// 	return redirect('/cart');
+			// }
 
-			$cart_items = DB::table('fumaco_items')
-				->whereIn('f_idcode', array_column($cart, 'item_code'))->get();
+			// $cart_items = DB::table('fumaco_items')
+			// 	->whereIn('f_idcode', array_column($cart, 'item_code'))->get();
 			
-			$cart_arr = [];
-			foreach ($cart_items as $n => $item) {
-				$item_image = DB::table('fumaco_items_image_v1')
-					->where('idcode', $item->f_idcode)->first();
+			// $cart_arr = [];
+			// foreach ($cart_items as $n => $item) {
+			// 	$item_image = DB::table('fumaco_items_image_v1')
+			// 		->where('idcode', $item->f_idcode)->first();
 
-				$price = ($item->f_price > 0) ? $item->f_price : $item->f_original_price;
+			// 	$price = ($item->f_price > 0) ? $item->f_price : $item->f_original_price;
 
-				$cart_arr[] = [
-					'item_code' => $item->f_idcode,
-					'item_description' => $item->f_name_name,
-					'price' => $price,
-					'amount' => ($price * $cart[$item->f_idcode]['quantity']),
-					'quantity' => $cart[$item->f_idcode]['quantity'],
-					'stock_qty' => $item->f_qty,
-					'item_image' => ($item_image) ? $item_image->imgprimayx : 'test.jpg'
-				];
-			}
+			// 	$cart_arr[] = [
+			// 		'item_code' => $item->f_idcode,
+			// 		'item_description' => $item->f_name_name,
+			// 		'price' => $price,
+			// 		'amount' => ($price * $cart[$item->f_idcode]['quantity']),
+			// 		'quantity' => $cart[$item->f_idcode]['quantity'],
+			// 		'stock_qty' => $item->f_qty,
+			// 		'item_image' => ($item_image) ? $item_image->imgprimayx : 'test.jpg'
+			// 	];
+			// }
 			$bill_address = "";
 			$ship_address = "";
 			if(Auth::check()){
@@ -201,32 +201,32 @@ class CheckoutController extends Controller
 				DB::table('fumaco_user_add')->where('user_idx', $user_id)->where('address_class', 'Delivery')->update(['xdefault' => 0]);
 			}
 
-			$cart = session()->get('fumCart');
-			$cart = (!$cart) ? [] : $cart;
-			if(count($cart) <= 0) {
-				return redirect('/cart');
-			}
+			// $cart = session()->get('fumCart');
+			// $cart = (!$cart) ? [] : $cart;
+			// if(count($cart) <= 0) {
+			// 	return redirect('/cart');
+			// }
 
-			$cart_items = DB::table('fumaco_items')
-				->whereIn('f_idcode', array_column($cart, 'item_code'))->get();
+			// $cart_items = DB::table('fumaco_items')
+			// 	->whereIn('f_idcode', array_column($cart, 'item_code'))->get();
 			
-			$cart_arr = [];
-			foreach ($cart_items as $n => $item) {
-				$item_image = DB::table('fumaco_items_image_v1')
-					->where('idcode', $item->f_idcode)->first();
+			// $cart_arr = [];
+			// foreach ($cart_items as $n => $item) {
+			// 	$item_image = DB::table('fumaco_items_image_v1')
+			// 		->where('idcode', $item->f_idcode)->first();
 
-				$price = ($item->f_price > 0) ? $item->f_price : $item->f_original_price;
+			// 	$price = ($item->f_price > 0) ? $item->f_price : $item->f_original_price;
 
-				$cart_arr[] = [
-					'item_code' => $item->f_idcode,
-					'item_description' => $item->f_name_name,
-					'price' => $price,
-					'amount' => ($price * $cart[$item->f_idcode]['quantity']),
-					'quantity' => $cart[$item->f_idcode]['quantity'],
-					'stock_qty' => $item->f_qty,
-					'item_image' => ($item_image) ? $item_image->imgprimayx : 'test.jpg'
-				];
-			}
+			// 	$cart_arr[] = [
+			// 		'item_code' => $item->f_idcode,
+			// 		'item_description' => $item->f_name_name,
+			// 		'price' => $price,
+			// 		'amount' => ($price * $cart[$item->f_idcode]['quantity']),
+			// 		'quantity' => $cart[$item->f_idcode]['quantity'],
+			// 		'stock_qty' => $item->f_qty,
+			// 		'item_image' => ($item_image) ? $item_image->imgprimayx : 'test.jpg'
+			// 	];
+			// }
 
 			$ship_address_arr = [
 				'address_class' => 'Delivery',
@@ -310,12 +310,12 @@ class CheckoutController extends Controller
 			$same_address = 0;
 
 			$user_type = '';
-			$order_no = '';
+			// $order_no = $request->session()->get('order_no');
 
 			// if(!Auth::check()){
 			if(!Auth::check() and request()->isMethod('post')) {
-				$order_no = $request->order_no;
-
+				$order_no = 'FUM-'.random_int(10000000, 99999999);
+				// dd($request->all());
 				$first_name = $request->fname;
 				$last_name = $request->lname;
 				$email = $request->ship_email;
@@ -443,7 +443,7 @@ class CheckoutController extends Controller
 				'xshipcountry' => $ship_country,
 				'xshiptype' => $ship_address_type,
 				'xlogs' => $order_no,
-				'order_status' => 'Order Placed',
+				'order_status' => 'Order Pending',
 				'order_tracker_code' => $order_no,
 				'order_shipping_type' => '', 
 				'order_ip' => $request->ip(),
@@ -518,10 +518,41 @@ class CheckoutController extends Controller
 				$insert = DB::table('fumaco_temp')->insert($temp_arr);
 			}
 			DB::commit();
-			return view('frontend.checkout.check_out_summary', compact('summary_arr', 'orders_arr', 'cart', 'cart_arr'));
+			request()->session()->put('summary_arr', $summary_arr);
+			request()->session()->put('cart_arr', $cart_arr);
+			return redirect('/checkout/summary_view');
+			// return view('frontend.checkout.check_out_summary', compact('summary_arr', 'orders_arr', 'cart', 'cart_arr'));
 		}catch(Exception $e){
 			DB::rollback();
 			return redirect()->back()->with('error', 'An error occured. Please try again.');
 		}		
+	}
+	
+	public function checkoutSummaryView(Request $request){
+		$summary_arr = $request->session()->get('summary_arr');
+		$cart_arr = $request->session()->get('cart_arr');
+		return view('frontend.checkout.check_out_summary', compact('summary_arr', 'cart_arr'));
+	}
+
+	public function checkoutUpdate(Request $request){
+		DB::beginTransaction();
+		try{
+			// dd($request->all());
+			$update = [
+ 				'shipping_id' => $request->shipping_id,
+ 				'shipping_amount' => $request->shipping_fee,
+ 				'item_total_price' => $request->total_amount,
+			];
+
+			DB::table('fumaco_order_items')->where('order_number', $request->order_no)->update($update);
+			DB::table('fumaco_temp')->where('order_tracker_code', $request->order_no)->update(['order_status' => 'Order Placed']);
+
+			DB::commit();
+			$eghl = "https://pay.e-ghl.com/IPGSG/Payment.aspx";
+			return redirect()->to($eghl);
+		}catch(Exception $e){
+			DB::rollback();
+			return redirect()->back()->with('error', 'An error occured. Please try again.');
+		}	
 	}
 }

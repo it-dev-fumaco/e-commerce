@@ -758,7 +758,7 @@
 						</div>
 					</div>
 
-					<div class="col-md-4 mx-auto">
+					{{-- <div class="col-md-4 mx-auto">
 						<div class="card" style="margin-left: 5%; background-color: #f4f4f4 !important; border-radius: 0rem !important;">
 							<div class="card-body he1x" style="padding-bottom: 0px !important;">Cart Total<hr></div>
 							<table class="table" id="cart-items">
@@ -818,7 +818,7 @@
 							</div>
 						</div>
 
-					</div>
+					</div> --}}
 
 					<div class="row">
 						<br/>&nbsp;
