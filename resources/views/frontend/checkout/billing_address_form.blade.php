@@ -757,86 +757,15 @@
 							<br/>&nbsp;
 						</div>
 					</div>
+				</div>
+				<div class="row">
+					<br/>&nbsp;
+					<div class="col-md-8 mx-auto">
+						<a href="/cart" class="btn btn-lg btn-outline-primary col-md-5 mx-auto" role="button" style="background-color: #777575 !important; border-color: #777575 !important;">BACK</a>
 
-					{{-- <div class="col-md-4 mx-auto">
-						<div class="card" style="margin-left: 5%; background-color: #f4f4f4 !important; border-radius: 0rem !important;">
-							<div class="card-body he1x" style="padding-bottom: 0px !important;">Cart Total<hr></div>
-							<table class="table" id="cart-items">
-								<thead>
-								<tr style="text-align: center">
-									<th class="col-md-2"></th>
-									<th>Product</th>
-									<th>Qty</th>
-									<th class="col-md-2">Total</th>
-								</tr>
-								</thead>
-								<tbody>
-									@foreach ($cart_arr as $cart)
-										<tr>
-											<td class="col-md-2" style="padding-top: 20px;padding-bottom: 20px;">
-												<center>
-													<img src="{{ asset('/storage/item/images/'.$cart['item_code'].'/gallery/preview/'.$cart['item_image']) }}" class="img-responsive" alt="" width="55" height="55">
-												</center>
-											</td>
-											<td style="font-size: 12px; padding-top: 20px;padding-bottom: 20px;">{{ $cart['item_description'] }}</td>
-											<td style="text-align: center; padding-top: 20px;padding-bottom: 20px;">{{ $cart['quantity'] }}</td>
-											<td class="col-md-2" style="text-align: center;padding-top: 20px;padding-bottom: 20px;"><span class="amount">{{ $cart['amount'] }}</span></td>
-										</tr>
-									@endforeach
-								</tbody>
-							</table>
-							
-							<div class="card-body he1x" style="padding-top: 0px !important; padding-bottom: 0px !important;">
-								<div class="d-flex justify-content-between align-items-center">
-									Subtotal <small class="text-muted stylecap he1x" id="cart-subtotal">P {{ number_format(collect($cart_arr)->sum('amount'), 2, '.', ',') }}</small>
-								</div>
-								<hr>
-							</div>
-							<div class="card-body he1x" id="ship_blk" style="padding-top: 0px !important; padding-bottom: 0px !important;">Shipping
-								<div class="form-check">
-									<label class="form-check-label" for="shipradio">&nbsp;</label>
-								</div>
-								<div class="d-flex justify-content-between align-items-center">
-									<div class="form-check">
-										<input class="form-check-input" type="radio" name="shipping_fee" id="Free Shipping" value="0" data-name="Free Delivery" required checked>
-										<label class="form-check-label" for="Free Shipping">Free Shipping</label>
-									</div>
-									<small class="text-muted stylecap he1x">P 0.00</small>
-								</div>
-								<div class="d-flex justify-content-between align-items-center">
-									<div class="form-check">
-										<input class="form-check-input" type="radio" name="shipping_fee" id="Standard" value="500" data-name="Standard Delivery" required>
-										<label class="form-check-label" for="Standard">Standard</label>
-									</div>
-									<small class="text-muted stylecap he1x">P 500.00</small>
-								</div>
-								<hr>
-							</div>
-							<div class="card-body he1x">
-								<div class="d-flex justify-content-between align-items-center" style="color:#FF9D00 !important;">Total <small class="text-muted stylecap he1x" style="color:#FF9D00 !important;" id="grand-total">0.00</small>
-								</div>
-							</div>
-						</div>
-
-					</div> --}}
-
-					<div class="row">
-						<br/>&nbsp;
-						<div class="col-md-12 mx-auto">
-							<a href="/cart" class="btn btn-lg btn-outline-primary col-md-3 mx-auto" role="button" style="background-color: #777575 !important; border-color: #777575 !important;">BACK</a>
-
-							<input type="submit" class="btn btn-lg btn-outline-primary col-md-3 mx-auto" role="button" style="float: right;" value="PROCEED">
-							<input type="text" name="order_no" class="p" value="{{ 'FUM-'.random_int(10000000, 99999999) }}" hidden readonly/>
-						</div>
-						{{-- <div class="col-md-6 border bordder-secondary" style="float: left!important">
-							<a href="/cart" class="btn btn-lg btn-outline-primary col-md-7 mx-auto border bordder-secondary" role="button" style="background-color: #777575 !important; border-color: #777575 !important;">BACK</a>
-						</div>
-						
-						<div class="col-md-6 border bordder-secondary" style="float: right !important">
-							<input type="submit" class="btn btn-lg btn-outline-primary col-md-7 mx-auto border bordder-secondary" role="button" style="float: right;" value="PROCEED">
-						</div> --}}
+						<input type="submit" class="btn btn-lg btn-outline-primary col-md-5 mx-auto" role="button" style="float: right;" value="PROCEED">
+						<input type="text" name="order_no" class="p" value="{{ 'FUM-'.random_int(10000000, 99999999) }}" hidden readonly/>
 					</div>
-					
 				</div>
 			</form>
 
@@ -880,7 +809,6 @@
 	
 	<script>
 		$(document).ready(function() {
-			updateTotal();
 			$('input[type="checkbox"]').click(function() {
 				if($(this).prop("checked") == false) {
 					$('#billAddress').slideDown();
@@ -913,63 +841,6 @@
 				}
             });
 
-			function updateTotal() {
-				var subtotal = 0;
-				$('#cart-items tbody tr').each(function(){
-					var amount = $(this).find('.amount').eq(0).text();
-					subtotal += parseFloat(amount);
-				});
-					
-				var shipping_fee = $("input[name='shipping_fee']:checked").val();
-				var total = parseFloat(shipping_fee) + subtotal;
-
-				total = (isNaN(total)) ? 0 : total;
-
-				// $('#cart-subtotal').text('P ' + subtotal.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,"));
-				// $('#cart-subtotal').text('P ' + total.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,"));
-				$('#grand-total').text('P ' + total.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,"));
-			}
-
-			function updateCart(type, id, quantity) {
-				var data = {
-					'id': id,
-					'quantity': quantity,
-					'_token': "{{ csrf_token() }}",
-					'type': type
-				}
-
-				$.ajax({
-					type:'PATCH',
-					url:'/updatecart',
-					data: data,
-				});
-			}
-
-			// $('#checkout-btn').click(function(e){
-			// 	e.preventDefault();
-			// 	var data = {
-			// 		'shipping_fee': $("input[name='shipping_fee']:checked").val(),
-			// 		'shipping_name': $("input[name='shipping_fee']:checked").data('name'),
-			// 		'_token': "{{ csrf_token() }}",
-			// 	}
-
-			// 	$.ajax({
-			// 		type:'POST',
-			// 		url:'/addshipping',
-			// 		data: data,
-			// 		success: function (response) {
-			// 			window.location.href = "/checkout/billing";
-			// 			// window.location.href = "/checkout/review_order";
-			// 		},
-			// 		error: function () {
-			// 			alert('An error occured.');
-			// 		}
-			// 	});
-			// });
-
-			$(document).on('change', 'input[name="shipping_fee"]', function(){
-				updateTotal();
-			});
         });
 
 	</script>
