@@ -458,12 +458,7 @@ class CheckoutController extends Controller
 			if(count($cart) <= 0) {
 				return redirect('/cart');
 			}
-			$cart['shipping'] = [
-				"shipping_name" => $request->shipping_name,
-				"shipping_fee" => $request->shipping_fee,
-			];
 
-			session()->put('fumCart', $cart); 
 			$cart_items = DB::table('fumaco_items')
 				->whereIn('f_idcode', array_column($cart, 'item_code'))->get();
 			
@@ -473,6 +468,9 @@ class CheckoutController extends Controller
 					->where('idcode', $item->f_idcode)->first();
 
 				$price = ($item->f_price > 0) ? $item->f_price : $item->f_original_price;
+
+				// dd($order_no);
+				$order_check = DB::table('fumaco_order_items')->where('order_number', $order_no)->where('item_code', $item->f_idcode)->count();
 
 				$cart_arr[] = [
 					'item_code' => $item->f_idcode,
@@ -493,12 +491,14 @@ class CheckoutController extends Controller
 					'item_status' => 2,
 					'date_update' => Carbon::now()->toDateTimeString(),
 					'ip_address' => $request->ip(),
-					'item_total_price' => ($cart['shipping']['shipping_fee'] + ($price * $cart[$item->f_idcode]['quantity']))
+					'item_total_price' => ($price * $cart[$item->f_idcode]['quantity'])
 				];
-
-				DB::table('fumaco_order_items')->insert($orders_arr);
+				if($order_check < 1){
+					DB::table('fumaco_order_items')->insert($orders_arr);
+				}
 			}
-			// dd($cart_arr);
+				// dd($orders_arr);
+				// dd($cart_arr);
 
 			$summary_arr[] = [
 				'shipping' => $cart['shipping']['shipping_fee'],
@@ -541,11 +541,10 @@ class CheckoutController extends Controller
 			$update = [
  				'shipping_id' => $request->shipping_id,
  				'shipping_amount' => $request->shipping_fee,
- 				'item_total_price' => $request->total_amount,
+ 				'order_status' => 'Order Placed'
 			];
 
-			DB::table('fumaco_order_items')->where('order_number', $request->order_no)->update($update);
-			DB::table('fumaco_temp')->where('order_tracker_code', $request->order_no)->update(['order_status' => 'Order Placed']);
+			DB::table('fumaco_temp')->where('order_tracker_code', $request->order_no)->update($update);
 
 			DB::commit();
 			$eghl = "https://pay.e-ghl.com/IPGSG/Payment.aspx";

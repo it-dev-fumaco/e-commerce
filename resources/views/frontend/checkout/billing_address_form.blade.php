@@ -83,7 +83,11 @@
 					$action = '/checkout/set_address';
 				}
 			@endphp
-		
+			@if(session()->has('error'))
+				<div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
+					{!! session()->get('error') !!}
+				</div>
+			@endif
 			<form action="{{ $action }}" method="post">
 				@csrf
 				<div class="row">

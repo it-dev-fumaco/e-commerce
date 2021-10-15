@@ -65,6 +65,9 @@ Route::group(['middleware' => 'auth'], function(){
     Route::get('/myprofile/address/{id}/{type}/change_default', 'FrontendController@setDefaultAddress');
     Route::get('/myprofile/address/{type}/new', 'FrontendController@addAddressForm');
     Route::post('/myprofile/address/{type}/save', 'FrontendController@saveAddress');
+
+    Route::get('/checkout/summary', 'CheckoutController@checkoutSummary');
+
 });
 
 // SHOPPING CART ROUTES
@@ -81,7 +84,6 @@ Route::get('/countwishlist', 'CartController@countWishlist');
 Route::get('/checkout/review_order', 'CheckoutController@reviewOrder');
 Route::get('/checkout/billing', 'CheckoutController@billingForm');
 Route::post('/checkout/summary', 'CheckoutController@checkoutSummary');
-Route::get('/checkout/summary', 'CheckoutController@checkoutSummary');
 Route::get('/checkout/summary_view', 'CheckoutController@checkoutSummaryView');
 Route::post('/checkout/set_address', 'CheckoutController@setAddress');
 Route::get('/checkout/set_billing_form', 'CheckoutController@setBillingForm');
