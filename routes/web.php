@@ -45,10 +45,8 @@ Route::get('/products/{id}', 'FrontendController@viewProducts');
 Route::post('/products/{id}', 'FrontendController@viewProducts');
 Route::get('/product/{item_code}', 'FrontendController@viewProduct');
 Route::get('/track_order', 'FrontendController@viewOrderTracking');
-
 Route::get('/categories', 'FrontendController@getProductCategories');
 Route::get('/website_settings', 'FrontendController@websiteSettings');
-
 Route::post('/getvariantcode', 'FrontendController@getVariantItemCode');
 
 Route::group(['middleware' => 'auth'], function(){
@@ -65,7 +63,6 @@ Route::group(['middleware' => 'auth'], function(){
     Route::get('/myprofile/address/{id}/{type}/change_default', 'FrontendController@setDefaultAddress');
     Route::get('/myprofile/address/{type}/new', 'FrontendController@addAddressForm');
     Route::post('/myprofile/address/{type}/save', 'FrontendController@saveAddress');
-
     Route::get('/checkout/summary', 'CheckoutController@checkoutSummary');
 
 });
@@ -88,8 +85,11 @@ Route::get('/checkout/summary_view', 'CheckoutController@checkoutSummaryView');
 Route::post('/checkout/set_address', 'CheckoutController@setAddress');
 Route::get('/checkout/set_billing_form', 'CheckoutController@setBillingForm');
 Route::post('/checkout/set_billing', 'CheckoutController@setBilling');
-Route::post('/checkout/place_order', 'CheckoutController@checkoutUpdate');
+Route::get('/eghlform/{order_no}', 'CheckoutController@viewPaymentForm');
+Route::post('/checkout/updateshipping/{id}', 'CheckoutController@updateShippingAmount');
 
+Route::get('/checkout/success/{id}', 'CheckoutController@orderSuccess');
+Route::post('/checkout/success/{id}', 'CheckoutController@orderSuccess');
 
 Auth::routes();
 
@@ -135,8 +135,7 @@ Route::prefix('admin')->group(function () {
         Route::post('/product/{parent_code}/save_related_products', 'ProductController@saveRelatedProducts');
         Route::delete('/product/remove_related/{id}', 'ProductController@removeRelatedProduct');
         
-        
-        
+    
         Route::post('/product/{id}/update', 'ProductController@updateItem');
         Route::post('/product/{item_code}/disable', 'ProductController@disableItem');
         Route::post('/product/{item_code}/enable', 'ProductController@enableItem');

@@ -4,11 +4,57 @@
 ])
 
 @section('content')
+	<style>
+		.products-head {
+			margin-top: 10px !important;
+			padding-left: 40px !important;
+			padding-right: 40px !important;
+		}
+		.he1 {
+			font-weight: 300 !important;
+			font-size: 12px !important;
+		}
+		.he2 {
+			font-weight: 200 !important;
+			font-size: 10px !important;
+		}
+		.he1x {
+			font-weight: 500 !important;
+			font-size: 15px !important;
+		}
+		.he2x {
+			font-weight: 200 !important;
+			font-size: 12px !important;
+		}
+		.he2x2 {
+			font-weight: 200 !important;
+			font-size: 14px !important;
+		}
+		.he2x2x {
+			font-weight: 200 !important;
+			font-size: 10px !important;
+		}
+		.he3x1x {
+			font-weight: 200 !important;
+			font-size: 14px !important;
+		}
+		.btmp {
+			margin-bottom: 15px !important;
+		}
+		.tbls {
+			padding-bottom: 25px !important;
+			padding-top: 25px !important;
+		}
+		.flex-1 {
+			flex: 1 !important;
+			display: flex !important;
+		}
+	</style>
 	<main style="background-color:#0062A5;">
 		<div id="myCarousel" class="carousel slide" data-bs-ride="carousel">
 			<div class="carousel-inner">
 				<div class="carousel-item active" style="height: 13rem !important;">
-				<img src="{{asset('/assets/site-img/header3-sm.png')}}"alt="" style="position: absolute; top: 0;left: 0;min-width: 100%; height: unset !important; ">
+					<img src="{{asset('/assets/site-img/header3-sm.png')}}"alt="" style="position: absolute; top: 0;left: 0;min-width: 100%; height: unset !important; ">
 					<div class="container">
 						<div class="carousel-caption text-start" style="bottom: 1rem !important; right: 25% !important; left: 25%; !important;">
 						<center><h3 class="carousel-header-font">SHOPPING CART</h3></center>
@@ -64,7 +110,7 @@
 							}
 						@endphp
 						<div class="card-body he1x" style="padding-bottom: 0px !important; font-size:1rem !important;" >
-							<strong>Your Order No : {{ $summary_arr[0]['address'][0]['order_tracker_code'] }}</strong>
+							<strong>Your Order No : <span id="order-no">{{ $summary_arr[0]['address'][0]['order_tracker_code'] }}</span></strong>
 						</div>
 						<div class="card-body he1x" style="padding-bottom: 0px !important;">
 							Customer Name :  {{ $summary_arr[0]['address'][0]['xfname']." ".$summary_arr[0]['address'][0]['xlname'] }}
@@ -192,14 +238,14 @@
 							</div>
 							<div class="d-flex justify-content-between align-items-center">
 								<div class="form-check">
-									<input class="form-check-input" type="radio" name="shipping_fee" id="Free Shipping" value="0" data-name="Free Delivery" required checked>
+									<input class="form-check-input" type="radio" name="shipping_fee" id="Free Shipping" value="0" data-sname="Free" required checked>
 									<label class="form-check-label" for="Free Shipping">Free Shipping</label>
 								</div>
 								<small class="text-muted stylecap he1x">P 0.00</small>
 							</div>
 							<div class="d-flex justify-content-between align-items-center">
 								<div class="form-check">
-									<input class="form-check-input" type="radio" name="shipping_fee" id="Standard" value="500" data-name="Standard Delivery" required>
+									<input class="form-check-input" type="radio" name="shipping_fee" id="Standard" value="500" data-sname="Standard" required>
 									<label class="form-check-label" for="Standard">Standard</label>
 								</div>
 								<small class="text-muted stylecap he1x">P 500.00</small>
@@ -214,200 +260,146 @@
 				</div>
 			</div>
 			<br/>
-			<div class="row">
+			<div class="row mb-4">
 				<div class="col-md-8 mx-auto">
-					<a href="javascript:history.back()" class="btn btn-lg btn-outline-primary col-md-4" role="button" style="background-color: #777575 !important; border-color: #777575 !important; float: left;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BACK&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+					<a href="javascript:history.back()" class="btn btn-lg btn-outline-primary col-md-4" role="button" style="background-color: #777575 !important; border-color: #777575 !important; float: left;">BACK</a>
 				</div>
 				<div class="col-md-4 mx-auto">
 					<div class="card" style="margin-left: 5%;">
-						@php
-						$password = 'q5m12345';
-						$serviceid = 'Q5M';
-						$merchantapprovalurl = $summary_arr[0]['base_url']."/cart-success";
-						$merchantunapprovalurl = $summary_arr[0]['base_url']."/checkout_summary";
-
-						$string = $password . $serviceid .  $summary_arr[0]['address'][0]['order_tracker_code'] . $summary_arr[0]['base_url']."/cart" . $merchantapprovalurl . $merchantunapprovalurl . $summary_arr[0]['grand_total'] . "PHP" . $summary_arr[0]['address'][0]['order_ip'] . "600";
-
-						$hash = hash('sha256', $string);
-					@endphp
-					<center>
-						<form action="/checkout/place_order" method="post" name="adminForm" enctype="multipart/form-data">
-							@csrf
-							<div style="display: none">
-								<input name="TransactionType" value="SALE">
-								<input name="PymtMethod" value="ANY">
-								<input name="ServiceID" value="Q5M">
-								<input name="PaymentID" value="{{ $summary_arr[0]['address'][0]['order_tracker_code'] }}">
-								<input name="OrderNumber" value="{{ $summary_arr[0]['address'][0]['order_tracker_code'] }}">
-								<input name="PaymentDesc" value="Fumaco Online Sale / Tracker Code : {{ $summary_arr[0]['address'][0]['order_tracker_code'] }}">
-								<input name="MerchantReturnURL" value="{{ $summary_arr[0]['base_url']."/cart" }}">
-								<input name="MerchantApprovalURL" value="{{ $merchantapprovalurl }}">
-								<input name="MerchantUnApprovalURL" value="{{ $merchantunapprovalurl }}">
-								<input name="Amount" value="{{ $summary_arr[0]['grand_total'] }}">
-								<input name="CurrencyCode" value="PHP">
-								<input name="CustIP" value="{{ $summary_arr[0]['address'][0]['order_ip'] }}">
-								<input name="CustName" value="{{ $summary_arr[0]['address'][0]['xfname']. " " .$summary_arr[0]['address'][0]['xlname'] }}">
-								<input name="CustEmail" value="{{ $summary_arr[0]['address'][0]['xemail'] }}">
-								<input name="CustPhone" value="{{ $summary_arr[0]['ship_mobile'] }}">
-								<input name="PageTimeout" value="600">
-								<input name="HashValue" value="{{ $hash }}">
-								<input name="order_id" value="FUMAC02020">
-								<input name="orderpayment_id" value="FUMAC02020">
-								<input name="orderpayment_type" value="payment_eghl">
-								<input name="task" value="confirmPayment">
-
-								{{-- place order --}}
-								<input type="text" name="order_no" value="{{ $summary_arr[0]['address'][0]['order_tracker_code'] }}" id="order_no">
-								<input id="total_amount" name="total_amount" value=""/>
-								<input type="text" id="shipping_id" name="shipping_id" value="">
-								<input type="text" id="shipping_fee" name="shipping_fee" value="">
-								{{-- place order --}}
-
-							</div>
-
-							<input id="checkout-btn" class="btn btn-lg btn-outline-primary col-md-12" value="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PROCEED&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" style="float: right;" type="submit">
-						</form>
+							<div id="payment-form" class="d-none"></div>
+							<button class="btn btn-lg btn-outline-primary" id="checkout-btn" style="float: right;">PROCEED</button>
 					</div>
 				</div>
 			</div>
 		</div>
-		<br>&nbsp;
 	</main>
 
+	<div id="custom-overlay" style="display: none;">
+		<div class="custom-spinner"></div>
+		<br/>
+		Loading...
+	</div>
+	  
 	<style>
-
-		.products-head {
-
-		 	margin-top: 10px !important;
-			padding-left: 40px !important;
-			padding-right: 40px !important;
-
+		#custom-overlay {
+			background: #ffffff;
+			color: #666666;
+			position: fixed;
+			height: 100%;
+			width: 100%;
+			z-index: 5000;
+			top: 0;
+			left: 0;
+			float: left;
+			text-align: center;
+			padding-top: 25%;
+			opacity: .80;
 		}
-
-
-		.he1 {
-
-			font-weight: 300 !important;
-			font-size: 12px !important;
-
+		.custom-spinner {
+			margin: 0 auto;
+			height: 64px;
+			width: 64px;
+			animation: rotate 0.8s infinite linear;
+			border: 5px solid firebrick;
+			border-right-color: transparent;
+			border-radius: 50%;
 		}
-
-
-		.he2 {
-
-			font-weight: 200 !important;
-			font-size: 10px !important;
-
-		}
-
-
-		.he1x {
-
-			font-weight: 500 !important;
-			font-size: 15px !important;
-
-		}
-
-
-		.he2x {
-
-			font-weight: 200 !important;
-			font-size: 12px !important;
-
-		}
-
-
-
-		.he2x2 {
-
-			font-weight: 200 !important;
-			font-size: 14px !important;
-
-		}
-
-
-		.he2x2x {
-
-			font-weight: 200 !important;
-			font-size: 10px !important;
-
-		}
-
-
-		.he3x1x {
-
-			font-weight: 200 !important;
-			font-size: 14px !important;
-
-		}
-
-
-		.btmp {
-			margin-bottom: 15px !important;
-
-		}
-
-		.tbls {
-			padding-bottom: 25px !important;
-			padding-top: 25px !important;
-		}
-
-		.flex-1 {
-			flex: 1 !important;
-			display: flex !important;
+		@keyframes rotate {
+			0% {
+				transform: rotate(0deg);
+			}
+			100% {
+				transform: rotate(360deg);
+			}
 		}
 	</style>
+@endsection
 
-	<script>
-		$(document).ready(function() {
+@section('script')
+<script>
+	$(document).ready(function() {
+		const id = $('#order-no').text();
+
+		updateTotal();
+		updateShipping();
+
+		$(document).on('change', 'input[name="shipping_fee"]', function(){
 			updateTotal();
-			function updateTotal() {
-				var subtotal = 0;
-				$('#cart-items tbody tr').each(function(){
-					var amount = $(this).find('.amount').eq(0).text();
-					subtotal += parseFloat(amount);
-				});
-
-				var shipping_fee = $("input[name='shipping_fee']:checked").val();
-				var total = parseFloat(shipping_fee) + subtotal;
-
-				total = (isNaN(total)) ? 0 : total;
-
-				$('#grand-total').text('P ' + total.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,"));
-
-				$("#total_amount").val($('#grand-total').text());
-				$('#shipping_id').val($("input[name='shipping_fee']:checked").data('name'));
-				$('#shipping_fee').val($("input[name='shipping_fee']:checked").val());
-			}
-
-			// $('#checkout-btn').click(function(e){
-			// 	e.preventDefault();
-			// 	var data = {
-			// 		'shipping_fee': $("input[name='shipping_fee']:checked").val(),
-			// 		'shipping_name': $("input[name='shipping_fee']:checked").data('name'),
-			// 		'grand_total' : $("#total_amount").val(),
-			// 		'order_no' : $("#order_no").val(),
-			// 		'_token': "{{ csrf_token() }}",
-			// 	}
-
-			// 	$.ajax({
-			// 		type:'POST',
-			// 		url:'/checkout/place_order',
-			// 		data: data,
-			// 		success: function (response) {
-			// 			window.location.href = "https://pay.e-ghl.com/IPGSG/Payment.aspx";
-			// 			// window.location.href = "/checkout/review_order";
-			// 		},
-			// 		error: function () {
-			// 			alert('An error occured.');
-			// 		}
-			// 	});
-			// });
-
-			$(document).on('change', 'input[name="shipping_fee"]', function(){
-				updateTotal();
-			});
+			updateShipping();
+		});
+		
+		$('#checkout-btn').click(function(e){
+			e.preventDefault();
+			updateShipping(1);
 		});
 
-	</script>
+		function callback(data) {
+			if(data.status == 2) {
+				window.location.href = '/';
+			} else if (data.status == 1) {
+				$('#payment-form').empty();
+				if(data.s) {
+					$('#custom-overlay').fadeIn();
+					$.ajax({
+						url: '/eghlform/' + id,
+						type:"GET",
+						success:function(data){
+							$('#payment-form').html(data);
+							checkForm();
+						},
+						error : function(data) {
+							console.log(data);
+						}
+					});
+				}
+			} else {
+				alert(d.message);
+			}
+		}
+
+		function checkForm() {
+			if ($("#payment-form").find('form').length) {
+				$('#payment-form form').delay(500).submit();
+			} else {
+				$('#custom-overlay').fadeOut();
+			}
+		}
+
+		function updateShipping(submit) {
+			var s_name = $("input[name='shipping_fee']:checked").data('sname');
+			var s_amount = $("input[name='shipping_fee']:checked").val();
+			var data = {
+				s_name, s_amount, _token: '{{ csrf_token() }}', submit
+			}
+
+			$.ajax({
+				url: '/checkout/updateshipping/' + id,
+				type:"POST",
+				data: data,
+				success: callback,
+				error : function(data) {
+					console.log('error updating shipping');
+				}
+			});
+		}
+
+		function updateTotal() {
+			var subtotal = 0;
+			$('#cart-items tbody tr').each(function(){
+				var amount = $(this).find('.amount').eq(0).text();
+				subtotal += parseFloat(amount);
+			});
+
+			var shipping_fee = $("input[name='shipping_fee']:checked").val();
+			var total = parseFloat(shipping_fee) + subtotal;
+
+			total = (isNaN(total)) ? 0 : total;
+
+			$('#grand-total').text('P ' + total.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,"));
+
+			$("#total_amount").val($('#grand-total').text());
+		}
+	});
+
+</script>
 @endsection

@@ -531,27 +531,158 @@ class CheckoutController extends Controller
 	public function checkoutSummaryView(Request $request){
 		$summary_arr = $request->session()->get('summary_arr');
 		$cart_arr = $request->session()->get('cart_arr');
+
+		if (!isset($cart_arr)) {
+			return redirect('/cart');
+		}
+		
 		return view('frontend.checkout.check_out_summary', compact('summary_arr', 'cart_arr'));
 	}
 
-	public function checkoutUpdate(Request $request){
+	// EGHL payment form
+	public function viewPaymentForm($order_no, Request $request) {
+		if($request->ajax()) {
+			$api = DB::table('api_setup')->where('type', 'payment_api')->first();
+
+			$temp = DB::table('fumaco_temp')->where('order_tracker_code', $order_no)->first();
+	
+			$amount = DB::table('fumaco_order_items')->where('order_number', $order_no)->sum('item_total_price');
+	
+			$grand_total = $amount + $temp->shipping_amount;
+	
+			return view('frontend.checkout.eghl_form', compact('temp', 'api', 'grand_total'));
+		}
+	}
+
+	// update shipping id and amount in checkout summary page (fumaco_temp table)
+	// note: $id = order_tracker_code
+	public function updateShippingAmount($id, Request $request) {
+		if($request->ajax()) {
+			DB::beginTransaction();
+			try {
+				$submit_form = ($request->submit) ? 1 : 0;
+				$temp = DB::table('fumaco_temp')->where('order_tracker_code', $id)->first();
+				if (!$temp) {
+					return response()->json(['status' => 2, 'message' => 'Temp order not found.']);
+				}
+				DB::table('fumaco_temp')->where('order_tracker_code', $id)->update([
+					'shipping_name' => $request->s_name,
+					'shipping_amount' => $request->s_amount,
+				]);
+	
+				DB::commit();
+	
+				return response()->json(['status' => 1, 'message' => 'Temp order updated.', 's' => $submit_form]);
+				return $request->all();
+			} catch (Exception $e) {
+				DB::rollback();
+	
+				return response()->json(['status' => 0, 'message' => 'An error occured. Please try again.']);
+			}
+		}
+	}
+
+	public function orderSuccess($id) {
 		DB::beginTransaction();
-		try{
-			// dd($request->all());
-			$update = [
- 				'shipping_id' => $request->shipping_id,
- 				'shipping_amount' => $request->shipping_fee,
- 				'order_status' => 'Order Placed'
-			];
+		try {
+			$temp = DB::table('fumaco_temp')->where('xtempcode', $id)->first();
+			if(!$temp) {
+				return redirect('/');
+			}
 
-			DB::table('fumaco_temp')->where('order_tracker_code', $request->order_no)->update($update);
+			$now = Carbon::now();
 
+			$order_items = DB::table('fumaco_order_items')
+				->where('order_number', $temp->order_tracker_code)->get();
+
+			// insert orders if not existing
+			$existing_order = DB::table('fumaco_order')->where('order_number', $temp->order_tracker_code)->exists();
+			if (!$existing_order) {
+				$subtotal = collect($order_items)->sum('item_total_price');
+
+				DB::table('fumaco_order')->insert([
+					'order_number' => $temp->order_tracker_code,
+					'order_name' => $temp->xfname,
+					'order_lastname' => $temp->xlname,
+					'order_bill_address1' => $temp->xadd1,
+					'order_bill_address2' => $temp->xadd2,
+					'order_bill_prov' => $temp->xprov,
+					'order_bill_city' => $temp->xcity,
+					'order_bill_brgy' => $temp->xbrgy,
+					'order_bill_postal' => $temp->xpostal,
+					'order_bill_country' => $temp->xcountry,
+					'order_bill_type' => $temp->xaddresstype,
+					'order_contactperson' => $temp->xcontact_person,
+					'order_ship_contactperson' => $temp->xshipcontact_person,
+					'order_ship_address1' => $temp->xshippadd1,
+					'order_ship_address2' => $temp->xshippadd2,
+					'order_ship_prov' => $temp->xshiprov,
+					'order_ship_city' => $temp->xshipcity,
+					'order_ship_brgy' => $temp->xshipbrgy,
+					'order_ship_postal' => $temp->xshippostalcode,
+					'order_ship_country' => $temp->xshipcountry,
+					'order_ship_type' => $temp->xshiptype,
+					'order_email' => $temp->xemail,
+					'order_contact' => $temp->xcontact,
+					'order_subtotal' => $subtotal,
+					'order_shipping' => $temp->shipping_name,
+					'order_shipping_amount' => $temp->shipping_amount,
+					'order_ip' => $temp->order_ip,
+				  	'order_date' => $now,
+					'order_status' => "Order Placed",
+					'tracker_code' => $temp->order_tracker_code,
+				]);
+
+				// insert order in tracking order table
+				DB::table('track_order')->insert([
+					'track_code' => $temp->order_tracker_code,
+					'track_date' => $now,
+					'track_item' => 'Item Purchase',
+					'track_description' => 'Your order is on processing',
+					'track_status' => 'Order Placed',
+					'track_ip' => $temp->order_ip,
+					'transaction_member' => (Auth::check()) ? Auth::user()->id : 'Guest'
+				]);
+			}
+
+			$order_details = DB::table('fumaco_order')->where('order_number', $temp->order_tracker_code)->first();
+
+			$items = [];
+			foreach($order_items as $row) {
+				$image = DB::table('fumaco_items_image_v1')->where('idcode', $row->item_code)->first();
+
+				$items[] = [
+					'item_code' => $row->item_code,
+					'item_name' => $row->item_name,
+					'price' => $row->item_price,
+					'qty' => $row->item_qty,
+					'amount' => $row->item_total_price,
+					'image' => ($image) ? $image->imgprimayx : null
+				];
+
+				// update reserved qty for items
+				$item_details = DB::table('fumaco_items')->where('f_idcode', $row->item_code)->first();
+				if($item_details) {
+					DB::table('fumaco_items')->where('f_idcode', $row->item_code)->update([
+						'f_qty' => $item_details->f_qty - $row->item_qty,
+						'f_reserved_qty' => $item_details->f_reserved_qty + $row->item_qty,
+					]);
+				}
+			}
+
+			DB::table('fumaco_temp')->where('xtempcode', $id)->delete();
+
+			session()->forget('fumCart');
+			session()->forget('summary_arr');
+			session()->forget('cart_arr');
+			
 			DB::commit();
-			$eghl = "https://pay.e-ghl.com/IPGSG/Payment.aspx";
-			return redirect()->to($eghl);
-		}catch(Exception $e){
+
+			return view('frontend.checkout.success', compact('order_details', 'items'));
+		} catch (Exception $e) {
 			DB::rollback();
-			return redirect()->back()->with('error', 'An error occured. Please try again.');
-		}	
+
+			return view('error');
+		}
 	}
 }
