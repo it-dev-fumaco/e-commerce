@@ -43,17 +43,36 @@
 							@endif
 							<form action="/admin/product/list" method="GET">
 								<div class="row">
-									<div class="col-md-4">
+									<div class="col-md-10">
 										<div class="form-group row">
-											<div class="col-md-8">
+											<div class="col-md-3">
 											<input type="text" class="form-control" id="search-box" name="q" placeholder="Search" value="{{request()->get('q')}}">
 											</div>
-											<div class="col-md-4">
+											<div class="col-md-2">
+												<input type="text" class="form-control" id="search-box" name="parent_code" placeholder="Parent Code" value="{{request()->get('parent_code')}}">
+											</div>
+											<div class="col-md-2">
+												<select class="form-control" name="brands">
+                                                    <option {{ (request()->get('brands') == '') ? 'selected' : '' }} disabled value="">Select Brand</option>
+                                                    @foreach ($brands as $b)
+														<option {{ (request()->get('brands') == $b->f_brand) ? 'selected' : ''}} value="{{ $b->f_brand }}">{{ $b->f_brand }}</option>
+													@endforeach
+                                                </select>
+											</div>
+											<div class="col-md-3">
+												<select class="form-control" name="category">
+                                                    <option {{ (request()->get('category') == '') ? 'selected' : '' }}  disabled value="">Select Category</option>
+                                                    @foreach ($categories as $c)
+														<option {{ (request()->get('category') == $c->name) ? 'selected' : ''}} value="{{ $c->name }}">{{ $c->name }}</option>
+													@endforeach
+                                                </select>
+											</div>
+											<div class="col-md-2">
 												<button type="submit" class="btn btn-primary">Search</button>
 											</div>
 										</div>
 									</div>
-									<div class="col-md-8">
+									<div class="col-md-2">
 										<div class="float-right">
 											<a href="/admin/product/add" class="btn btn-primary">Create New Product</a>
 										</div>

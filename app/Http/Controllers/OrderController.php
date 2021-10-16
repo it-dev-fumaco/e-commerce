@@ -9,11 +9,6 @@ use DB;
 
 class OrderController extends Controller
 {
-    // public function searchOrder(Request $request){
-    //     $order_no = "testsssssssssssssssssss";
-    //     return redirect('/admin/order/order_lists/'.$order_no);
-    // }
-
     public function orderList(Request $request){
 
         $search_id = ($request->search) ? $request->search : '';

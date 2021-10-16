@@ -441,7 +441,7 @@ class ProductController extends Controller
     public function viewList(Request $request) {
         $q_string = $request->q;
         $search_str = explode(' ', $q_string);
-        $product_list = DB::table('fumaco_items')
+        $product_list = DB::table('fumaco_items')->where('f_brand', 'LIKE', "%".$request->brands."%")->where('f_parent_code', 'LIKE', "%".$request->parent_code."%")->where('f_category', 'LIKE', "%".$request->category."%")
             ->when($q_string, function ($query) use ($search_str, $q_string) {
                 return $query->where(function($q) use ($search_str, $q_string) {
                     foreach ($search_str as $str) {
@@ -453,6 +453,9 @@ class ProductController extends Controller
                 });
             })
             ->orderBy('f_date', 'desc')->paginate(15);
+
+        $brands = DB::table('fumaco_items')->select('f_brand')->orderBy('f_brand', 'asc')->groupBy('f_brand')->get();
+        $categories = DB::table('fumaco_categories')->get();
 
         $list = [];
         foreach ($product_list as $product) {
@@ -478,7 +481,7 @@ class ProductController extends Controller
             ];
         }
 
-        return view('backend.products.list', compact('list', 'product_list'));
+        return view('backend.products.list', compact('list', 'product_list', 'brands', 'categories'));
     }
 
     public function viewProduct($id) {
