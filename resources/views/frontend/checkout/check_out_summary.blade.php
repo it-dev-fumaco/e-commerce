@@ -232,24 +232,21 @@
 							</div>
 							<hr>
 						</div>
-						<div class="card-body he1x" id="ship_blk" style="padding-top: 0px !important; padding-bottom: 0px !important;">Shipping
+						<div class="card-body he1x" id="ship_blk" style="padding-top: 0px !important; padding-bottom: 0px !important;">Select Shipping Method
 							<div class="form-check">
 								<label class="form-check-label" for="shipradio">&nbsp;</label>
 							</div>
+							@forelse ($shipping_rates as $l => $srate)
 							<div class="d-flex justify-content-between align-items-center">
 								<div class="form-check">
-									<input class="form-check-input" type="radio" name="shipping_fee" id="Free Shipping" value="0" data-sname="Free" required checked>
-									<label class="form-check-label" for="Free Shipping">Free Shipping</label>
+									<input class="form-check-input" type="radio" name="shipping_fee" id="{{ 'sr' . $l }}" value="{{ $srate['shipping_cost'] }}" data-sname="{{ $srate['shipping_service_name'] }}" required checked>
+									<label class="form-check-label" for="{{ 'sr' . $l }}">{{ $srate['shipping_service_name'] }}</label>
 								</div>
-								<small class="text-muted stylecap he1x">P 0.00</small>
+								<small class="text-muted stylecap he1x">P {{ number_format($srate['shipping_cost'], 2, '.', ',') }}</small>
 							</div>
-							<div class="d-flex justify-content-between align-items-center">
-								<div class="form-check">
-									<input class="form-check-input" type="radio" name="shipping_fee" id="Standard" value="500" data-sname="Standard" required>
-									<label class="form-check-label" for="Standard">Standard</label>
-								</div>
-								<small class="text-muted stylecap he1x">P 500.00</small>
-							</div>
+							@empty
+								<h5>No shipping rates found.</h5>
+							@endforelse
 							<hr>
 						</div>
 						<div class="card-body he1x">

@@ -7,15 +7,17 @@ use Carbon\Carbon;
 use Auth;
 use DB;
 
+use App\Models\ShippingService;
+use App\Models\ShippingZoneRate;
+use App\Models\ShippingCondition;
+
 class CheckoutController extends Controller
 {
 	public function billingForm() {
-
 		return view('frontend.checkout.billing_address_form');
 	}
 
 	public function setBillingForm(){
-
 		return view('frontend.checkout.set_billing');
 	}
 
@@ -77,7 +79,8 @@ class CheckoutController extends Controller
 
 			$bill_address = DB::table('fumaco_user_add')->where('xdefault', 1)->where('user_idx', $user_id)->where('address_class', 'Billing')->get();
 			$ship_address = DB::table('fumaco_user_add')->where('xdefault', 1)->where('user_idx', $user_id)->where('address_class', 'Delivery')->get();
-			if(count($bill_address) > 0){
+			if(count($bill_address) > 0)
+			{
 				DB::table('fumaco_user_add')->where('user_idx', $user_id)->where('address_class', 'Billing')->update(['xdefault' => 0]);
 			}
 
@@ -167,7 +170,6 @@ class CheckoutController extends Controller
 			$same_address = 0;
 
 			$user_type = '';
-			// $order_no = $request->session()->get('order_no');
 
 			// if(!Auth::check()){
 			if(!Auth::check() and request()->isMethod('post')) {
@@ -392,10 +394,12 @@ class CheckoutController extends Controller
 		if (!isset($cart_arr)) {
 			return redirect('/cart');
 		}
-		
-		return view('frontend.checkout.check_out_summary', compact('summary_arr', 'cart_arr'));
-	}
 
+		$order_id = $summary_arr[0]['address'][0]['order_tracker_code'];
+		$shipping_rates = $this->getShippingRates($order_id);
+		
+		return view('frontend.checkout.check_out_summary', compact('summary_arr', 'cart_arr', 'shipping_rates'));
+	}
 	// EGHL payment form
 	public function viewPaymentForm($order_no, Request $request) {
 		if($request->ajax()) {
@@ -410,7 +414,6 @@ class CheckoutController extends Controller
 			return view('frontend.checkout.eghl_form', compact('temp', 'api', 'grand_total'));
 		}
 	}
-
 	// update shipping id and amount in checkout summary page (fumaco_temp table)
 	// note: $id = order_tracker_code
 	public function updateShippingAmount($id, Request $request) {
@@ -430,7 +433,6 @@ class CheckoutController extends Controller
 				DB::commit();
 	
 				return response()->json(['status' => 1, 'message' => 'Temp order updated.', 's' => $submit_form]);
-				return $request->all();
 			} catch (Exception $e) {
 				DB::rollback();
 	
@@ -541,5 +543,237 @@ class CheckoutController extends Controller
 
 			return view('error');
 		}
+	}
+	// get address detail from google maps api
+	private function getAddressDetails($address){
+        if($address){
+            $response = \GoogleMaps::load('geocoding')
+                ->setParam (['address' => $address])
+                ->get();
+
+            $components = [
+                'political' => "long_name",
+                'locality' => "long_name",
+                'administrative_area_level_1' => "long_name",
+                'administrative_area_level_2' => "long_name"
+            ];
+
+            $output= json_decode($response, true);
+            $arr= [];
+            for ($i = 0; $i < count($output['results'][0]['address_components']); $i++) {
+                $address_type = $output['results'][0]['address_components'][$i]['types'][0];
+                if(isset($components[$address_type])){
+                    array_push($arr, $output['results'][0]['address_components'][$i][$components[$address_type]]);
+                }
+            }
+            
+            return $arr;
+        }
+    }
+
+	private function delivery_leadtime($min, $max){
+        $min_leadtime = Carbon::parse(now()->addDays($min));
+        $min_leadtime_y = $min_leadtime->format('Y');
+        $min_leadtime_m = $min_leadtime->format('M');
+        $min_leadtime_d = $min_leadtime->format('d');
+
+        $max_leadtime = Carbon::parse(now()->addDays($max));
+        $max_leadtime_y = $max_leadtime->format('Y');
+        $max_leadtime_m = $max_leadtime->format('M');
+        $max_leadtime_d = $max_leadtime->format('d');
+
+        if($min_leadtime->format('M d, Y') == $max_leadtime->format('M d, Y')){
+            return $min_leadtime->format('M d, Y');
+        }
+
+        if($min_leadtime_y == $max_leadtime_y){
+            if($min_leadtime_m == $max_leadtime_m){
+                return $min_leadtime_m . ' ' . $min_leadtime_d . ' - ' . $max_leadtime_d . ', ' . $min_leadtime_y;
+            }else{
+                return $min_leadtime_m . ' ' . $min_leadtime_d . ' - ' . $max_leadtime_m . ' ' . $max_leadtime_d . ', ' . $min_leadtime_y;
+            }
+        } else {
+            return $min_leadtime->format('M d, Y') . ' - ' . $max_leadtime->format('M d, Y');
+        }
+    }
+
+	private function get_shipping_cost_per_calculation($operator, $op1, $op2, $cost){
+        if($operator == '>') {
+            if($op1 > $op2){
+                return $cost;
+            }
+        }elseif($operator == '>=') {
+            if($op1 >= $op2){
+                return $cost;
+            }
+        }elseif($operator == '==') {
+            if($op1 == $op2){
+                return $cost;
+            }
+        }elseif($operator == '<=') {
+            if($op1 <= $op2){
+                return $cost;
+            }
+        }elseif($operator == '<') {
+            if($op1 < $op2){
+                return $cost;
+            }
+        }
+
+        return false;
+    }
+
+	private function getShippingRates($order_no){
+		$temp = DB::table('fumaco_temp')->where('order_tracker_code', $order_no)->first();
+		if (!$temp) {
+			return [];
+		}
+
+		$address = $temp->xshippadd1 . ' ' . $temp->xshippadd2 . ' ' . $temp->xshipbrgy. ' ' . $temp->xshipcity . ' ' . $temp->xshiprov . ' ' .	$temp->xshipcountry;
+		$region = $temp->xshiprov;
+		$city = $temp->xshipcity;
+
+		$order_items = DB::table('fumaco_order_items as a')->join('fumaco_items as b', 'b.f_idcode', 'a.item_code')
+			->where('a.order_number', $order_no)->get();
+		$total_weight_of_items = 0;
+		$total_amount = collect($order_items)->sum('item_total_price');
+
+		$total_cubic_cm = 0;
+        foreach ($order_items as $row) {
+            $cubic_cm = ($row->f_package_length * $row->f_package_width * $row->f_package_height);
+            $cubic_cm = $cubic_cm * $row->item_qty;
+
+            $total_cubic_cm += $cubic_cm;
+            $total_weight_of_items += $row->f_package_weight * $row->item_qty;
+
+            $packs[] = [
+                "dimensions" => [(float)$row->f_package_length, (float)$row->f_package_width, (float)$row->f_package_height],
+                "weight" => (float)$row->f_package_weight,
+                "quantity" =>  (int)$row->item_qty
+            ];
+        }
+
+		$intersect_array_counts = [];
+        $shipping_address_arr = $this->getAddressDetails($address);
+
+        // get shipping zone based on selected address
+        $shipping_zones = ShippingZoneRate::whereIn('province_name', $shipping_address_arr)
+			->orderBy('shipping_service_id', 'desc')->get();
+
+        $shipping_services_arr = [];
+        foreach($shipping_zones as $row){
+            $address = ($row->city_code > -1) ? $row->city_name . ' ' . $row->province_name : $row->province_name;
+            $address_details = $this->getAddressDetails($address);
+
+            $address_arr_intersect = array_intersect($shipping_address_arr, $address_details);
+
+            if(!in_array($row->shipping_service_id, $shipping_services_arr)){
+                if(isset($address_details) && in_array($city, $address_details) && in_array($region, $address_details)){
+                    array_push($shipping_services_arr, $row->shipping_service_id);
+           
+                    $intersect_array_counts[] = [
+                        'count_intersect' =>count($address_arr_intersect),
+                        'shipping_service_id' => $row->shipping_service_id,
+                    ];
+                }
+            }
+
+            if(!in_array($row->shipping_service_id, $shipping_services_arr)){
+                if(isset($address_details) && ($row->city_code == -1) && in_array($region, $address_details)){
+                    array_push($shipping_services_arr, $row->shipping_service_id);
+
+                    $intersect_array_counts[] = [
+                        'count_intersect' => count($address_arr_intersect),
+                        'shipping_service_id' => $row->shipping_service_id,
+                    ];
+                }
+            }
+        }
+
+        $max_intersect = collect($intersect_array_counts)->max('count_intersect');
+        $shipping_services_arr = collect($intersect_array_counts)->filter(function ($value, $key) use ($max_intersect){
+            return $value['count_intersect'] == $max_intersect;
+        })->toArray();
+
+        $shipping_services_arr = array_column($shipping_services_arr, 'shipping_service_id');
+        $shipping_services_without_conditions = ShippingService::where('shipping_calculation', 'Flat Rate')->whereIn('shipping_service_id', $shipping_services_arr)->get();
+        
+        $shipping_offer_rates = [];
+        foreach($shipping_services_without_conditions as $row){
+            $expected_delivery_date = $this->delivery_leadtime($row->min_leadtime, $row->max_leadtime);
+            $shipping_offer_rates[] = [
+                'shipping_service_name' => $row->shipping_service_name,
+                'expected_delivery_date' => $expected_delivery_date,
+                'shipping_cost' => (float)$row->amount,
+                'external_carrier' => false,
+                'allow_delivery_after' => 0,
+                'pickup' => false,
+                'stores' => [],
+            ];
+        }
+
+       $shipping_services = ShippingService::join('fumaco_shipping_condition as a', 'fumaco_shipping_service.shipping_service_id', 'a.shipping_service_id')
+            ->whereIn('a.shipping_service_id', $shipping_services_arr)->get();
+
+        foreach($shipping_services as $row){
+            $expected_delivery_date = $this->delivery_leadtime($row->min_leadtime, $row->max_leadtime);
+
+            if($row->shipping_calculation == 'Per Cubic cm') {
+                $shipping_cost = $row->shipping_amount * $total_cubic_cm;
+            }
+
+            if($row->shipping_calculation == 'Per Weight') {
+                $shipping_cost = $this->get_shipping_cost_per_calculation($row->conditional_operator, $total_weight_of_items, $row->value, $row->shipping_amount);
+            }
+
+            if($row->shipping_calculation == 'Per Amount') {
+                $shipping_cost = $this->get_shipping_cost_per_calculation($row->conditional_operator, $total_amount, $row->value, $row->shipping_amount);
+            }
+
+            if($row->shipping_calculation == 'Per Quantity') {
+                $shipping_cost = $this->get_shipping_cost_per_calculation($row->conditional_operator, $total_quantity_of_items, $row->value, $row->shipping_amount);
+            }
+
+            if($row->shipping_calculation != 'Flat Rate'){
+                if($shipping_cost > 0 && $shipping_cost < $row->min_charge_amount){
+                    $shipping_cost = $row->min_charge_amount;
+                }
+
+                if($shipping_cost > 0 && $shipping_cost > $row->max_charge_amount){
+                    $shipping_cost = $row->max_charge_amount;
+                }
+            }
+
+            if($shipping_cost !== false) {
+                $shipping_offer_rates[] = [
+                    'shipping_service_name' => $row->shipping_service_name,
+                    'expected_delivery_date' => $expected_delivery_date,
+                    'shipping_cost' => $shipping_cost,
+                    'external_carrier' => false,
+                    'allow_delivery_after' => 0,
+                    'pickup' => false,
+                    'stores' => [],
+                ];
+            }
+        }
+
+        $store_pickup_query = ShippingService::where('shipping_service_name', 'Store Pickup')->get();
+        foreach($store_pickup_query as $row){
+            $stores = DB::table('store_location')
+                ->join('shipping_service_store', 'shipping_service_store.store_location_id', 'store_location.store_id')
+                ->where('shipping_service_id', $row->shipping_service_id)->select('store_name', 'available_from', 'available_to')->get();
+
+            $shipping_offer_rates[] = [
+                'shipping_service_name' => $row->shipping_service_name,
+                'expected_delivery_date' => null,
+                'shipping_cost' => '-',
+                'external_carrier' => false,
+                'allow_delivery_after' => 0,
+                'pickup' => true,
+                'stores' => $stores,
+            ];
+        }
+
+		return $shipping_offer_rates;
 	}
 }
