@@ -102,6 +102,178 @@
 					</div>
 				</div>
 				@endif
+				<strong><h4>Shipping Address : </h4></strong>
+				<br>
+				<table class="table">
+					<thead>
+						<tr>
+							<th></th>
+							<th>Address</th>
+							<th>Contacts</th>
+							<th>Type</th>
+							<th>Action</th>
+						</tr>
+					</thead>
+					<tbody>
+						@forelse ($shipping_addresses as $shipping_address)
+						<tr>
+							<td>
+								<a href="/myprofile/address/{{ $shipping_address->id }}/shipping/change_default">
+								@if($shipping_address->xdefault)
+								<i class="fas fa-check-circle" style="font-size: 24px;"></i>
+								@else
+								<i class="far fa-check-circle" style="font-size: 24px; color:#ada8a8;"></i>
+								@endif
+								</a>
+							</td>
+							<td>{{ $shipping_address->xadd1 .' '. $shipping_address->xadd2 .' '. $shipping_address->xprov }}</td>
+							<td>{{ $shipping_address->xcontactlastname1 .', '.$shipping_address->xcontactname1 }}</td>
+							<td>{{ $shipping_address->add_type }}</td>
+							<td>
+								<button type="button" class="btn btn-success btn-xs" data-toggle="modal" data-target="#shipping-view{{ $shipping_address->id }}">
+									<i class="fas fa-eye"></i>
+								</button>
+								<button type="button" class="btn btn-danger btn-xs" data-toggle="modal" data-target="#shipping-del{{ $shipping_address->id }}">
+									<i class="fas fa-trash-alt"></i>
+								</button>
+								@if($shipping_address->xdefault)
+								<div id="shipping-del{{ $shipping_address->id }}" class="modal fade" role="dialog">
+									<div class="modal-dialog">
+										<div class="modal-content">
+											<div class="modal-header">
+												<h4 class="modal-title">Warning!</h4>
+											</div>
+											<div class="modal-body">
+												<p class="text-center">Cannot delete default shipping address.</p>
+											</div>
+											<div class="modal-footer">
+												<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+											</div>
+										</div>
+									</div>
+								</div>
+								@else
+								<div id="shipping-del{{ $shipping_address->id }}" class="modal fade" role="dialog">
+									<form action="/myprofile/address/{{ $shipping_address->id }}/shipping/delete" method="POST">
+										@csrf
+										@method('delete')
+										<div class="modal-dialog">
+											<div class="modal-content">
+												<div class="modal-header">
+													<h4 class="modal-title">Confirmation</h4>
+												</div>
+												<div class="modal-body">
+													<p class="text-center">Delete shipping address?</p>
+												</div>
+												<div class="modal-footer">
+													<button type="submit" class="btn btn-primary btn-xs">Confirm</button>
+													<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+												</div>
+											</div>
+										</div>
+									</form>
+								</div>
+								@endif
+								<div id="shipping-view{{ $shipping_address->id }}" class="modal fade" role="dialog">
+									<div class="modal-dialog" style="max-width: 80% !important;">
+										<div class="modal-content">
+											<div class="modal-header">
+												<h4 class="modal-title">Shipping Information</h4>
+											</div>
+											<div class="modal-body">
+												<div class="row">
+													<div class="col">
+														<label for="x" class="myprofile-font-form"><strong>Contact Person</strong></label>
+														<br>
+													</div>
+												</div>
+												<div class="row">
+													<div class="col">
+														<label for="Address1_1" class="myprofile-font-form">First Name : </label>
+														<input type="text" class="form-control caption_1" id="Address1_1" value="{{ $shipping_address->xcontactname1 }}">
+													</div>
+													<div class="col">
+														<label for="Address2_1" class="myprofile-font-form">Last Name : </label>
+														<input type="text" class="form-control caption_1" id="Address2_1" value="{{ $shipping_address->xcontactlastname1 }}">
+													</div>
+												</div>
+												<div class="row"><br></div>
+												<div class="row">
+													<div class="col">
+														<label for="Address1_1" class="myprofile-font-form">Contact Number : </label>
+														<input type="text" class="form-control caption_1" id="Address1_1" value="{{ $shipping_address->xcontactnumber1 }}">
+													</div>
+													<div class="col">
+														<label for="Address2_1" class="myprofile-font-form">Contact Email : </label>
+														<input type="text" class="form-control caption_1" id="Address2_1" value="{{ $shipping_address->xcontactemail1 }}">
+													</div>
+												</div>
+												<div class="row">
+													<div class="col">
+														<br>
+														<label for="x" class="myprofile-font-form"><strong>Address</strong></label>
+														<br>
+													</div>
+												</div>
+												<div class="row">
+													<div class="col">
+														<label for="Address1_1" class="myprofile-font-form">Address Line 1 : </label>
+														<input type="text" class="form-control caption_1" id="Address1_1" value="{{ $shipping_address->xadd1 }}">
+													</div>
+													<div class="col">
+														<label for="Address2_1" class="myprofile-font-form">Address Line 2 : </label>
+														<input type="text" class="form-control caption_1" id="Address2_1" value="{{ $shipping_address->xadd2 }}">
+													</div>
+												</div>
+												<br>
+												<div class="row">
+													<div class="col">
+														<label for="province1_1" class="myprofile-font-form">Province : </label>
+														<input type="text" class="form-control caption_1" id="province1_1" value="{{ $shipping_address->xprov }}">
+													</div>
+													<div class="col">
+														<label for="City_Municipality1_1" class="myprofile-font-form">City / Municipality : </label>
+														<input type="text" class="form-control caption_1" id="City_Municipality1_1" value="{{ $shipping_address->xcity }}">
+													</div>
+													<div class="col">
+														<label for="Barangay1_1" class="myprofile-font-form">Barangay : </label>
+														<input type="text" class="form-control caption_1" id="Barangay1_1" value="{{ $shipping_address->xbrgy }}">
+													</div>
+												</div>
+												<br>
+												<div class="row">
+													<div class="col">
+														<label for="postal1_1" class="myprofile-font-form">Postal Code : </label>
+														<input type="text" class="form-control caption_1" id="postal1_1" value="{{ $shipping_address->xpostal }}">
+													</div>
+													<div class="col">
+														<label for="country_region1_1" class="myprofile-font-form">Country / Region : </label>
+														<input type="text" class="form-control caption_1" id="ctounry_1" value="{{ $shipping_address->xcountry }}">
+													</div>
+													<div class="col">
+														<label for="Address_type1_1" class="myprofile-font-form">Address Type :</label>
+														<input type="text" class="form-control caption_1" id="Address_type1_1_type" value="{{ $shipping_address->add_type }}">
+													</div>
+												</div>
+											</div>
+											<div class="modal-footer">
+												<button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+											</div>
+										</div>
+									</div>
+								</div>
+							</td>
+							</tr>
+						@empty
+						<tr>
+							<td colspan="5" class="text-center">No shipping address found.</td>
+						</tr>
+						@endforelse
+					</tbody>
+				</table>
+				<br>
+				<a href="/myprofile/address/shipping/new" class="btn btn-primary" role="button">Add New Shipping Address</a>
+				<br><br><br>
 				<strong><h4>Billing Address : </h4></strong>
 				<br>
 				<table class="table">
@@ -276,178 +448,7 @@
 				<br>
 				<a href="/myprofile/address/billing/new" class="btn btn-primary" role="button">Add New Billing Address</a>
 				<br><br><br>
-				<strong><h4>Shipping Address : </h4></strong>
-				<br>
-				<table class="table">
-					<thead>
-						<tr>
-							<th></th>
-							<th>Address</th>
-							<th>Contacts</th>
-							<th>Type</th>
-							<th>Action</th>
-						</tr>
-					</thead>
-					<tbody>
-						@forelse ($shipping_addresses as $shipping_address)
-						<tr>
-							<td>
-								<a href="/myprofile/address/{{ $shipping_address->id }}/shipping/change_default">
-								@if($shipping_address->xdefault)
-								<i class="fas fa-check-circle" style="font-size: 24px;"></i>
-								@else
-								<i class="far fa-check-circle" style="font-size: 24px; color:#ada8a8;"></i>
-								@endif
-								</a>
-							</td>
-							<td>{{ $shipping_address->xadd1 .' '. $shipping_address->xadd2 .' '. $shipping_address->xprov }}</td>
-							<td>{{ $shipping_address->xcontactlastname1 .', '.$shipping_address->xcontactname1 }}</td>
-							<td>{{ $shipping_address->add_type }}</td>
-							<td>
-								<button type="button" class="btn btn-success btn-xs" data-toggle="modal" data-target="#shipping-view{{ $shipping_address->id }}">
-									<i class="fas fa-eye"></i>
-								</button>
-								<button type="button" class="btn btn-danger btn-xs" data-toggle="modal" data-target="#shipping-del{{ $shipping_address->id }}">
-									<i class="fas fa-trash-alt"></i>
-								</button>
-								@if($shipping_address->xdefault)
-								<div id="shipping-del{{ $shipping_address->id }}" class="modal fade" role="dialog">
-									<div class="modal-dialog">
-										<div class="modal-content">
-											<div class="modal-header">
-												<h4 class="modal-title">Warning!</h4>
-											</div>
-											<div class="modal-body">
-												<p class="text-center">Cannot delete default shipping address.</p>
-											</div>
-											<div class="modal-footer">
-												<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-											</div>
-										</div>
-									</div>
-								</div>
-								@else
-								<div id="shipping-del{{ $shipping_address->id }}" class="modal fade" role="dialog">
-									<form action="/myprofile/address/{{ $shipping_address->id }}/shipping/delete" method="POST">
-										@csrf
-										@method('delete')
-										<div class="modal-dialog">
-											<div class="modal-content">
-												<div class="modal-header">
-													<h4 class="modal-title">Confirmation</h4>
-												</div>
-												<div class="modal-body">
-													<p class="text-center">Delete shipping address?</p>
-												</div>
-												<div class="modal-footer">
-													<button type="submit" class="btn btn-primary btn-xs">Confirm</button>
-													<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-												</div>
-											</div>
-										</div>
-									</form>
-								</div>
-								@endif
-								<div id="shipping-view{{ $shipping_address->id }}" class="modal fade" role="dialog">
-									<div class="modal-dialog" style="max-width: 80% !important;">
-										<div class="modal-content">
-											<div class="modal-header">
-												<h4 class="modal-title">Shipping Information</h4>
-											</div>
-											<div class="modal-body">
-												<div class="row">
-													<div class="col">
-														<label for="x" class="myprofile-font-form"><strong>Contact Person</strong></label>
-														<br>
-													</div>
-												</div>
-												<div class="row">
-													<div class="col">
-														<label for="Address1_1" class="myprofile-font-form">First Name : </label>
-														<input type="text" class="form-control caption_1" id="Address1_1" value="{{ $shipping_address->xcontactname1 }}">
-													</div>
-													<div class="col">
-														<label for="Address2_1" class="myprofile-font-form">Last Name : </label>
-														<input type="text" class="form-control caption_1" id="Address2_1" value="{{ $shipping_address->xcontactlastname1 }}">
-													</div>
-												</div>
-												<div class="row"><br></div>
-												<div class="row">
-													<div class="col">
-														<label for="Address1_1" class="myprofile-font-form">Contact Number : </label>
-														<input type="text" class="form-control caption_1" id="Address1_1" value="{{ $shipping_address->xcontactnumber1 }}">
-													</div>
-													<div class="col">
-														<label for="Address2_1" class="myprofile-font-form">Contact Email : </label>
-														<input type="text" class="form-control caption_1" id="Address2_1" value="{{ $shipping_address->xcontactemail1 }}">
-													</div>
-												</div>
-												<div class="row">
-													<div class="col">
-														<br>
-														<label for="x" class="myprofile-font-form"><strong>Address</strong></label>
-														<br>
-													</div>
-												</div>
-												<div class="row">
-													<div class="col">
-														<label for="Address1_1" class="myprofile-font-form">Address Line 1 : </label>
-														<input type="text" class="form-control caption_1" id="Address1_1" value="{{ $shipping_address->xadd1 }}">
-													</div>
-													<div class="col">
-														<label for="Address2_1" class="myprofile-font-form">Address Line 2 : </label>
-														<input type="text" class="form-control caption_1" id="Address2_1" value="{{ $shipping_address->xadd2 }}">
-													</div>
-												</div>
-												<br>
-												<div class="row">
-													<div class="col">
-														<label for="province1_1" class="myprofile-font-form">Province : </label>
-														<input type="text" class="form-control caption_1" id="province1_1" value="{{ $shipping_address->xprov }}">
-													</div>
-													<div class="col">
-														<label for="City_Municipality1_1" class="myprofile-font-form">City / Municipality : </label>
-														<input type="text" class="form-control caption_1" id="City_Municipality1_1" value="{{ $shipping_address->xcity }}">
-													</div>
-													<div class="col">
-														<label for="Barangay1_1" class="myprofile-font-form">Barangay : </label>
-														<input type="text" class="form-control caption_1" id="Barangay1_1" value="{{ $shipping_address->xbrgy }}">
-													</div>
-												</div>
-												<br>
-												<div class="row">
-													<div class="col">
-														<label for="postal1_1" class="myprofile-font-form">Postal Code : </label>
-														<input type="text" class="form-control caption_1" id="postal1_1" value="{{ $shipping_address->xpostal }}">
-													</div>
-													<div class="col">
-														<label for="country_region1_1" class="myprofile-font-form">Country / Region : </label>
-														<input type="text" class="form-control caption_1" id="ctounry_1" value="{{ $shipping_address->xcountry }}">
-													</div>
-													<div class="col">
-														<label for="Address_type1_1" class="myprofile-font-form">Address Type :</label>
-														<input type="text" class="form-control caption_1" id="Address_type1_1_type" value="{{ $shipping_address->add_type }}">
-													</div>
-												</div>
-											</div>
-											<div class="modal-footer">
-												<button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
-											</div>
-										</div>
-									</div>
-								</div>
-							</td>
-							</tr>
-						@empty
-						<tr>
-							<td colspan="5" class="text-center">No shipping address found.</td>
-						</tr>
-						@endforelse
-					</tbody>
-				</table>
-				<br>
-				<a href="/myprofile/address/shipping/new" class="btn btn-primary" role="button">Add New Shipping Address</a>
-				<br><br><br>
+				
 			</div>
 		</div>
 	</div>

@@ -122,6 +122,12 @@
 								<label for="contact_no" class="myprofile-font-form">Contact Number : *</label>
 								<input type="text" class="form-control caption_1" id="contact_no" name="contact_no" value="{{ old('contact_no') }}" required>
 							</div>
+
+							<div class="col">
+								<label for="mobile_no" class="myprofile-font-form">Mobile Number : *</label>
+								<input type="text" class="form-control caption_1" id="mobile_no" name="mobile_no" value="" required/>
+							</div>
+
 							<div class="col">
 								<label for="email_address" class="myprofile-font-form">Email : *</label>
 								<input type="email" class="form-control caption_1" id="email_address" name="email_address" value="{{ old('email_address') }}" required>

@@ -624,7 +624,7 @@ class FrontendController extends Controller
             ->where('user_idx', Auth::user()->id)->where('address_class', 'Billing')->get();
 
         $shipping_addresses = DB::table('fumaco_user_add')
-            ->where('user_idx', Auth::user()->id)->where('address_class', 'Shipping')->get();
+            ->where('user_idx', Auth::user()->id)->where('address_class', 'Delivery')->get();
 
         return view('frontend.profile.address_list', compact('default_billing_address', 'billing_addresses', 'shipping_addresses'));
     }
@@ -654,7 +654,7 @@ class FrontendController extends Controller
     public function setDefaultAddress($id, $type) {
         DB::beginTransaction();
         try {
-            $address_class = ($type == 'billing') ? 'Billing' : 'Shipping';
+            $address_class = ($type == 'billing') ? 'Billing' : 'Delivery';
             $address_details = DB::table('fumaco_user_add')->where('id', $id)->first();
             if($address_details) {
                 if (!$address_details->xdefault) {
@@ -700,7 +700,7 @@ class FrontendController extends Controller
                 'address_type' => 'required',
             ]);
 
-            $address_class = ($type == 'billing') ? 'Billing' : 'Shipping';            
+            $address_class = ($type == 'billing') ? 'Billing' : 'Delivery';            
 
             DB::table('fumaco_user_add')->insert(
                 [
@@ -717,6 +717,7 @@ class FrontendController extends Controller
                     'xcontactname1' => $request->first_name,
                     'xcontactlastname1' => $request->last_name,
                     'xcontactnumber1' => $request->contact_no,
+                    'xmobile_number' => $request->mobile_no,
                     'xcontactemail1' => $request->email_address
                 ]
             );
