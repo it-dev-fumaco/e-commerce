@@ -9,66 +9,62 @@ use DB;
 
 class OrderController extends Controller
 {
-    public function order_list(){
-        $orders = DB::table('fumaco_temp')->where('xstatus', 2)->get();
+    // public function searchOrder(Request $request){
+    //     $order_no = "testsssssssssssssssssss";
+    //     return redirect('/admin/order/order_lists/'.$order_no);
+    // }
+
+    public function orderList(Request $request){
+
+        $search_id = ($request->search) ? $request->search : '';
+        $order_status = ($request->order_status) ? $request->order_status : '';
+
+        $orders = DB::table('fumaco_order')->where('order_number', 'LIKE', '%'.$search_id.'%')->where('order_status', 'LIKE', '%'.$order_status.'%')->orderBy('id', 'desc')->paginate(10);
 
         $orders_arr = [];
+        $items_arr = [];
 
         foreach($orders as $o){
-            $items = DB::table('fumaco_order_items')->where('order_number', $o->xlogs)->first();
-        //     $item_data2_fumaco = $data_1['xadd1'];
-        //     $item_data3_fumaco = $data_1['xadd2'];
-
-        //     $item_data4_fumaco = $data_1['xprov'];
-        //     $item_data5_fumaco = $data_1['xcity'];
-        //     $item_data6_fumaco = $data_1['xbrgy'];
-        //     $item_data7_fumaco = $data_1['xpostal'];
-        //     $item_data8_fumaco = $data_1['xcountry'];
-        //     $item_data9_fumaco = $data_1['xaddresstype'];
-
-        //     $item_data10_fumaco = $data_1['xemail'];
-        //     $item_data11_fumaco = $data_1['xmobile'];
-        //     $item_data12_fumaco = $data_1['xcontact'];
-
-        //     $item_data13_fumaco = $data_1['xshippadd1'];
-        //     $item_data14_fumaco = $data_1['xshippadd2'];
-        //     $item_data15_fumaco = $data_1['xshiprov'];
-        //     $item_data16_fumaco = $data_1['xshipcity'];
-        //     $item_data17_fumaco = $data_1['xshipbrgy'];
-        //     $item_data18_fumaco = $data_1['xshippostalcode'];
-        //     $item_data19_fumaco = $data_1['xshipcountry'];
-        //     $item_data20_fumaco = $data_1['xshiptype'];
-
-        // <p><strong>Customer Information Address : </strong> '.$item_data2_fumaco.' '.$item_data3_fumaco.', '.$item_data4_fumaco.' '.$item_data5_fumaco.' '.$item_data6_fumaco.' '.$item_data8_fumaco.' '.$item_data7_fumaco.'</p>
-
-        // <p><strong>Customer Shipping Address : </strong> '.$item_data13_fumaco.' '.$item_data14_fumaco.', '.$item_data15_fumaco.' '.$item_data16_fumaco.' '.$item_data17_fumaco.' '.$item_data19_fumaco.' '.$item_data18_fumaco.'</p>
+            $items = DB::table('fumaco_order_items')->where('order_number', $o->order_number)->get();
+            foreach($items as $i){
+                $items_arr[] = [
+                    'item_code' => $i->item_code,
+                    'item_name' => $i->item_name,
+                    'item_qty' => $i->item_qty,
+                    'item_price' => $i->item_price,
+                    'item_total' => $i->item_total_price,
+                ];
+            }
             $orders_arr[] = [
-                'order_no' => $o->xlogs,
-                'first_name' => $o->xfname,
-                'last_name' => $o->xlname,
-                'email' => $o->xemail,
-                'date' => $o->xdateupdate,
-                'order_tracker_code' => $o->order_tracker_code,
-                'cust_id' => $o->xtempcode,
-                'item_name' => $items->item_name,
-                'item_qty' => $items->item_qty,
-                'item_price' => $items->item_price,
-                'item_total' => $items->item_total_price,
-                'bill_address1' => $o->xadd1,
-                'bill_address2' => $o->xadd2,
-                'bill_province' => $o->xprov,
-                'bill_city' => $o->xcity,
-                'bill_brgy' => $o->xbrgy,
-                'bill_country' => $o->xcountry,
-                'ship_address1' => $o->xadd1,
-                'ship_address2' => $o->xadd2,
-                'ship_province' => $o->xprov,
-                'ship_city' => $o->xcity,
-                'ship_brgy' => $o->xbrgy,
-                'ship_country' => $o->xcountry,
+                'order_no' => $o->order_number,
+                'first_name' => $o->order_name,
+                'last_name' => $o->order_lastname,
+                'bill_contact_person' => $o->order_contactperson,
+                'ship_contact_person' => $o->order_ship_contactperson,
+                'email' => $o->order_email,
+                'date' => $o->order_update,
+                'ordered_items' => $items_arr,
+                'order_tracker_code' => $o->tracker_code,
+                'cust_id' => $o->order_account,
+                'bill_address1' => $o->order_bill_address1,
+                'bill_address2' => $o->order_bill_address2,
+                'bill_province' => $o->order_bill_prov,
+                'bill_city' => $o->order_bill_city,
+                'bill_brgy' => $o->order_bill_brgy,
+                'bill_country' => $o->order_bill_country,
+                'bill_postal' => $o->order_bill_postal,
+                'ship_address1' => $o->order_ship_address1,
+                'ship_address2' => $o->order_ship_address2,
+                'ship_province' => $o->order_ship_prov,
+                'ship_city' => $o->order_ship_city,
+                'ship_brgy' => $o->order_ship_brgy,
+                'ship_country' => $o->order_ship_country,
+                'ship_postal' => $o->order_ship_postal,
+                'shipping_id' => $o->order_shipping,
+                'shipping_amount' => $o->order_shipping_amount,
+                'total_amount' => ($o->order_shipping_amount + $o->order_subtotal)
             ];
         }
-
-        return view('backend.orders.order_list', compact('orders_arr'));
+        return view('backend.orders.order_list', compact('orders_arr', 'orders'));
     }
 }

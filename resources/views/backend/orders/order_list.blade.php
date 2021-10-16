@@ -31,6 +31,28 @@
                                     <h3 class="card-title">List Customers</h3>
                                 </div>
                                 <div class="card-body">
+                                    <form action="/admin/order/order_lists/" method="get">
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                <div class="input-group mb-3">
+                                                    <input type="text" class="form-control" name="search" aria-describedby="button-addon2" placeholder="Order ID">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <select class="form-control" name="order_status">
+                                                    <option selected disabled value="">Order Status</option>
+                                                    <option value="Order Placed">Order Placed</option>
+                                                    <option value="Order Received">Order Received</option>
+                                                    <option value="Ready for Delivery">Ready for Delivery</option>
+                                                    <option value="Delivered">Delivered</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <button class="btn btn-success" type="submit" id="button-addon2">Search</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                    
                                     <table id="example2" data-pagination="true" class="table table-bordered table-hover">
                                         <thead>
                                             <tr>
@@ -44,42 +66,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {{-- $item_data00_fumaco = $data_1['xtempcode'];
-                                            $item_data0_fumaco = $data_1['xfname'];
-                                            $item_data1_fumaco = $data_1['xlname'];
-                
-                                            $item_data2_fumaco = $data_1['xadd1'];
-                                            $item_data3_fumaco = $data_1['xadd2'];
-                
-                                            $item_data4_fumaco = $data_1['xprov'];
-                                            $item_data5_fumaco = $data_1['xcity'];
-                                            $item_data6_fumaco = $data_1['xbrgy'];
-                                            $item_data7_fumaco = $data_1['xpostal'];
-                                            $item_data8_fumaco = $data_1['xcountry'];
-                                            $item_data9_fumaco = $data_1['xaddresstype'];
-                
-                                            $item_data10_fumaco = $data_1['xemail'];
-                                            $item_data11_fumaco = $data_1['xmobile'];
-                                            $item_data12_fumaco = $data_1['xcontact'];
-                
-                                            $item_data13_fumaco = $data_1['xshippadd1'];
-                                            $item_data14_fumaco = $data_1['xshippadd2'];
-                                            $item_data15_fumaco = $data_1['xshiprov'];
-                                            $item_data16_fumaco = $data_1['xshipcity'];
-                                            $item_data17_fumaco = $data_1['xshipbrgy'];
-                                            $item_data18_fumaco = $data_1['xshippostalcode'];
-                                            $item_data19_fumaco = $data_1['xshipcountry'];
-                                            $item_data20_fumaco = $data_1['xshiptype'];
-                                            $item_data21_fumaco = $data_1['xdateupdate'];
-                                            $item_data22_fumaco = $data_1['xstatus'];
-                
-                                            $item_data23_fumaco = $data_1['order_status'];
-                                            $item_data24_fumaco = $data_1['order_tracker_code'];
-                                            $item_data25_fumaco = $data_1['order_shipping_type'];
-                                           $item_data27_fumaco = $data_1['xlogs'];
-                                           $item_data28_fumaco = $data_1['xdateupdate']; --}}
-
-                                            @foreach($orders_arr as $order)
+                                            @forelse($orders_arr as $order)
                                                 <tr>
                                                     <td>{{ $order['order_no'] }}</td>
                                                     <td>{{ $order['first_name'] }}</td>
@@ -89,206 +76,167 @@
                                                     <td>{{ $order['order_tracker_code'] }}</td>
                                                     <td>
                                                         <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#order-{{ $order['cust_id'] }}">View Orders</button>
+
+                                                        <div class="modal fade" id="order-{{ $order['cust_id'] }}" role="dialog">
+                                                            <div class="modal-dialog">
+                                                                <div class="modal-content">
+                                                                    <div class="modal-header">
+                                                                        <h4 class="modal-title">ORDER NUMBER : {{ $order['order_no'] }}</h4>
+                                                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                                                    </div>
+        
+                                                                    <div class="modal-body">
+                                                                        <p><strong>Customer Name : </strong> {{ ($order['bill_contact_person']) ? $order['bill_contact_person'] : $order['first_name'] . " " . $order['last_name'] }}</p>
+        
+                                                                        <p><strong>Customer Information Address : </strong>{{ $order['bill_address1'] . " " . $order['bill_address2'] . ", " . $order['bill_province'] . " " . $order['bill_city'] . " " . $order['bill_brgy'] . ' ' .  $order['bill_country'] . ' ' . $order['bill_postal'] }}
+        
+                                                                        </p>
+        
+                                                                        <p><strong>Customer Shipping Address : </strong>{{ $order['ship_address1'] . " " . $order['ship_address2'] . ", " . $order['ship_province'] . " " . $order['ship_city'] . " " . $order['ship_brgy'] . ' ' .  $order['ship_country'] . ' ' . $order['ship_postal'] }}
+                                                                        </p>
+        
+                                                                        <p><strong>Date Order : </strong> {{ $order['date'] }}</p>
+        
+                                                                        <hr>
+
+                                                                        <div class="row">
+                                                                            <table class="table">
+                                                                                <tr>
+                                                                                    <th>ITEM CODE</th>
+                                                                                    <th>ITEM</th>
+                                                                                    <th>QTY</th>
+                                                                                    <th>PRICE</th>
+                                                                                    <th>TOTAL PRICE</th>
+                                                                                </tr>
+                                                                                @foreach ($order['ordered_items'] as $item)
+                                                                                    <tr>
+                                                                                        <td>{{ $item['item_code'] }}</td>
+                                                                                        <td>{{ $item['item_name'] }}</td>
+                                                                                        <td>{{ $item['item_qty'] }}</td>
+                                                                                        <td>{{ $item['item_price'] }}</td>
+                                                                                        <td>{{ $item['item_total'] }}</td>
+                                                                                    </tr>
+                                                                                @endforeach
+                                                                            </table>
+                                                                        </div>   
+                                                                        <hr>
+                                                                        <div class="row">
+                                                                            <div class="col-md-6">
+                                                                                <p>SHIPPING FEE</p>
+                                                                            </div>
+                                                                            <div class="col-md-6">
+                                                                                <p style="float: right;">{{ $order['shipping_amount'] }}</p>
+                                                                            </div>
+                                                                        </div>
+                                                                        <hr>
+        
+                                                                        <div class="row">
+                                                                            <div class="col-md-6">
+                                                                                <p>TOTAL PRICE</p>
+                                                                            </div>
+                                                                            <div class="col-md-6">
+                                                                                <p style="float: right;">{{ $order['total_amount'] }}</p>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+        
+        
+                                                                    <div class="modal-footer">
+        
+                                                                        <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#tracker-{{ $order['cust_id'] }}">
+                                                                            Add Tracker Code
+                                                                        </button>
+
+                                                                        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#delivered-{{ $order['cust_id'] }}">
+                                                                            Delivered Order
+                                                                        </button>
+
+                                                                        <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#cancel-{{ $order['cust_id'] }}">
+                                                                            Cancel Order
+                                                                        </button>
+
+                                                                        <div class="modal fade confirm-modal" id="tracker-{{ $order['cust_id'] }}" tabindex="-1" role="dialog" aria-labelledby="tracker-{{ $order['cust_id'] }}" aria-hidden="true">
+                                                                            <div class="modal-dialog" role="document">
+                                                                              <div class="modal-content">
+                                                                                <div class="modal-header">
+                                                                                    <h5 class="modal-title">Add Tracker Code</h5>
+                                                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                                      <span aria-hidden="true">&times;</span>
+                                                                                    </button>
+                                                                                </div>
+                                                                                <div class="modal-body">
+                                                                                    <div class="col">
+                                                                                        <form action="" method="post">
+                                                                                            <label for="tracker">Tracker Code: </label>
+                                                                                            <input type="text" class="form-control" id="tracker" name="tracker" required>
+                                                                                        </form>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="modal-footer">
+                                                                                  <a href="" class="btn btn-primary">YES</a>
+                                                                                  <button type="button" class="btn btn-secondary" data-dismiss="cmodal">NO</button>
+                                                                                </div>
+                                                                              </div>
+                                                                            </div>
+                                                                        </div>
+                                                                          
+                                                                        <div class="modal fade confirm-modal" id="delivered-{{ $order['cust_id'] }}" tabindex="-1" role="dialog" aria-labelledby="delivered-{{ $order['cust_id'] }}" aria-hidden="true">
+                                                                            <div class="modal-dialog" role="document">
+                                                                              <div class="modal-content">
+                                                                                <div class="modal-header">
+                                                                                    <h5 class="modal-title">Order Delivered</h5>
+                                                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                                      <span aria-hidden="true">&times;</span>
+                                                                                    </button>
+                                                                                </div>
+                                                                                <div class="modal-body">
+                                                                                    Order has been delivered?
+                                                                                </div>
+                                                                                <div class="modal-footer">
+                                                                                  <a href="" class="btn btn-primary">YES</a>
+                                                                                  <button type="button" class="btn btn-secondary" data-dismiss="cmodal">NO</button>
+                                                                                </div>
+                                                                              </div>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="modal fade confirm-modal" id="cancel-{{ $order['cust_id'] }}" tabindex="-1" role="dialog" aria-labelledby="cancel-{{ $order['cust_id'] }}" aria-hidden="true">
+                                                                            <div class="modal-dialog" role="document">
+                                                                              <div class="modal-content">
+                                                                                <div class="modal-header">
+                                                                                    <h5 class="modal-title">Cancel Order</h5>
+                                                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                                      <span aria-hidden="true">&times;</span>
+                                                                                    </button>
+                                                                                </div>
+                                                                                <div class="modal-body">
+                                                                                    Order has been cancelled?
+                                                                                </div>
+                                                                                <div class="modal-footer">
+                                                                                  <a href="" class="btn btn-primary">YES</a>
+                                                                                  <button type="button" class="btn btn-secondary" data-dismiss="cmodal">NO</button>
+                                                                                </div>
+                                                                              </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+        
+                                                            </div>
+                                                        </div>
                                                     </td>
                                                 </tr>
 
-                                                <div class="modal fade" id="order-{{ $order['cust_id'] }}" role="dialog">
-                                                    <div class="modal-dialog">
-                                                        <div class="modal-content">
-                                                            <div class="modal-header">
-                                                                <h4 class="modal-title">ORDER NUMBER : {{ $order['order_no'] }}</h4>
-                                                                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                                            </div>
-
-                                                            <div class="modal-body">
-
-                                                                <p><strong>Customer Name : </strong> {{ $order['first_name'] . " " . $order['last_name'] }}</p>
-
-                                                                <p><strong>Customer Information Address : </strong> '.$item_data2_fumaco.' '.$item_data3_fumaco.', '.$item_data4_fumaco.' '.$item_data5_fumaco.' '.$item_data6_fumaco.' '.$item_data8_fumaco.' '.$item_data7_fumaco.'</p>
-
-                                                                <p><strong>Customer Shipping Address : </strong> '.$item_data13_fumaco.' '.$item_data14_fumaco.', '.$item_data15_fumaco.' '.$item_data16_fumaco.' '.$item_data17_fumaco.' '.$item_data19_fumaco.' '.$item_data18_fumaco.'</p>
-
-                                                                <p><strong>Date Order : </strong> '.$item_data21_fumaco.'</p>
-
-                                                                <hr>
-
-
-
-                                                                <div class="row">
-                                                                <div class="col-md-2">
-                                                                <strong>ITEM CODE</strong>
-                                                                </div>
-
-
-                                                                <div class="col-md-4">
-                                                                    <strong>ITEM</strong>
-                                                                </div>
-
-                                                                <div class="col-md-2">
-                                                                    <strong>QTY</strong>
-                                                                </div>
-
-
-                                                                <div class="col-md-2">
-                                                                    <strong>PRICE</strong>
-                                                                </div>
-
-
-                                                                <div class="col-md-2">
-                                                                    <strong>TOTAL PRICE</strong>
-                                                                </div>
-
-
-                                                                </div>
-
-                                                                <hr>
-
-
-
-                                                                ';
-
-                                                                $A1_sqlx = "SELECT * FROM fumaco_order_items WHERE order_number = '$item_data27_fumaco'";
-                                                                $data1_xx = $fumaco_conn ->query($A1_sqlx);
-
-                                                                if ($data1_xx->num_rows > 0) {
-
-                                                                while($data_1x = $data1_xx->fetch_assoc())
-
-                                                                    {
-
-
-                                                                    $xxxx0 = $data_1x['item_code'];
-                                                                    $xxxx1 = $data_1x['item_name'];
-                                                                    $xxxx2 = $data_1x['item_qty'];
-
-                                                                    $xxxx4x = $data_1x['item_price'];
-
-
-                                                                    $xxxx4 = number_format("$xxxx4x",2);
-
-
-                                                                    $xxxx5x = $data_1x['item_total_price'];
-
-                                                                    $xxxx5 = number_format("$xxxx5x",2);
-
-                                                                    echo '
-
-                                                                    <div class="row">
-                                                                    <div class="col-md-2">
-                                                                        '.$xxxx0.'
-
-                                                                    </div>
-
-
-                                                                        <div class="col-md-4">
-                                                                        '.$xxxx1.'
-
-                                                                        </div>
-
-                                                                        <div class="col-md-2">
-                                                                        '.$xxxx2.'
-
-                                                                        </div>
-
-
-                                                                        <div class="col-md-2">
-                                                                        '.$xxxx4.'
-
-                                                                        </div>
-
-
-                                                                        <div class="col-md-2">
-                                                                        '.$xxxx5.'
-
-                                                                        </div>
-
-
-                                                                    </div>
-                                                                    <br>
-                                                                <hr>
-                                                                <div class="row">
-                                                                <div class="col-md-2">
-                                                                    SHIPPING FEE
-
-                                                                </div>
-
-                                                                <div class="col-md-4">
-                                                                    &nbsp
-
-                                                                </div>
-
-                                                                <div class="col-md-2">
-                                                                    &nbsp
-
-                                                                </div>
-
-
-
-
-                                                                <div class="col-md-2">
-                                                                    &nbsp
-
-                                                                </div>
-
-
-                                                                <div class="col-md-2">
-                                                                    0.00
-                                                                </div>
-                                                                </div>
-                                                                <hr>
-
-                                                                <div class="row">
-                                                                <div class="col-md-2">
-                                                                    TOTAL PRICE
-
-                                                                </div>
-
-                                                                <div class="col-md-4">
-                                                                    &nbsp
-
-                                                                </div>
-
-                                                                <div class="col-md-2">
-                                                                    &nbsp
-
-                                                                </div>
-
-
-                                                                <div class="col-md-2">
-                                                                    &nbsp
-
-                                                                </div>
-
-
-                                                                <div class="col-md-2">
-
-                                                                
-                                                                </div>
-                                                                </div>
-                                                            </div>
-
-
-                                                            <div class="modal-footer">
-
-
-                                                            <span id="imagex1" style="color: red; font-size: 24px; display:none;">Order has been delivered? <a href="orderdeliver.php?id='.$item_data27_fumaco.'" class="btn btn-primary btn-sm active" role="button" aria-pressed="true">YES</a> / <button type="button" class="btn btn-warning btn-sm active" onclick="show_hide()">No</button>&nbsp;&nbsp;&nbsp;&nbsp;</span>
-
-                                                            <span id="imagex2" style="color: red; font-size: 24px; display:none;">Order has been cancelled? <a href="cancelorder_1.php?id='.$item_data27_fumaco.'" class="btn btn-danger btn-sm active" role="button" aria-pressed="true">YES</a> / <button type="button" class="btn btn-warning btn-sm active" onclick="show_hide1()">No</button>&nbsp;&nbsp;&nbsp;&nbsp;</span>
-
-
-                                                            <a href="add_tracker_code.php?id='.$item_data27_fumaco.'" class="btn btn-info btn-sm active" role="button" aria-pressed="true">Add Tracking Code</a>
-
-                                                            <button type="button" class="btn btn-success btn-sm active" onclick="show_hide()">Delivered Order</button>
-                                                            <button type="button" class="btn btn-danger btn-sm active" onclick="show_hide1()">Cancel Order</button>
-
-                                                            </div>
-                                                        </div>
-
-                                                    </div>
-                                                </div>
-                                            @endforeach
+                                                
+                                                
+                                            @empty
+                                                <tr><td colspan=7 class="text-center"><b>No Orders</b></td></tr>
+                                            @endforelse
                                         </tbody>
                                     </table>
+                                </div>
+                                <div class="float-right mt-4">
+                                    {{ $orders->withQueryString()->links('pagination::bootstrap-4') }}
                                 </div>
                             </div>
                         </div>
@@ -297,4 +245,10 @@
             </section>
         </div>
     </div>
+
+    <style>
+        .confirm-modal{
+            background: rgba(0, 0, 0, .7);
+        }
+    </style>
 @endsection

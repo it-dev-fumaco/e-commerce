@@ -159,7 +159,8 @@ Route::prefix('admin')->group(function () {
         Route::post('/add_media_records', 'MediaController@add_media_record');
         Route::post('/delete_media', 'MediaController@delete_media_record');
 
-        Route::get('/order/order_lists', 'OrderController@order_list');
+        Route::get('/order/order_lists/', 'OrderController@orderList');
+        // Route::get('/order/search_order', 'OrderController@searchOrder');
 
         // SHIPPING SERVICES ROUTES CMS
         Route::get('/shipping/list', 'ShippingController@viewList');
