@@ -88,187 +88,187 @@
                                                                                             <label for="x2">Image : </label>
                                                                                             <br>
                                                                                             <div class="form-check form-check-inline">
-                                                                                                <input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="nav1.jpg" required>
+                                                                                                <input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="nav1.jpg" required {{ ($c->image == "nav1.jpg") ? 'checked' : '' }}>
                                                                                                 <label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/nav1.jpg') }}" width="30" ></label>
                                                                                               </div>
                           
                           
                                                                                               <div class="form-check form-check-inline">
-                                                                                                <input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="nav2.jpg" required>
+                                                                                                <input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="nav2.jpg" required {{ ($c->image == "nav2.jpg") ? 'checked' : '' }}>
                                                                                                 <label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/nav2.jpg') }}" width="30"></label>
                                                                                               </div>
                           
                           
                                                                                               <div class="form-check form-check-inline">
-                                                                                                <input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="nav3.jpg" required>
+                                                                                                <input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="nav3.jpg" required {{ ($c->image == "nav3.jpg") ? 'checked' : '' }}>
                                                                                                 <label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/nav3.jpg') }}" width="30"></label>
                                                                                               </div>
                           
                           
                                                                                               <div class="form-check form-check-inline">
-                                                                                                <input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="nav4.jpg" required>
+                                                                                                <input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="nav4.jpg" required {{ ($c->image == "nav4.jpg") ? 'checked' : '' }}>
                                                                                                 <label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/nav4.jpg') }}" width="30"></label>
                                                                                               </div>
                           
                           
                                                                                               <div class="form-check form-check-inline">
-                                                                                                <input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="nav5.jpg" required>
+                                                                                                <input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="nav5.jpg" required {{ ($c->image == "nav5.jpg") ? 'checked' : '' }}>
                                                                                                 <label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/nav5.jpg') }}" width="30"></label>
                                                                                               </div>
                           
                           
                                                                                               <div class="form-check form-check-inline">
-                                                                                                <input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="nav6.jpg" required>
+                                                                                                <input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="nav6.jpg" required {{ ($c->image == "nav6.jpg") ? 'checked' : '' }}>
                                                                                                 <label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/nav6.jpg') }}" width="30"></label>
                                                                                               </div>
                           
                           
                                                                                               <div class="form-check form-check-inline">
-                                                                                                <input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="nav7.jpg" required>
+                                                                                                <input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="nav7.jpg" required {{ ($c->image =="nav7.jpg" ) ? 'checked' : '' }}>
                                                                                                 <label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/nav7.jpg') }}" width="30"></label>
                                                                                               </div>
                           
                           
                                                                                               <div class="form-check form-check-inline">
-                                                                                                <input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="nav8.jpg" required>
+                                                                                                <input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="nav8.jpg" required {{ ($c->image == "nav8.jpg" ) ? 'checked' : '' }}>
                                                                                                 <label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/nav8.jpg') }}" width="30"></label>
                                                                                               </div>
                           
                           
                                                                                               <div class="form-check form-check-inline">
-                                                                                                <input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="nav9.jpg" required>
+                                                                                                <input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="nav9.jpg" required {{ ($c->image =="nav9.jpg" ) ? 'checked' : '' }}>
                                                                                                 <label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/nav9.jpg') }}" width="30"></label>
                                                                                               </div>
                           
                                                                                               <div class="form-check form-check-inline">
-                                                                                                <input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="nav10.jpg" required>
+                                                                                                <input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="nav10.jpg" required {{ ($c->image == "nav10.jpg") ? 'checked' : '' }}>
                                                                                                 <label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/nav10.jpg') }}" width="30"></label>
                                                                                               </div>
                           
                           
                                                                                               <div class="form-check form-check-inline">
-                                                                                                <input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="nav11.jpg" required>
+                                                                                                <input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="nav11.jpg" required {{ ($c->image == "nav11.jpg") ? 'checked' : '' }}>
                                                                                                 <label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/nav11.jpg') }}" width="30"></label>
                                                                                               </div>
                           
                           
                                                                                               <div class="form-check form-check-inline">
-                                                                                                <input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="nav12.jpg" required>
+                                                                                                <input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="nav12.jpg" required {{ ($c->image == "nav12.jpg") ? 'checked' : '' }}>
                                                                                                 <label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/nav12.jpg') }}" width="30"></label>
                                                                                               </div>
                           
                           
                                                                                               <div class="form-check form-check-inline">
-                                                                                                <input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="nav13.jpg">
+                                                                                                <input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="nav13.jpg" required {{ ($c->image == "nav13.jpg") ? 'checked' : '' }}>
                                                                                                 <label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/nav13.jpg') }}" width="30"></label>
                                                                                               </div>
                           
                           
                                                                                               <div class="form-check form-check-inline">
-                                                                                                <input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="nav14.jpg">
+                                                                                                <input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="nav14.jpg" required {{ ($c->image == "nav14.jpg") ? 'checked' : '' }}>
                                                                                                 <label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/nav14.jpg') }}" width="30"></label>
                                                                                               </div>
                           
                           
                                                                                               <div class="form-check form-check-inline">
-                                                                                                <input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="nav16.jpg" required>
+                                                                                                <input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="nav16.jpg" required {{ ($c->image == "nav16.jpg") ? 'checked' : '' }}>
                                                                                                 <label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/nav16.jpg') }}" width="30"></label>
                                                                                               </div>
                           
                           
                                                                                               <div class="form-check form-check-inline">
-                                                                                                <input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="nav17.jpg" required>
+                                                                                                <input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="nav17.jpg" required {{ ($c->image == "nav17.jpg") ? 'checked' : '' }}>
                                                                                                 <label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/nav17.jpg') }}" width="30"></label>
                                                                                               </div>
                           
                                                                                               <div class="form-check form-check-inline">
-                                                                                                <input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="nav18.jpg" required>
+                                                                                                <input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="nav18.jpg" required {{ ($c->image == "nav18.jpg") ? 'checked' : '' }}>
                                                                                                 <label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/nav18.jpg') }}" width="30"></label>
                                                                                               </div>
                           
                           
                                                                                               <div class="form-check form-check-inline">
-                                                                                                <input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="nav19.jpg" required>
+                                                                                                <input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="nav19.jpg" required {{ ($c->image == "nav19.jpg") ? 'checked' : '' }}>
                                                                                                 <label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/nav19.jpg') }}" width="30"></label>
                                                                                               </div>
 
                                                                                               <div class="form-check form-check-inline">
-                                                                                                <input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="icons_27_Fumaco-Water.jpg" required>
+                                                                                                <input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="icons_27_Fumaco-Water.jpg" required {{ ($c->image == "icons_27_Fumaco-Water.jpg") ? 'checked' : '' }}>
                                                                                                 <label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/icons_27_Fumaco-Water.jpg') }}" width="30"></label>
                                                                                               </div>
                           
                           
                           
                                                                                               <div class="form-check form-check-inline">
-                                                                                                <input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="icons_26_Wall-lights.jpg" required>
+                                                                                                <input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="icons_26_Wall-lights.jpg" required {{ ($c->image == "icons_26_Wall-lights.jpg") ? 'checked' : '' }}>
                                                                                                 <label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon//icons_26_Wall-lights.jpg') }}" width="30"></label>
                                                                                               </div>
                           
                           
                                                                                               <div class="form-check form-check-inline">
-                                                                                                <input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="icons_25_Tracklights.jpg" required>
+                                                                                                <input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="icons_25_Tracklights.jpg" required {{ ($c->image == "icons_25_Tracklights.jpg") ? 'checked' : '' }}>
                                                                                                 <label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/icons_25_Tracklights.jpg') }}" width="30"></label>
                                                                                               </div>
                           
                           
                           
                                                                                               <div class="form-check form-check-inline">
-                                                                                                <input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="icons_24_Striplights.jpg" required>
+                                                                                                <input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="icons_24_Striplights.jpg" required {{ ($c->image == "icons_24_Striplights.jpg") ? 'checked' : '' }}>
                                                                                                 <label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/icons_24_Striplights.jpg') }}" width="30"></label>
                                                                                               </div>
                           
                           
                           
                                                                                               <div class="form-check form-check-inline">
-                                                                                                <input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="icons_23_Bollard.jpg" required>
+                                                                                                <input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="icons_23_Bollard.jpg" required {{ ($c->image == "icons_23_Bollard.jpg") ? 'checked' : '' }}>
                                                                                                 <label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/icons_23_Bollard.jpg') }}" width="30"></label>
                                                                                               </div>
                           
                           
                                                                                               <div class="form-check form-check-inline">
-                                                                                                <input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="icons_22_Downlight-Recessed.jpg" required>
+                                                                                                <input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="icons_22_Downlight-Recessed.jpg" required {{ ($c->image == "icons_22_Downlight-Recessed.jpg") ? 'checked' : '' }}>
                                                                                                 <label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/icons_22_Downlight-Recessed.jpg') }}" width="30"></label>
                                                                                               </div>
                           
                           
                                                                                               <div class="form-check form-check-inline">
-                                                                                                <input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="icons_21_Electrical-Boxes.jpg" required>
+                                                                                                <input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="icons_21_Electrical-Boxes.jpg" required {{ ($c->image == "icons_21_Electrical-Boxes.jpg") ? 'checked' : '' }}>
                                                                                                 <label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/icons_21_Electrical-Boxes.jpg') }}" width="30"></label>
                                                                                               </div>
                           
                           
                                                                                               <div class="form-check form-check-inline">
-                                                                                                <input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="icons_20_Sockets.jpg" required>
+                                                                                                <input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="icons_20_Sockets.jpg" required {{ ($c->image == "icons_20_Sockets.jpg") ? 'checked' : '' }}>
                                                                                                 <label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/icons_20_Sockets.jpg') }}" width="30"></label>
                                                                                               </div>
                           
                           
                                                                                               <div class="form-check form-check-inline">
-                                                                                                <input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="icons_19_Switches.jpg" required>
+                                                                                                <input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="icons_19_Switches.jpg" required {{ ($c->image == "icons_19_Switches.jpg") ? 'checked' : '' }}>
                                                                                                 <label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/icons_19_Switches.jpg') }}" width="30"></label>
                                                                                               </div>
                           
                           
                                                                                               <div class="form-check form-check-inline">
-                                                                                                <input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="icons_18_Panel-Board.jpg" required>
+                                                                                                <input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="icons_18_Panel-Board.jpg" required {{ ($c->image == "icons_18_Panel-Board.jpg") ? 'checked' : '' }}>
                                                                                                 <label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/icons_18_Panel-Board.jpg') }}" width="30"></label>
                                                                                               </div>
                           
                           
                                                                                               <div class="form-check form-check-inline">
-                                                                                                <input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="icons_17_Circuit-Breaker.jpg" required>
+                                                                                                <input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="icons_17_Circuit-Breaker.jpg" required {{ ($c->image == "icons_17_Circuit-Breaker.jpg") ? 'checked' : '' }}>
                                                                                                 <label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/icons_17_Circuit-Breaker.jpg') }}" width="30"></label>
                                                                                               </div>
                           
                           
                                                                                               <div class="form-check form-check-inline">
-                                                                                                <input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="icons_16_Batten Type.jpg" required>
+                                                                                                <input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="icons_16_Batten Type.jpg" required {{ ($c->image == "icons_16_Batten Type.jpg") ? 'checked' : '' }}>
                                                                                                 <label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon//icons_16_Batten Type.jpg') }}" width="30"></label>
                                                                                               </div>
                           
                           
                                                                                               <div class="form-check form-check-inline">
-                                                                                                <input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="icons_15_IP-rated-Luminaire.jpg" required>
+                                                                                                <input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="icons_15_IP-rated-Luminaire.jpg" required {{ ($c->image == "icons_15_IP-rated-Luminaire.jpg") ? 'checked' : '' }}>
                                                                                                 <label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/icons_15_IP-rated-Luminaire.jpg') }}" width="30"></label>
                                                                                               </div>                          
                                                                                         </div>
