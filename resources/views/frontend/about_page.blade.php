@@ -182,7 +182,7 @@
     }
 </style>
 
-<main class="abt_standard">
+<main>
     <section class="py-5 container">
 
     </section>
@@ -190,14 +190,14 @@
     <div class="container-fluid padabout">
         <div class="row">
             <div class="col-lg-12 aboutalign animated animatedFadeInUp fadeInUp" style="padding-top:20px; text-align: center !important;">
-                <p class="font1color about-main">{!! $about_data->title !!}</p>
+                <p class="abt_standard font1color about-main">{!! $about_data->title !!}</p>
             </div>
         </div>
         <div class="row">
             <div class="col-lg-12" style="text-align: right !important;"></div>
         </div>
         <div class="row">
-            <div class="col-lg-12 animated animatedFadeInUp fadeInUp" style="text-align: left !important; color:#00a7ff !important;">
+            <div class="col-lg-12 animated animatedFadeInUp fadeInUp" style="font-family: 'poppins', sans-serif !important; text-align: left !important; color:#00a7ff !important;">
                 <p class="fumacoFont_about_title">{!! $about_data->{'1_title_1'} !!}</p>
             </div>
         </div>
@@ -206,7 +206,7 @@
         </div>
         <div class="row">
             <div class="col-lg-12 animated animatedFadeInUp fadeInUp">
-                <p class="font1color fumacoFont_about_sub_title">{!! $about_data->{'1_caption_1'} !!}</p>
+                <p class="abt_standard font1color fumacoFont_about_sub_title">{!! $about_data->{'1_caption_1'} !!}</p>
             </div>
         </div>
         <div class="row">
@@ -214,19 +214,19 @@
         </div>
         <div class="row">
             <div class="col-lg-6 animated animatedFadeInUp fadeInUp">
-                <p class="font1color fumacoFont_about_caption">{!! $about_data->{'1_caption_2'} !!}<br>{!! $about_data->{'1_caption_3'} !!}</p>
+                <p class="abt_standard font1color fumacoFont_about_caption">{!! $about_data->{'1_caption_2'} !!}<br>{!! $about_data->{'1_caption_3'} !!}</p>
             </div>
             <div class="col-lg-6">
-                <div class="col-md-12"><p class="font1color fumacoFont_about_caption"></p></div>
+                <div class="col-md-12"><p class="abt_standard font1color fumacoFont_about_caption"></p></div>
                 <div class="col-md-12"><br></div>
                 <div class="row">
                     <div class="col-sm-3 animated animatedFadeInUp fadeInUp" style="text-align: center;">
-                        <p class="font1color about-number">
+                        <p class="abt_standard font1color about-number">
                             <img src="/assets/About/30plus.png" alt="" class="responsive">
                         </p>
                     </div>
                     <div class="col-sm-8 animated animatedFadeInUp fadeInUp">
-                        <p class="font1color fumacoFont_about_caption" style="vertical-align: baseline; padding: 30px 0;">{!! $about_data->{'1_year_1_details'} !!}</p>
+                        <p class="abt_standard font1color fumacoFont_about_caption" style="vertical-align: baseline; padding: 30px 0;">{!! $about_data->{'1_year_1_details'} !!}</p>
                     </div>
                 </div>
                 <div class="row">
@@ -234,12 +234,12 @@
                 </div>
                 <div class="row">
                     <div class="col-sm-3 animated animatedFadeInUp fadeInUp" style="text-align: center;">
-                        <p class="font1color about-number">
+                        <p class="abt_standard font1color about-number">
                             <img src="/assets/About/7companies.png" alt="" class="responsive">
                         </p>
                     </div>
                     <div class="col-sm-8 animated animatedFadeInUp fadeInUp">
-                        <p class="font1color fumacoFont_about_caption" style="vertical-align: baseline; padding: 30px 0;">{!! $about_data->{'1_year_2_details'} !!}</p>
+                        <p class="abt_standard font1color fumacoFont_about_caption" style="vertical-align: baseline; padding: 30px 0;">{!! $about_data->{'1_year_2_details'} !!}</p>
                     </div>
                 </div>
             </div>
@@ -264,7 +264,7 @@
             <div class="col-lg-12" style="text-align: right !important;"><br><br></div>
         </div>
         <div class="row">
-            <div class="col-lg-12 animated animatedFadeInUp fadeInUp" style="text-align: left !important; color:#00a7ff !important;">
+            <div class="col-lg-12 animated animatedFadeInUp fadeInUp" style="font-family: 'poppins', sans-serif !important; text-align: left !important; color:#00a7ff !important;">
                 <p class="fumacoFont_about_title">{!! $about_data->{'2_title_1'} !!}</p>
             </div>
         </div>
@@ -273,7 +273,7 @@
         </div>
         <div class="row">
             <div class="col-lg-12 animated animatedFadeInUp fadeInUp">
-                <p class="font1color fumacoFont_about_sub_title">{!! $about_data->{'2_caption_1'} !!}</p>
+                <p class="abt_standard font1color fumacoFont_about_sub_title">{!! $about_data->{'2_caption_1'} !!}</p>
             </div>
         </div>
         <div class="row">
@@ -281,17 +281,17 @@
         </div>
         <div class="row">
             <div class="col-lg-6 animated animatedFadeInUp fadeInUp">
-                <p class="font1color fumacoFont_about_caption">{!! $about_data->{'2_caption_2'} !!}</p>
+                <p class="abt_standard font1color fumacoFont_about_caption">{!! $about_data->{'2_caption_2'} !!}</p>
             </div>
             <div class="col-lg-6">
                 <div class="row">
                     <div class="col-sm-3 animated animatedFadeInUp fadeInUp" style="text-align: center;">
-                        <p class="font1color about-number">
+                        <p class="abt_standard font1color about-number">
                             <img src="/assets/About/28percent.png" alt="" class="responsive">
                         </p>
                     </div>
                     <div class="col-sm-8 animated animatedFadeInUp fadeInUp">
-                        <p class="font1color fumacoFont_about_caption" style="vertical-align: baseline; padding: 30px 0;">{!! $about_data->{'2_year_1_details'} !!}</p>
+                        <p class="abt_standard font1color fumacoFont_about_caption" style="vertical-align: baseline; padding: 30px 0;">{!! $about_data->{'2_year_1_details'} !!}</p>
                     </div>
                 </div>
             </div>
@@ -316,7 +316,7 @@
             <div class="col-lg-12" style="text-align: right !important;"><br><br></div>
         </div>
         <div class="row">
-            <div class="col-lg-12 animated animatedFadeInUp fadeInUp" style="text-align: left !important; color:#00a7ff !important;">
+            <div class="col-lg-12 animated animatedFadeInUp fadeInUp" style="font-family: 'poppins', sans-serif !important; text-align: left !important; color:#00a7ff !important;">
                 <p class="fumacoFont_about_title">{!! $about_data->{'3_title_1'} !!}</p>
             </div>
         </div>
@@ -325,7 +325,7 @@
         </div>
         <div class="row">
             <div class="col-lg-12 animated animatedFadeInUp fadeInUp">
-                <p class="font1color fumacoFont_about_sub_title">{!! $about_data->{'3_caption_1'} !!}</p>
+                <p class="abt_standard font1color fumacoFont_about_sub_title">{!! $about_data->{'3_caption_1'} !!}</p>
             </div>
         </div>
         <div class="row">
@@ -333,7 +333,7 @@
         </div>
         <div class="row">
             <div class="col-lg-6 animated animatedFadeInUp fadeInUp">
-                <p class="font1color fumacoFont_about_caption">{!! $about_data->{'3_caption_2'} !!}</p>
+                <p class="abt_standard font1color fumacoFont_about_caption">{!! $about_data->{'3_caption_2'} !!}</p>
             </div>
             <div class="col-lg-6">
                 <div class="row">
@@ -341,10 +341,10 @@
                 </div>
                 <div class="row">
                     <div class="col-sm-3 animated animatedFadeInUp fadeInUp" style="text-align: center;">
-                        <p class="font1color about-number"><img src="/assets/About/13companies.png" alt="" class="responsive"></p>
+                        <p class="abt_standard font1color about-number"><img src="/assets/About/13companies.png" alt="" class="responsive"></p>
                     </div>
                     <div class="col-sm-8 animated animatedFadeInUp fadeInUp">
-                        <p class="font1color fumacoFont_about_caption" style="vertical-align: baseline; padding: 30px 0;">{!! $about_data->{'3_year_1_details'} !!}</p>
+                        <p class="abt_standard font1color fumacoFont_about_caption" style="vertical-align: baseline; padding: 30px 0;">{!! $about_data->{'3_year_1_details'} !!}</p>
                     </div>
                 </div>
             </div>
@@ -364,7 +364,7 @@
         </div>
         <div class="row">
             <div class="col-lg-12 animated animatedFadeInUp fadeInUp" style="text-align: center !important;"><br><br>
-                <p class="font1color about-quote-title"><i class="fas fa-quote-left" style="font-size:12px !important; vertical-align: text-top !important;"></i>&nbsp;&nbsp;<i>{!! $about_data->slogan_title !!}</i>&nbsp;&nbsp;<i class="fas fa-quote-right" style="font-size:12px !important; vertical-align: text-top !important;"></i></p><br><br><br>
+                <p class="abt_standard font1color about-quote-title"><i class="fas fa-quote-left" style="font-size:12px !important; vertical-align: text-top !important;"></i>&nbsp;&nbsp;<i>{!! $about_data->slogan_title !!}</i>&nbsp;&nbsp;<i class="fas fa-quote-right" style="font-size:12px !important; vertical-align: text-top !important;"></i></p><br><br><br>
             </div>
         </div>
     </div>
@@ -376,7 +376,7 @@
             <div class="col-lg-12"><br></div>
         </div>
         <div class="row">
-            <div class="col-lg-12 animated animatedFadeInUp fadeInUp" style="text-align: left !important; color:#00a7ff !important;">
+            <div class="col-lg-12 animated animatedFadeInUp fadeInUp" style="font-family: 'poppins', sans-serif !important; text-align: left !important; color:#00a7ff !important;">
                 <p class="fumacoFont_about_title">{!! $about_data->{'4_title_1'} !!}</p>
             </div>
         </div>
@@ -385,7 +385,7 @@
         </div>
         <div class="row">
             <div class="col-lg-12">
-                <p class="font1color fumacoFont_about_sub_title animated animatedFadeInUp fadeInUp">{!! $about_data->{'4_caption_1'} !!}</p>
+                <p class="abt_standard font1color fumacoFont_about_sub_title animated animatedFadeInUp fadeInUp">{!! $about_data->{'4_caption_1'} !!}</p>
             </div>
         </div>
         <div class="row">
