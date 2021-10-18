@@ -724,7 +724,9 @@ class FrontendController extends Controller
     }
 
     public function viewOrderTracking(Request $request) {
-        $order_details = DB::table('track_order')->where('track_code', $request->id)->get();
+        $order_details = DB::table('fumaco_order')->where('order_number', $request->id)->first();
+
+        $track_order_details = DB::table('track_order')->where('track_code', $request->id)->get();
 
         $ordered_items = DB::table('fumaco_order_items')->where('order_number', $request->id)->get();
         $items = [];
@@ -743,7 +745,7 @@ class FrontendController extends Controller
             ];
         }
 
-        return view('frontend.track_order', compact('order_details', 'items'));
+        return view('frontend.track_order', compact('order_details', 'items', 'track_order_details'));
     }
 
     // get item code based on variants selected in product page

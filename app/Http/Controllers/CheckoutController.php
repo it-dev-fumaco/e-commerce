@@ -424,6 +424,7 @@ class CheckoutController extends Controller
 				DB::table('fumaco_temp')->where('order_tracker_code', $id)->update([
 					'shipping_name' => $request->s_name,
 					'shipping_amount' => $request->s_amount,
+					'estimated_delivery_date' => $request->estimated_del,
 				]);
 	
 				DB::commit();
@@ -509,7 +510,8 @@ class CheckoutController extends Controller
 					'bank_ref_no' => $request->BankRefNo,
 					'issuing_bank' => $request->IssuingBank,
 					'payment_transaction_time' => $request->RespTime,
-					'amount_paid' => $request->Amount
+					'amount_paid' => $request->Amount,
+					'estimated_delivery_date' => $temp->estimated_delivery_date
 				]);
 
 				// insert order in tracking order table

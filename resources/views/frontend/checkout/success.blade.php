@@ -70,6 +70,9 @@
 							<br>
 							<span class="d-inline-block" style="width: 100px;"><strong>Address: </strong></span>
 							{!! $order_details->order_ship_address1 . ' ' . $order_details->order_ship_address2 . ', ' . $order_details->order_ship_brgy . ', ' . $order_details->order_ship_city . ', ' . $order_details->order_ship_prov . ', ' . $order_details->order_ship_postal . ', ' . $order_details->order_ship_country !!}
+
+							<br>
+							<p>Estimated Delivery Date: <b>{{ $order_details->estimated_delivery_date }}</b></p>
 						</div>
 						<br><br>
 						<table class="table">

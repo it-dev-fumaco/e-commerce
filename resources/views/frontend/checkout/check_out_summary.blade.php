@@ -373,8 +373,11 @@
 		function updateShipping(submit) {
 			var s_name = $("input[name='shipping_fee']:checked").data('sname');
 			var s_amount = $("input[name='shipping_fee']:checked").val();
+			
+			var estimated_del = $("input[name='shipping_fee']:checked").data('est');
+			
 			var data = {
-				s_name, s_amount, _token: '{{ csrf_token() }}', submit
+				estimated_del, s_name, s_amount, _token: '{{ csrf_token() }}', submit
 			}
 
 			$.ajax({

@@ -78,9 +78,13 @@
 						</form>
 					</center>
 				</div>
-				@if(count($order_details) > 0)
+				@if(count($track_order_details) > 0)
 				<div class="col-lg-12" style="padding-left: 15%; padding-right: 15%;">
 					<br><br>
+					Order No.: <b>{{ request()->id }}</b>
+					<br>
+					Estimated Delivery Date: {{ $order_details->estimated_delivery_date }}
+					<br>
 					<table class="table">
 						<thead>
 							<tr>
@@ -91,7 +95,7 @@
 							</tr>
 						</thead>
 						<tbody>
-						@foreach ($order_details as $order)
+						@foreach ($track_order_details as $order)
 						<tr>
 							<td>{{ $order->track_date }}</td>
 							<td><a href="#TrackItemsData" data-toggle="modal">{{ $order->track_item }}</a></td>
