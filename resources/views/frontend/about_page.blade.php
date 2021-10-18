@@ -133,6 +133,7 @@
         font-weight: 100 !important;
         font-size: 12px !important;
         letter-spacing: 2px !important;
+        color: red
     }
     .about-quote-sub {
         font-weight: 400 !important;
