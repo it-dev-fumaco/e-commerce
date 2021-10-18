@@ -367,18 +367,20 @@ class CheckoutController extends Controller
 					'item_image' => ($item_image) ? $item_image->imgprimayx : 'test.jpg'
 				];
 
+				$orders_arr[] = [
+					'order_number' => $order_no,
+					'item_code' => $item->f_idcode,
+					'item_name' => $item->f_name_name,
+					'item_qty' => $b_qty,
+					'item_price' => $price,
+					'item_status' => 2,
+					'date_update' => Carbon::now()->toDateTimeString(),
+					'ip_address' => $request->ip(),
+					'item_total_price' => ($price * $b_qty)
+				];
+
 				if($order_check < 1){
-					DB::table('fumaco_order_items')->insert([
-						'order_number' => $order_no,
-						'item_code' => $item->f_idcode,
-						'item_name' => $item->f_name_name,
-						'item_qty' => $b_qty,
-						'item_price' => $price,
-						'item_status' => 2,
-						'date_update' => Carbon::now()->toDateTimeString(),
-						'ip_address' => $request->ip(),
-						'item_total_price' => ($price * $b_qty)
-					]);
+					DB::table('fumaco_order_items')->insert($orders_arr);
 				}
 			}else{
 				$cart = session()->get('fumCart');
@@ -412,23 +414,24 @@ class CheckoutController extends Controller
 						'stock_qty' => $item->f_qty,
 						'item_image' => ($item_image) ? $item_image->imgprimayx : 'test.jpg'
 					];
+
+					$orders_arr[] = [
+						'order_number' => $order_no,
+						'item_code' => $item->f_idcode,
+						'item_name' => $item->f_name_name,
+						'item_qty' => $cart[$item->f_idcode]['quantity'],
+						'item_price' => $price,
+						'item_status' => 2,
+						'date_update' => Carbon::now()->toDateTimeString(),
+						'ip_address' => $request->ip(),
+						'item_total_price' => ($price * $cart[$item->f_idcode]['quantity'])
+					];
 	
 					if($order_check < 1){
-						$orders_arr[] = [
-							'order_number' => $order_no,
-							'item_code' => $item->f_idcode,
-							'item_name' => $item->f_name_name,
-							'item_qty' => $cart[$item->f_idcode]['quantity'],
-							'item_price' => $price,
-							'item_status' => 2,
-							'date_update' => Carbon::now()->toDateTimeString(),
-							'ip_address' => $request->ip(),
-							'item_total_price' => ($price * $cart[$item->f_idcode]['quantity'])
-						];
+						DB::table('fumaco_order_items')->insert($orders_arr);
 					}
 				}
 
-				DB::table('fumaco_order_items')->insert($orders_arr);
 			}
 
 			$summary_arr[] = [
