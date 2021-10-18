@@ -4,7 +4,7 @@
     $password = $api->password;
     $ip_address = request()->ip();
     $currency_code = 'PHP';
-    $payment_id = 'FUM' . date('Y') . explode(" ", microtime())[1];
+    $payment_id = 'FUM' . date('Y') . date('d') . explode(" ", microtime())[1];
     $order_no = $temp->order_tracker_code;
     $page_timeout = '200';
     $merchantreturn = url('') . '/cart';

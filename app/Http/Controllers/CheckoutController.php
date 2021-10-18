@@ -441,7 +441,7 @@ class CheckoutController extends Controller
 		}
 	}
 
-	public function orderSuccess($id) {
+	public function orderSuccess($id, Request $request) {
 		DB::beginTransaction();
 		try {
 			$temp = DB::table('fumaco_temp')->where('xtempcode', $id)->first();
@@ -458,6 +458,24 @@ class CheckoutController extends Controller
 			$existing_order = DB::table('fumaco_order')->where('order_number', $temp->order_tracker_code)->exists();
 			if (!$existing_order) {
 				$subtotal = collect($order_items)->sum('item_total_price');
+
+				switch ($request->PymtMethod) {
+					case 'CC':
+						$payment_method = 'Credit Card';
+						break;
+					case 'MO':
+						$payment_method = 'Credit Card';
+						break;
+					case 'DD':
+						$payment_method = 'Direct Debit';
+						break;
+					case 'WA':
+						$payment_method = 'e-Wallet';
+						break;
+					default:
+						$payment_method = $request->PymtMethod;
+						break;
+				}
 
 				DB::table('fumaco_order')->insert([
 					'order_number' => $temp->order_tracker_code,
@@ -489,6 +507,7 @@ class CheckoutController extends Controller
 					'order_ip' => $temp->order_ip,
 				  	'order_date' => $now,
 					'order_status' => "Order Placed",
+					'order_payment_method' => $payment_method,
 					'tracker_code' => $temp->order_tracker_code,
 				]);
 
