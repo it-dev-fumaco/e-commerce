@@ -15,7 +15,7 @@
             <div class="col-lg-12">
                 <br>
                 <br>
-                <p style="color:#373b3e !important; font-weight: 400 !important; font-size:12px !important;">
+                <p style="font-family: 'poppins', sans-serif !important;"  style="color:#373b3e !important; font-weight: 400 !important; font-size:12px !important;">
                     Home&nbsp;&nbsp;&nbsp;>&nbsp;&nbsp;&nbsp;Blogs </p>
                 <hr>
             </div>
@@ -41,37 +41,37 @@
 
         <div class="row">
             <div class="col-lg-12 animated animatedFadeInUp fadeInUp">
-                <p class="blog-font-a fumacoFont_card_caption">{{ $blog->datepublish }} | {{ $comment_count->count() }} Comment(s)</p>
+                <p style="font-family: 'poppins', sans-serif !important;"  class="blog-font-a fumacoFont_card_caption">{{ $blog->datepublish }} | {{ $comment_count->count() }} Comment(s)</p>
             </div>
         </div>
 
         <div class="row">
             <div class="col-lg-12 animated animatedFadeInUp fadeInUp">
-                <p class="font3color fumacoFont_card_title" style="color: #0F6DB7">{{ $blog->blogtitle }}</p>
+                <p style="font-family: 'poppins', sans-serif !important;"  class="font3color fumacoFont_card_title" style="color: #0F6DB7">{{ $blog->blogtitle }}</p>
             </div>
         </div>
 
         <div class="row">
             <div class="col-lg-12 animated animatedFadeInUp fadeInUp">
-                <p class="blog-font-a fumacoFont_card_caption">{{ $blog->blogtype }}</p>
+                <p style="font-family: 'poppins', sans-serif !important;"  class="blog-font-a fumacoFont_card_caption">{{ $blog->blogtype }}</p>
             </div>
         </div>
 
         <div class="row">
             <div class="col-lg-12 animated animatedFadeInUp fadeInUp">
-                <p class="font1color">&nbsp;</p>
+                <p style="font-family: 'poppins', sans-serif !important;"  class="font1color">&nbsp;</p>
             </div>
         </div>
 
         <div class="row">
             <div class="col-lg-12 animated animatedFadeInUp fadeInUp">
-                <p class="fumacoFont_card_caption">{{ $blog->blog_caption }}</p>
+                <p style="font-family: 'poppins', sans-serif !important;"  class="fumacoFont_card_caption">{{ $blog->blog_caption }}</p>
             </div>
         </div>
 
         <div class="row">
             <div class="col-lg-12">
-                <p class="font1color">&nbsp;</p>
+                <p style="font-family: 'poppins', sans-serif !important;"  class="font1color">&nbsp;</p>
             </div>
         </div>
 
@@ -83,7 +83,7 @@
 
         <div class="row">
             <div class="col-lg-6 animated animatedFadeInUp fadeInUp">
-                <p class="blog-font-a font1color">Tags : <button
+                <p style="font-family: 'poppins', sans-serif !important;"  class="blog-font-a font1color">Tags : <button
                         class="btn btn-outline-primary1 btn-sm">Products</button>&nbsp;<button
                         class="btn btn-outline-primary1 btn-sm">Applications</button></p>
 
@@ -105,7 +105,7 @@
             </div>
 
             <div class="col-lg-6" style="text-align:right;">
-                <p class="blog-font-a font1color">
+                <p style="font-family: 'poppins', sans-serif !important;"  class="blog-font-a font1color">
 
                 </p>
             </div>
@@ -142,13 +142,13 @@
                         <div class="row">
                             <div class="col">
                                 <br>
-                                <p class="font2color animated animatedFadeInUp fadeInUp">LEAVE A COMMENT</p>
+                                <p style="font-family: 'poppins', sans-serif !important;"  class="font2color animated animatedFadeInUp fadeInUp">LEAVE A COMMENT</p>
                             </div>
                         </div>
 
                         <div class="row">
                             <div class="col">
-                                <p class="fumacoFont_card_caption animated animatedFadeInUp fadeInUp" style="color:#a9a9a9 !important;">Your email address will not be published. Required fields are marked *</p>
+                                <p style="font-family: 'poppins', sans-serif !important;"  class="fumacoFont_card_caption animated animatedFadeInUp fadeInUp" style="color:#a9a9a9 !important;">Your email address will not be published. Required fields are marked *</p>
                             </div>
                         </div>
 
@@ -196,8 +196,8 @@
             <br>
     
             <div class="col-lg-12">
-              <span style="font-size:24px; font-weight:300;">&nbsp;
-              &nbsp;Comments<span>&nbsp;&nbsp;<span style="font-size:10px; font-weight:300;"> (Avatar powered by gravatar.com)</span>
+              <span style="font-family: 'poppins', sans-serif !important;"  style="font-size:24px; font-weight:300;">&nbsp;
+              &nbsp;Comments<span style="font-family: 'poppins', sans-serif !important;" >&nbsp;&nbsp;<span style="font-family: 'poppins', sans-serif !important;"  style="font-size:10px; font-weight:300;"> (Avatar powered by gravatar.com)</span>
             </div>
     
             <div class="col-lg-12">
@@ -217,9 +217,9 @@
                         <img src="https://www.gravatar.com/avatar/{{ $useravatar }}&d=https://secure.gravatar.com/avatar/56445b52ab352ef83cfff87e35d9929a?s=150&d=mm&r=g" />
                     </div>
                     <div class="col-lg-10">
-                        <span class="font3color blog-font-b">{{ $comment['name'] }}</span> on {{ $date }}
+                        <span style="font-family: 'poppins', sans-serif !important;"  class="font3color blog-font-b">{{ $comment['name'] }}</span> on {{ $date }}
                         <br>
-                        <span class="fumacoFont_card_caption">{{ $comment['comment'] }}</span>
+                        <span style="font-family: 'poppins', sans-serif !important;"  class="fumacoFont_card_caption">{{ $comment['comment'] }}</span>
                         <br>
                         <br>
                         <button type="button" class="btn btn-sm btn-outline-secondary" id="x1{{ $comment['id'] }}">Reply</button>
@@ -278,9 +278,9 @@
                                 </div>
                 
                                 <div class="col-lg-10">
-                                    <span class="font3color blog-font-b">{{ $reply->blog_name }}</span> on {{ $reply->blog_date }}
+                                    <span style="font-family: 'poppins', sans-serif !important;"  class="font3color blog-font-b">{{ $reply->blog_name }}</span> on {{ $reply->blog_date }}
                                     <br>
-                                    <span class="fumacoFont_card_caption">{{ $reply->blog_comments }}</span>
+                                    <span style="font-family: 'poppins', sans-serif !important;"  class="fumacoFont_card_caption">{{ $reply->blog_comments }}</span>
                                     <br><br>
                                 </div>
                                 <br>

@@ -4,7 +4,7 @@
 ])
 
 @section('content')
-<main style="background-color:#000;">  
+<main class="abt_standard" style="background-color:#000;">  
     <div id="myCarousel" class="carousel slide" data-bs-ride="carousel">
         <ol class="carousel-indicators">
             @foreach($blog_carousel as $key => $carousel)
@@ -30,9 +30,9 @@
                     <img src="{{ asset('/assets/journal/'. $carousel->blogprimaryimage) }}" alt="{{ $carousel->blogtitle }}" style="object-fit: cover; opacity: 0.6;">
                     <div class="container">
                         <div class="carousel-caption text-start">
-                            <h3 class="fumacoFont1">{{ $carousel->blogtitle }}</h3>
-                            <p class="fumacoFont2" style="text-align: left; text-justify: inter-word; letter-spacing: 1px;">{{ $string }}</p>
-                            <p><a class="btn btn-lg btn-primary btn-fumaco fumacoFont_btn" href="blog?id={{ $carousel->id }}" role="button">Read More</a></p>
+                            <h3 class="fumacoFont1" style="font-family: 'poppins', sans-serif !important;">{{ $carousel->blogtitle }}</h3>
+                            <p class="abt_standard fumacoFont2" style="text-align: left; text-justify: inter-word; letter-spacing: 1px;">{{ $string }}</p>
+                            <p><a class="abt_standard btn btn-lg btn-primary btn-fumaco fumacoFont_btn" href="blog?id={{ $carousel->id }}" role="button">Read More</a></p>
                         </div>
                     </div>
                 </div>
@@ -94,10 +94,10 @@
                     <div class="card" style="border: 0px solid rgba(0, 0, 0, 0.125) !important;">
                         <img class="card-img-top" src="{{ asset('/assets/journal/'. $blogs['image']) }}" alt="">
                         <div class="card-body">
-                            <p style="color:#b2b2b2 !important;" class="fumacoFont_card_caption">{{ $blogs['publish_date'] }} | {{ $blogs['comment_count'] }} Comment(s)</p>
+                            <p style="color:#b2b2b2 !important;" class="abt_standard fumacoFont_card_caption">{{ $blogs['publish_date'] }} | {{ $blogs['comment_count'] }} Comment(s)</p>
                             <a href="blog?id={{ $blogs['id'] }}" style="text-decoration: none !important;">
-                                <p style="color:#373b3e !important;" class="fumacoFont_card_title">{{ $blogs['title'] }}</p></a>
-                            <p style="color:#b2b2b2 !important;" class="fumacoFont_card_caption">{{ $blogs['type'] }}</p>
+                                <p style="color:#373b3e !important;" class="abt_standard fumacoFont_card_title">{{ $blogs['title'] }}</p></a>
+                            <p style="color:#b2b2b2 !important;" class="abt_standard fumacoFont_card_caption">{{ $blogs['type'] }}</p>
                         </div>
                     </div>
                 </div>
