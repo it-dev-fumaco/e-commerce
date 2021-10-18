@@ -171,10 +171,8 @@ class CheckoutController extends Controller
 
 			$user_type = '';
 
-			// if(!Auth::check()){
 			if(!Auth::check() and request()->isMethod('post')) {
 				$order_no = 'FUM-'.random_int(10000000, 99999999);
-				// dd($request->all());
 				$first_name = $request->fname;
 				$last_name = $request->lname;
 				$email = $request->ship_email;
@@ -209,7 +207,6 @@ class CheckoutController extends Controller
 					$bill_country = $request->ship_country_region1_1;
 					$bill_address_type = $request->ship_Address_type1_1;
 					$bill_email = $request->ship_email;
-					// $bill_contact = $request->ship_contactnumber1_1;
 					$bill_mobile = $request->ship_mobilenumber1_1;
 				}else{
 					$same_address = 0;
@@ -225,7 +222,6 @@ class CheckoutController extends Controller
 					$bill_address_type = $request->Address_type1_1;
 					$bill_mobile = $request->mobilenumber1_1;
 					$bill_email = $request->email;
-					// $bill_contact = $request->contactnumber1_1;
 				}				
 			}else{
 				$o_email = Auth::user()->username;
@@ -234,12 +230,10 @@ class CheckoutController extends Controller
 				$user = DB::table('fumaco_users')->where('username', $o_email)->first();
 				$user_id = $user->id;
 
-				// $user_ship_address = DB::table('fumaco_user_add_bill')->where('xdefault_b', 1)->where('user_idx_b', $user_id)->first();
 				$user_bill_address = DB::table('fumaco_user_add')->where('xdefault', 1)->where('user_idx', $user_id)->where('address_class', 'Billing')->first();
 				$user_ship_address = DB::table('fumaco_user_add')->where('xdefault', 1)->where('user_idx', $user_id)->where('address_class', 'Delivery')->first();
 				$bill = collect($user_bill_address);
 				$ship = collect($user_ship_address);
-				// dd($bill);
 				$add_check = count($bill->diff($ship));
 				$same_address = ($add_check > 3) ? 0 : 1;
 
@@ -326,10 +320,10 @@ class CheckoutController extends Controller
 				$item_image = DB::table('fumaco_items_image_v1')
 					->where('idcode', $item->f_idcode)->first();
 
-				$price = ($item->f_price > 0) ? $item->f_price : $item->f_original_price;
+				$price = ($item->f_discount_trigger) ? $item->f_price : $item->f_original_price;
 
-				// dd($order_no);
-				$order_check = DB::table('fumaco_order_items')->where('order_number', $order_no)->where('item_code', $item->f_idcode)->count();
+				$order_check = DB::table('fumaco_order_items')->where('order_number', $order_no)
+					->where('item_code', $item->f_idcode)->count();
 
 				$cart_arr[] = [
 					'item_code' => $item->f_idcode,
@@ -347,6 +341,7 @@ class CheckoutController extends Controller
 					'item_name' => $item->f_name_name,
 					'item_qty' => $cart[$item->f_idcode]['quantity'],
 					'item_price' => $price,
+					'item_discount' => $item->f_discount_percent,
 					'item_status' => 2,
 					'date_update' => Carbon::now()->toDateTimeString(),
 					'ip_address' => $request->ip(),
@@ -356,8 +351,6 @@ class CheckoutController extends Controller
 					DB::table('fumaco_order_items')->insert($orders_arr);
 				}
 			}
-				// dd($orders_arr);
-				// dd($cart_arr);
 
 			$summary_arr[] = [
 				'shipping' => $cart['shipping']['shipping_fee'],
@@ -370,8 +363,6 @@ class CheckoutController extends Controller
 				'address' => $temp_arr
 			];
 
-			// dd($orders_arr);
-			// dd($summary_arr);
 			$checker = DB::table('fumaco_temp')->where('order_tracker_code', $order_no)->count();
 			if($checker < 1){
 				$insert = DB::table('fumaco_temp')->insert($temp_arr);
@@ -379,8 +370,8 @@ class CheckoutController extends Controller
 			DB::commit();
 			request()->session()->put('summary_arr', $summary_arr);
 			request()->session()->put('cart_arr', $cart_arr);
+
 			return redirect('/checkout/summary_view');
-			// return view('frontend.checkout.check_out_summary', compact('summary_arr', 'orders_arr', 'cart', 'cart_arr'));
 		}catch(Exception $e){
 			DB::rollback();
 			return redirect()->back()->with('error', 'An error occured. Please try again.');
@@ -509,6 +500,11 @@ class CheckoutController extends Controller
 					'order_status' => "Order Placed",
 					'order_payment_method' => $payment_method,
 					'tracker_code' => $temp->order_tracker_code,
+					'payment_id' => $request->PaymentID,
+					'bank_ref_no' => $request->BankRefNo,
+					'issuing_bank' => $request->IssuingBank,
+					'payment_transaction_time' => $request->RespTime,
+					'amount_paid' => $request->Amount
 				]);
 
 				// insert order in tracking order table
@@ -533,6 +529,7 @@ class CheckoutController extends Controller
 					'item_code' => $row->item_code,
 					'item_name' => $row->item_name,
 					'price' => $row->item_price,
+					'discount' => $row->item_discount,
 					'qty' => $row->item_qty,
 					'amount' => $row->item_total_price,
 					'image' => ($image) ? $image->imgprimayx : null

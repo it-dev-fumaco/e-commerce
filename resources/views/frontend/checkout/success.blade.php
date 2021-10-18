@@ -60,10 +60,10 @@
 							<br><br><br>
 							<h1 style="color:#186EA9 !important; letter-spacing: 2px !important;">THANK YOU FOR SHOPPING!</h1>
 							<br>
-                  </center>
+                  		</center>
 						<div style="color:#58595A !important;">
-							<h6 class="font-weight-bold mt-2">Your order no.: <b>{{ $order_details->order_number }}</b></h6>
-							<p class="mt-3 mb-5">Confirmation will be sent to your email with the details of your order.</p>
+							<h6 class="font-weight-bold mt-2">Order no.: <b>{{ $order_details->order_number }}</b></h6>
+							<p class="mt-3 mb-5">Your order has been placed, a confirmation will be sent to your email with the details of your order.</p>
 							<h6 class="font-weight-bold mt-2"><b>SHIPPING TO:</b></h6>
 							<span class="d-inline-block" style="width: 100px;"><strong>Customer: </strong></span>
 							{{ $order_details->order_name .' ' . $order_details->order_lastname }}
@@ -77,6 +77,7 @@
 								<tr style="font-size: 0.9rem;">
 									<th class="text-left" colspan="2">Item Description</th>
 									<th class="text-center">Qty</th>
+									<th class="text-center">Discount (%)</th>
 									<th class="text-center">Price</th>
 									<th class="text-center">Amount</th>
 								</tr>
@@ -92,26 +93,27 @@
 									</td>
 									<td>{{ $item['item_name'] }}</td>
 									<td class="text-center">{{ $item['qty'] }}</td>
+									<td class="text-center">{{ $item['discount'] . '%' }}</td>
 									<td class="text-right" style="text-align: right;">₱ {{ number_format(str_replace(",","",$item['price']), 2) }}</td>
 									<td class="text-right" style="text-align: right;">₱ {{ number_format(str_replace(",","",$item['amount']), 2) }}</td>
 								 </tr>
 								@empty
 								<tr>
-									<td colspan="5" class="text-center text-muted">No items found.</td>
+									<td colspan="6" class="text-center text-muted">No items found.</td>
 								</tr>
 								@endforelse
 							</tbody>
 							<tfoot>
 								<tr style="font-size: 0.8rem; text-align: right;">
-									<td class="pb-1 pt-1" colspan="4">Subtotal</td>
+									<td class="pb-1 pt-1" colspan="5">Subtotal</td>
 									<td class="pb-1 pt-1">₱ {{ number_format(str_replace(",","",$order_details->order_subtotal), 2) }}</td>
 								</tr>
 								<tr style="font-size: 0.8rem; text-align: right;">
-									<td class="pb-1 pt-1" colspan="4">{{ $order_details->order_shipping }}</td>
+									<td class="pb-1 pt-1" colspan="5">{{ $order_details->order_shipping }}</td>
 									<td class="pb-1 pt-1">₱ {{ number_format(str_replace(",","",$order_details->order_shipping_amount), 2) }}</td>
 								</tr>
 								<tr style="font-size: 0.9rem; text-align: right; border-top: 2px solid;">
-									<td class="pb-1 pt-1" colspan="4"><b>Grand Total</b></td>
+									<td class="pb-1 pt-1" colspan="5"><b>Grand Total</b></td>
 									<td class="pb-1 pt-1"><b>₱ {{ number_format(str_replace(",","",($order_details->order_shipping_amount + $order_details->order_subtotal)), 2) }}</b></td>
 								</tr>
 							</tfoot>
