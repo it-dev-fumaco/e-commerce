@@ -127,6 +127,15 @@ class ShippingController extends Controller
                 if($shipping_calculation != 'Flat Rate'){
                     if($request->conditional_op){
                         foreach ($request->conditional_op as $e => $row) {
+                            if(!is_numeric($request->shipping_amount[$e])) {
+                                return response()->json([
+                                    'status' => 0, 
+                                    'message' => 'Invalid input in shipping amount field.', 
+                                    'redirect_to' => null, 
+                                    'new' => 0
+                                ]);
+                            }
+
                             $shipping_conditions[] = [
                                 'shipping_service_id' => $shipping_service->shipping_service_id,
                                 'type' => $request->condition[$e],
@@ -313,6 +322,15 @@ class ShippingController extends Controller
                 if($shipping_calculation != 'Flat Rate'){
                     if($request->conditional_op){
                         foreach ($request->conditional_op as $e => $row) {
+                            if(!is_numeric($request->shipping_amount[$e])) {
+                                return response()->json([
+                                    'status' => 0, 
+                                    'message' => 'Invalid input in shipping amount field.', 
+                                    'redirect_to' => null, 
+                                    'new' => 0
+                                ]);
+                            }
+                            
                             $shipping_conditions[] = [
                                 'shipping_service_id' => $shipping_service->shipping_service_id,
                                 'type' => $request->condition[$e],

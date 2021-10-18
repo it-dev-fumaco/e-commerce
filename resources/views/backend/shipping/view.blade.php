@@ -439,7 +439,7 @@
 					'<input type="text" class="form-control" name="value[]" required>' +
 				'</td>' +
 				'<td class="p-2">' +
-					'<input type="number" name="shipping_amount[]" class="form-control" placeholder="0.00" required>' +
+					'<input type="text" name="shipping_amount[]" class="form-control" placeholder="0.00" required>' +
 				'</td>' +
 				'<td class="text-center">' +
 					'<button type="button" class="btn btn-outline-danger btn-sm remove-td-row">Remove</button>' +
