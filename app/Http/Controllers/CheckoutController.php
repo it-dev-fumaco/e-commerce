@@ -367,19 +367,18 @@ class CheckoutController extends Controller
 					'item_image' => ($item_image) ? $item_image->imgprimayx : 'test.jpg'
 				];
 
-				$orders_arr[] = [
-					'order_number' => $order_no,
-					'item_code' => $item->f_idcode,
-					'item_name' => $item->f_name_name,
-					'item_qty' => $b_qty,
-					'item_price' => $price,
-					'item_status' => 2,
-					'date_update' => Carbon::now()->toDateTimeString(),
-					'ip_address' => $request->ip(),
-					'item_total_price' => ($price * $b_qty)
-				];
 				if($order_check < 1){
-					DB::table('fumaco_order_items')->insert($orders_arr);
+					DB::table('fumaco_order_items')->insert([
+						'order_number' => $order_no,
+						'item_code' => $item->f_idcode,
+						'item_name' => $item->f_name_name,
+						'item_qty' => $b_qty,
+						'item_price' => $price,
+						'item_status' => 2,
+						'date_update' => Carbon::now()->toDateTimeString(),
+						'ip_address' => $request->ip(),
+						'item_total_price' => ($price * $b_qty)
+					]);
 				}
 			}else{
 				$cart = session()->get('fumCart');
@@ -392,6 +391,7 @@ class CheckoutController extends Controller
 					->whereIn('f_idcode', array_column($cart, 'item_code'))->get();
 				
 				$cart_arr = [];
+				$orders_arr = [];
 				foreach ($cart_items as $n => $item) {
 					$item_image = DB::table('fumaco_items_image_v1')
 						->where('idcode', $item->f_idcode)->first();
@@ -413,19 +413,18 @@ class CheckoutController extends Controller
 						'item_image' => ($item_image) ? $item_image->imgprimayx : 'test.jpg'
 					];
 	
-					$orders_arr[] = [
-						'order_number' => $order_no,
-						'item_code' => $item->f_idcode,
-						'item_name' => $item->f_name_name,
-						'item_qty' => $cart[$item->f_idcode]['quantity'],
-						'item_price' => $price,
-						'item_status' => 2,
-						'date_update' => Carbon::now()->toDateTimeString(),
-						'ip_address' => $request->ip(),
-						'item_total_price' => ($price * $cart[$item->f_idcode]['quantity'])
-					];
 					if($order_check < 1){
-						DB::table('fumaco_order_items')->insert($orders_arr);
+						$orders_arr[] = [
+							'order_number' => $order_no,
+							'item_code' => $item->f_idcode,
+							'item_name' => $item->f_name_name,
+							'item_qty' => $cart[$item->f_idcode]['quantity'],
+							'item_price' => $price,
+							'item_status' => 2,
+							'date_update' => Carbon::now()->toDateTimeString(),
+							'ip_address' => $request->ip(),
+							'item_total_price' => ($price * $cart[$item->f_idcode]['quantity'])
+						];
 					}
 				}
 			}
@@ -433,7 +432,6 @@ class CheckoutController extends Controller
 			DB::table('fumaco_order_items')->insert($orders_arr);
 
 			$summary_arr[] = [
-
 				'same_address' => $same_address,
 				'base_url' => $base_url->set_value,
 				'ship_mobile' => $ship_mobile,
@@ -823,23 +821,6 @@ class CheckoutController extends Controller
                     'stores' => [],
                 ];
             }
-        }
-
-        $store_pickup_query = ShippingService::where('shipping_service_name', 'Store Pickup')->get();
-        foreach($store_pickup_query as $row){
-            $stores = DB::table('store_location')
-                ->join('shipping_service_store', 'shipping_service_store.store_location_id', 'store_location.store_id')
-                ->where('shipping_service_id', $row->shipping_service_id)->select('store_name', 'available_from', 'available_to')->get();
-
-            $shipping_offer_rates[] = [
-                'shipping_service_name' => $row->shipping_service_name,
-                'expected_delivery_date' => null,
-                'shipping_cost' => '-',
-                'external_carrier' => false,
-                'allow_delivery_after' => 0,
-                'pickup' => true,
-                'stores' => $stores,
-            ];
         }
 
 		return $shipping_offer_rates;

@@ -56,24 +56,22 @@
                                     <table id="example2" data-pagination="true" class="table table-bordered table-hover">
                                         <thead>
                                             <tr>
+                                                <th>Order Date</th>
                                                 <th>Order ID</th>
-                                                <th>First Name</th>
-                                                <th>Last Name</th>
+                                                <th>Customer Name</th>
                                                 <th>Email</th>
-                                                <th>Date Update</th>
-                                                <th>Tracking Code</th>
+                                                <th>Status</th>
                                                 <th>Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             @forelse($orders_arr as $order)
                                                 <tr>
-                                                    <td>{{ $order['order_no'] }}</td>
-                                                    <td>{{ $order['first_name'] }}</td>
-                                                    <td>{{ $order['last_name'] }}</td>
-                                                    <td>{{ $order['email'] }}</td>
                                                     <td>{{ $order['date'] }}</td>
-                                                    <td>{{ $order['order_tracker_code'] }}</td>
+                                                    <td>{{ $order['order_no'] }}</td>
+                                                    <td>{{ $order['first_name'] .' '. $order['last_name'] }}</td>
+                                                    <td>{{ $order['email'] }}</td>
+                                                    <td>{{ $order['status'] }}</td>
                                                     <td>
                                                         <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#order-{{ $order['cust_id'] }}">View Orders</button>
 

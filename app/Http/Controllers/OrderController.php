@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use DB;
+use Carbon\Carbon;
 
 class OrderController extends Controller
 {
@@ -37,7 +38,7 @@ class OrderController extends Controller
                 'bill_contact_person' => $o->order_contactperson,
                 'ship_contact_person' => $o->order_ship_contactperson,
                 'email' => $o->order_email,
-                'date' => $o->order_update,
+                'date' => Carbon::parse($o->order_update)->format('Y-m-d H:i'),
                 'ordered_items' => $items_arr,
                 'order_tracker_code' => $o->tracker_code,
                 'cust_id' => $o->order_account,
@@ -57,7 +58,8 @@ class OrderController extends Controller
                 'ship_postal' => $o->order_ship_postal,
                 'shipping_id' => $o->order_shipping,
                 'shipping_amount' => $o->order_shipping_amount,
-                'total_amount' => ($o->order_shipping_amount + $o->order_subtotal)
+                'total_amount' => ($o->order_shipping_amount + $o->order_subtotal),
+                'status' => $o->order_status
             ];
         }
         return view('backend.orders.order_list', compact('orders_arr', 'orders'));
