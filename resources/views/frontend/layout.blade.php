@@ -22,6 +22,7 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 
     <style>
+      
       .fumacoFont1 {
           font-family: 'Montserrat', sans-serif !important; font-weight:400 !important; font-size: 1.75rem!important;
       }
@@ -178,6 +179,14 @@
           opacity: 0;
           animation-name: fadeInUp;
           -webkit-animation-name: fadeInUp;
+      }
+
+      .abt_standard{
+        font-family: 'poppins', sans-serif !important;
+        font-weight: 200 !important;
+        font-size: 14px !important;
+        text-decoration: none !important;
+        letter-spacing: 0.1em;
       }
     </style>
     {!! ReCaptcha::htmlScriptTagJsApi() !!}
