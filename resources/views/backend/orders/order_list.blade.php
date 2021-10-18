@@ -92,7 +92,7 @@
 																			<strong>Payment ID : </strong> {{ $order['payment_id'] }}<br>
 																			<strong>Payment Method : </strong> {{ $order['payment_method'] }}<br>
 																			<strong>Order Date : </strong> {{ $order['date'] }} <br>
-																			<strong>Status : </strong> <span class="badge badge-warning">{{ $order['status'] }}</span>
+																			<strong>Status : </strong> <span class="badge badge-warning" style="font-size: 1rem;">{{ $order['status'] }}</span>
 																		</p>
 																	</div>
 																	<div class="col-md-4">
@@ -109,7 +109,7 @@
 																	</div>
 																</div>
 																<div class="row">
-																	<div class="col-md-12 mb-4">
+																	<div class="col-md-12">
 																		<table class="table table-bordered">
 																			@php
 																				$sum_discount = collect($order['ordered_items'])->sum('item_discount');
@@ -140,20 +140,18 @@
 																					<td class="text-right">₱ {{ number_format(str_replace(",","",$item['item_total']), 2) }}</td>
 																				</tr>
 																				@endforeach
-																				<tr>
-																					<td class="text-right pb-1 pt-1" colspan="{{ $colspan }}">Subtotal</td>
-																					<td class="text-right pb-1 pt-1">₱ {{ number_format(str_replace(",","",$order['subtotal']), 2) }}</td>
-																				</tr>
-																				<tr>
-																					<td class="text-right pb-1 pt-1" colspan="{{ $colspan }}">{{ $order['shipping_name'] }}</td>
-																					<td class="text-right pb-1 pt-1">₱ {{ number_format(str_replace(",","",$order['shipping_amount']), 2) }}</td>
-																				</tr>
-																				<tr>
-																					<td class="text-right font-weight-bold" colspan="{{ $colspan }}">Grand Total</td>
-																					<td class="text-right font-weight-bold">₱ {{ number_format(str_replace(",","",$order['grand_total']), 2) }}</td>
-																				</tr>
 																			</tbody>
 																		</table>
+																	</div>
+																	<div class="col-md-8 offset-md-4 mb-4">
+																		<dl class="row">
+																			<dt class="col-sm-10 text-right">Subtotal</dt>
+																			<dd class="col-sm-2 text-right">₱ {{ number_format(str_replace(",","",$order['subtotal']), 2) }}</dd>
+																			<dt class="col-sm-10 text-right">{{ $order['shipping_name'] }}</dt>
+																			<dd class="col-sm-2 text-right">₱ {{ number_format(str_replace(",","",$order['shipping_amount']), 2) }}</dd>
+																			<dt class="col-sm-10 text-right">Grand Total</dt>
+																			<dd class="col-sm-2 text-right">₱ {{ number_format(str_replace(",","",$order['grand_total']), 2) }}</dd>
+																		</dl>
 																	</div>
 
 
