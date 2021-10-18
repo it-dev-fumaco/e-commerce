@@ -5,13 +5,6 @@
 
 @section('content')
 <style>
-    .abt-body{
-        font-family: 'poppins', sans-serif !important;
-        font-weight: 200 !important;
-        font-size: 14px !important;
-        text-decoration: none !important;
-        letter-spacing: 0.1em;
-    }
     .aboutalign {
         text-align: right !important;
     }
@@ -189,7 +182,7 @@
     }
 </style>
 
-<main class="abt-body">
+<main class="abt_standard">
     <section class="py-5 container">
 
     </section>
