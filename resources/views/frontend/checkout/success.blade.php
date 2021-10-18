@@ -79,6 +79,7 @@
 						<table class="table">
 							@php
 									$sum_discount = collect($items)->sum('discount');
+									$colspan = ($sum_discount > 0) ? 5 : 4;
 								@endphp
 							<thead>
 								<tr style="font-size: 0.9rem;">
@@ -116,15 +117,15 @@
 							</tbody>
 							<tfoot>
 								<tr style="font-size: 0.8rem; text-align: right;">
-									<td class="pb-1 pt-1" colspan="5">Subtotal</td>
+									<td class="pb-1 pt-1" colspan="{{ $colspan }}">Subtotal</td>
 									<td class="pb-1 pt-1">₱ {{ number_format(str_replace(",","",$order_details->order_subtotal), 2) }}</td>
 								</tr>
 								<tr style="font-size: 0.8rem; text-align: right;">
-									<td class="pb-1 pt-1" colspan="5">{{ $order_details->order_shipping }}</td>
+									<td class="pb-1 pt-1" colspan="{{ $colspan }}">{{ $order_details->order_shipping }}</td>
 									<td class="pb-1 pt-1">₱ {{ number_format(str_replace(",","",$order_details->order_shipping_amount), 2) }}</td>
 								</tr>
 								<tr style="font-size: 0.9rem; text-align: right; border-top: 2px solid;">
-									<td class="pb-1 pt-1" colspan="5"><b>Grand Total</b></td>
+									<td class="pb-1 pt-1" colspan="{{ $colspan }}"><b>Grand Total</b></td>
 									<td class="pb-1 pt-1"><b>₱ {{ number_format(str_replace(",","",($order_details->order_shipping_amount + $order_details->order_subtotal)), 2) }}</b></td>
 								</tr>
 							</tfoot>
