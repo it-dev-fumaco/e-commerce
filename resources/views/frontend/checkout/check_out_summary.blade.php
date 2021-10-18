@@ -203,24 +203,31 @@
 						<div class="card-body he1x" style="padding-bottom: 0px !important;">Cart Total<hr></div>
 						<table class="table" id="cart-items">
 							<thead>
-							<tr style="text-align: center">
-								<th class="col-md-2"></th>
-								<th>Product</th>
-								<th>Qty</th>
-								<th class="col-md-2">Total</th>
+							<tr style="font-size: 0.8rem !important;">
+								<th class="text-center" colspan="2">Product Description</th>
+								<th class="text-center">Qty</th>
+								<th class="text-center">Amount</th>
 							</tr>
 							</thead>
-							<tbody>
+							<tbody style="font-size: 0.8rem !important;">
 								@foreach ($cart_arr as $cart)
 									<tr>
-										<td class="col-md-2" style="padding-top: 20px;padding-bottom: 20px;">
+										<td class="col-md-2">
 											<center>
 												<img src="{{ asset('/storage/item/images/'.$cart['item_code'].'/gallery/preview/'.$cart['item_image']) }}" class="img-responsive" alt="" width="55" height="55">
 											</center>
 										</td>
-										<td style="font-size: 12px; padding-top: 20px;padding-bottom: 20px;">{{ $cart['item_description'] }}</td>
-										<td style="text-align: center; padding-top: 20px;padding-bottom: 20px;">{{ $cart['quantity'] }}</td>
-										<td class="col-md-2" style="text-align: center;padding-top: 20px;padding-bottom: 20px;"><span class="amount">{{ $cart['subtotal'] }}</span></td>
+										<td>{{ $cart['item_description'] }}</td>
+										<td style="text-align: center;">{{ $cart['quantity'] }}</td>
+										<td class="col-md-2" style="text-align: right;">
+                                 @if ($cart['discount'])
+                                     <small class="text-muted"><s>₱ {{ number_format($cart['original_price'], 2, '.', ',') }}</s></small><br>
+                                     ₱ {{ number_format($cart['price'], 2, '.', ',') }}
+                                 @else
+                                 ₱ {{ number_format($cart['price'], 2, '.', ',') }}
+                                 @endif
+                                 <span class="amount d-none">{{ $cart['subtotal'] }}</span>
+                              </td>
 									</tr>
 								@endforeach
 							</tbody>
@@ -228,7 +235,7 @@
 
 						<div class="card-body he1x" style="padding-top: 0px !important; padding-bottom: 0px !important;">
 							<div class="d-flex justify-content-between align-items-center">
-								Subtotal <small class="text-muted stylecap he1x" id="cart-subtotal">P {{ number_format(collect($cart_arr)->sum('subtotal'), 2, '.', ',') }}</small>
+								Subtotal <small class="text-muted stylecap he1x" id="cart-subtotal">₱ {{ number_format(collect($cart_arr)->sum('subtotal'), 2, '.', ',') }}</small>
 							</div>
 							<hr>
 						</div>
@@ -239,18 +246,19 @@
 							@forelse ($shipping_rates as $l => $srate)
 							<div class="d-flex justify-content-between align-items-center">
 								<div class="form-check">
-									<input class="form-check-input" type="radio" name="shipping_fee" id="{{ 'sr' . $l }}" value="{{ $srate['shipping_cost'] }}" data-sname="{{ $srate['shipping_service_name'] }}" required checked>
+									<input class="form-check-input" type="radio" name="shipping_fee" id="{{ 'sr' . $l }}" value="{{ $srate['shipping_cost'] }}" data-sname="{{ $srate['shipping_service_name'] }}" data-est="{{ $srate['expected_delivery_date'] }}" required checked>
 									<label class="form-check-label" for="{{ 'sr' . $l }}">{{ $srate['shipping_service_name'] }}</label>
 								</div>
-								<small class="text-muted stylecap he1x">P {{ number_format($srate['shipping_cost'], 2, '.', ',') }}</small>
+								<small class="text-muted stylecap he1x">₱ {{ number_format($srate['shipping_cost'], 2, '.', ',') }}</small>
 							</div>
 							@empty
-								<h5>No shipping rates found.</h5>
+								<h6>No available shipping methods.</h6>
 							@endforelse
 							<hr>
+							<p class="d-none" id="est-div" style="font-size: 0.8rem; font-style: italic;">Estimated Delivery Date: <b><span id="estimated-delivery-date"></span></b></p>
 						</div>
 						<div class="card-body he1x">
-							<div class="d-flex justify-content-between align-items-center" style="color:#FF9D00 !important;">Total <small class="text-muted stylecap he1x" style="color:#FF9D00 !important;" id="grand-total">0.00</small>
+							<div class="d-flex justify-content-between align-items-center" style="color:#FF9D00 !important;">Grand Total <small class="text-muted stylecap he1x" style="color:#FF9D00 !important;" id="grand-total">0.00</small>
 							</div>
 						</div>
 					</div>
@@ -390,9 +398,15 @@
 			var shipping_fee = $("input[name='shipping_fee']:checked").val();
 			var total = parseFloat(shipping_fee) + subtotal;
 
+			var estimated_del = $("input[name='shipping_fee']:checked").data('est');
+			if (estimated_del) {
+				$('#est-div').removeClass('d-none');
+				$('#estimated-delivery-date').text(estimated_del);
+			}
+
 			total = (isNaN(total)) ? 0 : total;
 
-			$('#grand-total').text('P ' + total.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,"));
+			$('#grand-total').text('₱ ' + total.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,"));
 
 			$("#total_amount").val($('#grand-total').text());
 		}
