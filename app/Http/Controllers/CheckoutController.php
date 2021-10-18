@@ -427,9 +427,9 @@ class CheckoutController extends Controller
 						];
 					}
 				}
-			}
 
-			DB::table('fumaco_order_items')->insert($orders_arr);
+				DB::table('fumaco_order_items')->insert($orders_arr);
+			}
 
 			$summary_arr[] = [
 				'same_address' => $same_address,

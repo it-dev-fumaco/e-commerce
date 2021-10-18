@@ -38,7 +38,7 @@ class OrderController extends Controller
                 'bill_contact_person' => $o->order_contactperson,
                 'ship_contact_person' => $o->order_ship_contactperson,
                 'email' => $o->order_email,
-                'date' => Carbon::parse($o->order_update)->format('Y-m-d H:i'),
+                'date' => Carbon::parse($o->order_update)->format('Y-m-d h:i A'),
                 'ordered_items' => $items_arr,
                 'order_tracker_code' => $o->tracker_code,
                 'cust_id' => $o->order_account,
