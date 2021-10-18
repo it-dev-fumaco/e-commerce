@@ -20,11 +20,34 @@ class CartController extends Controller
         }
 
         if (isset($data['buynow']) && $data['buynow']) {
-            return $this->addToCart($data);
+            // return $this->buyNow($data);
+            if(Auth::check()){
+				$user_id = DB::table('fumaco_users')->where('username', Auth::user()->username)->first();
+                $bill_address = DB::table('fumaco_user_add')->where('xdefault', 1)->where('user_idx', $user_id->id)->where('address_class', 'Billing')->count();
+				$ship_address = DB::table('fumaco_user_add')->where('xdefault', 1)->where('user_idx', $user_id->id)->where('address_class', 'Delivery')->count();
+
+                if($bill_address > 0 and $ship_address > 0){
+                    $action = '/checkout/summary/'.$data['item_code']."/".$data['quantity'];
+                }else if($ship_address < 1){
+                    $action = '/checkout/billing/'.$data['item_code']."/".$data['quantity'];
+                }else if($bill_address < 1){
+                    $action = '/checkout/set_billing_form/'.$data['item_code']."/".$data['quantity'];
+                }else{
+                    $action = '/checkout/billing/'.$data['item_code']."/".$data['quantity'];
+                }
+
+                return redirect($action);
+            }
+            return redirect('/checkout/billing/'.$data['item_code']."/".$data['quantity']);
+            // return redirect('/buy_now');
         }
 
         return redirect('/');
     }
+
+    // public function buyNow($data){
+    //     dd($data);
+    // }
 
     public function addToCart($data) {
         $id = $data['item_code'];
@@ -47,9 +70,9 @@ class CartController extends Controller
             session()->put('fumCart', $cart);
 
             if (isset($data['buynow']) && $data['buynow']) {
-                return redirect('/cart');
+                return redirect('/checkout/summary');
             }
-            
+
             return redirect()->back()->with('success', 'Product added to your cart!');
         }
         // if cart not empty then check if this product exist then increment quantity

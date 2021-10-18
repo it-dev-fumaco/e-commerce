@@ -416,7 +416,11 @@
 					<br/>&nbsp;
 					<div class="col-md-8 mx-auto">
 						<a href="/cart" class="btn btn-lg btn-outline-primary col-md-5 mx-auto" role="button" style="background-color: #777575 !important; border-color: #777575 !important;">BACK</a>
-
+						<div class="d-none">
+							<input type="text" value="{{ $item_code_buy }}" name="buy_now_item_code">
+							<input type="text" value="{{ $qty_buy }}" name="buy_now_qty">
+							<input type="checkbox" value="buy_now" name="buy_now" {{ ($item_code_buy) ? "checked" : '' }} readonly>
+						</div>
 						<input type="submit" class="btn btn-lg btn-outline-primary col-md-5 mx-auto" role="button" style="float: right;" value="PROCEED">
 						<input type="text" name="order_no" class="p" value="{{ 'FUM-'.random_int(10000000, 99999999) }}" hidden readonly/>
 					</div>

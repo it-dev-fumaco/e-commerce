@@ -63,7 +63,7 @@ Route::group(['middleware' => 'auth'], function(){
     Route::get('/myprofile/address/{id}/{type}/change_default', 'FrontendController@setDefaultAddress');
     Route::get('/myprofile/address/{type}/new', 'FrontendController@addAddressForm');
     Route::post('/myprofile/address/{type}/save', 'FrontendController@saveAddress');
-    Route::get('/checkout/summary', 'CheckoutController@checkoutSummary');
+    Route::get('/checkout/summary/{item_code_buy?}/{qty_buy?}', 'CheckoutController@checkoutSummary');
 
 });
 
@@ -79,11 +79,11 @@ Route::get('/countwishlist', 'CartController@countWishlist');
 
 // CHECKOUT ROUTES
 Route::get('/checkout/review_order', 'CheckoutController@reviewOrder');
-Route::get('/checkout/billing', 'CheckoutController@billingForm');
+Route::get('/checkout/billing/{item_code_buy?}/{qty_buy?}', 'CheckoutController@billingForm');
 Route::post('/checkout/summary', 'CheckoutController@checkoutSummary');
 Route::get('/checkout/summary_view', 'CheckoutController@checkoutSummaryView');
 Route::post('/checkout/set_address', 'CheckoutController@setAddress');
-Route::get('/checkout/set_billing_form', 'CheckoutController@setBillingForm');
+Route::get('/checkout/set_billing_form/{item_code_buy?}/{qty_buy?}', 'CheckoutController@setBillingForm');
 Route::post('/checkout/set_billing', 'CheckoutController@setBilling');
 Route::get('/eghlform/{order_no}', 'CheckoutController@viewPaymentForm');
 Route::post('/checkout/updateshipping/{id}', 'CheckoutController@updateShippingAmount');

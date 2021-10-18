@@ -13,12 +13,12 @@ use App\Models\ShippingCondition;
 
 class CheckoutController extends Controller
 {
-	public function billingForm() {
-		return view('frontend.checkout.billing_address_form');
+	public function billingForm($item_code_buy = null, $qty_buy = null) {
+		return view('frontend.checkout.billing_address_form', compact('item_code_buy', 'qty_buy'));
 	}
 
-	public function setBillingForm(){
-		return view('frontend.checkout.set_billing');
+	public function setBillingForm($item_code_buy = null, $qty_buy = null){
+		return view('frontend.checkout.set_billing', compact('item_code_buy', 'qty_buy'));
 	}
 
 	public function setBilling(Request $request){
@@ -61,7 +61,17 @@ class CheckoutController extends Controller
 				$ship_address = DB::table('fumaco_user_add')->where('xdefault', 1)->where('user_idx', $user_id->id)->where('address_class', 'Delivery')->get();
 			}
 
-			return redirect('/checkout/summary')->with('add_success', 'Record Updated');
+			$item_code_buy = "";
+			$qty_buy = "";
+			$summary = '/checkout/summary/';
+
+			if(isset($request->buy_now)){
+				$item_code_buy = $request->buy_now_item_code;
+				$qty_buy = $request->buy_now_qty;
+				$summary = '/checkout/summary/'.$item_code_buy."/".$qty_buy;
+			}
+
+			return redirect($summary)->with('add_success', 'Record Updated');
 		}catch(Exception $e){
 			DB::rollback();
 			return redirect()->back()->with('error', 'An error occured. Please try again.');
@@ -153,26 +163,46 @@ class CheckoutController extends Controller
 
 			$request->session()->put('order_no', 'FUM-'.random_int(10000000, 99999999));
 
+			$item_code_buy = "";
+			$qty_buy = "";
+			$summary = '/checkout/summary/';
+
+			if(isset($request->buy_now)){
+				$item_code_buy = $request->buy_now_item_code;
+				$qty_buy = $request->buy_now_qty;
+				$summary = '/checkout/summary/'.$item_code_buy."/".$qty_buy;
+			}
+
+
 			DB::commit();
 
-			return redirect('/checkout/summary')->with('add_success', 'Record Updated');
+			return redirect($summary)->with('add_success', 'Record Updated');
 		}catch(Exception $e){
 			DB::rollback();
 			return redirect()->back()->with('error', 'An error occured. Please try again.');
 		}	
 	}
 
-	public function checkoutSummary(Request $request){
+	public function checkoutSummary(Request $request, $item_code_buy = null, $qty_buy = null){
         DB::beginTransaction();
 		try{
 			$base_url = DB::table('fumaco_settings')->first();
 
 			$same_address = 0;
+			$buy_now = 0;
 
 			$user_type = '';
 
+			// if(!Auth::check()){
 			if(!Auth::check() and request()->isMethod('post')) {
+
+				if(isset($request->buy_now)){
+					$buy_now = 1;
+					$b_item_code = $request->buy_now_item_code;
+					$b_qty = $request->buy_now_qty;
+				}
 				$order_no = 'FUM-'.random_int(10000000, 99999999);
+				// dd($request->all());
 				$first_name = $request->fname;
 				$last_name = $request->lname;
 				$email = $request->ship_email;
@@ -207,6 +237,7 @@ class CheckoutController extends Controller
 					$bill_country = $request->ship_country_region1_1;
 					$bill_address_type = $request->ship_Address_type1_1;
 					$bill_email = $request->ship_email;
+					// $bill_contact = $request->ship_contactnumber1_1;
 					$bill_mobile = $request->ship_mobilenumber1_1;
 				}else{
 					$same_address = 0;
@@ -222,18 +253,27 @@ class CheckoutController extends Controller
 					$bill_address_type = $request->Address_type1_1;
 					$bill_mobile = $request->mobilenumber1_1;
 					$bill_email = $request->email;
+					// $bill_contact = $request->contactnumber1_1;
 				}				
 			}else{
+				if($item_code_buy){
+					$buy_now = 1;
+					$b_item_code = $item_code_buy;
+					$b_qty = $qty_buy;
+				}
+				
 				$o_email = Auth::user()->username;
 				$order_no = $request->session()->get('order_no');
 
 				$user = DB::table('fumaco_users')->where('username', $o_email)->first();
 				$user_id = $user->id;
 
+				// $user_ship_address = DB::table('fumaco_user_add_bill')->where('xdefault_b', 1)->where('user_idx_b', $user_id)->first();
 				$user_bill_address = DB::table('fumaco_user_add')->where('xdefault', 1)->where('user_idx', $user_id)->where('address_class', 'Billing')->first();
 				$user_ship_address = DB::table('fumaco_user_add')->where('xdefault', 1)->where('user_idx', $user_id)->where('address_class', 'Delivery')->first();
 				$bill = collect($user_bill_address);
 				$ship = collect($user_ship_address);
+				// dd($bill);
 				$add_check = count($bill->diff($ship));
 				$same_address = ($add_check > 3) ? 0 : 1;
 
@@ -306,61 +346,94 @@ class CheckoutController extends Controller
 				'xuser_id' => $user_id
 			];
 
-			$cart = session()->get('fumCart');
-			$cart = (!$cart) ? [] : $cart;
-			if(count($cart) <= 0) {
-				return redirect('/cart');
-			}
+			if($buy_now == 1){
+				$item = DB::table('fumaco_items')->where('f_idcode', $b_item_code)->first();
 
-			$cart_items = DB::table('fumaco_items')
-				->whereIn('f_idcode', array_column($cart, 'item_code'))->get();
-			
-			$cart_arr = [];
-			$orders_arr = [];
-			foreach ($cart_items as $n => $item) {
-				$item_image = DB::table('fumaco_items_image_v1')
-					->where('idcode', $item->f_idcode)->first();
+				$item_image = DB::table('fumaco_items_image_v1')->where('idcode', $item->f_idcode)->first();
+				
+				$order_check = DB::table('fumaco_order_items')->where('order_number', $order_no)->where('item_code', $item->f_idcode)->count();
 
-				$price = ($item->f_discount_trigger) ? $item->f_price : $item->f_original_price;
-
-				$order_check = DB::table('fumaco_order_items')->where('order_number', $order_no)
-					->where('item_code', $item->f_idcode)->count();
+				$price = ($item->f_price > 0) ? $item->f_price : $item->f_original_price;
 
 				$cart_arr[] = [
 					'item_code' => $item->f_idcode,
 					'item_description' => $item->f_name_name,
 					'price' => $price,
+					'subtotal' => ($price * $b_qty),
 					'original_price' => $item->f_original_price,
 					'discount' => $item->f_discount_percent,
-					'subtotal' => ($price * $cart[$item->f_idcode]['quantity']),
-					'quantity' => $cart[$item->f_idcode]['quantity'],
+					'quantity' => $b_qty,
 					'stock_qty' => $item->f_qty,
 					'item_image' => ($item_image) ? $item_image->imgprimayx : 'test.jpg'
 				];
 
+				$orders_arr[] = [
+					'order_number' => $order_no,
+					'item_code' => $item->f_idcode,
+					'item_name' => $item->f_name_name,
+					'item_qty' => $b_qty,
+					'item_price' => $price,
+					'item_status' => 2,
+					'date_update' => Carbon::now()->toDateTimeString(),
+					'ip_address' => $request->ip(),
+					'item_total_price' => ($price * $b_qty)
+				];
 				if($order_check < 1){
+					DB::table('fumaco_order_items')->insert($orders_arr);
+				}
+			}else{
+				$cart = session()->get('fumCart');
+				$cart = (!$cart) ? [] : $cart;
+				if(count($cart) <= 0) {
+					return redirect('/cart');
+				}
+	
+				$cart_items = DB::table('fumaco_items')
+					->whereIn('f_idcode', array_column($cart, 'item_code'))->get();
+				
+				$cart_arr = [];
+				foreach ($cart_items as $n => $item) {
+					$item_image = DB::table('fumaco_items_image_v1')
+						->where('idcode', $item->f_idcode)->first();
+	
+					$price = ($item->f_price > 0) ? $item->f_price : $item->f_original_price;
+	
+					// dd($order_no);
+					$order_check = DB::table('fumaco_order_items')->where('order_number', $order_no)->where('item_code', $item->f_idcode)->count();
+	
+					$cart_arr[] = [
+						'item_code' => $item->f_idcode,
+						'item_description' => $item->f_name_name,
+						'price' => $price,
+						'subtotal' => ($price * $cart[$item->f_idcode]['quantity']),
+						'original_price' => $item->f_original_price,
+						'discount' => $item->f_discount_percent,
+						'quantity' => $cart[$item->f_idcode]['quantity'],
+						'stock_qty' => $item->f_qty,
+						'item_image' => ($item_image) ? $item_image->imgprimayx : 'test.jpg'
+					];
+	
 					$orders_arr[] = [
 						'order_number' => $order_no,
 						'item_code' => $item->f_idcode,
 						'item_name' => $item->f_name_name,
 						'item_qty' => $cart[$item->f_idcode]['quantity'],
-						'item_price' => $item->f_price,
-						'item_original_price' => $item->f_original_price,
-						'item_discount' => $item->f_discount_percent,
+						'item_price' => $price,
 						'item_status' => 2,
 						'date_update' => Carbon::now()->toDateTimeString(),
 						'ip_address' => $request->ip(),
 						'item_total_price' => ($price * $cart[$item->f_idcode]['quantity'])
 					];
+					if($order_check < 1){
+						DB::table('fumaco_order_items')->insert($orders_arr);
+					}
 				}
 			}
 
 			DB::table('fumaco_order_items')->insert($orders_arr);
 
 			$summary_arr[] = [
-				'shipping' => $cart['shipping']['shipping_fee'],
-				'subtotal' => collect($cart_arr)->sum('subtotal'),
-				'grand_total' => ($cart['shipping']['shipping_fee'] + collect($cart_arr)->sum('subtotal')),
+
 				'same_address' => $same_address,
 				'base_url' => $base_url->set_value,
 				'ship_mobile' => $ship_mobile,
@@ -375,7 +448,6 @@ class CheckoutController extends Controller
 			DB::commit();
 			request()->session()->put('summary_arr', $summary_arr);
 			request()->session()->put('cart_arr', $cart_arr);
-
 			return redirect('/checkout/summary_view');
 		}catch(Exception $e){
 			DB::rollback();
@@ -386,7 +458,6 @@ class CheckoutController extends Controller
 	public function checkoutSummaryView(Request $request){
 		$summary_arr = $request->session()->get('summary_arr');
 		$cart_arr = $request->session()->get('cart_arr');
-
 		if (!isset($cart_arr)) {
 			return redirect('/cart');
 		}
@@ -438,7 +509,7 @@ class CheckoutController extends Controller
 		}
 	}
 
-	public function orderSuccess($id, Request $request) {
+	public function orderSuccess($id) {
 		DB::beginTransaction();
 		try {
 			$temp = DB::table('fumaco_temp')->where('xtempcode', $id)->first();
@@ -455,24 +526,6 @@ class CheckoutController extends Controller
 			$existing_order = DB::table('fumaco_order')->where('order_number', $temp->order_tracker_code)->exists();
 			if (!$existing_order) {
 				$subtotal = collect($order_items)->sum('item_total_price');
-
-				switch ($request->PymtMethod) {
-					case 'CC':
-						$payment_method = 'Credit Card';
-						break;
-					case 'MO':
-						$payment_method = 'Credit Card';
-						break;
-					case 'DD':
-						$payment_method = 'Direct Debit';
-						break;
-					case 'WA':
-						$payment_method = 'e-Wallet';
-						break;
-					default:
-						$payment_method = $request->PymtMethod;
-						break;
-				}
 
 				DB::table('fumaco_order')->insert([
 					'order_number' => $temp->order_tracker_code,
@@ -504,14 +557,7 @@ class CheckoutController extends Controller
 					'order_ip' => $temp->order_ip,
 				  	'order_date' => $now,
 					'order_status' => "Order Placed",
-					'order_payment_method' => $payment_method,
 					'tracker_code' => $temp->order_tracker_code,
-					'payment_id' => $request->PaymentID,
-					'bank_ref_no' => $request->BankRefNo,
-					'issuing_bank' => $request->IssuingBank,
-					'payment_transaction_time' => $request->RespTime,
-					'amount_paid' => $request->Amount,
-					'estimated_delivery_date' => $temp->estimated_delivery_date
 				]);
 
 				// insert order in tracking order table
@@ -536,7 +582,6 @@ class CheckoutController extends Controller
 					'item_code' => $row->item_code,
 					'item_name' => $row->item_name,
 					'price' => $row->item_price,
-					'discount' => $row->item_discount,
 					'qty' => $row->item_qty,
 					'amount' => $row->item_total_price,
 					'image' => ($image) ? $image->imgprimayx : null
@@ -778,6 +823,23 @@ class CheckoutController extends Controller
                     'stores' => [],
                 ];
             }
+        }
+
+        $store_pickup_query = ShippingService::where('shipping_service_name', 'Store Pickup')->get();
+        foreach($store_pickup_query as $row){
+            $stores = DB::table('store_location')
+                ->join('shipping_service_store', 'shipping_service_store.store_location_id', 'store_location.store_id')
+                ->where('shipping_service_id', $row->shipping_service_id)->select('store_name', 'available_from', 'available_to')->get();
+
+            $shipping_offer_rates[] = [
+                'shipping_service_name' => $row->shipping_service_name,
+                'expected_delivery_date' => null,
+                'shipping_cost' => '-',
+                'external_carrier' => false,
+                'allow_delivery_after' => 0,
+                'pickup' => true,
+                'stores' => $stores,
+            ];
         }
 
 		return $shipping_offer_rates;
