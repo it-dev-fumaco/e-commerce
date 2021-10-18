@@ -72,15 +72,21 @@
 							{!! $order_details->order_ship_address1 . ' ' . $order_details->order_ship_address2 . ', ' . $order_details->order_ship_brgy . ', ' . $order_details->order_ship_city . ', ' . $order_details->order_ship_prov . ', ' . $order_details->order_ship_postal . ', ' . $order_details->order_ship_country !!}
 
 							<br>
-							<p>Estimated Delivery Date: <b>{{ $order_details->estimated_delivery_date }}</b></p>
+							<br>
+							<p><b>Estimated Delivery Date:</b> {{ $order_details->estimated_delivery_date }}</p>
 						</div>
 						<br><br>
 						<table class="table">
+							@php
+									$sum_discount = collect($items)->sum('discount');
+								@endphp
 							<thead>
 								<tr style="font-size: 0.9rem;">
 									<th class="text-left" colspan="2">Item Description</th>
 									<th class="text-center">Qty</th>
+									@if ($sum_discount > 0)
 									<th class="text-center">Discount (%)</th>
+									@endif
 									<th class="text-center">Price</th>
 									<th class="text-center">Amount</th>
 								</tr>
@@ -96,7 +102,9 @@
 									</td>
 									<td>{{ $item['item_name'] }}</td>
 									<td class="text-center">{{ $item['qty'] }}</td>
+									@if ($sum_discount > 0)
 									<td class="text-center">{{ $item['discount'] . '%' }}</td>
+									@endif
 									<td class="text-right" style="text-align: right;">₱ {{ number_format(str_replace(",","",$item['price']), 2) }}</td>
 									<td class="text-right" style="text-align: right;">₱ {{ number_format(str_replace(",","",$item['amount']), 2) }}</td>
 								 </tr>

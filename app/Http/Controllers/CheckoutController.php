@@ -556,6 +556,7 @@ class CheckoutController extends Controller
 				  	'order_date' => $now,
 					'order_status' => "Order Placed",
 					'tracker_code' => $temp->order_tracker_code,
+					'estimated_delivery_date' => $temp->estimated_delivery_date
 				]);
 
 				// insert order in tracking order table
