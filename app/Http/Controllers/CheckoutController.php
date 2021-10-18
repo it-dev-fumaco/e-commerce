@@ -580,6 +580,7 @@ class CheckoutController extends Controller
 					'item_code' => $row->item_code,
 					'item_name' => $row->item_name,
 					'price' => $row->item_price,
+					'discount' => $row->item_discount,
 					'qty' => $row->item_qty,
 					'amount' => $row->item_total_price,
 					'image' => ($image) ? $image->imgprimayx : null
