@@ -43,7 +43,7 @@
 								<div class="col-md-6">
 									<div class="form-group">
 										<label for="shipping-service-type" class="form-label">* Shipping Rules</label>
-										<select name="shipping_service_type" id="shipping-service-type" class="form-control">
+										<select name="shipping_service_type" id="shipping-service-type" class="form-control" required>
 											<option value="">-</option>
 											<option value="Standard Delivery">Standard Delivery</option>
 											<option value="Express Delivery">Express Delivery</option>

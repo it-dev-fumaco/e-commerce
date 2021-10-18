@@ -27,6 +27,14 @@ class ShippingController extends Controller
         try {
             if($request->shipping_service_type != 'Store Pickup'){
                 $shipping_calculation = $request->shipping_calculation;
+                if(!$shipping_calculation) {
+                    return response()->json([
+                        'status' => 0, 
+                        'message' => 'Please select shipping condition.', 
+                        'redirect_to' => null, 
+                        'new' => 0
+                    ]);
+                }
                 
                 if($shipping_calculation == 'Flat Rate'){
                     $amount = $request->amount;
@@ -79,7 +87,7 @@ class ShippingController extends Controller
                         ];
                     }
 
-                    DB::table('shipping_service_store')->insert($stores);
+                    DB::table('fumaco_shipping_service_store')->insert($stores);
                 }
             }
 
@@ -249,7 +257,7 @@ class ShippingController extends Controller
                                 'store_location_id' => $request->store[$e],
                             ];
 
-                            DB::table('shipping_service_store')->where('shipping_service_store_id', $request->shipping_service_store_id[$e])->update($values);
+                            DB::table('fumaco_shipping_service_store')->where('shipping_service_store_id', $request->shipping_service_store_id[$e])->update($values);
                         }else{
                             $stores[] = [
                                 'shipping_service_id' => $shipping_service->shipping_service_id,
@@ -258,7 +266,7 @@ class ShippingController extends Controller
                         }
                     }
 
-                    DB::table('shipping_service_store')->insert($stores);
+                    DB::table('fumaco_shipping_service_store')->insert($stores);
                 }
             }
 
@@ -330,7 +338,7 @@ class ShippingController extends Controller
                                     'new' => 0
                                 ]);
                             }
-                            
+
                             $shipping_conditions[] = [
                                 'shipping_service_id' => $shipping_service->shipping_service_id,
                                 'type' => $request->condition[$e],
