@@ -28,6 +28,7 @@ class OrderController extends Controller
                     'item_name' => $i->item_name,
                     'item_qty' => $i->item_qty,
                     'item_price' => $i->item_price,
+                    'item_discount' => $i->item_discount,
                     'item_total' => $i->item_total_price,
                 ];
             }
@@ -56,10 +57,14 @@ class OrderController extends Controller
                 'ship_brgy' => $o->order_ship_brgy,
                 'ship_country' => $o->order_ship_country,
                 'ship_postal' => $o->order_ship_postal,
-                'shipping_id' => $o->order_shipping,
+                'shipping_name' => $o->order_shipping,
                 'shipping_amount' => $o->order_shipping_amount,
-                'total_amount' => ($o->order_shipping_amount + $o->order_subtotal),
-                'status' => $o->order_status
+                'grand_total' => ($o->order_shipping_amount + $o->order_subtotal),
+                'status' => $o->order_status,
+                'estimated_delivery_date' => $o->estimated_delivery_date,
+                'payment_id' => $o->payment_id,
+                'payment_method' => $o->order_payment_method,
+                'subtotal' => $o->order_subtotal
             ];
         }
         return view('backend.orders.order_list', compact('orders_arr', 'orders'));
