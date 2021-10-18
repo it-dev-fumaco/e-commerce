@@ -776,23 +776,6 @@ class CheckoutController extends Controller
             }
         }
 
-        $store_pickup_query = ShippingService::where('shipping_service_name', 'Store Pickup')->get();
-        foreach($store_pickup_query as $row){
-            $stores = DB::table('store_location')
-                ->join('shipping_service_store', 'shipping_service_store.store_location_id', 'store_location.store_id')
-                ->where('shipping_service_id', $row->shipping_service_id)->select('store_name', 'available_from', 'available_to')->get();
-
-            $shipping_offer_rates[] = [
-                'shipping_service_name' => $row->shipping_service_name,
-                'expected_delivery_date' => null,
-                'shipping_cost' => '-',
-                'external_carrier' => false,
-                'allow_delivery_after' => 0,
-                'pickup' => true,
-                'stores' => $stores,
-            ];
-        }
-
 		return $shipping_offer_rates;
 	}
 }
