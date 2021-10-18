@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Arr;
 use DB;
 use Auth;
 
@@ -416,36 +417,29 @@ class FrontendController extends Controller
             ->whereIn('idcode', $variant_items)->where('c.status', 1)->orderBy('a.idx', 'asc')->get();
         $variant_attributes = collect($variant_attributes)->groupBy('attribute_name');
 
-        // get item attributes for display 
-        // $attributes = DB::table('fumaco_items_attributes as a')
-        //     ->join('fumaco_attributes_per_category as c', 'c.id', 'a.attribute_name_id')
-        //     ->where('idcode', $item_code)->orderBy('idx', 'asc')->pluck('a.attribute_value', 'c.attribute_name');
-
         $attrib = DB::table('fumaco_items_attributes as a')
             ->join('fumaco_attributes_per_category as c', 'c.id', 'a.attribute_name_id')
             ->where('idcode', $item_code);
-        // dd($product_details);
+        
         $na_check = DB::table('fumaco_categories')->where('name', $product_details->f_category)->first();
-        // dd($na_check);
         if($na_check->hide_none == 1){
             $attributes = $attrib->where('a.attribute_value', 'NOT LIKE', '%n/a%')->orderBy('idx', 'asc')->pluck('a.attribute_value', 'c.attribute_name');
         }else{
             $attributes = $attrib->orderBy('idx', 'asc')->pluck('a.attribute_value', 'c.attribute_name');
         }
 
-        // $active_attr = [];
         $variant_attr_arr = [];
         if (count($variant_items) > 1) {
             foreach ($variant_attributes as $attr => $value) {
                 $values = collect($value)->groupBy('attribute_value')->map(function($d, $i) {
                     return array_unique(array_column($d->toArray(), 'idcode'));
                 });
-    
+
+                if($na_check->hide_none == 1){
+                    $values = Arr::except($values, ['n/a', 'N/A']); 
+                }
+
                 $variant_attr_arr[$attr] = $values;
-    
-                // if (count($variant_attr_arr[$attr][$attributes[$attr]]) > 1) {
-                //     $active_attr[] = $variant_attr_arr[$attr][$attributes[$attr]];
-                // }
             }
         }
 
@@ -471,9 +465,6 @@ class FrontendController extends Controller
                 'image' => ($image) ? $image->imgprimayx : null
             ];
         }
-        
-        // get common item code to set attribute button as active
-        // $active_variants = call_user_func_array('array_intersect', $active_attr);
 
         return view('frontend.product_page', compact('product_details', 'product_images', 'attributes', 'variant_attr_arr', 'related_products'));
     }
