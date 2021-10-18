@@ -316,6 +316,7 @@ class CheckoutController extends Controller
 				->whereIn('f_idcode', array_column($cart, 'item_code'))->get();
 			
 			$cart_arr = [];
+			$orders_arr = [];
 			foreach ($cart_items as $n => $item) {
 				$item_image = DB::table('fumaco_items_image_v1')
 					->where('idcode', $item->f_idcode)->first();
@@ -337,23 +338,24 @@ class CheckoutController extends Controller
 					'item_image' => ($item_image) ? $item_image->imgprimayx : 'test.jpg'
 				];
 
-				$orders_arr[] = [
-					'order_number' => $order_no,
-					'item_code' => $item->f_idcode,
-					'item_name' => $item->f_name_name,
-					'item_qty' => $cart[$item->f_idcode]['quantity'],
-					'item_price' => $item->f_price,
-					'item_original_price' => $item->f_original_price,
-					'item_discount' => $item->f_discount_percent,
-					'item_status' => 2,
-					'date_update' => Carbon::now()->toDateTimeString(),
-					'ip_address' => $request->ip(),
-					'item_total_price' => ($price * $cart[$item->f_idcode]['quantity'])
-				];
 				if($order_check < 1){
-					DB::table('fumaco_order_items')->insert($orders_arr);
+					$orders_arr[] = [
+						'order_number' => $order_no,
+						'item_code' => $item->f_idcode,
+						'item_name' => $item->f_name_name,
+						'item_qty' => $cart[$item->f_idcode]['quantity'],
+						'item_price' => $item->f_price,
+						'item_original_price' => $item->f_original_price,
+						'item_discount' => $item->f_discount_percent,
+						'item_status' => 2,
+						'date_update' => Carbon::now()->toDateTimeString(),
+						'ip_address' => $request->ip(),
+						'item_total_price' => ($price * $cart[$item->f_idcode]['quantity'])
+					];
 				}
 			}
+
+			DB::table('fumaco_order_items')->insert($orders_arr);
 
 			$summary_arr[] = [
 				'shipping' => $cart['shipping']['shipping_fee'],
