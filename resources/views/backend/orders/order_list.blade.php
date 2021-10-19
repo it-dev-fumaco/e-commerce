@@ -32,17 +32,17 @@
 									<div class="row">
 										<div class="col-md-3">
 											<div class="input-group mb-3">
-												<input type="text" class="form-control" name="search" aria-describedby="button-addon2" placeholder="Order ID">
+												<input type="text" class="form-control" name="search" aria-describedby="button-addon2" placeholder="Order ID" value="{{ (request()->get('search')) ? request()->get('search') : '' }}">
 											</div>
 										</div>
 										<div class="col-md-3">
 											<select class="form-control" name="order_status">
-												<option selected disabled value="">Order Status</option>
-												<option value="Order Placed">Order Placed</option>
-												<option value="Order Confirmed">Order Confirmed</option>
-												<option value="Ready for Delivery">Ready for Delivery</option>
-												<option value="Out for Delivery">Out for Delivery</option>
-												<option value="Delivered">Delivered</option>
+												<option {{ (request()->get('order_status') == "" ) ? 'selected' : '' }} disabled value="">Order Status</option>
+												<option value="Order Placed" {{ (request()->get('order_status') == "Order Placed" ) ? 'selected' : '' }}>Order Placed</option>
+												<option value="Order Confirmed" {{ (request()->get('order_status') == "Order Confirmed" ) ? 'selected' : '' }}>Order Confirmed</option>
+												<option value="Ready for Delivery" {{ (request()->get('order_status') == "Ready for Delivery" ) ? 'selected' : '' }}>Ready for Delivery</option>
+												<option value="Out for Delivery" {{ (request()->get('order_status') == "Out for Delivery" ) ? 'selected' : '' }}>Out for Delivery</option>
+												<option value="Delivered" {{ (request()->get('order_status') == "Delivered" ) ? 'selected' : '' }}>Delivered</option>
 											</select>
 										</div>
 										<div class="col-md-4">
@@ -252,7 +252,7 @@ Order has been cancelled?
 
 
 @empty
-<tr><td colspan=7 class="text-center"><b>No Orders</b></td></tr>
+<tr><td colspan=8 class="text-center"><b>No Orders</b></td></tr>
 @endforelse
 </tbody>
 </table>

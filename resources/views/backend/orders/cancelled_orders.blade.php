@@ -32,7 +32,7 @@
 									<div class="row">
 										<div class="col-md-3">
 											<div class="input-group mb-3">
-												<input type="text" class="form-control" name="search" aria-describedby="button-addon2" placeholder="Order ID">
+												<input type="text" class="form-control" name="search" aria-describedby="button-addon2" placeholder="Order ID" value="{{ (request()->get('search')) ? request()->get('search') : '' }}">
 											</div>
 										</div>
 										<div class="col-md-4">
@@ -171,7 +171,7 @@
 
 
 @empty
-<tr><td colspan=7 class="text-center"><b>No Orders</b></td></tr>
+<tr><td colspan=8 class="text-center"><b>No Orders</b></td></tr>
 @endforelse
 </tbody>
 </table>

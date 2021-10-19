@@ -301,7 +301,7 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a href="/admin/orders_delivered" class="nav-link {{ $activePage == 'order_delivered' ? 'active' : '' }}">
+                <a href="/admin/order/delivered" class="nav-link {{ $activePage == 'order_delivered' ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Delivered Orders</p>
                 </a>
