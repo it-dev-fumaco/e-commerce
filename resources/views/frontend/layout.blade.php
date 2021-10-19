@@ -183,8 +183,8 @@
 
       .abt_standard{
         font-family: 'poppins', sans-serif !important;
-        font-weight: 200 !important;
-        font-size: 17px !important;
+        /* font-weight: 200 !important; */
+        /* font-size: 17px !important; */
         text-decoration: none !important;
         letter-spacing: 0.1em;
       }

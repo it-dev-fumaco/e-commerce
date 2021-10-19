@@ -79,7 +79,7 @@
               <img src="{!!  asset('/assets/site-img/'. $b->{'blogprimayimage-home'})  !!}" alt="{{ $b->blog_caption }}" class="img-responsive" style="width: 100% !important;">
               <br><br>
               <h5 class="font-style-thin fumacoFont_card_title" style="font-family: 'poppins', sans-serif !important; color:#ffffff !important; line-height: 26px !important;">{{ substr($b->blogtitle, 0, 39) }}</h5><br>
-              <p class="abt_standard font-style-thin-caption fumacoFont_card_caption" style="margin-left: 0rem !important; color:#ffffff !important;">
+              <p class="abt_standard" style="margin-left: 0rem !important; color:#ffffff !important;">
                 <a href="blog?id={{ $b->id }}" style="color:#ffffff !important; text-decoration: none !important; text-transform: none !important">{{ substr($b->blog_caption, 0, 100) }}...</a>
               </p>
               <p class="abt_standard font-style-thin" style="margin-left: 0rem !important; color:#ffffff !important;"><a href="blog?id={{ $b->id }}" class="fumacoFont_card_readmore"><span style="color:#ffffff !important;">Read More &#x2192;</span></a></p>

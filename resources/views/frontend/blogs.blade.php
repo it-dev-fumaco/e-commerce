@@ -41,19 +41,19 @@
 
         <div class="row">
             <div class="col-lg-12 animated animatedFadeInUp fadeInUp">
-                <p style="font-family: 'poppins', sans-serif !important;"  class="blog-font-a fumacoFont_card_caption">{{ $blog->datepublish }} | {{ $comment_count->count() }} Comment(s)</p>
+                <p style="font-family: 'poppins', sans-serif !important; font-size: 10pt"  class="blog-font-a">{{ $blog->datepublish }} | {{ $comment_count->count() }} Comment(s)</p>
             </div>
         </div>
 
         <div class="row">
             <div class="col-lg-12 animated animatedFadeInUp fadeInUp">
-                <p style="font-family: 'poppins', sans-serif !important;"  class="font3color fumacoFont_card_title" style="color: #0F6DB7">{{ $blog->blogtitle }}</p>
+                <p style="font-family: 'poppins', sans-serif !important; color: #0F6DB7 !important"  class="fumacoFont_card_title">{{ $blog->blogtitle }}</p>
             </div>
         </div>
 
         <div class="row">
             <div class="col-lg-12 animated animatedFadeInUp fadeInUp">
-                <p style="font-family: 'poppins', sans-serif !important;"  class="blog-font-a fumacoFont_card_caption">{{ $blog->blogtype }}</p>
+                <p style="font-family: 'poppins', sans-serif !important; font-size: 10pt"  class="blog-font-a">{{ $blog->blogtype }}</p>
             </div>
         </div>
 
@@ -65,7 +65,7 @@
 
         <div class="row">
             <div class="col-lg-12 animated animatedFadeInUp fadeInUp">
-                <p style="font-family: 'poppins', sans-serif !important;"  class="fumacoFont_card_caption">{{ $blog->blog_caption }}</p>
+                <p style="font-family: 'poppins', sans-serif !important;">{{ $blog->blog_caption }}</p>
             </div>
         </div>
 
@@ -83,9 +83,7 @@
 
         <div class="row">
             <div class="col-lg-6 animated animatedFadeInUp fadeInUp">
-                <p style="font-family: 'poppins', sans-serif !important;"  class="blog-font-a font1color">Tags : <button
-                        class="btn btn-outline-primary1 btn-sm">Products</button>&nbsp;<button
-                        class="btn btn-outline-primary1 btn-sm">Applications</button></p>
+                <p style="font-family: 'poppins', sans-serif !important;">Tags : <button style=" color: #0F6DB7 !important" class="btn btn-outline-primary1 btn-sm">Products</button>&nbsp;<button style=" color: #0F6DB7 !important" class="btn btn-outline-primary1 btn-sm">Applications</button></p>
 
                 <div id="fb-root"></div>
                 <script>
@@ -148,7 +146,7 @@
 
                         <div class="row">
                             <div class="col">
-                                <p style="font-family: 'poppins', sans-serif !important;"  class="fumacoFont_card_caption animated animatedFadeInUp fadeInUp" style="color:#a9a9a9 !important;">Your email address will not be published. Required fields are marked *</p>
+                                <p style="font-family: 'poppins', sans-serif !important;"  class="animated animatedFadeInUp fadeInUp" style="color:#a9a9a9 !important;">Your email address will not be published. Required fields are marked *</p>
                             </div>
                         </div>
 
