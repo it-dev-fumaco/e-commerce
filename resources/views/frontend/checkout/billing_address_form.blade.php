@@ -76,19 +76,12 @@
 	
 	<main style="background-color:#ffffff; min-height: 700px;" class="products-head">
 		<div class="container-fluid">
-			@php
-				if(!Auth::check()){
-					$action = '/checkout/summary';
-				}else{
-					$action = '/checkout/set_address';
-				}
-			@endphp
 			@if(session()->has('error'))
 				<div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
 					{!! session()->get('error') !!}
 				</div>
 			@endif
-			<form action="{{ $action }}" method="post">
+			<form action="/setdetails" method="post">
 				@csrf
 				<div class="row">
 					<div class="col-md-8 mx-auto">
@@ -431,7 +424,7 @@
 						</div>
 						<br><br>
 						<div class="form-check">
-							<input class="form-check-input" type="checkbox" id="myCheck" name="myCheck"  checked onclick="shipp_function()">
+							<input class="form-check-input" type="checkbox" id="myCheck" name="same_as_billing"  checked onclick="shipp_function()">
 							<label class="form-check-label" for="flexCheckChecked" class="formslabelfnt" style="font-size: 14px;">Billing address is the same as above</label>
 						</div>
 						<br/>
@@ -766,13 +759,7 @@
 					<br/>&nbsp;
 					<div class="col-md-8 mx-auto">
 						<a href="/cart" class="btn btn-lg btn-outline-primary col-md-5 mx-auto" role="button" style="background-color: #777575 !important; border-color: #777575 !important;">BACK</a>
-						<div class="d-none">
-							<input type="text" value="{{ $item_code_buy }}" name="buy_now_item_code">
-							<input type="text" value="{{ $qty_buy }}" name="buy_now_qty">
-							<input type="checkbox" value="buy_now" name="buy_now" {{ ($item_code_buy) ? "checked" : '' }} readonly>
-						</div>
 						<input type="submit" class="btn btn-lg btn-outline-primary col-md-5 mx-auto" role="button" style="float: right;" value="PROCEED">
-						<input type="text" name="order_no" class="p" value="{{ 'FUM-'.random_int(10000000, 99999999) }}" hidden readonly/>
 					</div>
 				</div>
 			</form>

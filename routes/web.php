@@ -63,7 +63,6 @@ Route::group(['middleware' => 'auth'], function(){
     Route::get('/myprofile/address/{id}/{type}/change_default', 'FrontendController@setDefaultAddress');
     Route::get('/myprofile/address/{type}/new', 'FrontendController@addAddressForm');
     Route::post('/myprofile/address/{type}/save', 'FrontendController@saveAddress');
-    Route::get('/checkout/summary/{item_code_buy?}/{qty_buy?}', 'CheckoutController@checkoutSummary');
 
 });
 
@@ -72,21 +71,21 @@ Route::get('/cart', 'CartController@viewCart');
 Route::post('/product_actions', 'CartController@productActions');
 Route::patch('/updatecart', 'CartController@updateCart');
 Route::delete('/removefromcart', 'CartController@removeFromCart');
-Route::post('/addshipping', 'CartController@addShippingDetails');
 Route::post('/addtowishlist', 'CartController@addToWishlist');
 Route::get('/countcartitems', 'CartController@countCartItems');
 Route::get('/countwishlist', 'CartController@countWishlist');
+Route::get('/setdetails', 'CartController@setShippingBillingDetails');
+Route::post('/setdetails', 'CartController@setShippingBillingDetails');
 
 // CHECKOUT ROUTES
 Route::get('/checkout/review_order', 'CheckoutController@reviewOrder');
 Route::get('/checkout/billing/{item_code_buy?}/{qty_buy?}', 'CheckoutController@billingForm');
-Route::post('/checkout/summary', 'CheckoutController@checkoutSummary');
-Route::get('/checkout/summary_view', 'CheckoutController@checkoutSummaryView');
+Route::get('/checkout/summary', 'CheckoutController@checkoutSummary');
 Route::post('/checkout/set_address', 'CheckoutController@setAddress');
 Route::get('/checkout/set_billing_form/{item_code_buy?}/{qty_buy?}', 'CheckoutController@setBillingForm');
 Route::post('/checkout/set_billing', 'CheckoutController@setBilling');
 Route::get('/eghlform/{order_no}', 'CheckoutController@viewPaymentForm');
-Route::post('/checkout/updateshipping/{id}', 'CheckoutController@updateShippingAmount');
+Route::post('/order/save', 'CheckoutController@saveOrder');
 
 Route::get('/checkout/success/{id}', 'CheckoutController@orderSuccess');
 Route::post('/checkout/success/{id}', 'CheckoutController@orderSuccess');

@@ -87,19 +87,20 @@
 				<div class="col-md-8 mx-auto">
 					<div class="card" style="background-color: #f4f4f4 !important; border-radius: 0rem !important;">
 						@php
-							$shipping_fname = $summary_arr[0]['address'][0]['xfname'];
-							$shipping_lname = $summary_arr[0]['address'][0]['xlname'];
-							$shipping_address1 = $summary_arr[0]['address'][0]['xshippadd1'];
-							$shipping_address2 = $summary_arr[0]['address'][0]['xshippadd2'];
-							$shipping_province = $summary_arr[0]['address'][0]['xshiprov'];
-							$shipping_city = $summary_arr[0]['address'][0]['xshipcity'];
-							$shipping_brgy = $summary_arr[0]['address'][0]['xshipbrgy'];
-							$shipping_postal = $summary_arr[0]['address'][0]['xshippostalcode'];
-							$shipping_country = $summary_arr[0]['address'][0]['xshipcountry'];
-							$shipping_address_type = $summary_arr[0]['address'][0]['xshiptype'];
-							$shipping_mobile = $summary_arr[0]['ship_mobile'];
+							$shipping_fname = $shipping_details['fname'];
+							$shipping_lname = $shipping_details['lname'];
+							$shipping_address1 = $shipping_details['address_line1'];
+							$shipping_address2 = $shipping_details['address_line2'];
+							$shipping_province = $shipping_details['province'];
+							$shipping_city = $shipping_details['city'];
+							$shipping_brgy = $shipping_details['brgy'];
+							$shipping_postal = $shipping_details['postal_code'];
+							$shipping_country = $shipping_details['country'];
+							$shipping_address_type = $shipping_details['address_type'];
+							$shipping_mobile = $shipping_details['mobile_no'];
+							$shipping_email = $shipping_details['email_address'];
 
-							if($summary_arr[0]['same_address'] == 1){
+							if($shipping_details['same_as_billing'] == 1){
 								$checkbox = 'd-block';
 								$col = "12";
 								$ship_text = " & Billing";
@@ -110,12 +111,12 @@
 							}
 						@endphp
 						<div class="card-body he1x" style="padding-bottom: 0px !important; font-size:1rem !important;" >
-							<strong>Your Order No : <span id="order-no">{{ $summary_arr[0]['address'][0]['order_tracker_code'] }}</span></strong>
+							<strong>Your Order No : <span id="order-no">{{ $order_no }}</span></strong>
 						</div>
 						<div class="card-body he1x" style="padding-bottom: 0px !important;">
-							Customer Name :  {{ $summary_arr[0]['address'][0]['xfname']." ".$summary_arr[0]['address'][0]['xlname'] }}
+							Customer Name :  {{ $shipping_fname." ".$shipping_lname }}
 						</div>
-						<div class="card-body he1x" style="padding-bottom: 0px !important;">Email Address :  {{ $summary_arr[0]['address'][0]['xemail'] }}
+						<div class="card-body he1x" style="padding-bottom: 0px !important;">Email Address :  {{ $shipping_email }}
 							<div class="card-body he1x" style="padding-bottom: 0px !important;">
 								<div class="accordion" id="accordionExample">
 									<div class="row">
@@ -155,7 +156,7 @@
 												</div>
 											</div>
 										</div>
-										@if ($summary_arr[0]['same_address'] == 0)
+										@if ($shipping_details['same_as_billing'] == 0)
 											<div class="col-md-6 d-flex align-items-stretch">
 												<div class="card" style="width: 100%">
 													<div class="card-header" id="headingOne1">
@@ -177,13 +178,13 @@
 
 													<div id="collapseOne1" class="collapse show" aria-labelledby="headingOne1" data-parent="#accordionExample">
 														<div class="card-body">
-                                                            <div class="card-body he1x" style="padding-bottom: 0px !important;"><b>{{ $summary_arr[0]['address'][0]['xaddresstype'] }}</b></div>
-															<div class="card-body he1x" style="padding-bottom: 0px !important;">Contact Person :  {{ $summary_arr[0]['address'][0]['xcontact_person'] }}</div>
+															<div class="card-body he1x" style="padding-bottom: 0px !important;"><b>{{ $billing_details['address_type'] }}</b></div>
+															<div class="card-body he1x" style="padding-bottom: 0px !important;">Contact Person :  {{ $billing_details['fname'] . ' ' . $billing_details['lname'] }}</div>
 															<div class="card-body he1x" style="padding-bottom: 0px !important;">
-																{{ $summary_arr[0]['address'][0]['xadd1']." ".$summary_arr[0]['address'][0]['xadd2'].", ".$summary_arr[0]['address'][0]['xbrgy'].", ".$summary_arr[0]['address'][0]['xcity'].", ".$summary_arr[0]['address'][0]['xprov'].", ".$summary_arr[0]['address'][0]['xcountry']." ".$summary_arr[0]['address'][0]['xpostal'] }}
+																{{ $billing_details['address_line1']." ".$billing_details['address_line2'].", ".$billing_details['brgy'].", ".$billing_details['city'].", ".$billing_details['province'].", ".$billing_details['country']." ".$billing_details['postal_code'] }}
 															</div>
 
-															<div class="card-body he1x" style="padding-bottom: 0px !important;">Contact Number :  {{ $summary_arr[0]['bill_mobile'] }}<br/>&nbsp;</div>
+															<div class="card-body he1x" style="padding-bottom: 0px !important;">Contact Number :  {{ $billing_details['mobile_no'] }}<br/>&nbsp;</div>
 														</div>
 													</div>
 												</div>
@@ -323,40 +324,35 @@
 @section('script')
 <script>
 	$(document).ready(function() {
-		const id = $('#order-no').text();
-
 		updateTotal();
-		updateShipping();
 
 		$(document).on('change', 'input[name="shipping_fee"]', function(){
 			updateTotal();
-			updateShipping();
 		});
 		
 		$('#checkout-btn').click(function(e){
 			e.preventDefault();
-			updateShipping(1);
+			saveOrder();
 		});
 
 		function callback(data) {
+			console.log(data);
 			if(data.status == 2) {
-				window.location.href = '/';
+				alert(data.message);
+				// window.location.href = '/';
 			} else if (data.status == 1) {
 				$('#payment-form').empty();
-				if(data.s) {
-					$('#custom-overlay').fadeIn();
-					$.ajax({
-						url: '/eghlform/' + id,
-						type:"GET",
-						success:function(data){
-							$('#payment-form').html(data);
-							checkForm();
-						},
-						error : function(data) {
-							console.log(data);
-						}
-					});
-				}
+				$.ajax({
+					url: '/eghlform/' + data.id,
+					type:"GET",
+					success:function(data){
+						$('#payment-form').html(data);
+						checkForm();
+					},
+					error : function(data) {
+						console.log(data);
+					}
+				});
 			} else {
 				alert(d.message);
 			}
@@ -370,23 +366,23 @@
 			}
 		}
 
-		function updateShipping(submit) {
+		function saveOrder() {
 			var s_name = $("input[name='shipping_fee']:checked").data('sname');
 			var s_amount = $("input[name='shipping_fee']:checked").val();
-			
 			var estimated_del = $("input[name='shipping_fee']:checked").data('est');
-			
 			var data = {
-				estimated_del, s_name, s_amount, _token: '{{ csrf_token() }}', submit
+				estimated_del, s_name, s_amount, _token: '{{ csrf_token() }}'
 			}
 
+			$('#custom-overlay').fadeIn();
+
 			$.ajax({
-				url: '/checkout/updateshipping/' + id,
+				url: '/order/save',
 				type:"POST",
 				data: data,
 				success: callback,
 				error : function(data) {
-					console.log('error updating shipping');
+					console.log('error updating');
 				}
 			});
 		}

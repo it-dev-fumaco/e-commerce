@@ -180,7 +180,7 @@
 
                                 if(Auth::check()){//member
                                     if($bill_address > 0 and $ship_address > 0){
-                                        $action = '/checkout/summary';
+                                        $action = '/setdetails';
                                     }else if($ship_address < 1){
                                         $action = '/checkout/billing';
                                     }else if($bill_address < 1){
@@ -196,99 +196,11 @@
                             <div class="card-body col-md-8 mx-auto">
                                 <button id="checkout-btn" class="btn btn-outline-primary" role="button" style="width:100% !important;" {{ (count($cart_arr) > 0) ? '' : 'disabled' }}>PROCEED TO CHECKOUT</button>
                             </div>
-                            {{-- @if(Auth::check())
-                                @if($bill_address > 0 and $ship_address > 0)
-                                    <div class="card-body col-md-8 mx-auto">
-                                        <button id="checkout-btn" class="btn btn-outline-primary" role="button" style="width:100% !important;" {{ (count($cart_arr) > 0) ? '' : 'disabled' }}>PROCEED TO CHECKOUT</button>
-                                    </div>
-                                @elseif($ship_address < 1)
-                                    <div class="card-body col-md-8 mx-auto">
-                                        <p class="text-center">You have no saved shipping address</p>
-                                        <a href="/checkout/billing" class="btn btn-outline-primary" role="button" style="width:100% !important;">SET YOUR ADDRESS</a>
-                                    </div>
-                                @elseif($bill_address < 1)
-                                    <div class="card-body col-md-8 mx-auto">
-                                        <p class="text-center">You have no saved billing address</p>
-                                        <a href="/checkout/set_billing_form" class="btn btn-outline-primary" role="button" style="width:100% !important;">SET YOUR ADDRESS</a>
-                                    </div>
-                                @else
-                                    <div class="card-body col-md-8 mx-auto">
-                                        <p class="text-center">You have no saved shipping/billing address</p>
-                                        <a href="/checkout/billing" class="btn btn-outline-primary" role="button" style="width:100% !important;">SET YOUR ADDRESS</a>
-                                    </div>
-                                @endif
-                            @else
-                                <div class="card-body col-md-8 mx-auto">
-                                    <button id="checkout-btn" class="btn btn-outline-primary" role="button" style="width:100% !important;" {{ (count($cart_arr) > 0) ? '' : 'disabled' }}>PROCEED TO CHECKOUT</button>
-                                </div>
-                            @endif --}}
                         </td>
                     </tr>
                 </table>
                 <br><br><br>
             </div>
-            {{-- <div class="col-lg-4 animated animatedFadeInUp fadeInUp d-none">
-                <div class="card" style="background-color: #f4f4f4 !important; border-radius: 0rem !important;">
-                    <div class="card-body he1x" style="padding-bottom: 0px !important;">Cart Total<hr></div>
-                    <div class="card-body he1x" style="padding-top: 0px !important; padding-bottom: 0px !important;">
-                        <div class="d-flex justify-content-between align-items-center">
-                            Subtotal <small class="text-muted stylecap he1x" id="cart-subtotal">P {{ number_format(collect($cart_arr)->sum('amount'), 2, '.', ',') }}</small>
-                        </div>
-                        <hr>
-                    </div>
-                    <div class="card-body he1x" id="ship_blk" style="padding-top: 0px !important; padding-bottom: 0px !important;">Shipping
-                        <div class="form-check">
-                            <label class="form-check-label" for="shipradio">&nbsp;</label>
-                        </div>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="shipping_fee" id="Free Shipping" value="0" data-name="Free Delivery" required checked>
-                                <label class="form-check-label" for="Free Shipping">Free Shipping</label>
-                            </div>
-                            <small class="text-muted stylecap he1x">P 0.00</small>
-                        </div>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="shipping_fee" id="Standard" value="500" data-name="Standard Delivery" required>
-                                <label class="form-check-label" for="Standard">Standard</label>
-                            </div>
-                            <small class="text-muted stylecap he1x">P 500.00</small>
-                        </div>
-                        <hr>
-                    </div>
-                    <div class="card-body he1x">
-                        <div class="d-flex justify-content-between align-items-center" style="color:#FF9D00 !important;">Total <small class="text-muted stylecap he1x" style="color:#FF9D00 !important;" id="grand-total">0.00</small>
-                        </div>
-                    </div>
-                    @if(Auth::check())
-                        @if($bill_address > 0 and $ship_address > 0)
-                            <div class="card-body">
-                                <button id="checkout-btn" class="btn btn-outline-primary" role="button" style="width:100% !important;" {{ (count($cart_arr) > 0) ? '' : 'disabled' }}>PROCEED TO CHECKOUT</button>
-                            </div>
-                        @elseif($ship_address < 1)
-                            <div class="card-body">
-                                <p class="text-center">You have no saved shipping address</p>
-                                <a href="/checkout/billing" class="btn btn-outline-primary" role="button" style="width:100% !important;">SET YOUR ADDRESS</a>
-                            </div>
-                        @elseif($bill_address < 1)
-                            <div class="card-body">
-                                <p class="text-center">You have no saved billing address</p>
-                                <a href="/checkout/set_billing_form" class="btn btn-outline-primary" role="button" style="width:100% !important;">SET YOUR ADDRESS</a>
-                            </div>
-                        @else
-                            <div class="card-body">
-                                <p class="text-center">You have no saved shipping/billing address</p>
-                                <a href="/checkout/billing" class="btn btn-outline-primary" role="button" style="width:100% !important;">SET YOUR ADDRESS</a>
-                            </div>
-                        @endif
-                    @else
-                        <div class="card-body">
-                            <button id="checkout-btn" class="btn btn-outline-primary" role="button" style="width:100% !important;" {{ (count($cart_arr) > 0) ? '' : 'disabled' }}>PROCEED TO CHECKOUT</button>
-                        </div>
-                    @endif
-                </div>
-                    <br>
-            </div> --}}
             <div class="col-lg-12">&nbsp;&nbsp;</div>
         </div>
     </div>
@@ -368,24 +280,7 @@
 
         $('#checkout-btn').click(function(e){
             e.preventDefault();
-            var data = {
-                'shipping_fee': $("input[name='shipping_fee']:checked").val(),
-                'shipping_name': $("input[name='shipping_fee']:checked").data('name'),
-                '_token': "{{ csrf_token() }}",
-            }
-
-            $.ajax({
-                type:'POST',
-                url:'/addshipping',
-                data: data,
-                success: function (response) {
-                    window.location.href = "{{ $action }}";
-                    // window.location.href = "/checkout/review_order";
-                },
-                error: function () {
-                    alert('An error occured.');
-                }
-            });
+            window.location.href = "{{ $action }}";
         });
 
         function updateTotal() {
@@ -401,7 +296,6 @@
             total = (isNaN(total)) ? 0 : total;
 
             $('#cart-subtotal').text('P ' + subtotal.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,"));
-            // $('#cart-subtotal').text('P ' + total.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,"));
             $('#grand-total').text('P ' + total.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,"));
         }
 

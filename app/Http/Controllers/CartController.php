@@ -10,8 +10,12 @@ class CartController extends Controller
 {
     public function productActions(Request $request) {
         $data = $request->all();
-
+        $order_no = 'FUM-' . date('ymd') . random_int(9999, 100000);
         if (isset($data['addtocart']) && $data['addtocart']) {
+            if (!session()->get('fumOrderNo')) {
+                session()->put('fumOrderNo', $order_no);
+            }
+
             return $this->addToCart($data);
         }
 
@@ -20,34 +24,47 @@ class CartController extends Controller
         }
 
         if (isset($data['buynow']) && $data['buynow']) {
-            // return $this->buyNow($data);
+            if (!session()->get('fumOrderNo')) {
+                session()->put('fumOrderNo', $order_no);
+            }
+            
             if(Auth::check()){
 				$user_id = DB::table('fumaco_users')->where('username', Auth::user()->username)->first();
                 $bill_address = DB::table('fumaco_user_add')->where('xdefault', 1)->where('user_idx', $user_id->id)->where('address_class', 'Billing')->count();
 				$ship_address = DB::table('fumaco_user_add')->where('xdefault', 1)->where('user_idx', $user_id->id)->where('address_class', 'Delivery')->count();
 
+                $product_details = DB::table('fumaco_items')->where('f_idcode', $data['item_code'])->first();
+                if (!$product_details) {
+                    return redirect()->back()->with('error', 'Product not found.');
+                }
+                $cart = [
+                    $data['item_code'] => [
+                        "item_code" => $product_details->f_idcode,
+                        "quantity" => $data['quantity'],
+                        "price" => ($product_details->f_price > 0) ? $product_details->f_price : $product_details->f_original_price,
+                    ]
+                ];
+     
+                session()->put('fumCart', $cart);
+
                 if($bill_address > 0 and $ship_address > 0){
-                    $action = '/checkout/summary/'.$data['item_code']."/".$data['quantity'];
+                   
+                    $action = '/setdetails';
                 }else if($ship_address < 1){
-                    $action = '/checkout/billing/'.$data['item_code']."/".$data['quantity'];
+                    $action = '/checkout/billing';
                 }else if($bill_address < 1){
-                    $action = '/checkout/set_billing_form/'.$data['item_code']."/".$data['quantity'];
+                    $action = '/checkout/set_billing_form';
                 }else{
-                    $action = '/checkout/billing/'.$data['item_code']."/".$data['quantity'];
+                    $action = '/checkout/billing';
                 }
 
                 return redirect($action);
             }
-            return redirect('/checkout/billing/'.$data['item_code']."/".$data['quantity']);
-            // return redirect('/buy_now');
+            return redirect('/checkout/billing');
         }
 
         return redirect('/');
     }
-
-    // public function buyNow($data){
-    //     dd($data);
-    // }
 
     public function addToCart($data) {
         $id = $data['item_code'];
@@ -127,7 +144,7 @@ class CartController extends Controller
                 'item_image' => ($item_image) ? $item_image->imgprimayx : 'test.jpg'
             ];
         }
-        // dd($cart);
+        
         $bill_address = "";
 		$ship_address = "";
 		if(Auth::check()){
@@ -171,20 +188,6 @@ class CartController extends Controller
 
             return response()->json(['status' => 1, 'message' => 'Cart updated!']);
         }
-    }
-
-    // add shipping details in cart sessions
-    public function addShippingDetails(Request $request) {
-        $cart = session()->get('fumCart');
-
-        $cart['shipping'] = [
-            "shipping_name" => $request->shipping_name,
-            "shipping_fee" => $request->shipping_fee,
-        ];
-
-        session()->put('fumCart', $cart);
-
-        return response()->json(['status' => 1, 'message' => 'Cart updated!']);
     }
 
     public function addToWishlist($data) {
@@ -252,5 +255,104 @@ class CartController extends Controller
             $wishlist = 0;
             return $wishlist;
         }
+    }
+
+    public function setShippingBillingDetails(Request $request) {
+
+        if(Auth::check()) {
+            $user_id = Auth::user()->id;
+            $user = DB::table('fumaco_users')->where('id', $user_id)->first();
+
+            $shipping_address = DB::table('fumaco_user_add')->where('xdefault', 1)
+                ->where('user_idx', $user_id)->where('address_class', 'Delivery')->first();
+            
+            $shipping_details = [
+                'fname' => $shipping_address->xcontactname1,
+                'lname' => $shipping_address->xcontactlastname1,
+                'address_line1' => $shipping_address->xadd1,
+                'address_line2' => $shipping_address->xadd2,
+                'province' => $shipping_address->xprov,
+                'city' => $shipping_address->xcity,
+                'brgy' => $shipping_address->xbrgy,
+                'postal_code' => $shipping_address->xpostal,
+                'country' => $shipping_address->xcountry,
+                'address_type' => $shipping_address->add_type,
+                'email_address' => $shipping_address->xcontactemail1,
+                'mobile_no' => $shipping_address->xmobile_number,
+                'contact_no' => $shipping_address->xcontactnumber1,
+                'same_as_billing' => 0
+            ];
+
+            $billing_address = DB::table('fumaco_user_add')->where('xdefault', 1)
+                ->where('user_idx', $user_id)->where('address_class', 'Billing')->first();
+            if ($billing_address) {
+                $billing_details = [
+                    'fname' => $shipping_address->xcontactname1,
+                    'lname' => $shipping_address->xcontactlastname1,
+                    'address_line1' => $shipping_address->xadd1,
+                    'address_line2' => $shipping_address->xadd2,
+                    'province' => $shipping_address->xprov,
+                    'city' => $shipping_address->xcity,
+                    'brgy' => $shipping_address->xbrgy,
+                    'postal_code' => $shipping_address->xpostal,
+                    'country' => $shipping_address->xcountry,
+                    'address_type' => $shipping_address->add_type,
+                    'email_address' => $shipping_address->xcontactemail1,
+                    'mobile_no' => $shipping_address->xmobile_number,
+                    'contact_no' => $shipping_address->xcontactnumber1,
+                    'same_as_billing' => 0
+                ];
+
+                session()->put('fumBillDet', $billing_details);
+            } else {
+                session()->forget('fumBillDet');
+            }
+            
+            session()->put('fumShipDet', $shipping_details);
+        }
+        
+        if($request->isMethod('POST')) {
+            $shipping_details = [
+                'fname' => $request->fname,
+                'lname' => $request->lname,
+                'address_line1' => $request->ship_Address1_1,
+                'address_line2' => $request->ship_Address2_1,
+                'province' => $request->ship_province1_1,
+                'city' => $request->ship_City_Municipality1_1,
+                'brgy' => $request->ship_Barangay1_1,
+                'postal_code' => $request->ship_postal1_1,
+                'country' => $request->ship_country_region1_1,
+                'address_type' => $request->ship_Address_type1_1,
+                'email_address' => $request->ship_email,
+                'mobile_no' => $request->ship_mobilenumber1_1,
+                'contact_no' => $request->contactnumber1_1,
+                'same_as_billing' => ($request->same_as_billing) ? 1 : 0
+            ];
+    
+            if(!$request->same_as_billing) {
+                $billing_details = [
+                    'fname' => $request->bill_fname,
+                    'lname' => $request->bill_lname,
+                    'address_line1' => $request->Address1_1,
+                    'address_line2' => $request->Address2_1,
+                    'province' => $request->province1_1,
+                    'city' => $request->City_Municipality1_1,
+                    'brgy' => $request->Barangay1_1,
+                    'postal_code' => $request->postal1_1,
+                    'country' => $request->country_region1_1,
+                    'address_type' => $request->Address_type1_1,
+                    'email_address' => $request->email,
+                    'mobile_no' => $request->mobilenumber1_1,
+                ];
+    
+                session()->put('fumBillDet', $billing_details);
+            } else {
+                session()->forget('fumBillDet');
+            }
+
+            session()->put('fumShipDet', $shipping_details);
+        }
+    
+        return redirect('/checkout/summary');
     }
 }
