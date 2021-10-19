@@ -59,7 +59,7 @@ class FrontendController extends Controller
 
     // returns an array of product category
     public function getProductCategories() {
-        $item_categories = DB::table('fumaco_categories')->get();
+        $item_categories = DB::table('fumaco_categories')->where('publish', 1)->get();
 
         return response()->json($item_categories);
     }

@@ -48,7 +48,8 @@
                                                 <th>image</th>
                                                 <th>slug</th>
                                                 <th>Action</th>
-                                            </tr>
+                                                <th>Publish</th>
+                                              </tr>
                                         </thead>
                                         <tbody>
                                             @foreach ($categories as $c)
@@ -302,7 +303,41 @@
                                                         <a href="/admin/category/settings/{{ $c->id }}" class="btn btn-success btn-sm active" role="button" aria-pressed="true">Sort Items</a>
 
                                                         <a href="/admin/category/delete/{{ $c->id }}" class="float-right btn btn-danger btn-sm active" role="button" aria-pressed="true">Delete</a>
+                                                    </td>
+                                                    <td class="col-sm-1">
+                                                      <center>
+                                                      <label class="switch">
+                                                        <input type="checkbox" id="toggle_{{ $c->id }}" name="publish" {{ ($c->publish == 1) ? 'checked' : '' }}/>
+                                                        <span class="slider round"></span>
+                                                      </label>
+                                                      </center>
+                                                      <input type="text" value="{{ $c->id }}" id="cat_id_{{ $c->id }}" hidden/>
 
+                                                      <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+                                                      <script>
+                                                        $(document).ready(function() {
+                                                          $("#toggle_{{ $c->id }}").change(function(){
+                                                            var data = {
+                                                              'publish': $(this).prop('checked') == true ? 1 : 0,
+                                                              'cat_id': $("#cat_id_{{ $c->id }}").val(),
+                                                              '_token': "{{ csrf_token() }}",
+                                                            }
+                                                            // console.log(data);
+                                                            $.ajax({
+                                                                type:'POST',
+                                                                url:'/admin/category/publish',
+                                                                data: data,
+                                                                success: function (response) {
+                                                                    // window.location.href = "/checkout/review_order";
+                                                                  console.log(status);
+                                                                },
+                                                                error: function () {
+                                                                    alert('An error occured.');
+                                                                }
+                                                            });
+                                                          });
+                                                        });
+                                                      </script>                          
                                                     </td>
                                                 </tr>
                                             @endforeach
@@ -312,7 +347,7 @@
                             </div>
                         </div>
 
-                        <div class="col-md-12">
+                        <div class="col-md-12">{{-- Add Category --}}
 
                             <div class="card card-primary">
                                 <div class="card-header">
@@ -538,5 +573,66 @@
             </section>
         </div>
     </div>     
-
+  <style>
+      .switch {
+        position: relative;
+        display: inline-block;
+        width: 60px;
+        height: 34px;
+      }
+      
+      .switch input { 
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+      
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        -webkit-transition: .4s;
+        transition: .4s;
+      }
+      
+      .slider:before {
+        position: absolute;
+        content: "";
+        height: 26px;
+        width: 26px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        -webkit-transition: .4s;
+        transition: .4s;
+      }
+      
+      input:checked + .slider {
+        background-color: #2196F3;
+      }
+      
+      input:focus + .slider {
+        box-shadow: 0 0 1px #2196F3;
+      }
+      
+      input:checked + .slider:before {
+        -webkit-transform: translateX(26px);
+        -ms-transform: translateX(26px);
+        transform: translateX(26px);
+      }
+      
+      /* Rounded sliders */
+      .slider.round {
+        border-radius: 34px;
+      }
+      
+      .slider.round:before {
+        border-radius: 50%;
+      }
+  </style>
+  
 @endsection

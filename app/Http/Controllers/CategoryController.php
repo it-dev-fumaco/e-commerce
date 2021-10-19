@@ -114,4 +114,16 @@ class CategoryController extends Controller
             return redirect()->back()->with('error', 'An error occured. Please try again.');
         }
     }
+
+    public function publishCategory(Request $request){
+        DB::beginTransaction();
+        try {
+            DB::table('fumaco_categories')->where('id', $request->cat_id)->update(['publish' => $request->publish]);
+            DB::commit();
+            return response()->json(['status' => 1, 'message' => 'Test']);
+        } catch (Exception $e) {
+            DB::rollback();
+            return redirect()->back()->with('error', 'An error occured. Please try again.');
+        }
+    }
 }

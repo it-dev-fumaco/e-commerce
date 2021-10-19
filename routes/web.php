@@ -151,6 +151,7 @@ Route::prefix('admin')->group(function () {
         Route::post('/category/settings/{id}', 'CategoryController@sortItems');
         Route::get('/category/reset/{id}', 'CategoryController@resetOrder');
         Route::post('/category/set_row/{id}', 'CategoryController@changeSort');
+        Route::post('/category/publish', 'CategoryController@publishCategory');
 
         Route::get('/media/add', 'MediaController@add_media_form');
         Route::get('/media/list', 'MediaController@list_media');
