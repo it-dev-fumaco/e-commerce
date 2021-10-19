@@ -4,6 +4,8 @@
 ])
 
 @section('content')
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
     <div class="wrapper">
         <div class="content-wrapper">
             <section class="content-header">
@@ -306,14 +308,13 @@
                                                     </td>
                                                     <td class="col-sm-1">
                                                       <center>
-                                                      <label class="switch">
-                                                        <input type="checkbox" id="toggle_{{ $c->id }}" name="publish" {{ ($c->publish == 1) ? 'checked' : '' }}/>
-                                                        <span class="slider round"></span>
-                                                      </label>
+                                                        <label class="switch">
+                                                          <input type="checkbox" id="toggle_{{ $c->id }}" name="publish" {{ ($c->publish == 1) ? 'checked' : '' }}/>
+                                                          <span class="slider round"></span>
+                                                        </label>
                                                       </center>
                                                       <input type="text" value="{{ $c->id }}" id="cat_id_{{ $c->id }}" hidden/>
 
-                                                      <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
                                                       <script>
                                                         $(document).ready(function() {
                                                           $("#toggle_{{ $c->id }}").change(function(){
@@ -634,5 +635,4 @@
         border-radius: 50%;
       }
   </style>
-  
 @endsection
