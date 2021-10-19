@@ -191,7 +191,7 @@
     <div class="container-fluid padabout">
         <div class="row">
             <div class="col-lg-12 aboutalign animated animatedFadeInUp fadeInUp" style="padding-top:20px; text-align: center !important;">
-                <p class="abt_standard font1color about-main">{!! $about_data->title !!}</p>
+                <p class="abt_standard font1color about-main">{!! $about_data->title !!}11111</p>
             </div>
         </div>
         <div class="row">
