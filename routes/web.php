@@ -160,7 +160,7 @@ Route::prefix('admin')->group(function () {
         Route::post('/delete_media', 'MediaController@delete_media_record');
 
         Route::get('/order/order_lists/', 'OrderController@orderList');
-        // Route::get('/order/search_order', 'OrderController@searchOrder');
+        Route::get('/order/cancelled/', 'OrderController@cancelledOrders');
 
         // SHIPPING SERVICES ROUTES CMS
         Route::get('/shipping/list', 'ShippingController@viewList');
