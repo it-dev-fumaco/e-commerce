@@ -93,11 +93,11 @@
                     <div class="card" style="border: 0px solid rgba(0, 0, 0, 0.125) !important;">
                         <img class="card-img-top" src="{{ asset('/assets/journal/'. $blogs['image']) }}" alt="">
                         <div class="card-body align-items-stretch">
-                            <p style="color:#000 !important; font-size: 10pt !important" class="abt_standard">{{ $blogs['publish_date'] }} | {{ $blogs['comment_count'] }} Comment(s)</p>
+                            <p style="color:#000 !important; font-size: 10pt !important; font-weight: 300;" class="abt_standard">{{ $blogs['publish_date'] }} | {{ $blogs['comment_count'] }} Comment(s)</p>
                             <a href="blog?id={{ $blogs['id'] }}" style="text-decoration: none !important;">
                                 <p style="color:#373b3e !important;" class="abt_standard fumacoFont_card_title">{{ $blogs['title'] }}</p></a>
                         </div>
-                        <p style="color:#000 !important; font-size: 10pt !important" class="abt_standard">&nbsp;&nbsp;&nbsp;{{ $blogs['type'] }}</p>
+                        <p style="color:#000 !important; font-size: 10pt !important; font-weight: 300;" class="abt_standard">&nbsp;&nbsp;&nbsp;{{ $blogs['type'] }}</p>
                       </div>
                 </div>
             @endforeach
