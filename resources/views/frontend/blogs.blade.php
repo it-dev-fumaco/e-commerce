@@ -300,4 +300,13 @@
     <br>&nbsp;
     <br>&nbsp;
 </main>
+    <style>
+        .MsoNormal span{
+            font-family: 'poppins', sans-serif !important;
+        }
+
+        .MsoNormal{
+            font-family: 'poppins', sans-serif !important;
+        }
+    </style>
 @endsection
