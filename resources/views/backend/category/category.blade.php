@@ -5,7 +5,6 @@
 
 @section('content')
 
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
     <div class="wrapper">
         <div class="content-wrapper">
             <section class="content-header">
@@ -50,7 +49,7 @@
                                                 <th>image</th>
                                                 <th>slug</th>
                                                 <th>Action</th>
-                                                <th>Publish</th>
+                                                <th class="text-center">Publish</th>
                                               </tr>
                                         </thead>
                                         <tbody>
@@ -309,36 +308,10 @@
                                                     <td class="col-sm-1">
                                                       <center>
                                                         <label class="switch">
-                                                          <input type="checkbox" id="toggle_{{ $c->id }}" name="publish" {{ ($c->publish == 1) ? 'checked' : '' }}/>
+                                                          <input type="checkbox" class="toggle" id="toggle_{{ $c->id }}" name="publish" {{ ($c->publish == 1) ? 'checked' : '' }} value="{{ $c->id }}"/>
                                                           <span class="slider round"></span>
                                                         </label>
                                                       </center>
-                                                      <input type="text" value="{{ $c->id }}" id="cat_id_{{ $c->id }}" hidden/>
-
-                                                      <script>
-                                                        $(document).ready(function() {
-                                                          $("#toggle_{{ $c->id }}").change(function(){
-                                                            var data = {
-                                                              'publish': $(this).prop('checked') == true ? 1 : 0,
-                                                              'cat_id': $("#cat_id_{{ $c->id }}").val(),
-                                                              '_token': "{{ csrf_token() }}",
-                                                            }
-                                                            // console.log(data);
-                                                            $.ajax({
-                                                                type:'POST',
-                                                                url:'/admin/category/publish',
-                                                                data: data,
-                                                                success: function (response) {
-                                                                    // window.location.href = "/checkout/review_order";
-                                                                  console.log(status);
-                                                                },
-                                                                error: function () {
-                                                                    alert('An error occured.');
-                                                                }
-                                                            });
-                                                          });
-                                                        });
-                                                      </script>                          
                                                     </td>
                                                 </tr>
                                             @endforeach
@@ -573,66 +546,91 @@
                 </div>
             </section>
         </div>
-    </div>     
+    </div> 
   <style>
-      .switch {
-        position: relative;
-        display: inline-block;
-        width: 60px;
-        height: 34px;
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 30px;
+      height: 16px;
+    }
+    
+    .switch input { 
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      -webkit-transition: .4s;
+      transition: .4s;
+    }
+    
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 10px;
+      width: 10px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      -webkit-transition: .4s;
+      transition: .4s;
+    }
+    
+    input:checked + .slider {
+      background-color: #2196F3;
+    }
+    
+    input:focus + .slider {
+      box-shadow: 0 0 1px #2196F3;
+    }
+    
+    input:checked + .slider:before {
+      -webkit-transform: translateX(16px);
+      -ms-transform: translateX(16px);
+      transform: translateX(16px);
+    }
+    
+    /* Rounded sliders */
+    .slider.round {
+      border-radius: 34px;
+    }
+    
+    .slider.round:before {
+      border-radius: 50%;
+    }
+    </style>
+@endsection
+@section('script')
+<script>
+  $(document).ready(function() {
+    $(".toggle").change(function(){
+      var data = {
+        'publish': $(this).prop('checked') == true ? 1 : 0,
+        'cat_id': $(this).val(),
+        '_token': "{{ csrf_token() }}",
       }
-      
-      .switch input { 
-        opacity: 0;
-        width: 0;
-        height: 0;
-      }
-      
-      .slider {
-        position: absolute;
-        cursor: pointer;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: #ccc;
-        -webkit-transition: .4s;
-        transition: .4s;
-      }
-      
-      .slider:before {
-        position: absolute;
-        content: "";
-        height: 26px;
-        width: 26px;
-        left: 4px;
-        bottom: 4px;
-        background-color: white;
-        -webkit-transition: .4s;
-        transition: .4s;
-      }
-      
-      input:checked + .slider {
-        background-color: #2196F3;
-      }
-      
-      input:focus + .slider {
-        box-shadow: 0 0 1px #2196F3;
-      }
-      
-      input:checked + .slider:before {
-        -webkit-transform: translateX(26px);
-        -ms-transform: translateX(26px);
-        transform: translateX(26px);
-      }
-      
-      /* Rounded sliders */
-      .slider.round {
-        border-radius: 34px;
-      }
-      
-      .slider.round:before {
-        border-radius: 50%;
-      }
-  </style>
+      // console.log(data);
+      $.ajax({
+          type:'POST',
+          url:'/admin/category/publish',
+          data: data,
+          success: function (response) {
+            console.log(status);
+          },
+          error: function () {
+              alert('An error occured.');
+          }
+      });
+    });
+  });
+</script>
 @endsection
