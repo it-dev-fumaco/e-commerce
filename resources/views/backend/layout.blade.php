@@ -295,9 +295,9 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a href="/admin/cancel_orders" class="nav-link {{ $activePage == 'order_cancel' ? 'active' : '' }}">
+                <a href="/admin/order/cancelled" class="nav-link {{ $activePage == 'order_cancel' ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Cancel Orders</p>
+                  <p>Cancelled Orders</p>
                 </a>
               </li>
               <li class="nav-item">

@@ -31,7 +31,7 @@
                     <div class="container">
                         <div class="carousel-caption text-start">
                             <h3 class="fumacoFont1" style="font-family: 'poppins', sans-serif !important;">{{ $carousel->blogtitle }}</h3>
-                            <p class="abt_standard fumacoFont2" style="text-align: left; text-justify: inter-word; letter-spacing: 1px;">{{ $string }}</p>
+                            <p class="abt_standard fumacoFont2" style="text-align: left; text-justify: inter-word; letter-spacing: 1px; font-weight: 700 !important">{{ $string }}</p>
                             <p><a class="abt_standard btn btn-lg btn-primary btn-fumaco fumacoFont_btn" href="blog?id={{ $carousel->id }}" role="button">Read More</a></p>
                         </div>
                     </div>
@@ -94,10 +94,10 @@
                     <div class="card" style="border: 0px solid rgba(0, 0, 0, 0.125) !important;">
                         <img class="card-img-top" src="{{ asset('/assets/journal/'. $blogs['image']) }}" alt="">
                         <div class="card-body">
-                            <p style="color:#b2b2b2 !important;" class="abt_standard fumacoFont_card_caption">{{ $blogs['publish_date'] }} | {{ $blogs['comment_count'] }} Comment(s)</p>
+                            <p style="color:#000 !important; font-size: 10pt !important" class="abt_standard">{{ $blogs['publish_date'] }} | {{ $blogs['comment_count'] }} Comment(s)</p>
                             <a href="blog?id={{ $blogs['id'] }}" style="text-decoration: none !important;">
                                 <p style="color:#373b3e !important;" class="abt_standard fumacoFont_card_title">{{ $blogs['title'] }}</p></a>
-                            <p style="color:#b2b2b2 !important;" class="abt_standard fumacoFont_card_caption">{{ $blogs['type'] }}</p>
+                            <p style="color:#000 !important; font-size: 10pt !important" class="abt_standard">{{ $blogs['type'] }}</p>
                         </div>
                     </div>
                 </div>

@@ -1,6 +1,6 @@
 @extends('backend.layout', [
 	'namePage' => 'Orders',
-	'activePage' => 'order_list'
+	'activePage' => 'order_cancel'
 ])
 
 @section('content')
@@ -10,7 +10,7 @@
 			<div class="container-fluid">
 				<div class="row mb-2">
 					<div class="col-sm-6">
-						<h1>List of Orders</h1>
+						<h1>List of Cancelled Orders</h1>
 					</div>
 					<div class="col-sm-6">
 						<ol class="breadcrumb float-sm-right">
@@ -28,22 +28,12 @@
 					<div class="col-md-12">
 						<div class="card card-primary">
 							<div class="card-body">
-								<form action="/admin/order/order_lists/" method="get">
+								<form action="/admin/order/cancelled/" method="get">
 									<div class="row">
 										<div class="col-md-3">
 											<div class="input-group mb-3">
 												<input type="text" class="form-control" name="search" aria-describedby="button-addon2" placeholder="Order ID">
 											</div>
-										</div>
-										<div class="col-md-3">
-											<select class="form-control" name="order_status">
-												<option selected disabled value="">Order Status</option>
-												<option value="Order Placed">Order Placed</option>
-												<option value="Order Confirmed">Order Confirmed</option>
-												<option value="Ready for Delivery">Ready for Delivery</option>
-												<option value="Out for Delivery">Out for Delivery</option>
-												<option value="Delivered">Delivered</option>
-											</select>
 										</div>
 										<div class="col-md-4">
 											<button class="btn btn-success" type="submit">Search</button>
@@ -72,7 +62,7 @@
 											<td>{{ $order['estimated_delivery_date'] }}</td>
 											<td>{{ $order['shipping_name'] }}</td>
 											<td>₱ {{ $order['grand_total'] }}</td>
-											<td><span class="badge badge-{{ ($order['status'] == 'Order Placed' ? 'warning' : 'primary') }}">{{ $order['status'] }}</span></td>
+											<td><span class="badge badge-danger">{{ $order['status'] }}</span></td>
 											<td>
 												<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#order-{{ $order['cust_id'] }}">View Orders</button>
 												<div class="modal fade" id="order-{{ $order['cust_id'] }}" role="dialog">
@@ -97,7 +87,7 @@
 																			<strong>Payment ID : </strong> {{ $order['payment_id'] }}<br>
 																			<strong>Payment Method : </strong> {{ $order['payment_method'] }}<br>
 																			<strong>Order Date : </strong> {{ $order['date'] }} <br>
-																			<strong>Status : </strong> <span class="badge badge-warning" style="font-size: 1rem;">{{ $order['status'] }}</span>
+																			<strong>Status : </strong> <span class="badge badge-danger" style="font-size: 1rem;">{{ $order['status'] }}</span>
 																		</p>
 																	</div>
 																	<div class="col-md-4">
@@ -165,83 +155,12 @@
 
 <div class="modal-footer">
 
-<button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#tracker-{{ $order['cust_id'] }}">
-Add Tracker Code
-</button>
 
-<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#delivered-{{ $order['cust_id'] }}">
-Delivered Order
-</button>
 
-<button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#cancel-{{ $order['cust_id'] }}">
-Cancel Order
-</button>
 
-<div class="modal fade confirm-modal" id="tracker-{{ $order['cust_id'] }}" tabindex="-1" role="dialog" aria-labelledby="tracker-{{ $order['cust_id'] }}" aria-hidden="true">
-<div class="modal-dialog" role="document">
-<div class="modal-content">
-<div class="modal-header">
-<h5 class="modal-title">Add Tracker Code</h5>
-<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-<span aria-hidden="true">&times;</span>
-</button>
-</div>
-<div class="modal-body">
-<div class="col">
-<form action="" method="post">
-<label for="tracker">Tracker Code: </label>
-<input type="text" class="form-control" id="tracker" name="tracker" required>
-</form>
-</div>
-</div>
-<div class="modal-footer">
-<a href="" class="btn btn-primary">YES</a>
-<button type="button" class="btn btn-secondary" data-dismiss="cmodal">NO</button>
-</div>
-</div>
-</div>
+
 </div>
 
-<div class="modal fade confirm-modal" id="delivered-{{ $order['cust_id'] }}" tabindex="-1" role="dialog" aria-labelledby="delivered-{{ $order['cust_id'] }}" aria-hidden="true">
-<div class="modal-dialog" role="document">
-<div class="modal-content">
-<div class="modal-header">
-<h5 class="modal-title">Order Delivered</h5>
-<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-<span aria-hidden="true">&times;</span>
-</button>
-</div>
-<div class="modal-body">
-Order has been delivered?
-</div>
-<div class="modal-footer">
-<a href="" class="btn btn-primary">YES</a>
-<button type="button" class="btn btn-secondary" data-dismiss="cmodal">NO</button>
-</div>
-</div>
-</div>
-</div>
-
-<div class="modal fade confirm-modal" id="cancel-{{ $order['cust_id'] }}" tabindex="-1" role="dialog" aria-labelledby="cancel-{{ $order['cust_id'] }}" aria-hidden="true">
-<div class="modal-dialog" role="document">
-<div class="modal-content">
-<div class="modal-header">
-<h5 class="modal-title">Cancel Order</h5>
-<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-<span aria-hidden="true">&times;</span>
-</button>
-</div>
-<div class="modal-body">
-Order has been cancelled?
-</div>
-<div class="modal-footer">
-<a href="" class="btn btn-primary">YES</a>
-<button type="button" class="btn btn-secondary" data-dismiss="cmodal">NO</button>
-</div>
-</div>
-</div>
-</div>
-</div>
 </div>
 
 </div>
@@ -267,10 +186,4 @@ Order has been cancelled?
 </section>
 </div>
 </div>
-
-<style>
-.confirm-modal{
-background: rgba(0, 0, 0, .7);
-}
-</style>
 @endsection
