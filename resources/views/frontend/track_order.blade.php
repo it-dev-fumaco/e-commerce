@@ -58,7 +58,7 @@
 		</div>
 	</main>
 	
-	<main style="background-color:#ffffff; min-height: 500px;" class="products-head">
+	<main style="background-color:#ffffff; min-height: 550px;" class="products-head">
 		<div class="container-fluid">
 			<div class="row">
 				<div class="col-lg-8 offset-lg-2" style="padding-left: 15%; padding-right: 15%;">
@@ -68,13 +68,16 @@
 					<center><h4>Please enter your order reference number</h4></center>
 					<br>
 					<center>
-						<form action="/track_order" class="form-inline" method="GET">
-							<div class="form-group">
+						<form action="/track_order" class="form-inline p-0" method="GET">
+							<div class="form-group d-inline-block m-2">
 								<label class="sr-only" for="email">Code:</label>
-								<input type="text" class="form-control" id="text" placeholder="Enter Code"  name="id" value="{{ request()->get('id') }}" required>
+								<input type="text" class="form-control m-1" id="text" placeholder="Enter Code"  name="id" value="{{ request()->get('id') }}" required style="width: 500px;">
 							</div>
-							<br>
-							<input type="submit" class="btn btn-success" value="Search" style="color: #fff; background-color: #1a6ea9 !important; border-color: #1a6ea9 !important; border-radius: 0rem;">
+							<div class="form-group d-inline-block p-0" style="padding: 0; margin: 0">
+								<input type="submit" class="btn btn-success" value="Search" style="color: #fff; background-color: #1a6ea9 !important; border-color: #1a6ea9 !important; border-radius: 0rem; margin: 0;">
+								
+							</div>
+							
 						</form>
 					</center>
 				</div>
@@ -102,7 +105,7 @@
 							<td>{{ $order->track_date }}</td>
 							<td><a href="#TrackItemsData" data-toggle="modal">{{ $order->track_item }}</a></td>
 							<td>{{ $order->track_description }}</td>
-							<td>{{ $order->track_status }}</td>
+							<td><span class="badge text-dark" style="background-color: #FFC482; font-size: 0.9rem;">{{ $order->track_status }}</span></td>
 						</tr>
 						@endforeach
 						</tbody>
@@ -120,7 +123,7 @@
 			</div>
 			
 			<div id="TrackItemsData" class="modal fade" role="dialog">
-				<div class="modal-dialog" style="max-width: 85%;">
+				<div class="modal-dialog modal-xl">
 					<div class="modal-content">
 						<div class="modal-header">
 							<h4 class="modal-title">List of Orders</h4>
@@ -129,9 +132,8 @@
 							<table class="table">
 								<thead>
 									<tr style="font-size: 16px;">
-										<th class="text-center">ORDER NUMBER</th>
 										<th></th>
-										<th class="text-center">ITEM NAME</th>
+										<th class="text-center">ITEM DESCRIPTION</th>
 										<th class="text-center">QTY</th>
 										<th class="text-center">PRICE</th>
 										<th class="text-center">TOTAL</th>
@@ -140,7 +142,6 @@
 								<tbody>
 									@forelse ($items as $item)
 									<tr style="font-size: 11pt;">
-										<td class="text-center">{{ $item['order_number'] }}</td>
 										<td class="text-center">
 											<img src="{{ asset('/storage/item/images/'. $item['item_code'] .'/gallery/preview/'.$item['image']) }}" class="img-responsive" alt="" width="55" height="55">
 										</td>
