@@ -160,6 +160,8 @@ Route::prefix('admin')->group(function () {
         Route::get('/order/order_lists/', 'OrderController@orderList');
         Route::get('/order/cancelled/', 'OrderController@cancelledOrders');
         Route::get('/order/delivered/', 'OrderController@deliveredOrders');
+        
+        Route::get('/customer/list', 'CustomerController@viewCustomers');
 
         // SHIPPING SERVICES ROUTES CMS
         Route::get('/shipping/list', 'ShippingController@viewList');

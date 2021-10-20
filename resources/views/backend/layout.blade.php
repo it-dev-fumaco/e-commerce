@@ -233,6 +233,7 @@
             $media_pages = ['list_media', 'add_media'];
             $order_pages = ['order_list', 'order_cancel', 'order_delivered'];
             $category_pages = ['product_category'];
+            $customer_pages = ['customers_list'];
           @endphp
           <li class="nav-header">PRODUCT CATALOGUE</li>
           <li class="nav-item {{ (in_array($activePage, $product_pages) ? 'menu-open' : '') }}">
@@ -268,14 +269,14 @@
             </ul>
           </li>
           <li class="nav-header">CUSTOMERS</li>
-          <li class="nav-item">
-            <a href="#" class="nav-link">
+          <li class="nav-item {{ (in_array($activePage, $customer_pages) ? 'menu-open' : '') }}">
+            <a href="#" class="nav-link {{ (in_array($activePage, $customer_pages) ? 'active' : '') }}">
               <i class="nav-icon fas fa-users"></i>
               <p>Customer <i class="fas fa-angle-left right"></i></p>
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="/admin/customer/list" class="nav-link">
+                <a href="/admin/customer/list" class="nav-link {{ (in_array($activePage, $customer_pages) ? 'active' : '') }}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Customer List</p>
                 </a>
