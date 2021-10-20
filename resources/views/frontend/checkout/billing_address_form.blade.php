@@ -83,7 +83,7 @@
 			@endif
 			@php
 				$form_action = '/setdetails';
-				if (!$has_shipping_address) {
+				if ($has_shipping_address) {
 					$form_action = '/checkout/set_address';
 				}
 			@endphp
