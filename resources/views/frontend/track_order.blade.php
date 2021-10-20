@@ -102,7 +102,7 @@
 						<tbody>
 						@foreach ($track_order_details as $order)
 						<tr>
-							<td>{{ $order->track_date }}</td>
+							<td>{{ date('M d, Y - h:m:s', strtotime($order->track_date)) }}</td>
 							<td><a href="#TrackItemsData" data-toggle="modal">{{ $order->track_item }}</a></td>
 							<td>{{ $order->track_description }}</td>
 							<td><span class="badge text-dark" style="background-color: #FFC482; font-size: 0.9rem;">{{ $order->track_status }}</span></td>

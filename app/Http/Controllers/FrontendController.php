@@ -505,11 +505,39 @@ class FrontendController extends Controller
     }
 
     public function viewOrders() {
-        $orders = DB::table('track_order')
-            ->where('transaction_member', Auth::user()->id)
-            ->orderBy('track_date_update', 'desc')->paginate(10);
+        $orders = DB::table('fumaco_order')->where('order_account', Auth::user()->id)->paginate(10);
 
-        return view('frontend.orders', compact('orders'));
+        $orders_arr = [];
+        $items_arr = [];
+ 
+        foreach($orders as $order){
+            $order_items = DB::table('fumaco_order_items')->where('order_number', $order->order_number)->get();
+            foreach($order_items as $item){
+                $item_image = DB::table('fumaco_items_image_v1')->where('idcode', $item->item_code)->first();
+
+                $items_arr[] = [
+                    'image' => ($item_image) ? $item_image->imgprimayx : null,
+                    'item_code' => $item->item_code,
+                    'item_name' => $item->item_name,
+                    'qty' => $item->item_qty,
+                    'discount' => $item->item_discount,
+                    'orig_price' => $item->item_original_price,
+                    'price' => $item->item_price,
+                ];
+            }
+
+            $orders_arr[] = [
+                'order_number' => $order->order_number,
+                'date' => date('M d, Y - h:m:s', strtotime($order->order_date)),
+                'status' => $order->order_status,
+                'edd' => $order->estimated_delivery_date,
+                'items' => $items_arr
+            ];
+        }
+
+        // dd($orders);
+
+        return view('frontend.orders', compact('orders', 'orders_arr'));
     }
 
     public function viewOrder($order_id) {
