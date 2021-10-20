@@ -35,7 +35,7 @@ return [
     'drivers' => [
 
         'cwebp' => [
-            'path' => 'C:/Users/clynton.manaois/Downloads/libwebp-1.2.1-windows-x64/libwebp-1.2.1-windows-x64/bin/cwebp',
+            'path' => '/usr/share/doc/libwebp-0.3.0',
         ],
 
     ],
