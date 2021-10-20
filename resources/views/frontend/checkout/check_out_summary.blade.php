@@ -215,7 +215,7 @@
 									<tr>
 										<td class="col-md-2">
 											<center>
-												<img src="{{ asset('/storage/item/images/'.$cart['item_code'].'/gallery/preview/'.$cart['item_image']) }}" class="img-responsive" alt="" width="55" height="55">
+												<img src="{{ asset('/storage/item_images/'.$cart['item_code'].'/gallery/preview/'.$cart['item_image']) }}" class="img-responsive" alt="" width="55" height="55">
 											</center>
 										</td>
 										<td>{{ $cart['item_description'] }}</td>
@@ -285,7 +285,7 @@
 		<br/>
 		Loading...
 	</div>
-	  
+
 	<style>
 		#custom-overlay {
 			background: #ffffff;
@@ -329,7 +329,7 @@
 		$(document).on('change', 'input[name="shipping_fee"]', function(){
 			updateTotal();
 		});
-		
+
 		$('#checkout-btn').click(function(e){
 			e.preventDefault();
 			saveOrder();

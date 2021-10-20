@@ -46,11 +46,11 @@
 			padding-top: 25px !important;
 		}
 	</style>
-	
+
 	<main style="background-color:#0062A5;">
 		<br><br><br>
 	</main>
-	
+
 	<main style="background-color:#ffffff;" class="products-head">
 		<div class="container">
 			<div class="row">
@@ -95,7 +95,7 @@
 							<tbody>
 								@forelse ($items as $item)
 								@php
-								$src = ($item['image']) ? '/storage/item/images/'. $item['item_code'].'/gallery/preview/'. $item['image'] : '/storage/no-photo-available.png';
+								$src = ($item['image']) ? '/storage/item_images/'. $item['item_code'].'/gallery/preview/'. $item['image'] : '/storage/no-photo-available.png';
 								@endphp
 								<tr style="font-size: 0.8rem;">
 									<td class="text-center">
@@ -142,7 +142,7 @@
 			</div>
 		</div>
 	</main>
-	
+
 	<main style="background-color:#0062A5;"></main>
 
 @endsection

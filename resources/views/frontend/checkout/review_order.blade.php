@@ -38,7 +38,7 @@
 			padding-top: 25px !important;
 		}
 	</style>
-	
+
 	<main style="background-color:#0062A5;">
 		<div id="myCarousel" class="carousel slide" data-bs-ride="carousel">
 			<div class="carousel-inner">
@@ -53,7 +53,7 @@
 			</div>
 		</div>
 	</main>
-	
+
 	<main style="background-color:#ffffff;" class="products-head">
 		<nav>
 			<ol class="breadcrumb" style="font-weight: 300 !important; font-size: 14px !important;">
@@ -69,7 +69,7 @@
 			</ol>
 		</nav>
 	</main>
-	
+
 	<main style="background-color:#ffffff; min-height: 500px;" class="products-head">
 		<div class="container">
 			<div class="row">
@@ -99,7 +99,7 @@
 							@forelse ($cart_arr as $item)
 							<tr class="he2x2">
 								<td class="text-center align-middle">
-									<img src="{{ asset('/storage/item/images/'.$item['item_code'].'/gallery/preview/'.$item['item_image']) }}" class="img-responsive" alt="" width="55" height="55">
+									<img src="{{ asset('/storage/item_images/'.$item['item_code'].'/gallery/preview/'.$item['item_image']) }}" class="img-responsive" alt="" width="55" height="55">
 									<input type="text" name="item_code" id="item_code" value="{{$item['item_code']}}" hidden/>
 								</td>
 								<td class="tbls">{{ $item['item_description'] }}</td>
@@ -132,7 +132,7 @@
 					</table>
 				</div>
 				<!--products-->
-				
+
 				<!--sidebar-->
 				<div class="col-lg-4">
 					<div class="card" style="background-color: #f4f4f4 !important; border-radius: 0rem !important;">

@@ -42,7 +42,7 @@
 			font-size: 14px !important;
 		}
 	</style>
-	
+
 	<main style="background-color:#0062A5;">
 		<div id="myCarousel" class="carousel slide" data-bs-ride="carousel">
 			<div class="carousel-inner">
@@ -57,7 +57,7 @@
 			</div>
 		</div>
 	</main>
-	
+
 	<main style="background-color:#ffffff; min-height: 550px;" class="products-head">
 		<div class="container-fluid">
 			<div class="row">
@@ -75,9 +75,9 @@
 							</div>
 							<div class="form-group d-inline-block p-0" style="padding: 0; margin: 0">
 								<input type="submit" class="btn btn-success" value="Search" style="color: #fff; background-color: #1a6ea9 !important; border-color: #1a6ea9 !important; border-radius: 0rem; margin: 0;">
-								
+
 							</div>
-							
+
 						</form>
 					</center>
 				</div>
@@ -88,7 +88,7 @@
 						<div class="col-md-6 mt-4" style="text-align: right;">Estimated Delivery Date : <b>{{ $order_details->estimated_delivery_date }}</b></div>
 					</div>
 				</div>
-				
+
 				<div class="col-lg-12" style="padding-left: 15%; padding-right: 15%;">
 					<table class="table">
 						<thead>
@@ -121,7 +121,7 @@
 				@endif
 				@endif
 			</div>
-			
+
 			<div id="TrackItemsData" class="modal fade" role="dialog">
 				<div class="modal-dialog modal-xl">
 					<div class="modal-content">
@@ -143,7 +143,7 @@
 									@forelse ($items as $item)
 									<tr style="font-size: 11pt;">
 										<td class="text-center">
-											<img src="{{ asset('/storage/item/images/'. $item['item_code'] .'/gallery/preview/'.$item['image']) }}" class="img-responsive" alt="" width="55" height="55">
+											<img src="{{ asset('/storage/item_images/'. $item['item_code'] .'/gallery/preview/'.$item['image']) }}" class="img-responsive" alt="" width="55" height="55">
 										</td>
 										<td>{{ $item['item_name'] }}</td>
 										<td class="text-center">{{ $item['quantity'] }}</td>

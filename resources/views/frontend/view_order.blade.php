@@ -42,7 +42,7 @@
 			font-size: 14px !important;
 		}
 	</style>
-	
+
 	<main style="background-color:#0062A5;">
 		<div id="myCarousel" class="carousel slide" data-bs-ride="carousel">
 			<div class="carousel-inner">
@@ -86,7 +86,7 @@
 							<tr style="font-size: 10pt;">
                         <td class="text-center">{{ $item['order_number'] }}</td>
 								<td>
-									<img src="{{ asset('/storage/item/images/'.$item['item_code'].'/gallery/preview/'.$item['image']) }}" class="img-responsive" alt="" width="55" height="55">
+									<img src="{{ asset('/storage/item_images/'.$item['item_code'].'/gallery/preview/'.$item['image']) }}" class="img-responsive" alt="" width="55" height="55">
                         </td>
                         <td>{{ $item['item_name'] }}</td>
                         <td class="text-center">{{ $item['quantity'] }}</td>
