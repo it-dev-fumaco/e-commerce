@@ -127,7 +127,7 @@
                         @forelse ($cart_arr as $cart)
                         <tr class="he2x2">
                             <td>
-                                <img src="{{ asset('/storage/item/images/'.$cart['item_code'].'/gallery/preview/'.$cart['item_image']) }}" class="img-responsive" alt="" width="55" height="55">
+                                <img src="{{ asset('/storage/item_images/'.$cart['item_code'].'/gallery/preview/'.$cart['item_image']) }}" class="img-responsive" alt="" width="55" height="55">
                             </td>
                             <td class="tbls" style="width:40% !important;"><a href="/product/{{ $cart['item_code'] }}" style="text-decoration: none !important; color: #000;">{{ $cart['item_description'] }}</a></td>
                             <td class="tbls">P <span class="formatted-price">{{ number_format($cart['price'], 2, '.', ',') }}</span><span class="price d-none">{{ $cart['price'] }}</span></td>
@@ -216,7 +216,7 @@
             var row = $(this).closest('tr');
             var input_name = row.find('input[name="quantity[]"]').eq(0);
             var id = input_name.data('id');
-            
+
             var current_qty = input_name.val();
             if (current_qty > 1) {
                 current_qty--;
