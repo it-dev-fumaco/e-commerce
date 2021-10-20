@@ -5,7 +5,7 @@
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
-        'reference' => 'b5b8e4bba614997633ce0a2217190db513287c1a',
+        'reference' => '06f9e2e8307609cd3aa202b52263311206ccb1bd',
         'name' => 'laravel/laravel',
         'dev' => true,
     ),
@@ -53,6 +53,15 @@
             'install_path' => __DIR__ . '/../brick/math',
             'aliases' => array(),
             'reference' => 'ca57d18f028f84f777b2168cd1911b0dee2343ae',
+            'dev_requirement' => false,
+        ),
+        'buglinjo/laravel-webp' => array(
+            'pretty_version' => '2.1',
+            'version' => '2.1.0.0',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../buglinjo/laravel-webp',
+            'aliases' => array(),
+            'reference' => 'a16aa528dc500e99817f3b314b48c5272614598d',
             'dev_requirement' => false,
         ),
         'cordoval/hamcrest-php' => array(
@@ -427,7 +436,7 @@
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
-            'reference' => 'b5b8e4bba614997633ce0a2217190db513287c1a',
+            'reference' => '06f9e2e8307609cd3aa202b52263311206ccb1bd',
             'dev_requirement' => false,
         ),
         'laravel/sail' => array(

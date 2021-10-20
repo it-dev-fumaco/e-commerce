@@ -172,6 +172,7 @@ class ComposerStaticInit0f1e38f3feaf9a00f758a56db0972401
         ),
         'B' => 
         array (
+            'Buglinjo\\LaravelWebp\\' => 21,
             'Brick\\Math\\' => 11,
             'Biscolab\\ReCaptcha\\' => 19,
         ),
@@ -504,6 +505,10 @@ class ComposerStaticInit0f1e38f3feaf9a00f758a56db0972401
         array (
             0 => __DIR__ . '/..' . '/nesbot/carbon/src/Carbon',
         ),
+        'Buglinjo\\LaravelWebp\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/buglinjo/laravel-webp/src',
+        ),
         'Brick\\Math\\' => 
         array (
             0 => __DIR__ . '/..' . '/brick/math/src',
@@ -563,6 +568,7 @@ class ComposerStaticInit0f1e38f3feaf9a00f758a56db0972401
         'App\\Http\\Controllers\\ProductController' => __DIR__ . '/../..' . '/app/Http/Controllers/ProductController.php',
         'App\\Http\\Controllers\\SettingsController' => __DIR__ . '/../..' . '/app/Http/Controllers/SettingsController.php',
         'App\\Http\\Controllers\\ShippingController' => __DIR__ . '/../..' . '/app/Http/Controllers/ShippingController.php',
+        'App\\Http\\Controllers\\StoreController' => __DIR__ . '/../..' . '/app/Http/Controllers/StoreController.php',
         'App\\Http\\Kernel' => __DIR__ . '/../..' . '/app/Http/Kernel.php',
         'App\\Http\\Middleware\\Authenticate' => __DIR__ . '/../..' . '/app/Http/Middleware/Authenticate.php',
         'App\\Http\\Middleware\\EncryptCookies' => __DIR__ . '/../..' . '/app/Http/Middleware/EncryptCookies.php',
@@ -608,6 +614,12 @@ class ComposerStaticInit0f1e38f3feaf9a00f758a56db0972401
         'Brick\\Math\\Internal\\Calculator\\GmpCalculator' => __DIR__ . '/..' . '/brick/math/src/Internal/Calculator/GmpCalculator.php',
         'Brick\\Math\\Internal\\Calculator\\NativeCalculator' => __DIR__ . '/..' . '/brick/math/src/Internal/Calculator/NativeCalculator.php',
         'Brick\\Math\\RoundingMode' => __DIR__ . '/..' . '/brick/math/src/RoundingMode.php',
+        'Buglinjo\\LaravelWebp\\Cwebp' => __DIR__ . '/..' . '/buglinjo/laravel-webp/src/Cwebp.php',
+        'Buglinjo\\LaravelWebp\\Facades\\Webp' => __DIR__ . '/..' . '/buglinjo/laravel-webp/src/Facades/Webp.php',
+        'Buglinjo\\LaravelWebp\\Interfaces\\WebpInterface' => __DIR__ . '/..' . '/buglinjo/laravel-webp/src/Interfaces/WebpInterface.php',
+        'Buglinjo\\LaravelWebp\\Traits\\WebpTrait' => __DIR__ . '/..' . '/buglinjo/laravel-webp/src/Traits/WebpTrait.php',
+        'Buglinjo\\LaravelWebp\\Webp' => __DIR__ . '/..' . '/buglinjo/laravel-webp/src/Webp.php',
+        'Buglinjo\\LaravelWebp\\WebpServiceProvider' => __DIR__ . '/..' . '/buglinjo/laravel-webp/src/WebpServiceProvider.php',
         'Carbon\\Carbon' => __DIR__ . '/..' . '/nesbot/carbon/src/Carbon/Carbon.php',
         'Carbon\\CarbonConverterInterface' => __DIR__ . '/..' . '/nesbot/carbon/src/Carbon/CarbonConverterInterface.php',
         'Carbon\\CarbonImmutable' => __DIR__ . '/..' . '/nesbot/carbon/src/Carbon/CarbonImmutable.php',

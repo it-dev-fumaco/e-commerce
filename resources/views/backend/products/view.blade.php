@@ -61,7 +61,7 @@
                         <div class="row">
                            <div class="col-md-2">
                               @php
-                                 $image = ($item_image) ? '/storage/item/images/'. $details->f_idcode .'/gallery/original/'.$item_image : '/storage/no-photo-available.png';
+                                 $image = ($item_image) ? '/storage/item_images/'. $details->f_idcode .'/gallery/original/'.explode(".", $item_image)[0] .'.webp' : '/storage/no-photo-available.png';
                               @endphp
                               <img src="{{ asset($image) }}" class="img-responsive rounded img-thumbnail" alt="" width="250" height="250">
                            </div>

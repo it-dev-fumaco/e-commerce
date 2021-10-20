@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Auth;
+use Webp;
 use DB;
 
 class ProductController extends Controller
@@ -578,7 +579,35 @@ class ProductController extends Controller
     public function deleteProductImage(Request $request){
         DB::beginTransaction();
 		try{
+            $img = DB::table('fumaco_items_image_v1')->where('id', $request->img_id)->first();
+
+            $primary_img = explode(".", $img->imgprimayx)[0];
+            $original_img = explode(".", $img->imgoriginalx)[0];
+
+            $primary = storage_path('/app/public/item_images/'.$img->idcode.'/gallery/preview/') . $img->imgprimayx;
+            $original = storage_path('/app/public/item_images/'.$img->idcode.'/gallery/original/') . $img->imgoriginalx;
+
+            $primary_webp = storage_path('/app/public/item_images/'.$img->idcode.'/gallery/preview/') . $primary_img .'.webp';
+            $original_webp = storage_path('/app/public/item_images/'.$img->idcode.'/gallery/original/') . $primary_img .'.webp';
+   
+			if (file_exists($primary)) {
+				unlink($primary);
+			}
+
+            if (file_exists($original)) {
+				unlink($original);
+			}
+
+            if (file_exists($primary_webp)) {
+				unlink($primary_webp);
+			}
+
+			if (file_exists($original_webp)) {
+				unlink($original_webp);
+			}
+
             DB::table('fumaco_items_image_v1')->where('id', $request->img_id)->delete();
+
             DB::commit();
 			return redirect()->back()->with('success', 'Media Successfully Deleted');
 		}catch(Exception $e){
@@ -599,6 +628,9 @@ class ProductController extends Controller
 			$z_filename = pathinfo($img_zoom->getClientOriginalName(), PATHINFO_FILENAME);//1024
 			$p_extension = pathinfo($img_primary->getClientOriginalName(), PATHINFO_EXTENSION);//400
 			$z_extension = pathinfo($img_zoom->getClientOriginalName(), PATHINFO_EXTENSION);//1024
+
+            $p_filename = Str::slug($p_filename, '-');
+            $z_filename = Str::slug($z_filename, '-');
 
 			$p_name = $p_filename.".".$p_extension;//400
 			$z_name = $z_filename.".".$z_extension;//1024
@@ -631,9 +663,16 @@ class ProductController extends Controller
                 }
 			}
 
-            $request->file('img_zoom')->storeAs('/public/item/images/'.$request->item_code.'/gallery/original', $z_name);//1024
-			$request->file('img_primary')->storeAs('/public/item/images/'.$request->item_code.'/gallery/preview', $p_name);//400
+            $folder_name = 'public/item_images/'.$request->item_code.'/gallery/';
+            $img_primary->storeAs($folder_name . 'preview', $p_name); // 400px
+			$img_zoom->storeAs($folder_name . 'original', $z_name); // 1024px
 
+            $webp_primary = Webp::make($request->file('img_primary'));
+            $webp_zoom = Webp::make($request->file('img_zoom'));
+
+			$webp_primary->save(storage_path('/app/' .$folder_name . 'preview/') . $p_filename  .'.webp');
+            $webp_zoom->save(storage_path('/app/' .$folder_name . 'original/') . $z_filename .'.webp');
+		
 			$images_arr[] = [
 				'idcode' => $request->item_code,
                 'imgnum' => " ",
@@ -644,13 +683,15 @@ class ProductController extends Controller
 			];
 
             DB::table('fumaco_items_image_v1')->insert($images_arr);
+
             DB::commit();
+
 			return redirect()->back()->with('success', 'Media Successfully Added');
 		}catch(Exception $e){
 			DB::rollback();
+
 			return redirect()->back()->with('image_error', 'Error');
 		}
-
     }
 
     // ajax get products based on item category

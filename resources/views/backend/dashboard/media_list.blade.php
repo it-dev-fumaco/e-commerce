@@ -44,9 +44,9 @@
                                         @if($m->add_extension == 'mp4')
                                             <div class="col-md-2 d-flex align-items-stretch">
                                                 <div class="thumbnail" style="background-color: #f1f1f1; padding-left: 10px; padding-right: 10px; padding-bottom: 10px; padding-top: 10px; border: solid #7d7d7d 1px;">
-                                                    <a href="{{asset('/assets/gallery/')."/".$m->mediafiles }}" target="_blank">
+                                                    <a href="{{asset('storage/gallery/')."/".$m->mediafiles.'.'. $m->add_extension }}" target="_blank">
                                                         <video width="100%" controls>
-                                                            <source src="{{asset('/assets/gallery/')."/".$m->mediafiles }}" type="video/mp4">
+                                                            <source src="{{asset('storage/gallery/')."/".$m->mediafiles.'.'. $m->add_extension }}" type="video/mp4">
                                                             Your browser does not support HTML video.
                                                         </video>
                                                         <div class="caption">
@@ -63,8 +63,8 @@
                                         @else 
                                             <div class="col-md-2 d-flex align-items-stretch">
                                                 <div class="thumbnail" style="background-color: #f1f1f1; padding-left: 10px; padding-right: 10px; padding-bottom: 10px; padding-top: 10px; border: solid #7d7d7d 1px;">
-                                                    <a href="{{asset('/assets/gallery/')."/".$m->mediafiles }}" target="_blank">
-                                                        <img src="{{asset('/assets/gallery/')."/".$m->mediafiles }}" alt="{{ $m->medianame }}" style="width:100%">
+                                                    <a href="{{asset('storage/gallery/')."/".$m->mediafiles.'.webp' }}" target="_blank">
+                                                        <img src="{{asset('storage/gallery/')."/".$m->mediafiles.'.webp' }}" alt="{{ $m->medianame }}" style="width:100%">
                                                         <div class="caption">
                                                             <p style="color: #333232; font-size: 20px;">{{ $m->medianame }}</p>
                                                             <form action="/admin/delete_media" method="post">

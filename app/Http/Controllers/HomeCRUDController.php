@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Support\Str;
 use Auth;
+use Webp;
 use DB;
 
 
@@ -42,6 +44,8 @@ class HomeCRUDController extends Controller
 			$filename = pathinfo($img->getClientOriginalName(), PATHINFO_FILENAME);
 			$extension = pathinfo($img->getClientOriginalName(), PATHINFO_EXTENSION);
 			$request->file('fileToUpload')->store('/assets/site-img');
+
+			$filename = Str::slug($filename, '-');
 
 			$image_name = $filename.".".$extension;
 
@@ -80,8 +84,13 @@ class HomeCRUDController extends Controller
 				'fumaco_image2' => $image_name
 			];
 
-			$destinationPath = public_path('/assets/site-img');
-			$img->move($destinationPath, $img->getClientOriginalName());
+			$webp = Webp::make($request->file('fileToUpload'));
+
+			if ($webp->save(public_path('/assets/site-img/'.$filename.'.webp'))) {
+				// File is saved successfully
+				$destinationPath = public_path('/assets/site-img');
+				$img->move($destinationPath, $img->getClientOriginalName());
+			}
 
 			$insert = DB::table('fumaco_header')->insert($add_carousel);
             DB::commit();

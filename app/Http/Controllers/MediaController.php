@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use DB;
+use Webp;
+use Illuminate\Support\Str;
 
 class MediaController extends Controller
 {
@@ -18,8 +20,23 @@ class MediaController extends Controller
 	public function delete_media_record(Request $request){
 		DB::beginTransaction();
 		try{
-			$delete = DB::table('fumaco_gallery')->where('id', $request->media_id)->delete();
+			$media = DB::table('fumaco_gallery')->where('id', $request->media_id)->first();
+
+			$filepath = storage_path('/app/public/gallery/') . $media->mediafiles . '.' . $media->add_extension;
+			$image_webp = storage_path('/app/public/gallery/') . $media->mediafiles . '.webp';
+
+			if (file_exists($filepath)) {
+				unlink($filepath);
+			}
+
+			if (file_exists($image_webp)) {
+				unlink($image_webp);
+			}
+
+			DB::table('fumaco_gallery')->where('id', $request->media_id)->delete();
+
             DB::commit();
+
 			return redirect()->back()->with('success', 'Media Deleted.');
 		}catch(Exception $e){
 			DB::rollback();
@@ -38,19 +55,19 @@ class MediaController extends Controller
 
 			$img = $request->file('fileToUpload');
 
-			$filename = pathinfo($img->getClientOriginalName(), PATHINFO_FILENAME);
-			$extension = pathinfo($img->getClientOriginalName(), PATHINFO_EXTENSION);
-
-			$request->file('fileToUpload')->store('\assets\gallery');
-
-			$image_name = $filename.".".$extension;
-
 			$image_error = '';
 			$rules = array(
 				'uploadFile' => 'image|max:500000'
 			);
 
 			$validation = Validator::make($request->all(), $rules);
+
+			$filename = pathinfo($img->getClientOriginalName(), PATHINFO_FILENAME);
+			$extension = pathinfo($img->getClientOriginalName(), PATHINFO_EXTENSION);
+
+			$filename = Str::slug($filename, '-');
+
+			$image_name = $filename.".".$extension;
 
 			if ($validation->fails()){
 				$image_error = "Sorry, your file is too large.";
@@ -74,21 +91,29 @@ class MediaController extends Controller
 				}
 			}
 
-			$destinationPath = public_path('\assets\gallery');
-			$img->move($destinationPath, $img->getClientOriginalName());
-
 			$media_arr[] = [
 				'medianame' => $request->media_name,
-				'mediaurl' => '/assets/gallery',
-				'mediafiles' => $image_name,
+				'mediaurl' => '/app/public/gallery/',
+				'mediafiles' => $filename,
 				'add_extension' => $extension
 			];
-			// dd($media_arr);
+			
+			$webp = Webp::make($request->file('fileToUpload'));
+
+			if ($webp->save(storage_path('/app/public/gallery/'.$filename.'.webp'))) {
+				// File is saved successfully
+				$destinationPath = storage_path('/app/public/gallery/');
+				$img->move($destinationPath, $image_name);
+			}
+
 			DB::table('fumaco_gallery')->insert($media_arr);
+
             DB::commit();
+
 			return redirect()->back()->with('success', 'Media Successfully Added');
 		}catch(Exception $e){
 			DB::rollback();
+
 			return redirect()->back()->with('image_error', 'Error');
 		}
 	}

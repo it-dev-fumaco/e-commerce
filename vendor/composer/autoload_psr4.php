@@ -85,6 +85,7 @@ return array(
     'Database\\Factories\\' => array($baseDir . '/database/factories'),
     'Cron\\' => array($vendorDir . '/dragonmantank/cron-expression/src/Cron'),
     'Carbon\\' => array($vendorDir . '/nesbot/carbon/src/Carbon'),
+    'Buglinjo\\LaravelWebp\\' => array($vendorDir . '/buglinjo/laravel-webp/src'),
     'Brick\\Math\\' => array($vendorDir . '/brick/math/src'),
     'Biscolab\\ReCaptcha\\' => array($vendorDir . '/biscolab/laravel-recaptcha/src'),
     'Asm89\\Stack\\' => array($vendorDir . '/asm89/stack-cors/src'),

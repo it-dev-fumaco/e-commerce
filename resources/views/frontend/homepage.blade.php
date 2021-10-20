@@ -52,7 +52,12 @@
             }
           @endphp
           <div class="carousel-item {{ $loop->first ? "active" : ""}}" style="background: black;">
-            <img src="{{ asset('/assets/site-img/'. $carousel->fumaco_image1) }}" alt="{{ $carousel->fumaco_title }}" style="object-fit: cover;opacity: 0.6;">
+            <picture>
+              <source srcset="{{ asset('/assets/site-img/'. explode(".", $carousel->fumaco_image1)[0] .'.webp') }}" type="image/webp" style="object-fit: cover;opacity: 0.6;">
+              <source srcset="{{ asset('/assets/site-img/'. $carousel->fumaco_image1) }}" type="image/jpeg" style="object-fit: cover;opacity: 0.6;"> 
+              <img src="{{ asset('/assets/site-img/'. $carousel->fumaco_image1) }}" alt="" style="object-fit: cover;opacity: 0.6;">
+            </picture>
+
             <div class="container">
               <div class="carousel-caption text-start">
                 <h3 class="carousel-header-font fumacoFont1">{{ $carousel->fumaco_title }}</h3>
@@ -76,7 +81,11 @@
         @foreach($blogs as $b)
           <div class="col-lg-4 pr-md-1 animated animatedFadeInUp fadeInUp equal-height-columns" style="text-align: left !important;">
             <div class="equal-column-content">
-              <img src="{!!  asset('/assets/site-img/'. $b->{'blogprimayimage-home'})  !!}" alt="{{ $b->blog_caption }}" class="img-responsive" style="width: 100% !important;">
+              <picture>
+                <source srcset="{!!  asset('/assets/site-img/'. explode(".", $b->{'blogprimayimage-home'})[0] .'.webp') !!}" type="image/webp" class="img-responsive" style="width: 100% !important;">
+                <source srcset="{!!  asset('/assets/site-img/'. $b->{'blogprimayimage-home'}) !!}" type="image/jpeg" class="img-responsive" style="width: 100% !important;"> 
+                <img src="{!!  asset('/assets/site-img/'. $b->{'blogprimayimage-home'}) !!}" alt="" class="img-responsive" style="width: 100% !important;">
+              </picture>
               <br><br>
               <h5 class="font-style-thin fumacoFont_card_title" style="font-family: 'poppins', sans-serif !important; color:#ffffff !important; line-height: 26px !important;">{{ substr($b->blogtitle, 0, 39) }}</h5><br>
               <p class="abt_standard" style="margin-left: 0rem !important; color:#ffffff !important; font-weight: 400">
@@ -104,10 +113,19 @@
               <div class="col animated animatedFadeInUp fadeInUp equal-height-columns">
                 <div class="card shadow-sm">
                   <div class="equal-column-content">
-                    @php
-                      $img = ($bs['bs_img']) ? '/storage/item/images/'. $bs['item_code'] .'/gallery/preview/'. $bs['bs_img'] : '/storage/no-photo-available.png';
-                    @endphp
-                    <img src="{{ asset($img) }}" alt="" class="img-responsive" style="width: 100% !important;">
+
+@php
+$img_bs = ($bs['bs_img']) ? '/storage/item/images/'. $bs['item_code'] .'/gallery/preview/'. $bs['bs_img'] : '/storage/no-photo-available.png';
+$img_bs_webp = ($bs['bs_img']) ? '/storage/item/images/'. $bs['item_code'] .'/gallery/preview/'. explode(".", $bs['bs_img'])[0] . '.webp' : '/storage/no-photo-available.png';
+@endphp
+
+                    <picture>
+                      <source srcset="{{ asset($img_bs_webp) }}" type="image/webp" class="img-responsive" style="width: 100% !important;">
+                      <source srcset="{{ asset($img_bs) }}" type="image/jpeg" class="img-responsive" style="width: 100% !important;"> 
+                      <img src="{{ asset($img_bs) }}" alt="{{ $bs['item_code'] }}" class="img-responsive" style="width: 100% !important;">
+                    </picture>
+
+
                     <div class="card-body">
                       <div class="text ellipsis">
                         <p class="card-text product-head fumacoFont_card_title text-concat" style="color:#0062A5 !important;  height: 80px; ">{{ $bs['item_name'] }}</p>
@@ -116,7 +134,7 @@
                         @if ($bs['is_discounted'])
                         <s style="color: #c5c5c5;">₱ {{ $bs['orig_price'] }}</s>&nbsp;&nbsp; ₱ {{ $bs['new_price'] }}
                         @else
-                        ₱ {{ $bs['new_price'] }}
+                        ₱ {{ $bs['orig_price'] }}
                         @endif
                         </p>
                       <div class="d-flex justify-content-between align-items-center">
@@ -152,14 +170,22 @@
     <div class="album py-5">
       <div class="container">
         <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4">
-          @foreach($on_sale_arr as $os)
+          @foreach($on_sale_arr as $os) 
+           @php
+            $img_os = ($os['os_img']) ? '/storage/item_images/'. $os['item_code'] .'/gallery/preview/'. $os['os_img'] : '/storage/no-photo-available.png';
+            $img_os_webp = ($os['os_img']) ? '/storage/item_images/'. $os['item_code'] .'/gallery/preview/'. explode(".", $os['os_img'])[0] . '.webp' : '/storage/no-photo-available.png';
+          @endphp
               <div class="col animated animatedFadeInUp fadeInUp equal-height-columns">
                 <div class="card shadow-sm">
                   <div class="equal-column-content">
-                    @php
-                    $img_os = ($os['os_img']) ? '/storage/item/images/'. $os['item_code'] .'/gallery/preview/'. $os['os_img'] : '/storage/no-photo-available.png';
-                  @endphp
-                    <img src="{{ asset($img_os) }}" alt="" class="img-responsive" style="width: 100% !important;">
+                  
+
+                      <picture>
+                        <source srcset="{{ asset($img_os_webp) }}" type="image/webp" class="img-responsive" style="width: 100% !important;">
+                        <source srcset="{{ asset($img_os) }}" type="image/jpeg" class="img-responsive" style="width: 100% !important;"> 
+                        <img src="{{ asset($img_os) }}" alt="{{ $os['item_code'] }}" class="img-responsive" style="width: 100% !important;">
+                      </picture>
+                  
                     <div class="card-body">
                       <div class="text ellipsis">
                         <p class="card-text product-head fumacoFont_card_title text-concat" style="color:#0062A5 !important; height: 80px;">{{ $os['item_name'] }}</p>
