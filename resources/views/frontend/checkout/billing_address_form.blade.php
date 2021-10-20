@@ -81,7 +81,13 @@
 					{!! session()->get('error') !!}
 				</div>
 			@endif
-			<form action="/setdetails" method="post">
+			@php
+				$form_action = '/setdetails';
+				if (!$has_shipping_address) {
+					$form_action = '/checkout/set_address';
+				}
+			@endphp
+			<form action="{{ $form_action }}" method="post">
 				@csrf
 				<div class="row">
 					<div class="col-md-8 mx-auto">

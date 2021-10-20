@@ -13,8 +13,15 @@ use App\Models\ShippingCondition;
 
 class CheckoutController extends Controller
 {
-	public function billingForm($item_code_buy = null, $qty_buy = null) {
-		return view('frontend.checkout.billing_address_form', compact('item_code_buy', 'qty_buy'));
+	public function billingForm() {
+		$has_shipping_address = false;
+		if (Auth::check()) {
+			$has_shipping_address = DB::table('fumaco_user_add')
+				->where('xdefault', 1)->where('user_idx', Auth::user()->id)
+				->where('address_class', 'Delivery')->exists();
+		}
+
+		return view('frontend.checkout.billing_address_form', compact('has_shipping_address'));
 	}
 
 	public function setBillingForm($item_code_buy = null, $qty_buy = null){
@@ -117,7 +124,7 @@ class CheckoutController extends Controller
 				'xdefault' => 1
 			];
 
-			if (isset($request->myCheck)){
+			if (isset($request->same_as_billing)){
 				$bill_address_arr = [
 					'address_class' => 'Billing',
 					'user_idx' => $user_id,
@@ -161,20 +168,9 @@ class CheckoutController extends Controller
 			$bill_insert = DB::table('fumaco_user_add')->insert($bill_address_arr);
 			$ship_insert = DB::table('fumaco_user_add')->insert($ship_address_arr);
 
-			$item_code_buy = "";
-			$qty_buy = "";
-			$summary = '/checkout/summary/';
-
-			if(isset($request->buy_now)){
-				$item_code_buy = $request->buy_now_item_code;
-				$qty_buy = $request->buy_now_qty;
-				$summary = '/checkout/summary/'.$item_code_buy."/".$qty_buy;
-			}
-
-
 			DB::commit();
 
-			return redirect($summary)->with('add_success', 'Record Updated');
+			return redirect('/setdetails');
 		}catch(Exception $e){
 			DB::rollback();
 			return redirect()->back()->with('error', 'An error occured. Please try again.');
