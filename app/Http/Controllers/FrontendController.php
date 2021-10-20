@@ -248,14 +248,14 @@ class FrontendController extends Controller
                 'email' => ['required', 'string', 'email', 'max:255'],
                 'phone' => ['required', 'string', 'max:255'],
                 'subject' => ['required', 'string', 'max:255'],
-                'message' => ['required', 'string', 'max:255'],
-                'ip_address' => ['required', 'string', 'max:255'],
-                'xstatus' => ['required', 'string', 'max:255'],
-                'g-recaptcha-response' => 'recaptcha'
+                'comment' => ['required', 'string', 'max:255'],
+                'g-recaptcha-response' => 'required|recaptcha'
             ]);
 
-            $insert = DB::table('fumaco_contact_list')->insert($new_contact);
+            DB::table('fumaco_contact_list')->insert($new_contact);
+            
             DB::commit();
+            
             return redirect()->back()->with('message', 'Thank you for contacting us!. We have recieved your message.');
         }catch(Exception $e){
             DB::rollback();

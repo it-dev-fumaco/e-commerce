@@ -28,16 +28,6 @@
     <br>
     <br>
     <div>
-      @if(session()->has('message'))
-        <div class="alert alert-success">
-          {{ session()->get('message') }}
-        </div>
-      @endif
-      {{-- <div class="alert alert-danger">
-        <strong>Fail!</strong> Please check information below, make sure email is correct.<br>
-      </div>
-    </div> --}}
-
     <div class="row" style="padding-left: 5% !important; padding-right: 5% !important;">
       @foreach($fumaco_contact as $contact)
         <div class="col-md-6 animated animatedFadeInUp fadeInUp">
@@ -54,19 +44,11 @@
         </div>
       @endforeach
     </div>
-    {{-- $contact_data0_fumaco = $data_contact_1["office_title"];
-    $contact_data1_fumaco = $data_contact_1["office_address"];
-    $contact_data2_fumaco = $data_contact_1["office_phone"];
-    $contact_data3_fumaco = $data_contact_1["office_mobile"];
-    $contact_data4_fumaco = $data_contact_1["office_fax"];
-    $contact_data5_fumaco = $data_contact_1["office_email"]; --}}
     <div class="row" style="padding-left: 5% !important; padding-right: 5% !important;">
       <div class="col-md-12">
         <iframe src="{{ $fumaco_map->map_url }}" width="100%" height="480"></iframe>
       </div>
     </div>
-
-
     <div class="row" style="padding-left: 5% !important; padding-right: 5% !important;">
       <br>
       <br>
@@ -95,19 +77,27 @@
         <center>
           <p style="color:#186EA9 !important; font-size:21px !important;"class="fumacoFont_card_title animated animatedFadeInUp fadeInUp">GET IN TOUCH</p>
           <p style="color:#58595A !important;" class="fumacoFont_card_caption animated animatedFadeInUp fadeInUp">We collaborate with ambitious brands and people; we'd love to build something great together.</p>
-          {{-- <p style="color:#58595A !important;" class="fumacoFont_card_caption animated animatedFadeInUp fadeInUp">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
-            dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex
-            ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-            fugiat nulla pariatur. </p> --}}
           <br>
         </center>
+        @if(session()->has('message'))
+        <div class="alert alert-success">
+          {{ session()->get('message') }}
+        </div>
+      @endif
+
+      @if(count($errors->all()) > 0)
+      <div class="alert alert-warning alert-dismissible fade show text-center" role="alert">
+        @foreach ($errors->all() as $error)
+          <span class="d-block">{{ $error }}</span>
+        @endforeach
+      </div>
+    @endif
       </div>
     </div>
   </div>
   <div class="container">
     <div class="row">
-      <form action="add_contact" method="post">
+      <form action="add_contact" method="post" id="contact-form">
         @csrf
         <div class="row">
           <div class="col-lg-4 animated animatedFadeInUp fadeInUp">
@@ -149,4 +139,22 @@
     </div>
   </div>
 </main>
+@endsection
+
+@section('script')
+<script>
+    (function() {
+  $('#contact-form').submit(function(e){
+    e.preventDefault();
+    var captchResponse = $('#g-recaptcha-response');
+// if(captchResponse.length == 0 )
+console.log(captchResponse);
+    //user has not yet checked the 'I am not a robot' checkbox
+// else 
+    //user is a verified human and you are good to submit your form now
+  });
+
+})();
+
+</script>
 @endsection
