@@ -10,7 +10,7 @@ class CartController extends Controller
 {
     public function productActions(Request $request) {
         $data = $request->all();
-        $order_no = 'FUM-' . date('ymd') . random_int(9999, 100000);
+        $order_no = 'FUM-' . date('yd') . random_int(0, 9999);
         if (isset($data['addtocart']) && $data['addtocart']) {
             if (!session()->get('fumOrderNo')) {
                 session()->put('fumOrderNo', $order_no);
