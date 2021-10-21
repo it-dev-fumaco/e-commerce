@@ -96,7 +96,7 @@ class OrderController extends Controller
                 'bill_contact_person' => $o->order_contactperson,
                 'ship_contact_person' => $o->order_ship_contactperson,
                 'email' => $o->order_email,
-                'date' => Carbon::parse($o->order_update)->format('Y-m-d h:i A'),
+                'date' => Carbon::parse($o->order_update)->format('M d, Y - h:m A'),
                 'ordered_items' => $items_arr,
                 'order_tracker_code' => $o->tracker_code,
                 'cust_id' => $o->order_account,
@@ -121,7 +121,8 @@ class OrderController extends Controller
                 'estimated_delivery_date' => $o->estimated_delivery_date,
                 'payment_id' => $o->payment_id,
                 'payment_method' => $o->order_payment_method,
-                'subtotal' => $o->order_subtotal
+                'subtotal' => $o->order_subtotal,
+                'date_cancelled' => Carbon::parse($o->date_cancelled)->format('M d, Y - h:m A')
             ];
         }
         return view('backend.orders.cancelled_orders', compact('orders_arr', 'orders'));
@@ -153,7 +154,7 @@ class OrderController extends Controller
                 'bill_contact_person' => $o->order_contactperson,
                 'ship_contact_person' => $o->order_ship_contactperson,
                 'email' => $o->order_email,
-                'date' => Carbon::parse($o->order_update)->format('Y-m-d h:i A'),
+                'date' => Carbon::parse($o->order_update)->format('M d, Y - h:m A'),
                 'ordered_items' => $items_arr,
                 'order_tracker_code' => $o->tracker_code,
                 'cust_id' => $o->order_account,
@@ -201,6 +202,20 @@ class OrderController extends Controller
                     DB::table('fumaco_items')->where('f_idcode', $orders->item_code)->update(['f_reserved_qty' => $qty_left]);
                 }
             }
+
+            if($status == 'Cancelled'){
+                $ordered_items = DB::table('fumaco_order_items')->where('order_number', $request->order_number)->get();
+
+                foreach($ordered_items as $orders){
+                    $items = DB::table('fumaco_items')->select('f_reserved_qty', 'f_qty')->where('f_idcode', $orders->item_code)->first();
+                    $r_qty = $items->f_reserved_qty - $orders->item_qty;
+                    $f_qty = $items->f_qty + $orders->item_qty;
+
+                    DB::table('fumaco_items')->where('f_idcode', $orders->item_code)->update(['f_reserved_qty' => $r_qty, 'f_qty' => $f_qty]);
+                }
+                // dd($items);
+            }
+
 
             DB::table('fumaco_order')->where('order_number', $request->order_number)->update(['order_status' => $status, 'order_update' => $now]);
 

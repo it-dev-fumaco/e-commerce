@@ -49,7 +49,8 @@
 											<th>Est. Delivery Date</th>
 											<th>Shipping Method</th>
 											<th>Grand Total</th>
-											<th>Status</th>
+											{{-- <th>Status</th> --}}
+											<th>Date Cancelled</th>
 											<th>Action</th>
 										</tr>
 									</thead>
@@ -62,7 +63,8 @@
 											<td>{{ $order['estimated_delivery_date'] }}</td>
 											<td>{{ $order['shipping_name'] }}</td>
 											<td>₱ {{ $order['grand_total'] }}</td>
-											<td><span class="badge badge-danger">{{ $order['status'] }}</span></td>
+											{{-- <td><span class="badge badge-danger">{{ $order['status'] }}</span></td> --}}
+											<td>{{ $order['date_cancelled'] }}</td>
 											<td>
 												<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#order-{{ $order['cust_id'] }}">View Orders</button>
 												<div class="modal fade" id="order-{{ $order['cust_id'] }}" role="dialog">
@@ -78,7 +80,9 @@
 																		<p><strong>Customer Name : </strong> {{ $order['first_name'] . " " . $order['last_name'] }}</p>
 																	</div>
 																	<div class="col-md-4">
-																		<p><strong>Est. Delivery Date : </strong> {{ $order['estimated_delivery_date'] }}
+																		{{-- <p><strong>Est. Delivery Date : </strong> {{ $order['estimated_delivery_date'] }}</p> --}}
+																		
+																		<p><strong>Date Cancelled : </strong> {{ $order['date_cancelled'] }}
 																		</p>
 																	</div>
 																	<div class="col-md-4">

@@ -103,8 +103,8 @@
 											@endphp
 											<td><span class="badge badge-{{ $badge }}" style="font-size: 11pt">{{ $order['status'] }}</span></td>
 											<td>
-												<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#order-{{ $order['cust_id'] }}">View Orders</button>
-												<div class="modal fade" id="order-{{ $order['cust_id'] }}" role="dialog">
+												<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#order-{{ $order['order_no']}}">View Orders</button>
+												<div class="modal fade" id="order-{{ $order['order_no'] }}" role="dialog">
 													<div class="modal-dialog modal-xl" style="min-width: 70%;">
 														<div class="modal-content">
 															<div class="modal-header">
@@ -192,29 +192,29 @@
 </div>
 
 
-<div class="modal-footer">
+<div class="modal-footer {{ ($order['status'] == 'Delivered') ? 'd-none' : '' }}">
 
-<button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#tracker-{{ $order['cust_id'] }}">
+<button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#tracker-{{ $order['order_no'] }}">
 Add Tracker Code
 </button>
 
-<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#order_confirmed-{{ $order['cust_id'] }}">
+<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#order_confirmed-{{ $order['order_no'] }}">
 	Order Confirmed
 </button>
 
-<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#for_delivery-{{ $order['cust_id'] }}">
+<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#for_delivery-{{ $order['order_no'] }}">
 	Out for Delivery
 </button>
 
-<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#delivered-{{ $order['cust_id'] }}">
+<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#delivered-{{ $order['order_no'] }}">
 Delivered Order
 </button>
 
-<button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#cancel-{{ $order['cust_id'] }}">
+<button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#cancel-{{ $order['order_no'] }}" >
 Cancel Order
 </button>
 
-<div class="modal fade confirm-modal" id="tracker-{{ $order['cust_id'] }}" tabindex="-1" role="dialog" aria-labelledby="tracker-{{ $order['cust_id'] }}" aria-hidden="true">
+<div class="modal fade confirm-modal" id="tracker-{{ $order['order_no'] }}" tabindex="-1" role="dialog" aria-labelledby="tracker-{{ $order['order_no'] }}" aria-hidden="true">
 <div class="modal-dialog" role="document">
 <div class="modal-content">
 <div class="modal-header">
@@ -239,7 +239,7 @@ Cancel Order
 </div>
 </div>
 
-<div class="modal fade confirm-modal" id="order_confirmed-{{ $order['cust_id'] }}" tabindex="-1" role="dialog" aria-labelledby="order_confirmed-{{ $order['cust_id'] }}" aria-hidden="true">
+<div class="modal fade confirm-modal" id="order_confirmed-{{ $order['order_no'] }}" tabindex="-1" role="dialog" aria-labelledby="order_confirmed-{{ $order['order_no'] }}" aria-hidden="true">
 <div class="modal-dialog" role="document">
 <div class="modal-content">
 <div class="modal-header">
@@ -264,7 +264,7 @@ Order confirmed?
 </div>
 </div>
 
-<div class="modal fade confirm-modal" id="for_delivery-{{ $order['cust_id'] }}" tabindex="-1" role="dialog" aria-labelledby="for_delivery-{{ $order['cust_id'] }}" aria-hidden="true">
+<div class="modal fade confirm-modal" id="for_delivery-{{ $order['order_no'] }}" tabindex="-1" role="dialog" aria-labelledby="for_delivery-{{ $order['order_no'] }}" aria-hidden="true">
 <div class="modal-dialog" role="document">
 <div class="modal-content">
 <div class="modal-header">
@@ -289,7 +289,7 @@ Is order out for delivery?
 </div>
 </div>
 
-<div class="modal fade confirm-modal" id="delivered-{{ $order['cust_id'] }}" tabindex="-1" role="dialog" aria-labelledby="delivered-{{ $order['cust_id'] }}" aria-hidden="true">
+<div class="modal fade confirm-modal" id="delivered-{{ $order['order_no'] }}" tabindex="-1" role="dialog" aria-labelledby="delivered-{{ $order['order_no'] }}" aria-hidden="true">
 <div class="modal-dialog" role="document">
 <div class="modal-content">
 <div class="modal-header">
@@ -314,20 +314,25 @@ Order has been delivered?
 </div>
 </div>
 
-<div class="modal fade confirm-modal" id="cancel-{{ $order['cust_id'] }}" tabindex="-1" role="dialog" aria-labelledby="cancel-{{ $order['cust_id'] }}" aria-hidden="true">
+<div class="modal fade confirm-modal" id="cancel-{{ $order['order_no'] }}" tabindex="-1" role="dialog" aria-labelledby="cancel-{{ $order['order_no'] }}" aria-hidden="true">
 <div class="modal-dialog" role="document">
 <div class="modal-content">
 <div class="modal-header">
-<h5 class="modal-title">Cancel Order</h5>
+<h5 class="modal-title">Order Cancel</h5>
 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
 <span aria-hidden="true">&times;</span>
 </button>
 </div>
 <div class="modal-body">
-Order has been cancelled?
+Cancel Order?
 </div>
 <div class="modal-footer">
-<a href="" class="btn btn-primary">YES</a>
+	<form action="/admin/order/status_update" method="POST">
+		@csrf
+		<input type="text" value="{{ $order['order_no'] }}" name="order_number" hidden readonly/>
+		<input type="text" value="Cancelled" name="status" hidden readonly/>
+		<button type="submit" class="btn btn-primary">YES</button>
+	</form>
 <button type="button" class="btn btn-secondary" data-dismiss="cmodal">NO</button>
 </div>
 </div>
