@@ -111,9 +111,14 @@
 									<tr>
 										<td class="align-middle">
 											@php
-												$image = ($item['image']) ? '/storage/item_images/'. $item['item_code'] .'/gallery/preview/'.explode(".", $item['image'])[0] .'.webp' : '/storage/no-photo-available.png';
+												$image_webp = ($item['image']) ? '/storage/item_images/'. $item['item_code'] .'/gallery/preview/'.explode(".", $item['image'])[0] .'.webp' : '/storage/no-photo-available.png';
+												$image = ($item['image']) ? '/storage/item_images/'. $item['item_code'] .'/gallery/preview/'. $item['image'] : '/storage/no-photo-available.png';
 											@endphp
-											<img src="{{ asset($image) }}" class="img-responsive rounded img-thumbnail d-inline-block" alt="" width="70" height="70">
+											 <picture>
+												<source srcset="{{ asset($image_webp) }}" type="image/webp" class="img-responsive rounded  d-inline-block" alt="" width="70" height="70">
+												<source srcset="{{ asset($image) }}" type="image/jpeg" class="img-responsive rounded  d-inline-block" alt="" width="70" height="70"> 
+												<img src="{{ asset($image) }}" alt="{{ $item['item_code'] }}" class="img-responsive rounded  d-inline-block" alt="" width="70" height="70">
+											</picture>
 										</td>
 										<td>
 											<span class="d-block font-weight-bold">{{ $item['item_code'] }}</span> {{ $item['product_name'] }}
