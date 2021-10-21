@@ -550,7 +550,7 @@
 
 		.text.ellipsis::after {
 			position: absolute;
-			right: -12px; 
+			right: -12px;
 			bottom: 4px;
 		}
 	</style>
@@ -559,7 +559,7 @@
 	<link type="text/css" rel="stylesheet" media="all" href="{{ asset('/item/magnific-popup/css/magnific-popup.css') }}" />
 	<link rel="stylesheet" type="text/css" href="{{ asset('/item/dist/xzoom.css') }}" media="all" />
 	<link type="text/css" rel="stylesheet" href="{{ asset('/assets/loading.css') }}" />
-    
+
 	<main style="background-color:#ffffff;" class="products-head">
 		<nav>
 			<ol class="breadcrumb" style="font-weight: 300 !important; font-size: 14px !important;">
@@ -673,7 +673,7 @@
 									@endphp
 									<label style="margin-left: 3%;">{{ $attr }} : </label>
 									<div class="btn-group" role="group" aria-label="Select Variants" style="display: unset !important;">
-										
+
 										@foreach ($row as $attr_value => $items)
 										@php
 											$x++;
@@ -772,7 +772,7 @@
 											<div class="card shadow-sm">
 												<div class="equal-column-content" style="border: 1px solid  #d5dbdb  ;">
 													@php
-														$img = ($rp['image']) ? '/storage/item/images/'. $rp['item_code'] .'/gallery/preview/'. $rp['image'] : '/storage/no-photo-available.png';
+														$img = ($rp['image']) ? '/storage/item_images/'. $rp['item_code'] .'/gallery/preview/'. $rp['image'] : '/storage/no-photo-available.png';
 													@endphp
 													<img src="{{ asset($img) }}" alt="" class="img-responsive" style="width: 100% !important;">
 													<div class="card-body">
@@ -806,7 +806,7 @@
 									</div>
 								</div>
 							</div>
-						@endif                    
+						@endif
 						</div>
 					</div>
 				</div>
@@ -826,7 +826,7 @@
 <script type="text/javascript" src="{{ asset('/item/hammer.js/1.0.5/jquery.hammer.min.js') }}"></script>
 <script type="text/javascript" src="{{ asset('/item/fancybox/source/jquery.fancybox.js') }}"></script>
 <script type="text/javascript" src="{{ asset('/item/magnific-popup/js/magnific-popup.js') }}"></script>
-				
+
 <script>
    (function() {
 		$(document).on('change', '.attr-radio', function(){

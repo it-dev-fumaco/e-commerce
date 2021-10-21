@@ -42,7 +42,7 @@
 			font-size: 14px !important;
 		}
 	</style>
-	
+
 	<main style="background-color:#0062A5;">
 		<div id="myCarousel" class="carousel slide" data-bs-ride="carousel">
 			<div class="carousel-inner">
@@ -57,7 +57,7 @@
 			</div>
 		</div>
 	</main>
-	
+
 	<main style="background-color:#ffffff; min-height: 500px;" class="products-head">
 		<div class="container-fluid">
 			<div class="row">
@@ -89,7 +89,7 @@
 								<td class="text-center align-middle">{{ $order['date'] }}</td>
 								<td class="text-center align-middle">
 									<a href="#" data-toggle="modal" data-target="#{{ $order['order_number'] }}-Modal">Item Purchase</a>
-									
+
 									<!-- Modal -->
 									<div class="modal fade" id="{{ $order['order_number'] }}-Modal" tabindex="-1" role="dialog" aria-labelledby="{{ $order['order_number'] }}-ModalLabel" aria-hidden="true">
 										<div class="modal-dialog modal-xl" style="min-width: 70%;">
@@ -111,7 +111,7 @@
 														@foreach ($order['items'] as $item)
 															<tr>
 																<td>
-																	<img src="{{ asset('/storage/item/images/'.$item['item_code'].'/gallery/preview/'.$item['image']) }}" class="img-responsive" alt="" width="55" height="55">
+																	<img src="{{ asset('/storage/item_images/'.$item['item_code'].'/gallery/preview/'.$item['image']) }}" class="img-responsive" alt="" width="55" height="55">
 																</td>
 																<td>{{ $item['item_name'] }}</td>
 																<td>{{ $item['qty'] }}</td>
@@ -154,7 +154,7 @@
 								@endphp
 								<td class="text-center align-middle"><span class="badge text-dark" style="background-color: {{ $badge }}; font-size: 0.9rem;">{{ $order['status'] }}</span></td>
 							</tr>
-							@empty	 
+							@empty
 								<tr>
 									<td class="text-center p-3" colspan="4">No transactions found.</td>
 								</tr>
@@ -164,7 +164,7 @@
 					<div style="float: right;">
 						{{ $orders->links('pagination::bootstrap-4') }}
 					</div>
-					
+
 				</div>
 			</div>
 		</div>
