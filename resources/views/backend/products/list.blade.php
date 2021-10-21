@@ -153,7 +153,7 @@
 												  <a class="dropdown-item" href="#" data-toggle="modal" data-target="#e{{ $item['id'] }}">Enable</a>
 												  @endif
 												  <a class="dropdown-item" href="#" data-toggle="modal" data-target="#dm{{ $item['id'] }}"><small>Delete</small></a>
-												  <a class="dropdown-item" href="/admin/product/item_images/{{ $item['id'] }}"><small>Images</small></a>
+												  <a class="dropdown-item" href="/admin/product/images/{{ $item['id'] }}"><small>Images</small></a>
 												</div>
 											</div>
 
