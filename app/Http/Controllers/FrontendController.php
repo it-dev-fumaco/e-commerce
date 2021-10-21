@@ -153,6 +153,7 @@ class FrontendController extends Controller
                 'orig_price' => $bs->f_original_price,
                 'is_discounted' => $bs->f_discount_trigger,
                 'new_price' => $bs->f_price,
+                'discount' => $bs->f_discount_percent,
                 'bs_img' => ($bs_img) ? $bs_img->imgprimayx : null
             ];
         }
