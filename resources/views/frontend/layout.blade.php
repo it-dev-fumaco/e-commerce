@@ -221,16 +221,17 @@
                 <a class="nav-link" href="/contact">CONTACTS</a>
               </li>
             </ul>
+            <form action="/" method="GET">
             <div class="input-group mb-0 searchbar" style="width: unset !important;">
-              <input type="text" placeholder="Search" class="form-control searchstyle" aria-label="Text input with dropdown button">
-              <button class="btn btn-outline-secondary dropdown-toggle searchstyle" type="button" data-bs-toggle="dropdown" aria-expanded="false">All&nbsp;&nbsp;</button>
-              <ul class="dropdown-menu dropdown-menu-end navbar-header">
-                <li><a class="dropdown-item searchstyle" href="#">All</a></li>
-                <li><a class="dropdown-item searchstyle" href="#">Products</a></li>
-                <li><a class="dropdown-item searchstyle" href="#">Blogs</a></li>
-              </ul>
-                <button class="btn btn-outline-secondary searchstyle" type="button"><i class="fas fa-search"></i></button>
+              <input type="text" placeholder="Search" name="s" value="{{ request()->s }}" class="form-control searchstyle" aria-label="Text input with dropdown button">
+              <select class="custom-select form-control" name="by" style="max-width: 115px !important;">
+                <option value="all" {{ request()->by == 'all' ? 'selected' : '' }}>All</option>
+                <option value="products" {{ request()->by == 'products' ? 'selected' : '' }}>Products</option>
+                <option value="blogs" {{ request()->by == 'blogs' ? 'selected' : '' }}>Blogs</option>
+              </select>
+                <button class="btn btn-outline-secondary searchstyle" type="submit"><i class="fas fa-search"></i></button>
             </div>
+          </form>
             <ul class="navbar-nav">
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle navbar-header" href="#" id="navbarDarkDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">Welcome, {{ (Auth::check()) ? Auth::user()->f_name : 'Guest' }} <i class="fa" style="font-size:24px; color:#126cb6;">&#xf07a;</i><span class="badge badge-warning count-cart-items" id="lblCartCount" style="font-size: 12px; background: #ff0000; color: #fff; padding: 4px 7px; vertical-align: top; margin-left: -10px;display: unset !important; font-weight: 500 !important; border-radius: 1rem !important;">0</span></a>

@@ -63,7 +63,6 @@ Route::group(['middleware' => 'auth'], function(){
     Route::get('/myprofile/address/{id}/{type}/change_default', 'FrontendController@setDefaultAddress');
     Route::get('/myprofile/address/{type}/new', 'FrontendController@addAddressForm');
     Route::post('/myprofile/address/{type}/save', 'FrontendController@saveAddress');
-
 });
 
 // SHOPPING CART ROUTES

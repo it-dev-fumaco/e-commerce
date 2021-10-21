@@ -9,9 +9,128 @@ use Illuminate\Support\Arr;
 use DB;
 use Auth;
 
+use Illuminate\Pagination\LengthAwarePaginator;
+
 class FrontendController extends Controller
 {
-    public function index() {
+    public function index(Request $request) {
+        if ($request->s) {
+            $search_by = $request->by;
+            $search_str = $request->s;
+
+            $results = [];
+            if ($search_by == 'products') {
+                $product_list = DB::table('fumaco_items')
+                    ->where('f_brand', 'LIKE', "%".$search_str."%")
+                    ->orWhere('f_parent_code', 'LIKE', "%".$search_str."%")
+                    ->orWhere('f_category', 'LIKE', "%".$search_str."%")
+                    ->orWhere(function($q) use ($search_str) {
+                        $search_strs = explode(" ", $search_str);
+                        foreach ($search_strs as $str) {
+                            $q->where('f_description', 'LIKE', "%".$str."%");
+                        }
+
+                        $q->orWhere('f_idcode', 'LIKE', "%".$search_str."%")
+                            ->orWhere('f_item_classification', 'LIKE', "%".$search_str."%");
+                    })
+                    ->where('f_status', 1)->orderBy('f_date', 'desc')->get();
+
+              
+                foreach($product_list as $item){
+                    $image = DB::table('fumaco_items_image_v1')->where('idcode', $item->f_idcode)->first();
+                    $results[] = [
+                        'id' => $item->id,
+                        'item_code' => $item->f_idcode,
+                        'item_name' => $item->f_name_name,
+                        'original_price' => $item->f_original_price,
+                        'is_discounted' => $item->f_discount_trigger,
+                        'discounted_price' => $item->f_price,
+                        'on_sale' => $item->f_onsale,
+                        'discount_percent' => $item->f_discount_percent,
+                        'image' => ($image) ? $image->imgprimayx : null,
+                        'comment_count' => null,
+                        'publish_date' => null,
+                        'title' => null,
+                        'type' => null
+                    ];
+                }
+            }
+
+            if ($search_by == 'blogs') {
+                $blogs = DB::table('fumaco_blog')->where('blog_enable', 1)
+                    ->where(function($q) use ($search_str) {
+                        $search_strs = explode(" ", $search_str);
+                        foreach ($search_strs as $str) {
+                            $q->where('blogtitle', 'LIKE', "%".$str."%")
+                                ->orWhere('blog_caption', 'LIKE', "%".$str."%")
+                                ->orWhere('blogcontent', 'LIKE', "%".$str."%");
+                        }
+                    })
+                    ->get();
+                foreach($blogs as $blog){
+                    $blog_comment = DB::table('fumaco_comments')->where('blog_id', $blog->id)->where('blog_status', 1)->count();
+                    $results[] = [
+                        'item_code' => null,
+                        'item_name' => null,
+                        'original_price' => 0,
+                        'is_discounted' => 0,
+                        'discounted_price' => 0,
+                        'on_sale' => 0,
+                        'discount_percent' => 0,
+                        'id' => $blog->id,
+                        'comment_count' => $blog_comment,
+                        'image' => $blog->{'blogprimayimage-journal'},
+                        'publish_date' => $blog->datepublish,
+                        'title' => $blog->blogtitle,
+                        'type' => $blog->blogtype
+                    ];
+                }
+            }
+           
+            // Get current page form url e.x. &page=1
+            $currentPage = LengthAwarePaginator::resolveCurrentPage();
+            // Create a new Laravel collection from the array data
+            $itemCollection = collect($results);
+            // Define how many items we want to be visible in each page
+            $perPage = 18;
+            // Slice the collection to get the items to display in current page
+            $currentPageItems = $itemCollection->slice(($currentPage * $perPage) - $perPage, $perPage)->all();
+            // Create our paginator and pass it to the view
+            $paginatedItems= new LengthAwarePaginator($currentPageItems , count($itemCollection), $perPage);
+            // set url path for generted links
+            $paginatedItems->setPath($request->url());
+            $results = $paginatedItems;
+
+            $products = [];
+            $blogs = [];
+            foreach ($results as $result) {
+                if($result['item_code'] != null) {
+                    $products[] = [
+                        'id' => $result['id'],
+                        'item_code' => $result['item_code'],
+                        'item_name' => $result['item_name'],
+                        'original_price' => $result['original_price'],
+                        'is_discounted' => $result['is_discounted'],
+                        'discounted_price' => $result['discounted_price'],
+                        'on_sale' => $result['on_sale'],
+                        'discount_percent' => $result['discount_percent'],
+                        'image' => $result['image'],
+                    ];
+                } else {
+                    $blogs[] = [
+                        'id' => $result['id'],
+                        'comment_count' => $result['comment_count'],
+                        'image' => $result['image'],
+                        'publish_date' => $result['publish_date'],
+                        'title' => $result['title'],
+                        'type' => $result['type']
+                    ];
+                }
+            }
+
+            return view('frontend.search_results', compact('results', 'blogs', 'products'));
+        }
+
         $carousel_data = DB::table('fumaco_header')->where('fumaco_status', 1)
             ->orderBy('fumaco_active', 'desc')->get();
 
