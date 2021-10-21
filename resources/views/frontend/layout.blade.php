@@ -222,7 +222,7 @@
               </li>
             </ul>
             <form action="/" method="GET">
-            <div class="input-group mb-0 searchbar" style="width: unset !important;">
+            <div class="input-group mb-0 searchbar" style="width: 500px !important;">
               <input type="text" placeholder="Search" name="s" value="{{ request()->s }}" class="form-control searchstyle" aria-label="Text input with dropdown button">
               <select class="custom-select form-control" name="by" style="max-width: 115px !important;">
                 <option value="all" {{ request()->by == 'all' ? 'selected' : '' }}>All</option>

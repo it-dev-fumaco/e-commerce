@@ -22,7 +22,7 @@
 	<div class="container">
 		<div class="row">
 			<div class="col-md-12 mt-4 mb-2">
-				<h5>Search result(s) for: <b>{{ request()->s }}</b></h5>
+				<h5>Search result(s) for: <span style="font-style: italic;"><b>{{ request()->s }}</b></span></h5>
 			</div>
 		</div>
 		@if (count($results) < 1)

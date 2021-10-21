@@ -19,7 +19,7 @@ class FrontendController extends Controller
             $search_str = $request->s;
 
             $results = [];
-            if ($search_by == 'products') {
+            if (in_array($search_by, ['products', 'all', ''])) {
                 $product_list = DB::table('fumaco_items')
                     ->where('f_brand', 'LIKE', "%".$search_str."%")
                     ->orWhere('f_parent_code', 'LIKE', "%".$search_str."%")
@@ -56,7 +56,7 @@ class FrontendController extends Controller
                 }
             }
 
-            if ($search_by == 'blogs') {
+            if (in_array($search_by, ['blogs', 'all', ''])) {
                 $blogs = DB::table('fumaco_blog')->where('blog_enable', 1)
                     ->where(function($q) use ($search_str) {
                         $search_strs = explode(" ", $search_str);
