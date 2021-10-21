@@ -35,7 +35,7 @@ return [
     'drivers' => [
 
         'cwebp' => [
-            'path' => '/usr/share/doc/libwebp-0.3.0',
+            'path' => '/usr/bin/cwebp',
         ],
 
     ],
