@@ -51,7 +51,7 @@
                         <center>
                         <div class="col-lg-7" style="text-align: left;">
                             <br>
-                            <label for="InputUsername" class="login_1" style="padding-bottom:10px;">Username or email address *<br></label>
+                            <label for="InputUsername" class="login_1" style="padding-bottom:10px;">Email address *<br></label>
                             <label for="InputUsername" class="login_1">&nbsp;</label>
                             <br>
 
@@ -142,7 +142,7 @@
     <br>
     <br>
 </main>
- 
+
 <main style="background-color:#ffffff;">
     <br>
     <br>
@@ -169,7 +169,7 @@
 
     /* sign in FORM */
     #logreg-forms{
-  
+
         margin:0vh auto;
         background-color:#ffffff;
         box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
@@ -198,7 +198,7 @@
         border-top-left-radius: 0;
         border-top-right-radius: 0;
     }
-  
+
     #logreg-forms .social-login{
         width:390px;
         margin:0 auto;
@@ -210,7 +210,7 @@
         width:190px;
         font-size: 0.9rem;
     }
-  
+
     #logreg-forms a{
         display: block;
         padding-top:10px;
@@ -219,37 +219,37 @@
         text-transform: none !important;
         color: #000; */
     }
-  
+
     #logreg-form .lines{
         width:200px;
         border:1px solid red;
     }
-  
-  
+
+
     #logreg-forms button[type="submit"]{ margin-top:10px; }
-  
+
     #logreg-forms .facebook-btn{  background-color:#3C589C; }
-  
+
     #logreg-forms .google-btn{ background-color: #DF4B3B; }
-  
+
     #logreg-forms .form-reset, #logreg-forms .form-signup{ display: none; }
-  
+
     #logreg-forms .form-signup .social-btn{ width:210px; }
-  
+
     #logreg-forms .form-signup input { margin-bottom: 2px;}
-  
+
     .form-signup .social-login{
         width:210px !important;
         margin: 0 auto;
     }
-  
+
     /* Mobile */
-  
+
     @media screen and (max-width:500px){
         #logreg-forms{
-  
+
         }
-  
+
         #logreg-forms  .social-login{
             width:200px;
             margin:0 auto;
@@ -261,7 +261,7 @@
             color:white;
             width:200px;
             height: 56px;
-  
+
         }
         #logreg-forms .social-btn:nth-child(1){
             margin-bottom: 5px;
@@ -272,13 +272,13 @@
         #logreg-forms  .facebook-btn:after{
             content:'Facebook';
         }
-  
+
         #logreg-forms  .google-btn:after{
             content:'Google+';
         }
-  
+
     }
-  
+
 </style>
 <style>
 
@@ -298,85 +298,85 @@
       .btmp {
             margin-bottom: 15px !important;
       }
-  
+
       .caption_1 {
         font-weight: 400 !important;
         font-size: 14px !important;
       }
-  
+
       .caption_2 {
         font-weight: 200 !important;
         font-size: 10px !important;
       }
-  
-  
-  
+
+
+
       .order-font {
-  
+
         font-weight: 200 !important;
         font-size: 14px !important;
-  
-  
+
+
         }
-  
-  
+
+
         .order-font-sub {
-  
+
           font-weight: 200 !important;
           font-size: 10px !important;
-  
-  
+
+
           }
-  
-  
-  
+
+
+
           .order-font-sub-b {
-  
+
             font-weight: 300 !important;
             font-size: 14px !important;
-  
-  
+
+
             }
-  
+
             .tbls{
-  
+
               vertical-align: center !important;
-  
+
             }
-  
-  
+
+
             .login_1 {
               font-weight: 400 !important;
               font-size: 12px !important;
             }
-  
-  
+
+
             .login_2 {
               font-weight: 400 !important;
               font-size: 14px !important;
               color: #655f5f !important;
             }
-  
-  
+
+
             .active {
               border-bottom: 3px solid #dc6f12;
             }
-  
-  
+
+
             .forgot-1 {
               font-weight: 200 !important;
               font-size: 13px !important;
               color: #655f5f !important;
             }
-  
-  
+
+
             .status-1{
               font-weight: 200 !important;
               font-size: 16px !important;
               color: red !important;
             }
-  
-  
+
+
       </style>
 <script>
 
@@ -385,13 +385,13 @@
         $('#logreg-forms .form-signin').toggle() // display:block or none
         $('#logreg-forms .form-reset').toggle() // display:block or none
     }
-    
+
     function toggleSignUp(e){
         e.preventDefault();
         $('#logreg-forms .form-signin').toggle(); // display:block or none
         $('#logreg-forms .form-signup').toggle(); // display:block or none
     }
-    
+
     $(()=>{
         // Login Register Form
         $('#logreg-forms #forgot_pswd').click(toggleResetPswd);
@@ -399,7 +399,7 @@
         $('#logreg-forms #btn-signup').click(toggleSignUp);
         $('#logreg-forms #cancel_signup').click(toggleSignUp);
     })
-    
+
     $(document).ready(function() {
         $('#terms_checkbox').click(function() {
             if($(this).prop("checked") == false) {
