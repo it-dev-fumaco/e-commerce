@@ -302,8 +302,12 @@ Is order out for delivery?
 Order has been delivered?
 </div>
 <div class="modal-footer">
-	<a href="" class="btn btn-primary">YES</a>
-
+	<form action="/admin/order/status_update" method="POST">
+		@csrf
+		<input type="text" value="{{ $order['order_no'] }}" name="order_number" hidden readonly/>
+		<input type="text" value="Delivered" name="status" hidden readonly/>
+		<button type="submit" class="btn btn-primary">YES</button>
+	</form>
 <button type="button" class="btn btn-secondary" data-dismiss="cmodal">NO</button>
 </div>
 </div>

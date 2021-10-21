@@ -191,6 +191,16 @@ class OrderController extends Controller
             $now  = Carbon::now()->toDateTimeString();
             $status = $request->status;
 
+            if($status == 'Delivered'){
+                $ordered_items = DB::table('fumaco_order_items')->where('order_number', $request->order_number)->get();
+
+                foreach($ordered_items as $orders){
+                    $items = DB::table('fumaco_items')->select('f_reserved_qty')->where('f_idcode', $orders->item_code)->first();
+                    $qty_left = $items->f_reserved_qty - $orders->item_qty;
+
+                    DB::table('fumaco_items')->where('f_idcode', $orders->item_code)->update(['f_reserved_qty' => $qty_left]);
+                }
+            }
 
             DB::table('fumaco_order')->where('order_number', $request->order_number)->update(['order_status' => $status, 'order_update' => $now]);
 
