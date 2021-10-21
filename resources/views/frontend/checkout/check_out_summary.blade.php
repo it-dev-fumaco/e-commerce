@@ -273,7 +273,7 @@
 				<div class="col-md-4 mx-auto">
 					<div class="card" style="margin-left: 5%;">
 							<div id="payment-form" class="d-none"></div>
-							<button class="btn btn-lg btn-outline-primary" id="checkout-btn" style="float: right;">PROCEED</button>
+							<button class="btn btn-lg btn-outline-primary" id="checkout-btn" style="float: right;" {{ (count($shipping_rates) <= 0) ? 'disabled' : '' }}>PROCEED</button>
 					</div>
 				</div>
 			</div>

@@ -494,12 +494,14 @@ class CheckoutController extends Controller
 
             $output= json_decode($response, true);
             $arr= [];
-            for ($i = 0; $i < count($output['results'][0]['address_components']); $i++) {
-                $address_type = $output['results'][0]['address_components'][$i]['types'][0];
-                if(isset($components[$address_type])){
-                    array_push($arr, $output['results'][0]['address_components'][$i][$components[$address_type]]);
-                }
-            }
+			if ($output['status'] != "ZERO_RESULTS") {
+				for ($i = 0; $i < count($output['results'][0]['address_components']); $i++) {
+					$address_type = $output['results'][0]['address_components'][$i]['types'][0];
+					if(isset($components[$address_type])){
+						array_push($arr, $output['results'][0]['address_components'][$i][$components[$address_type]]);
+					}
+				}
+			}
             
             return $arr;
         }
