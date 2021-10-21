@@ -346,8 +346,8 @@
 
 
             .login_1 {
-              font-weight: 400 !important;
-              font-size: 12px !important;
+              font-weight: 500 !important;
+              font-size: 13px !important;
             }
 
 
@@ -364,7 +364,7 @@
 
 
             .forgot-1 {
-              font-weight: 200 !important;
+              font-weight: 500 !important;
               font-size: 13px !important;
               color: #655f5f !important;
             }

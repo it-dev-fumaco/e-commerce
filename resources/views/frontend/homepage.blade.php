@@ -132,7 +132,7 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
                       </div>
                       <p class="card-text fumacoFont_card_price" style="color:#000000 !important; ">
                         @if ($bs['is_discounted'])
-                        <s style="color: #c5c5c5;">₱ {{ $bs['orig_price'] }}</s>&nbsp;&nbsp; ₱ {{ $bs['new_price'] }}
+                        <s style="color: #c5c5c5;">₱ {{ $bs['orig_price'] }}</s>&nbsp;&nbsp; ₱ {{ $bs['new_price'] }} <span class="badge badge-danger" style="vertical-align: middle;background-color: red;">{{ $bs['discount'] }}% OFF</span>
                         @else
                         ₱ {{ $bs['orig_price'] }}
                         @endif
