@@ -14,7 +14,7 @@ use App\Models\ShippingCondition;
 class CheckoutController extends Controller
 {
 	public function billingForm() {
-		$has_shipping_address = false;
+		$has_shipping_address = true;
 		if (Auth::check()) {
 			$has_shipping_address = DB::table('fumaco_user_add')
 				->where('xdefault', 1)->where('user_idx', Auth::user()->id)
