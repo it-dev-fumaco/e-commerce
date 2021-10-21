@@ -39,7 +39,7 @@ class OrderController extends Controller
                 'bill_contact_person' => $o->order_contactperson,
                 'ship_contact_person' => $o->order_ship_contactperson,
                 'email' => $o->order_email,
-                'date' => Carbon::parse($o->order_update)->format('Y-m-d h:i A'),
+                'date' => Carbon::parse($o->order_update)->format('M d, Y - h:m A'),
                 'ordered_items' => $items_arr,
                 'order_tracker_code' => $o->tracker_code,
                 'cust_id' => $o->order_account,
@@ -183,5 +183,23 @@ class OrderController extends Controller
             ];
         }
         return view('backend.orders.delivered_orders', compact('orders_arr', 'orders'));
+    }
+
+    public function statusUpdate(Request $request){
+        DB::beginTransaction();
+		try{
+            $now  = Carbon::now()->toDateTimeString();
+            $status = $request->status;
+
+
+            DB::table('fumaco_order')->where('order_number', $request->order_number)->update(['order_status' => $status, 'order_update' => $now]);
+
+            DB::table('track_order')->where('track_code', $request->order_number)->update(['track_status' => $status, 'track_date_update' => $now]);
+			DB::commit();
+            return redirect()->back()->with('success', 'Order <b>'.$request->order_number.'</b> status has been updated.');
+		}catch(Exception $e){
+			DB::rollback();
+			return redirect()->back()->with('error', 'An error occured. Please try again.');
+		}	
     }
 }
