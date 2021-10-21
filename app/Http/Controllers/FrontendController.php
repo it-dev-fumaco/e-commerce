@@ -505,7 +505,7 @@ class FrontendController extends Controller
     }
 
     public function viewOrders() {
-        $orders = DB::table('fumaco_order')->where('order_account', Auth::user()->id)->paginate(10);
+        $orders = DB::table('fumaco_order')->where('order_account', Auth::user()->id)->orderBy('id', 'desc')->paginate(10);
 
         $orders_arr = [];
         $items_arr = [];
