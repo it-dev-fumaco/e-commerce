@@ -264,7 +264,7 @@
                            <tbody>
                               @forelse ($related_products as $a => $related_product)
                               @php
-                                 $image_r = ($related_product['image']) ? '/storage/item/images/'. $related_product['item_code'] .'/gallery/preview/'.$related_product['image'] : '/storage/no-photo-available.png';
+                                 $image_r = ($related_product['image']) ? '/storage/item/item_images/'. $related_product['item_code'] .'/gallery/preview/'.$related_product['image'] : '/storage/no-photo-available.png';
                               @endphp
                               <tr>
                                  <td class="text-center align-middle">
@@ -304,7 +304,7 @@
    <div class="modal-dialog modal-xl" style="min-width: 80%;">
       <form action="/admin/product/{{ $details->f_idcode }}/save_related_products" method="POST">
       @csrf
-   
+
      <div class="modal-content">
        <div class="modal-header">
          <h4 class="modal-title">Select Related Product(s)</h4>
