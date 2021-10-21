@@ -9,7 +9,7 @@
     $page_timeout = '200';
     $merchantreturn = url('') . '/cart';
     $merchantapprovalurl =  url('') . '/checkout/success/' . $temp->xtempcode;
-    $merchantunapprovalurl =  url('') . '/checkout/summary_view';
+    $merchantunapprovalurl =  url('') . '/checkout/failed';
     $amount = number_format($grand_total, 2, '.', '' );
     $customer_name = $temp->xfname . ' ' . $temp->xlname;
     $customer_email = $temp->xemail;

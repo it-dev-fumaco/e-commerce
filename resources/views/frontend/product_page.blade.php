@@ -604,9 +604,9 @@
 									<div class="product-rating">
 										<div class="d-flex justify-content-between align-items-center">
 											<div class="btn-group stylecap">
-												<span class="fa fa-star checked starcolor"></span>
-												<span class="fa fa-star checked starcolor"></span>
-												<span class="fa fa-star checked starcolor"></span>
+												<span class="fa fa-star starcolorgrey"></span>
+												<span class="fa fa-star starcolorgrey"></span>
+												<span class="fa fa-star starcolorgrey"></span>
 												<span class="fa fa-star starcolorgrey"></span>
 												<span class="fa fa-star starcolorgrey"></span>
 												<span style="color:#000000 !important; font-weight:200 !important;">&nbsp;&nbsp;( 0 Reviews )</span>
@@ -797,9 +797,9 @@
 															</p>
 														<div class="d-flex justify-content-between align-items-center">
 															<div class="btn-group stylecap">
-															<span class="fa fa-star checked starcolor"></span>
-															<span class="fa fa-star checked starcolor"></span>
-															<span class="fa fa-star checked starcolor"></span>
+															<span class="fa fa-star starcolorgrey"></span>
+															<span class="fa fa-star starcolorgrey"></span>
+															<span class="fa fa-star starcolorgrey"></span>
 															<span class="fa fa-star starcolorgrey"></span>
 															<span class="fa fa-star starcolorgrey"></span>
 															</div>

@@ -707,4 +707,8 @@ class CheckoutController extends Controller
 
 		return $shipping_offer_rates;
 	}
+
+	public function orderFailed() {
+		return view('frontend.checkout.failed');
+	}
 }
