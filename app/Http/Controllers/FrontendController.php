@@ -14,50 +14,41 @@ use Illuminate\Pagination\LengthAwarePaginator;
 class FrontendController extends Controller
 {
     public function index(Request $request) {
-        if ($request->s) {
+        if ($request->has('s')) {
             $search_by = $request->by;
             $search_str = $request->s;
 
-            $results = [];
-            if (in_array($search_by, ['products', 'all', ''])) {
-                $product_list = DB::table('fumaco_items')
-                    ->where('f_brand', 'LIKE', "%".$search_str."%")
-                    ->orWhere('f_parent_code', 'LIKE', "%".$search_str."%")
-                    ->orWhere('f_category', 'LIKE', "%".$search_str."%")
-                    ->orWhere(function($q) use ($search_str) {
-                        $search_strs = explode(" ", $search_str);
-                        foreach ($search_strs as $str) {
-                            $q->where('f_description', 'LIKE', "%".$str."%");
-                        }
-
-                        $q->orWhere('f_idcode', 'LIKE', "%".$search_str."%")
-                            ->orWhere('f_item_classification', 'LIKE', "%".$search_str."%");
-                    })
-                    ->where('f_status', 1)->orderBy('f_date', 'desc')->get();
-
-              
-                foreach($product_list as $item){
-                    $image = DB::table('fumaco_items_image_v1')->where('idcode', $item->f_idcode)->first();
-                    $results[] = [
-                        'id' => $item->id,
-                        'item_code' => $item->f_idcode,
-                        'item_name' => $item->f_name_name,
-                        'original_price' => $item->f_original_price,
-                        'is_discounted' => $item->f_discount_trigger,
-                        'discounted_price' => $item->f_price,
-                        'on_sale' => $item->f_onsale,
-                        'discount_percent' => $item->f_discount_percent,
-                        'image' => ($image) ? $image->imgprimayx : null,
-                        'comment_count' => null,
-                        'publish_date' => null,
-                        'title' => null,
-                        'type' => null
-                    ];
+            $product_list = [];
+            $blogs = [];
+            if ($request->s == null) {
+                if (in_array($search_by, ['products', 'all', ''])) {
+                    $product_list = DB::table('fumaco_items')->where('f_status', 1)->where('f_featured', 1)->get();
                 }
-            }
 
-            if (in_array($search_by, ['blogs', 'all', ''])) {
-                $blogs = DB::table('fumaco_blog')->where('blog_enable', 1)
+                if (in_array($search_by, ['blogs', 'all', ''])) {
+                    $blogs = DB::table('fumaco_blog')->where('blog_featured', 1)
+                        ->where('blog_enable', 1)->get();
+                }
+            } else {
+                if (in_array($search_by, ['products', 'all', ''])) {
+                    $product_list = DB::table('fumaco_items')
+                        ->where('f_brand', 'LIKE', "%".$search_str."%")
+                        ->orWhere('f_parent_code', 'LIKE', "%".$search_str."%")
+                        ->orWhere('f_category', 'LIKE', "%".$search_str."%")
+                        ->orWhere(function($q) use ($search_str) {
+                            $search_strs = explode(" ", $search_str);
+                            foreach ($search_strs as $str) {
+                                $q->where('f_description', 'LIKE', "%".$str."%");
+                            }
+    
+                            $q->orWhere('f_idcode', 'LIKE', "%".$search_str."%")
+                                ->orWhere('f_item_classification', 'LIKE', "%".$search_str."%");
+                        })
+                        ->where('f_status', 1)->orderBy('f_date', 'desc')->get();
+                }
+
+                if (in_array($search_by, ['blogs', 'all', ''])) {
+                    $blogs = DB::table('fumaco_blog')->where('blog_enable', 1)
                     ->where(function($q) use ($search_str) {
                         $search_strs = explode(" ", $search_str);
                         foreach ($search_strs as $str) {
@@ -67,26 +58,48 @@ class FrontendController extends Controller
                         }
                     })
                     ->get();
-                foreach($blogs as $blog){
-                    $blog_comment = DB::table('fumaco_comments')->where('blog_id', $blog->id)->where('blog_status', 1)->count();
-                    $results[] = [
-                        'item_code' => null,
-                        'item_name' => null,
-                        'original_price' => 0,
-                        'is_discounted' => 0,
-                        'discounted_price' => 0,
-                        'on_sale' => 0,
-                        'discount_percent' => 0,
-                        'id' => $blog->id,
-                        'comment_count' => $blog_comment,
-                        'image' => $blog->{'blogprimayimage-journal'},
-                        'publish_date' => $blog->datepublish,
-                        'title' => $blog->blogtitle,
-                        'type' => $blog->blogtype
-                    ];
-                }
+                } 
+            } 
+
+            $results = [];
+            foreach($product_list as $item){
+                $image = DB::table('fumaco_items_image_v1')->where('idcode', $item->f_idcode)->first();
+                $results[] = [
+                    'id' => $item->id,
+                    'item_code' => $item->f_idcode,
+                    'item_name' => $item->f_name_name,
+                    'original_price' => $item->f_original_price,
+                    'is_discounted' => $item->f_discount_trigger,
+                    'discounted_price' => $item->f_price,
+                    'on_sale' => $item->f_onsale,
+                    'discount_percent' => $item->f_discount_percent,
+                    'image' => ($image) ? $image->imgprimayx : null,
+                    'comment_count' => null,
+                    'publish_date' => null,
+                    'title' => null,
+                    'type' => null
+                ];
             }
-           
+
+            foreach($blogs as $blog){
+                $blog_comment = DB::table('fumaco_comments')->where('blog_id', $blog->id)->where('blog_status', 1)->count();
+                $results[] = [
+                    'item_code' => null,
+                    'item_name' => null,
+                    'original_price' => 0,
+                    'is_discounted' => 0,
+                    'discounted_price' => 0,
+                    'on_sale' => 0,
+                    'discount_percent' => 0,
+                    'id' => $blog->id,
+                    'comment_count' => $blog_comment,
+                    'image' => $blog->{'blogprimayimage-journal'},
+                    'publish_date' => $blog->datepublish,
+                    'title' => $blog->blogtitle,
+                    'type' => $blog->blogtype
+                ];
+            }
+
             // Get current page form url e.x. &page=1
             $currentPage = LengthAwarePaginator::resolveCurrentPage();
             // Create a new Laravel collection from the array data
@@ -137,7 +150,7 @@ class FrontendController extends Controller
         $blogs = DB::table('fumaco_blog')->where('blog_featured', 1)
             ->where('blog_enable', 1)->take(3)->get();
         $display = DB::table('fumaco_items')->where('f_status', 1);
-        $best_selling = Clone $display->take(4)->get();
+        $best_selling = Clone $display->where('f_featured', 1)->take(4)->get();
         $on_sale = Clone $display->where('f_onsale', 1)->take(4)->get();
         $best_selling_arr = [];
         $on_sale_arr = [];

@@ -20,18 +20,20 @@
 </main>
 <main style="background-color:#ffffff; min-height: 600px;" class="products-head">
 	<div class="container">
+		@if(request()->s != null)
 		<div class="row">
 			<div class="col-md-12 mt-4 mb-2">
 				<h5>Search result(s) for: <span style="font-style: italic;"><b>{{ request()->s }}</b></span></h5>
 			</div>
 		</div>
+		@endif
 		@if (count($results) < 1)
 			<h4 class="text-center text-muted mt-5 text-uppercase">No search result(s) found</h4>
 		@endif
 		@if(count($products) > 0)
 		<div class="row">
 			<div class="col-12 text-center">
-				<h4 class="mt-4 mb-3 fw-light bestsellinghead fumacoFont1 animated animatedFadeInUp fadeInUp" style="color:#000000 !important;">PRODUCT(S)</h4>
+				<h4 class="mt-4 mb-3 fw-light bestsellinghead fumacoFont1 animated animatedFadeInUp fadeInUp" style="color:#000000 !important;">{{ request()->s == null ? 'FEATURED PRODUCT(S)' : 'PRODUCT(S)' }}</h4>
 			</div>
 			@foreach ($products as $product)
 			<div class="col-md-4 animated animatedFadeInUp fadeInUp">
@@ -54,7 +56,7 @@
 								@if($product['is_discounted'])
 								<s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$product['original_price']), 2) }}</s> ₱ {{ number_format(str_replace(",","",$product['discounted_price']), 2) }} <span class="badge badge-danger" style="vertical-align: middle;background-color: red; display: {{ ($product['on_sale']) ? 'inline' : 'none' }} !important;">{{ $product['discount_percent'] }}% OFF</span>
 								@else
-								₱ {{ number_format(str_replace(",","",$product['discounted_price']), 2) }}
+								₱ {{ number_format(str_replace(",","",$product['original_price']), 2) }}
 								@endif
 							</p>
 							<div class="d-flex justify-content-between align-items-center">
