@@ -386,9 +386,11 @@ class CheckoutController extends Controller
 						$payment_method = $request->PymtMethod;
 						break;
 				}
-
+				
 				DB::table('fumaco_order')->insert([
-					'order_number' => $temp->order_tracker_code,
+					// 'order_number' => $temp->order_tracker_code,
+					'order_number' => $temp->xlogs,
+					'order_account' => $temp->xuser_id, // account number of logged user
 					'order_name' => $temp->xfname,
 					'order_lastname' => $temp->xlname,
 					'order_bill_address1' => $temp->xadd1,
@@ -439,7 +441,8 @@ class CheckoutController extends Controller
 				]);
 			}
 
-			$order_details = DB::table('fumaco_order')->where('order_number', $temp->order_tracker_code)->first();
+			// $order_details = DB::table('fumaco_order')->where('order_number', $temp->order_tracker_code)->first();
+			$order_details = DB::table('fumaco_order')->where('order_number', $temp->xlogs)->first();
 
 			$items = [];
 			foreach($order_items as $row) {
