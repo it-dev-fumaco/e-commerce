@@ -282,6 +282,9 @@
 									@endforelse
 								</tbody>
 							</table>
+							<div class="float-left mt-4">
+								Total Item(s) : <b>{{ $product_list->total() }}</b>
+							</div>
 							<div class="float-right mt-4">
 								{{ $product_list->withQueryString()->links('pagination::bootstrap-4') }}
 							</div>
