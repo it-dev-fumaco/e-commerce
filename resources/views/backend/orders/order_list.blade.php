@@ -124,7 +124,7 @@
 																				<option value="" {{ ($order['status'] == 'Order Placed') ? 'selected' : '' }} disabled>Order Placed</option>
 																				<option value="Order Confirmed" {{ ($order['status'] == 'Order Confirmed') ? 'selected disabled' : '' }}>Order Confirmed</option>
 																				<option value="Out for Delivery" {{ ($order['status'] == 'Out for Delivery') ? 'selected disabled' : '' }}>Out for Delivery</option>
-																				<option value="Delivered Order" {{ ($order['status'] == 'Delivered') ? 'selected disabled' : '' }}>Delivered Order</option>
+																				<option value="Delivered" {{ ($order['status'] == 'Delivered') ? 'selected disabled' : '' }}>Delivered Order</option>
 																				<option value="Cancel Order">Cancel Order</option>
 																			</select>
 																			<input type="text" value="{{ $order['order_no'] }}" name="order_number" hidden readonly/>
