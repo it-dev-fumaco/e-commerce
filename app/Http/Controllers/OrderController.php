@@ -15,7 +15,7 @@ class OrderController extends Controller
         $search_id = ($request->search) ? $request->search : '';
         $order_status = ($request->order_status) ? $request->order_status : '';
 
-        $orders = DB::table('fumaco_order')->where('order_number', 'LIKE', '%'.$search_id.'%')->where('order_status', 'LIKE', '%'.$order_status.'%')->where('order_status', '!=', 'Cancelled')->orderBy('id', 'desc')->paginate(10);
+        $orders = DB::table('fumaco_order')->where('order_number', 'LIKE', '%'.$search_id.'%')->where('order_status', 'LIKE', '%'.$order_status.'%')->where('order_status', '!=', 'Cancelled')->where('order_status', '!=', 'Delivered')->orderBy('id', 'desc')->paginate(10);
 
         $orders_arr = [];
         $items_arr = [];
