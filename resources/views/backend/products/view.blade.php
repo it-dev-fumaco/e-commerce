@@ -123,19 +123,19 @@
                                  <div class="col-md-6">
                                     <div class="form-group">
                                        <label for="weight-uom">Weight UoM</label>
-                                       <input type="text" class="form-control" id="weight-uom" value="{{ $details->f_weight_uom }}" readonly required>
+                                       <input type="text" class="form-control" id="weight-uom" value="{{ $details->f_weight_uom }}" readonly>
                                     </div>
                                  </div>
                                  <div class="col-md-6">
                                     <div class="form-group">
                                        <label for="weight-per-unit">Weight per Unit</label>
-                                       <input type="text" class="form-control" id="weight-per-unit" value="{{ $details->f_weight_per_unit }}" readonly required>
+                                       <input type="text" class="form-control" id="weight-per-unit" value="{{ $details->f_weight_per_unit }}" readonly>
                                     </div>
                                  </div>
                                  <div class="col-md-6">
                                     <div class="form-group">
                                        <label for="package-weight">Package Weight</label>
-                                       <input type="text" class="form-control" id="package-weight" value="{{ $details->f_package_weight }}" readonly required>
+                                       <input type="text" class="form-control" id="package-weight" value="{{ $details->f_package_weight }}" readonly>
                                     </div>
                                  </div>
                               </div>
