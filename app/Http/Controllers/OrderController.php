@@ -191,10 +191,11 @@ class OrderController extends Controller
 		try{
             $now  = Carbon::now()->toDateTimeString();
             $status = $request->status;
+            $delivery_date = "";
 
             if($status == 'Delivered'){
                 $ordered_items = DB::table('fumaco_order_items')->where('order_number', $request->order_number)->get();
-
+                $delivery_date = Carbon::now()->toDateTimeString();
                 foreach($ordered_items as $orders){
                     $items = DB::table('fumaco_items')->select('f_reserved_qty')->where('f_idcode', $orders->item_code)->first();
                     $qty_left = $items->f_reserved_qty - $orders->item_qty;
@@ -216,8 +217,15 @@ class OrderController extends Controller
                 // dd($items);
             }
 
+            $orders_arr = [
+                'order_status' => $status,
+                'order_update' => $now,
+                'date_delivered' => $delivery_date,
+                'date_cancelled' => $date_cancelled
+            ];
 
-            DB::table('fumaco_order')->where('order_number', $request->order_number)->update(['order_status' => $status, 'order_update' => $now]);
+
+            DB::table('fumaco_order')->where('order_number', $request->order_number)->update($orders_arr);
 
             DB::table('track_order')->where('track_code', $request->order_number)->update(['track_status' => $status, 'track_date_update' => $now]);
 			DB::commit();

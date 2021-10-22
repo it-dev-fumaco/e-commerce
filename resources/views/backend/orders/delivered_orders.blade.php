@@ -62,7 +62,7 @@
 											<td>{{ $order['date_delivered'] }}</td>
 											<td>{{ $order['shipping_name'] }}</td>
 											<td>₱ {{ $order['grand_total'] }}</td>
-											<td><span class="badge badge-success">{{ $order['status'] }}</span></td>
+											<td><span class="badge" style=" background-color: #fd6300 !important; color: #fff;">{{ $order['status'] }}</span></td>
 											<td>
 												<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#order-{{ $order['cust_id'] }}">View Orders</button>
 												<div class="modal fade" id="order-{{ $order['cust_id'] }}" role="dialog">
@@ -89,7 +89,7 @@
 																			<strong>Payment ID : </strong> {{ $order['payment_id'] }}<br>
 																			<strong>Payment Method : </strong> {{ $order['payment_method'] }}<br>
 																			<strong>Order Date : </strong> {{ $order['date'] }} <br>
-																			<strong>Status : </strong> <span class="badge badge-success" style="font-size: 1rem;">{{ $order['status'] }}</span>
+																			<strong>Status : </strong> <span class="badge" style="font-size: 1rem; background-color: #fd6300 !important; color: #fff;">{{ $order['status'] }}</span>
 																		</p>
 																	</div>
 																	<div class="col-md-4">
