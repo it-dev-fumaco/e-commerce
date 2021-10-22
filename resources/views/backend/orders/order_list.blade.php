@@ -114,12 +114,13 @@
 															<div class="modal-body">
 																<div class="row {{ ($order['status'] == 'Delivered') ? 'd-none' : '' }}">
 																	<div class="col-md-6"></div>
-																	<div class="col-md-2" style="height: 40px !important;">
+																	{{-- <div class="col-md-2" style="height: 40px !important;">
 																		<h5 style="height: 40px !important; display: table-cell !important; vertical-align: middle !important;">Order Status</h5>
-																	</div>
-																	<div class="col-md-4">
-																		<form class="btn-group" action="/admin/order/status_update" method="POST" style="width: 100%">
+																	</div> --}}
+																	<div class="col-md-6">
+																		<form class="btn-group" action="/admin/order/status_update" method="POST" style="width: 100%; height: 40px !important;">
 																			@csrf
+																			<label class="stat-label" for="status">Order Status</label>
 																			<select name="status" class="form-control col-md-6" name="order_status" required> 
 																				<option value="" {{ ($order['status'] == 'Order Placed') ? 'selected' : '' }} disabled>Order Placed</option>
 																				<option value="Order Confirmed" {{ ($order['status'] == 'Order Confirmed') ? 'selected disabled' : '' }}>Order Confirmed</option>
@@ -128,7 +129,7 @@
 																				<option value="Cancel Order">Cancel Order</option>
 																			</select>
 																			<input type="text" value="{{ $order['order_no'] }}" name="order_number" hidden readonly/>
-																			<button type="submit" class="form-control col-md-3 mx-auto">Update</button>
+																			<button type="submit" class="form-control col-md-3" style="margin-left: 2%">Update</button>
 																		</form>
 																	</div>
 																</div>
@@ -390,6 +391,15 @@ Cancel Order?
 <style>
 .confirm-modal{
 background: rgba(0, 0, 0, .7);
+}
+
+.stat-label {
+	height: 100%;
+	padding: 0 10px;
+	white-space: normal;
+	word-break: break-word;
+	display: flex;
+	align-items: center;
 }
 </style>
 @endsection
