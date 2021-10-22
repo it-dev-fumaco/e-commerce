@@ -554,10 +554,11 @@ class FrontendController extends Controller
             ->where('idcode', $item_code);
         
         $na_check = DB::table('fumaco_categories')->where('name', $product_details->f_category)->first();
+     
+        $attributes = $attrib->orderBy('idx', 'asc')->pluck('a.attribute_value', 'c.attribute_name');
+        $filtered_attributes = $attributes;
         if($na_check->hide_none == 1){
-            $attributes = $attrib->where('a.attribute_value', 'NOT LIKE', '%n/a%')->orderBy('idx', 'asc')->pluck('a.attribute_value', 'c.attribute_name');
-        }else{
-            $attributes = $attrib->orderBy('idx', 'asc')->pluck('a.attribute_value', 'c.attribute_name');
+            $filtered_attributes = $attrib->where('a.attribute_value', 'NOT LIKE', '%n/a%')->orderBy('idx', 'asc')->pluck('a.attribute_value', 'c.attribute_name');
         }
 
         $variant_attr_arr = [];
@@ -566,11 +567,7 @@ class FrontendController extends Controller
                 $values = collect($value)->groupBy('attribute_value')->map(function($d, $i) {
                     return array_unique(array_column($d->toArray(), 'idcode'));
                 });
-
-                if($na_check->hide_none == 1){
-                    $values = Arr::except($values, ['n/a', 'N/A']); 
-                }
-
+                
                 $variant_attr_arr[$attr] = $values;
             }
         }
@@ -598,7 +595,7 @@ class FrontendController extends Controller
             ];
         }
 
-        return view('frontend.product_page', compact('product_details', 'product_images', 'attributes', 'variant_attr_arr', 'related_products'));
+        return view('frontend.product_page', compact('product_details', 'product_images', 'attributes', 'variant_attr_arr', 'related_products', 'filtered_attributes'));
     }
 
     public function viewWishlist() {
@@ -670,8 +667,6 @@ class FrontendController extends Controller
                 'grand_total' => ($order->order_shipping_amount + $order->order_subtotal),
             ];
         }
-
-        // dd($orders);
 
         return view('frontend.orders', compact('orders', 'orders_arr'));
     }
@@ -948,7 +943,8 @@ class FrontendController extends Controller
         $item_code = DB::table('fumaco_items as a')
             ->join('fumaco_items_attributes as b', 'a.f_idcode', 'b.idcode')
             ->join('fumaco_attributes_per_category as c', 'c.id', 'b.attribute_name_id')
-            ->where('c.slug', $selected_cb)->where('b.attribute_value', $attr_collection[$selected_cb])->where('a.f_status', 1)->first();
+            ->where('a.f_parent_code', $request->parent)->where('c.slug', $selected_cb)
+            ->where('b.attribute_value', $attr_collection[$selected_cb])->where('a.f_status', 1)->first();
 
         return ($item_code) ? $item_code->f_idcode : $request->id;
     }

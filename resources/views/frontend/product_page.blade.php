@@ -730,7 +730,7 @@
 										<p class="card-text">
 											<table class="table">
 												<tbody style="border-style: inset !important;">
-													@foreach ($attributes as $attr => $value)
+													@foreach ($filtered_attributes as $attr => $value)
 													<tr>
 														<td>{{ $attr }}</td>
 														<td>{{ $value }}</td>

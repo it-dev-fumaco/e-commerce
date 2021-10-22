@@ -283,11 +283,16 @@ class ProductController extends Controller
                 // get attribute name id
                 $attr_name_id = ($existing_attribute) ? $existing_attribute->id : $attr_id;
 
+                $attribute_value = $attr['attribute_value'];
+                if (strtoupper($attribute_value) == 'n/a') {
+                    $attribute_value = strtoupper($attribute_value);
+                }
+
                 $item_attr[] = [
                     'idx' => $attr['idx'],
                     'idcode' => $attr['parent'],
                     'attribute_name_id' => $attr_name_id,
-                    'attribute_value' => $attr['attribute_value'],
+                    'attribute_value' => $attribute_value,
                 ];
             }
 
