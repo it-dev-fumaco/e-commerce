@@ -10,7 +10,7 @@
 			<div class="container-fluid">
 				<div class="row mb-2">
 					<div class="col-sm-6">
-						<h1>List of Orders</h1>
+						<h1>New Orders</h1>
 					</div>
 					<div class="col-sm-6">
 						<ol class="breadcrumb float-sm-right">
@@ -60,7 +60,6 @@
 												<option value="Order Confirmed" {{ (request()->get('order_status') == "Order Confirmed" ) ? 'selected' : '' }}>Order Confirmed</option>
 												<option value="Ready for Delivery" {{ (request()->get('order_status') == "Ready for Delivery" ) ? 'selected' : '' }}>Ready for Delivery</option>
 												<option value="Out for Delivery" {{ (request()->get('order_status') == "Out for Delivery" ) ? 'selected' : '' }}>Out for Delivery</option>
-												<option value="Delivered" {{ (request()->get('order_status') == "Delivered" ) ? 'selected' : '' }}>Delivered</option>
 											</select>
 										</div>
 										<div class="col-md-4">
@@ -124,7 +123,7 @@
 																				<option value="" {{ ($order['status'] == 'Order Placed') ? 'selected' : '' }} disabled>Order Placed</option>
 																				<option value="Order Confirmed" {{ ($order['status'] == 'Order Confirmed') ? 'selected disabled' : '' }}>Order Confirmed</option>
 																				<option value="Out for Delivery" {{ ($order['status'] == 'Out for Delivery') ? 'selected disabled' : '' }}>Out for Delivery</option>
-																				<option value="Delivered" {{ ($order['status'] == 'Delivered') ? 'selected disabled' : '' }}>Delivered Order</option>
+																				<option value="Delivered">Delivered Order</option>
 																				<option value="Cancelled">Cancel Order</option>
 																			</select>
 																			<input type="text" value="{{ $order['order_no'] }}" name="order_number" hidden readonly/>
