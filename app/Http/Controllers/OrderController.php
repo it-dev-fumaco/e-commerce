@@ -192,6 +192,7 @@ class OrderController extends Controller
             $now  = Carbon::now()->toDateTimeString();
             $status = $request->status;
             $delivery_date = "";
+            $date_cancelled = "";
 
             if($status == 'Delivered'){
                 $ordered_items = DB::table('fumaco_order_items')->where('order_number', $request->order_number)->get();
@@ -206,7 +207,7 @@ class OrderController extends Controller
 
             if($status == 'Cancelled'){
                 $ordered_items = DB::table('fumaco_order_items')->where('order_number', $request->order_number)->get();
-
+                $date_cancelled = Carbon::now()->toDateTimeString();
                 foreach($ordered_items as $orders){
                     $items = DB::table('fumaco_items')->select('f_reserved_qty', 'f_qty')->where('f_idcode', $orders->item_code)->first();
                     $r_qty = $items->f_reserved_qty - $orders->item_qty;
