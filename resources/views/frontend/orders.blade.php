@@ -178,7 +178,7 @@
 							</tr>
 							@empty
 								<tr>
-									<td class="text-center p-3" colspan="4">No transactions found.</td>
+									<td class="text-center p-3" colspan="6">No transactions found.</td>
 								</tr>
 							@endforelse
 						</tbody>
