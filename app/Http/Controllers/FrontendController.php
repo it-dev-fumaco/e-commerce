@@ -660,10 +660,14 @@ class FrontendController extends Controller
 
             $orders_arr[] = [
                 'order_number' => $order->order_number,
-                'date' => date('M d, Y - h:m:s', strtotime($order->order_date)),
+                'date' => date('M d, Y - h:m: A', strtotime($order->order_date)),
                 'status' => $order->order_status,
                 'edd' => $order->estimated_delivery_date,
-                'items' => $items_arr
+                'items' => $items_arr,
+                'subtotal' => $order->order_subtotal,
+                'shipping_name' => $order->order_shipping,
+                'shipping_fee' => $order->order_shipping_amount,
+                'grand_total' => ($order->order_shipping_amount + $order->order_subtotal),
             ];
         }
 

@@ -105,7 +105,20 @@
 							<td>{{ date('M d, Y - h:m:s', strtotime($order->track_date)) }}</td>
 							<td><a href="#TrackItemsData" data-toggle="modal">{{ $order->track_item }}</a></td>
 							<td>{{ $order->track_description }}</td>
-							<td><span class="badge text-dark" style="background-color: #FFC482; font-size: 0.9rem;">{{ $order->track_status }}</span></td>
+							@php
+								if($order->track_status == "Order Placed"){
+									$badge = '#ffc107';
+								}else if($order->track_status == "Cancelled"){
+									$badge = '#6c757d';
+								}else if($order->track_status == "Delivered"){
+									$badge = '#fd6300';
+								}else if($order->track_status == "Out for Delivery"){
+									$badge = '#28a745';
+								}else{
+									$badge = '#007bff';
+								}
+							@endphp
+							<td><span class="badge text-dark" style="background-color: {{ $badge }}; font-size: 0.9rem;">{{ $order->track_status }}</span></td>
 						</tr>
 						@endforeach
 						</tbody>

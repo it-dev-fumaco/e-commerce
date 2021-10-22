@@ -78,6 +78,7 @@
 								<th class="text-center">Order Number</th>
 								<th class="text-center">Date</th>
 								<th class="text-center">Details</th>
+								<th class="text-center">Shipping</th>
 								<th class="text-center">Est. Delivery Date</th>
 								<th class="text-center">Status</th>
 							</tr>
@@ -115,15 +116,13 @@
 																</td>
 																<td>{{ $item['item_name'] }}</td>
 																<td>{{ $item['qty'] }}</td>
-																{{-- <td>{{ $item['discount'] }}</td>
-																<td>₱ {{ number_format($item['orig_price'], 2) }}</td> --}}
 																@php
 																	$orig_price = number_format($item['orig_price'], 2);
 																	$price = number_format($item['price'], 2);
 																@endphp
 																<td>
 																	@if($item['discount'] > 0)
-																		<p><span style="text-decoration: line-through;">₱ {{ $orig_price }}</span> <b>{{ $price }}</b></p>
+																		<p><span style="text-decoration: line-through; font-size: 9pt;">₱ {{ $orig_price }}</span><br/><b>₱ {{ $price }}</b></p>
 																	@else
 																		<p>₱ {{ $price }}</p>
 																	@endif
@@ -131,6 +130,26 @@
 															</tr>
 														@endforeach
 													</table>
+													<div class="row">
+														<div class="col-md-10" style="text-align: right;">
+															<span>Subtotal: </span>
+														</div>
+														<div class="col-md-2" style="text-align: left;">
+															<span>₱ {{ number_format($order['subtotal'], 2) }}</span>
+														</div>
+														<div class="col-md-10" style="text-align: right;">
+															<span>Shipping Fee: </span>
+														</div>
+														<div class="col-md-2" style="text-align: left;">
+															<span>₱ {{ number_format($order['shipping_fee'], 2) }}</span>
+														</div>
+														<div class="col-md-10" style="text-align: right;">
+															<span style="font-weight: 700">Grand Total: </span>
+														</div>
+														<div class="col-md-2" style="text-align: left;">
+															<span style="font-weight: 700">₱ {{ number_format($order['grand_total'], 2) }}</span>
+														</div>
+													</div>
 												</div>
 												<div class="modal-footer">
 													<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -140,6 +159,7 @@
 									</div>
 
 								</td>
+								<td class="text-center align-middle">{{ $order['shipping_name'] }}</td>
 								<td class="text-center align-middle">{{ $order['edd'] }}</td>
 								@php
 									if($order['status'] == "Order Placed"){
@@ -147,12 +167,14 @@
 									}else if($order['status'] == "Cancelled"){
 										$badge = '#6c757d';
 									}else if($order['status'] == "Delivered"){
+										$badge = '#fd6300';
+									}else if($order['status'] == "Out for Delivery"){
 										$badge = '#28a745';
 									}else{
-										$badge = 'primary';
+										$badge = '#007bff';
 									}
 								@endphp
-								<td class="text-center align-middle"><span class="badge text-dark" style="background-color: {{ $badge }}; font-size: 0.9rem;">{{ $order['status'] }}</span></td>
+								<td class="text-center align-middle"><span class="badge text-dark" style="background-color: {{ $badge }}; font-size: 0.9rem; color: #fff;">{{ $order['status'] }}</span></td>
 							</tr>
 							@empty
 								<tr>
@@ -170,4 +192,5 @@
 		</div>
 		<br/>&nbsp;
 	</main>
+
 @endsection
