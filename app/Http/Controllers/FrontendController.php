@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\WelcomeEmail;
 use DB;
 use Auth;
 
@@ -223,8 +225,17 @@ class FrontendController extends Controller
                 'f_temp_passcode' => 'fumaco12345'
             ];
 
-            $insert = DB::table('fumaco_users')->insert($new_user);
+            DB::table('fumaco_users')->insert($new_user);
+
+            Mail::to(trim($request->username))
+                ->queue(new WelcomeEmail(['username' => trim($request->username), 'password' => $request->password]));
+            // check for failures
+            if (Mail::failures()) {
+                return redirect()->back()->with('error', 'There was a problem in user registration. Please try again.');
+            }
+
             DB::commit();
+
             return redirect()->back()->with('success', 'New record created successfully. You can login now!');
         }catch(Exception $e){
             DB::rollback();
@@ -567,7 +578,7 @@ class FrontendController extends Controller
                 $values = collect($value)->groupBy('attribute_value')->map(function($d, $i) {
                     return array_unique(array_column($d->toArray(), 'idcode'));
                 });
-                
+
                 $variant_attr_arr[$attr] = $values;
             }
         }
