@@ -112,8 +112,29 @@
 																<button type="button" class="close" data-dismiss="modal">&times;</button>
 															</div>
 															<div class="modal-body">
+																<div class="row {{ ($order['status'] == 'Delivered') ? 'd-none' : '' }}">
+																	<div class="col-md-6"></div>
+																	<div class="col-md-2" style="height: 40px !important;">
+																		<h5 style="height: 40px !important; display: table-cell !important; vertical-align: middle !important;">Order Status</h5>
+																	</div>
+																	<div class="col-md-4">
+																		<form class="btn-group" action="/admin/order/status_update" method="POST" style="width: 100%">
+																			@csrf
+																			<select name="status" class="form-control col-md-6" name="order_status" required> 
+																				<option value="" {{ ($order['status'] == 'Order Placed') ? 'selected' : '' }} disabled>Order Placed</option>
+																				<option value="Order Confirmed" {{ ($order['status'] == 'Order Confirmed') ? 'selected disabled' : '' }}>Order Confirmed</option>
+																				<option value="Out for Delivery" {{ ($order['status'] == 'Out for Delivery') ? 'selected disabled' : '' }}>Out for Delivery</option>
+																				<option value="Delivered Order" {{ ($order['status'] == 'Delivered') ? 'selected disabled' : '' }}>Delivered Order</option>
+																				<option value="Cancel Order">Cancel Order</option>
+																			</select>
+																			<input type="text" value="{{ $order['order_no'] }}" name="order_number" hidden readonly/>
+																			<button type="submit" class="form-control col-md-3 mx-auto">Update</button>
+																		</form>
+																	</div>
+																</div>
+																<br/>
 																<div class="row">
-																	<div class="col-md-8">
+																	<div class="col-md-8"> 
 																		<p><strong>Customer Name : </strong> {{ $order['first_name'] . " " . $order['last_name'] }}</p>
 																	</div>
 																	<div class="col-md-4">
@@ -192,13 +213,13 @@
 </div>
 
 
-<div class="modal-footer {{ ($order['status'] == 'Delivered') ? 'd-none' : '' }}">
+<div class="modal-footer">
 
 <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#tracker-{{ $order['order_no'] }}">
 Add Tracker Code
 </button>
 
-<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#order_confirmed-{{ $order['order_no'] }}">
+{{-- <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#order_confirmed-{{ $order['order_no'] }}">
 	Order Confirmed
 </button>
 
@@ -212,7 +233,7 @@ Delivered Order
 
 <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#cancel-{{ $order['order_no'] }}" >
 Cancel Order
-</button>
+</button> --}}
 
 <div class="modal fade confirm-modal" id="tracker-{{ $order['order_no'] }}" tabindex="-1" role="dialog" aria-labelledby="tracker-{{ $order['order_no'] }}" aria-hidden="true">
 <div class="modal-dialog" role="document">
@@ -239,7 +260,7 @@ Cancel Order
 </div>
 </div>
 
-<div class="modal fade confirm-modal" id="order_confirmed-{{ $order['order_no'] }}" tabindex="-1" role="dialog" aria-labelledby="order_confirmed-{{ $order['order_no'] }}" aria-hidden="true">
+{{-- <div class="modal fade confirm-modal" id="order_confirmed-{{ $order['order_no'] }}" tabindex="-1" role="dialog" aria-labelledby="order_confirmed-{{ $order['order_no'] }}" aria-hidden="true">
 <div class="modal-dialog" role="document">
 <div class="modal-content">
 <div class="modal-header">
@@ -262,9 +283,9 @@ Order confirmed?
 </div>
 </div>
 </div>
-</div>
+</div> --}}
 
-<div class="modal fade confirm-modal" id="for_delivery-{{ $order['order_no'] }}" tabindex="-1" role="dialog" aria-labelledby="for_delivery-{{ $order['order_no'] }}" aria-hidden="true">
+{{-- <div class="modal fade confirm-modal" id="for_delivery-{{ $order['order_no'] }}" tabindex="-1" role="dialog" aria-labelledby="for_delivery-{{ $order['order_no'] }}" aria-hidden="true">
 <div class="modal-dialog" role="document">
 <div class="modal-content">
 <div class="modal-header">
@@ -287,9 +308,9 @@ Is order out for delivery?
 </div>
 </div>
 </div>
-</div>
+</div> --}}
 
-<div class="modal fade confirm-modal" id="delivered-{{ $order['order_no'] }}" tabindex="-1" role="dialog" aria-labelledby="delivered-{{ $order['order_no'] }}" aria-hidden="true">
+{{-- <div class="modal fade confirm-modal" id="delivered-{{ $order['order_no'] }}" tabindex="-1" role="dialog" aria-labelledby="delivered-{{ $order['order_no'] }}" aria-hidden="true">
 <div class="modal-dialog" role="document">
 <div class="modal-content">
 <div class="modal-header">
@@ -312,9 +333,9 @@ Order has been delivered?
 </div>
 </div>
 </div>
-</div>
+</div> --}}
 
-<div class="modal fade confirm-modal" id="cancel-{{ $order['order_no'] }}" tabindex="-1" role="dialog" aria-labelledby="cancel-{{ $order['order_no'] }}" aria-hidden="true">
+{{-- <div class="modal fade confirm-modal" id="cancel-{{ $order['order_no'] }}" tabindex="-1" role="dialog" aria-labelledby="cancel-{{ $order['order_no'] }}" aria-hidden="true">
 <div class="modal-dialog" role="document">
 <div class="modal-content">
 <div class="modal-header">
@@ -337,7 +358,7 @@ Cancel Order?
 </div>
 </div>
 </div>
-</div>
+</div> --}}
 
 </div>
 </div>
