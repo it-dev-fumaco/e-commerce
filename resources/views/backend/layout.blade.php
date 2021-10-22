@@ -399,15 +399,15 @@
               </li>
             </ul>
           </li>
-          <li class="nav-item {{ (in_array($activePage, $settings_pages) ? 'menu-open' : '') }}">
-            <a href="#" class="nav-link {{ (in_array($activePage, $settings_pages) ? 'active' : '') }}">
+          <li class="nav-item {{ (in_array($activePage, ['email_setup']) ? 'menu-open' : '') }}">
+            <a href="#" class="nav-link {{ (in_array($activePage, ['email_setup']) ? 'active' : '') }}">
               <i class="nav-icon fas fa-cogs"></i>
 
               <p>Email Settings <i class="fas fa-angle-left right"></i></p>
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href=" " class="nav-link {{ $activePage == 'payment_api_setup' ? 'active' : '' }}">
+                <a href="/admin/email_setup" class="nav-link {{ $activePage == 'email_setup' ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Email Setup</p>
                 </a>

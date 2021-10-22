@@ -116,6 +116,9 @@ Route::prefix('admin')->group(function () {
         Route::get('/api_setup/payment', 'SettingsController@paymentApiSetup');
         Route::post('/api_setup/save', 'SettingsController@saveApiCredentials');
 
+        Route::get('/email_setup', 'SettingsController@emailSetup');
+        Route::post('/email_setup/save', 'SettingsController@saveEmailSetup');
+
         Route::get('/product/settings', 'ProductController@viewCategoryAttr');
         Route::post('/attribute_status/{cat_id}/update', 'ProductController@updateCategoryAttr');
         

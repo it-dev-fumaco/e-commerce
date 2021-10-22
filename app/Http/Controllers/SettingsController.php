@@ -59,4 +59,56 @@ class SettingsController extends Controller
         }
     }
 
+    public function emailSetup() {
+        $details = [];
+        $email_config = DB::table('email_config')->first();
+        if($email_config) {
+            $details = $email_config;
+        }
+        
+        return view('backend.settings.email_setup', compact('details'));
+    }
+
+    public function saveEmailSetup(Request $request) {
+        DB::beginTransaction();
+        try {
+            $request->validate([
+                'driver' => 'required',
+                'host' => 'required',
+                'port' => 'required|integer',
+                'encryption' => 'required',
+                'username' => 'required',
+                'password' => 'required',
+                'address' => 'required',
+                'name' => 'required',
+            ]);
+
+            $data = [
+                'driver' => $request->driver,
+                'host' => $request->host,
+                'port' => $request->port,
+                'encryption' => $request->encryption,
+                'username' => $request->username,
+                'password' => $request->password,
+                'address' => $request->address,
+                'name' => $request->name,
+            ];
+
+            $email_config = DB::table('email_config')->first();
+            if($email_config) {
+                DB::table('email_config')->where('id', $email_config->id)
+                    ->update($data);
+            } else {
+                DB::table('email_config')->insert($data);
+            }
+
+            DB::commit();
+
+            return redirect()->back()->with('success', 'Email Configuration has been saved.');
+        } catch (Exception $e) {
+            DB::rollback();
+
+            return redirect()->back()->with('error', 'An error occured. Please try again.');
+        }
+    }
 }

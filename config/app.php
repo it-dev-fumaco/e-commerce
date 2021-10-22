@@ -176,6 +176,7 @@ return [
         App\Providers\RouteServiceProvider::class,
         GoogleMaps\ServiceProvider\GoogleMapsServiceProvider::class,
         Buglinjo\LaravelWebp\WebpServiceProvider::class,
+        App\Providers\MailConfigServiceProvider::class,
     ],
 
     /*
