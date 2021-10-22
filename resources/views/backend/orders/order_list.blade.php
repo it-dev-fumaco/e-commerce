@@ -93,15 +93,17 @@
 											@php
 												if($order['status'] == 'Order Placed'){
 													$badge = 'warning';
-												}else if($order['status'] == 'Delivered'){
+												}else if($order['status'] == 'Out for Delivery'){
 													$badge = 'success';
 												}else if($order['status'] == 'Cancelled'){
-													$badge = 'danger';
-												}else{
+													$badge = 'secondary';
+												}else if($order['status'] == 'Order Confirmed'){
 													$badge = 'primary';
+												}else{
+													$badge = "";
 												}
 											@endphp
-											<td><span class="badge badge-{{ $badge }}" style="font-size: 11pt">{{ $order['status'] }}</span></td>
+											<td><span class="badge badge-{{ $badge }}" style="font-size: 11pt; {{ ($order['status'] == 'Delivered') ? "background-color: #fd6300 !important; color: #fff;" : '' }}">{{ $order['status'] }}</span></td>
 											<td>
 												<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#order-{{ $order['order_no']}}">View Orders</button>
 												<div class="modal fade" id="order-{{ $order['order_no'] }}" role="dialog">
@@ -114,9 +116,6 @@
 															<div class="modal-body">
 																<div class="row {{ ($order['status'] == 'Delivered') ? 'd-none' : '' }}">
 																	<div class="col-md-6"></div>
-																	{{-- <div class="col-md-2" style="height: 40px !important;">
-																		<h5 style="height: 40px !important; display: table-cell !important; vertical-align: middle !important;">Order Status</h5>
-																	</div> --}}
 																	<div class="col-md-6">
 																		<form class="btn-group" action="/admin/order/status_update" method="POST" style="width: 100%; height: 40px !important;">
 																			@csrf
@@ -220,22 +219,6 @@
 Add Tracker Code
 </button>
 
-{{-- <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#order_confirmed-{{ $order['order_no'] }}">
-	Order Confirmed
-</button>
-
-<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#for_delivery-{{ $order['order_no'] }}">
-	Out for Delivery
-</button>
-
-<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#delivered-{{ $order['order_no'] }}">
-Delivered Order
-</button>
-
-<button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#cancel-{{ $order['order_no'] }}" >
-Cancel Order
-</button> --}}
-
 <div class="modal fade confirm-modal" id="tracker-{{ $order['order_no'] }}" tabindex="-1" role="dialog" aria-labelledby="tracker-{{ $order['order_no'] }}" aria-hidden="true">
 <div class="modal-dialog" role="document">
 <div class="modal-content">
@@ -260,106 +243,6 @@ Cancel Order
 </div>
 </div>
 </div>
-
-{{-- <div class="modal fade confirm-modal" id="order_confirmed-{{ $order['order_no'] }}" tabindex="-1" role="dialog" aria-labelledby="order_confirmed-{{ $order['order_no'] }}" aria-hidden="true">
-<div class="modal-dialog" role="document">
-<div class="modal-content">
-<div class="modal-header">
-<h5 class="modal-title">Order Confirmed</h5>
-<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-<span aria-hidden="true">&times;</span>
-</button>
-</div>
-<div class="modal-body">
-Order confirmed?
-</div>
-<div class="modal-footer">
-	<form action="/admin/order/status_update" method="POST">
-		@csrf
-		<input type="text" value="{{ $order['order_no'] }}" name="order_number" hidden readonly/>
-		<input type="text" value="Order Confirmed" name="status" hidden readonly/>
-		<button type="submit" class="btn btn-primary">YES</button>
-	</form>
-<button type="button" class="btn btn-secondary" data-dismiss="cmodal">NO</button>
-</div>
-</div>
-</div>
-</div> --}}
-
-{{-- <div class="modal fade confirm-modal" id="for_delivery-{{ $order['order_no'] }}" tabindex="-1" role="dialog" aria-labelledby="for_delivery-{{ $order['order_no'] }}" aria-hidden="true">
-<div class="modal-dialog" role="document">
-<div class="modal-content">
-<div class="modal-header">
-<h5 class="modal-title">Out for Delivery</h5>
-<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-<span aria-hidden="true">&times;</span>
-</button>
-</div>
-<div class="modal-body">
-Is order out for delivery?
-</div>
-<div class="modal-footer">
-	<form action="/admin/order/status_update" method="POST">
-		@csrf
-		<input type="text" value="{{ $order['order_no'] }}" name="order_number" hidden readonly/>
-		<input type="text" value="Out for Delivery" name="status" hidden readonly/>
-		<button type="submit" class="btn btn-primary">YES</button>
-	</form>
-<button type="button" class="btn btn-secondary" data-dismiss="cmodal">NO</button>
-</div>
-</div>
-</div>
-</div> --}}
-
-{{-- <div class="modal fade confirm-modal" id="delivered-{{ $order['order_no'] }}" tabindex="-1" role="dialog" aria-labelledby="delivered-{{ $order['order_no'] }}" aria-hidden="true">
-<div class="modal-dialog" role="document">
-<div class="modal-content">
-<div class="modal-header">
-<h5 class="modal-title">Order Delivered</h5>
-<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-<span aria-hidden="true">&times;</span>
-</button>
-</div>
-<div class="modal-body">
-Order has been delivered?
-</div>
-<div class="modal-footer">
-	<form action="/admin/order/status_update" method="POST">
-		@csrf
-		<input type="text" value="{{ $order['order_no'] }}" name="order_number" hidden readonly/>
-		<input type="text" value="Delivered" name="status" hidden readonly/>
-		<button type="submit" class="btn btn-primary">YES</button>
-	</form>
-<button type="button" class="btn btn-secondary" data-dismiss="cmodal">NO</button>
-</div>
-</div>
-</div>
-</div> --}}
-
-{{-- <div class="modal fade confirm-modal" id="cancel-{{ $order['order_no'] }}" tabindex="-1" role="dialog" aria-labelledby="cancel-{{ $order['order_no'] }}" aria-hidden="true">
-<div class="modal-dialog" role="document">
-<div class="modal-content">
-<div class="modal-header">
-<h5 class="modal-title">Order Cancel</h5>
-<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-<span aria-hidden="true">&times;</span>
-</button>
-</div>
-<div class="modal-body">
-Cancel Order?
-</div>
-<div class="modal-footer">
-	<form action="/admin/order/status_update" method="POST">
-		@csrf
-		<input type="text" value="{{ $order['order_no'] }}" name="order_number" hidden readonly/>
-		<input type="text" value="Cancelled" name="status" hidden readonly/>
-		<button type="submit" class="btn btn-primary">YES</button>
-	</form>
-<button type="button" class="btn btn-secondary" data-dismiss="cmodal">NO</button>
-</div>
-</div>
-</div>
-</div> --}}
 
 </div>
 </div>

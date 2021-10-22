@@ -91,7 +91,7 @@
 																			<strong>Payment ID : </strong> {{ $order['payment_id'] }}<br>
 																			<strong>Payment Method : </strong> {{ $order['payment_method'] }}<br>
 																			<strong>Order Date : </strong> {{ $order['date'] }} <br>
-																			<strong>Status : </strong> <span class="badge badge-danger" style="font-size: 1rem;">{{ $order['status'] }}</span>
+																			<strong>Status : </strong> <span class="badge badge-secondary" style="font-size: 1rem;">{{ $order['status'] }}</span>
 																		</p>
 																	</div>
 																	<div class="col-md-4">
