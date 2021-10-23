@@ -119,7 +119,7 @@
                       <div class="col-md-6">
                         <div class="form-group">
                           <label for="package-weight">* Package Weight</label>
-                          <input type="text" class="form-control" id="package-weight" name="package_weight" value="{{ old('package_weight') }}" readonly>
+                          <input type="text" class="form-control" id="package-weight" name="package_weight" value="{{ old('package_weight') }}">
                         </div>
                       </div>
                     </div>
