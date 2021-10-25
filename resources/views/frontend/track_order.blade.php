@@ -90,22 +90,19 @@
 					</div>
 				</div>
 
-				<div class="col-lg-12" style="padding-left: 15%; padding-right: 15%;">
+				<div class="col-lg-10 mx-auto">
 					<table class="table">
 						<thead>
 							<tr>
 								<th>Date</th>
 								<th>Details</th>
-								<th>Description</th>
-								<th>Status</th>
+								<th class="d-none d-sm-table-cell">Description</th>
+								<th class="d-none d-sm-table-cell">Status</th>
 							</tr>
 						</thead>
 						<tbody>
 						@foreach ($track_order_details as $order)
 						<tr>
-							<td>{{ date('M d, Y - h:m: A', strtotime($order->track_date)) }}</td>
-							<td><a href="#TrackItemsData" data-toggle="modal">{{ $order->track_item }}</a></td>
-							<td>{{ $order->track_description }}</td>
 							@php
 								if($order->track_status == "Order Placed"){
 									$badge = '#ffc107';
@@ -119,7 +116,13 @@
 									$badge = '#007bff';
 								}
 							@endphp
-							<td><span class="badge" style="background-color: {{ $badge }}; font-size: 0.9rem;">{{ $order->track_status }}</span></td>
+							<td>{{ date('M d, Y - h:m: A', strtotime($order->track_date)) }}</td>
+							<td><a href="#TrackItemsData" data-toggle="modal">{{ $order->track_item }}</a>
+								<br/><span class="d-lg-none d-xl-none">{{ $order->track_description }}</span>
+								<br/><span class="badge d-lg-none d-xl-none" style="background-color: {{ $badge }}; font-size: 0.9rem;">{{ $order->track_status }}</span>
+							</td>
+							<td class="d-none d-sm-table-cell">{{ $order->track_description }}</td>
+							<td class="d-none d-sm-table-cell"><span class="badge" style="background-color: {{ $badge }}; font-size: 0.9rem;">{{ $order->track_status }}</span></td>
 						</tr>
 						@endforeach
 						</tbody>
