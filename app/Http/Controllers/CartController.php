@@ -27,25 +27,25 @@ class CartController extends Controller
             if (!session()->get('fumOrderNo')) {
                 session()->put('fumOrderNo', $order_no);
             }
+
+            $product_details = DB::table('fumaco_items')->where('f_idcode', $data['item_code'])->first();
+            if (!$product_details) {
+                return redirect()->back()->with('error', 'Product not found.');
+            }
+            $cart = [
+                $data['item_code'] => [
+                    "item_code" => $product_details->f_idcode,
+                    "quantity" => $data['quantity'],
+                    "price" => ($product_details->f_price > 0) ? $product_details->f_price : $product_details->f_original_price,
+                ]
+            ];
+ 
+            session()->put('fumCart', $cart);
             
             if(Auth::check()){
 				$user_id = DB::table('fumaco_users')->where('username', Auth::user()->username)->first();
                 $bill_address = DB::table('fumaco_user_add')->where('xdefault', 1)->where('user_idx', $user_id->id)->where('address_class', 'Billing')->count();
 				$ship_address = DB::table('fumaco_user_add')->where('xdefault', 1)->where('user_idx', $user_id->id)->where('address_class', 'Delivery')->count();
-
-                $product_details = DB::table('fumaco_items')->where('f_idcode', $data['item_code'])->first();
-                if (!$product_details) {
-                    return redirect()->back()->with('error', 'Product not found.');
-                }
-                $cart = [
-                    $data['item_code'] => [
-                        "item_code" => $product_details->f_idcode,
-                        "quantity" => $data['quantity'],
-                        "price" => ($product_details->f_price > 0) ? $product_details->f_price : $product_details->f_original_price,
-                    ]
-                ];
-     
-                session()->put('fumCart', $cart);
 
                 if($bill_address > 0 and $ship_address > 0){
                    
@@ -60,6 +60,7 @@ class CartController extends Controller
 
                 return redirect($action);
             }
+
             return redirect('/checkout/billing');
         }
 

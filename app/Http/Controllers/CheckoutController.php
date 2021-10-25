@@ -7,6 +7,9 @@ use Carbon\Carbon;
 use Auth;
 use DB;
 
+use Illuminate\Support\Facades\Mail;
+use App\Mail\OrderSuccess;
+
 use App\Models\ShippingService;
 use App\Models\ShippingZoneRate;
 use App\Models\ShippingCondition;
@@ -441,7 +444,6 @@ class CheckoutController extends Controller
 				]);
 			}
 
-			// $order_details = DB::table('fumaco_order')->where('order_number', $temp->order_tracker_code)->first();
 			$order_details = DB::table('fumaco_order')->where('order_number', $temp->xlogs)->first();
 
 			$items = [];
@@ -473,6 +475,14 @@ class CheckoutController extends Controller
 			session()->forget('fumCart');
 			
 			DB::commit();
+
+			$order = [
+				'order_details' => $order_details,
+				'items' => $items
+			];
+
+			Mail::to(trim($order_details->order_email))
+				->queue(new OrderSuccess($order));
 
 			return view('frontend.checkout.success', compact('order_details', 'items'));
 		} catch (Exception $e) {
