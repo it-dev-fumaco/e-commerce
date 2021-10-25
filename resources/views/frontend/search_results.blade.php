@@ -4,6 +4,29 @@
 ])
 
 @section('content')
+<style>
+    .text {
+      position: relative;
+      font-size: 14px;
+      width: 100%;
+    }
+
+    .text-concat {
+      position: relative;
+      display: inline-block;
+      word-wrap: break-word;
+      overflow: hidden;
+      max-height: 4.8em;
+      line-height: 1.2em;
+      text-align:justify;
+    }
+
+    .text.ellipsis::after {
+      position: absolute;
+      right: -12px; 
+      bottom: 4px;
+    }
+</style>
 <main style="background-color:#0062A5;">
 	<div id="myCarousel" class="carousel slide" data-bs-ride="carousel">
 		<div class="carousel-inner">
