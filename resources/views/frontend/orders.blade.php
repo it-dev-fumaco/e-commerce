@@ -174,7 +174,7 @@
 										$badge = '#007bff';
 									}
 								@endphp
-								<td class="text-center align-middle"><span class="badge text-dark" style="background-color: {{ $badge }}; font-size: 0.9rem; color: #fff;">{{ $order['status'] }}</span></td>
+								<td class="text-center align-middle"><span class="badge text-dark" style="background-color: {{ $badge }}; font-size: 0.9rem; color: #fff !important;">{{ $order['status'] }}</span></td>
 							</tr>
 							@empty
 								<tr>
