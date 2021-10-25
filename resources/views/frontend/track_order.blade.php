@@ -69,7 +69,7 @@
 					<br>
 					<center>
 						<form action="/track_order" class="form-inline p-0" method="GET">
-							<div class="form-group col-md-10 d-inline-block m-2">
+							<div class="form-group col-md-8 d-inline-block m-2">
 								<label class="sr-only" for="email">Code:</label>
 								<input type="text" class="form-control m-1" id="text" placeholder="Enter Code"  name="id" value="{{ request()->get('id') }}" required style="width: 100%;">
 							</div>
