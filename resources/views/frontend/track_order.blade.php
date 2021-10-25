@@ -61,7 +61,7 @@
 	<main style="background-color:#ffffff; min-height: 550px;" class="products-head">
 		<div class="container-fluid">
 			<div class="row">
-				<div class="col-lg-8 offset-lg-2" style="padding-left: 15%; padding-right: 15%;">
+				<div class="col-lg-8 offset-lg-2 mx-auto" >
 					<br><br>
 					<center><h3>Order Tracking</h3></center>
 					<br>
@@ -69,10 +69,11 @@
 					<br>
 					<center>
 						<form action="/track_order" class="form-inline p-0" method="GET">
-							<div class="form-group d-inline-block m-2">
+							<div class="form-group col-md-10 d-inline-block m-2">
 								<label class="sr-only" for="email">Code:</label>
-								<input type="text" class="form-control m-1" id="text" placeholder="Enter Code"  name="id" value="{{ request()->get('id') }}" required style="width: 500px;">
+								<input type="text" class="form-control m-1" id="text" placeholder="Enter Code"  name="id" value="{{ request()->get('id') }}" required style="width: 100%;">
 							</div>
+							<br/>
 							<div class="form-group d-inline-block p-0" style="padding: 0; margin: 0">
 								<input type="submit" class="btn btn-success" value="Search" style="color: #fff; background-color: #1a6ea9 !important; border-color: #1a6ea9 !important; border-radius: 0rem; margin: 0;">
 
@@ -118,7 +119,7 @@
 									$badge = '#007bff';
 								}
 							@endphp
-							<td><span class="badge text-dark" style="background-color: {{ $badge }}; font-size: 0.9rem;">{{ $order->track_status }}</span></td>
+							<td><span class="badge" style="background-color: {{ $badge }}; font-size: 0.9rem;">{{ $order->track_status }}</span></td>
 						</tr>
 						@endforeach
 						</tbody>
