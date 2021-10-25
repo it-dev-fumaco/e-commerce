@@ -41,10 +41,12 @@
           font-family: 'Montserrat', sans-serif !important; font-weight:200 !important; font-size: 16px !important;
       }
       .fumacoFont_card_title {
-          font-family: 'Montserrat', sans-serif !important; font-weight:600 !important; font-size: 16px !important;
+          /* font-family: 'Montserrat', sans-serif !important; font-weight:600 !important; font-size: 16px !important; */
+          font-family: 'poppins', sans-serif !important; font-weight:600 !important; font-size: 16px !important;
       }
       .fumacoFont_card_caption {
-          font-family: 'Roboto', sans-serif !important; font-weight:200 !important; font-size: 16px !important;
+          /* font-family: 'Roboto', sans-serif !important; font-weight:200 !important; font-size: 16px !important; */
+          font-family: 'poppins', sans-serif !important; font-weight:300 !important; font-size: 16px !important;
       }
       .fumacoFont_card_readmore {
           font-family: 'Montserrat', sans-serif !important; font-weight:200 !important; font-size: 16px !important; text-decoration: none !important;
@@ -209,6 +211,13 @@
           <a class="navbar-brand" href="/" id="navbar-brand">
             <img src="{{ asset('/assets/site-img/logo-sm.png') }}" alt="">
           </a>
+          {{-- Cart Icon --}}
+          <a class="d-md-none d-lg-none d-xl-none" href="/cart" style="margin-left: 70px !important;">
+            <div class="" style="width: 50px !important; padding: 0 !important;">
+              <i class="fa" style="font-size:24px; color:#126cb6;">&#xf07a;</i><span class="badge badge-warning count-cart-items" id="lblCartCount" style="font-size: 12px; background: #ff0000; color: #fff; padding: 4px 7px; vertical-align: top; margin-left: -10px;display: unset !important; font-weight: 500 !important; border-radius: 1rem !important; margin-top: -15px;">0</span>
+            </div>
+          </a>
+          {{-- Cart Icon --}}
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
@@ -229,20 +238,20 @@
                 <a class="nav-link" href="/contact">CONTACTS</a>
               </li>
             </ul>
-            <form action="/" method="GET">
-            <div class="input-group mb-0 searchbar" style="width: 500px !important;">
-              <input type="text" placeholder="Search" name="s" value="{{ request()->s }}" class="form-control searchstyle" aria-label="Text input with dropdown button">
-              <select class="custom-select form-control" name="by" style="max-width: 115px !important;">
-                <option value="all" {{ request()->by == 'all' ? 'selected' : '' }}>All</option>
-                <option value="products" {{ request()->by == 'products' ? 'selected' : '' }}>Products</option>
-                <option value="blogs" {{ request()->by == 'blogs' ? 'selected' : '' }}>Blogs</option>
-              </select>
-                <button class="btn btn-outline-secondary searchstyle" type="submit"><i class="fas fa-search"></i></button>
-            </div>
-          </form>
+            <form class="d-none d-xl-block" action="/" method="GET">
+              <div class="input-group mb-0 searchbar" style="width: 400px !important;">
+                <input type="text" placeholder="Search" name="s" value="{{ request()->s }}" class="form-control searchstyle" aria-label="Text input with dropdown button">
+                <select class="custom-select form-control" name="by" style="max-width: 115px !important;">
+                  <option value="all" {{ request()->by == 'all' ? 'selected' : '' }}>All</option>
+                  <option value="products" {{ request()->by == 'products' ? 'selected' : '' }}>Products</option>
+                  <option value="blogs" {{ request()->by == 'blogs' ? 'selected' : '' }}>Blogs</option>
+                </select>
+                  <button class="btn btn-outline-secondary searchstyle" type="submit"><i class="fas fa-search"></i></button>
+              </div>
+            </form>
             <ul class="navbar-nav">
               <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle navbar-header" href="#" id="navbarDarkDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">Welcome, {{ (Auth::check()) ? Auth::user()->f_name : 'Guest' }} <i class="fa" style="font-size:24px; color:#126cb6;">&#xf07a;</i><span class="badge badge-warning count-cart-items" id="lblCartCount" style="font-size: 12px; background: #ff0000; color: #fff; padding: 4px 7px; vertical-align: top; margin-left: -10px;display: unset !important; font-weight: 500 !important; border-radius: 1rem !important;">0</span></a>
+                <a class="nav-link dropdown-toggle navbar-header" href="#" id="navbarDarkDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">Welcome, {{ (Auth::check()) ? Auth::user()->f_name : 'Guest' }}</a>
                 <ul class="dropdown-menu dropdown-menu-light navbar-header" aria-labelledby="navbarDarkDropdownMenuLink" style="right: 14px !important; left: auto !important;">
                   <li>
                     <a class="dropdown-item" style="font-weight: 300 !important;" href="/cart">
@@ -285,9 +294,35 @@
                 </ul>
               </li>
             </ul>
+            
           </div>
+          {{-- Cart Icon --}}
+          <a class="d-none d-lg-block d-xl-block" href="/cart">
+            <div class="" style="width: 50px !important; padding: 0 !important; margin-right: -20px !important">
+              <i class="fa" style="font-size:24px; color:#126cb6;">&#xf07a;</i><span class="badge badge-warning count-cart-items" id="lblCartCount" style="font-size: 12px; background: #ff0000; color: #fff; padding: 4px 7px; vertical-align: top; margin-left: -10px;display: unset !important; font-weight: 500 !important; border-radius: 1rem !important; margin-top: -15px;">0</span>
+            </div>
+          </a>
+          {{-- Cart Icon --}}
+          <div class="d-lg-block d-xl-none">
+            <div class="col-md-12">
+              <form action="/" method="GET">
+                <div class="input-group mb-0 searchbar" style="width: 100% !important;">
+                  <input type="text" placeholder="Search" name="s" value="{{ request()->s }}" class="form-control searchstyle" aria-label="Text input with dropdown button">
+                  <select class="custom-select form-control" name="by" style="max-width: 115px !important;">
+                    <option value="all" {{ request()->by == 'all' ? 'selected' : '' }}>All</option>
+                    <option value="products" {{ request()->by == 'products' ? 'selected' : '' }}>Products</option>
+                    <option value="blogs" {{ request()->by == 'blogs' ? 'selected' : '' }}>Blogs</option>
+                  </select>
+                    <button class="btn btn-outline-secondary searchstyle" type="submit"><i class="fas fa-search"></i></button>
+                </div>
+              </form><br/>
+            </div>
+          </div>
+          
         </div>
+        
       </nav>
+      
     </header>
 
   @yield('content')
