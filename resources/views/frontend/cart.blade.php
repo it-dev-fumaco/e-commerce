@@ -89,7 +89,7 @@
 
 <main style="background-color:#ffffff;" class="products-head">
     <nav>
-        <ol class="breadcrumb" style="font-weight: 300 !important; font-size: 14px !important;">
+        <ol class="breadcrumb" style="font-weight: 300 !important; font-size: 8pt !important; white-space: nowrap !important">
             <li class="breadcrumb-item">
                 <a href="#" style="color: #000000 !important; text-decoration: underline;">Shopping Cart</a>
             </li>
@@ -116,10 +116,10 @@
                         <tr>
                             <th class="he1x">Product</th>
                             <th class="he1x"></th>
-                            <th class="he1x">Price</th>
+                            <th class="he1x d-none d-sm-table-cell">Price</th>
                             <th class="he1x">Quantity</th>
                             <th class="he1x"></th>
-                            <th class="he1x">Total</th>
+                            <th class="he1x d-none d-sm-table-cell">Total</th>
                             <th class="he1x"></th>
                         </tr>
                     </thead>
@@ -129,23 +129,25 @@
                             <td>
                                 <img src="{{ asset('/storage/item_images/'.$cart['item_code'].'/gallery/preview/'.$cart['item_image']) }}" class="img-responsive" alt="" width="55" height="55">
                             </td>
-                            <td class="tbls" style="width:40% !important;"><a href="/product/{{ $cart['item_code'] }}" style="text-decoration: none !important; color: #000;">{{ $cart['item_description'] }}</a></td>
-                            <td class="tbls">P <span class="formatted-price">{{ number_format($cart['price'], 2, '.', ',') }}</span><span class="price d-none">{{ $cart['price'] }}</span></td>
+                            <td class="tbls" style="width:40% !important;"><a href="/product/{{ $cart['item_code'] }}" style="text-decoration: none !important; color: #000;">{{ $cart['item_description'] }}</a>
+                            <span class="formatted-price d-lg-none d-xl-none"><br/><b>P {{ number_format($cart['price'], 2, '.', ',') }}</b></span>
+                            </td>
+                            <td class="tbls d-none d-sm-table-cell">P <span class="formatted-price">{{ number_format($cart['price'], 2, '.', ',') }}</span><span class="price d-none">{{ $cart['price'] }}</span></td>
                             <td class="tbls">
                                 <div class="input-group">
-                                    <span class="input-group-btn">
+                                    <span class="input-group-btn d-none d-sm-table-cell">
                                         <a href="#" class="quantity-left-minus btn btn-number" style="background-color: #ccc !important; height: 100% !important; border-radius: 0px !important;"> - </a>
                                     </span>
                                     <div>&nbsp;</div>
                                     <input type="text" name="quantity[]" class="form-control input-number " value="{{ $cart['quantity'] }}" min="1" max="{{ $cart['stock_qty'] }}" style="width: 5px !important; text-align: center !important;" data-id="{{ $cart['item_code'] }}">
                                     <div>&nbsp;</div>
-                                    <span class="input-group-btn">
+                                    <span class="input-group-btn d-none d-sm-table-cell">
                                         <a href="#" class="quantity-right-plus btn btn-number" style="background-color: #ccc !important; height: 100% !important; border-radius: 0px !important;"> + </a>
                                     </span>
                                 </div>
                             </td>
                             <td class="tbls">&nbsp;</td>
-                            <td class="tbls">P <span class="formatted-amount">{{ number_format($cart['amount'], 2, '.', ',') }}</span><span class="amount d-none">{{ $cart['amount'] }}</span></td>
+                            <td class="tbls d-none d-sm-table-cell">P <span class="formatted-amount">{{ number_format($cart['amount'], 2, '.', ',') }}</span><span class="amount d-none">{{ $cart['amount'] }}</span></td>
                             <td class="tbls">
                                 <a class="btn btn-sm btn-outline-primary remove-from-cart-btn" href="#" role="button" data-id="{{ $cart['item_code'] }}">&#x2715;</a>
                             </td>
@@ -167,7 +169,41 @@
                     </tr>
                 </table>
                 <br/>
-                <table class="table">
+                @php
+                    $action = '';
+
+                    if(Auth::check()){//member
+                        if($bill_address > 0 and $ship_address > 0){
+                            $action = '/setdetails';
+                        }else if($ship_address < 1){
+                            $action = '/checkout/billing';
+                        }else if($bill_address < 1){
+                            $action = '/checkout/set_billing_form';
+                        }else{
+                            $action = '/checkout/billing';
+                        }
+                    }else{// guest
+                        $action = '/checkout/billing';
+                    }
+                @endphp
+                <div class="row">
+                    <div class="col-md-6 d-none d-lg-block d-xl-block">
+                        <div class="card-body col-md-8 mx-auto">
+                            <a href="/" class="btn btn-secondary" style="width:100% !important;" role="button"><span style="font-size: 12pt; font-weight: 700">˂ </span> CONTINUE SHOPPING</a>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card-body col-md-8 mx-auto">
+                            <button id="checkout-btn" class="btn btn-outline-primary" role="button" style="width:100% !important;" {{ (count($cart_arr) > 0) ? '' : 'disabled' }}>PROCEED TO CHECKOUT</button>
+                        </div>
+                    </div>
+                    <div class="col-md-6 d-lg-none d-xl-none">
+                        <div class="card-body col-md-8 mx-auto">
+                            <a href="/" class="btn btn-secondary" style="width:100% !important;" role="button"><span style="font-size: 12pt; font-weight: 700">˂ </span> CONTINUE SHOPPING</a>
+                        </div>
+                    </div>
+                </div>
+                {{-- <table class="table">
                     <tr>
                         <td class="col-md-6">
                             <div class="card-body col-md-8 mx-auto">
@@ -198,7 +234,7 @@
                             </div>
                         </td>
                     </tr>
-                </table>
+                </table> --}}
                 <br><br><br>
             </div>
             <div class="col-lg-12">&nbsp;&nbsp;</div>
