@@ -34,9 +34,9 @@
           <center>
             <p style="color:#186EA9 !important;" class="fumacoFont_card_title">{{ $contact->office_title }}</p>
             <p style="color:#58595A !important;" class="fumacoFont_card_caption">{{ $contact->office_address }}</p>
-            <p style="color:#58595A !important;" class="fumacoFont_card_caption">Phone: {{ $contact->office_phone }}</p>
-            <p style="color:#58595A !important;" class="fumacoFont_card_caption">Mobile: {{ $contact->office_mobile }}</p>
-            <p style="color:#58595A !important;" class="fumacoFont_card_caption">Fax: {{ $contact->office_fax }}</p>
+            <p style="color:#58595A !important; line-height: 10px !important;" class="fumacoFont_card_caption">Phone: {{ $contact->office_phone }}</p>
+            <p style="color:#58595A !important; line-height: 10px !important;" class="fumacoFont_card_caption">Mobile: {{ $contact->office_mobile }}</p>
+            <p style="color:#58595A !important; line-height: 10px !important;" class="fumacoFont_card_caption">Fax: {{ $contact->office_fax }}</p>
             <p style="color:#58595A !important;" class="fumacoFont_card_caption">Email: {{ $contact->office_email }}</p>
           </center>
           <br>
@@ -59,7 +59,7 @@
           <p style="color:#186EA9 !important;" class="fumacoFont_card_title animated animatedFadeInUp fadeInUp">SOCIAL</p>
           <p style="color:#58595A !important;" class="fumacoFont_card_caption animated animatedFadeInUp fadeInUp">Like & Follow Us</p>
           <p style="color:#58595A !important;" class="fumacoFont_card_caption animated animatedFadeInUp fadeInUp">
-            <i class="fa fa-twitter" aria-hidden="true"></i>&nbsp;&nbsp;<i class="fa fa-facebook-square" aria-hidden="true"></i>&nbsp;&nbsp;<i class="fa fa-instagram" aria-hidden="true"></i>
+            <i class="fa fa-twitter" aria-hidden="true" style="font-size: 15pt !important"></i>&nbsp;&nbsp;<i class="fa fa-facebook-square" aria-hidden="true" style="font-size: 15pt !important"></i>&nbsp;&nbsp;<i class="fa fa-instagram" aria-hidden="true" style="font-size: 15pt !important"></i>
           </p>
         </center>
         <br>
