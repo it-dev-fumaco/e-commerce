@@ -67,7 +67,7 @@
 
 	<main style="background-color:#ffffff;" class="products-head">
 		<nav>
-			<ol class="breadcrumb" style="font-weight: 300 !important; font-size: 14px !important;">
+			<ol class="breadcrumb" style="font-weight: 300 !important; font-size: 8pt !important; white-space: nowrap !important">
 				<li class="breadcrumb-item"><a href="/cart" style="color: #000000 !important; text-decoration: none;">Shopping Cart</a></li>
 				<li class="breadcrumb-item"><a href="{{ url()->previous() }}" style="color: #000000 !important; text-decoration: none;">Billing & Shipping Address</a></li>
 				<li class="breadcrumb-item active"><a href="#" style="color: #000000 !important; text-decoration: underline;">Place Order</a></li>
@@ -268,7 +268,10 @@
 			<br/>
 			<div class="row mb-4">
 				<div class="col-md-8 mx-auto">
-					<a href="javascript:history.back()" class="btn btn-lg btn-outline-primary col-md-4" role="button" style="background-color: #777575 !important; border-color: #777575 !important; float: left;">BACK</a>
+					<div class="col-md-4">
+						<a href="javascript:history.back()" class="btn btn-lg btn-outline-primary" role="button" style="background-color: #777575 !important; border-color: #777575 !important; float: left; width: 94%;margin-left: 5%;">BACK</a>
+					</div>
+					{{-- <a href="javascript:history.back()" class="btn btn-lg btn-outline-primary col-md-4" role="button" style="background-color: #777575 !important; border-color: #777575 !important; float: left;">BACK</a> --}}
 				</div>
 				<div class="col-md-4 mx-auto">
 					<div class="card" style="margin-left: 5%;">
