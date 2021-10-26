@@ -1,7 +1,7 @@
 
 
 @extends('emails.template', [
-    'namePage' => 'Welcome Email'
+    'namePage' => 'Order Success'
 ])
 
 @section('content')
@@ -99,7 +99,7 @@
   </tr>
      <tr>
     <td class="innerpadding bodycopy">
-      If you did not initiate this request, please contact us immediately at support@fumaco.com.ph
+      If you did not initiate this request, please contact us immediately at support@fumaco.com
     </td>
   </tr>
 </table>

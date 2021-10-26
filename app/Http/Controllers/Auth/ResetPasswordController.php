@@ -3,28 +3,45 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Providers\RouteServiceProvider;
-use Illuminate\Foundation\Auth\ResetsPasswords;
+use Illuminate\Http\Request;
+use DB;
+use Hash;
 
 class ResetPasswordController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | Password Reset Controller
-    |--------------------------------------------------------------------------
-    |
-    | This controller is responsible for handling password reset requests
-    | and uses a simple trait to include this behavior. You're free to
-    | explore this trait and override any methods you wish to tweak.
-    |
-    */
+    public function showResetForm($token) { 
+        return view('auth.passwords.reset', ['token' => $token]);
+    }
 
-    use ResetsPasswords;
+    public function reset(Request $request) {
+        DB::beginTransaction();
+        try {
+            $request->validate([
+                'username' => 'required|email|exists:fumaco_users',
+                'password' => 'required|string|min:6|confirmed',   
+                'password_confirmation' => 'required'
+            ]);
+            
+            $updatePassword = DB::table('password_resets')->where([
+                'email' => $request->username, 
+                'token' => $request->token
+            ])->first();
 
-    /**
-     * Where to redirect users after resetting their password.
-     *
-     * @var string
-     */
-    protected $redirectTo = RouteServiceProvider::HOME;
+            if(!$updatePassword){
+                return back()->withInput()->with('error', 'Invalid token!');
+            }
+            
+            DB::table('fumaco_users')->where('username', $request->username)->update(['password' => Hash::make($request->password)]);
+            
+            DB::table('password_resets')->where(['email'=> $request->username])->delete();
+
+            DB::commit();
+            
+            return redirect('/login')->with('success', 'Your password has been changed!');
+        } catch (Exception $e) {
+            DB::rollback();
+
+            return back()->withInput()->with('error', 'An error occured. Please try again.');
+        }
+    }
 }

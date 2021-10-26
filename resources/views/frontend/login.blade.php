@@ -66,7 +66,7 @@
                             <br>
                             <input type="submit" class="btn btn-primary" value="&nbsp;&nbsp;LOGIN&nbsp;&nbsp;">
 
-                            <a href="forgot" id="forgot_pswdx" class="forgot-1">Forgot password?</a>
+                            <a href="{{ route('password.request') }}" id="forgot_pswdx" class="forgot-1">Forgot password?</a>
                             <br>
                             <label for="InputPassword" class="status-1"></label>
                         </div>
