@@ -51,13 +51,13 @@
                         <center>
                         <div class="col-lg-7" style="text-align: left;">
                             <br>
-                            <label for="InputUsername" class="login_1" style="padding-bottom:10px;">Email address *<br></label>
+                            <label for="InputUsername" class="login_1" style="padding-bottom:10px;">Email address <span class="text-danger">*</span><br></label>
                             <label for="InputUsername" class="login_1">&nbsp;</label>
                             <br>
 
                             <input type="email" id="username" name="username" class="form-control" required="" autofocus="" value="{{ old('username') }}">
                             <br>
-                            <label for="InputPassword" class="login_1" style="padding-bottom:10px;">Password *</label>
+                            <label for="InputPassword" class="login_1" style="padding-bottom:10px;">Password <span class="text-danger">*</span></label>
                             <label for="InputPassword" class="login_1">&nbsp;</label>
                             <br>
 
@@ -95,29 +95,29 @@
                         <center>
                             <div class="col-lg-7" style="text-align: left;">
                                 <div class="row">
-                                    <label for="mobile_1" class="myprofile-font-form login_1">First Name : *</label>
+                                    <label for="mobile_1" class="myprofile-font-form login_1">First Name : <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control caption_1" id="fname" name="first_name" required>
                                 </div>
                                 <br/>
                                 <div class="row">
-                                    <label for="mobile_1" class="myprofile-font-form login_1">Last Name : *</label>
+                                    <label for="mobile_1" class="myprofile-font-form login_1">Last Name : <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control caption_1" id="lname" name="last_name" required>
                                 </div>
                                 <br/>
                                 <div class="row">
-                                    <label class="login_1">Email address *</label>
+                                    <label class="login_1">Email address <span class="text-danger">*</span></label>
                                     <input type="email" name="username" id="username" class="form-control caption_1" value="" required>
                                     <span class="help-block"></span>
                                 </div>
                                 <br/>
                                 <div class="row">
-                                    <label class="login_1">Password *</label>
+                                    <label class="login_1">Password <span class="text-danger">*</span></label>
                                     <input type="password" name="password" id="password" class="form-control caption_1" value="" required>
                                     <span class="help-block"></span>
                                 </div>
                                 <br/>
                                 <div class="row">
-                                    <label class="login_1">Confirm Password *</label>
+                                    <label class="login_1">Confirm Password <span class="text-danger">*</span></label>
                                     <input type="password" name="confirm_password" id="confirm_password"  class="form-control caption_1" value="" required>
                                     <span class="help-block"></span>
                                 </div>

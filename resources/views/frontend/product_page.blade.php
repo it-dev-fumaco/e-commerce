@@ -628,14 +628,15 @@
 									</div>
 									<div>
 										@if ($product_details->f_discount_trigger)
+										<span class="product_price fumacoFont_item_price">₱ {{ number_format(str_replace(",","",$product_details->f_price), 2) }}</span>
 										<s class="product_discount">
 											<span style='color:black; '>₱ {{ number_format(str_replace(",","",$product_details->f_original_price), 2) }}<span>
 										</s>
-										<span class="product_price fumacoFont_item_price">₱ {{ number_format(str_replace(",","",$product_details->f_price), 2) }}</span>
+										
 										@else
 										<span class="product_price fumacoFont_item_price">₱ {{ number_format(str_replace(",","",$product_details->f_original_price), 2) }}</span>
 										@endif
-										<span class="badge badge-danger" style="vertical-align: middle;background-color: red; display: {{ ($product_details->f_discount_trigger) ? 'inline' : 'none' }} !important;">{{ $product_details->f_discount_percent }}% OFF</span>
+										<span class="badge badge-danger" style="margin-left: 8px; vertical-align: middle;background-color: red; display: {{ ($product_details->f_discount_trigger) ? 'inline' : 'none' }} !important;">{{ $product_details->f_discount_percent }}% OFF</span>
 									</div>
 									<div>
 										<p class="card-text fumacoFont_card_caption">{!! $product_details->f_caption !!}
@@ -649,7 +650,7 @@
 										</p>
 										<input type="hidden" name="item_code" value="{{ $product_details->f_idcode }}">
 										<p class="card-text">QTY&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;   <input type="number" value="1" id="quantity" name="quantity" min="1" max="{{ ($product_details->f_qty > 0) ? $product_details->f_qty : 1 }}" style="width: 70px;"></p>
-										<p class="card-text">In-Stocks :
+										<p class="card-text">
 											@if($product_details->f_qty < 1)
 											<span style='color:red;';>Not Available</span>
 											@else

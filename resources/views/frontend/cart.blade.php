@@ -164,7 +164,7 @@
                 <table class="table">
                     <tr>
                         <td class="col-md-8">&nbsp</td>
-                        <td class="col-md-2">Subtotal</td>
+                        <td class="col-md-2">Total</td>
                         <td><small class="text-muted stylecap he1x" id="cart-subtotal">P {{ number_format(collect($cart_arr)->sum('amount'), 2, '.', ',') }}</small></td>
                     </tr>
                 </table>

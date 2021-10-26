@@ -105,19 +105,19 @@
 						</table>
 						<div class="row">
 							<div class="col-md-6">
-								<label for="fname" class="formslabelfnt">First Name : *</label>
+								<label for="fname" class="formslabelfnt">First Name : <span class="text-danger">*</span></label>
 								<input type="hidden" class="form-control formslabelfnt" id="logtype" name="logtype" value="1" required>
 								<input type="text" class="form-control formslabelfnt" id="fname" name="fname" required>
 							</div>
 							<div class="col-md-6">
-								<label for="lname" class="formslabelfnt">Last Name : *</label>
+								<label for="lname" class="formslabelfnt">Last Name : <span class="text-danger">*</span></label>
 								<input type="text" class="form-control formslabelfnt" id="lname" name="lname" required>
 							</div>
 						</div>
 						<br>
 						<div class="row">
 							<div class="col-md-6">
-								<label for="Address1_1" class="formslabelfnt">Address Line 1 : *</label>
+								<label for="Address1_1" class="formslabelfnt">Address Line 1 : <span class="text-danger">*</span></label>
 								<input type="text" class="form-control formslabelfnt" id="ship_Address1_1" name="ship_Address1_1" required>
 							</div>
 							<div class="col-md-6">
@@ -128,26 +128,26 @@
 						<br>
 						<div class="row">
 							<div class="col-md-4">
-								<label for="province1_1" class="formslabelfnt">Province : *</label>
+								<label for="province1_1" class="formslabelfnt">Province : <span class="text-danger">*</span></label>
 								<input type="text" class="form-control formslabelfnt" id="ship_province1_1" name="ship_province1_1" required>
 							</div>
 							<div class="col-md-4">
-								<label for="City_Municipality1_1" class="formslabelfnt">City / Municipality : *</label>
+								<label for="City_Municipality1_1" class="formslabelfnt">City / Municipality : <span class="text-danger">*</span></label>
 								<input type="text" class="form-control formslabelfnt" id="ship_City_Municipality1_1" name="ship_City_Municipality1_1" required>
 							</div>
 							<div class="col-md-4">
-								<label for="Barangay1_1" class="formslabelfnt">Barangay : *</label>
+								<label for="Barangay1_1" class="formslabelfnt">Barangay : <span class="text-danger">*</span></label>
 								<input type="text" class="form-control formslabelfnt" id="ship_Barangay1_1" name="ship_Barangay1_1" required>
 							</div>
 						</div>
 						<br>
 						<div class="row">
 							<div class="col-md-4">
-								<label for="postal1_1" class="formslabelfnt">Postal Code : *</label>
+								<label for="postal1_1" class="formslabelfnt">Postal Code : <span class="text-danger">*</span></label>
 								<input type="text" class="form-control formslabelfnt" id="ship_postal1_1" name="ship_postal1_1" required>
 							</div>
 							<div class="col-md-4">{{-- Country Select --}}
-								<label for="country_region1_1" class="formslabelfnt">Country / Region : *</label>
+								<label for="country_region1_1" class="formslabelfnt">Country / Region : <span class="text-danger">*</span></label>
 								<select class="form-control formslabelfnt" id="ship_country_region1_1" name="ship_country_region1_1" required>
 									<option selected disabled value="">Choose...</option>
 									<option value="Afghanistan">Afghanistan</option>
@@ -405,7 +405,7 @@
 								</select>
 							</div>
 							<div class="col-md-4">
-								<label for="Address_type1_1" class="formslabelfnt">Address Type : *</label>
+								<label for="Address_type1_1" class="formslabelfnt">Address Type : <span class="text-danger">*</span></label>
 								<select class="form-control formslabelfnt" id="ship_Address_type1_1" name="ship_Address_type1_1" required>
 									<option selected disabled value="">Choose...</option>
 									<option value="Business Address">Business Address</option>
@@ -416,11 +416,11 @@
 						<br>
 						<div class="row">
 							<div class="col-md-4">
-								<label for="email1_1" class="formslabelfnt">Email Address : *</label>
+								<label for="email1_1" class="formslabelfnt">Email Address : <span class="text-danger">*</span></label>
 								<input type="email" class="form-control formslabelfnt" id="ship_email" name="ship_email" required>
 							</div>
 							<div class="col-md-4">
-								<label for="contactnumber1_1" class="formslabelfnt">Mobile Number : *</label>
+								<label for="contactnumber1_1" class="formslabelfnt">Mobile Number : <span class="text-danger">*</span></label>
 								<input type="number" class="form-control formslabelfnt" id="ship_mobilenumber1_1" name="ship_mobilenumber1_1" required>
 							</div>
 							<div class="col-md-4">
@@ -428,7 +428,8 @@
 								<input type="number" class="form-control formslabelfnt" id="contactnumber1_1" name="contactnumber1_1">
 							</div>
 						</div>
-						<br><br>
+						<small style="font-style: italic; font-size: 0.75rem; margin-top: 20px; display: block;">Note: * Required information</small>
+						<br>
 						<div class="form-check">
 							<input class="form-check-input" type="checkbox" id="myCheck" name="same_as_billing"  checked onclick="shipp_function()">
 							<label class="form-check-label" for="flexCheckChecked" class="formslabelfnt" style="font-size: 14px;">Billing address is the same as above</label>
@@ -439,18 +440,18 @@
 							<p style="color:#212529 !important; letter-spacing: 1px !important; font-size:16px !important;  text-align: justify !important; font-weight: 600 !important;">Billing Information</p>
 							<div class="row">
 								<div class="col-md-6">
-									<label for="fname" class="formslabelfnt">First Name : *</label>
+									<label for="fname" class="formslabelfnt">First Name : <span class="text-danger">*</span></label>
 									<input type="text" class="form-control formslabelfnt" id="bill_fname" name="bill_fname">
 								</div>
 								<div class="col-md-6">
-									<label for="lname" class="formslabelfnt">Last Name : *</label>
+									<label for="lname" class="formslabelfnt">Last Name : <span class="text-danger">*</span></label>
 									<input type="text" class="form-control formslabelfnt" id="bill_lname" name="bill_lname">
 								</div>
 							</div>
 							<br/>
 							<div class="row">
 								<div class="col-md-6">
-									<label for="Address1_1" class="formslabelfnt">Address Line 1 : *</label>
+									<label for="Address1_1" class="formslabelfnt">Address Line 1 : <span class="text-danger">*</span></label>
 									<input type="text" class="form-control formslabelfnt" id="Address1_1" name="Address1_1">
 								</div>
 								<div class="col-md-6">
@@ -461,26 +462,26 @@
 							<br>
 							<div class="row">
 								<div class="col-md-4">
-									<label for="province1_1" class="formslabelfnt">Province : *</label>
+									<label for="province1_1" class="formslabelfnt">Province : <span class="text-danger">*</span></label>
 									<input type="text" class="form-control formslabelfnt" id="province1_1" name="province1_1">
 								</div>
 								<div class="col-md-4">
-									<label for="City_Municipality1_1" class="formslabelfnt">City / Municipality : *</label>
+									<label for="City_Municipality1_1" class="formslabelfnt">City / Municipality : <span class="text-danger">*</span></label>
 									<input type="text" class="form-control formslabelfnt" id="City_Municipality1_1" name="City_Municipality1_1">
 								</div>
 								<div class="col-md-4">
-									<label for="Barangay1_1" class="formslabelfnt">Barangay : *</label>
+									<label for="Barangay1_1" class="formslabelfnt">Barangay : <span class="text-danger">*</span></label>
 									<input type="text" class="form-control formslabelfnt" id="Barangay1_1" name="Barangay1_1">
 								</div>
 							</div>
 							<br>
 							<div class="row">
 								<div class="col-md-4">
-									<label for="postal1_1" class="formslabelfnt">Postal Code : *</label>
+									<label for="postal1_1" class="formslabelfnt">Postal Code : <span class="text-danger">*</span></label>
 									<input type="text" class="form-control formslabelfnt" id="postal1_1" name="postal1_1">
 								</div>
 								<div class="col-md-4">{{-- Country Select --}}
-									<label for="country_region1_1" class="formslabelfnt">Country / Region : *</label>
+									<label for="country_region1_1" class="formslabelfnt">Country / Region : <span class="text-danger">*</span></label>
 									<select class="form-control formslabelfnt" id="country_region1_1" name="country_region1_1">
 										<option selected disabled value="">Choose...</option>
 										<option value="Afghanistan">Afghanistan</option>
@@ -738,7 +739,7 @@
 									</select>
 								</div>
 								<div class="col-md-4">
-									<label for="Address_type1_1" class="formslabelfnt">Address Type : *</label>
+									<label for="Address_type1_1" class="formslabelfnt">Address Type : <span class="text-danger">*</span></label>
 									<select class="form-control formslabelfnt" id="Address_type1_1" name="Address_type1_1">
 										<option selected disabled value="">Choose...</option>
 										<option value="Business Address">Business Address</option>
@@ -749,14 +750,16 @@
 							<br>
 							<div class="row">
 								<div class="col-md-6">
-									<label for="email1_1" class="formslabelfnt">Email Address : *</label>
+									<label for="email1_1" class="formslabelfnt">Email Address : <span class="text-danger">*</span></label>
 									<input type="email" class="form-control formslabelfnt" id="email" name="email">
 								</div>
 								<div class="col-md-6">
-									<label for="mobilenumber1_1" class="formslabelfnt">Mobile Number : *</label>
+									<label for="mobilenumber1_1" class="formslabelfnt">Mobile Number : <span class="text-danger">*</span></label>
 									<input type="number" class="form-control formslabelfnt" id="mobilenumber1_1" name="mobilenumber1_1">
 								</div>
 							</div>
+							
+							<small style="font-style: italic; font-size: 0.75rem; margin-top: 20px; display: block;">Note: * Required information</small>
 							<br/>&nbsp;
 						</div>
 					</div>

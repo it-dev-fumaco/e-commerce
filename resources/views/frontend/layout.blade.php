@@ -352,7 +352,7 @@
                   <td class="tdfooter footer2nd" style="border-style: unset !important;">&nbsp;</td>
                 </tr>
                 <tr>
-                  <td class="tdfooter footer2nd" style="border-style: unset !important;"><a href="/privacy_policy" style="text-decoration: none;     color: #0062A5;">Privacy & Policy</a></td>
+                  <td class="tdfooter footer2nd" style="border-style: unset !important;"><a href="/privacy_policy" style="text-decoration: none;     color: #0062A5;">Privacy Policy</a></td>
                   <td class="tdfooter footer2nd" style="border-style: unset !important;">&nbsp;</td>
                 </tr>
                 <tr>
