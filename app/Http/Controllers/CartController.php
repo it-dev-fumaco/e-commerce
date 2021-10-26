@@ -259,7 +259,6 @@ class CartController extends Controller
     }
 
     public function setShippingBillingDetails(Request $request) {
-
         if(Auth::check()) {
             $user_id = Auth::user()->id;
             $user = DB::table('fumaco_users')->where('id', $user_id)->first();
@@ -313,6 +312,13 @@ class CartController extends Controller
         }
         
         if($request->isMethod('POST')) {
+            $request->validate([
+                'ship_email' => 'required|email|unique:fumaco_users,username',
+            ],
+            [
+                'unique' => 'Email already exists, please <a href="'. route('login') .'">login</a>.'
+            ]);
+            
             $shipping_details = [
                 'fname' => $request->fname,
                 'lname' => $request->lname,
