@@ -44,7 +44,7 @@
               <strong>{{ $message }}</strong>
             </span>
             @enderror
-            <label for="email" class="mb-2" style="font-size: 0.75rem;">{{ __("Enter your email address, then we'll email your password reset link.") }}</label>
+            <label for="email" class="mb-2" style="font-size: 0.75rem;">{{ __("Please enter your registered email addresss, password reset link will be sent to your email") }}</label>
             <button type="submit" class="btn btn-primary mt-3 fumacoFont_btn animated animatedFadeInUp fadeInUp" style="display: block !impportant; width: 100%;">Reset Password</button>
           </div>
         </form>
