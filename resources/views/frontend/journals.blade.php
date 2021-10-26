@@ -1,10 +1,10 @@
 @extends('frontend.layout', [
-  'namePage' => 'Journals',
+  'namePage' => 'Blogs',
   'activePage' => 'journals'
 ])
 
 @section('content')
-<main class="abt_standard" style="background-color:#000;">  
+<main class="abt_standard" style="background-color:#000;">
     <div id="myCarousel" class="carousel slide" data-bs-ride="carousel">
         <ol class="carousel-indicators">
             @foreach($blog_carousel as $key => $carousel)

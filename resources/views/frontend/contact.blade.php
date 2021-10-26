@@ -1,5 +1,5 @@
 @extends('frontend.layout', [
-  'namePage' => 'Contact',
+  'namePage' => 'Contact Us',
   'activePage' => 'contact'
 ])
 
@@ -150,7 +150,7 @@
 // if(captchResponse.length == 0 )
 console.log(captchResponse);
     //user has not yet checked the 'I am not a robot' checkbox
-// else 
+// else
     //user is a verified human and you are good to submit your form now
   });
 

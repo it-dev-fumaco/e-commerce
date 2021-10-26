@@ -3,9 +3,11 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
+    <meta name="description" content="Fumaco Inc. is the Philippine’s premiere lighting solutions powerhouse. It has manufacturing, import, distribution and sales capabilities of high quality lighting fixtures. The company employs industry experts and engineers to provide clients with utmost support for various lighting services.">
     <meta name="author" content="Fumaco Website">
-    <title>Fumaco</title>
+    <meta name="keywords" content="FUMACO, Lighting, Philippines, Philippine, Leading, Luminaire, Manufacturing, ISO, Quality, light" />
+    <title>{{ $namePage }}</title>
+
     <link href="{{ asset('/assets/dist/css/bootstrap.css') }}" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <script src="https://kit.fontawesome.com/ec0415ab92.js"></script>
@@ -229,10 +231,10 @@
                 </ul>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="/about">ABOUT FUMACO</a>
+                <a class="nav-link" href="/about">ABOUT US</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="/journals">JOURNALS</a>
+                <a class="nav-link" href="/journals">BLOGS</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="/contact">CONTACTS</a>
@@ -294,7 +296,7 @@
                 </ul>
               </li>
             </ul>
-            
+
           </div>
           {{-- Cart Icon --}}
           <a class="d-none d-lg-block d-xl-block" href="/cart">
@@ -318,11 +320,11 @@
               </form><br/>
             </div>
           </div>
-          
+
         </div>
-        
+
       </nav>
-      
+
     </header>
 
   @yield('content')
@@ -434,7 +436,7 @@
           url:'/website_settings',
           success: function (response) {
             $('#navbar-brand').attr('href', response.set_value);
-            $('title').text(response.set_sitename);
+            // $('title').text(response.set_sitename);
           }
         });
       }

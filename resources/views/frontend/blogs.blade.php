@@ -1,5 +1,5 @@
 @extends('frontend.layout', [
-'namePage' => 'Blog',
+'namePage' => 'Blog Content',
 'activePage' => 'blog'
 ])
 
@@ -177,7 +177,7 @@
                         <input class="btn btn-primary mt-3 caption_1 animated animatedFadeInUp fadeInUp" type="submit" value="POST COMMENT">
                         <br>&nbsp;
                     </form>
-                    
+
                 </div>
             </div>
         </div>
@@ -192,18 +192,18 @@
         <div class="row" style="background-color:#ffffff;">
 
             <br>
-    
+
             <div class="col-lg-12">
               <span style="font-family: 'poppins', sans-serif !important;"  style="font-size:24px; font-weight:300;">&nbsp;
               &nbsp;Comments<span style="font-family: 'poppins', sans-serif !important;" >&nbsp;&nbsp;<span style="font-family: 'poppins', sans-serif !important;"  style="font-size:10px; font-weight:300;"> (Avatar powered by gravatar.com)</span>
             </div>
-    
+
             <div class="col-lg-12">
               <hr>
             </div>
             <br>
             <br>
-    
+
             <div class="col-lg-12 animated animatedFadeInUp fadeInUp">
               <!-- comments -->
                 @foreach($comments_arr as $comment)
@@ -238,20 +238,20 @@
                                         <br>
                                     </div>
                                 </div>
-    
+
                                 <div class="row">
                                     <div class="col">
                                         <textarea class="form-control caption_1" rows="5" id="reply_comment" name="reply_comment" required></textarea>
                                     </div>
                                 </div>
-    
+
                                 <br>
-    
+
                                 <div class="row" >
                                     <div class="col">
                                         <input type="text" class="form-control caption_1" placeholder="Name *" name="reply_name" required>
                                     </div>
-    
+
                                     <div class="col">
                                         <input type="email" class="form-control caption_1" placeholder="Email *" name="reply_email" required>
                                         <input type="hidden" class="form-control caption_1"  name="reply_blogId" value="{{ $id }}">
@@ -274,7 +274,7 @@
                                 <div class="col-lg-2">
                                     <img src="https://www.gravatar.com/avatar/205e460b479e2e5b48aec077210c08d50?s=100&d=https://secure.gravatar.com/avatar/56445b52ab352ef83cfff87e35d9929a?s=80&d=mm&r=g" />
                                 </div>
-                
+
                                 <div class="col-lg-10">
                                     <span style="font-family: 'poppins', sans-serif !important;"  class="font3color blog-font-b">{{ $reply->blog_name }}</span> on {{ $reply->blog_date }}
                                     <br>
@@ -295,7 +295,7 @@
                 <!-- row of comments -->
                 @endforeach
             </div>
-        </div> 
+        </div>
     </div>
     <br>&nbsp;
     <br>&nbsp;

@@ -1,5 +1,5 @@
 @extends('frontend.layout', [
-  'namePage' => 'Home',
+  'namePage' => 'Homepage',
   'activePage' => 'homepage'
 ])
 
@@ -23,7 +23,7 @@
 
     .text.ellipsis::after {
       position: absolute;
-      right: -12px; 
+      right: -12px;
       bottom: 4px;
     }
   </style>
@@ -54,7 +54,7 @@
           <div class="carousel-item {{ $loop->first ? "active" : ""}}" style="background: black;">
             <picture>
               <source srcset="{{ asset('/assets/site-img/'. explode(".", $carousel->fumaco_image1)[0] .'.webp') }}" type="image/webp" style="object-fit: cover;opacity: 0.6;">
-              <source srcset="{{ asset('/assets/site-img/'. $carousel->fumaco_image1) }}" type="image/jpeg" style="object-fit: cover;opacity: 0.6;"> 
+              <source srcset="{{ asset('/assets/site-img/'. $carousel->fumaco_image1) }}" type="image/jpeg" style="object-fit: cover;opacity: 0.6;">
               <img src="{{ asset('/assets/site-img/'. $carousel->fumaco_image1) }}" alt="" style="object-fit: cover;opacity: 0.6;">
             </picture>
 
@@ -75,7 +75,7 @@
           <div class="col-lg-6 col-md-8 mx-auto">
             <h4 class="fw-light font-b2 fumacoFont1">LATEST ARTICLES</h4>
           </div>
-        </div>  
+        </div>
       </section>
       <div class="row">
         @foreach($blogs as $b)
@@ -83,7 +83,7 @@
             <div class="equal-column-content">
               <picture>
                 <source srcset="{!!  asset('/assets/site-img/'. explode(".", $b->{'blogprimayimage-home'})[0] .'.webp') !!}" type="image/webp" class="img-responsive" style="width: 100% !important;">
-                <source srcset="{!!  asset('/assets/site-img/'. $b->{'blogprimayimage-home'}) !!}" type="image/jpeg" class="img-responsive" style="width: 100% !important;"> 
+                <source srcset="{!!  asset('/assets/site-img/'. $b->{'blogprimayimage-home'}) !!}" type="image/jpeg" class="img-responsive" style="width: 100% !important;">
                 <img src="{!!  asset('/assets/site-img/'. $b->{'blogprimayimage-home'}) !!}" alt="" class="img-responsive" style="width: 100% !important;">
               </picture>
               <br><br>
@@ -121,7 +121,7 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
 
                     <picture>
                       <source srcset="{{ asset($img_bs_webp) }}" type="image/webp" class="img-responsive" style="width: 100% !important;">
-                      <source srcset="{{ asset($img_bs) }}" type="image/jpeg" class="img-responsive" style="width: 100% !important;"> 
+                      <source srcset="{{ asset($img_bs) }}" type="image/jpeg" class="img-responsive" style="width: 100% !important;">
                       <img src="{{ asset($img_bs) }}" alt="{{ $bs['item_code'] }}" class="img-responsive" style="width: 100% !important;">
                     </picture>
 
@@ -166,11 +166,11 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
         </div>
       </div>
     </section>
-  
+
     <div class="album py-5">
       <div class="container">
         <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4">
-          @foreach($on_sale_arr as $os) 
+          @foreach($on_sale_arr as $os)
            @php
             $img_os = ($os['os_img']) ? '/storage/item_images/'. $os['item_code'] .'/gallery/preview/'. $os['os_img'] : '/storage/no-photo-available.png';
             $img_os_webp = ($os['os_img']) ? '/storage/item_images/'. $os['item_code'] .'/gallery/preview/'. explode(".", $os['os_img'])[0] . '.webp' : '/storage/no-photo-available.png';
@@ -178,14 +178,14 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
               <div class="col animated animatedFadeInUp fadeInUp equal-height-columns">
                 <div class="card shadow-sm">
                   <div class="equal-column-content">
-                  
+
 
                       <picture>
                         <source srcset="{{ asset($img_os_webp) }}" type="image/webp" class="img-responsive" style="width: 100% !important;">
-                        <source srcset="{{ asset($img_os) }}" type="image/jpeg" class="img-responsive" style="width: 100% !important;"> 
+                        <source srcset="{{ asset($img_os) }}" type="image/jpeg" class="img-responsive" style="width: 100% !important;">
                         <img src="{{ asset($img_os) }}" alt="{{ $os['item_code'] }}" class="img-responsive" style="width: 100% !important;">
                       </picture>
-                  
+
                     <div class="card-body">
                       <div class="text ellipsis">
                         <p class="card-text product-head fumacoFont_card_title text-concat" style="color:#0062A5 !important; height: 80px;">{{ $os['item_name'] }}</p>
@@ -219,5 +219,5 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
       </div>
     </div>
   </div>
-  
+
 @endsection

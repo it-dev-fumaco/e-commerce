@@ -1,5 +1,5 @@
 @extends('frontend.layout', [
-    'namePage' => 'Product',
+    'namePage' => $product_details->f_name_name,
     'activePage' => 'product_page'
 ])
 
@@ -776,14 +776,14 @@
 														$img_webp = ($rp['image']) ? '/storage/item_images/'. $rp['item_code'] .'/gallery/preview/'. explode(".", $rp['image'])[0] .'.webp' : '/storage/no-photo-available.png';
 													@endphp
 
-													
+
 <picture>
 	<source srcset="{{ asset($img_webp) }}" type="image/webp" class="img-responsive" style="width: 100% !important;">
-	<source srcset="{{ asset($img) }}" type="image/jpeg" class="img-responsive" style="width: 100% !important;"> 
+	<source srcset="{{ asset($img) }}" type="image/jpeg" class="img-responsive" style="width: 100% !important;">
 	<img src="{{ asset($img) }}" alt="{{ $rp['item_code'] }}" class="img-responsive" style="width: 100% !important;">
   </picture>
 
-											
+
 													<div class="card-body">
 														<div class="text ellipsis">
 															<p class="card-text product-head fumacoFont_card_title text-concat" style="color:#0062A5 !important;  height: 80px; ">{{ $rp['item_name'] }}</p>
