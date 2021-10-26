@@ -721,4 +721,8 @@ class CheckoutController extends Controller
 	public function orderFailed() {
 		return view('frontend.checkout.failed');
 	}
+
+	public function paymentCallback(Request $request) {
+		return ($request->urlType == 'return') ? 'Retry' : 'OK';
+	}
 }

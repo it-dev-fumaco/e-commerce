@@ -90,6 +90,8 @@ Route::get('/checkout/success/{id}', 'CheckoutController@orderSuccess');
 Route::post('/checkout/success/{id}', 'CheckoutController@orderSuccess');
 Route::get('/checkout/failed', 'CheckoutController@orderFailed');
 Route::post('/checkout/failed', 'CheckoutController@orderFailed');
+Route::post('/checkout/callback', 'CheckoutController@paymentCallback');
+
 
 Auth::routes();
 
