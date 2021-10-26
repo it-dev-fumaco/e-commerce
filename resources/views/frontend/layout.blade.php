@@ -305,16 +305,16 @@
             </div>
           </a>
           {{-- Cart Icon --}}
-          <div class="d-lg-block d-xl-none">
+          <div class="d-lg-block d-xl-none" style="width: 100% !important">
             <div class="col-md-12">
               <form action="/" method="GET">
                 <div class="input-group mb-0 searchbar" style="width: 100% !important;">
                   <input type="text" placeholder="Search" name="s" value="{{ request()->s }}" class="form-control searchstyle" aria-label="Text input with dropdown button">
-                  <select class="custom-select form-control" name="by" style="max-width: 115px !important;">
+                  {{-- <select class="custom-select form-control" name="by" style="max-width: 115px !important;">
                     <option value="all" {{ request()->by == 'all' ? 'selected' : '' }}>All</option>
                     <option value="products" {{ request()->by == 'products' ? 'selected' : '' }}>Products</option>
                     <option value="blogs" {{ request()->by == 'blogs' ? 'selected' : '' }}>Blogs</option>
-                  </select>
+                  </select> --}}
                     <button class="btn btn-outline-secondary searchstyle" type="submit"><i class="fas fa-search"></i></button>
                 </div>
               </form><br/>
