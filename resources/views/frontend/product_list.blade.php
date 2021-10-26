@@ -136,9 +136,9 @@
 			<div class="row">
 				<!--sidebar-->
 				<div class="col-lg-2 checkersxx">
-					<div class="d-flex justify-content-between align-items-center he1">Filter Results
+					<div class="d-flex justify-content-between align-items-center he1" style="font-weight: 500 !important"><b>Filter Results</b>
 						<a href="/products/{{ $product_category->id }}" style="text-decoration: none;">
-							<small class="stylecap he2 text-dark" style="font-weight:100 !important;">Clear All</small>
+							<small class="stylecap he2 text-dark" style="font-weight:400 !important;">Clear All</small>
 						</a>
 					</div>
 					<hr>
@@ -242,7 +242,7 @@
 										</div>
 										<p class="card-text fumacoFont_card_price" style="color:#000000 !important;">
 											@if($product['is_discounted'])
-											<s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$product['price']), 2) }}</s> ₱ {{ number_format(str_replace(",","",$product['discounted_price']), 2) }}
+											₱ {{ number_format(str_replace(",","",$product['discounted_price']), 2) }} <s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$product['price']), 2) }}</s>
 											<span class="badge badge-danger" style="vertical-align: middle;background-color: red; display: {{ ($product['on_sale']) ? 'inline' : 'none' }} !important;">{{ $product['discount_percent'] }}% OFF</span>
 											@else
 											₱ {{ number_format(str_replace(",","",$product['price']), 2) }}
