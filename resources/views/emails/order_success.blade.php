@@ -92,6 +92,11 @@
 			</table>
         </td>
      </tr>
+	 <tr>
+        <td class="button borderbottom" style="padding: 6% 5% 6% 5%; text-align: left;">
+            <a href="{{ route('track_order', ['id' => $order['order_details']->order_number]) }}" style="background: #e05443; padding: 2% 5%;">Track my Order</a>
+        </td>
+     </tr>
      <tr>
     <td class="innerpadding borderbottom">
     <!--  <img class="fix" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/210284/wide.png" width="100%" border="0" alt="" />-->

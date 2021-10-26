@@ -44,7 +44,7 @@ Route::post('/add_contact', 'FrontendController@addContact');
 Route::get('/products/{id}', 'FrontendController@viewProducts');
 Route::post('/products/{id}', 'FrontendController@viewProducts');
 Route::get('/product/{item_code}', 'FrontendController@viewProduct');
-Route::get('/track_order', 'FrontendController@viewOrderTracking');
+Route::get('/track_order', 'FrontendController@viewOrderTracking')->name('track_order');
 Route::get('/categories', 'FrontendController@getProductCategories');
 Route::get('/website_settings', 'FrontendController@websiteSettings');
 Route::post('/getvariantcode', 'FrontendController@getVariantItemCode');

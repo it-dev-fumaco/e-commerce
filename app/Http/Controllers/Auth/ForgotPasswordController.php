@@ -20,7 +20,8 @@ class ForgotPasswordController extends Controller
         try {
             $request->validate([
                 'username' => 'required|email|exists:fumaco_users',
-            ]);
+            ],
+        ['exists' => 'Sorry, no existing account for this email.']);
 
             $token = Str::random(64);
             DB::table('password_resets')->insert([

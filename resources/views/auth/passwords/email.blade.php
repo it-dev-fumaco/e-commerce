@@ -40,11 +40,11 @@
           <div class="form-group">
             <input id="email" type="email" class="form-control @error('username') is-invalid @enderror" name="username" value="{{ old('username') }}" required autocomplete="email" autofocus placeholder="Email Address">
             @error('username')
-            <span class="invalid-feedback" role="alert">
+            <span class="invalid-feedback" style="margin-top: 12px; display: block;" role="alert">
               <strong>{{ $message }}</strong>
             </span>
             @enderror
-            <label for="email" class="mb-2" style="font-size: 0.75rem;">{{ __("Please enter your registered email addresss, password reset link will be sent to your email") }}</label>
+            <label for="email" style="font-size: 0.75rem; display: block; margin-top: 10px;">{{ __("Please enter your registered email address, password reset link will be sent to your email.") }}</label>
             <button type="submit" class="btn btn-primary mt-3 fumacoFont_btn animated animatedFadeInUp fadeInUp" style="display: block !impportant; width: 100%;">Reset Password</button>
           </div>
         </form>
