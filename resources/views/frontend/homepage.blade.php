@@ -132,7 +132,7 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
                       </div>
                       <p class="card-text fumacoFont_card_price" style="color:#000000 !important; ">
                         @if ($bs['is_discounted'])
-                        ₱ {{ number_format(str_replace(",","",$bs['new_price']), 2) }}&nbsp;&nbsp;<s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$bs['orig_price']), 2) }}</s>&nbsp;&nbsp;<span class="badge badge-danger" style="vertical-align: middle;background-color: red;">{{ $bs['discount'] }}% OFF</span>
+                        ₱ {{ number_format(str_replace(",","",$bs['new_price']), 2) }}&nbsp;&nbsp;<s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$bs['orig_price']), 2) }}</s>&nbsp;&nbsp;&nbsp;<span class="badge badge-danger" style="vertical-align: middle;background-color: red;">{{ $bs['discount'] }}% OFF</span>
                         @else
                         ₱ {{ number_format(str_replace(",","",$bs['orig_price']), 2) }}
                         @endif
@@ -198,7 +198,7 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
                         @else
                         ₱ {{ number_format(str_replace(",","",$os['orig_price']), 2) }}
                         @endif
-                        <span class="badge badge-danger" style="vertical-align: middle;background-color: red;">&nbsp;&nbsp;{{ $os['discount_percent'] }}% OFF</span>
+                        &nbsp;&nbsp;<span class="badge badge-danger" style="vertical-align: middle;background-color: red;">{{ $os['discount_percent'] }}% OFF</span>
                       </p>
                       <div class="d-flex justify-content-between align-items-center">
                         <div class="btn-group stylecap">

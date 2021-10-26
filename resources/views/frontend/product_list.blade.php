@@ -243,7 +243,7 @@
 										<p class="card-text fumacoFont_card_price" style="color:#000000 !important;">
 											@if($product['is_discounted'])
 											₱ {{ number_format(str_replace(",","",$product['discounted_price']), 2) }} <s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$product['price']), 2) }}</s>
-											<span class="badge badge-danger" style="vertical-align: middle;background-color: red; display: {{ ($product['on_sale']) ? 'inline' : 'none' }} !important;">{{ $product['discount_percent'] }}% OFF</span>
+											&nbsp;<span class="badge badge-danger" style="vertical-align: middle;background-color: red; display: {{ ($product['on_sale']) ? 'inline' : 'none' }} !important;">{{ $product['discount_percent'] }}% OFF</span>
 											@else
 											₱ {{ number_format(str_replace(",","",$product['price']), 2) }}
 											@endif
