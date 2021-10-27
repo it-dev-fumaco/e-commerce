@@ -54,9 +54,9 @@
 		<div id="myCarousel" class="carousel slide" data-bs-ride="carousel">
 			<div class="carousel-inner">
 				<div class="carousel-item active" style="height: 13rem !important;">
-					<img src="{{asset('/assets/site-img/header3-sm.png')}}"alt="" style="position: absolute; top: 0;left: 0;min-width: 100%; height: unset !important; ">
+					<img src="{{asset('/assets/site-img/header3-sm.png')}}"alt="" style="position: absolute; top: 0;left: 0;">
 					<div class="container">
-						<div class="carousel-caption text-start" style="bottom: 1rem !important; right: 25% !important; left: 25%; !important;">
+						<div class="carousel-caption text-start mx-auto" style="bottom: 1rem !important;">
 						<center><h3 class="carousel-header-font">SHOPPING CART</h3></center>
 						</div>
 					</div>
@@ -67,7 +67,7 @@
 
 	<main style="background-color:#ffffff;" class="products-head">
 		<nav>
-			<ol class="breadcrumb" style="font-weight: 300 !important; font-size: 8pt !important; white-space: nowrap !important">
+			<ol class="breadcrumb" style="font-weight: 300 !important; white-space: nowrap !important">
 				<li class="breadcrumb-item"><a href="/cart" style="color: #000000 !important; text-decoration: none;">Shopping Cart</a></li>
 				<li class="breadcrumb-item"><a href="{{ url()->previous() }}" style="color: #000000 !important; text-decoration: none;">Billing & Shipping Address</a></li>
 				<li class="breadcrumb-item active"><a href="#" style="color: #000000 !important; text-decoration: underline;">Place Order</a></li>
@@ -140,7 +140,7 @@
 												</div>
 
 												<div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample">
-													<div class="card-body">
+													<div class="card-body" style="padding: 10px !important">
                                                         <div class="card-body he1x" style="padding-bottom: 0px !important;"><b>{{ $shipping_address_type }}</b></div>
 														<div class="card-body he1x" style="padding-bottom: 0px !important;">Contact Person :  {{ $shipping_fname. " " .$shipping_lname }}</div>
 														<div class="card-body he1x" style="padding-bottom: 0px !important;">
@@ -200,7 +200,7 @@
 				</div>
 
 				<div class="col-md-4 mx-auto">
-					<div class="card" style="margin-left: 5%; background-color: #f4f4f4 !important; border-radius: 0rem !important;">
+					<div class="card" style="background-color: #f4f4f4 !important; border-radius: 0rem !important;">
 						<div class="card-body he1x" style="padding-bottom: 0px !important;">Cart Total<hr></div>
 						<table class="table" id="cart-items">
 							<thead>
@@ -268,16 +268,19 @@
 			<br/>
 			<div class="row mb-4">
 				<div class="col-md-8 mx-auto">
-					<div class="col-md-4">
-						<a href="javascript:history.back()" class="btn btn-lg btn-outline-primary" role="button" style="background-color: #777575 !important; border-color: #777575 !important; float: left; width: 94%;margin-left: 5%;">BACK</a>
+					<div class="col-md-4 d-none d-xl-block">
+						<a href="javascript:history.back()" class="btn btn-lg btn-outline-primary" role="button" style="background-color: #777575 !important; border-color: #777575 !important; float: left; width: 94%;">BACK</a>
 					</div>
 					{{-- <a href="javascript:history.back()" class="btn btn-lg btn-outline-primary col-md-4" role="button" style="background-color: #777575 !important; border-color: #777575 !important; float: left;">BACK</a> --}}
 				</div>
 				<div class="col-md-4 mx-auto">
-					<div class="card" style="margin-left: 5%;">
+					<div class="card">
 							<div id="payment-form" class="d-none"></div>
 							<button class="btn btn-lg btn-outline-primary" id="checkout-btn" style="float: right;" {{ (count($shipping_rates) <= 0) ? 'disabled' : '' }}>PROCEED</button>
 					</div>
+				</div><br/>&nbsp;
+				<div class="col-md-4 d-md-none d-lg-none d-xl-none">
+					<a href="javascript:history.back()" class="btn btn-lg btn-outline-primary" role="button" style="background-color: #777575 !important; border-color: #777575 !important; float: left; width: 100%;">BACK</a>
 				</div>
 			</div>
 		</div>

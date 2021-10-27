@@ -76,9 +76,9 @@
     <div id="myCarousel" class="carousel slide" data-bs-ride="carousel">
         <div class="carousel-inner">
             <div class="carousel-item active" style="height: 13rem !important;">
-                <img src="{{ asset('/assets/site-img/header3-sm.png') }}" alt="" style="position: absolute; top: 0;left: 0;min-width: 100%; height: unset !important;">
+                <img src="{{ asset('/assets/site-img/header3-sm.png') }}" alt="" style="position: absolute; top: 0;left: 0;">
                 <div class="container">
-                    <div class="carousel-caption text-start" style="bottom: 1rem !important; right: 25% !important; left: 25%; !important;">
+                    <div class="carousel-caption text-start mx-auto" style="bottom: 1rem !important;">
                         <center><h3 class="carousel-header-font">SHOPPING CART</h3></center>
                     </div>
                 </div>
@@ -89,15 +89,15 @@
 
 <main style="background-color:#ffffff;" class="products-head">
     <nav>
-        <ol class="breadcrumb" style="font-weight: 300 !important; font-size: 8pt !important; white-space: nowrap !important">
+        <ol class="breadcrumb" style="white-space: nowrap !important">
             <li class="breadcrumb-item">
                 <a href="#" style="color: #000000 !important; text-decoration: underline;">Shopping Cart</a>
             </li>
             <li class="breadcrumb-item">
-                <a href="#" style="color: #c1bdbd !important; text-decoration: none;">Billing & Shipping Address</a>
+                <a href="#" style="color: #928d8d !important; text-decoration: none;">Billing & Shipping Address</a>
             </li>
             <li class="breadcrumb-item active">
-                <a href="#" style="color: #c1bdbd !important; text-decoration: none;">Place Order</a>
+                <a href="#" style="color: #928d8d !important; text-decoration: none;">Place Order</a>
             </li>
         </ol>
     </nav>
@@ -117,7 +117,7 @@
                             <th class="he1x">Product</th>
                             <th class="he1x"></th>
                             <th class="he1x d-none d-sm-table-cell">Price</th>
-                            <th class="he1x">Quantity</th>
+                            <th class="he1x d-none d-sm-table-cell">Quantity</th>
                             <th class="he1x"></th>
                             <th class="he1x d-none d-sm-table-cell">Total</th>
                             <th class="he1x"></th>
@@ -130,18 +130,33 @@
                                 <img src="{{ asset('/storage/item_images/'.$cart['item_code'].'/gallery/preview/'.$cart['item_image']) }}" class="img-responsive" alt="" width="55" height="55">
                             </td>
                             <td class="tbls" style="width:40% !important;"><a href="/product/{{ $cart['item_code'] }}" style="text-decoration: none !important; color: #000;">{{ $cart['item_description'] }}</a>
+                                <br/>{{-- for mobile --}}
                             <span class="formatted-price d-lg-none d-xl-none"><br/><b>P {{ number_format($cart['price'], 2, '.', ',') }}</b></span>
-                            </td>
-                            <td class="tbls d-none d-sm-table-cell">P <span class="formatted-price">{{ number_format($cart['price'], 2, '.', ',') }}</span><span class="price d-none">{{ $cart['price'] }}</span></td>
-                            <td class="tbls">
+                            <br/><br/>
+                            <span class="d-lg-none d-xl-none">Quantity<br/>
                                 <div class="input-group">
-                                    <span class="input-group-btn d-none d-sm-table-cell">
+                                    <span class="input-group-btn">
                                         <a href="#" class="quantity-left-minus btn btn-number" style="background-color: #ccc !important; height: 100% !important; border-radius: 0px !important;"> - </a>
                                     </span>
                                     <div>&nbsp;</div>
                                     <input type="text" name="quantity[]" class="form-control input-number " value="{{ $cart['quantity'] }}" min="1" max="{{ $cart['stock_qty'] }}" style="width: 5px !important; text-align: center !important;" data-id="{{ $cart['item_code'] }}">
                                     <div>&nbsp;</div>
-                                    <span class="input-group-btn d-none d-sm-table-cell">
+                                    <span class="input-group-btn">
+                                        <a href="#" class="quantity-right-plus btn btn-number" style="background-color: #ccc !important; height: 100% !important; border-radius: 0px !important;"> + </a>
+                                    </span>
+                                </div>
+                            </span>{{-- for mobile --}}
+                            </td>
+                            <td class="tbls d-none d-sm-table-cell">P <span class="formatted-price">{{ number_format($cart['price'], 2, '.', ',') }}</span><span class="price d-none">{{ $cart['price'] }}</span></td>
+                            <td class="tbls d-none d-sm-table-cell">
+                                <div class="input-group">
+                                    <span class="input-group-btn">
+                                        <a href="#" class="quantity-left-minus btn btn-number" style="background-color: #ccc !important; height: 100% !important; border-radius: 0px !important;"> - </a>
+                                    </span>
+                                    <div>&nbsp;</div>
+                                    <input type="text" name="quantity[]" class="form-control input-number " value="{{ $cart['quantity'] }}" min="1" max="{{ $cart['stock_qty'] }}" style="width: 5px !important; text-align: center !important;" data-id="{{ $cart['item_code'] }}">
+                                    <div>&nbsp;</div>
+                                    <span class="input-group-btn">
                                         <a href="#" class="quantity-right-plus btn btn-number" style="background-color: #ccc !important; height: 100% !important; border-radius: 0px !important;"> + </a>
                                     </span>
                                 </div>

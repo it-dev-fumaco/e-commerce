@@ -47,9 +47,9 @@
 		<div id="myCarousel" class="carousel slide" data-bs-ride="carousel">
 			<div class="carousel-inner">
 				<div class="carousel-item active" style="height: 13rem !important;">
-					<img src="{{ asset('/assets/site-img/header3-sm.png') }}" alt="" style="position: absolute; top: 0;left: 0;min-width: 100%; height: unset !important;">
+					<img src="{{ asset('/assets/site-img/header3-sm.png') }}" alt="" style="position: absolute; top: 0;left: 0;">
 					<div class="container">
-						<div class="carousel-caption text-start" style="bottom: 1rem !important; right: 25% !important; left: 25%; !important;">
+						<div class="carousel-caption text-start mx-auto" style="bottom: 1rem !important;">
 							<center><h3 class="carousel-header-font">SHOPPING CART</h3></center>
 						</div>
 					</div>
@@ -60,7 +60,7 @@
 
 	<main style="background-color:#ffffff;" class="products-head">
 		<nav>
-			<ol class="breadcrumb" style="font-weight: 300 !important; font-size: 8pt !important; white-space: nowrap !important">
+			<ol class="breadcrumb" style="font-weight: 300 !important; white-space: nowrap !important">
 				<li class="breadcrumb-item">
 					<a href="/cart" style="color: #000000 !important; text-decoration: none;">Shopping Cart</a>
 				</li>
@@ -68,7 +68,7 @@
 					<a href="#" style="color: #000000 !important; text-decoration: underline;">Billing & Shipping Address</a>
 				</li>
 				<li class="breadcrumb-item active">
-					<a href="#" style="color: #c1bdbd !important; text-decoration: none;">Place Order</a>
+					<a href="#" style="color: #928d8d !important; text-decoration: none;">Place Order</a>
 				</li>
 			</ol>
 		</nav>
@@ -114,18 +114,18 @@
 							<div class="col-md-6">
 								<label for="fname" class="formslabelfnt">First Name : <span class="text-danger">*</span></label>
 								<input type="hidden" class="form-control formslabelfnt" id="logtype" name="logtype" value="1" required>
-								<input type="text" class="form-control formslabelfnt" id="fname" name="fname" required value="{{ old('fname') }}">
+								<input type="text" class="form-control formslabelfnt" id="fname" name="fname" required value="{{ old('fname') }}"><br class="d-lg-none d-xl-none"/>
 							</div>
 							<div class="col-md-6">
 								<label for="lname" class="formslabelfnt">Last Name : <span class="text-danger">*</span></label>
-								<input type="text" class="form-control formslabelfnt" id="lname" name="lname" required value="{{ old('lname') }}">
+								<input type="text" class="form-control formslabelfnt" id="lname" name="lname" required value="{{ old('lname') }}"><br class="d-lg-none d-xl-none"/>
 							</div>
 						</div>
 						<br>
 						<div class="row">
 							<div class="col-md-6">
 								<label for="Address1_1" class="formslabelfnt">Address Line 1 : <span class="text-danger">*</span></label>
-								<input type="text" class="form-control formslabelfnt" id="ship_Address1_1" name="ship_Address1_1" required value="{{ old('ship_Address1_1') }}">
+								<input type="text" class="form-control formslabelfnt" id="ship_Address1_1" name="ship_Address1_1" required value="{{ old('ship_Address1_1') }}"><br class="d-lg-none d-xl-none"/>
 							</div>
 							<div class="col-md-6">
 								<label for="Address2_1" class="formslabelfnt">Address Line 2 : </label>
@@ -136,11 +136,11 @@
 						<div class="row">
 							<div class="col-md-4">
 								<label for="province1_1" class="formslabelfnt">Province : <span class="text-danger">*</span></label>
-								<input type="text" class="form-control formslabelfnt" id="ship_province1_1" name="ship_province1_1" required value="{{ old('ship_province1_1') }}">
+								<input type="text" class="form-control formslabelfnt" id="ship_province1_1" name="ship_province1_1" required value="{{ old('ship_province1_1') }}"><br class="d-lg-none d-xl-none"/>
 							</div>
 							<div class="col-md-4">
 								<label for="City_Municipality1_1" class="formslabelfnt">City / Municipality : <span class="text-danger">*</span></label>
-								<input type="text" class="form-control formslabelfnt" id="ship_City_Municipality1_1" name="ship_City_Municipality1_1" required value="{{ old('ship_City_Municipality1_1') }}">
+								<input type="text" class="form-control formslabelfnt" id="ship_City_Municipality1_1" name="ship_City_Municipality1_1" required value="{{ old('ship_City_Municipality1_1') }}"><br class="d-lg-none d-xl-none"/>
 							</div>
 							<div class="col-md-4">
 								<label for="Barangay1_1" class="formslabelfnt">Barangay : <span class="text-danger">*</span></label>
@@ -151,7 +151,7 @@
 						<div class="row">
 							<div class="col-md-4">
 								<label for="postal1_1" class="formslabelfnt">Postal Code : <span class="text-danger">*</span></label>
-								<input type="text" class="form-control formslabelfnt" id="ship_postal1_1" name="ship_postal1_1" required value="{{ old('ship_postal1_1') }}">
+								<input type="text" class="form-control formslabelfnt" id="ship_postal1_1" name="ship_postal1_1" required value="{{ old('ship_postal1_1') }}"><br class="d-lg-none d-xl-none"/>
 							</div>
 							<div class="col-md-4">{{-- Country Select --}}
 								@php
@@ -163,14 +163,14 @@
 									@foreach ($countries as $country)
 									<option value="{{ $country }}" {{ old('ship_country_region1_1') == $country ? 'selected' : '' }}>{{ $country }}</option>
 									@endforeach
-								</select>
+								</select><br class="d-lg-none d-xl-none"/>
 							</div>
 							<div class="col-md-4">
 								<label for="Address_type1_1" class="formslabelfnt">Address Type : <span class="text-danger">*</span></label>
 								<select class="form-control formslabelfnt" id="ship_Address_type1_1" name="ship_Address_type1_1" required>
 									<option selected disabled value="">Choose...</option>
 									<option value="Business Address" {{ old('ship_Address_type1_1') == 'Business Address' ? 'selected' : '' }}>Business Address</option>
-									<option value="Home Address" {{ old('ship_Address_type1_1') == 'Home Address' ? 'selected' : '' }}>Home Address</option>
+									<option value="Home Address" {{ old('ship_Address_type1_1') == 'Home Address' ? 'selected' : '' }}>Home Address</option><br class="d-lg-none d-xl-none"/>
 								</select>
 							</div>
 						</div>
@@ -178,15 +178,15 @@
 						<div class="row">
 							<div class="col-md-4">
 								<label for="email1_1" class="formslabelfnt">Email Address : <span class="text-danger">*</span></label>
-								<input type="email" class="form-control formslabelfnt" id="ship_email" name="ship_email" required value="{{ old('ship_email') }}">
+								<input type="email" class="form-control formslabelfnt" id="ship_email" name="ship_email" required value="{{ old('ship_email') }}"><br class="d-lg-none d-xl-none"/>
 							</div>
 							<div class="col-md-4">
 								<label for="contactnumber1_1" class="formslabelfnt">Mobile Number : <span class="text-danger">*</span></label>
-								<input type="number" class="form-control formslabelfnt" id="ship_mobilenumber1_1" name="ship_mobilenumber1_1" required value="{{ old('ship_mobilenumber1_1') }}">
+								<input type="number" class="form-control formslabelfnt" id="ship_mobilenumber1_1" name="ship_mobilenumber1_1" required value="{{ old('ship_mobilenumber1_1') }}"><br class="d-lg-none d-xl-none"/>
 							</div>
 							<div class="col-md-4">
 								<label for="contactnumber1_1" class="formslabelfnt">Contact Number : </label>
-								<input type="number" class="form-control formslabelfnt" id="contactnumber1_1" name="contactnumber1_1" value="{{ old('contactnumber1_1') }}">
+								<input type="number" class="form-control formslabelfnt" id="contactnumber1_1" name="contactnumber1_1" value="{{ old('contactnumber1_1') }}"><br class="d-lg-none d-xl-none"/>
 							</div>
 						</div>
 						<small style="font-style: italic; font-size: 0.75rem; margin-top: 20px; display: block;">Note: * Required information</small>
@@ -276,12 +276,30 @@
 						</div>
 					</div>
 				</div>
-				<div class="row">
+				{{-- <div class="row">
 					<br/>&nbsp;
 					<div class="col-md-8 mx-auto">
 						<a href="/cart" class="btn btn-lg btn-outline-primary col-md-5 mx-auto" role="button" style="background-color: #777575 !important; border-color: #777575 !important;">BACK</a>
 						<input type="submit" class="btn btn-lg btn-outline-primary col-md-5 mx-auto" role="button" style="float: right;" value="PROCEED">
 					</div>
+				</div> --}}
+				<div class="row mb-4">
+					<div class="col-md-9 mx-auto">
+						<div class="col-md-4 d-none d-xl-block">
+							<a href="/cart" class="btn btn-lg btn-outline-primary" role="button" style="background-color: #777575 !important; border-color: #777575 !important; float: left; width: 94%;margin-left: 5%;">BACK</a>
+						</div>
+						<div class="col-md-4 d-none d-xl-block" style="float: right !important">
+							<button type="submit" class="btn btn-lg btn-outline-primary" style="width: 100% !important">PROCEED</button>
+						</div>
+						<div class="col-md-4 d-md-none d-lg-none d-xl-none">
+							<button type="submit" class="btn btn-lg btn-outline-primary" style="width: 100% !important">PROCEED</button>
+						</div>
+						<br/>
+						<div class="col-md-4 d-md-none d-lg-none d-xl-none">
+							<a href="/cart" class="btn btn-lg btn-outline-primary" role="button" style="background-color: #777575 !important; border-color: #777575 !important; float: left; width: 100%;">BACK</a>
+						</div>
+					</div>
+					
 				</div>
 			</form>
 

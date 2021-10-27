@@ -47,7 +47,7 @@
 		<div id="myCarousel" class="carousel slide" data-bs-ride="carousel">
 			<div class="carousel-inner">
 				<div class="carousel-item active" style="height: 13rem !important;">
-					<img src="{{ asset('/assets/site-img/header3-sm.png') }}" alt="" style="position: absolute; top: 0;left: 0;min-width: 100%; height: unset !important;">
+					<img src="{{ asset('/assets/site-img/header3-sm.png') }}" alt="" style="position: absolute; top: 0;left: 0;">
 					<div class="container">
 						<div class="carousel-caption text-start" style="bottom: 1rem !important; right: 25% !important; left: 25%; !important;">
 							<center><h3 class="carousel-header-font">SHOPPING CART</h3></center>
@@ -412,7 +412,7 @@
 					</div>					
 				</div>
 				<br/>&nbsp;
-				<div class="row">
+				{{-- <div class="row">
 					<br/>&nbsp;
 					<div class="col-md-8 mx-auto">
 						<a href="/cart" class="btn btn-lg btn-outline-primary col-md-5 mx-auto" role="button" style="background-color: #777575 !important; border-color: #777575 !important;">BACK</a>
@@ -422,9 +422,28 @@
 							<input type="checkbox" value="buy_now" name="buy_now" {{ ($item_code_buy) ? "checked" : '' }} readonly>
 						</div>
 						<input type="submit" class="btn btn-lg btn-outline-primary col-md-5 mx-auto" role="button" style="float: right;" value="PROCEED">
-						<input type="text" name="order_no" class="p" value="{{ 'FUM-'.random_int(10000000, 99999999) }}" hidden readonly/>
+						
 					</div>
 
+				</div> --}}
+				<div class="row mb-4">
+					<div class="col-md-9 mx-auto">
+						<div class="col-md-4 d-none d-xl-block">
+							<a href="/cart" class="btn btn-lg btn-outline-primary" role="button" style="background-color: #777575 !important; border-color: #777575 !important; float: left; width: 94%;margin-left: 5%;">BACK</a>
+						</div>
+						<div class="col-md-4 d-none d-xl-block" style="float: right !important">
+							<button type="submit" class="btn btn-lg btn-outline-primary" style="width: 100% !important">PROCEED</button>
+						</div>
+						<div class="col-md-4 d-md-none d-lg-none d-xl-none">
+							<button type="submit" class="btn btn-lg btn-outline-primary" style="width: 100% !important">PROCEED</button>
+						</div>
+						<br/>
+						<div class="col-md-4 d-md-none d-lg-none d-xl-none">
+							<a href="/cart" class="btn btn-lg btn-outline-primary" role="button" style="background-color: #777575 !important; border-color: #777575 !important; float: left; width: 100%;">BACK</a>
+						</div>
+						<input type="text" name="order_no" class="p" value="{{ 'FUM-'.random_int(10000000, 99999999) }}" hidden readonly/>
+					</div>
+					
 				</div>
 			</form>
 		</div>

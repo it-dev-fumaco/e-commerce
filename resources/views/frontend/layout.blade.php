@@ -204,6 +204,26 @@
         text-decoration: none !important;
         letter-spacing: 0.1em;
       }
+      @media (max-width: 575.98px) {
+        header{
+          min-height: 50px;
+        }
+        .breadcrumb{
+          font-size: 8pt !important;
+          font-weight: 500;
+        }
+      }
+
+      @media (max-width: 767.98px) {
+        header{
+          min-height: 50px;
+        }
+        .breadcrumb{
+          font-size: 8pt !important;
+          font-weight: 500;
+        }
+      }
+
     </style>
     {!! ReCaptcha::htmlScriptTagJsApi() !!}
   </head>
