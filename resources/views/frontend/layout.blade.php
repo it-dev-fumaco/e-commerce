@@ -212,6 +212,9 @@
           font-size: 8pt !important;
           font-weight: 500;
         }
+        .track-order-eta{
+          text-align: left !important;
+        }
       }
 
       @media (max-width: 767.98px) {
@@ -221,6 +224,9 @@
         .breadcrumb{
           font-size: 8pt !important;
           font-weight: 500;
+        }
+        .track-order-eta{
+          text-align: left !important;
         }
       }
 

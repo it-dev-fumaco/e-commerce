@@ -73,7 +73,7 @@
 						<tr>
 							<th class="order-font-sub-b">Products</th>
 							<th class="order-font-sub-b">&nbsp;&nbsp;</th>
-							<th class="order-font-sub-b text-center">Price</th>
+							<th class="order-font-sub-b text-center d-none d-sm-table-cell">Price</th>
 							<th class="order-font-sub-b text-center">Action</th>
 						</tr>
 					</thead>
@@ -95,10 +95,13 @@
 							<td class="text-center">
 								<img src="{{ asset('/storage/item_images/'.$wishlist['item_code'].'/gallery/preview/'.$wishlist['image']) }}" class="img-responsive" alt="" width="55" height="55">
 							</td>
-							<td class="tbls">{{ $wishlist['item_name'] }}</td>
-							<td class="tbls text-center">P {{ number_format($wishlist['item_price'], 2) }}</td>
+							<td class="tbls">{{ $wishlist['item_name'] }}<br/>&nbsp;
+							<p class="d-lg-none d-xl-none"><b>Price:</b> P {{ number_format($wishlist['item_price'], 2) }}</p>
+							</td>
+							<td class="tbls text-center d-none d-sm-table-cell">P {{ number_format($wishlist['item_price'], 2) }}</td>
 							<td class="tbls text-center">
-								<a href="/product/{{ $wishlist['item_code'] }}" class="btn btn-success" role="button" style="color: #fff; background-color: #1a6ea9; border-color: #1a6ea9; border-radius: 0rem;">View</a>&nbsp;
+								<a href="/product/{{ $wishlist['item_code'] }}" class="btn btn-success d-none d-lg-inline d-xl-inline" role="button" style="color: #fff; background-color: #1a6ea9; border-color: #1a6ea9; border-radius: 0rem;">View</a>&nbsp;
+								<a href="/product/{{ $wishlist['item_code'] }}" class="btn btn-success d-lg-none d-xl-none" role="button" style="color: #fff; background-color: #1a6ea9; border-color: #1a6ea9; border-radius: 0rem;"><i class="fas fa-eye"></i></a>&nbsp;
 								<button type="button" class="btn btn-danger rounded-0" data-toggle="modal" data-target="#rmw{{ $wishlist['wishlist_id'] }}">
 									<i class="fas fa-trash-alt"></i>
 								</button>

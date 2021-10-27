@@ -61,12 +61,12 @@
 	<main style="background-color:#ffffff; min-height: 500px;" class="products-head">
 		<div class="container-fluid">
 			<div class="row">
-				<div class="col-lg-12" style="padding-left: 15%; padding-right: 15%;">
+				<div class="col-lg-8 mx-auto">
 					<br><br>
 					<center><h3>Order History</h3></center>
 					<br><br>
 				</div>
-				<div class="col-lg-12" style="padding-left: 15%; padding-right: 15%;">
+				<div class="col-lg-8 mx-auto">
 					<table class="table">
 						{{-- <col style="width: 20%;">
 						<col style="width: 15%;">
@@ -75,18 +75,31 @@
 						<col style="width: 15%;"> --}}
 						<thead>
 							<tr>
-								<th class="text-center">Order Number</th>
+								<th class="text-center d-none d-sm-table-cell">Order Number</th>
 								<th class="text-center">Date</th>
 								<th class="text-center">Details</th>
-								<th class="text-center">Shipping</th>
-								<th class="text-center">Est. Delivery Date</th>
-								<th class="text-center">Status</th>
+								<th class="text-center d-none d-sm-table-cell">Shipping</th>
+								<th class="text-center d-none d-sm-table-cell">Est. Delivery Date</th>
+								<th class="text-center d-none d-sm-table-cell">Status</th>
 							</tr>
 						</thead>
 						<tbody>
 							@forelse ($orders_arr as $order)
+							@php
+								if($order['status'] == "Order Placed"){
+									$badge = '#ffc107';
+								}else if($order['status'] == "Cancelled"){
+									$badge = '#6c757d';
+								}else if($order['status'] == "Delivered"){
+									$badge = '#fd6300';
+								}else if($order['status'] == "Out for Delivery"){
+									$badge = '#28a745';
+								}else{
+									$badge = '#007bff';
+								}
+							@endphp
 							<tr>
-								<td class="text-center align-middle">{{ $order['order_number'] }}</td>
+								<td class="text-center align-middle d-none d-sm-table-cell">{{ $order['order_number'] }}</td>
 								<td class="text-center align-middle">{{ $order['date'] }}</td>
 								<td class="text-center align-middle">
 									<a href="#" data-toggle="modal" data-target="#{{ $order['order_number'] }}-Modal">Item Purchase</a>
@@ -129,8 +142,23 @@
 																</td>
 															</tr>
 														@endforeach
+														<tr class="d-lg-none d-xl-none" style="border-bottom: rgba(0,0,0,0) !important">
+															<td></td>
+															<td colspan=2 style="text-align: right;">Subtotal: </td>
+															<td style="text-align: left; white-space: nowrap !important">₱ {{ number_format($order['subtotal'], 2) }}</td>
+														</tr>
+														<tr class="d-lg-none d-xl-none" style="border-bottom: rgba(0,0,0,0) !important">
+															<td></td>
+															<td colspan=2 style="text-align: right;">Shipping Fee: </td>
+															<td style="text-align: left; white-space: nowrap !important">₱ {{ number_format($order['shipping_fee'], 2) }}</td>
+														</tr>
+														<tr class="d-lg-none d-xl-none" style="border-bottom: rgba(0,0,0,0) !important; font-weight: 700 !important">
+															<td></td>
+															<td colspan=2 style="text-align: right;">Grand Total: </td>
+															<td style="text-align: left; white-space: nowrap !important">₱ {{ number_format($order['grand_total'], 2) }}</td>
+														</tr>
 													</table>
-													<div class="row">
+													<div class="row d-none d-xl-block">
 														<div class="col-md-10" style="text-align: right;">
 															<span>Subtotal: </span>
 														</div>
@@ -157,24 +185,16 @@
 											</div>
 										</div>
 									</div>
-
+									<div class="d-lg-none d-xl-none" style="text-align: left;">
+										<br/>
+										<b>Shipping Name:</b> {{ $order['shipping_name'] }}<br/><br/>
+										<b>Est. Delivery Date:</b> {{ $order['edd'] }}<br/>
+										<span class="badge text-dark" style="background-color: {{ $badge }}; font-size: 0.9rem; color: #fff !important;">{{ $order['status'] }}</span>
+									</div>
 								</td>
-								<td class="text-center align-middle">{{ $order['shipping_name'] }}</td>
-								<td class="text-center align-middle">{{ $order['edd'] }}</td>
-								@php
-									if($order['status'] == "Order Placed"){
-										$badge = '#ffc107';
-									}else if($order['status'] == "Cancelled"){
-										$badge = '#6c757d';
-									}else if($order['status'] == "Delivered"){
-										$badge = '#fd6300';
-									}else if($order['status'] == "Out for Delivery"){
-										$badge = '#28a745';
-									}else{
-										$badge = '#007bff';
-									}
-								@endphp
-								<td class="text-center align-middle"><span class="badge text-dark" style="background-color: {{ $badge }}; font-size: 0.9rem; color: #fff !important;">{{ $order['status'] }}</span></td>
+								<td class="text-center align-middle d-none d-sm-table-cell">{{ $order['shipping_name'] }}</td>
+								<td class="text-center align-middle d-none d-sm-table-cell">{{ $order['edd'] }}</td>
+								<td class="text-center align-middle d-none d-sm-table-cell"><span class="badge text-dark" style="background-color: {{ $badge }}; font-size: 0.9rem; color: #fff !important;">{{ $order['status'] }}</span></td>
 							</tr>
 							@empty
 								<tr>
