@@ -662,6 +662,8 @@ class CheckoutController extends Controller
             $shipping_offer_rates[] = [
                 'shipping_service_name' => $row->shipping_service_name,
                 'expected_delivery_date' => $expected_delivery_date,
+				'min_lead_time' => $row->min_leadtime,
+				'max_lead_time' => $row->max_leadtime,
                 'shipping_cost' => (float)$row->amount,
                 'external_carrier' => false,
                 'allow_delivery_after' => 0,
@@ -706,6 +708,8 @@ class CheckoutController extends Controller
                 $shipping_offer_rates[] = [
                     'shipping_service_name' => $row->shipping_service_name,
                     'expected_delivery_date' => $expected_delivery_date,
+					'min_lead_time' => $row->min_leadtime, //
+					'max_lead_time' => $row->max_leadtime, //
                     'shipping_cost' => $shipping_cost,
                     'external_carrier' => false,
                     'allow_delivery_after' => 0,
