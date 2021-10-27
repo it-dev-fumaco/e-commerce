@@ -229,6 +229,21 @@
           text-align: left !important;
         }
       }
+      .user-icon{
+        font-size: 24px;
+      }
+      @media (max-width: 1199.98px) {/* tablet */
+        .nav-item, .searchstyle{
+          font-size: 12px !important;
+          margin: 0 !important;
+        }
+        .user-icon{
+          font-size: 20px !important; 
+        }
+        .nav-a{
+          padding: 0 !important;
+        }
+      }
 
     </style>
     {!! ReCaptcha::htmlScriptTagJsApi() !!}
@@ -244,7 +259,7 @@
             <img src="{{ asset('/assets/site-img/logo-sm.png') }}" alt="">
           </a>
           {{-- Cart Icon --}}
-          <a class="d-md-none d-lg-none d-xl-none" href="/cart" style="margin-left: 70px !important;">
+          <a class="d-md-none d-lg-none d-xl-none" href="/cart" style="margin-left: 30px !important; text-decoration: none !important">
             <div class="" style="width: 50px !important; padding: 0 !important;">
               <i class="fa" style="font-size:24px; color:#126cb6;">&#xf07a;</i><span class="badge badge-warning count-cart-items" id="lblCartCount" style="font-size: 12px; background: #ff0000; color: #fff; padding: 4px 7px; vertical-align: top; margin-left: -10px;display: unset !important; font-weight: 500 !important; border-radius: 1rem !important; margin-top: -15px;">0</span>
             </div>
@@ -253,7 +268,7 @@
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
-          <div class="collapse navbar-collapse nav_fumaco_res" id="navbarCollapse">
+          <div class="collapse navbar-collapse nav_fumaco_res nav-a" id="navbarCollapse">
             <ul class="navbar-nav me-auto mb-2 mb-md-0 navbar-header">
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDarkDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">PRODUCTS</a>
@@ -266,6 +281,8 @@
               <li class="nav-item">
                 <a class="nav-link" href="/journals">BLOGS</a>
               </li>
+              @if(!Auth::check())
+              <li class="nav-item">
                 <a class="nav-link" href="/track_order">TRACK ORDER</a>
               </li>
               @endif
@@ -327,13 +344,13 @@
 
           </div>
           {{-- Cart Icon --}}
-          <a class="d-none d-lg-block d-xl-block" href="/cart">
+          <a class="d-none d-md-block d-lg-block d-xl-block" style="text-decoration: none !important" href="/cart">
             <div class="" style="width: 50px !important; padding: 0 !important; margin-right: -20px !important">
               <i class="fa" style="font-size:24px; color:#126cb6;">&#xf07a;</i><span class="badge badge-warning count-cart-items" id="lblCartCount" style="font-size: 12px; background: #ff0000; color: #fff; padding: 4px 7px; vertical-align: top; margin-left: -10px;display: unset !important; font-weight: 500 !important; border-radius: 1rem !important; margin-top: -15px;">0</span>
             </div>
           </a>
           {{-- Cart Icon --}}
-          <div class="d-lg-block d-xl-none" style="width: 100% !important">
+          <div class="d-sm-block d-md-none d-lg-none d-xl-none test" style="width: 100% !important">
             <div class="col-md-12">
               <form action="/" method="GET">
                 <div class="input-group mb-0 searchbar" style="width: 100% !important;">
