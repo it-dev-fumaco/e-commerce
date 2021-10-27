@@ -84,12 +84,12 @@
 							<thead>
 								<tr style="font-size: 0.9rem;">
 									<th class="text-left" colspan="2">Item Description</th>
-									<th class="text-center">Qty</th>
+									<th class="text-center d-none d-sm-table-cell">Qty</th>
 									@if ($sum_discount > 0)
-									<th class="text-center">Discount (%)</th>
+									<th class="text-center d-none d-sm-table-cell">Discount (%)</th>
 									@endif
-									<th class="text-center">Price</th>
-									<th class="text-center">Amount</th>
+									<th class="text-center d-none d-sm-table-cell">Price</th>
+									<th class="text-center d-none d-sm-table-cell">Amount</th>
 								</tr>
 							</thead>
 							<tbody>
@@ -101,13 +101,25 @@
 									<td class="text-center">
 										<img src="{{ $src }}" class="img-responsive" alt="" width="55" height="55">
 									</td>
-									<td>{{ $item['item_name'] }}</td>
-									<td class="text-center">{{ $item['qty'] }}</td>
+									<td>{{ $item['item_name'] }}
+									{{-- for mobile --}}
+									<div class="d-lg-none d-xl-none">
+										<br/>
+										<p><b>Qty:</b> {{ $item['qty'] }}</p>
+										@if ($sum_discount > 0)
+											<p><b>Discount (%):</b> {{ $item['discount'] . '%' }}</p>
+										@endif
+										<p><b>Price:</b> ₱ {{ number_format(str_replace(",","",$item['price']), 2) }}</p>
+										<p><b>Amount:</b> ₱ {{ number_format(str_replace(",","",$item['amount']), 2) }}</p>
+									</div>
+									{{-- for mobile --}}
+									</td>
+									<td class="text-center d-none d-sm-table-cell">{{ $item['qty'] }}</td>
 									@if ($sum_discount > 0)
-									<td class="text-center">{{ $item['discount'] . '%' }}</td>
+									<td class="text-center d-none d-sm-table-cell">{{ $item['discount'] . '%' }}</td>
 									@endif
-									<td class="text-right" style="text-align: right;">₱ {{ number_format(str_replace(",","",$item['price']), 2) }}</td>
-									<td class="text-right" style="text-align: right;">₱ {{ number_format(str_replace(",","",$item['amount']), 2) }}</td>
+									<td class="text-right d-none d-sm-table-cell" style="text-align: right;">₱ {{ number_format(str_replace(",","",$item['price']), 2) }}</td>
+									<td class="text-right d-none d-sm-table-cell" style="text-align: right;">₱ {{ number_format(str_replace(",","",$item['amount']), 2) }}</td>
 								 </tr>
 								@empty
 								<tr>
@@ -117,22 +129,25 @@
 							</tbody>
 							<tfoot>
 								<tr style="font-size: 0.8rem; text-align: right;">
-									<td class="pb-1 pt-1" colspan="{{ $colspan }}">Subtotal</td>
+									<td class="pb-1 pt-1 d-none d-sm-table-cell" colspan="{{ $colspan }}">Subtotal</td>
+									<td class="pb-1 pt-1 d-lg-none d-xl-none">Subtotal</td>
 									<td class="pb-1 pt-1">₱ {{ number_format(str_replace(",","",$order_details->order_subtotal), 2) }}</td>
 								</tr>
 								<tr style="font-size: 0.8rem; text-align: right;">
-									<td class="pb-1 pt-1" colspan="{{ $colspan }}">{{ $order_details->order_shipping }}</td>
+									<td class="pb-1 pt-1 d-none d-sm-table-cell" colspan="{{ $colspan }}">{{ $order_details->order_shipping }}</td>
+									<td class="pb-1 pt-1 d-lg-none d-xl-none">{{ $order_details->order_shipping }}</td>
 									<td class="pb-1 pt-1">₱ {{ number_format(str_replace(",","",$order_details->order_shipping_amount), 2) }}</td>
 								</tr>
 								<tr style="font-size: 0.9rem; text-align: right; border-top: 2px solid;">
-									<td class="pb-1 pt-1" colspan="{{ $colspan }}"><b>Grand Total</b></td>
+									<td class="pb-1 pt-1 d-none d-sm-table-cell" colspan="{{ $colspan }}"><b>Grand Total</b></td>
+									<td class="pb-1 pt-1 d-lg-none d-xl-none"><b>Grand Total</b></td>
 									<td class="pb-1 pt-1"><b>₱ {{ number_format(str_replace(",","",($order_details->order_shipping_amount + $order_details->order_subtotal)), 2) }}</b></td>
 								</tr>
 							</tfoot>
 						</table>
 					</div>
 				</div>
-				<div class="col-lg-12 text-center p-5">
+				<div class="col-lg-12 text-center mx-auto"><br/><br/>
 					<a href="/" class="btn btn-lg btn-outline-primary" role="button" style="background-color: #313131 !important; border-color: #313131 !important;">RETURN TO HOMEPAGE</a>
 					<br>
 				</div>

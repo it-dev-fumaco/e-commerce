@@ -139,7 +139,7 @@
                                         <a href="#" class="quantity-left-minus btn btn-number" style="background-color: #ccc !important; height: 100% !important; border-radius: 0px !important;"> - </a>
                                     </span>
                                     <div>&nbsp;</div>
-                                    <input type="text" name="quantity[]" class="form-control input-number " value="{{ $cart['quantity'] }}" min="1" max="{{ $cart['stock_qty'] }}" style="width: 5px !important; text-align: center !important;" data-id="{{ $cart['item_code'] }}">
+                                    <input type="text" name="res_quantity[]" class="form-control input-number " value="{{ $cart['quantity'] }}" min="1" max="{{ $cart['stock_qty'] }}" style="width: 5px !important; text-align: center !important;" data-id="{{ $cart['item_code'] }}">
                                     <div>&nbsp;</div>
                                     <span class="input-group-btn">
                                         <a href="#" class="quantity-right-plus btn btn-number" style="background-color: #ccc !important; height: 100% !important; border-radius: 0px !important;"> + </a>
@@ -268,10 +268,13 @@
             var input_name = row.find('input[name="quantity[]"]').eq(0);
             var id = input_name.data('id');
 
+            var res_input_name = row.find('input[name="res_quantity[]"]').eq(0);
+
             var current_qty = input_name.val();
             if (current_qty > 1) {
                 current_qty--;
                 input_name.val(current_qty);
+                res_input_name.val(current_qty);
                 updateAmount(row);
                 updateCart('decrement', id, current_qty);
             }
@@ -284,10 +287,13 @@
             var max = input_name.attr('max');
             var id = input_name.data('id');
 
+            var res_input_name = row.find('input[name="res_quantity[]"]').eq(0);
+
             var current_qty = input_name.val();
             if (current_qty < max) {
                 current_qty++;
                 input_name.val(current_qty);
+                res_input_name.val(current_qty);
                 updateAmount(row);
                 updateCart('increment', id, current_qty);
             }
