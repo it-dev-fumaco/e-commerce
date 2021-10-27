@@ -253,7 +253,7 @@ class OrderController extends Controller
     
                 DB::table('track_order')->where('track_code', $request->order_number)->update(['track_status' => $status, 'track_date_update' => $now]);
     
-                // DB::commit();
+                DB::commit();
             }
 
             return redirect()->back()->with('success', 'Order <b>'.$request->order_number.'</b> status has been updated.');
