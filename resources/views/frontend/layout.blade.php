@@ -427,10 +427,13 @@
           </div>
           <div class="col-lg-4" style="text-align: right !important;">
             <h6 class="footer1st" style="color:#ffffff !important;">SUBSCRIBE TO OUR NEWSLETTER</h6>
-            <div class="input-group mb-3">
-              <input type="text" class="form-control" placeholder="Email Address" aria-label="Recipient's username" aria-describedby="basic-addon2">
-              <span class="input-group-text" id="basic-addon2">Subscribe</span>
-            </div>
+            <form action="/subscribe" method="POST">
+              @csrf
+              <div class="input-group mb-3">
+                <input type="text" class="form-control" name="email" placeholder="Email Address" aria-label="Recipient's username" aria-describedby="basic-addon2" required>
+                <button class="input-group-text" id="basic-addon2">Subscribe</button>
+              </div>
+            </form>
           </div>
         </div>
       </div>

@@ -123,7 +123,7 @@
                                 </div>
                                 <br>
                                 <div class="row">
-                                    <p class="reg_link" style="white-space: wrap;"><input type="checkbox"> &nbsp;Yes, I want to receive email updates and notifications.</p>
+                                    <p class="reg_link" style="white-space: wrap;"><input type="checkbox" name="subscribe"> &nbsp;Yes, I want to receive email updates and notifications.</p>
                                     <p class="reg_link" style=""><input type="checkbox" id="terms_checkbox"> I agree to <a href="/privacy_policy" style="display: inline-block !important;">Privacy Policy</a> and <a href="/terms_condition" style="display: inline-block !important;">Terms</a>.</p>
                                     <input type="submit" id="reg_btn" class="btn btn-primary" value="REGISTER" disabled><br/>
                                 </div>

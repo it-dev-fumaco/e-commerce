@@ -191,6 +191,35 @@ class FrontendController extends Controller
         return view('frontend.homepage', compact('carousel_data', 'blogs', 'best_selling_arr', 'on_sale_arr'));
     }
 
+    public function newsletterSubscription(Request $request){
+        DB::beginTransaction();
+        try{
+            $checker = DB::table('fumaco_subscribe')->where('email', $request->email)->count();
+
+            if($checker > 0){
+                return redirect()->back()->with('error_subscribe', 'Email already subscribed!');
+            }
+
+            $insert = [
+                'email' => $request->email,
+                'status' => 1,
+                'ip_logs' => $request->ip()
+            ];
+
+            DB::table('fumaco_subscribe')->insert($insert);
+
+            DB::commit();
+
+            return redirect('/thankyou');
+        }catch(Exception $e){
+            DB::rollback();
+        }
+    }
+
+    public function subscribeThankyou(){
+        return view('frontend.subscribe_thankyou');
+    }
+
     // returns an array of product category
     public function getProductCategories() {
         $item_categories = DB::table('fumaco_categories')->where('publish', 1)->get();
@@ -224,6 +253,19 @@ class FrontendController extends Controller
                 'f_email' => 'fumacoco_dev',
                 'f_temp_passcode' => 'fumaco12345'
             ];
+
+            if(isset($request->subscribe)){
+                $checker = DB::table('fumaco_subscribe')->where('email', $request->username)->count();
+                if($checker == 0){
+                    $newsletter = [
+                        'email' => $request->username,
+                        'status' => 1,
+                        'ip_logs' => $request->ip()
+                    ];
+        
+                    DB::table('fumaco_subscribe')->insert($newsletter);
+                }
+            }
 
             DB::table('fumaco_users')->insert($new_user);
 
