@@ -268,7 +268,7 @@
 			<br/>
 			<div class="row mb-4">
 				<div class="col-md-8 mx-auto">
-					<div class="col-md-4 d-none d-xl-block">
+					<div class="col-md-4 d-none d-md-block d-xl-block">
 						<a href="javascript:history.back()" class="btn btn-lg btn-outline-primary" role="button" style="background-color: #777575 !important; border-color: #777575 !important; float: left; width: 94%;">BACK</a>
 					</div>
 					{{-- <a href="javascript:history.back()" class="btn btn-lg btn-outline-primary col-md-4" role="button" style="background-color: #777575 !important; border-color: #777575 !important; float: left;">BACK</a> --}}

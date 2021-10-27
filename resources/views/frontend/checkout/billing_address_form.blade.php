@@ -284,9 +284,9 @@
 					</div>
 				</div> --}}
 				<div class="row mb-4">
-					<div class="col-md-9 mx-auto">
+					<div class="col-md-8 mx-auto">
 						<div class="col-md-4 d-none d-md-block d-lg-block d-xl-block">
-							<a href="/cart" class="btn btn-lg btn-outline-primary" role="button" style="background-color: #777575 !important; border-color: #777575 !important; float: left; width: 94%;margin-left: 5%;">BACK</a>
+							<a href="/cart" class="btn btn-lg btn-outline-primary" role="button" style="background-color: #777575 !important; border-color: #777575 !important; float: left; width: 94%;">BACK</a>
 						</div>
 						<div class="col-md-4 d-none d-md-block d-lg-block d-xl-block" style="float: right !important">
 							<button type="submit" class="btn btn-lg btn-outline-primary" style="width: 100% !important">PROCEED</button>
