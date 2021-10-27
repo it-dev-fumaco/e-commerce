@@ -232,6 +232,9 @@
       .user-icon{
         font-size: 24px;
       }
+      .search-bar{
+        width: 400px !important;
+      }
       @media (max-width: 1199.98px) {/* tablet */
         .nav-item, .searchstyle{
           font-size: 12px !important;
@@ -242,6 +245,9 @@
         }
         .nav-a{
           padding: 0 !important;
+        }
+        .search-bar{
+          width: auto !important;
         }
       }
 
@@ -258,16 +264,22 @@
           <a class="navbar-brand" href="/" id="navbar-brand">
             <img src="{{ asset('/assets/site-img/logo-sm.png') }}" alt="">
           </a>
-          {{-- Cart Icon --}}
-          <a class="d-md-none d-lg-none d-xl-none" href="/cart" style="margin-left: 30px !important; text-decoration: none !important">
+          {{-- Mobile Icons --}}
+          <a class="d-md-none d-lg-none d-xl-none" style="color: #000; margin-left: 10px !important" href="/login">
+            <i class="far fa-user user-icon" style=""></i>
+          </a>
+
+          <a class="d-md-none d-lg-none d-xl-none" href="/cart" style="text-decoration: none !important; margin-left: 10px !important">
             <div class="" style="width: 50px !important; padding: 0 !important;">
               <i class="fa" style="font-size:24px; color:#126cb6;">&#xf07a;</i><span class="badge badge-warning count-cart-items" id="lblCartCount" style="font-size: 12px; background: #ff0000; color: #fff; padding: 4px 7px; vertical-align: top; margin-left: -10px;display: unset !important; font-weight: 500 !important; border-radius: 1rem !important; margin-top: -15px;">0</span>
             </div>
           </a>
-          {{-- Cart Icon --}}
+
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
+          {{-- Mobile Icons --}}
+
           <div class="collapse navbar-collapse nav_fumaco_res nav-a" id="navbarCollapse">
             <ul class="navbar-nav me-auto mb-2 mb-md-0 navbar-header">
               <li class="nav-item dropdown">
@@ -292,7 +304,7 @@
             </ul>
             <form class="d-none d-md-block" action="/" method="GET">
               <div class="input-group mb-0 searchbar">
-                <input type="text" placeholder="Search" name="s" value="{{ request()->s }}" class="form-control searchstyle" aria-label="Text input with dropdown button">
+                <input type="text" placeholder="Search" name="s" value="{{ request()->s }}" class="form-control searchstyle search-bar" aria-label="Text input with dropdown button">
                 <select class="custom-select form-control" name="by" style="max-width: 115px !important;" hidden>
                   <option value="all" {{ request()->by == 'all' ? 'selected' : '' }}>All</option>
                   <option value="products" {{ request()->by == 'products' ? 'selected' : '' }}>Products</option>
@@ -304,7 +316,7 @@
             <ul class="navbar-nav">
               @if(!Auth::check())
               {{-- Guest --}}
-              <a class="dropdown-item" href="/login">
+              <a class="dropdown-item d-none d-md-block" href="/login">
                 <i class="far fa-user user-icon" style=""></i>
               </a>
               {{-- Guest --}}
