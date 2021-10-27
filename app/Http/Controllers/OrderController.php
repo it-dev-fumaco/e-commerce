@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Http;
 use DB;
+use Mail;
 use Carbon\Carbon;
 
 class OrderController extends Controller
@@ -225,11 +226,18 @@ class OrderController extends Controller
                 'date_cancelled' => $date_cancelled
             ];
 
+            $order_details = DB::table('fumaco_order')->where('order_number', $request->order_number)->first();
+            Mail::send('emails.order_status', ['id' => $request->order_number, 'status' => $status], function($message) use($order_details){
+                $message->to(trim($order_details->order_email));
+                $message->subject('Order Status - FUMACO');
+            });
 
             DB::table('fumaco_order')->where('order_number', $request->order_number)->update($orders_arr);
 
             DB::table('track_order')->where('track_code', $request->order_number)->update(['track_status' => $status, 'track_date_update' => $now]);
+
 			DB::commit();
+            
             return redirect()->back()->with('success', 'Order <b>'.$request->order_number.'</b> status has been updated.');
 		}catch(Exception $e){
 			DB::rollback();

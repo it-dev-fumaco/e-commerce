@@ -377,7 +377,7 @@ class CheckoutController extends Controller
 						$payment_method = 'Credit Card';
 						break;
 					case 'MO':
-						$payment_method = 'Credit Card';
+						$payment_method = 'Credit Card (MOTO)';
 						break;
 					case 'DD':
 						$payment_method = 'Direct Debit';

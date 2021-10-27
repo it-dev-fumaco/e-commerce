@@ -13,6 +13,7 @@ class VerifyCsrfToken extends Middleware
      */
     protected $except = [
         '/checkout/success/*',
-        '/checkout/callback'
+        '/checkout/callback',
+        '/checkout/failed'
     ];
 }

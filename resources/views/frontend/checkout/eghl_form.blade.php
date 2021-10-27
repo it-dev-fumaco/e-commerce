@@ -7,7 +7,7 @@
     $payment_id = 'FUM' . date('Y') . date('d') . explode(" ", microtime())[1];
     $order_no = $temp->order_tracker_code;
     $page_timeout = '200';
-    $merchantreturn = url('') . '/cart';
+    $merchantreturn = url('') . '/checkout/failed';
     $merchantcallback = url('') . '/checkout/callback';
     $merchantapprovalurl =  url('') . '/checkout/success/' . $temp->xtempcode;
     $merchantunapprovalurl =  url('') . '/checkout/failed';
