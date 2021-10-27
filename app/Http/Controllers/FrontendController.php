@@ -16,6 +16,20 @@ use Illuminate\Pagination\LengthAwarePaginator;
 class FrontendController extends Controller
 {
     public function index(Request $request) {
+        // get sorting value 
+        $sortby = $request->sortby;
+        switch ($sortby) {
+            case 'Price':
+                $sortby = 'f_price';
+                break;
+            case 'Product Name':
+                $sortby = 'f_name_name';
+                break;
+            default:
+                $sortby = 'f_order_by';
+                break;
+        }
+        
         if ($request->has('s')) {
             $search_by = $request->by;
             $search_str = $request->s;
@@ -46,7 +60,7 @@ class FrontendController extends Controller
                             $q->orWhere('f_idcode', 'LIKE', "%".$search_str."%")
                                 ->orWhere('f_item_classification', 'LIKE', "%".$search_str."%");
                         })
-                        ->where('f_status', 1)->orderBy('f_date', 'desc')->get();
+                        ->where('f_status', 1)->where('f_status', 1)->orderBy($sortby, 'asc')->get();
                 }
 
                 if (in_array($search_by, ['blogs', 'all', ''])) {
@@ -107,7 +121,7 @@ class FrontendController extends Controller
             // Create a new Laravel collection from the array data
             $itemCollection = collect($results);
             // Define how many items we want to be visible in each page
-            $perPage = 18;
+            $perPage = 16;
             // Slice the collection to get the items to display in current page
             $currentPageItems = $itemCollection->slice(($currentPage * $perPage) - $perPage, $perPage)->all();
             // Create our paginator and pass it to the view

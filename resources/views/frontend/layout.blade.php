@@ -304,12 +304,7 @@
             </ul>
             <form class="d-none d-md-block" action="/" method="GET">
               <div class="input-group mb-0 searchbar">
-                <input type="text" placeholder="Search" name="s" value="{{ request()->s }}" class="form-control searchstyle search-bar" aria-label="Text input with dropdown button">
-                <select class="custom-select form-control" name="by" style="max-width: 115px !important;" hidden>
-                  <option value="all" {{ request()->by == 'all' ? 'selected' : '' }}>All</option>
-                  <option value="products" {{ request()->by == 'products' ? 'selected' : '' }}>Products</option>
-                  <option value="blogs" {{ request()->by == 'blogs' ? 'selected' : '' }}>Blogs</option>
-                </select>
+                <input type="text" placeholder="Search" name="s" value="{{ request()->s }}" class="form-control searchstyle" aria-label="Text input with dropdown button">
                   <button class="btn btn-outline-secondary searchstyle" type="submit"><i class="fas fa-search"></i></button>
               </div>
             </form>

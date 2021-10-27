@@ -30,11 +30,24 @@
 <main style="background-color:#0062A5;">
 	<div id="myCarousel" class="carousel slide" data-bs-ride="carousel">
 		<div class="carousel-inner">
-			<div class="carousel-item active" style="height: 13rem !important;">
+			<div class="carousel-item active" style="height: 17rem !important;">
 				<img src="{{ asset('/assets/site-img/header3-sm.png') }}" alt="" style="position: absolute; top: 0;left: 0;min-width: 100%; height: unset !important; ">
 				<div class="container">
-					<div class="carousel-caption text-start" style="bottom: 1rem !important; right: 25% !important; left: 25%; !important;">
-						<h3 class="carousel-header-font text-center">SEARCH RESULT</h3>
+				
+							<div class="carousel-caption text-start" style="bottom: 1rem !important; right: 25% !important; left: 25%; !important;">
+								<div class="row justify-content-md-center">
+									<div class="col-md-8">
+								<h3 class="carousel-header-font text-center"><b>{{ $results->total() }} result(s) found</b></h3>
+								<form action="/" method="GET">
+								<div class="input-group mb-3">
+									<input type="text" class="form-control" placeholder="Search" name="s" value="{{ request()->s }}">
+									<div class="input-group-append">
+									  <button class="btn btn-outline-secondary btn-light rounded-right" type="submit"><i class="fas fa-search"></i></button>
+									</div>
+								</div>
+								</form>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -45,9 +58,28 @@
 	<div class="container">
 		@if(request()->s != null)
 		<div class="row">
-			<div class="col-md-12 mt-4 mb-2">
-				<h5>Search result(s) for: <span style="font-style: italic;"><b>{{ request()->s }}</b></span></h5>
+			<div class="col-md-6 mt-4 mb-2">
+				<h4><b>Search Results</b></h4>
+				<small>Showing {{ $results->firstItem() . ' - ' . $results->lastItem() }} out of {{ $results->total() }}</small>
 			</div>
+			<div class="col-md-6 mt-4 mb-2">
+				<div class="row mb-2">
+					<div class="col-md-9 pr-1" style="text-align: right;">
+						<label class="mt-1 mb-1 mr-0" style="font-size: 0.75rem;">Sort By</label>
+					</div>
+					<div class="col-md-3" style="padding-left: 0;">
+						<select name="sortby" class="form-control form-control-sm">
+							<option value="Position" data-loc="{{ request()->fullUrlWithQuery(['sortby' => 'Position']) }}" {{ (request()->sortby == 'Position') ? 'selected' : '' }}>Recommended</option>
+							<option value="Product Name" data-loc="{{ request()->fullUrlWithQuery(['sortby' => 'Product Name']) }}" {{ (request()->sortby == 'Product Name') ? 'selected' : '' }}>Product Name</option>
+							<option value="Price" data-loc="{{ request()->fullUrlWithQuery(['sortby' => 'Price']) }}" {{ (request()->sortby == 'Price') ? 'selected' : '' }}>Price</option>
+						</select>
+					</div>
+				</div>
+			
+			</div>
+
+
+		
 		</div>
 		@endif
 		@if (count($results) < 1)
@@ -59,7 +91,7 @@
 				<h4 class="mt-4 mb-3 fw-light bestsellinghead fumacoFont1 animated animatedFadeInUp fadeInUp" style="color:#000000 !important;">{{ request()->s == null ? 'FEATURED PRODUCT(S)' : 'PRODUCT(S)' }}</h4>
 			</div>
 			@foreach ($products as $product)
-			<div class="col-md-4 animated animatedFadeInUp fadeInUp">
+			<div class="col-md-3 animated animatedFadeInUp fadeInUp">
 				<div class="card mb-4">
 					<div class="equal-column-content">
 						@php
@@ -73,7 +105,7 @@
 						</picture>
 						<div class="card-body">
 							<div class="text ellipsis">
-								<p class="card-text fumacoFont_card_title text-concat" style="color:#0062A5 !important; height: 80px;">{{ $product['item_name'] }}</p>
+								<p class="card-text fumacoFont_card_title text-concat" style="color:#0062A5 !important; height: 80px; text-align: left;">{{ $product['item_name'] }}</p>
 							</div>
 							<p class="card-text fumacoFont_card_price" style="color:#000000 !important;">
 								@if($product['is_discounted'])
@@ -84,9 +116,9 @@
 							</p>
 							<div class="d-flex justify-content-between align-items-center">
 								<div class="btn-group stylecap">
-									<span class="fa fa-star checked starcolor"></span>
-									<span class="fa fa-star checked starcolor"></span>
-									<span class="fa fa-star checked starcolor"></span>
+									<span class="fa fa-star starcolorgrey"></span>
+									<span class="fa fa-star starcolorgrey"></span>
+									<span class="fa fa-star starcolorgrey"></span>
 									<span class="fa fa-star starcolorgrey"></span>
 									<span class="fa fa-star starcolorgrey"></span>
 								</div>
@@ -108,7 +140,7 @@
 				<h4 class="mt-4 mb-3 fw-light bestsellinghead fumacoFont1 animated animatedFadeInUp fadeInUp" style="color:#000000 !important;">BLOG(S)</h4>
 			</div>
 			@foreach($blogs as $blog)
-			<div class="col-lg-4 d-flex align-items-stretch animated animatedFadeInUp fadeInUp">
+			<div class="col-lg-3 d-flex align-items-stretch animated animatedFadeInUp fadeInUp">
 				<div class="card mb-4" style="border: 0px solid rgba(0, 0, 0, 0.125) !important;">
 					<img class="card-img-top" src="{{ asset('/assets/journal/'. $blog['image']) }}" alt="">
 					<div class="card-body align-items-stretch p-2">
@@ -135,5 +167,12 @@
 @endsection
 
 @section('script')
+<script>
+  (function() {
+   $(document).on('change', 'select[name="sortby"]', function(){
+		window.location.href = $(this).find(':selected').data('loc');
+   });
+  })();
 
+</script>
 @endsection
