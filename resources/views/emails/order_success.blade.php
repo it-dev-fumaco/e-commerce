@@ -15,10 +15,11 @@
 
 <table border="0" width="50%" bgcolor="#ffffff" cellpadding="0" cellspacing="0" style="margin: 0 auto 0 auto;">
     <tr>
-        <td class="h2" style="padding: 5% 0 0 5%;">Order Confirmation</td>
+        <td class="h2" style="padding: 5% 0 0 5%;">Order Placed</td>
      </tr>
      <tr>
         <td class="bodycopy borderbottom" style="padding: 3% 5% 5% 5%;">
+			Hi {{ $order['order_details']->order_name . ' ' . $order['order_details']->order_lastname }},<br><br>
 			Thank you for your order! <br><br> We received your order and will contact you as soon as your package is shipped. You can find your purchase information below. 	<br><br>
 			Order Summary : {{ date("Y-m-d h:i a") }}
 			<br>

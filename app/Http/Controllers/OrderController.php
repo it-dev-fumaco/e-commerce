@@ -196,48 +196,66 @@ class OrderController extends Controller
             $delivery_date = "";
             $date_cancelled = "";
 
-            if($status == 'Delivered'){
+            if($status) {
                 $ordered_items = DB::table('fumaco_order_items')->where('order_number', $request->order_number)->get();
-                $delivery_date = Carbon::now()->toDateTimeString();
-                foreach($ordered_items as $orders){
-                    $items = DB::table('fumaco_items')->select('f_reserved_qty')->where('f_idcode', $orders->item_code)->first();
-                    $qty_left = $items->f_reserved_qty - $orders->item_qty;
-
-                    DB::table('fumaco_items')->where('f_idcode', $orders->item_code)->update(['f_reserved_qty' => $qty_left]);
+                if($status == 'Delivered'){
+                    $delivery_date = Carbon::now()->toDateTimeString();
+                    foreach($ordered_items as $orders){
+                        $items = DB::table('fumaco_items')->select('f_reserved_qty')->where('f_idcode', $orders->item_code)->first();
+                        $qty_left = $items->f_reserved_qty - $orders->item_qty;
+    
+                        DB::table('fumaco_items')->where('f_idcode', $orders->item_code)->update(['f_reserved_qty' => $qty_left]);
+                    }
                 }
+    
+                if($status == 'Cancelled'){
+                    $date_cancelled = Carbon::now()->toDateTimeString();
+                    foreach($ordered_items as $orders){
+                        $items = DB::table('fumaco_items')->select('f_reserved_qty', 'f_qty')->where('f_idcode', $orders->item_code)->first();
+                        $r_qty = $items->f_reserved_qty - $orders->item_qty;
+                        $f_qty = $items->f_qty + $orders->item_qty;
+    
+                        DB::table('fumaco_items')->where('f_idcode', $orders->item_code)->update(['f_reserved_qty' => $r_qty, 'f_qty' => $f_qty]);
+                    }
+                }
+    
+                $orders_arr = [
+                    'order_status' => $status,
+                    'order_update' => $now,
+                    'date_delivered' => $delivery_date,
+                    'date_cancelled' => $date_cancelled
+                ];
+
+                $items = [];
+                foreach($ordered_items as $row) {
+                    $image = DB::table('fumaco_items_image_v1')->where('idcode', $row->item_code)->first();
+
+                    $items[] = [
+                        'item_code' => $row->item_code,
+                        'item_name' => $row->item_name,
+                        'price' => $row->item_price,
+                        'discount' => $row->item_discount,
+                        'qty' => $row->item_qty,
+                        'amount' => $row->item_total_price,
+                        'image' => ($image) ? $image->imgprimayx : null
+                    ];
+                }
+        
+                if ($status == 'Out for Delivery') {
+                    $order_details = DB::table('fumaco_order')->where('order_number', $request->order_number)->first();
+                    Mail::send('emails.out_for_delivery', ['order_details' => $order_details, 'status' => $status, 'items' => $items], function($message) use($order_details, $status){
+                        $message->to(trim($order_details->order_email));
+                        $message->subject($status . ' - FUMACO');
+                    });
+                }
+                
+                DB::table('fumaco_order')->where('order_number', $request->order_number)->update($orders_arr);
+    
+                DB::table('track_order')->where('track_code', $request->order_number)->update(['track_status' => $status, 'track_date_update' => $now]);
+    
+                // DB::commit();
             }
 
-            if($status == 'Cancelled'){
-                $ordered_items = DB::table('fumaco_order_items')->where('order_number', $request->order_number)->get();
-                $date_cancelled = Carbon::now()->toDateTimeString();
-                foreach($ordered_items as $orders){
-                    $items = DB::table('fumaco_items')->select('f_reserved_qty', 'f_qty')->where('f_idcode', $orders->item_code)->first();
-                    $r_qty = $items->f_reserved_qty - $orders->item_qty;
-                    $f_qty = $items->f_qty + $orders->item_qty;
-
-                    DB::table('fumaco_items')->where('f_idcode', $orders->item_code)->update(['f_reserved_qty' => $r_qty, 'f_qty' => $f_qty]);
-                }
-            }
-
-            $orders_arr = [
-                'order_status' => $status,
-                'order_update' => $now,
-                'date_delivered' => $delivery_date,
-                'date_cancelled' => $date_cancelled
-            ];
-
-            $order_details = DB::table('fumaco_order')->where('order_number', $request->order_number)->first();
-            Mail::send('emails.order_status', ['id' => $request->order_number, 'status' => $status], function($message) use($order_details){
-                $message->to(trim($order_details->order_email));
-                $message->subject('Order Status - FUMACO');
-            });
-
-            DB::table('fumaco_order')->where('order_number', $request->order_number)->update($orders_arr);
-
-            DB::table('track_order')->where('track_code', $request->order_number)->update(['track_status' => $status, 'track_date_update' => $now]);
-
-			DB::commit();
-            
             return redirect()->back()->with('success', 'Order <b>'.$request->order_number.'</b> status has been updated.');
 		}catch(Exception $e){
 			DB::rollback();
