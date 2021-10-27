@@ -248,6 +248,15 @@ class OrderController extends Controller
                         $message->subject($status . ' - FUMACO');
                     });
                 }
+
+                if ($status == 'Delivered') {
+                    $order_details = DB::table('fumaco_order')->where('order_number', $request->order_number)->first();
+                    $customer_name = $order_details->order_name . ' ' . $order_details->order_lastname;
+                    Mail::send('emails.delivered', ['id' => $order_details->order_number, 'customer_name' => $customer_name], function($message) use($order_details, $status){
+                        $message->to(trim($order_details->order_email));
+                        $message->subject('Order Delivered - FUMACO');
+                    });
+                }
                 
                 DB::table('fumaco_order')->where('order_number', $request->order_number)->update($orders_arr);
     
