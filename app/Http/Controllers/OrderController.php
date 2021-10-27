@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Http;
 use DB;
 use Carbon\Carbon;
 
@@ -215,7 +216,6 @@ class OrderController extends Controller
 
                     DB::table('fumaco_items')->where('f_idcode', $orders->item_code)->update(['f_reserved_qty' => $r_qty, 'f_qty' => $f_qty]);
                 }
-                // dd($items);
             }
 
             $orders_arr = [
@@ -235,5 +235,59 @@ class OrderController extends Controller
 			DB::rollback();
 			return redirect()->back()->with('error', 'An error occured. Please try again.');
 		}	
+    }
+
+    public function checkPaymentStatus(Request $request) {
+        $payment_id = $request->payment_id;
+        $output = [];
+        $details = [];
+        if ($request->isMethod('post')) {
+            $api = DB::table('api_setup')->where('type', 'payment_api')->first();
+
+            $details = DB::table('fumaco_order')->where('payment_id', $payment_id)->first();
+
+            if(!$details) {
+                return back()->with('error', 'Payment ID <b>' . $payment_id . '</b> not found.');
+            }
+
+            $amount_paid = number_format($details->amount_paid, 2, ".", "");
+
+            $string = $api->password . $api->service_id . $payment_id . $amount_paid . 'PHP';
+            $hash = hash('sha256', $string);
+
+            switch ($details->order_payment_method) {
+                case 'Credit Card':
+                    $payment_method = 'CC';
+                    break;
+                case 'Credit Card (MOTO)':
+                    $payment_method = 'MO';
+                    break;
+                case 'Direct Debit':
+                    $payment_method = 'DD';
+                    break;
+                case 'e-Wallet':
+                    $payment_method = 'WA';
+                    break;
+                default:
+                    $payment_method = 'ANY';
+                    break;
+            }
+
+            $data = [
+                'TransactionType' => 'QUERY',
+                'PymtMethod' => $payment_method,
+                'ServiceID' => $api->service_id,
+                'PaymentID'=> $payment_id,
+                'Amount' => $amount_paid,
+                'CurrencyCode' => 'PHP',
+                'HashValue' => $hash
+            ];
+            
+            $response = Http::asForm()->post('https://pay.e-ghl.com/IPGSG/Payment.aspx', $data);
+
+            parse_str($response, $output);
+        }
+
+        return view('backend.orders.track_payment_status', compact('output', 'payment_id', 'details'));
     }
 }

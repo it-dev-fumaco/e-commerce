@@ -167,6 +167,9 @@ Route::prefix('admin')->group(function () {
         Route::get('/order/cancelled/', 'OrderController@cancelledOrders');
         Route::get('/order/delivered/', 'OrderController@deliveredOrders');
         Route::post('/order/status_update', 'OrderController@statusUpdate');
+
+        Route::get('/order/payment_status', 'OrderController@checkPaymentStatus');
+        Route::post('/order/payment_status', 'OrderController@checkPaymentStatus');
         
         Route::get('/customer/list', 'CustomerController@viewCustomers');
 
