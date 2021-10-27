@@ -285,17 +285,17 @@
 				</div> --}}
 				<div class="row mb-4">
 					<div class="col-md-9 mx-auto">
-						<div class="col-md-4 d-none d-xl-block">
+						<div class="col-md-4 d-none d-md-block d-lg-block d-xl-block">
 							<a href="/cart" class="btn btn-lg btn-outline-primary" role="button" style="background-color: #777575 !important; border-color: #777575 !important; float: left; width: 94%;margin-left: 5%;">BACK</a>
 						</div>
-						<div class="col-md-4 d-none d-xl-block" style="float: right !important">
+						<div class="col-md-4 d-none d-md-block d-lg-block d-xl-block" style="float: right !important">
 							<button type="submit" class="btn btn-lg btn-outline-primary" style="width: 100% !important">PROCEED</button>
 						</div>
-						<div class="col-md-4 d-md-none d-lg-none d-xl-none">
+						<div class="col-md-4 d-md-none d-xl-none">
 							<button type="submit" class="btn btn-lg btn-outline-primary" style="width: 100% !important">PROCEED</button>
 						</div>
 						<br/>
-						<div class="col-md-4 d-md-none d-lg-none d-xl-none">
+						<div class="col-md-4 d-md-none d-xl-none">
 							<a href="/cart" class="btn btn-lg btn-outline-primary" role="button" style="background-color: #777575 !important; border-color: #777575 !important; float: left; width: 100%;">BACK</a>
 						</div>
 					</div>

@@ -110,7 +110,7 @@
     </div>
     <div class="container" style="max-width: 100% !important; min-height: 600px;">
         <div class="row">
-            <div class="col-lg-8 animated animatedFadeInUp fadeInUp mx-auto">
+            <div class="col-lg-10 animated animatedFadeInUp fadeInUp mx-auto">
                 <table class="table animated animatedFadeInUp fadeInUp" id="cart-items">
                     <thead>
                         <tr>
@@ -131,9 +131,9 @@
                             </td>
                             <td class="tbls" style="width:40% !important;"><a href="/product/{{ $cart['item_code'] }}" style="text-decoration: none !important; color: #000;">{{ $cart['item_description'] }}</a>
                                 <br/>{{-- for mobile --}}
-                            <span class="formatted-price d-lg-none d-xl-none"><br/><b>P {{ number_format($cart['price'], 2, '.', ',') }}</b></span>
+                            <span class="formatted-price d-md-none d-lg-none d-xl-none"><br/><b>P {{ number_format($cart['price'], 2, '.', ',') }}</b></span>
                             <br/><br/>
-                            <span class="d-lg-none d-xl-none">Quantity<br/>
+                            <span class="d-md-none d-lg-none d-xl-none">Quantity<br/>
                                 <div class="input-group">
                                     <span class="input-group-btn">
                                         <a href="#" class="quantity-left-minus btn btn-number" style="background-color: #ccc !important; height: 100% !important; border-radius: 0px !important;"> - </a>
@@ -147,14 +147,14 @@
                                 </div>
                             </span>{{-- for mobile --}}
                             </td>
-                            <td class="tbls d-none d-sm-table-cell">P <span class="formatted-price">{{ number_format($cart['price'], 2, '.', ',') }}</span><span class="price d-none">{{ $cart['price'] }}</span></td>
+                            <td class="tbls d-none d-sm-table-cell"><p style="white-space: nowrap !important;">P <span class="formatted-price">{{ number_format($cart['price'], 2, '.', ',') }}</span></p><span class="price d-none">{{ $cart['price'] }}</span></td>
                             <td class="tbls d-none d-sm-table-cell">
                                 <div class="input-group">
                                     <span class="input-group-btn">
                                         <a href="#" class="quantity-left-minus btn btn-number" style="background-color: #ccc !important; height: 100% !important; border-radius: 0px !important;"> - </a>
                                     </span>
                                     <div>&nbsp;</div>
-                                    <input type="text" name="quantity[]" class="form-control input-number " value="{{ $cart['quantity'] }}" min="1" max="{{ $cart['stock_qty'] }}" style="width: 5px !important; text-align: center !important;" data-id="{{ $cart['item_code'] }}">
+                                    <input type="text" name="quantity[]" class="form-control input-number " value="{{ $cart['quantity'] }}" min="1" max="{{ $cart['stock_qty'] }}" style="width: 4px !important; text-align: center !important;" data-id="{{ $cart['item_code'] }}">
                                     <div>&nbsp;</div>
                                     <span class="input-group-btn">
                                         <a href="#" class="quantity-right-plus btn btn-number" style="background-color: #ccc !important; height: 100% !important; border-radius: 0px !important;"> + </a>
@@ -162,7 +162,7 @@
                                 </div>
                             </td>
                             <td class="tbls">&nbsp;</td>
-                            <td class="tbls d-none d-sm-table-cell">P <span class="formatted-amount">{{ number_format($cart['amount'], 2, '.', ',') }}</span><span class="amount d-none">{{ $cart['amount'] }}</span></td>
+                            <td class="tbls d-none d-sm-table-cell"><p style="white-space: nowrap !important;">P <span class="formatted-amount">{{ number_format($cart['amount'], 2, '.', ',') }}</span></p><span class="amount d-none">{{ $cart['amount'] }}</span></td>
                             <td class="tbls">
                                 <a class="btn btn-sm btn-outline-primary remove-from-cart-btn" href="#" role="button" data-id="{{ $cart['item_code'] }}">&#x2715;</a>
                             </td>
