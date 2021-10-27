@@ -293,60 +293,60 @@
               <li class="nav-item">
                 <a class="nav-link" href="/journals">BLOGS</a>
               </li>
-              @if(!Auth::check())
-              <li class="nav-item">
-                <a class="nav-link" href="/track_order">TRACK ORDER</a>
-              </li>
-              @endif
               <li class="nav-item">
                 <a class="nav-link" href="/contact">CONTACT</a>
               </li>
             </ul>
-            <form class="d-none d-md-block" action="/" method="GET">
-              <div class="input-group mb-0 searchbar">
+            <form class="d-none d-xl-block" action="/" method="GET">
+              <div class="input-group mb-0 searchbar" style="width: 400px !important;">
                 <input type="text" placeholder="Search" name="s" value="{{ request()->s }}" class="form-control searchstyle" aria-label="Text input with dropdown button">
                   <button class="btn btn-outline-secondary searchstyle" type="submit"><i class="fas fa-search"></i></button>
               </div>
             </form>
             <ul class="navbar-nav">
-              @if(!Auth::check())
-              {{-- Guest --}}
-              <a class="dropdown-item d-none d-md-block" href="/login">
-                <i class="far fa-user user-icon" style=""></i>
-              </a>
-              {{-- Guest --}}
-              @else
-                <li class="nav-item dropdown">
-                  <a class="nav-link dropdown-toggle navbar-header" href="#" id="navbarDarkDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">Welcome, {{ (Auth::check()) ? Auth::user()->f_name : '' }}</a>
-                  <ul class="dropdown-menu dropdown-menu-light navbar-header" aria-labelledby="navbarDarkDropdownMenuLink" style="right: 14px !important; left: auto !important;">
-                    <li>
-                      <a class="dropdown-item" style="font-weight: 300 !important;" href="/cart">
-                        <img src="{{ asset('/assets/site-img/icon/nav11.jpg') }}" alt="cart" width="30">&nbsp;&nbsp;My Cart <span class="badge badge-primary count-cart-items" style="background-color:#186eaa; vertical-align: top;">0</span>
-                      </a>
-                    </li>
-                    <li>
-                      <a class="dropdown-item" style="font-weight: 300 !important;" href="/mywishlist">
-                        <img src="{{ asset('/assets/site-img/icon/nav12.jpg') }}" alt="mywishlist" width="30">&nbsp;&nbsp;Wishlist <span class="badge badge-primary count-wish-items" style="background-color:#186eaa; vertical-align: top;">0</span>
-                      </a>
-                    </li>
-                    <li>
-                      <a class="dropdown-item" style="font-weight: 300 !important;" href="/myorders">
-                        <img src="{{ asset('/assets/site-img/icon/nav13.jpg') }}" alt="myorders" width="30">&nbsp;&nbsp;My Orders
-                      </a>
-                    </li>
-                    <li>
-                      <a class="dropdown-item" style="font-weight: 300 !important;" href="/myprofile/account_details">
-                        <img src="{{ asset('/assets/site-img/icon/nav14.jpg') }}" alt="myprofile" width="30">&nbsp;&nbsp;My Profile
-                      </a>
-                    </li>
-                    <li>
-                      <a class="dropdown-item" style="font-weight: 300 !important;" href="/logout">
-                        <img src="{{ asset('/assets/site-img/icon/nav15.jpg') }}" alt="logout" width="30">&nbsp;&nbsp;Log Out
-                      </a>
-                    </li>
-                  </ul>
-                </li>
-              @endif
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle navbar-header" href="#" id="navbarDarkDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">Welcome, {{ (Auth::check()) ? Auth::user()->f_name : 'Guest' }}</a>
+                <ul class="dropdown-menu dropdown-menu-light navbar-header" aria-labelledby="navbarDarkDropdownMenuLink" style="right: 14px !important; left: auto !important;">
+                  <li>
+                    <a class="dropdown-item" style="font-weight: 300 !important;" href="/cart">
+                      <img src="{{ asset('/assets/site-img/icon/nav11.jpg') }}" alt="cart" width="30">&nbsp;&nbsp;My Cart <span class="badge badge-primary count-cart-items" style="background-color:#186eaa; vertical-align: top;">0</span>
+                    </a>
+                  </li>
+                  @if(Auth::check())
+                  <li>
+                    <a class="dropdown-item" style="font-weight: 300 !important;" href="/mywishlist">
+                      <img src="{{ asset('/assets/site-img/icon/nav12.jpg') }}" alt="mywishlist" width="30">&nbsp;&nbsp;Wishlist <span class="badge badge-primary count-wish-items" style="background-color:#186eaa; vertical-align: top;">0</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item" style="font-weight: 300 !important;" href="/myorders">
+                      <img src="{{ asset('/assets/site-img/icon/nav13.jpg') }}" alt="myorders" width="30">&nbsp;&nbsp;My Orders
+                    </a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item" style="font-weight: 300 !important;" href="/myprofile/account_details">
+                      <img src="{{ asset('/assets/site-img/icon/nav14.jpg') }}" alt="myprofile" width="30">&nbsp;&nbsp;My Profile
+                    </a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item" style="font-weight: 300 !important;" href="/logout">
+                      <img src="{{ asset('/assets/site-img/icon/nav15.jpg') }}" alt="logout" width="30">&nbsp;&nbsp;Log Out
+                    </a>
+                  </li>
+                  @else
+                  <li>
+                    <a class="dropdown-item" style="font-weight: 300 !important;" href="/track_order">
+                      <img src="{{ asset('/assets/site-img/icon/nav13.jpg') }}" alt="trackorder" width="30">&nbsp;&nbsp;Track My Order
+                    </a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item" style="font-weight: 300 !important;" href="/login">
+                      <img src="{{ asset('/assets/site-img/icon/nav15.jpg') }}" alt="login" width="30">&nbsp;&nbsp;Login | Sign Up
+                    </a>
+                  </li>
+                  @endif
+                </ul>
+              </li>
             </ul>
 
           </div>
