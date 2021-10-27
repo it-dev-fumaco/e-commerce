@@ -18,7 +18,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    {{-- <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet"> --}}
     <link href="{{ asset('/assets/fumaco.css') }}" rel="stylesheet">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -38,13 +38,13 @@
     <style>
 
       .fumacoFont1 {
-          font-family: 'Montserrat', sans-serif !important; font-weight:400 !important; font-size: 1.75rem!important;
+          font-family: 'poppins', sans-serif !important; font-weight:400 !important; font-size: 1.75rem!important;
       }
       .fumacoFont2 {
-          font-family: 'Montserrat', sans-serif !important; font-weight:200 !important;
+          font-family: 'poppins', sans-serif !important; font-weight:200 !important;
       }
       .fumacoFont_btn {
-          font-family: 'Montserrat', sans-serif !important; font-weight:200 !important; font-size: 16px !important;
+          font-family: 'poppins', sans-serif !important; font-weight:200 !important; font-size: 16px !important;
       }
       .fumacoFont_card_title {
           /* font-family: 'Montserrat', sans-serif !important; font-weight:600 !important; font-size: 16px !important; */
@@ -55,10 +55,10 @@
           font-family: 'poppins', sans-serif !important; font-weight:300 !important; font-size: 16px !important;
       }
       .fumacoFont_card_readmore {
-          font-family: 'Montserrat', sans-serif !important; font-weight:200 !important; font-size: 16px !important; text-decoration: none !important;
+          font-family: 'poppins', sans-serif !important; font-weight:200 !important; font-size: 16px !important; text-decoration: none !important;
       }
       .fumacoFont_card_price {
-          font-family: 'Montserrat', sans-serif !important; font-weight:600 !important; font-size: 16px !important; text-decoration: none !important;
+          font-family: 'poppins', sans-serif !important; font-weight:600 !important; font-size: 16px !important; text-decoration: none !important;
       }
       .carousel-item > img {
           position: absolute !important;
@@ -287,7 +287,7 @@
               </li>
               @endif
               <li class="nav-item">
-                <a class="nav-link" href="/contact">CONTACTS</a>
+                <a class="nav-link" href="/contact">CONTACT</a>
               </li>
             </ul>
             <form class="d-none d-md-block" action="/" method="GET">
