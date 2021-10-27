@@ -86,7 +86,7 @@
 				<div class="col-md-8 offset-md-2">
 					<div class="row mb-2">
 						<div class="col-md-6 mt-4">Order No. : <b>{{ request()->id }}</b></div>
-						<div class="col-md-6 mt-4" style="text-align: right;">Estimated Delivery Date : <b>{{ $order_details->estimated_delivery_date }}</b></div>
+						<div class="col-md-6 mt-4 track-order-eta" style="text-align: right;">Estimated Delivery Date : <br class="d-lg-none d-xl-none"/><b>{{ $order_details->estimated_delivery_date }}</b></div>
 					</div>
 				</div>
 
