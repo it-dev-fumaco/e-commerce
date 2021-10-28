@@ -75,6 +75,7 @@
 											<th>Customer Name</th>
 											<th>Est. Delivery Date</th>
 											<th>Shipping Method</th>
+											<th>Payment Method</th>
 											<th>Grand Total</th>
 											<th>Status</th>
 											<th>Action</th>
@@ -88,6 +89,7 @@
 											<td>{{ $order['first_name'] .' '. $order['last_name'] }}</td>
 											<td>{{ $order['estimated_delivery_date'] }}</td>
 											<td>{{ $order['shipping_name'] }}</td>
+											<td>{{ $order['payment_method'] }}</td>
 											<td>₱ {{ $order['grand_total'] }}</td>
 											@php
 												if($order['status'] == 'Order Placed'){

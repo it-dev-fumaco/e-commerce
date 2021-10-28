@@ -48,8 +48,8 @@
 											<th>Customer Name</th>
 											<th>Est. Delivery Date</th>
 											<th>Shipping Method</th>
+											<th>Payment Method</th>
 											<th>Grand Total</th>
-											{{-- <th>Status</th> --}}
 											<th>Date Cancelled</th>
 											<th>Action</th>
 										</tr>
@@ -62,6 +62,7 @@
 											<td>{{ $order['first_name'] .' '. $order['last_name'] }}</td>
 											<td>{{ $order['estimated_delivery_date'] }}</td>
 											<td>{{ $order['shipping_name'] }}</td>
+											<td>{{ $order['payment_method'] }}</td>
 											<td>₱ {{ $order['grand_total'] }}</td>
 											{{-- <td><span class="badge badge-danger">{{ $order['status'] }}</span></td> --}}
 											<td>{{ $order['date_cancelled'] }}</td>
