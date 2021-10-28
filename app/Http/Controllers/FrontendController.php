@@ -449,6 +449,10 @@ class FrontendController extends Controller
                 'subject' => ['required', 'string', 'max:255'],
                 'comment' => ['required', 'string', 'max:255'],
                 'g-recaptcha-response' => 'required|recaptcha'
+            ],
+            [
+                'g-recaptcha-response.required' => 'Please check the reCAPTCHA.',
+                'g-recaptcha-response.recaptcha' => 'Captcha error! Try again later or contact site admin.',
             ]);
 
             DB::table('fumaco_contact_list')->insert($new_contact);

@@ -101,27 +101,27 @@
         @csrf
         <div class="row">
           <div class="col-lg-4 animated animatedFadeInUp fadeInUp">
-            <input type="text" class="form-control caption_1" placeholder="Name *" name="name" required>
+            <input type="text" class="form-control caption_1" placeholder="Name *" name="name" value="{{ old('name') }}" required>
             <br>
           </div>
           <div class="col-lg-4 animated animatedFadeInUp fadeInUp">
-            <input type="email" class="form-control caption_1" placeholder="Email *" name="email" required>
+            <input type="email" class="form-control caption_1" placeholder="Email *" name="email" value="{{ old('email') }}" required>
             <br>
           </div>
           <div class="col-lg-4 animated animatedFadeInUp fadeInUp">
-            <input type="text" class="form-control caption_1" placeholder="Phone" name="phone" required>
+            <input type="text" class="form-control caption_1" placeholder="Phone" name="phone" value="{{ old('phone') }}" required>
             <br>
           </div>
         </div>
         <div class="row animated animatedFadeInUp fadeInUp">
           <div class="col">
-            <input type="text" class="form-control caption_1" placeholder="Subject" name="subject" required>
+            <input type="text" class="form-control caption_1" placeholder="Subject" name="subject" value="{{ old('subject') }}" required>
           </div>
         </div>
         <br>
         <div class="row animated animatedFadeInUp fadeInUp">
           <div class="col">
-            <textarea class="form-control caption_1" rows="5" id="comment" name="comment" placeholder="Message" required></textarea>
+            <textarea class="form-control caption_1" rows="5" id="comment" name="comment" placeholder="Message" required>{{ old('comment') }}</textarea>
           </div>
         </div>
         <br>
@@ -130,7 +130,6 @@
             <div class="g-recaptcha" data-sitekey="6LfbWpwcAAAAAEPssgZuCMj8MKeVy7UVAXFkIbME"></div>
           </div>
         </div>
-
        <center>
           <button type="submit" class="btn btn-primary mt-3 fumacoFont_btn animated animatedFadeInUp fadeInUp">&nbsp;&nbsp;&nbsp;Submit&nbsp;&nbsp;&nbsp;</button>
         </center>
@@ -142,19 +141,5 @@
 @endsection
 
 @section('script')
-<script>
-    (function() {
-  $('#contact-form').submit(function(e){
-    e.preventDefault();
-    var captchResponse = $('#g-recaptcha-response');
-// if(captchResponse.length == 0 )
-console.log(captchResponse);
-    //user has not yet checked the 'I am not a robot' checkbox
-// else
-    //user is a verified human and you are good to submit your form now
-  });
 
-})();
-
-</script>
 @endsection
