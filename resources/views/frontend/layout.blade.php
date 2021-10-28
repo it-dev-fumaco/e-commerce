@@ -470,13 +470,14 @@
             var f = '';
             $(response).each(function(i, d){
               var link = (d.external_link) ? d.external_link : '/products/' + d.id;
+              var target = (d.external_link) ? 'target="_blank"' : '';
               // for navbar dropdown
-              l += '<li><a class="dropdown-item" style="font-weight: 300 !important;" href="' + link +'">' +
+              l += '<li><a class="dropdown-item" style="font-weight: 300 !important;" href="' + link +'" ' + target + '>' +
               '<img src="{{ asset("assets/site-img/icon/") }}/' + d.image + '" alt="' + d.name +'" width="30">' + d.name +'</a></li>';
               // for footer links
               f += '<tr style="border-style: unset !important;">' +
                 '<td class="tdfooter footer2nd" style="border-style: unset !important;">' +
-                '<a style="text-decoration:none; color: #0062A5;" href="'+ link +'">' + d.name +'</a>' +
+                '<a style="text-decoration:none; color: #0062A5;" href="'+ link +'" ' + target + '>' + d.name +'</a>' +
               '</td></tr>';
             });
 
