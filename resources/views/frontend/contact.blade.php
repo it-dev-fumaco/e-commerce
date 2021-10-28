@@ -127,7 +127,10 @@
         <br>
        <div class="row animated animatedFadeInUp fadeInUp">
           <div class="col">
-            <div class="g-recaptcha" data-sitekey="6LfbWpwcAAAAAEPssgZuCMj8MKeVy7UVAXFkIbME"></div>
+            @if(config('services.recaptcha.key'))
+            <div class="g-recaptcha" data-sitekey="{{config('services.recaptcha.key')}}"></div>
+            @endif
+            {{-- <div class="g-recaptcha" data-sitekey="6LfbWpwcAAAAAEPssgZuCMj8MKeVy7UVAXFkIbME"></div> --}}
           </div>
         </div>
        <center>
