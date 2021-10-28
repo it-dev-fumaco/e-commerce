@@ -41,14 +41,14 @@
           font-family: 'poppins', sans-serif !important; font-weight:400 !important; font-size: 1.75rem!important;
       }
       .fumacoFont2 {
-          font-family: 'poppins', sans-serif !important; font-weight:200 !important;
+          font-family: 'poppins', sans-serif !important; font-weight:300 !important; padding-top: 10px !important;
       }
       .fumacoFont_btn {
           font-family: 'poppins', sans-serif !important; font-weight:200 !important; font-size: 16px !important;
       }
       .fumacoFont_card_title {
           /* font-family: 'Montserrat', sans-serif !important; font-weight:600 !important; font-size: 16px !important; */
-          font-family: 'poppins', sans-serif !important; font-weight:600 !important; font-size: 16px !important;
+          font-family: 'poppins', sans-serif !important; font-weight:500 !important; font-size: 20px !important;
       }
       .fumacoFont_card_caption {
           /* font-family: 'Roboto', sans-serif !important; font-weight:200 !important; font-size: 16px !important; */
@@ -203,6 +203,11 @@
         /* font-size: 17px !important; */
         text-decoration: none !important;
         letter-spacing: 0.1em;
+      }
+
+      .prod-desc{
+        /* font-size: 160px !important; */
+        font-weight: 500 !important;
       }
       @media (max-width: 575.98px) {
         header{

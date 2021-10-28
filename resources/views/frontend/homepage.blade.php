@@ -7,7 +7,7 @@
   <style>
     .text {
       position: relative;
-      font-size: 14px;
+      font-size: 16px !important;
       width: 100%;
     }
 
@@ -17,8 +17,9 @@
       word-wrap: break-word;
       overflow: hidden;
       max-height: 4.8em;
-      line-height: 1.2em;
-      text-align:justify;
+      /* line-height: 1.2em; */
+      line-height: 1.4em;
+      text-align: left;
     }
 
     .text.ellipsis::after {
@@ -88,7 +89,7 @@
               </picture>
               <br><br>
               <h5 class="font-style-thin fumacoFont_card_title" style="font-family: 'poppins', sans-serif !important; color:#ffffff !important; line-height: 26px !important;">{{ substr($b->blogtitle, 0, 39) }}</h5><br>
-              <p class="abt_standard" style="font-size: 14px; margin-left: 0rem !important; color:#ffffff !important; font-weight: 400">
+              <p class="abt_standard" style="font-size: 14px; margin-left: 0rem !important; color:#ffffff !important; font-weight: 300">
                 <a href="blog?id={{ $b->id }}" style="color:#ffffff !important; text-decoration: none !important; text-transform: none !important">{{ substr($b->blog_caption, 0, 100) }}...</a>
               </p>
               <p class="abt_standard font-style-thin" style="margin-left: 0rem !important; color:#ffffff !important;"><a href="blog?id={{ $b->id }}" class="fumacoFont_card_readmore"><span style="color:#ffffff !important;">Read More &#x2192;</span></a></p>
@@ -128,7 +129,7 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
 
                     <div class="card-body">
                       <div class="text ellipsis">
-                        <p class="card-text product-head fumacoFont_card_title text-concat" style="color:#0062A5 !important;  height: 80px; ">{{ $bs['item_name'] }}</p>
+                        <p class="card-text product-head fumacoFont_card_title text-concat" style="color:#0062A5 !important;  height: 80px; font-size: 16px !important; font-weight: 500 !important;">{{ $bs['item_name'] }}</p>
                       </div>
                       <p class="card-text fumacoFont_card_price" style="color:#000000 !important; ">
                         @if ($bs['is_discounted'])
@@ -190,7 +191,7 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
 
                     <div class="card-body">
                       <div class="text ellipsis">
-                        <p class="card-text product-head fumacoFont_card_title text-concat" style="color:#0062A5 !important; height: 80px;">{{ $os['item_name'] }}</p>
+                        <p class="card-text product-head fumacoFont_card_title text-concat" style="color:#0062A5 !important; height: 80px; font-size: 16px !important; font-weight: 500 !important;">{{ $os['item_name'] }}</p>
                       </div>
                       <p class="card-text fumacoFont_card_price" style="color:#000000 !important; ">
                         @if ($os['is_discounted'])

@@ -79,7 +79,7 @@
 
 		.text {
 			position: relative;
-			font-size: 14px;
+			font-size: 16px !important;
 			width: 100%;
 		}
 
@@ -89,8 +89,9 @@
 			word-wrap: break-word;
 			overflow: hidden;
 			max-height: 4.8em;
-			line-height: 1.2em;
-			text-align:justify;
+			line-height: 1.5em;
+			text-align: left;
+			font-size: 16px !important;
 		}
 
 		.text.ellipsis::after {
@@ -223,6 +224,8 @@
 
 						@forelse ($products_arr as $product)
 						<div class="col-md-4 btmp animated animatedFadeInUp fadeInUp equal-height-columns">
+						<a href="/product/{{ $product['item_code'] }}" style="text-decoration: none !important; text-transform: none !important;">
+
 							<div class="card">
 								<div class="equal-column-content">
 									@php
@@ -238,7 +241,7 @@
 
 									<div class="card-body">
 										<div class="text ellipsis">
-											<p class="card-text fumacoFont_card_title text-concat" style="color:#0062A5 !important; height: 80px;">{{ $product['item_name'] }}</p>
+											<p class="card-text fumacoFont_card_title text-concat prod-desc" style="color:#0062A5 !important; height: 80px; font-size: 16px !important; font-weight: 500 !important;">{{ $product['item_name'] }}</p>
 										</div>
 										<p class="card-text fumacoFont_card_price" style="color:#000000 !important;">
 											@if($product['is_discounted'])
@@ -266,6 +269,7 @@
 								<a href="/product/{{ $product['item_code'] }}" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto" role="button" style="width: 90% !important; margin-bottom: 20px">View</a>
 
 							</div>
+						</a>
 						</div>
 						@empty
 						<h4 class="text-center text-muted p-5 text-uppercase">No products found</h4>

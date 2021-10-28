@@ -181,6 +181,10 @@
         animation-name: fadeInUp;
         -webkit-animation-name: fadeInUp;
     }
+
+    .fumacoFont_about_caption{
+        font-weight: 200 !important;
+    }
 </style>
 
 <main>
@@ -190,7 +194,7 @@
 
     <div class="container-fluid padabout">
         <div class="row">
-            <div class="col-lg-12 aboutalign animated animatedFadeInUp fadeInUp" style="padding-top:20px; text-align: center !important;">
+            <div class="col-lg-12 aboutalign animated animatedFadeInUp fadeInUp" style="padding-top:20px; text-align: right !important;">
                 <p class="abt_standard font1color about-main">{!! $about_data->title !!}</p>
             </div>
         </div>
@@ -278,7 +282,7 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-lg-12" style="text-align: right !important;"><br><br></div>
+            <div class="col-lg-12" style="text-align: right !important;"><br></div>
         </div>
         <div class="row">
             <div class="col-lg-6 animated animatedFadeInUp fadeInUp">
@@ -330,7 +334,7 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-lg-12" style="text-align: right !important;"><br><br></div>
+            <div class="col-lg-12" style="text-align: right !important;"><br></div>
         </div>
         <div class="row">
             <div class="col-lg-6 animated animatedFadeInUp fadeInUp">
@@ -374,7 +378,7 @@
 <main class="bodybg4">
     <div class="container-fluid padabout">
         <div class="row">
-            <div class="col-lg-12"><br></div>
+            <div class="col-lg-12"><br><br></div>
         </div>
         <div class="row">
             <div class="col-lg-12 animated animatedFadeInUp fadeInUp" style="font-family: 'poppins', sans-serif !important; text-align: left !important; color:#00a7ff !important;">

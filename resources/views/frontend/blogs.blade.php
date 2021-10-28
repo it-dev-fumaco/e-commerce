@@ -47,7 +47,8 @@
 
         <div class="row">
             <div class="col-lg-12 animated animatedFadeInUp fadeInUp">
-                <p style="font-family: 'poppins', sans-serif !important; color: #0F6DB7 !important"  class="fumacoFont_card_title">{{ $blog->blogtitle }}</p>
+                <p style="font-family: 'poppins', sans-serif !important; color: #0F6DB7 !important"  class="fumacoFont_card_title">{{ $blog->blogtitle }}
+                </p>
             </div>
         </div>
 
@@ -57,11 +58,11 @@
             </div>
         </div>
 
-        <div class="row">
+        {{-- <div class="row">
             <div class="col-lg-12 animated animatedFadeInUp fadeInUp">
                 <p style="font-family: 'poppins', sans-serif !important;"  class="font1color">&nbsp;</p>
             </div>
-        </div>
+        </div> --}}
 
         <div class="row">
             <div class="col-lg-12 animated animatedFadeInUp fadeInUp">
@@ -69,11 +70,11 @@
             </div>
         </div>
 
-        <div class="row">
+        {{-- <div class="row">
             <div class="col-lg-12">
                 <p style="font-family: 'poppins', sans-serif !important;"  class="font1color">&nbsp;</p>
             </div>
-        </div>
+        </div> --}}
 
         <div class="row">
             <div class="col-lg-12 animated animatedFadeInUp fadeInUp">

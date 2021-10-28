@@ -346,6 +346,7 @@ class FrontendController extends Controller
                 'image' => $blogs->{'blogprimayimage-journal'},
                 'publish_date' => $blogs->datepublish,
                 'title' => $blogs->blogtitle,
+                'caption' => $blogs->blog_caption,
                 'type' => $blogs->blogtype
             ];
         }
