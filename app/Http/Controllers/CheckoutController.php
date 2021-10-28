@@ -511,7 +511,7 @@ class CheckoutController extends Controller
 				for ($i = 0; $i < count($output['results'][0]['address_components']); $i++) {
 					$address_type = $output['results'][0]['address_components'][$i]['types'][0];
 					if(isset($components[$address_type])){
-						array_push($arr, $output['results'][0]['address_components'][$i][$components[$address_type]]);
+						array_push($arr, strtolower($output['results'][0]['address_components'][$i][$components[$address_type]]));
 					}
 				}
 			}
@@ -578,9 +578,9 @@ class CheckoutController extends Controller
 			return [];
 		}
 
-		$address = $shipping_details['address_line1'] . ' ' . $shipping_details['address_line2'] . ' ' . $shipping_details['brgy']. ' ' . $shipping_details['city'] . ' ' . $shipping_details['province'] . ' ' .	$shipping_details['country'];
-		$region = $shipping_details['province'];
-		$city = $shipping_details['city'];
+		$address = strtolower($shipping_details['address_line1'] . ' ' . $shipping_details['address_line2'] . ' ' . $shipping_details['brgy']. ' ' . $shipping_details['city'] . ' ' . $shipping_details['province'] . ' ' .	$shipping_details['country']);
+		$region = strtolower($shipping_details['province']);
+		$city = strtolower($shipping_details['city']);
 
 		$cart = session()->get('fumCart');
 		$cart = (!$cart) ? [] : $cart;
