@@ -111,7 +111,7 @@
           color: #ccc;
           line-height: 26px;
           padding: 8px 0 8px 30px;
-          font-family: "Trebuchet MS",Helvetica,sans-serif;
+          font-family: "Poppins",Helvetica,sans-serif;
           position: fixed;
           bottom: 0;
           left: 0;
@@ -382,10 +382,7 @@
   @yield('content')
   <footer>
     <main style="background-color:#0062A5;"><br></main>
-
-    {{-- <div id="cookieConsent">
-      <p style="text-align: justify; padding-bottom: -10px !important; padding-top: 0px !important;">Fumaco Web Site uses cookies to ensure you get the best experience while browsing the site.<br>By continued use, you agree to our privacy policy and accept our use of such cookies. For further information, click <a href="privacy_policy" target="_blank">More info</a>. <a class="cookieConsentOK">I AGREE</a></p>
-    </div> --}}
+    @include('cookieConsent::index')
     <main style="background-color:#000000;">
       <div class="container marketing">
         <section class="py-5 text-center container" style="padding-top: 0rem !important; padding-bottom: 3rem !important;">
