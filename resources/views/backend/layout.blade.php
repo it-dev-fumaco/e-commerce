@@ -201,9 +201,11 @@
 
             </ul>
           </li>
-
-          <li class="nav-item">
-            <a href="#" class="nav-link">
+          @php
+              $blog_pages = ['subscribers_list'];
+          @endphp
+          <li class="nav-item {{ (in_array($activePage, $blog_pages) ? 'menu-open' : '') }}">
+            <a href="#" class="nav-link {{ (in_array($activePage, $blog_pages) ? 'active' : '') }}">
               <i class="nav-icon fab fa-blogger"></i>
               <p>Blog Content<i class="fas fa-angle-left right"></i></p>
             </a>
@@ -221,7 +223,7 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a href="/admin/pages/subscribers" class="nav-link">
+                <a href="/admin/blog/subscribers" class="nav-link {{ $activePage == 'subscribers_list' ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Subscriber</p>
                 </a>

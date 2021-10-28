@@ -175,6 +175,8 @@ Route::prefix('admin')->group(function () {
         
         Route::get('/customer/list', 'CustomerController@viewCustomers');
 
+        Route::get('/blog/subscribers', 'BlogController@viewSubscribers');
+
         // SHIPPING SERVICES ROUTES CMS
         Route::get('/shipping/list', 'ShippingController@viewList');
         Route::get('/shipping/add', 'ShippingController@viewAddForm');
