@@ -452,7 +452,7 @@ class FrontendController extends Controller
             ],
             [
                 'g-recaptcha-response.required' => 'Please check the reCAPTCHA.',
-                'g-recaptcha-response.recaptcha' => function ($attribute, $value, $fail) {
+                'g-recaptcha-response' => function ($attribute, $value, $fail) {
                     $secret_key = '6LfSLPscAAAAAE1XtyL_cYR5tU1P68qZt2ikcm2j';
                     $response = $value;
                     $userIP = $_SERVER['REMOTE_ADDR'];
