@@ -226,6 +226,10 @@
                            <label for="product-keywords">Keywords</label>
                            <textarea class="form-control" rows="3" id="product-keywords" name="keywords">{{ old('keywords') }}{{ $details->keywords }}</textarea>
                          </div>
+                         <div class="form-group">
+                           <label for="product-url">URL Title</label>
+                           <input type="text" class="form-control" id="product-url" name="url_title" value="{{ old('url_title') }}{{ $details->url_title }}" required>
+                         </div>
                         <h5>Product Specifications / Attributes</h5>
                         <hr>
                         <table class="table table-striped table-bordered" id="attributes-table">
@@ -268,7 +272,7 @@
                            <tbody>
                               @forelse ($related_products as $a => $related_product)
                               @php
-                                 $image_r = ($related_product['image']) ? '/storage/item/item_images/'. $related_product['item_code'] .'/gallery/preview/'.$related_product['image'] : '/storage/no-photo-available.png';
+                                 $image_r = ($related_product['image']) ? '/storage/item_images/'. $related_product['item_code'] .'/gallery/preview/'.$related_product['image'] : '/storage/no-photo-available.png';
                               @endphp
                               <tr>
                                  <td class="text-center align-middle">

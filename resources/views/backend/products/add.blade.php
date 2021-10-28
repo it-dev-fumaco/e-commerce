@@ -210,8 +210,11 @@
                 </div>
                 <div class="form-group">
                   <label for="product-keywords">Keywords</label>
-                  {{-- <small class="text-muted font-italic">Product keywords separated by comma " , "</small> --}}
                   <textarea class="form-control" rows="3" id="product-keywords" name="keywords">{{ old('keywords') }}</textarea>
+                </div>
+                <div class="form-group">
+                  <label for="product-url">URL Title</label>
+                  <input type="text" class="form-control" id="product-url" name="url_title" value="{{ old('url_title') }}" required>
                 </div>
                 <h5>Product Specifications / Attributes</h5>
                 <hr>
