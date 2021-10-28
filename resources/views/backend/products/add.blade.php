@@ -208,14 +208,6 @@
                   <label for="full-detail">* Full Detail</label>
                   <textarea class="form-control" rows="6" id="full-detail" name="full_detail">{{ old('full_detail') }}</textarea>
                 </div>
-                <div class="form-group">
-                  <label for="product-keywords">Keywords</label>
-                  <textarea class="form-control" rows="3" id="product-keywords" name="keywords">{{ old('keywords') }}</textarea>
-                </div>
-                <div class="form-group">
-                  <label for="product-url">URL Title</label>
-                  <input type="text" class="form-control" id="product-url" name="url_title" value="{{ old('url_title') }}" required>
-                </div>
                 <h5>Product Specifications / Attributes</h5>
                 <hr>
                 <table class="table table-striped table-bordered" id="attributes-table">
@@ -228,6 +220,17 @@
                   </thead>
                   <tbody></tbody>
                 </table>
+                <br>
+                <h5 class="mt-3">Search Engine Optimization (SEO)</h5>
+                <hr>
+                <div class="form-group">
+                  <label for="product-keywords">Meta Keywords</label>
+                  <textarea class="form-control" rows="3" id="product-keywords" name="keywords">{{ old('keywords') }}</textarea>
+                </div>
+                <div class="form-group">
+                  <label for="product-url">URL Title</label>
+                  <input type="text" class="form-control" id="product-url" name="url_title" value="{{ old('url_title') }}">
+                </div>
               </div>
               <!-- /.card-body -->
               <div class="card-footer text-center">
