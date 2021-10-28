@@ -208,6 +208,11 @@
                   <label for="full-detail">* Full Detail</label>
                   <textarea class="form-control" rows="6" id="full-detail" name="full_detail">{{ old('full_detail') }}</textarea>
                 </div>
+                <div class="form-group">
+                  <label for="product-keywords">Keywords</label>
+                  {{-- <small class="text-muted font-italic">Product keywords separated by comma " , "</small> --}}
+                  <textarea class="form-control" rows="3" id="product-keywords" name="keywords">{{ old('keywords') }}</textarea>
+                </div>
                 <h5>Product Specifications / Attributes</h5>
                 <hr>
                 <table class="table table-striped table-bordered" id="attributes-table">

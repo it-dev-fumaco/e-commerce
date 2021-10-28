@@ -263,6 +263,7 @@ class ProductController extends Controller
                 'f_by' => Auth::user()->username,
                 'f_ip' => $request->ip(),
                 'f_original_price' => $item['item_price'],
+                'keywords' => $request->keywords
             ]);
 
             // insert item attributes
@@ -342,7 +343,8 @@ class ProductController extends Controller
                 'f_alert_qty' => $request->alert_qty,
                 'f_caption' => $request->website_caption,
                 'f_full_description' => $request->full_detail,
-                'f_status' => ($request->is_disabled) ? 0 : 1
+                'f_status' => ($request->is_disabled) ? 0 : 1,
+                'keywords' => $request->keywords
             ]);
 
             if($detail->f_cat_id != $request->product_category) {
