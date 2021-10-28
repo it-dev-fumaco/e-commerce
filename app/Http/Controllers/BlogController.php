@@ -22,6 +22,7 @@ class BlogController extends Controller
             }  
             
             $subs_arr[] = [
+                'id' => $sub->id,
                 'email' => $sub->email,
                 'status' => $sub->status,
                 'membership_status' => $membership_status
@@ -29,5 +30,17 @@ class BlogController extends Controller
         }
 
         return view('backend.blog.subscribers', compact('subscribers', 'subs_arr'));
+    }
+
+    public function subscriberChangeStatus(Request $request){
+        DB::beginTransaction();
+        try {
+            DB::table('fumaco_subscribe')->where('id', $request->sub_id)->update(['status' => $request->status]);
+            DB::commit();
+            return response()->json(['status' => 1, 'message' => 'Status Changed']);
+        } catch (Exception $e) {
+            DB::rollback();
+            return redirect()->back()->with('error', 'An error occured. Please try again.');
+        }
     }
 }

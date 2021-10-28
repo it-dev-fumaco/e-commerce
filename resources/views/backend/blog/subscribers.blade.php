@@ -48,18 +48,18 @@
                                         </thead>
                                         <tbody>
                                             @forelse($subs_arr as $subs)
-                                                @php
-                                                    $badge = "danger";
-                                                    $status = "Disabled";
-                                                    if($subs['status'] == 1){
-                                                        $badge = "primary";
-                                                        $status = "Active";
-                                                    }
-                                                @endphp
+    
                                                 <tr>
                                                     <td>{{ $subs['email'] }}</td>
                                                     <td>{{ $subs['membership_status'] }}</td>
-                                                    <td><span class="badge bg-{{ $badge }}">{{ $status }}</span></td>
+                                                    <td>
+                                                        <center>
+                                                            <label class="switch">
+                                                                <input type="checkbox" class="toggle" id="toggle_{{ $subs['id'] }}" name="publish" {{ ($subs['status'] == 1) ? 'checked' : '' }} value="{{ $subs['id'] }}"/>
+                                                                <span class="slider round"></span>
+                                                            </label>
+                                                        </center>
+                                                    </td>
                                                 </tr>
                                             @empty
                                                 <tr>
@@ -78,5 +78,91 @@
                 </div>
             </section>
         </div>
-    </div>     
+    </div>
+    <style>
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 30px;
+            height: 16px;
+        }
+    
+        .switch input { 
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+    
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+    
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 10px;
+            width: 10px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+    
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+    
+        input:focus + .slider {
+            box-shadow: 0 0 1px #2196F3;
+        }
+    
+        input:checked + .slider:before {
+            -webkit-transform: translateX(16px);
+            -ms-transform: translateX(16px);
+            transform: translateX(16px);
+        }
+    
+        /* Rounded sliders */
+        .slider.round {
+            border-radius: 34px;
+        }
+    
+        .slider.round:before {
+            border-radius: 50%;
+        }
+    </style>
+@endsection
+@section('script')
+    <script>
+        $(document).ready(function() {
+            $(".toggle").change(function(){
+                var data = {
+                    'status': $(this).prop('checked') == true ? 1 : 0,
+                    'sub_id': $(this).val(),
+                    '_token': "{{ csrf_token() }}",
+                }
+                // console.log(data);
+                $.ajax({
+                    type:'POST',
+                    url:'/admin/subscribe/change_status',
+                    data: data,
+                    success: function (response) {
+                        console.log(status);
+                    },
+                    error: function () {
+                        alert('An error occured.');
+                    }
+                });
+            });
+        });
+    </script>
 @endsection
