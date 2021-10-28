@@ -77,7 +77,7 @@
                                                                             <input type="text" name="username" value="{{ $a->username }}" class="form-control" required readonly hidden>
                                                                             <div class="form-group">
                                                                                 <label for="name">Account Name</label>
-                                                                                <input type="text" name="account_name" class="form-control">
+                                                                                <input type="text" name="account_name" value="{{ $a->account_name }}" class="form-control">
                                                                             </div>
                                                                             <div class="form-group">
                                                                                 <label for="name">User Type</label>
