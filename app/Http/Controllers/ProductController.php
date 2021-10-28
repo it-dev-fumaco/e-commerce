@@ -265,6 +265,7 @@ class ProductController extends Controller
                 'f_original_price' => $item['item_price'],
                 'keywords' => $request->keywords,
                 'url_title' => $request->url_title,
+                'meta_description' => $request->meta_description
             ]);
 
             // insert item attributes
@@ -347,6 +348,7 @@ class ProductController extends Controller
                 'f_status' => ($request->is_disabled) ? 0 : 1,
                 'keywords' => $request->keywords,
                 'url_title' => $request->url_title,
+                'meta_description' => $request->meta_description
             ]);
 
             if($detail->f_cat_id != $request->product_category) {

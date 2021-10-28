@@ -10,7 +10,7 @@
 	<tbody>
 		@forelse ($list as $item)
 		@php
-			$image = ($item['image']) ? '/storage/item/images/'. $item['item_code'] .'/gallery/preview/'.$item['image'] : '/storage/no-photo-available.png';
+			$image = ($item['image']) ? '/storage/item_images/'. $item['item_code'] .'/gallery/preview/'.$item['image'] : '/storage/no-photo-available.png';
 		@endphp
 		<tr>
 			<td class="text-center align-middle">
