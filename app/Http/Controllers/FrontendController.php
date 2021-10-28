@@ -30,8 +30,6 @@ class FrontendController extends Controller
                 break;
         }
 
-        $orderby = ($request->order) ? $request->order : 'asc';
-        
         if ($request->has('s')) {
             $search_by = $request->by;
             $search_str = $request->s;
@@ -62,7 +60,7 @@ class FrontendController extends Controller
                             $q->orWhere('f_idcode', 'LIKE', "%".$search_str."%")
                                 ->orWhere('f_item_classification', 'LIKE', "%".$search_str."%");
                         })
-                        ->where('f_status', 1)->where('f_status', 1)->orderBy($sortby, $orderby)->get();
+                        ->where('f_status', 1)->where('f_status', 1)->orderBy($sortby, 'asc')->get();
                 }
 
                 if (in_array($search_by, ['blogs', 'all', ''])) {
@@ -573,14 +571,12 @@ class FrontendController extends Controller
                 break;
         }
 
-        $orderby = ($request->order) ? $request->order : 'asc';
-
         // get items based on category id
         $products = DB::table('fumaco_items')->where('f_cat_id', $category_id)
             ->when(count($request_data) > 0, function($c) use ($filtered_items) {
                 $c->whereIn('f_idcode', $filtered_items);
             })
-            ->where('f_status', 1)->orderBy($sortby, $orderby)->paginate(15);
+            ->where('f_status', 1)->orderBy($sortby, 'asc')->paginate(15);
 
         $products_arr = [];
         foreach ($products as $product) {

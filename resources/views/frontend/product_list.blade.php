@@ -207,20 +207,14 @@
 						<form id="sortForm" class="d-inline-block">
 							<div class="col-md-4 offset-md-8">
 								<div class="row mb-2">
-									<div class="col-md-6 pr-1" style="text-align: right;">
+									<div class="col-md-9 pr-1" style="text-align: right;">
 										<label class="mt-1 mb-1 mr-0" style="font-size: 0.75rem;">Sort By</label>
 									</div>
-									<div class="col-md-4" style="padding-left: 0;">
+									<div class="col-md-3" style="padding-left: 0;">
 										<select name="sortby" class="form-control form-control-sm" style="font-size: 0.75rem;">
 											<option value="Position" data-loc="{{ request()->fullUrlWithQuery(['sortby' => 'Position']) }}" {{ (request()->sortby == 'Position') ? 'selected' : '' }}>Recommended</option>
 											<option value="Product Name" data-loc="{{ request()->fullUrlWithQuery(['sortby' => 'Product Name']) }}" {{ (request()->sortby == 'Product Name') ? 'selected' : '' }}>Product Name</option>
 											<option value="Price" data-loc="{{ request()->fullUrlWithQuery(['sortby' => 'Price']) }}" {{ (request()->sortby == 'Price') ? 'selected' : '' }}>Price</option>
-										</select>
-									</div>
-									<div class="col-md-2" style="padding-left: 0;">
-										<select name="order" class="form-control form-control-sm" style="font-size: 0.75rem;">
-											<option value="asc" data-loc="{{ request()->fullUrlWithQuery(['order' => 'asc']) }}" {{ (request()->order == 'asc') ? 'selected' : '' }}>ASC</option>
-											<option value="desc" data-loc="{{ request()->fullUrlWithQuery(['order' => 'desc']) }}" {{ (request()->order == 'desc') ? 'selected' : '' }}>DESC</option>
 										</select>
 									</div>
 								</div>
