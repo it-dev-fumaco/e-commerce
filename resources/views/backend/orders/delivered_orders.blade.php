@@ -48,6 +48,7 @@
 											<th>Customer Name</th>
 											<th>Date Delivered</th>
 											<th>Shipping Method</th>
+											<th>Payment Method</th>
 											<th>Grand Total</th>
 											<th>Status</th>
 											<th>Action</th>
@@ -61,6 +62,7 @@
 											<td>{{ $order['first_name'] .' '. $order['last_name'] }}</td>
 											<td>{{ $order['date_delivered'] }}</td>
 											<td>{{ $order['shipping_name'] }}</td>
+											<td>{{ $order['payment_method'] }}</td>
 											<td>₱ {{ $order['grand_total'] }}</td>
 											<td><span class="badge" style=" background-color: #fd6300 !important; color: #fff;">{{ $order['status'] }}</span></td>
 											<td>
