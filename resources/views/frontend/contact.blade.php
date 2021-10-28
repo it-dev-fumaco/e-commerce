@@ -127,17 +127,17 @@
         <br>
        <div class="row animated animatedFadeInUp fadeInUp">
           <div class="col">
-            @if(config('services.recaptcha.key'))
+            {{-- @if(config('services.recaptcha.key'))
             <div class="g-recaptcha" data-sitekey="{{config('services.recaptcha.key')}}"></div>
-            @endif
-            {{-- <div class="g-recaptcha" data-sitekey="6LfbWpwcAAAAAEPssgZuCMj8MKeVy7UVAXFkIbME"></div> --}}
+            @endif --}}
+            <div class="g-recaptcha" data-sitekey="6LfbWpwcAAAAAEPssgZuCMj8MKeVy7UVAXFkIbME"></div>
           </div>
         </div>
        <center>
-        <button class="g-recaptcha"
+        {{-- <button class="g-recaptcha"
         data-sitekey="6LfSLPscAAAAAE1XtyL_cYR5tU1P68qZt2ikcm2j"
         data-callback='onSubmit'
-        data-action='submit'>Submit</button>
+        data-action='submit'>Submit</button> --}}
     
           <button type="submit" class="btn btn-primary mt-3 fumacoFont_btn animated animatedFadeInUp fadeInUp">&nbsp;&nbsp;&nbsp;Submit&nbsp;&nbsp;&nbsp;</button>
         </center>
@@ -149,12 +149,12 @@
 @endsection
 
 @section('script')
-<script>
+{{-- <script>
   function onSubmit(token) {
     alert();
     document.getElementById("contact-form").submit();
   }
-</script>
+</script> --}}
 
 
 
