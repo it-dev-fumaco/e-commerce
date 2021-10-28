@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin\Auth;
 
 use Auth;
+use DB;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\ThrottlesLogins;
@@ -35,6 +36,11 @@ class LoginController extends Controller
         //Login the admin...
         if(Auth::guard('admin')->attempt(['username' => $request->username,'password' => $request->password], 0)){
             //Authentication passed...
+            $checker = DB::table('fumaco_admin_user')->where('username', $request->username)->first();
+            if($checker->xstatus == 0){
+                Auth::guard('admin')->logout();
+                return redirect('/admin/login')->withInput()->with('d_info','Your admin account is deactivated.');
+            }
             return redirect('/admin/dashboard');
         }
 

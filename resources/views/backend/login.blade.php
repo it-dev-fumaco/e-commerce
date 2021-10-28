@@ -27,6 +27,15 @@
 				</div>
 			</div>
 			@endif
+			@if(session()->has('d_info'))
+			<div class="row">
+				<div class="col">
+					<div class="alert alert-warning fade show text-center" role="alert">
+						{{ session()->get('d_info') }}
+					  </div>
+				</div>
+			</div>
+			@endif
 			@if(session()->has('error'))
 			<div class="row">
 				<div class="col">

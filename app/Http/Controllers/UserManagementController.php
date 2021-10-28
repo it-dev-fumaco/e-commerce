@@ -16,4 +16,29 @@ class UserManagementController extends Controller
 
         return view('backend.user_management.admin_list', compact('admin'));
     }
+
+    public function editAdmin(Request $request){
+        DB::beginTransaction();
+        try {
+            $acc_name = ($request->account_name) ? $request->account_name : ' ';
+            DB::table('fumaco_admin_user')->where('username', $request->username)->update(['account_name' => $acc_name, 'user_type' => $request->user_type]); 
+            DB::commit();
+            return redirect()->back()->with('success', 'Admin Information Edited.');
+        } catch (Exception $e) {
+            DB::rollback();
+            return redirect()->back()->with('error', 'An error occured. Please try again.');
+        }
+    }
+
+    public function adminChangeStatus(Request $request){
+        DB::beginTransaction();
+        try {
+            DB::table('fumaco_admin_user')->where('id', $request->admin_id)->update(['xstatus' => $request->status]);
+            DB::commit();
+            return response()->json(['status' => 1, 'message' => 'Status Changed']);
+        } catch (Exception $e) {
+            DB::rollback();
+            return redirect()->back()->with('error', 'An error occured. Please try again.');
+        }
+    }
 }
