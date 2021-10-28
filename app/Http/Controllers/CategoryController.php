@@ -23,7 +23,8 @@ class CategoryController extends Controller
                 'name' => $request->edit_cat_name,
                 'image' => $request->edit_cat_icon,
                 'slug' => $request->edit_cat_slug,
-                'hide_none' => (isset($request->hide_na)) ? 1 : 0
+                'hide_none' => (isset($request->hide_na)) ? 1 : 0,
+                'external_link' => ($request->edit_is_external_link) ? $request->external_link : null
             ];
 
             DB::table('fumaco_categories')->where('id', $id)->update($edit);
@@ -43,7 +44,8 @@ class CategoryController extends Controller
                 'name' => $request->add_cat_name,
                 'image' => $request->add_cat_icon,
                 'slug' => $request->add_cat_slug,
-                'code' => " "
+                'code' => " ",
+                'external_link' => ($request->is_external_link) ? $request->external_link : null
             ];
 
             DB::table('fumaco_categories')->insert($add);
