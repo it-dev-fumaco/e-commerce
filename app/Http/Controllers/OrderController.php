@@ -203,22 +203,22 @@ class OrderController extends Controller
                     foreach($ordered_items as $orders){
                         $items = DB::table('fumaco_items')->select('f_reserved_qty')->where('f_idcode', $orders->item_code)->first();
                         $qty_left = $items->f_reserved_qty - $orders->item_qty;
-    
+
                         DB::table('fumaco_items')->where('f_idcode', $orders->item_code)->update(['f_reserved_qty' => $qty_left]);
                     }
                 }
-    
+
                 if($status == 'Cancelled'){
                     $date_cancelled = Carbon::now()->toDateTimeString();
                     foreach($ordered_items as $orders){
                         $items = DB::table('fumaco_items')->select('f_reserved_qty', 'f_qty')->where('f_idcode', $orders->item_code)->first();
                         $r_qty = $items->f_reserved_qty - $orders->item_qty;
                         $f_qty = $items->f_qty + $orders->item_qty;
-    
+
                         DB::table('fumaco_items')->where('f_idcode', $orders->item_code)->update(['f_reserved_qty' => $r_qty, 'f_qty' => $f_qty]);
                     }
                 }
-    
+
                 $orders_arr = [
                     'order_status' => $status,
                     'order_update' => $now,
@@ -240,7 +240,7 @@ class OrderController extends Controller
                         'image' => ($image) ? $image->imgprimayx : null
                     ];
                 }
-        
+
                 if ($status == 'Out for Delivery') {
                     $order_details = DB::table('fumaco_order')->where('order_number', $request->order_number)->first();
                     Mail::send('emails.out_for_delivery', ['order_details' => $order_details, 'status' => $status, 'items' => $items], function($message) use($order_details, $status){
@@ -257,11 +257,11 @@ class OrderController extends Controller
                         $message->subject('Order Delivered - FUMACO');
                     });
                 }
-                
+
                 DB::table('fumaco_order')->where('order_number', $request->order_number)->update($orders_arr);
-    
+
                 DB::table('track_order')->where('track_code', $request->order_number)->update(['track_status' => $status, 'track_date_update' => $now]);
-    
+
                 DB::commit();
             }
 
@@ -269,7 +269,7 @@ class OrderController extends Controller
 		}catch(Exception $e){
 			DB::rollback();
 			return redirect()->back()->with('error', 'An error occured. Please try again.');
-		}	
+		}
     }
 
     public function checkPaymentStatus(Request $request) {
@@ -317,8 +317,8 @@ class OrderController extends Controller
                 'CurrencyCode' => 'PHP',
                 'HashValue' => $hash
             ];
-            
-            $response = Http::asForm()->post('https://pay.e-ghl.com/IPGSG/Payment.aspx', $data);
+
+            $response = Http::asForm()->post($api->base_url, $data);
 
             parse_str($response, $output);
         }
