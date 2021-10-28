@@ -134,6 +134,11 @@
           </div>
         </div>
        <center>
+        <button class="g-recaptcha"
+        data-sitekey="6LfSLPscAAAAAE1XtyL_cYR5tU1P68qZt2ikcm2j"
+        data-callback='onSubmit'
+        data-action='submit'>Submit</button>
+    
           <button type="submit" class="btn btn-primary mt-3 fumacoFont_btn animated animatedFadeInUp fadeInUp">&nbsp;&nbsp;&nbsp;Submit&nbsp;&nbsp;&nbsp;</button>
         </center>
       </form>
@@ -144,5 +149,13 @@
 @endsection
 
 @section('script')
+<script>
+  function onSubmit(token) {
+    alert();
+    document.getElementById("contact-form").submit();
+  }
+</script>
+
+
 
 @endsection
