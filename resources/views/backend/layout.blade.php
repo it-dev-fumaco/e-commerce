@@ -428,25 +428,28 @@
               </li>
             </ul>
           </li>
+          @php
+              $user_mgt_pages = ['admin_list']
+          @endphp
           <li class="nav-header">User Management</li>
-          <li class="nav-item {{ (in_array($activePage, $settings_pages) ? 'menu-open' : '') }}">
-            <a href="#" class="nav-link {{ (in_array($activePage, $settings_pages) ? 'active' : '') }}">
+          <li class="nav-item {{ (in_array($activePage, $user_mgt_pages) ? 'menu-open' : '') }}">
+            <a href="#" class="nav-link {{ (in_array($activePage, $user_mgt_pages) ? 'active' : '') }}">
                 <i class="fas fa-users"></i>
               <p>Users <i class="fas fa-angle-left right"></i></p>
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href=" " class="nav-link {{ $activePage == 'payment_api_setup' ? 'active' : '' }}">
+                <a href="/admin/user_management/list" class="nav-link {{ $activePage == 'admin_list' ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Admin</p>
                 </a>
               </li>
-              <li class="nav-item">
+              {{-- <li class="nav-item">
                 <a href=" " class="nav-link {{ $activePage == 'erp_api_setup' ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>User</p>
                 </a>
-              </li>
+              </li> --}}
             </ul>
           </li>
         </ul>
