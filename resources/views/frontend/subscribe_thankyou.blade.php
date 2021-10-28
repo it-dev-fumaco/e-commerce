@@ -1,5 +1,5 @@
 @extends('frontend.layout', [
-  'namePage' => 'Newsletter Subscription',
+  'namePage' => 'Subscribe',
   'activePage' => 'newsletter_subscription'
 ])
 
@@ -25,8 +25,14 @@
                 <div class="card text-center" style="width: 100%">
                     <div class="card-body">
                         <h5 class="card-title">Thank You</h5>
-                        <p class="card-text">Thank you for subscribing to our newsletter. You'll receive your first email within 24 hours.</p>
+                        <br>
+                        <p class="card-text">Thank you for subscribing to our newsletter. You'll receive updates straight to your inbox!</p>
                         <br/>
+                        <p class="card-text">You may I also Like and follow us on our social media accounts</p>
+                        <br>
+                        <i class="fa fa-twitter" aria-hidden="true" style="font-size: 20pt !important"></i>&nbsp;&nbsp;<i class="fa fa-facebook-square" aria-hidden="true" style="font-size: 20pt !important"></i>&nbsp;&nbsp;<i class="fa fa-instagram" aria-hidden="true" style="font-size: 20pt !important"></i>
+                        <br>
+                        <br>
                         <a href="/" class="btn btn-primary">RETURN TO HOMEPAGE</a>
                     </div>
                 </div>
