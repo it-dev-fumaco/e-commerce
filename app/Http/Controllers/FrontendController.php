@@ -448,7 +448,7 @@ class FrontendController extends Controller
                 'phone' => ['required', 'string', 'max:255'],
                 'subject' => ['required', 'string', 'max:255'],
                 'comment' => ['required', 'string', 'max:255'],
-                'g-recaptcha-response' => function ($attribute, $value, $fail) {
+                'g-recaptcha-response' => ['required',function ($attribute, $value, $fail) {
                     $secret_key = '6LfbWpwcAAAAAPKCS6T0eiS06UkINMtn5NBpde54';
                     $response = $value;
                     $userIP = $_SERVER['REMOTE_ADDR'];
@@ -456,23 +456,14 @@ class FrontendController extends Controller
                     $response = \file_get_contents($url);
                     $response = json_decode($response);
                     if (!$response->success) {
-                        $fail($attribute.'google reCaptcha failed.');
+                        $fail('ReCaptcha failed.');
                     }
-                },
+                }],
             ],
             [
-                // 'g-recaptcha-response.required' => 'Please check the reCAPTCHA.',
-                // 'g-recaptcha-response' => function ($attribute, $value, $fail) {
-                //     $secret_key = '6LfbWpwcAAAAAPKCS6T0eiS06UkINMtn5NBpde54';
-                //     $response = $value;
-                //     $userIP = $_SERVER['REMOTE_ADDR'];
-                //     $url = "https://www.google.com/recaptcha/api/siteverify?secret=$secret_key&response=$response&remoteip=$userIP";
-                //     $response = \file_get_contents($url);
-                //     $response = json_decode($response);
-                //     if (!$response->success) {
-                //         $fail($attribute.'google reCaptcha failed.');
-                //     }
-                // },
+                'g-recaptcha-response' => [
+                    'required' => 'Please check ReCaptcha.'
+                ]
             ]);
 
             DB::table('fumaco_contact_list')->insert($new_contact);
