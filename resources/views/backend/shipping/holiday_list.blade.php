@@ -15,7 +15,7 @@
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
                                 <li class="breadcrumb-item"><a href="/admin/dashboard">Home</a></li>
-                                <li class="breadcrumb-item active">Holiday List Page</li>
+                                <li class="breadcrumb-item active">Holiday List</li>
                             </ol>
                         </div>
                     </div>
@@ -27,6 +27,31 @@
                         <div class="col-md-12">
                             <div class="card card-primary">
                                 <div class="card-body">
+                                    <h4>Register Holiday</h4>
+                                    <form action="/admin/holiday/new" method="POST">
+                                        @csrf
+                                        <div class="row">
+                                            <div class="form-group col-md-3">
+                                                <label for="name">Holiday Name</label>
+                                                <input type="text" name="name" class="form-control" required>
+
+                                                <label for="name">Holiday Date</label>
+                                                <input type="text" name="date" id="holiday" class="form-control" required/>
+                                                <br/>
+                                                <button type="submit" class="btn btn-primary">Save</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="card card-primary">
+                                <div class="card-body">
+
+                                    <div class="row">
+
+                                    </div>
                                     <form action="/admin/holiday/list" method="GET">
                                         <div class="form-group row">
                                             <div class="col-sm-2">
@@ -53,7 +78,7 @@
                                                     @endforeach
                                                 </select>
                                             </div>
-                                                
+
                                             <div class="col-sm-3">
                                                 <button type="submit" class="btn btn-primary">Search</button>
                                             </div>
@@ -105,7 +130,7 @@
                                                                                 <label for="name">Holiday Name</label>
                                                                                 <input type="text" name="name" class="form-control" value="{{ $holiday['name'] }}" required>
                                                                                 <input type="text" name="id" class="form-control" value="{{ $holiday['id'] }}" hidden readonly required>
-                                
+
                                                                                 <label for="name">Holiday Date</label>
                                                                                 <input type="text" name="date" id="holiday-edit" class="edit-holiday form-control" value="{{ date('Y-m-d', strtotime($holiday['date'])) }}" required/>
                                                                                 <br/>
@@ -134,34 +159,10 @@
                             </div>
                         </div>
                     </div>
-
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="card card-primary">
-                                <div class="card-body">
-                                    <h4>Add New</h4>
-                                    <form action="/admin/holiday/new" method="POST">
-                                        @csrf
-                                        <div class="row">
-                                            <div class="form-group col-md-6">
-                                                <label for="name">Holiday Name</label>
-                                                <input type="text" name="name" class="form-control" required>
-
-                                                <label for="name">Holiday Date</label>
-                                                <input type="text" name="date" id="holiday" class="form-control" required/>
-                                                <br/>
-                                                <button type="submit" class="btn btn-primary">Save</button>
-                                            </div>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </section>
         </div>
-    </div>     
+    </div>
 @endsection
 @section('script')
     <script>
@@ -185,7 +186,7 @@
                     },
                 }, function(start, end, label) {
             });
-            
+
         });
     </script>
 @endsection
