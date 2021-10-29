@@ -101,7 +101,7 @@
 						</picture>
 						<div class="card-body">
 							<div class="text ellipsis">
-								<p class="card-text fumacoFont_card_title text-concat" style="color:#0062A5 !important; height: 80px; text-align: left;">{{ $product['item_name'] }}</p>
+								<p class="card-text product-head fumacoFont_card_title text-concat" style="color:#0062A5 !important;  height: 80px; font-size: 16px !important; font-weight: 500 !important;">{{ $product['item_name'] }}</p>
 							</div>
 							<p class="card-text fumacoFont_card_price" style="color:#000000 !important;">
 								@if($product['is_discounted'])
