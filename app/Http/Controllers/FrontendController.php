@@ -222,7 +222,26 @@ class FrontendController extends Controller
 
             DB::table('fumaco_subscribe')->insert($insert);
 
-            Mail::send('emails.new_subscriber', [], function($message) use ($request) {
+         
+            $featured_items = DB::table('fumaco_items')->where('f_status', 1)->where('f_featured', 1)->limit(4)->get();
+            $featured = [];
+
+            foreach($featured_items as $row){
+                $bs_img = DB::table('fumaco_items_image_v1')->where('idcode', $row->f_idcode)->first();
+
+                $bs_item_name = $row->f_name_name;
+                $featured[] = [
+                    'item_code' => $row->f_idcode,
+                    'item_name' => $bs_item_name,
+                    'orig_price' => $row->f_original_price,
+                    'is_discounted' => $row->f_discount_trigger,
+                    'new_price' => $row->f_price,
+                    'discount' => $row->f_discount_percent,
+                    'image' => ($bs_img) ? $bs_img->imgprimayx : null
+                ];
+            }
+
+            Mail::send('emails.new_subscriber', ['featured' => $featured], function($message) use ($request) {
                 $message->to($request->email);
                 $message->subject('Thank you for subscribing - FUMACO');
             });
