@@ -3,9 +3,13 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Fumaco Inc. is the Philippine’s premiere lighting solutions powerhouse. It has manufacturing, import, distribution and sales capabilities of high quality lighting fixtures. The company employs industry experts and engineers to provide clients with utmost support for various lighting services.">
-    <meta name="author" content="Fumaco Website">
-    <meta name="keywords" content="FUMACO, Lighting, Philippines, Philippine, Leading, Luminaire, Manufacturing, ISO, Quality, light" />
+    @if($activePage == 'product_page')
+@yield('product_meta')
+    @else
+<meta name="description" content="Fumaco Inc. is the Philippine’s premiere lighting solutions powerhouse. It has manufacturing, import, distribution and sales capabilities of high quality lighting fixtures. The company employs industry experts and engineers to provide clients with utmost support for various lighting services.">
+    <meta name="keywords" content="FUMACO, Lighting, Philippines, Philippine, Leading, Luminaire, Manufacturing, ISO, Quality, light"  />
+    @endif<meta name="author" content="Fumaco Website">
+
     <title>{{ $namePage }}</title>
 
     <link rel="shortcut icon" type="image/x-icon" href="{{ asset('/assets/icon/favicon.ico') }}">

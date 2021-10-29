@@ -1,7 +1,12 @@
 @extends('frontend.layout', [
-    'namePage' => $product_details->f_name_name,
+    'namePage' => $product_details->url_title,
     'activePage' => 'product_page'
 ])
+
+@section('product_meta')
+<meta name="description" content="{{ $product_details->meta_description }}">
+	<meta name="keywords" content="{{ $product_details->keywords }}" />
+@endsection
 
 @section('content')
 	<style>

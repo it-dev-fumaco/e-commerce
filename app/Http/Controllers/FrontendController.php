@@ -666,7 +666,7 @@ class FrontendController extends Controller
         return view('frontend.product_list', compact('product_category', 'products_arr', 'products', 'filters'));
     }
 
-    public function viewProduct($item_code) {
+    public function viewProduct($item_code) { // Product Page
         $product_details = DB::table('fumaco_items')->where('f_idcode', $item_code)->first();
         if (!$product_details) {
             return view('error');
