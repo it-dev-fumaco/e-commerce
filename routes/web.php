@@ -176,8 +176,11 @@ Route::prefix('admin')->group(function () {
         Route::get('/customer/list', 'CustomerController@viewCustomers');
 
         Route::get('/blog/subscribers', 'BlogController@viewSubscribers');
+        Route::post('/subscribe/change_status', 'BlogController@subscriberChangeStatus');
 
         Route::get('/user_management/list', 'UserManagementController@viewAdmin');
+        Route::get('/user_management/add', 'UserManagementController@addAdminForm');
+        Route::post('/user_management/add_admin', 'UserManagementController@addAdmin');
         Route::post('/user_management/edit', 'UserManagementController@editAdmin');
         Route::post('/user_management/change_status', 'UserManagementController@adminChangeStatus');
 

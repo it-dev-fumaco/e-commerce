@@ -29,12 +29,15 @@
                                 <div class="card-body">
                                     <form action="/admin/user_management/list" method="GET">
                                         <div class="form-group row">
-                                            <div class="col-sm-3">
+                                            <div class="col-md-3">
                                                 <input type="text" class="form-control" id="search-box" name="email" placeholder="Search" value="{{request()->get('email')}}">
                                             </div>
                                                 
-                                            <div class="col-sm-3">
+                                            <div class="col-md-6">
                                                 <button type="submit" class="btn btn-primary">Search</button>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <a href="/admin/user_management/add" class="btn btn-primary float-right">New Admin</a>
                                             </div>
                                         </div>
                                     </form>
@@ -46,6 +49,8 @@
                                                 <th>User Type</th>
                                                 <th>Account Name</th>
                                                 <th>Action</th>
+                                                <th>Last Login</th>
+                                                <th>Last Login IP</th>
                                                 <th>Active</th>
                                             </tr>
                                         </thead>
@@ -97,6 +102,8 @@
                                                             </div>
                                                         </div>
                                                     </td>
+                                                    <td>{{ date('M d, Y h:i A', strtotime($a->last_login)) }}</td>
+                                                    <td>{{ $a->last_login_ip }}</td>
                                                     <td>
                                                         <center>
                                                             <label class="switch">
