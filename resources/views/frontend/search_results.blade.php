@@ -136,15 +136,19 @@
 				<h4 class="mt-4 mb-3 fw-light bestsellinghead fumacoFont1 animated animatedFadeInUp fadeInUp" style="color:#000000 !important;">BLOG(S)</h4>
 			</div>
 			@foreach($blogs as $blog)
-			<div class="col-lg-3 d-flex align-items-stretch animated animatedFadeInUp fadeInUp">
+			<div class="col-lg-4 d-flex align-items-stretch animated animatedFadeInUp fadeInUp">
 				<div class="card mb-4" style="border: 0px solid rgba(0, 0, 0, 0.125) !important;">
 					<img class="card-img-top" src="{{ asset('/assets/journal/'. $blog['image']) }}" alt="">
 					<div class="card-body align-items-stretch p-2">
-						<p style="color:#000 !important; font-size: 10pt !important; font-weight: 300;" class="abt_standard m-0">{{ $blog['publish_date'] }} | {{ $blog['comment_count'] }} Comment(s)</p>
+						{{-- <p style="color:#000 !important; font-size: 10pt !important; font-weight: 300;" class="abt_standard m-0">{{ $blog['publish_date'] }} | {{ $blog['comment_count'] }} Comment(s)</p> --}}
 						<a href="blog?id={{ $blog['id'] }}" style="text-decoration: none !important;">
 							<p style="color:#373b3e !important;" class="abt_standard fumacoFont_card_title">{{ $blog['title'] }}</p>
 						</a>
-						<a href="blog?id={{ $blog['id'] }}" class="text-decoration-none text-muted">Read More →</a>
+						<div class="text ellipsis">
+                            <p class="text-concat abt_standard">{{ $blog['caption'] }}</p>
+                          </div>
+						
+                          <a href="/blog?id={{ $blog['id'] }}" class="text-concat mx-auto read-more">Read More</a>
 					</div>
 				</div>
 			</div>
@@ -160,6 +164,38 @@
 		</div>
   	</div>
 </main>
+<style>
+  .text {
+    position: relative;
+    font-size: 12px !important;
+    width: 100%;
+  }
+
+  .text-concat {
+    position: relative;
+    display: inline-block;
+    word-wrap: break-word;
+    overflow: hidden;
+    max-height: 4.8em;
+    /* line-height: 1.2em; */
+    line-height: 1.5em;
+    text-align: left;
+    font-weight: 300 !important;
+    color:#404040 !important;
+  }
+
+  .text.ellipsis::after {
+    position: absolute;
+    right: -12px;
+    bottom: 4px;
+  }
+
+  .read-more{
+    text-decoration: none !important;
+    font-size: 12px !important;
+    border-bottom: 1px solid #404040;
+  }
+</style>
 @endsection
 
 @section('script')

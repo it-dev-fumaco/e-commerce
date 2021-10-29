@@ -94,7 +94,8 @@ class FrontendController extends Controller
                     'comment_count' => null,
                     'publish_date' => null,
                     'title' => null,
-                    'type' => null
+                    'type' => null,
+                    'caption' => null
                 ];
             }
 
@@ -113,7 +114,8 @@ class FrontendController extends Controller
                     'image' => $blog->{'blogprimayimage-journal'},
                     'publish_date' => $blog->datepublish,
                     'title' => $blog->blogtitle,
-                    'type' => $blog->blogtype
+                    'type' => $blog->blogtype,
+                    'caption' => $blog->blog_caption,
                 ];
             }
 
@@ -153,7 +155,8 @@ class FrontendController extends Controller
                         'image' => $result['image'],
                         'publish_date' => $result['publish_date'],
                         'title' => $result['title'],
-                        'type' => $result['type']
+                        'type' => $result['type'],
+                        'caption' => $result['caption'],
                     ];
                 }
             }
