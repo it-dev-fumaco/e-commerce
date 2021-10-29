@@ -172,14 +172,17 @@
             </a>
           </li>
           <li class="nav-header">CONTENT MANAGEMENT</li>
-          <li class="nav-item">
-            <a href="#" class="nav-link">
+          @php
+              $pages = ['pages_list', 'home_crud'];
+          @endphp
+          <li class="nav-item {{ (in_array($activePage, $pages) ? 'menu-open' : '') }}">
+            <a href="#" class="nav-link {{ (in_array($activePage, $pages) ? 'active' : '') }}">
               <i class="nav-icon fas fa-book"></i>
               <p>Pages <i class="fas fa-angle-left right"></i></p>
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="/admin/pages/home" class="nav-link">
+                <a href="/admin/pages/home" class="nav-link {{ $activePage == 'home_crud' ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Home Page</p>
                 </a>
@@ -202,7 +205,12 @@
                   <p>Contact List</p>
                 </a>
               </li>
-
+              <li class="nav-item">
+                <a href="/admin/pages/list" class="nav-link {{ $activePage == 'pages_list' ? 'active' : '' }}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Policy Pages</p>
+                </a>
+              </li>
             </ul>
           </li>
           @php

@@ -411,14 +411,16 @@
                   <td class="tdfooter footer2nd" style="border-style: unset !important;"><a href="/journals" style="text-decoration: none; color: #0062A5;">News</a></td>
                   <td class="tdfooter footer2nd" style="border-style: unset !important;">&nbsp;</td>
                 </tr>
-                <tr>
+                <tr id="policy-pages-footer"></tr>{{-- Policy Pages --}}
+                
+                {{-- <tr>
                   <td class="tdfooter footer2nd" style="border-style: unset !important;"><a href="/privacy_policy" style="text-decoration: none;     color: #0062A5;">Privacy Policy</a></td>
                   <td class="tdfooter footer2nd" style="border-style: unset !important;">&nbsp;</td>
                 </tr>
                 <tr>
                   <td class="tdfooter footer2nd" style="border-style: unset !important;"><a href="/terms_condition" style="text-decoration: none;     color: #0062A5;">Terms & Conditions</a></td>
                   <td class="tdfooter footer2nd" style="border-style: unset !important;">&nbsp;</td>
-                </tr>
+                </tr> --}}
               </tbody>
             </table>
           </div>
@@ -451,6 +453,7 @@
       productCategories();
       countCartItems();
       countWishItems();
+      policyPages();
       //Preloader
       preloaderFadeOutTime = 800;
       function hidePreloader() {
@@ -465,6 +468,28 @@
       $("#closeCookieConsent, .cookieConsentOK").click(function() {
           $("#cookieConsent").fadeOut(200);
       });
+
+      // policy pages
+      function policyPages() {
+        $('#policy-pages-footer').empty();
+        $.ajax({
+          type:'GET',
+          url:'/policy_pages',
+          success: function (response) {
+            var f = '';
+            $(response).each(function(i, d){
+              var link = '/pages/' + d.slug;
+              // for footer links
+              f += '<tr style="border-style: unset !important;">' +
+                '<td class="tdfooter footer2nd" style="border-style: unset !important;">' +
+                '<a style="text-decoration:none; color: #0062A5;" href="'+ link +'" target="_blank" >' + d.page_title +'</a>' +
+              '</td></tr>';
+            });
+
+            $('#policy-pages-footer').append(f);
+          }
+        });
+      }
 
       // set product category dropdown in navbar and links in footer
       function productCategories() {

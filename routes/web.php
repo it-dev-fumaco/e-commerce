@@ -51,6 +51,9 @@ Route::post('/getvariantcode', 'FrontendController@getVariantItemCode');
 Route::post('/subscribe', 'FrontendController@newsletterSubscription');
 Route::get('/thankyou', 'FrontendController@subscribeThankyou');
 
+Route::get('/policy_pages', 'FrontendController@pagesList');
+Route::get('/pages/{slug}', 'FrontendController@viewPage');
+
 Route::group(['middleware' => 'auth'], function(){
     Route::get('/mywishlist', 'FrontendController@viewWishlist');
     Route::delete('/mywishlist/{id}/delete', 'FrontendController@deleteWishlist');
@@ -184,6 +187,10 @@ Route::prefix('admin')->group(function () {
         Route::post('/user_management/add_admin', 'UserManagementController@addAdmin');
         Route::post('/user_management/edit', 'UserManagementController@editAdmin');
         Route::post('/user_management/change_status', 'UserManagementController@adminChangeStatus');
+
+        Route::get('/pages/list', 'PagesController@viewPages');
+        Route::get('/pages/edit/{page_id}', 'PagesController@editForm');
+        Route::post('/edit/{id}', 'PagesController@editPage');
 
         // SHIPPING SERVICES ROUTES CMS
         Route::get('/shipping/list', 'ShippingController@viewList');
