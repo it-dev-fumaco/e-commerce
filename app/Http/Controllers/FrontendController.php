@@ -271,6 +271,20 @@ class FrontendController extends Controller
         return response()->json($item_categories);
     }
 
+    public function pagesList(){
+        // Policy Pages
+        $pages = DB::table('fumaco_pages')->get();
+
+        return response()->json($pages);
+    }
+
+    public function viewPage($slug){
+        $pages = DB::table('fumaco_pages')->where('slug', $slug)->first();
+
+        return view('frontend.policy_page', compact('pages'));
+    }
+
+
     // get website settings
     public function websiteSettings() {
         return DB::table('fumaco_settings')->first();
@@ -335,10 +349,6 @@ class FrontendController extends Controller
             ->orderBy('partners_sort', 'asc')->get();
 
         return view('frontend.about_page', compact('about_data', 'partners'));
-    }
-
-    public function viewPrivacyPage(){
-        return view('frontend.privacy');
     }
 
     public function viewTermsPage(){
