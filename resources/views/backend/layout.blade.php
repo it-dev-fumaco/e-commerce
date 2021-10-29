@@ -26,8 +26,12 @@
   <link rel="stylesheet" href="{{ asset('/assets/admin/plugins/daterangepicker/daterangepicker.css') }}">
   <!-- summernote -->
   <link rel="stylesheet" href="{{ asset('/assets/admin/plugins/summernote/summernote-bs4.min.css') }}">
-  
+
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
 <div class="wrapper">
@@ -319,8 +323,8 @@
               </li>
             </ul>
           </li>
-          <li class="nav-item {{ (in_array($activePage, ['shipping_list', 'store_list']) ? 'menu-open' : '') }}">
-            <a href="#" class="nav-link {{ (in_array($activePage, ['shipping_list', 'store_list'])) ? 'active' : '' }}">
+          <li class="nav-item {{ (in_array($activePage, ['shipping_list', 'store_list', 'holiday_list']) ? 'menu-open' : '') }}">
+            <a href="#" class="nav-link {{ (in_array($activePage, ['shipping_list', 'store_list', 'holiday_list'])) ? 'active' : '' }}">
               <i class="nav-icon fas fa-truck"></i>
               <p>Shipping <i class="fas fa-angle-left right"></i></p>
             </a>
@@ -335,6 +339,12 @@
                 <a href="/admin/store/list" class="nav-link {{ $activePage == 'store_list' ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Store Location</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="/admin/holiday/list" class="nav-link {{ $activePage == 'holiday_list' ? 'active' : '' }}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Holiday List</p>
                 </a>
               </li>
             </ul>

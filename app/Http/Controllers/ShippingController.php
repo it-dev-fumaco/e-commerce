@@ -7,6 +7,7 @@ use App\Models\ShippingService;
 use App\Models\ShippingZoneRate;
 use App\Models\ShippingCondition;
 use DB;
+use Carbon\Carbon;
 
 class ShippingController extends Controller
 {
@@ -20,6 +21,83 @@ class ShippingController extends Controller
         $shipping_services = ShippingService::all();
         
         return view('backend.shipping.list', compact('shipping_services'));
+    }
+
+    public function viewHolidays(Request $request){
+        $hol_str = $request->holiday;
+        $holidays = DB::table('fumaco_holiday')->where('holiday_name', 'LIKE', '%'.$hol_str.'%');
+
+        if($request->holiday_month != ''){
+            $holidays->whereMonth('holiday_date', $request->holiday_month);
+        }
+
+        if($request->holiday_year != ''){
+            $holidays->whereYear('holiday_date', $request->holiday_year);
+        }
+
+        $holidays = $holidays->orderBy('holiday_date', 'asc')->paginate(10);
+
+        $holidays_arr = [];
+
+        $year_now = Carbon::now()->format('Y');
+
+        $years = DB::table('fumaco_holiday')->select(DB::raw('YEAR(holiday_date) as year'))->distinct()->pluck('year');
+
+        foreach($holidays as $holiday){
+            $holidays_arr[] = [
+                'id' => $holiday->holiday_id,
+                'name' => $holiday->holiday_name,
+                'date' => Carbon::parse($holiday->holiday_date)->format('M d')
+            ];
+        }
+
+        return view('backend.shipping.holiday_list', compact('holidays', 'holidays_arr', 'years', 'year_now'));
+    }
+
+    public function addHoliday(Request $request){
+        DB::beginTransaction();
+        try {
+            $insert = [
+                'holiday_date' => $request->date,
+                'holiday_name' => $request->name
+            ];
+
+            DB::table('fumaco_holiday')->insert($insert);
+            DB::commit();
+            return redirect()->back()->with('success', 'Holiday Added.');
+        } catch (Exception $e) {
+            DB::rollback();
+            return redirect()->back()->with('error', 'An error occured. Please try again.');
+        }
+    }
+
+    public function editHoliday(Request $request){
+        DB::beginTransaction();
+        try {
+            $update = [
+                'holiday_date' => $request->date,
+                'holiday_name' => $request->name
+            ];
+
+            DB::table('fumaco_holiday')->where('holiday_id', $request->id)->update($update);
+            DB::commit();
+            return redirect()->back()->with('success', 'Holiday Edited.');
+        } catch (Exception $e) {
+            DB::rollback();
+            return redirect()->back()->with('error', 'An error occured. Please try again.');
+        }
+    }
+
+    public function deleteHoliday($id){
+        DB::beginTransaction();
+        try {
+            DB::table('fumaco_holiday')->where('holiday_id', $id)->delete();
+            DB::commit();
+            return redirect()->back()->with('success', 'Holiday Deleted.');
+        } catch (Exception $e) {
+            DB::rollback();
+            return redirect()->back()->with('error', 'An error occured. Please try again.');
+        }
     }
 
     public function saveShipping(Request $request) {
