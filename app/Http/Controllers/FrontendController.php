@@ -433,16 +433,6 @@ class FrontendController extends Controller
     public function addContact(Request $request){
         DB::beginTransaction();
         try{
-            $new_contact = [
-                'name' => $request->name,
-                'email' => $request->email,
-                'phone' => $request->phone,
-                'subject' => $request->subject,
-                'message' => $request->comment,
-                'ip_address' => $request->ip(),
-                'xstatus' => 'Sent'
-            ];
-
             $request->validate([
                 'name' => ['required', 'string', 'max:255'],
                 'email' => ['required', 'string', 'email', 'max:255'],
@@ -467,13 +457,36 @@ class FrontendController extends Controller
                 ]
             ]);
 
+            $new_contact = [
+                'name' => $request->name,
+                'email' => $request->email,
+                'phone' => $request->phone,
+                'subject' => $request->subject,
+                'message' => $request->comment,
+                'ip_address' => $request->ip(),
+                'xstatus' => 'Sent'
+            ];
+
             DB::table('fumaco_contact_list')->insert($new_contact);
+
+            $emails = ['cs@fumaco.com', 'it@fumaco.com'];
+            Mail::send('emails.new_contact', ['new_contact' => $new_contact], function($message) use ($emails) {
+                $message->to($emails);
+                $message->subject('New Contact - FUMACO');
+            });
+
+            // check for failures
+            if (Mail::failures()) {
+                return redirect()->back()->with('error', 'An error occured. Please try again.');
+            }
             
             DB::commit();
             
-            return redirect()->back()->with('message', 'Thank you for contacting us!. We have recieved your message.');
+            return redirect()->back()->with('success', 'Thank you for contacting us! We have recieved your message.');
         }catch(Exception $e){
             DB::rollback();
+
+            return redirect()->back()->with('error', 'An error occured. Please try again.');
         }
     }
 

@@ -79,9 +79,14 @@
           <p style="color:#58595A !important;" class="fumacoFont_card_caption animated animatedFadeInUp fadeInUp">We collaborate with ambitious brands and people; we'd love to build something great together.</p>
           <br>
         </center>
-        @if(session()->has('message'))
+        @if(session()->has('success'))
         <div class="alert alert-success">
-          {{ session()->get('message') }}
+          {{ session()->get('success') }}
+        </div>
+      @endif
+      @if(session()->has('error'))
+        <div class="alert alert-warning">
+          {{ session()->get('error') }}
         </div>
       @endif
 
@@ -131,7 +136,7 @@
           </div>
         </div>
        <center>
-          <button type="submit" class="btn btn-primary mt-3 fumacoFont_btn animated animatedFadeInUp fadeInUp" id="submitBtn" disabled>&nbsp;&nbsp;&nbsp;Submit&nbsp;&nbsp;&nbsp;</button>
+          <button type="submit" class="btn btn-primary mt-3 fumacoFont_btn animated animatedFadeInUp fadeInUp" id="submitBtn" disabled>Submit</button>
         </center>
       </form>
       &nbsp;<br>&nbsp;<br>
