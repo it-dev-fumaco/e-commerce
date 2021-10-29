@@ -404,6 +404,8 @@ class CheckoutController extends Controller
 					'order_bill_postal' => $temp->xpostal,
 					'order_bill_country' => $temp->xcountry,
 					'order_bill_type' => $temp->xaddresstype,
+					'order_bill_contact' => $temp->xmobile,
+					'order_bill_email' => $temp->xemail,
 					'order_contactperson' => $temp->xcontact_person,
 					'order_ship_contactperson' => $temp->xshipcontact_person,
 					'order_ship_address1' => $temp->xshippadd1,

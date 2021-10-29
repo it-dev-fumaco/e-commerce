@@ -156,12 +156,16 @@
 																			<strong>Billing Address : </strong><br>
 																			{!! $order['bill_address1'] . " " . $order['bill_address2'] . ", <br>" . $order['bill_brgy'] . ", " . $order['bill_city'] . "<br>" . $order['bill_province'] . ' ' .  $order['bill_country'] . ' ' . $order['bill_postal'] !!}
 																		</p>
+																		<p><strong>Email : </strong> {{ $order['bill_email'] }}<br/>
+																			<strong>Contact Number : </strong> {{ $order['bill_contact'] }}</p>
 																	</div>
 																	<div class="col-md-4">
 																		<p>
 																			<strong>Shipping Address : </strong><br>
 																			{!! $order['ship_address1'] . " " . $order['ship_address2'] . ", <br>" . $order['ship_brgy'] . ", " . $order['ship_city'] . "<br>" . $order['ship_province'] . ', ' .  $order['ship_country'] . ' ' . $order['ship_postal'] !!}
 																		</p>
+																		<p><strong>Email : </strong> {{ $order['email'] }}<br/>
+																			<strong>Contact Number : </strong> {{ $order['contact'] }}</p>
 																	</div>
 																</div>
 																<div class="row">
