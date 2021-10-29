@@ -47,11 +47,16 @@ class ShippingController extends Controller
             $holidays_arr[] = [
                 'id' => $holiday->holiday_id,
                 'name' => $holiday->holiday_name,
-                'date' => Carbon::parse($holiday->holiday_date)->format('M d')
+                'date' => Carbon::parse($holiday->holiday_date)->format('M d'),
+                'year' => Carbon::parse($holiday->holiday_date)->format('Y')
             ];
         }
 
         return view('backend.shipping.holiday_list', compact('holidays', 'holidays_arr', 'years', 'year_now'));
+    }
+
+    public function addHolidayForm(){
+        return view('backend.shipping.add_holiday');
     }
 
     public function addHoliday(Request $request){
@@ -64,7 +69,7 @@ class ShippingController extends Controller
 
             DB::table('fumaco_holiday')->insert($insert);
             DB::commit();
-            return redirect()->back()->with('success', 'Holiday Added.');
+            return redirect('/admin/holiday/list')->with('success', 'Holiday Added.');
         } catch (Exception $e) {
             DB::rollback();
             return redirect()->back()->with('error', 'An error occured. Please try again.');
