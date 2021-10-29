@@ -27,27 +27,6 @@
                         <div class="col-md-12">
                             <div class="card card-primary">
                                 <div class="card-body">
-                                    <h4>Register Holiday</h4>
-                                    <form action="/admin/holiday/new" method="POST">
-                                        @csrf
-                                        <div class="row">
-                                            <div class="form-group col-md-3">
-                                                <label for="name">Holiday Name</label>
-                                                <input type="text" name="name" class="form-control" required>
-
-                                                <label for="name">Holiday Date</label>
-                                                <input type="text" name="date" id="holiday" class="form-control" required/>
-                                                <br/>
-                                                <button type="submit" class="btn btn-primary">Save</button>
-                                            </div>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-12">
-                            <div class="card card-primary">
-                                <div class="card-body">
 
                                     <div class="row">
 
@@ -72,9 +51,9 @@
 
                                             <div class="col-sm-2">
                                                 <select class="form-control" name="holiday_year">
-                                                    <option selected disabled value="">Select Year</option>
+                                                    <option {{ request()->get('holiday_year') == "" ? 'selected' : '' }} disabled value="">Select Year</option>
                                                     @foreach ($years as $y)
-                                                        <option {{ (request()->get('holiday_year') == $y ) ? 'selected' : '' }} value="{{ $y }}">{{ $y }}</option>
+                                                        <option {{ $y == $year_now ? 'selected' : '' }} value="{{ $y }}">{{ $y }}</option>
                                                     @endforeach
                                                 </select>
                                             </div>
@@ -82,7 +61,9 @@
                                             <div class="col-sm-3">
                                                 <button type="submit" class="btn btn-primary">Search</button>
                                             </div>
-
+                                            <div class="col-sm-3">
+                                                <a href="/admin/holiday/add_form" class="btn btn-primary float-right">Register New Holiday</a>
+                                            </div>
                                         </div>
                                     </form>
                                     @if(session()->has('success'))
@@ -98,8 +79,9 @@
                                     <table class="table table-bordered table-hover">
                                         <thead>
                                             <tr>
-                                                <th class="col-md-4">Name</th>
-                                                <th class="col-md-4">Date</th>
+                                                <th class="col-md-3">Name</th>
+                                                <th class="col-md-3">Date</th>
+                                                <th class="col-md-3">Year</th>
                                                 <th class="col-md-2 text-center">Action</th>
                                             </tr>
                                         </thead>
@@ -108,6 +90,7 @@
                                                 <tr>
                                                     <td>{{ $holiday['name'] }}</td>
                                                     <td>{{ $holiday['date'] }}</td>
+                                                    <td>{{ $holiday['year'] }}</td>
                                                     <td>
                                                         <div class="row">
                                                             <button class="btn btn-primary mx-auto" type="button" data-toggle="modal" data-target="#holidayModal-{{ $holiday['id'] }}">Edit</button>

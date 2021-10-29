@@ -195,6 +195,7 @@ Route::prefix('admin')->group(function () {
 
         Route::get('/holiday/list', 'ShippingController@viewHolidays');
         Route::post('/holiday/new', 'ShippingController@addHoliday');
+        Route::get('/holiday/add_form', 'ShippingController@addHolidayForm');
         Route::post('/holiday/edit', 'ShippingController@editHoliday');
         Route::get('/holiday/delete/{id}', 'ShippingController@deleteHoliday');
 
