@@ -723,11 +723,11 @@
 							<div class="card">
 								<div class="card-header" id="headingOne">
 									<h2 class="mb-0">
-										<button  class="btn btn-link collapsed fumacoFont_collapse_title" type="button" data-toggle="collapse" data-target="" aria-expanded="false" aria-controls="collapseOne">PRODUCT DETAIL</button>
+										<button  class="btn btn-link collapsed fumacoFont_collapse_title abt_standard" type="button" data-toggle="collapse" data-target="" aria-expanded="false" aria-controls="collapseOne">PRODUCT DETAIL</button>
 									</h2>
 								</div>
 								<div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample">
-									<div class="card-body">
+									<div class="card-body abt_standard">
 										<p class="card-text">
 											<table class="table">
 												<tbody style="border-style: inset !important;">
@@ -746,11 +746,11 @@
 							<div class="card">
 								<div class="card-header" id="headingTwo">
 									<h2 class="mb-0">
-										<button class="btn btn-link collapsed fumacoFont_collapse_title" type="button" data-toggle="collapse" data-target="" aria-expanded="false" aria-controls="collapseTwo">ADDITIONAL INFORMATION</button>
+										<button class="btn btn-link collapsed fumacoFont_collapse_title abt_standard" type="button" data-toggle="collapse" data-target="" aria-expanded="false" aria-controls="collapseTwo">ADDITIONAL INFORMATION</button>
 									</h2>
 								</div>
 								<div id="collapseTwo" class="collapse show" aria-labelledby="headingTwo" data-parent="#accordionExample">
-									<div class="card-body">
+									<div class="card-body abt_standard">
 										<p class="card-text">{!! $product_details->f_full_description !!}</p>
 									</div>
 								</div>
@@ -787,7 +787,7 @@
 
 													<div class="card-body">
 														<div class="text ellipsis">
-															<p class="card-text product-head fumacoFont_card_title text-concat" style="color:#0062A5 !important;  height: 80px; ">{{ $rp['item_name'] }}</p>
+															<p class="card-text product-head fumacoFont_card_title text-concat" style="color:#0062A5 !important;  height: 80px; font-size: 16px !important; font-weight: 500 !important;">{{ $rp['item_name'] }}</p>
 														</div>
 														<p class="card-text fumacoFont_card_price" style="color:#000000 !important; ">
 															@if ($rp['is_discounted'])
