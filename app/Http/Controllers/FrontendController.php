@@ -222,6 +222,16 @@ class FrontendController extends Controller
 
             DB::table('fumaco_subscribe')->insert($insert);
 
+            Mail::send('emails.new_subscriber', [], function($message) use ($request) {
+                $message->to($request->email);
+                $message->subject('Thank you for subscribing - FUMACO');
+            });
+
+            // check for failures
+            if (Mail::failures()) {
+                return redirect()->back()->with('error', 'An error occured. Please try again.');
+            }
+
             DB::commit();
 
             return redirect('/thankyou');
