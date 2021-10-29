@@ -97,6 +97,39 @@
 					</div>
 				<!-- /.card -->
 				</div>
+				<div class="col-md-6">
+					@if(session()->has('success_1'))
+						<div class="alert alert-success alert-dismissible fade show text-center" role="alert">
+							{{ session()->get('success_1') }}
+						</div>
+					@endif
+					@if(session()->has('error_1'))
+						<div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
+							{{ session()->get('error_1') }}
+						</div>
+					@endif
+					<!-- general form elements -->
+					<div class="card card-primary">
+						<div class="card-header">
+							<h3 class="card-title">Email Recipients</h3>
+						</div>
+						<!-- /.card-header -->
+						<!-- form start -->
+						<form action="/admin/email_recipients/save" method="POST" autocomplete="off">
+							@csrf
+							<div class="card-body">
+								<div class="form-group">
+									<label for="recipients">Email Recipients <small class="font-italic">(separated by comma " , ")</small></label>
+									<textarea class="form-control" name="email_recipients" id="recipients" rows="4">{{ old('email_recipients') }}{{ ($details) ? $details->email_recipients : old('email_recipients') }}</textarea>
+								</div>
+							</div>
+							<!-- /.card-body -->
+							<div class="card-footer">
+								<button type="submit" class="btn btn-primary">Save</button>
+							</div>
+						</form>
+					</div>
+				</div>
 			</div>
 			<!-- /.row -->
 		</div><!-- /.container-fluid -->

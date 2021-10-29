@@ -122,6 +122,7 @@ Route::prefix('admin')->group(function () {
 
         Route::get('/email_setup', 'SettingsController@emailSetup');
         Route::post('/email_setup/save', 'SettingsController@saveEmailSetup');
+        Route::post('/email_recipients/save', 'SettingsController@saveEmailRecipients');
 
         Route::get('/product/settings', 'ProductController@viewCategoryAttr');
         Route::post('/attribute_status/{cat_id}/update', 'ProductController@updateCategoryAttr');
