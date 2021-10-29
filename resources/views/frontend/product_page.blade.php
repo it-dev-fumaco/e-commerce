@@ -1,9 +1,9 @@
 @extends('frontend.layout', [
-    'namePage' => $product_details->url_title,
+    'namePage' => ($product_details->url_title) ? $product_details->url_title : $product_details->f_name_name,
     'activePage' => 'product_page'
 ])
 
-@section('product_meta')
+@section('meta')
 <meta name="description" content="{{ $product_details->meta_description }}">
 	<meta name="keywords" content="{{ $product_details->keywords }}" />
 @endsection
