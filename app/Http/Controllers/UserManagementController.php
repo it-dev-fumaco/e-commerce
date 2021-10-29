@@ -30,6 +30,37 @@ class UserManagementController extends Controller
         }
     }
 
+    public function addAdminForm(){
+        return view('backend.user_management.admin_add');
+    }
+
+    public function addAdmin(Request $request){
+        DB::beginTransaction();
+        try {
+            $checker = DB::table('fumaco_admin_user')->where('username', $request->username)->count();
+            if($checker >= 1){
+                return redirect()->back()->with('error', 'Username already exists.');
+            }
+            $insert = [
+                'account_name' => $request->account_name,
+                'username' => $request->username,
+                'password' => password_hash($request->password, PASSWORD_DEFAULT),
+                'user_type' => $request->user_type
+            ];
+
+            if($request->password != $request->confirm){
+                return redirect()->back()->with('error', 'Password/s do not match.');
+            }
+
+            DB::table('fumaco_admin_user')->insert($insert);
+            DB::commit();
+            return redirect()->back()->with('success', 'Admin Added.');
+        } catch (Exception $e) {
+            DB::rollback();
+            return redirect()->back()->with('error', 'An error occured. Please try again.');
+        }
+    }
+
     public function adminChangeStatus(Request $request){
         DB::beginTransaction();
         try {

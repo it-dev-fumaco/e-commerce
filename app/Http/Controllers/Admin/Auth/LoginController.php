@@ -7,6 +7,7 @@ use DB;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\ThrottlesLogins;
+use Carbon\Carbon;
 
 class LoginController extends Controller
 {
@@ -41,6 +42,8 @@ class LoginController extends Controller
                 Auth::guard('admin')->logout();
                 return redirect('/admin/login')->withInput()->with('d_info','Your admin account is deactivated.');
             }
+
+            DB::table('fumaco_admin_user')->where('username', $request->username)->update(['last_login' => Carbon::now(), 'last_login_ip' => $request->ip()]);
             return redirect('/admin/dashboard');
         }
 
