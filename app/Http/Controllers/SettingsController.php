@@ -115,20 +115,21 @@ class SettingsController extends Controller
     public function saveEmailRecipients(Request $request) {
         DB::beginTransaction();
         try {
-            // trim spaces
-            $email_recipients = explode(",", str_replace(' ', '', $request->email_recipients));
-
-            // check if exploeded email recipient is a valid email
-            foreach ($email_recipients as $email) {
-                if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                    return redirect()->back()->withInput()->with('error_1', "$email is not a valid email address");
-                }
+            if ($request->email_recipients) {
+                // trim spaces
+                $email_recipients = explode(",", str_replace(' ', '', $request->email_recipients));
+                // check if exploeded email recipient is a valid email
+                foreach ($email_recipients as $email) {
+                    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                        return redirect()->back()->withInput()->with('error_1', "$email is not a valid email address");
+                    }
+                }               
             }
 
             DB::table('email_config')->update(['email_recipients' => str_replace(' ', '', $request->email_recipients)]);
             
             DB::commit();
-
+          
             return redirect()->back()->with('success_1', 'Email Recipients has been saved.');
         } catch (Exception $e) {
             DB::rollback();
