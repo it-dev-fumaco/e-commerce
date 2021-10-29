@@ -351,10 +351,6 @@ class FrontendController extends Controller
         return view('frontend.about_page', compact('about_data', 'partners'));
     }
 
-    public function viewTermsPage(){
-        return view('frontend.terms_conditions');
-    }
-
     public function viewJournalsPage(Request $request) {
         $blog_carousel = DB::table('fumaco_blog')->where('blog_enable', 1)
             ->where('blog_featured', 1)->orderBy('blog_active', 'desc')->get();
