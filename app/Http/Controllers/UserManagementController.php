@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Auth;
 use DB;
+use Validator;
 
 class UserManagementController extends Controller
 {
@@ -41,6 +42,18 @@ class UserManagementController extends Controller
             if($checker >= 1){
                 return redirect()->back()->with('error', 'Username already exists.');
             }
+
+            $rules = array(
+                'password' => 'required|string|min:4|max:255',
+			);
+
+            $validation = Validator::make($request->all(), $rules);
+
+			if ($validation->fails()){
+				$error = "Password should be at least 4 characters";
+				return redirect()->back()->with('error', $error);
+			}
+
             $insert = [
                 'account_name' => $request->account_name,
                 'username' => $request->username,

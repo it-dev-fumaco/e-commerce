@@ -193,6 +193,11 @@ Route::prefix('admin')->group(function () {
         Route::get('/shipping/{id}/edit', 'ShippingController@viewShipping');
         Route::delete('/shipping/{id}/delete', 'ShippingController@deleteShipping');
 
+        Route::get('/holiday/list', 'ShippingController@viewHolidays');
+        Route::post('/holiday/new', 'ShippingController@addHoliday');
+        Route::post('/holiday/edit', 'ShippingController@editHoliday');
+        Route::get('/holiday/delete/{id}', 'ShippingController@deleteHoliday');
+
         // STORE ROUTES CMS
         Route::get('/store/list', 'StoreController@viewList');
         Route::get('/store/add', 'StoreController@viewAddForm');

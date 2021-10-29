@@ -531,7 +531,14 @@ class CheckoutController extends Controller
         $max_leadtime = Carbon::parse(now()->addDays($max));
         $max_leadtime_y = $max_leadtime->format('Y');
         $max_leadtime_m = $max_leadtime->format('M');
-        $max_leadtime_d = $max_leadtime->format('d');
+
+		$holidays = DB::table('fumaco_holiday')->where('holiday_date', '>=', $min_leadtime->format('Y-m-d'))->where('holiday_date', '<=', $max_leadtime->format('Y-m-d'))->get();
+
+		foreach($holidays as $holiday){
+			$min_leadtime_d = (Carbon::parse($holiday->holiday_date)->format('m-d') == $min_leadtime->format('m-d')) ? $min_leadtime->addDays(1)->format('d') : $min_leadtime->format('d');
+		}
+
+        $max_leadtime_d = $max_leadtime->addDays(count($holidays))->format('d');
 
         if($min_leadtime->format('M d, Y') == $max_leadtime->format('M d, Y')){
             return $min_leadtime->format('M d, Y');
