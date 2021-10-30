@@ -2,6 +2,11 @@
 'namePage' => $pages->page_title,
 'activePage' => $pages->slug
 ])
+@section('meta')
+<meta name="description" content="{{ $pages->meta_description }}">
+	<meta name="keywords" content="{{ $pages->meta_keywords }}" />
+@endsection
+
 @section('content')
 <main style="background-color:#0062A5;">
     <div id="myCarousel" class="carousel slide" data-bs-ride="carousel">
