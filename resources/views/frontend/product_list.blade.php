@@ -99,6 +99,14 @@
 			right: -12px;
 			bottom: 4px;
 		}
+		
+		/*Required*/
+@media (max-width: 576px){.modal-dialog.modal-dialog-slideout {width: 80%}}
+.modal-dialog-slideout {min-height: 100%; margin: 0 0 0 auto ;background: #fff;}
+/* .modal.fade .modal-dialog.modal-dialog-slideout {-webkit-transform: translate(-100%,0);transform: translate(-100%,0);} */
+.modal.fade .modal-dialog.modal-dialog-slideout {-webkit-transform: translate(100%, 0);transform: translate(100%, 0);}
+.modal.fade.show .modal-dialog.modal-dialog-slideout {-webkit-transform: translate(0,0);transform: translate(0,0);flex-flow: column;}
+.modal-dialog-slideout .modal-content{border: 0;}
 	</style>
 	<script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>
 	<script type='text/javascript' src='https://stackpath.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.bundle.min.js'></script>
@@ -107,7 +115,7 @@
 		<div id="myCarousel" class="carousel slide" data-bs-ride="carousel">
 			<div class="carousel-inner">
 				<div class="carousel-item active" style="height: 13rem !important;">
-					<img src="{{ asset('/assets/site-img/header3-sm.png') }}" alt="" style="position: absolute; top: 0;left: 0;min-width: 100%; height: unset !important;">
+					<img src="{{ asset('/assets/site-img/header3-sm.png') }}" alt="" style="position: absolute; top: 0;left: 0;min-width: 100%;">
 					<div class="container">
 						<div class="carousel-caption text-start" style="bottom: 1rem !important; right: 25% !important; left: 25%; !important;">
 							<center><h3 class="carousel-header-font">{{ $product_category->name }}</h3></center>
@@ -206,18 +214,100 @@
 				<div class="col-lg-10">
 					<div class="row g-6">
 						<form id="sortForm" class="d-inline-block">
+							<a class="btn d-sm-block d-md-none filter-btn" data-toggle="modal" data-target="#filterModal2" style="font-size: 0.75rem !important; float: left !important">
+								<i class="fas fa-filter"></i>&nbsp; Filters
+							</a>
 							<div class="col-md-4 offset-md-8">
+								
 								<div class="row mb-2">
-									<div class="col-md-9 pr-1" style="text-align: right;">
+								
+									<div class="col-md-6 pr-1" style="text-align: right">
+										<a class="btn d-sm-block d-md-none" data-toggle="modal" data-target="#filterModal2" style="font-size: 0.75rem !important; float: left !important">
+											<i class="fas fa-filter"></i>&nbsp; Filters
+										</a>
+
 										<label class="mt-1 mb-1 mr-0" style="font-size: 0.75rem;">Sort By</label>
 									</div>
-									<div class="col-md-3" style="padding-left: 0;">
+									<div class="col-md-6" style="padding: 0; float: right !important; min-width: 120px !important; padding-right: 5%">
 										<select name="sortby" class="form-control form-control-sm" style="font-size: 0.75rem;">
 											<option value="Position" data-loc="{{ request()->fullUrlWithQuery(['sortby' => 'Position']) }}" {{ (request()->sortby == 'Position') ? 'selected' : '' }}>Recommended</option>
 											<option value="Product Name" data-loc="{{ request()->fullUrlWithQuery(['sortby' => 'Product Name']) }}" {{ (request()->sortby == 'Product Name') ? 'selected' : '' }}>Product Name</option>
 											<option value="Price" data-loc="{{ request()->fullUrlWithQuery(['sortby' => 'Price']) }}" {{ (request()->sortby == 'Price') ? 'selected' : '' }}>Price</option>
 										</select>
 									</div>
+									<div class="col-md-3 d-sm-block d-md-none filter-slide">
+										<div class="modal fade" id="filterModal2" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel2" aria-hidden="true">
+											<div class="modal-dialog modal-dialog-slideout modal-sm" role="document">
+											  <div class="modal-content">
+												<div class="modal-body">
+													<div class="d-flex justify-content-between align-items-center" style="font-weight: 500 !important;  margin: 20px !important"><b>Filter Results</b>
+														<a href="/products/{{ $product_category->id }}" style="text-decoration: none;">
+															<small class="stylecap he2 text-dark" style="font-weight:400 !important; padding-right: 10px;">Clear All</small>
+														</a>
+													</div>
+													<hr>
+													<form action="/products/{{ $product_category->id }}" method="POST" id="filter-form">
+														@csrf
+														@php
+															$a = 0;
+														@endphp
+														@if (count($filters['Brand']) > 1)
+														<div class="card mb-3 m-3" style="width: 85% !important">
+															<div class="card-header text-white font-weight-bold" style="font-size: 0.75rem; background-color: rgb(0, 98, 165);">BRAND</div>
+															<div class="card-body">
+																@foreach ($filters['Brand'] as $brand)
+																@php
+																	$a++;
+																	$filter_attr = Str::slug('brand', '-');
+																	$filter_values = explode('+', request()->brand);
+																	$status = (in_array($brand, $filter_values)) ? 'checked' : '';
+																@endphp
+																<div class="form-check">
+																	<input type="checkbox" class="form-check-input product-cb-filter" id="{{ 'cbb' . $a }}" name="{{ 'attr[' .$filter_attr.'][]' }}" value="{{ $brand }}" data-attrname="{{ $filter_attr }}" {{ $status }}>
+																	<label class="form-check-label" for="{{ 'cbb' . $a }}" style="font-size: 0.8rem;">{{ $brand }}</label>
+																</div>
+															@endforeach
+															</div>
+														</div>
+														@endif
+														@php
+															$x = 0;
+														@endphp
+														@foreach ($filters as $id => $row)
+														@php
+															$filter_attr = Str::slug($id, '-');
+														@endphp
+														@if ($id != 'Brand')
+														@if (count($row) > 1 || request()->$filter_attr)
+														<div class="card mb-3 m-3" style="width: 85% !important">
+															<div class="card-header text-white font-weight-bold" style="font-size: 0.75rem; background-color: rgb(0, 98, 165);">{{ strtoupper($id) }}</div>
+															<div class="card-body">
+																@foreach ($row as $attr_val)
+																@php
+																	$x++;
+																	$filter_values = explode('+', request()->$filter_attr);
+																	$status = (in_array($attr_val, $filter_values)) ? 'checked' : '';
+																@endphp
+																<div class="form-check">
+																	<input type="checkbox" class="form-check-input product-cb-filter" id="{{ 'cb' . $x }}" name="{{ 'attr[' .$filter_attr.'][]' }}" value="{{ $attr_val }}" data-attrname="{{ $filter_attr }}" {{ $status }}>
+																	<label class="form-check-label" for="{{ 'cb' . $x }}" style="font-size: 0.8rem;">{{ $attr_val }}</label>
+																</div>
+																@endforeach
+															</div>
+														</div>
+														@endif
+														@endif
+								
+														@endforeach
+														<input type="hidden" name="sortby" value="{{ request()->sortby }}">
+														<input type="hidden" name="sel_attr" value="{{ request()->sel_attr }}">
+													</form>
+												</div>
+											  </div>
+											</div>
+										  </div>
+									</div>
+
 								</div>
 							</div>
 						</form>

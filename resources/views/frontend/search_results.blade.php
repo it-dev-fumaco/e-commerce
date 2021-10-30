@@ -54,7 +54,7 @@
 		</div>
 	</div>
 </main>
-<main style="background-color:#ffffff; min-height: 600px;" class="products-head">
+<main style="background-color:#ffffff; min-height: 600px; width: 100% !important" class="products-head">
 	<div class="container">
 		@if(request()->s != null)
 		<div class="row">
@@ -105,7 +105,7 @@
 							</div>
 							<p class="card-text fumacoFont_card_price" style="color:#000000 !important;">
 								@if($product['is_discounted'])
-								<s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$product['original_price']), 2) }}</s> ₱ {{ number_format(str_replace(",","",$product['discounted_price']), 2) }} <span class="badge badge-danger" style="vertical-align: middle;background-color: red; display: {{ ($product['on_sale']) ? 'inline' : 'none' }} !important;">{{ $product['discount_percent'] }}% OFF</span>
+								₱ {{ number_format(str_replace(",","",$product['discounted_price']), 2) }} <s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$product['original_price']), 2) }}</s> <span class="badge badge-danger" style="vertical-align: middle;background-color: red; display: {{ ($product['on_sale']) ? 'inline' : 'none' }} !important;">{{ $product['discount_percent'] }}% OFF</span>
 								@else
 								₱ {{ number_format(str_replace(",","",$product['original_price']), 2) }}
 								@endif

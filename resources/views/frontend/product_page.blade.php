@@ -10,6 +10,13 @@
 
 @section('content')
 	<style>
+	html,body{
+		width: 100% !important;
+		height: 100% !important;
+		margin: 0px !important;
+		padding: 0px !important;
+		overflow-x: hidden !important; 
+	}
 	._1yv {
 			box-shadow: 0 0px 0px rgb(0 0 0 / 30%), 0 0 0 1px rgb(0 0 0) !important;
 	}
@@ -677,9 +684,8 @@
 										$x = 0;
 										$opt_name = preg_replace('/\s+/', '', strtolower($attr));
 									@endphp
-									<label style="margin-left: 3%;">{{ $attr }} : </label>
+									<label style="margin-left: 3%;">{{ $attr }} : </label><br class="d-md-none"/>
 									<div class="btn-group" role="group" aria-label="Select Variants" style="display: unset !important;">
-
 										@foreach ($row as $attr_value => $items)
 										@php
 											$x++;
@@ -732,7 +738,7 @@
 									</h2>
 								</div>
 								<div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample">
-									<div class="card-body abt_standard">
+									<div class="card-body prod_standard">
 										<p class="card-text">
 											<table class="table">
 												<tbody style="border-style: inset !important;">
@@ -755,7 +761,7 @@
 									</h2>
 								</div>
 								<div id="collapseTwo" class="collapse show" aria-labelledby="headingTwo" data-parent="#accordionExample">
-									<div class="card-body abt_standard">
+									<div class="card-body prod_standard">
 										<p class="card-text">{!! $product_details->f_full_description !!}</p>
 									</div>
 								</div>
@@ -776,7 +782,7 @@
 										@foreach($related_products as $rp)
 										<div class="col animated animatedFadeInUp fadeInUp equal-height-columns">
 											<div class="card shadow-sm">
-												<div class="equal-column-content" style="border: 1px solid  #d5dbdb  ;">
+												<div class="equal-column-content" style="border: 1px solid  #d5dbdb; position: relative;">
 													@php
 														$img = ($rp['image']) ? '/storage/item_images/'. $rp['item_code'] .'/gallery/preview/'. $rp['image'] : '/storage/no-photo-available.png';
 														$img_webp = ($rp['image']) ? '/storage/item_images/'. $rp['item_code'] .'/gallery/preview/'. explode(".", $rp['image'])[0] .'.webp' : '/storage/no-photo-available.png';
@@ -792,13 +798,13 @@
 
 													<div class="card-body">
 														<div class="text ellipsis">
-															<p class="card-text product-head fumacoFont_card_title text-concat" style="color:#0062A5 !important;  height: 80px; font-size: 16px !important; font-weight: 500 !important;">{{ $rp['item_name'] }}</p>
+															<p class="card-text product-head fumacoFont_card_title text-concat prod_desc" style="color:#0062A5 !important;  height: 80px;">{{ $rp['item_name'] }}</p>
 														</div>
 														<p class="card-text fumacoFont_card_price" style="color:#000000 !important; ">
 															@if ($rp['is_discounted'])
-															<s style="color: #c5c5c5;">₱ {{ $rp['orig_price'] }}</s>&nbsp;&nbsp; ₱ {{ $rp['new_price'] }}
+															<span style="white-space: nowrap !important">₱ {{ number_format(str_replace(",","",$rp['new_price']), 2) }}</span>&nbsp;<br class="d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$rp['orig_price']), 2) }}</s>
 															@else
-															₱ {{ $rp['orig_price'] }}
+															₱ {{ number_format(str_replace(",","",$rp['orig_price']), 2) }}
 															@endif
 															</p>
 														<div class="d-flex justify-content-between align-items-center">

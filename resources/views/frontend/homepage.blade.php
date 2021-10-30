@@ -88,7 +88,8 @@
                 <img src="{!!  asset('/assets/site-img/'. $b->{'blogprimayimage-home'}) !!}" alt="" class="img-responsive" style="width: 100% !important;">
               </picture>
               <br><br>
-              <h5 class="font-style-thin fumacoFont_card_title" style="font-family: 'poppins', sans-serif !important; color:#ffffff !important; line-height: 26px !important;">{{ substr($b->blogtitle, 0, 39) }}</h5><br>
+              {{-- <h5 class="font-style-thin fumacoFont_card_title" style="font-family: 'poppins', sans-serif !important; color:#ffffff !important; line-height: 26px !important;">{{ substr($b->blogtitle, 0, 39) }}</h5><br> --}}
+              <h5 class="font-style-thin fumacoFont_card_title" style="font-family: 'poppins', sans-serif !important; color:#ffffff !important; line-height: 26px !important; font-size: 18px !important">{{ $b->blogtitle }}</h5><br>
               <p class="abt_standard" style="font-size: 14px; margin-left: 0rem !important; color:#ffffff !important; font-weight: 300">
                 <a href="blog?id={{ $b->id }}" style="color:#ffffff !important; text-decoration: none !important; text-transform: none !important">{{ substr($b->blog_caption, 0, 100) }}...</a>
               </p>
@@ -129,7 +130,7 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
 
                     <div class="card-body">
                       <div class="text ellipsis">
-                        <p class="card-text product-head fumacoFont_card_title text-concat" style="color:#0062A5 !important;  height: 80px; font-size: 16px !important; font-weight: 500 !important;">{{ $bs['item_name'] }}</p>
+                        <p class="card-text product-head fumacoFont_card_title text-concat prod_desc" style="color:#0062A5 !important;  height: 80px;">{{ $bs['item_name'] }}</p>
                       </div>
                       <p class="card-text fumacoFont_card_price" style="color:#000000 !important; ">
                         @if ($bs['is_discounted'])
@@ -191,7 +192,7 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
 
                     <div class="card-body">
                       <div class="text ellipsis">
-                        <p class="card-text product-head fumacoFont_card_title text-concat" style="color:#0062A5 !important; height: 80px; font-size: 16px !important; font-weight: 500 !important;">{{ $os['item_name'] }}</p>
+                        <p class="card-text product-head fumacoFont_card_title text-concat prod_desc" style="color:#0062A5 !important; height: 80px;">{{ $os['item_name'] }}</p>
                       </div>
                       <p class="card-text fumacoFont_card_price" style="color:#000000 !important; ">
                         @if ($os['is_discounted'])
