@@ -17,6 +17,19 @@ use App\Models\ShippingCondition;
 class CheckoutController extends Controller
 {
 	public function billingForm() {
+		$cart = session()->get('fumCart');
+        $cart = (!$cart) ? [] : $cart;
+
+        $cart_items = DB::table('fumaco_items')
+            ->whereIn('f_idcode', array_column($cart, 'item_code'))->get();
+        
+        $cart_arr = [];
+        foreach ($cart_items as $n => $item) {
+			if ($cart[$item->f_idcode]['quantity'] > $item->f_qty) {
+				return redirect()->back()->with('error', 'Insufficient stock for <b>' . $item->f_name_name . '</b>');
+			}
+        }
+
 		$has_shipping_address = true;
 		if (Auth::check()) {
 			$has_shipping_address = DB::table('fumaco_user_add')
@@ -183,6 +196,19 @@ class CheckoutController extends Controller
 	public function checkoutSummary(Request $request){
         DB::beginTransaction();
 		try{
+
+			$cart = session()->get('fumCart');
+			$cart = (!$cart) ? [] : $cart;
+
+			$cart_items = DB::table('fumaco_items')
+				->whereIn('f_idcode', array_column($cart, 'item_code'))->get();
+			
+			$cart_arr = [];
+			foreach ($cart_items as $n => $item) {
+				if ($cart[$item->f_idcode]['quantity'] > $item->f_qty) {
+					return redirect()->back()->with('error', 'Insufficient stock for <b>' . $item->f_name_name . '</b>');
+				}
+			}
 
 			if (!session()->get('fumOrderNo')) {
 				$order_no = 'FUM-' . date('ymd') . random_int(9999, 100000);

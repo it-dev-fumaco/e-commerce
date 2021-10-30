@@ -111,6 +111,11 @@
     <div class="container" style="max-width: 100% !important; min-height: 600px;">
         <div class="row">
             <div class="col-lg-10 animated animatedFadeInUp fadeInUp mx-auto">
+                @if(session()->has('error'))
+                    <div class="alert alert-warning">
+                    {!! session()->get('error') !!}
+                    </div>
+                @endif
                 <table class="table animated animatedFadeInUp fadeInUp" id="cart-items">
                     <thead>
                         <tr>
@@ -277,7 +282,7 @@
                 updateAmount(row);
                 updateCart('increment', id, current_qty);
             }
-            
+
             if (parseInt(current_qty) > parseInt(max)) {
                 row.find('.stock-status').eq(0).removeClass('text-success').addClass('text-danger').text('Insufficient Stock');
             } else {
