@@ -5,7 +5,7 @@
 
 @section('content')
   <style>
-    .text {
+    .text, .carousel-text {
       position: relative;
       font-size: 16px !important;
       width: 100%;
@@ -26,6 +26,10 @@
       position: absolute;
       right: -12px;
       bottom: 4px;
+    }
+    .carousel-text.ellipsis::after {
+      position: absolute;
+      right: -12px;
     }
   </style>
   <main style="background-color:#0062A5;">
@@ -62,7 +66,10 @@
             <div class="container">
               <div class="carousel-caption text-start">
                 <h3 class="carousel-header-font fumacoFont1">{{ $carousel->fumaco_title }}</h3>
-                <p class="carousel-caption-font fumacoFont2"style="text-align: left; text-justify: inter-word; letter-spacing: 1px;">{{ $string }}</p>
+                <div class="text ellipsis">
+                  <p class="carousel-caption-font fumacoFont2 text-concat" style="text-align: left; text-justify: left; letter-spacing: 1px;">{{ $string }}</p>
+                </div>
+                {{-- <p class="carousel-caption-font fumacoFont2" style="text-align: left; text-justify: inter-word; letter-spacing: 1px;">{{ $string }}</p> --}}
                 <p><a class="btn btn-lg btn-primary btn-fumaco fumacoFont_btn" href="{{ $carousel->fumaco_url }}"role="button">{{ $carousel->fumaco_btn_name }}</a></p>
               </div>
             </div>
@@ -93,7 +100,7 @@
               <p class="abt_standard" style="font-size: 14px; margin-left: 0rem !important; color:#ffffff !important; font-weight: 300">
                 <a href="blog?id={{ $b->id }}" style="color:#ffffff !important; text-decoration: none !important; text-transform: none !important">{{ substr($b->blog_caption, 0, 100) }}...</a>
               </p>
-              <p class="abt_standard font-style-thin" style="margin-left: 0rem !important; color:#ffffff !important;"><a href="blog?id={{ $b->id }}" class="fumacoFont_card_readmore"><span style="color:#ffffff !important;">Read More &#x2192;</span></a></p>
+              <p class="abt_standard font-style-thin" style="margin-left: 0rem !important; color:#ffffff !important;"><a href="blog?id={{ $b->id }}" class="fumacoFont_card_readmore"><span style="color:#ffffff !important;font-size: 14px;">Read More &#x2192;</span></a></p>
             </div>
           </div>
         @endforeach

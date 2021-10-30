@@ -10,7 +10,9 @@
 
 @section('content')
 	<style>
-
+		html, body{
+			font-family: 'poppins', sans-serif !important;
+		}
 	._1yv {
 			box-shadow: 0 0px 0px rgb(0 0 0 / 30%), 0 0 0 1px rgb(0 0 0) !important;
 	}
@@ -559,6 +561,68 @@
 			right: -12px;
 			bottom: 4px;
 		}
+
+		@media (max-width: 575.98px) {
+        header{
+          min-height: 50px;
+        }
+        .breadcrumb{
+          font-size: 8pt !important;
+          font-weight: 500;
+        }
+        .track-order-eta{
+          text-align: left !important;
+        }
+
+        .prod-details{
+          padding: 10px !important;
+		  font-size: 12px !important;
+        }
+		.fumacoFont_collapse_title{
+			font-size: 12px !important;
+			padding: 0 !important;
+		}
+		.prod-font-size, .fumacoFont_card_readmore{
+			font-size: 12px !important;
+		}
+		html, body{
+			font-size: 12px !important;
+		}
+		.fumacoFont_item_title, .fumacoFont_item_price{
+			font-size: 16px !important;
+		}
+      }
+
+      @media (max-width: 767.98px) {
+        header{
+          min-height: 50px;
+        }
+        .breadcrumb{
+          font-size: 8pt !important;
+          font-weight: 500;
+        }
+        .track-order-eta{
+          text-align: left !important;
+        }
+
+        .prod-details{
+          padding: 10px !important;
+		  font-size: 12px !important;
+        }
+		.fumacoFont_collapse_title{
+			font-size: 12px !important;
+			padding: 0 !important;
+		}
+		.prod-font-size, .fumacoFont_card_readmore{
+			font-size: 12px !important;
+		}
+		html, body{
+			font-size: 12px !important;
+		}
+		.fumacoFont_item_title, .fumacoFont_item_price{
+			font-size: 16px !important;
+		}
+      }
 	</style>
 
 	<link type="text/css" rel="stylesheet" media="all" href="{{ asset('/item/fancybox/source/jquery.fancybox.css') }}" />
@@ -644,12 +708,13 @@
 										@endif
 										<span class="badge badge-danger" style="margin-left: 8px; vertical-align: middle;background-color: red; display: {{ ($product_details->f_discount_trigger) ? 'inline' : 'none' }} !important;">{{ $product_details->f_discount_percent }}% OFF</span>
 									</div>
-									<div>
-										<p class="card-text fumacoFont_card_caption">{!! $product_details->f_caption !!}
-											<ul style="margin-top: -15px !important;">
+									<br class="d-md-none"/>
+									<div><span class="prod-font-size">{!! $product_details->f_caption !!}</span>
+										<p class="card-text fumacoFont_card_caption">
+											<ul style="margin-top: -12px !important;">
 												<li>
 													<a href="#product_details" style="text-decoration: none;">
-														<span style="text-decoration: none;color: #1a6ea9 !important;font-size: 13px !important; font-weight: 400 !important;">See more products details</span>
+														<span style="text-decoration: none;color: #1a6ea9 !important;font-size: 12px !important; font-weight: 400 !important;">See more products details</span>
 													</a>
 												</li>
 											</ul>
@@ -718,7 +783,7 @@
 				</div>
 			</main>
 		</form>
-		<main  style="background-color:#ffffff;" class="products-head2" style=" margin-top: 0px !important; padding-left: 40px !important; padding-right: 40px !important; margin-left: : 40px !important; margin-right: 40px !important;">
+		<main  style="background-color:#ffffff; margin-top: 0px !important;" class="products-head2 prod-details" >
 			<div class="container">
 				<div class="row">
 					<br>
@@ -732,7 +797,7 @@
 									</h2>
 								</div>
 								<div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample">
-									<div class="card-body prod_standard">
+									<div class="card-body prod_standard p-0">
 										<p class="card-text">
 											<table class="table">
 												<tbody style="border-style: inset !important;">
