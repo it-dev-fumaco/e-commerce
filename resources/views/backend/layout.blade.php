@@ -173,7 +173,7 @@
           </li>
           <li class="nav-header">CONTENT MANAGEMENT</li>
           @php
-              $pages = ['pages_list', 'home_crud'];
+              $pages = ['pages_list', 'home_crud', 'privacy_policy', 'terms_condition'];
           @endphp
           <li class="nav-item {{ (in_array($activePage, $pages) ? 'menu-open' : '') }}">
             <a href="#" class="nav-link {{ (in_array($activePage, $pages) ? 'active' : '') }}">
@@ -205,12 +205,7 @@
                   <p>Contact List</p>
                 </a>
               </li>
-              <li class="nav-item">
-                <a href="/admin/pages/list" class="nav-link {{ $activePage == 'pages_list' ? 'active' : '' }}">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Policy Pages</p>
-                </a>
-              </li>
+              <li class="nav-item" id="policy-pages"></li>{{-- Policy Pages --}}
             </ul>
           </li>
           @php
@@ -517,7 +512,39 @@
 <script src="{{ asset('/assets/admin/dist/js/adminlte.js') }}"></script>
 <!-- Select2 -->
 <script src="{{ asset('/assets/admin/plugins/select2/js/select2.full.min.js') }}"></script>
+<script>
+  $(document).ready(function() {
+    policyPages();
+    function policyPages() {
+  // policy pages
+      $('#policy-pages').empty();
+      $.ajax({
+        type:'GET',
+        url:'/admin/pages/list',
+        success: function (response) {
+          var active = '';
+          var f = '';
+          var activePage = {!! str_replace("'", "\'", json_encode($activePage)) !!};
+          
+          $(response).each(function(i, d){
+            var link = '/admin/pages/edit/' + d.slug;
+            if(activePage == d.slug){
+              active = 'active';
+            }else{
+              active = '';
+            }
+            f += '<a href="' + link + '" class="nav-link ' + active + '">' + 
+                    '<i class="far fa-circle nav-icon"></i>' + 
+                    '<p>' + d.page_title + '</p>' +
+                  '</a>'
+          });
 
+          $('#policy-pages').append(f);
+        }
+      });
+    }
+  });
+</script>
 @yield('script')
 </body>
 </html>

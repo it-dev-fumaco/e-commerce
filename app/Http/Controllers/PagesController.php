@@ -14,11 +14,12 @@ class PagesController extends Controller
     public function viewPages(){
         $pages = DB::table('fumaco_pages')->get();
 
-        return view('backend.pages.list', compact('pages'));
+        // return view('backend.pages.list', compact('pages'));
+        return response()->json($pages);
     }
 
-    public function editForm($page_id){
-        $policy = DB::table('fumaco_pages')->where('page_id', $page_id)->first();
+    public function editForm($slug){
+        $policy = DB::table('fumaco_pages')->where('slug', $slug)->first();
 
         return view('backend.pages.edit', compact('policy'));
     }
@@ -26,6 +27,10 @@ class PagesController extends Controller
     public function editPage($id, Request $request){
         DB::beginTransaction();
         try {
+            if(strip_tags($request->content1) == ''){
+                return redirect()->back()->with('error', 'Content 1 cannot be empty.');
+            }
+            
             $update = [
                 'page_name' => $request->name,
                 'page_title' => $request->title,
@@ -42,7 +47,7 @@ class PagesController extends Controller
 
             DB::commit();
 
-            return redirect('/admin/pages/list')->with('success', $request->name.' has been updated.');
+            return redirect()->back()->with('success', $request->name.' has been updated.');
         } catch (Exception $e) {
             DB::rollback();
             

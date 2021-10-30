@@ -189,7 +189,7 @@ Route::prefix('admin')->group(function () {
         Route::post('/user_management/change_status', 'UserManagementController@adminChangeStatus');
 
         Route::get('/pages/list', 'PagesController@viewPages');
-        Route::get('/pages/edit/{page_id}', 'PagesController@editForm');
+        Route::get('/pages/edit/{slug}', 'PagesController@editForm');
         Route::post('/edit/{id}', 'PagesController@editPage');
 
         // SHIPPING SERVICES ROUTES CMS

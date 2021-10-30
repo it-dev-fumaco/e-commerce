@@ -1,6 +1,6 @@
 @extends('backend.layout', [
 'namePage' => $policy->page_name,
-'activePage' => 'pages_list'
+'activePage' => $policy->slug
 ])
 
 @section('content')
@@ -25,6 +25,11 @@
                 <div class="container-fluid">
                     <div class="row">
                         <div class="col-md-12">
+                            @if(session()->has('success'))
+                                <div class="alert alert-success fade show" role="alert">
+                                    {{ session()->get('success') }}
+                                </div>
+                            @endif
                             @if(session()->has('error'))
                                 <div class="alert alert-warning fade show" role="alert">
                                     {{ session()->get('error') }}
@@ -65,13 +70,13 @@
                                         </div>
                                         <div class="row">
                                             <div class="form-group col-md-12">
-                                                <label>Content 2 *</label>
+                                                <label>Content 2</label>
                                                 <textarea name="content_1" rows="10" class="form-control page-content">{{ $policy->content2 }}</textarea>
                                             </div>
                                         </div>
                                         <div class="row">
                                             <div class="form-group col-md-12">
-                                                <label>Content 3 *</label>
+                                                <label>Content 3</label>
                                                 <textarea name="content_1" rows="10" class="form-control page-content">{{ $policy->content3 }}</textarea>
                                             </div>
                                         </div>
