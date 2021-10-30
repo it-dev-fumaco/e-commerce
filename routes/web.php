@@ -39,7 +39,7 @@ Route::get('/terms_condition', 'FrontendController@viewTermsPage');
 Route::get('/blog', 'FrontendController@viewBlogPage');
 Route::post('/add_comment', 'FrontendController@addComment');
 Route::post('/add_reply', 'FrontendController@addReply');
-Route::get('/contact', 'FrontendController@viewContactPage');
+Route::get('/contact', 'FrontendController@viewContactPage')->name('contact');
 Route::post('/add_contact', 'FrontendController@addContact');
 Route::get('/products/{id}', 'FrontendController@viewProducts');
 Route::post('/products/{id}', 'FrontendController@viewProducts');
@@ -52,7 +52,7 @@ Route::post('/subscribe', 'FrontendController@newsletterSubscription');
 Route::get('/thankyou', 'FrontendController@subscribeThankyou');
 
 Route::get('/policy_pages', 'FrontendController@pagesList');
-Route::get('/pages/{slug}', 'FrontendController@viewPage');
+Route::get('/pages/{slug}', 'FrontendController@viewPage')->name('pages');
 
 Route::group(['middleware' => 'auth'], function(){
     Route::get('/mywishlist', 'FrontendController@viewWishlist');

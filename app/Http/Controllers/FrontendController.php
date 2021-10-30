@@ -511,7 +511,7 @@ class FrontendController extends Controller
             // send email to fumaco staff
             $email_recipient = DB::table('email_config')->first();
             $email_recipient = ($email_recipient) ? explode(",", $email_recipient->email_recipients) : [];
-            if (count($email_recipient) > 0) {
+            if (count(array_filter($email_recipient)) > 0) {
                 Mail::send('emails.new_contact', ['new_contact' => $new_contact, 'client' => 0], function($message) use ($email_recipient) {
                     $message->to($email_recipient);
                     $message->subject('New Contact - FUMACO');
