@@ -185,6 +185,10 @@
     .fumacoFont_about_caption{
         font-weight: 200 !important;
     }
+
+    p{
+        letter-spacing: 0.1em !important;
+    }
 </style>
 
 <main>

@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     {{-- @if($activePage == 'product_page')
 @yield('product_meta') --}}
     @hasSection('meta')
@@ -42,7 +42,13 @@
     gtag('config', 'G-XHTGRGDC35');
     </script>
     <style>
-
+	html,body{
+		width: 100% !important;
+		height: 100% !important;
+		margin: 0px !important;
+		padding: 0px !important;
+		overflow-x: hidden !important; 
+	}
       .fumacoFont1 {
           font-family: 'poppins', sans-serif !important; font-weight:400 !important; font-size: 1.75rem!important;
       }
@@ -208,12 +214,34 @@
         /* font-weight: 200 !important; */
         /* font-size: 17px !important; */
         text-decoration: none !important;
-        letter-spacing: 0.1em;
+        /* letter-spacing: 0.1em; */
+      }
+
+      .prod_desc{
+        font-size: 16px !important;
+        font-weight: 500 !important;
+        text-align: left !important;
+      }
+
+      .prod_standard{
+        font-family: 'poppins', sans-serif !important;
+        font-weight: 300 !important;
+        /* font-size: 17px !important; */
+        text-decoration: none !important;
       }
 
       .prod-desc{
         /* font-size: 160px !important; */
         font-weight: 500 !important;
+      }
+      .filter-btn, .mbl-welcome{
+        display: none !important;
+      }
+      .user-icon{
+        font-size: 24px;
+      }
+      .search-bar{
+        width: 400px !important;
       }
       @media (max-width: 575.98px) {
         header{
@@ -240,14 +268,9 @@
           text-align: left !important;
         }
       }
-      .user-icon{
-        font-size: 24px;
-      }
-      .search-bar{
-        width: 400px !important;
-      }
+      
       @media (max-width: 1199.98px) {/* tablet */
-        .nav-item, .searchstyle{
+        .nav-item, .searchstyle, .welcome-msg {
           font-size: 12px !important;
           margin: 0 !important;
         }
@@ -261,6 +284,15 @@
           width: auto !important;
         }
       }
+      
+      @media only screen and (min-device-width : 768px) and (max-device-width : 1024px) and (orientation : portrait) {/* portrait tablet */
+        .filter-btn, .filter-slide, .mbl-welcome{
+          display: inline-block !important;
+        }
+        .welcome-msg{
+          display: none !important;
+        }
+      }
 
     </style>
     {!! ReCaptcha::htmlScriptTagJsApi() !!}
@@ -270,17 +302,18 @@
       <div class="spinner"></div>
     </div>
     <header>
-      <nav class="navbar navbar-expand-md navbar-light fixed-top bg-light" style="padding-left: 10px; padding-right: 10px; padding-bottom:0px; border-bottom: 1px solid #e4e4e4;">
+      <nav class="navbar navbar-expand-lg navbar-light fixed-top bg-light" style="padding-bottom:0px; border-bottom: 1px solid #e4e4e4;">
         <div class="container-fluid">
           <a class="navbar-brand" href="/" id="navbar-brand">
             <img src="{{ asset('/assets/site-img/logo-sm.png') }}" alt="">
           </a>
           {{-- Mobile Icons --}}
-          <a class="d-md-none d-lg-none d-xl-none" style="color: #000; margin-left: 10px !important" href="/login">
+          {{-- Login Icon --}}
+          {{-- <a class="d-md-none d-lg-none d-xl-none" style="color: #000; margin-left: 10px !important" href="/login">
             <i class="far fa-user user-icon" style=""></i>
-          </a>
+          </a> --}}
 
-          <a class="d-md-none d-lg-none d-xl-none" href="/cart" style="text-decoration: none !important; margin-left: 10px !important">
+          <a class="d-md-none d-lg-none d-xl-none" href="/cart" style="text-decoration: none !important; margin-left:30px !important">
             <div class="" style="width: 50px !important; padding: 0 !important;">
               <i class="fa" style="font-size:24px; color:#126cb6;">&#xf07a;</i><span class="badge badge-warning count-cart-items" id="lblCartCount" style="font-size: 12px; background: #ff0000; color: #fff; padding: 4px 7px; vertical-align: top; margin-left: -10px;display: unset !important; font-weight: 500 !important; border-radius: 1rem !important; margin-top: -15px;">0</span>
             </div>
@@ -299,7 +332,7 @@
                 </ul>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="/about">ABOUT US</a>
+                <a class="nav-link" href="/about" style="white-space: nowrap !important">ABOUT US</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="/journals">BLOGS</a>
@@ -308,21 +341,22 @@
                 <a class="nav-link" href="/contact">CONTACT</a>
               </li>
             </ul>
-            <form class="d-none d-xl-block" action="/" method="GET">
-              <div class="input-group mb-0 searchbar" style="width: 400px !important;">
+            <form class="d-none d-md-block" action="/" method="GET">
+              <div class="input-group mb-0 searchbar search-bar">
                 <input type="text" placeholder="Search" name="s" value="{{ request()->s }}" class="form-control searchstyle" aria-label="Text input with dropdown button">
                   <button class="btn btn-outline-secondary searchstyle" type="submit"><i class="fas fa-search"></i></button>
               </div>
             </form>
             <ul class="navbar-nav">
               <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle navbar-header" href="#" id="navbarDarkDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">Welcome, {{ (Auth::check()) ? Auth::user()->f_name : 'Guest' }}</a>
+                <a class="nav-link dropdown-toggle navbar-header welcome-msg" href="#" id="navbarDarkDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">Welcome, {{ (Auth::check()) ? Auth::user()->f_name : 'Guest' }}</a>
+                <a class="nav-link dropdown-toggle navbar-header mbl-welcome" href="#" id="navbarDarkDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="far fa-user" style="font-size: 20px"></i></a>
                 <ul class="dropdown-menu dropdown-menu-light navbar-header" aria-labelledby="navbarDarkDropdownMenuLink" style="right: 14px !important; left: auto !important;">
-                  <li>
+                  {{-- <li>
                     <a class="dropdown-item" style="font-weight: 300 !important;" href="/cart">
                       <img src="{{ asset('/assets/site-img/icon/nav11.jpg') }}" alt="cart" width="30">&nbsp;&nbsp;My Cart <span class="badge badge-primary count-cart-items" style="background-color:#186eaa; vertical-align: top;">0</span>
                     </a>
-                  </li>
+                  </li> --}}
                   @if(Auth::check())
                   <li>
                     <a class="dropdown-item" style="font-weight: 300 !important;" href="/mywishlist">
@@ -368,16 +402,11 @@
             </div>
           </a>
           {{-- Cart Icon --}}
-          <div class="d-sm-block d-md-none d-lg-none d-xl-none test" style="width: 100% !important">
+          <div class="d-sm-block d-md-none d-lg-none d-xl-none mob-srch" style="width: 100% !important">
             <div class="col-md-12">
               <form action="/" method="GET">
                 <div class="input-group mb-0 searchbar" style="width: 100% !important;">
                   <input type="text" placeholder="Search" name="s" value="{{ request()->s }}" class="form-control searchstyle" aria-label="Text input with dropdown button">
-                  {{-- <select class="custom-select form-control" name="by" style="max-width: 115px !important;">
-                    <option value="all" {{ request()->by == 'all' ? 'selected' : '' }}>All</option>
-                    <option value="products" {{ request()->by == 'products' ? 'selected' : '' }}>Products</option>
-                    <option value="blogs" {{ request()->by == 'blogs' ? 'selected' : '' }}>Blogs</option>
-                  </select> --}}
                     <button class="btn btn-outline-secondary searchstyle" type="submit"><i class="fas fa-search"></i></button>
                 </div>
               </form><br/>
@@ -412,15 +441,6 @@
                   <td class="tdfooter footer2nd" style="border-style: unset !important;">&nbsp;</td>
                 </tr>
                 <tr id="policy-pages-footer"></tr>{{-- Policy Pages --}}
-                
-                {{-- <tr>
-                  <td class="tdfooter footer2nd" style="border-style: unset !important;"><a href="/privacy_policy" style="text-decoration: none;     color: #0062A5;">Privacy Policy</a></td>
-                  <td class="tdfooter footer2nd" style="border-style: unset !important;">&nbsp;</td>
-                </tr>
-                <tr>
-                  <td class="tdfooter footer2nd" style="border-style: unset !important;"><a href="/terms_condition" style="text-decoration: none;     color: #0062A5;">Terms & Conditions</a></td>
-                  <td class="tdfooter footer2nd" style="border-style: unset !important;">&nbsp;</td>
-                </tr> --}}
               </tbody>
             </table>
           </div>
