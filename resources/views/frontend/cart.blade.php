@@ -148,7 +148,7 @@
                             </span>{{-- for mobile --}}
                             </td>
                             <td class="tbls d-none d-sm-table-cell"><p style="white-space: nowrap !important;">P <span class="formatted-price">{{ number_format($cart['price'], 2, '.', ',') }}</span></p><span class="price d-none">{{ $cart['price'] }}</span></td>
-                            <td class="tbls d-none d-sm-table-cell">
+                            <td class="tbls d-none d-sm-table-cell text-center">
                                 <div class="input-group">
                                     <span class="input-group-btn">
                                         <a href="#" class="quantity-left-minus btn btn-number" style="background-color: #ccc !important; height: 100% !important; border-radius: 0px !important;"> - </a>
@@ -160,6 +160,11 @@
                                         <a href="#" class="quantity-right-plus btn btn-number" style="background-color: #ccc !important; height: 100% !important; border-radius: 0px !important;"> + </a>
                                     </span>
                                 </div>
+                                @if ($cart['insufficient_stock'])
+                                <small class="text-danger d-block m-2 stock-status">Insufficient Stock</small>
+                                @else
+                                <small class="text-success d-block m-2 stock-status">Available :  {{ $cart['stock_qty'] }}</small>
+                                @endif
                             </td>
                             <td class="tbls">&nbsp;</td>
                             <td class="tbls d-none d-sm-table-cell"><p style="white-space: nowrap !important;">P <span class="formatted-amount">{{ number_format($cart['amount'], 2, '.', ',') }}</span></p><span class="amount d-none">{{ $cart['amount'] }}</span></td>
@@ -218,38 +223,6 @@
                         </div>
                     </div>
                 </div>
-                {{-- <table class="table">
-                    <tr>
-                        <td class="col-md-6">
-                            <div class="card-body col-md-8 mx-auto">
-                                <a href="/" class="btn btn-secondary" style="width:100% !important;" role="button"><span style="font-size: 12pt; font-weight: 700">˂ </span> CONTINUE SHOPPING</a>
-                            </div>
-                        </td>
-                        <td class="col-md-6">
-                            @php
-                                $action = '';
-
-                                if(Auth::check()){//member
-                                    if($bill_address > 0 and $ship_address > 0){
-                                        $action = '/setdetails';
-                                    }else if($ship_address < 1){
-                                        $action = '/checkout/billing';
-                                    }else if($bill_address < 1){
-                                        $action = '/checkout/set_billing_form';
-                                    }else{
-                                        $action = '/checkout/billing';
-                                    }
-                                }else{// guest
-                                    $action = '/checkout/billing';
-                                }
-                            @endphp
-
-                            <div class="card-body col-md-8 mx-auto">
-                                <button id="checkout-btn" class="btn btn-outline-primary" role="button" style="width:100% !important;" {{ (count($cart_arr) > 0) ? '' : 'disabled' }}>PROCEED TO CHECKOUT</button>
-                            </div>
-                        </td>
-                    </tr>
-                </table> --}}
                 <br><br><br>
             </div>
             <div class="col-lg-12">&nbsp;&nbsp;</div>
@@ -267,16 +240,23 @@
             var row = $(this).closest('tr');
             var input_name = row.find('input[name="quantity[]"]').eq(0);
             var id = input_name.data('id');
+            var max = input_name.attr('max');
 
             var res_input_name = row.find('input[name="res_quantity[]"]').eq(0);
 
             var current_qty = input_name.val();
-            if (current_qty > 1) {
+            if (parseInt(current_qty) > 1) {
                 current_qty--;
                 input_name.val(current_qty);
                 res_input_name.val(current_qty);
                 updateAmount(row);
                 updateCart('decrement', id, current_qty);
+            }
+
+            if (parseInt(current_qty) > parseInt(max)) {
+                row.find('.stock-status').eq(0).removeClass('text-success').addClass('text-danger').text('Insufficient Stock');
+            } else {
+                row.find('.stock-status').eq(0).removeClass('text-danger').addClass('text-success').text('Available : ' + max);
             }
         });
 
@@ -290,12 +270,18 @@
             var res_input_name = row.find('input[name="res_quantity[]"]').eq(0);
 
             var current_qty = input_name.val();
-            if (current_qty < max) {
+            if (parseInt(current_qty) < parseInt(max)) {
                 current_qty++;
                 input_name.val(current_qty);
                 res_input_name.val(current_qty);
                 updateAmount(row);
                 updateCart('increment', id, current_qty);
+            }
+            
+            if (parseInt(current_qty) > parseInt(max)) {
+                row.find('.stock-status').eq(0).removeClass('text-success').addClass('text-danger').text('Insufficient Stock');
+            } else {
+                row.find('.stock-status').eq(0).removeClass('text-danger').addClass('text-success').text('Available : ' + max);
             }
         });
 
