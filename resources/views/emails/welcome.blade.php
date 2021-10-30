@@ -35,7 +35,7 @@
   </tr>
      <tr>
     <td class="innerpadding bodycopy">
-      If you did not initiate this request, please contact us immediately at support@fumaco.com
+      If you did not initiate this request, please contact us immediately at <a href="mailto:support@fumaco.com">support@fumaco.com</a>
     </td>
   </tr>
 </table>

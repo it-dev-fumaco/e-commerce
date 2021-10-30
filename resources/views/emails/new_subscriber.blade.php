@@ -62,10 +62,5 @@
       </div>
     </td>
  </tr>
-     <tr>
-    <td class="innerpadding borderbottom">
-    <!--  <img class="fix" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/210284/wide.png" width="100%" border="0" alt="" />-->
-    </td>
-  </tr>
 </table>
 @endsection

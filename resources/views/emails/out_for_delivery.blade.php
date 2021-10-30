@@ -16,7 +16,7 @@
     <td class="h2" style="padding: 5% 0 0 5%;">We've just shipped your order!</td>
   </tr>
   <tr>
-    <td class="bodycopy borderbottom" style="padding: 3% 5% 5% 5%;">
+    <td class="bodycopy borderbottom" style="padding: 5%;">
       Hi {{ $order_details->order_name . ' ' . $order_details->order_lastname }},<br><br>
       This is just a quick update to let you know that your order is now on it's way to you. To track your shipment and view it's delivery status, click the link below.
       <br><br>
@@ -126,7 +126,7 @@
   </tr>
      <tr>
     <td class="innerpadding bodycopy">
-      If you did not initiate this request, please contact us immediately at support@fumaco.com
+      If you did not initiate this request, please contact us immediately at <a href="mailto:support@fumaco.com">support@fumaco.com</a>
     </td>
   </tr>
 </table>

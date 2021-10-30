@@ -18,7 +18,7 @@
         <td class="h2" style="padding: 5% 0 0 5%;">Order Placed</td>
      </tr>
      <tr>
-        <td class="bodycopy borderbottom" style="padding: 3% 5% 5% 5%;">
+        <td class="bodycopy borderbottom" style="padding: 5%;">
 			Hi {{ $order['order_details']->order_name . ' ' . $order['order_details']->order_lastname }},<br><br>
 			Thank you for your order! <br><br> We received your order and will contact you as soon as your package is shipped. You can find your purchase information below. 	<br><br>
 			Order Summary : {{ date("Y-m-d h:i a") }}
@@ -105,7 +105,7 @@
   </tr>
      <tr>
     <td class="innerpadding bodycopy">
-      If you did not initiate this request, please contact us immediately at support@fumaco.com
+      If you did not initiate this request, please contact us immediately at <a href="mailto:support@fumaco.com">support@fumaco.com</a>
     </td>
   </tr>
 </table>
