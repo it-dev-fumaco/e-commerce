@@ -540,27 +540,28 @@
 			right: 0;
 			top: 0;
 		}
-		.text {
+		.text{
 			position: relative;
-			font-size: 14px;
+			font-size: 16px !important;
 			width: 100%;
-		}
+			}
 
-		.text-concat {
-			position: relative;
-			display: inline-block;
-			word-wrap: break-word;
-			overflow: hidden;
-			max-height: 4.8em;
-			line-height: 1.2em;
-			text-align:justify;
-		}
+    .text-concat {
+      position: relative;
+      display: inline-block;
+      word-wrap: break-word;
+      overflow: hidden;
+      max-height: 4.3em;
+      /* line-height: 1.2em; */
+      line-height: 1.4em;
+      text-align: left;
+    }
 
-		.text.ellipsis::after {
-			position: absolute;
-			right: -12px;
-			bottom: 4px;
-		}
+    .text.ellipsis::after {
+      position: absolute;
+      right: -12px;
+      bottom: 4px;
+    }
 
 		@media (max-width: 575.98px) {
         header{
@@ -590,6 +591,12 @@
 		}
 		.fumacoFont_item_title, .fumacoFont_item_price{
 			font-size: 16px !important;
+		}
+		.prod-main, .related-prod{
+			padding: 0 !important;
+		}
+		.products-head{
+			padding-left: 20px !important;
 		}
       }
 
@@ -622,6 +629,12 @@
 		.fumacoFont_item_title, .fumacoFont_item_price{
 			font-size: 16px !important;
 		}
+		.prod-main, .related-prod{
+			padding: 0 !important;
+		}
+		.products-head{
+			padding-left: 20px !important;
+		}
       }
 	</style>
 
@@ -643,9 +656,9 @@
 	<div class="container"></div>
 	<form action="/product_actions" method="POST" autocomplete="off">
 		@csrf
-		<main style="background-color:#ffffff;">
+		<main class="prod-main" style="background-color:#ffffff;">
 			<div class="container marketing">
-				<div class="single_product" style="padding-bottom: 0px !important;">
+				<div class="single_product prod-main" style="padding-bottom: 0px !important;">
 					<div class="container-fluid" style=" background-color: #fff; padding: 11px;">
 						<div class="row">
 							<div class="col-lg-4">
@@ -743,7 +756,7 @@
 										$x = 0;
 										$opt_name = preg_replace('/\s+/', '', strtolower($attr));
 									@endphp
-									<label style="margin-left: 3%;">{{ $attr }} : </label><br class="d-md-none"/>
+									<label>{{ $attr }} : </label><br class="d-md-none"/>
 									<div class="btn-group" role="group" aria-label="Select Variants" style="display: unset !important;">
 										@foreach ($row as $attr_value => $items)
 										@php
@@ -767,11 +780,25 @@
 									@endif
 									@endforeach
 									<div class="row mt-5" id="product_details">
-										<div class="col-xs-6">
+										<div class="col-xs-6 d-none d-md-block">
 											<button type="submit" class="btn btn-lg btn-outline-primary fumacoFont_card_readmore" name="addtocart" style="padding: 1rem 1.5rem !important; color: #ffffff;background-color: #0062A5;border-color: #7cc;border-radius: 0 !important; {{ ($product_details->f_qty < 1) ? 'display: none;' : '' }}" value="1"><i class="fas fa-shopping-cart"></i> Add to Cart</button>
 											<button type="submit" class="btn btn-lg btn-outline-primary fumacoFont_card_readmore" name="buynow" style="padding: 1rem 1.5rem !important; color: #ffffff;background-color: #0062A5;border-color: #7cc;border-radius: 0 !important; {{ ($product_details->f_qty < 1) ? 'display: none;' : '' }}"  value="1"><i class="fas fa-wallet"></i> Buy Now</button>
 											@if($product_details->f_qty < 1)
 											<button type="submit" class="btn btn-lg btn-outline-primary fumacoFont_card_readmore" style="padding: 1rem 1.5rem !important; color: #ffffff;background-color: #0062A5;border-color: #7cc;border-radius: 0 !important;" name="addtowishlist" value="1"><i class="fas fa-heart"></i> Add to Wish List</button>
+											@endif
+										</div>
+
+										<div class="col-xs-6 d-md-none">
+											<div class="col-sm-12">
+												<button type="submit" class="btn btn-lg btn-outline-primary fumacoFont_card_readmore col-sm-12" name="addtocart" style="padding: 1rem 1.5rem !important; color: #ffffff;background-color: #0062A5;border-color: #7cc;border-radius: 0 !important; {{ ($product_details->f_qty < 1) ? 'display: none;' : '' }}; width: 100% !important" value="1"><i class="fas fa-shopping-cart"></i> Add to Cart</button>
+											</div><br/>
+											<div class="col-md-12">
+												<button type="submit" class="btn btn-lg btn-outline-primary fumacoFont_card_readmore col-sm-12" name="buynow" style="padding: 1rem 1.5rem !important; color: #ffffff;background-color: #0062A5;border-color: #7cc;border-radius: 0 !important; {{ ($product_details->f_qty < 1) ? 'display: none;' : '' }}; width: 100% !important"  value="1"><i class="fas fa-wallet"></i> Buy Now</button>
+											</div>
+											@if($product_details->f_qty < 1)
+											<div class="col-md-12">
+												<button type="submit" class="btn btn-lg btn-outline-primary fumacoFont_card_readmore col-sm-12" style="padding: 1rem 1.5rem !important; color: #ffffff;background-color: #0062A5;border-color: #7cc;border-radius: 0 !important; width: 100% !important" name="addtowishlist" value="1"><i class="fas fa-heart"></i> Add to Wish List</button>
+											</div>
 											@endif
 										</div>
 										<div class="row"><br></div>
@@ -836,7 +863,7 @@
 							</section>
 
 							<div class="album py-5">
-								<div class="container">
+								<div class="container related-prod">
 									<div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4">
 										@foreach($related_products as $rp)
 										<div class="col animated animatedFadeInUp fadeInUp equal-height-columns">
