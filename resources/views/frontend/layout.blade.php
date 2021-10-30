@@ -42,7 +42,13 @@
     gtag('config', 'G-XHTGRGDC35');
     </script>
     <style>
-
+	html,body{
+		width: 100% !important;
+		height: 100% !important;
+		margin: 0px !important;
+		padding: 0px !important;
+		overflow-x: hidden !important; 
+	}
       .fumacoFont1 {
           font-family: 'poppins', sans-serif !important; font-weight:400 !important; font-size: 1.75rem!important;
       }
