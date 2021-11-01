@@ -697,7 +697,7 @@ class FrontendController extends Controller
             ->join('fumaco_attributes_per_category as c', 'c.id', 'a.attribute_name_id')
             ->where('idcode', $item_code);
         
-        $na_check = DB::table('fumaco_categories')->where('name', $product_details->f_category)->first();
+        $na_check = DB::table('fumaco_categories')->where('id', $product_details->f_cat_id)->first();
      
         $attributes = $attrib->orderBy('idx', 'asc')->pluck('a.attribute_value', 'c.attribute_name');
         $filtered_attributes = $attributes;

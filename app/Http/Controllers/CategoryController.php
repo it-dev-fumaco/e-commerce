@@ -61,8 +61,14 @@ class CategoryController extends Controller
     public function deleteCategory($id){
         DB::beginTransaction();
         try {
+            $existing_item = DB::table('fumaco_items')->where('f_cat_id', $id)->exists();
+            if ($existing_item) {
+                return redirect()->back()->with('error', 'Cannot delete category '. $id .'. Already linked to items.');
+            }
             DB::table('fumaco_categories')->where('id', $id)->delete();
+
             DB::commit();
+
             return redirect()->back()->with('success', 'Product category '. $id .' has been removed.');
         } catch (Exception $e) {
             DB::rollback();
