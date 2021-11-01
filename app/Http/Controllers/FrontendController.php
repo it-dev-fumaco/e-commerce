@@ -572,7 +572,7 @@ class FrontendController extends Controller
                 $attribute_value_filter[] = $value;
             }
         }
-        
+
         $brand_filter = ($brand_filter) ? array_values(explode('+', $brand_filter)) : [];
 
         // get items based on filters
@@ -654,7 +654,7 @@ class FrontendController extends Controller
 
         // get items based on category id
         $products = DB::table('fumaco_items')->where('f_cat_id', $category_id)
-            ->when(count($request_data) > 0, function($c) use ($filtered_items) {
+            ->when(count($request->except(['page', 'sel_attr', 'sortby', 'order'])) > 0, function($c) use ($filtered_items) {
                 $c->whereIn('f_idcode', $filtered_items);
             })
             ->where('f_status', 1)->orderBy($sortby, 'asc')->paginate(15);
