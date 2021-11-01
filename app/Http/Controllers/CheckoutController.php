@@ -518,7 +518,8 @@ class CheckoutController extends Controller
 				'items' => $items
 			];
 
-			Mail::to(trim($order_details->order_email))
+			$emails = array_unique([trim($order_details->order_bill_email), trim($order_details->order_email)]);
+			Mail::to($emails)
 				->queue(new OrderSuccess($order));
 
 			return view('frontend.checkout.success', compact('order_details', 'items'));
