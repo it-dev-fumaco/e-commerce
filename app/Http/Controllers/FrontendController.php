@@ -18,7 +18,7 @@ class FrontendController extends Controller
     public function signupForm() {
         return view('frontend.register');
     }
-    
+
     public function index(Request $request) {
         // get sorting value 
         $sortby = $request->sortby;
@@ -343,7 +343,7 @@ class FrontendController extends Controller
 
             DB::commit();
 
-            return redirect()->back()->with('success', 'New record created successfully. You can login now!');
+            return redirect('/login')->with('success', 'New record created successfully. You can login now!');
         }catch(Exception $e){
             DB::rollback();
         }
