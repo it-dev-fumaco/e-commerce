@@ -18,7 +18,7 @@
     <link rel="icon" type="image/png" href="{{ asset('/assets/icon/favicon-16x16.png') }}" sizes="16x16">
     <link rel="icon" type="image/png" href="{{ asset('/assets/icon/favicon-32x32.png') }}" sizes="32x32">
 
-    <link href="{{ asset('/assets/dist/css/bootstrap.css') }}" rel="stylesheet">
+    <link href="{{ asset('/assets/dist/css/bootstrap.min.css') }}" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <script src="https://kit.fontawesome.com/ec0415ab92.js"></script>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -466,7 +466,7 @@
       <br>
     </main>
   </footer>
-  <script src="{{ asset('/assets/dist/js/bootstrap.bundle.js') }}"></script>
+  <script src="{{ asset('/assets/dist/js/bootstrap.bundle.min.js') }}"></script>
   <script>
     $(document).ready(function() {
       websiteSettings();
