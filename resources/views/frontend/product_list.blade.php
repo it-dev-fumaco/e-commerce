@@ -312,58 +312,62 @@
 							</div>
 						</form>
 
-						@forelse ($products_arr as $product)
-						<div class="col-md-4 btmp animated animatedFadeInUp fadeInUp equal-height-columns">
-						<a href="/product/{{ $product['item_code'] }}" style="text-decoration: none !important; text-transform: none !important;">
-
-							<div class="card">
-								<div class="equal-column-content">
-									@php
-										$image = ($product['image']) ? '/storage/item_images/'.$product['item_code'].'/gallery/preview/'.$product['image'] : '/storage/no-photo-available.png';
-										$image_webp = ($product['image']) ? '/storage/item_images/'.$product['item_code'].'/gallery/preview/'.explode(".", $product['image'])[0] .'.webp' : '/storage/no-photo-available.png';
-									@endphp
-
-									<picture>
-										<source srcset="{{ asset($image_webp) }}" type="image/webp" class="card-img-top">
-										<source srcset="{{ asset($image) }}" type="image/jpeg" class="card-img-top">
-										<img src="{{ asset($image) }}" alt="{{ $product['item_code'] }}" class="card-img-top">
-									 </picture>
-
-									<div class="card-body">
-										<div class="text ellipsis">
-											<p class="card-text fumacoFont_card_title text-concat prod-desc" style="color:#0062A5 !important; height: 80px; font-size: 16px !important; font-weight: 500 !important;">{{ $product['item_name'] }}</p>
-										</div>
-										<p class="card-text fumacoFont_card_price" style="color:#000000 !important;">
-											@if($product['is_discounted'])
-											₱ {{ number_format(str_replace(",","",$product['discounted_price']), 2) }} <s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$product['price']), 2) }}</s>
-											&nbsp;<span class="badge badge-danger" style="vertical-align: middle;background-color: red; display: {{ ($product['on_sale']) ? 'inline' : 'none' }} !important;">{{ $product['discount_percent'] }}% OFF</span>
-											@else
-											₱ {{ number_format(str_replace(",","",$product['price']), 2) }}
-											@endif
-										</p>
-										<div class="d-flex justify-content-between align-items-center">
-											<div class="btn-group stylecap">
-												<span class="fa fa-star starcolorgrey"></span>
-												<span class="fa fa-star starcolorgrey"></span>
-												<span class="fa fa-star starcolorgrey"></span>
-												<span class="fa fa-star starcolorgrey"></span>
-												<span class="fa fa-star starcolorgrey"></span>
+						<div class="row animated animatedFade1InUp fadeInUp">
+							@forelse ($products_arr as $product)
+							<div class="col-md-4 mb-3 btmp">
+								{{-- <div class="col-md-4 btmp animated animatedFadeInUp fadeInUp equal-height-columns"> --}}
+							{{-- <a href="/product/{{ $product['item_code'] }}" style="text-decoration: none !important; text-transform: none !important;"> --}}
+	
+								<div class="card">
+									<div class="equal-column-content">
+										@php
+											$image = ($product['image']) ? '/storage/item_images/'.$product['item_code'].'/gallery/preview/'.$product['image'] : '/storage/no-photo-available.png';
+											$image_webp = ($product['image']) ? '/storage/item_images/'.$product['item_code'].'/gallery/preview/'.explode(".", $product['image'])[0] .'.webp' : '/storage/no-photo-available.png';
+										@endphp
+									
+											<picture>
+												<source srcset="{{ asset($image_webp) }}" type="image/webp" class="card-img-top">
+												<source srcset="{{ asset($image) }}" type="image/jpeg" class="card-img-top">
+												<img src="{{ asset($image) }}" alt="{{ $product['item_code'] }}" class="card-img-top">
+											 </picture>
+								
+										<div class="card-body">
+											<div class="text ellipsis">
+												<p class="card-text fumacoFont_card_title text-concat prod-desc" style="color:#0062A5 !important; height: 80px; font-size: 16px !important; font-weight: 500 !important;">{{ $product['item_name'] }}</p>
 											</div>
-											<small class="text-muted stylecap" style="color:#c4cad0 !important; font-weight:100 !important;">( 0 Reviews )</small>
+											<p class="card-text fumacoFont_card_price" style="color:#000000 !important;">
+												@if($product['is_discounted'])
+												₱ {{ number_format(str_replace(",","",$product['discounted_price']), 2) }} <s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$product['price']), 2) }}</s>
+												&nbsp;<span class="badge badge-danger" style="vertical-align: middle;background-color: red; display: {{ ($product['on_sale']) ? 'inline' : 'none' }} !important;">{{ $product['discount_percent'] }}% OFF</span>
+												@else
+												₱ {{ number_format(str_replace(",","",$product['price']), 2) }}
+												@endif
+											</p>
+											<div class="d-flex justify-content-between align-items-center">
+												<div class="btn-group stylecap">
+													<span class="fa fa-star starcolorgrey"></span>
+													<span class="fa fa-star starcolorgrey"></span>
+													<span class="fa fa-star starcolorgrey"></span>
+													<span class="fa fa-star starcolorgrey"></span>
+													<span class="fa fa-star starcolorgrey"></span>
+												</div>
+												<small class="text-muted stylecap" style="color:#c4cad0 !important; font-weight:100 !important;">( 0 Reviews )</small>
+											</div>
+										</div>
+										<div class="card-body">
+											{{-- <a href="/product/{{ $product['item_code'] }}" class="btn btn-outline-primary fumacoFont_card_readmore" role="button" style="width:100% !important;">View</a> --}}
 										</div>
 									</div>
-									<div class="card-body">
-										{{-- <a href="/product/{{ $product['item_code'] }}" class="btn btn-outline-primary fumacoFont_card_readmore" role="button" style="width:100% !important;">View</a> --}}
-									</div>
+									<a href="/product/{{ $product['item_code'] }}" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto" role="button" style="width: 90% !important; margin-bottom: 20px">View</a>
+	
 								</div>
-								<a href="/product/{{ $product['item_code'] }}" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto" role="button" style="width: 90% !important; margin-bottom: 20px">View</a>
-
+							{{-- </a> --}}
 							</div>
-						</a>
+							@empty
+							<h4 class="text-center text-muted p-5 text-uppercase">No products found</h4>
+							@endforelse
 						</div>
-						@empty
-						<h4 class="text-center text-muted p-5 text-uppercase">No products found</h4>
-						@endforelse
+					
 					</div>
 				</div>
 				<!--products-->
