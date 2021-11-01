@@ -10,9 +10,7 @@
 
 @section('content')
 	<style>
-		html, body{
-			font-family: 'poppins', sans-serif !important;
-		}
+	
 	._1yv {
 			box-shadow: 0 0px 0px rgb(0 0 0 / 30%), 0 0 0 1px rgb(0 0 0) !important;
 	}
