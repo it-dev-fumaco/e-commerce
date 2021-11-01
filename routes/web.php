@@ -31,6 +31,7 @@ Route::namespace('Auth')->group(function(){
 
 });
 
+Route::get('/signup', 'FrontendController@signupForm');
 Route::post('/user_register', 'FrontendController@userRegistration');
 Route::get('/about', 'FrontendController@viewAboutPage');
 Route::get('/journals', 'FrontendController@viewJournalsPage');

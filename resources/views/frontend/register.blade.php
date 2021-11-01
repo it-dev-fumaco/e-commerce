@@ -1,6 +1,6 @@
 @extends('frontend.layout', [
-  'namePage' => 'Login',
-  'activePage' => 'login'
+  'namePage' => 'Register',
+  'activePage' => 'signup'
 ])
 
 @section('content')
@@ -11,7 +11,7 @@
             <img src="{{ asset('/assets/site-img/header3-sm.png') }}" alt="" style="position: absolute; top: 0;left: 0;min-width: 100%; height: unset !important; ">
                 <div class="container">
                     <div class="carousel-caption text-start" style="bottom: 1rem !important; right: 25% !important; left: 25%; !important;">
-                        <center><h3 class="carousel-header-font">LOGIN</h3></center>
+                        <center><h3 class="carousel-header-font">SIGN UP</h3></center>
                     </div>
                 </div>
             </div>
@@ -25,9 +25,9 @@
             <div class="col-lg-12">
               <br>
                 <div id="logreg-forms" style="box-shadow: unset !important;">
-                    
+              
 
-                    <form class="form-signin" action="/login" method="POST" style="max-width: 600px !important; border-color: #efefef; border-style: solid; border-width: 1px; border-top: 8px solid #186eaa; ">
+                    <form action="user_register" class="form-signup1" method="post" style="max-width: 600px !important; border-color: #efefef; border-style: solid; border-width: 1px; border-top: 8px solid #186eaa; ">
                         @if(session()->has('success'))
                         <div class="alert alert-success alert-dismissible fade show" role="alert">
                             {{ session()->get('success') }}
@@ -40,16 +40,50 @@
                         </div>
                     @endif
                         @csrf
-                        <h4 style="color: #404040; border-bottom: 2px solid  #e59866 ; padding-bottom: 8px; text-align: center;">Sign In</h4>
-                        {{-- <ul class="nav nav-tabs">
-                            <li class="nav-item active" style="width: 50%;">
-                            <a class="nav-link" href="#"><center><span class="login_2">Sign in</span></center></a>
-                            </li>
-
-                            {{-- <li class="nav-item" style="width: 50%;">
-                            <a class="nav-link" href="#" type="button" id="btn-signup"><center><span class="login_2">Register</span></center></a>
-                            </li> --}}
-                        {{-- </ul> --}}
+                        <h4 style="color: #404040; border-bottom: 2px solid  #e59866 ; padding-bottom: 8px; text-align: center;">Sign Up</h4>
+                        <br>
+                        <center>
+                            <div class="col-lg-7" style="text-align: left;">
+                                <div class="row">
+                                    <label for="mobile_1" class="myprofile-font-form login_1">First Name : <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control caption_1" id="fname" name="first_name" required>
+                                </div>
+                                <br/>
+                                <div class="row">
+                                    <label for="mobile_1" class="myprofile-font-form login_1">Last Name : <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control caption_1" id="lname" name="last_name" required>
+                                </div>
+                                <br/>
+                                <div class="row">
+                                    <label class="login_1">Email address <span class="text-danger">*</span></label>
+                                    <input type="email" name="username" id="username" class="form-control caption_1" value="" required>
+                                    <span class="help-block"></span>
+                                </div>
+                                <br/>
+                                <div class="row">
+                                    <label class="login_1">Password <span class="text-danger">*</span></label>
+                                    <input type="password" name="password" id="password" class="form-control caption_1" value="" required>
+                                    <span class="help-block"></span>
+                                </div>
+                                <br/>
+                                <div class="row">
+                                    <label class="login_1">Confirm Password <span class="text-danger">*</span></label>
+                                    <input type="password" name="confirm_password" id="confirm_password"  class="form-control caption_1" value="" required>
+                                    <span class="help-block"></span>
+                                </div>
+                                <br>
+                                <div class="row">
+                                    <p class="reg_link" style="white-space: wrap;"><input type="checkbox" name="subscribe"> &nbsp;Yes, I want to receive email updates and notifications.</p>
+                                    <p class="reg_link" style=""><input type="checkbox" id="terms_checkbox"> I agree to <a href="/pages/privacy_policy" style="display: inline-block !important;">Privacy Policy</a> and <a href="/pages/terms_condition" style="display: inline-block !important;">Terms</a>.</p>
+                                    <input type="submit" id="reg_btn" class="btn btn-primary" value="REGISTER" disabled><br/>
+                                </div>
+                            </div>
+                        </center>
+                    </form>
+{{-- 
+                    <form class="form-signin" action="/login" method="POST" style="max-width: 600px !important; border-color: #efefef; border-style: solid; border-width: 1px; border-top: 8px solid #186eaa; ">
+                        @csrf
+                        <h4 style="color: #404040; border-bottom: 2px solid  #e59866 ; padding-bottom: 8px; text-align: center;">Sign Up</h4>
                         <center>
                         <div class="col-lg-7" style="text-align: left;">
                             <br>
@@ -69,22 +103,19 @@
                             <input type="submit" class="btn btn-primary" value="&nbsp;&nbsp;LOGIN&nbsp;&nbsp;">
 
                             <a href="{{ route('password.request') }}" id="forgot_pswdx" class="forgot-1">Forgot password?</a>
-                            <p style=" font-size: 1rem !important; margin-top: 12px;">
-                                <span style="display: inline-block; color:  #616a6b ">New member? </span> <a href="/signup" class="forgot-1" style="display: inline-block; font-size: 1rem !important;">Create new account.</a>
-                            </p>
                             <br>
                             <label for="InputPassword" class="status-1"></label>
                         </div>
                         </center>
-                    </form>
+                    </form> --}}
 
                     <form action="/reset/password/" class="form-reset" style="border-color: #efefef; border-style: solid; border-width: 1px; border-top: 8px solid #186eaa; ">
                         <input type="email" id="resetEmail" class="form-control" placeholder="Email address" required="" autofocus="">
                         <button class="btn btn-primary btn-block" type="submit">Reset Password</button>
                         <a href="#" id="cancel_reset"><i class="fas fa-angle-left"></i> Back</a>
                     </form>
-
-                    {{-- <form action="user_register" class="form-signup" method="post" style="max-width: 600px !important; border-color: #efefef; border-style: solid; border-width: 1px; border-top: 8px solid #186eaa; ">
+{{-- 
+                    <form action="user_register" class="form-signup" method="post" style="max-width: 600px !important; border-color: #efefef; border-style: solid; border-width: 1px; border-top: 8px solid #186eaa; ">
                         @csrf
                         <ul class="nav nav-tabs">
                             <li class="nav-item" style="width: 50%;">
@@ -140,7 +171,7 @@
             </div>
         </div>
     </div>
-</main>
+</main>\
 
 <main style="background-color:#ffffff;">
     <br>
@@ -160,11 +191,6 @@
     <br>
 </main>
 
-<main style="background-color:#ffffff;">
-    <br>
-    <br>
-    <br>
-</main>
 <style>
     .reg_link{
         font-size: 9pt;

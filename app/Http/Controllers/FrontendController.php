@@ -14,7 +14,11 @@ use Auth;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class FrontendController extends Controller
-{
+{   
+    public function signupForm() {
+        return view('frontend.register');
+    }
+    
     public function index(Request $request) {
         // get sorting value 
         $sortby = $request->sortby;
