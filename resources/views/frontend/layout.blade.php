@@ -47,7 +47,7 @@
 		height: 100% !important;
 		margin: 0px !important;
 		padding: 0px !important;
-		overflow-x: hidden !important; 
+		overflow-x: hidden !important;
 			font-family: 'poppins', sans-serif !important;
 	}
       .fumacoFont1 {
@@ -269,14 +269,14 @@
           text-align: left !important;
         }
       }
-      
+
       @media (max-width: 1199.98px) {/* tablet */
         .nav-item, .searchstyle, .welcome-msg {
           font-size: 12px !important;
           margin: 0 !important;
         }
         .user-icon{
-          font-size: 20px !important; 
+          font-size: 20px !important;
         }
         .nav-a{
           padding: 0 !important;
@@ -285,7 +285,7 @@
           width: auto !important;
         }
       }
-      
+
       @media only screen and (min-device-width : 768px) and (max-device-width : 1024px) and (orientation : portrait) {/* portrait tablet */
         .filter-btn, .filter-slide, .mbl-welcome{
           display: inline-block !important;
@@ -306,7 +306,7 @@
       <nav class="navbar navbar-expand-lg navbar-light fixed-top bg-light" style="padding-bottom:0px; border-bottom: 1px solid #e4e4e4;">
         <div class="container-fluid">
           <a class="navbar-brand" href="/" id="navbar-brand">
-            <img src="{{ asset('/assets/site-img/logo-sm.png') }}" alt="">
+            <img src="{{ asset('/assets/site-img/logo-sm.png') }}" alt="" width="155" height="54">
           </a>
           {{-- Mobile Icons --}}
           {{-- Login Icon --}}
