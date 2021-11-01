@@ -392,7 +392,7 @@
 
           <li class="nav-header">SYSTEM SETTINGS</li>
           @php
-            $settings_pages = ['erp_api_setup', 'payment_api_setup'];
+            $settings_pages = ['erp_api_setup', 'payment_api_setup', 'google_api_setup'];
           @endphp
           <li class="nav-item {{ (in_array($activePage, $settings_pages) ? 'menu-open' : '') }}">
             <a href="#" class="nav-link {{ (in_array($activePage, $settings_pages) ? 'active' : '') }}">
@@ -410,6 +410,12 @@
                 <a href="/admin/api_setup/erp" class="nav-link {{ $activePage == 'erp_api_setup' ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Fumaco Backend</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="/admin/api_setup/google" class="nav-link {{ $activePage == 'google_api_setup' ? 'active' : '' }}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Google API</p>
                 </a>
               </li>
               <li class="nav-item">

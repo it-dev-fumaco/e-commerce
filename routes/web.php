@@ -121,6 +121,7 @@ Route::prefix('admin')->group(function () {
 
         Route::get('/api_setup/erp', 'SettingsController@erpApiSetup');
         Route::get('/api_setup/payment', 'SettingsController@paymentApiSetup');
+        Route::get('/api_setup/google', 'SettingsController@googleApiSetup');
         Route::post('/api_setup/save', 'SettingsController@saveApiCredentials');
 
         Route::get('/email_setup', 'SettingsController@emailSetup');

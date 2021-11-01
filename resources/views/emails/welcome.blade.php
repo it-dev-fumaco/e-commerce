@@ -28,11 +28,7 @@
             <a href="{{ route('login') }}" style="background: #e05443; padding: 2% 5%;">Shop Now!</a>
         </td>
      </tr>
-     <tr>
-    <td class="innerpadding borderbottom">
-    <!--  <img class="fix" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/210284/wide.png" width="100%" border="0" alt="" />-->
-    </td>
-  </tr>
+
      <tr>
     <td class="innerpadding bodycopy">
       If you did not initiate this request, please contact us immediately at <a href="mailto:support@fumaco.com">support@fumaco.com</a>
