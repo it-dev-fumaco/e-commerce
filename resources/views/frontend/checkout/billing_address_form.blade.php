@@ -348,6 +348,9 @@
 								</div>
 								<br/>
 								<a href="/password/reset">Forgot Password?</a>
+								<p style=" font-size: 1rem !important; margin-top: 12px;">
+									<span style="display: inline-block; color:  #616a6b ">New member? </span> <a href="/signup" class="forgot-1" style="display: inline-block; font-size: 1rem !important;">Create new account.</a>
+								</p>
 							</div>
 							<div class="modal-footer">
 								<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
