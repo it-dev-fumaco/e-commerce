@@ -30,6 +30,15 @@ class CheckoutController extends Controller
 			}
         }
 
+		// $provinces = public_path() . "/json/provinces.json";
+		// $provinces = json_decode(file_get_contents($provinces), true)['results'];
+
+		// $shipping_zones = DB::table('fumaco_shipping_zone_rate')->distinct()->pluck('province_name')->toArray();
+
+		// $provinces = array_filter($provinces, function($r) use ($shipping_zones) {
+		// 	return in_array($r['text'], $shipping_zones);
+		// });
+
 		$has_shipping_address = true;
 		if (Auth::check()) {
 			$has_shipping_address = DB::table('fumaco_user_add')

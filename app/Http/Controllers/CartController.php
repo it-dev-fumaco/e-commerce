@@ -236,7 +236,7 @@ class CartController extends Controller
 
         $count = 0;
         if (isset($session_cart)) {
-            $count = count($session_cart);
+            $count = collect($session_cart)->sum('quantity');
         }
 
         unset($session_cart['shipping']);

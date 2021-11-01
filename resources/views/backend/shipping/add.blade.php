@@ -433,7 +433,6 @@
 				type:"POST",
 				data: frm.serialize(),
 				success:function(data){
-					console.log(data);
 					if(data.status){
 						$('#alert-div').removeClass('d-none alert-danger').addClass('alert-success').text(data.message);
 						if(data.new){

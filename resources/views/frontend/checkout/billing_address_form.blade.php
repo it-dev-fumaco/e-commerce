@@ -135,15 +135,22 @@
 						<br>
 						<div class="row">
 							<div class="col-md-4">
-								<label for="province1_1" class="formslabelfnt">Province : <span class="text-danger">*</span></label>
-								<input type="text" class="form-control formslabelfnt" id="ship_province1_1" name="ship_province1_1" required value="{{ old('ship_province1_1') }}"><br class="d-lg-none d-xl-none"/>
+								<label for="ship_province1_1" class="formslabelfnt">Province : <span class="text-danger">*</span></label>
+								{{-- <select class="form-control formslabelfnt" id="ship_province1_1" name="ship_province1_1" required>
+									<option value="">Select Province</option>
+									@foreach ($provinces as $province)
+									<option value="{{ $province['text'] }}" data-id="{{ $province['provCode'] }}">{{ $province['text'] }}</option>
+									@endforeach
+								</select> --}}
+								<input type="text" class="form-control formslabelfnt" id="ship_province1_1" name="ship_province1_1" required value="{{ old('ship_province1_1') }}">
+								<br class="d-lg-none d-xl-none"/>
 							</div>
 							<div class="col-md-4">
-								<label for="City_Municipality1_1" class="formslabelfnt">City / Municipality : <span class="text-danger">*</span></label>
+								<label for="ship_City_Municipality1_1" class="formslabelfnt">City / Municipality : <span class="text-danger">*</span></label>
 								<input type="text" class="form-control formslabelfnt" id="ship_City_Municipality1_1" name="ship_City_Municipality1_1" required value="{{ old('ship_City_Municipality1_1') }}"><br class="d-lg-none d-xl-none"/>
 							</div>
 							<div class="col-md-4">
-								<label for="Barangay1_1" class="formslabelfnt">Barangay : <span class="text-danger">*</span></label>
+								<label for="ship_Barangay1_1" class="formslabelfnt">Barangay : <span class="text-danger">*</span></label>
 								<input type="text" class="form-control formslabelfnt" id="ship_Barangay1_1" name="ship_Barangay1_1" required value="{{ old('ship_Barangay1_1') }}">
 							</div>
 						</div>
@@ -199,7 +206,7 @@
 						<small style="font-style: italic; font-size: 0.75rem; margin-top: 20px; display: block;">Note: * Required information</small>
 						<br>
 						<div class="form-check">
-							<input class="form-check-input" type="checkbox" id="myCheck" name="same_as_billing"  checked onclick="shipp_function()">
+							<input class="form-check-input" type="checkbox" id="myCheck" name="same_as_billing"  checked>
 							<label class="form-check-label" for="flexCheckChecked" class="formslabelfnt" style="font-size: 14px;">Billing address is the same as above</label>
 						</div>
 						<br/>
@@ -354,42 +361,212 @@
 			<br/>&nbsp;
 		</div>
 	</main>
-	
-	<script>
-		$(document).ready(function() {
-			$('input[type="checkbox"]').click(function() {
-				if($(this).prop("checked") == false) {
-					$('#billAddress').slideDown();
-					$("#Address1_1").prop('required',true);
-					$("#email").prop('required',true);
-					$("#province1_1").prop('required',true);
-					$("#City_Municipality1_1").prop('required',true);
-					$("#Barangay1_1").prop('required',true);
-					$("#postal1_1").prop('required',true);
-					$("#country_region1_1").prop('required',true);
-					$("#Address_type1_1").prop('required',true);
-					$("#email").prop('required',true);
-					$("#mobilenumber1_1").prop('required',true);
-					$("#bill_fname").prop('required',true);
-					$("#bill_lname").prop('required',true);
-				}else{
-					$('#billAddress').slideUp();
-					$("#Address1_1").prop('required',false);
-					$("#email").prop('required',false);
-					$("#province1_1").prop('required',false);
-					$("#City_Municipality1_1").prop('required',false);
-					$("#Barangay1_1").prop('required',false);
-					$("#postal1_1").prop('required',false);
-					$("#country_region1_1").prop('required',false);
-					$("#Address_type1_1").prop('required',false);
-					$("#email").prop('required',false);
-					$("#mobilenumber1_1").prop('required',false);
-					$("#bill_fname").prop('required',false);
-					$("#bill_lname").prop('required',false);
-				}
-            });
 
-        });
 
-	</script>
+	<style>
+		.select2-selection__rendered {
+				line-height: 34px !important;
+			}
+			.select2-container .select2-selection--single {
+				height: 37px !important;
+			}
+			.select2-selection__arrow {
+				height: 35px !important;
+			}
+	</style>
 @endsection
+
+@section('script')
+<!-- Select2 -->
+<script src="{{ asset('/assets/admin/plugins/select2/js/select2.full.min.js') }}"></script>
+
+<script>
+	$(document).ready(function() {
+		var provinces = [];
+		$.getJSON("{{ asset('/json/provinces.json') }}", function(obj){
+			$.each(obj.results, function(e, i) {
+				provinces.push({
+					id: i.text,
+					code: i.provCode,
+					text: i.text
+				});
+			});
+
+			$('#ship_province1_1').select2({
+				placeholder: 'Select Province',
+				data: provinces
+			});
+
+			$('#ship_City_Municipality1_1').select2({
+				placeholder: 'Select City',
+			});
+
+			$('#ship_Barangay1_1').select2({
+				placeholder: 'Select Barangay',
+			});
+		});
+
+		$(document).on('select2:select', '#ship_province1_1', function(e){
+			var data = e.params.data;
+			var select_el = $('#ship_City_Municipality1_1');
+			var cities = [];
+
+			select_el.empty();
+			$.getJSON("{{ asset('/json/cities.json') }}", function(obj){
+				var filtered_cities = $.grep(obj.results, function(v) {
+					return v.provCode === data.code;
+				});
+
+				$.each(filtered_cities, function(e, i) {
+					cities.push({
+						id: i.text,
+						code: i.citymunCode,
+						text: i.text,
+					});
+				});
+
+				select_el.select2({
+					placeholder: 'Select City',
+					data: cities
+				});
+			});
+		});
+
+		$(document).on('select2:select', '#ship_City_Municipality1_1', function(e){
+			var data = e.params.data;
+			var select_el = $('#ship_Barangay1_1');
+			var brgy = [];
+
+			select_el.empty();
+			$.getJSON("{{ asset('/json/brgy.json') }}", function(obj){
+				var filtered = $.grep(obj.results, function(v) {
+					return v.citymunCode === data.code;
+				});
+
+				$.each(filtered, function(e, i) {
+					brgy.push({
+						id: i.brgyDesc,
+						text: i.brgyDesc
+					});
+				});
+
+				select_el.select2({
+					placeholder: 'Select Barangay',
+					data: brgy
+				});
+			});
+		});
+
+		$('input[type="checkbox"]').click(function() {
+			if($(this).prop("checked") == false) {
+				$('#billAddress').slideDown();
+				$("#Address1_1").prop('required',true);
+				$("#email").prop('required',true);
+				$("#province1_1").prop('required',true);
+				$("#City_Municipality1_1").prop('required',true);
+				$("#Barangay1_1").prop('required',true);
+				$("#postal1_1").prop('required',true);
+				$("#country_region1_1").prop('required',true);
+				$("#Address_type1_1").prop('required',true);
+				$("#email").prop('required',true);
+				$("#mobilenumber1_1").prop('required',true);
+				$("#bill_fname").prop('required',true);
+				$("#bill_lname").prop('required',true);
+			}else{
+				$('#billAddress').slideUp();
+				$("#Address1_1").prop('required',false);
+				$("#email").prop('required',false);
+				$("#province1_1").prop('required',false);
+				$("#City_Municipality1_1").prop('required',false);
+				$("#Barangay1_1").prop('required',false);
+				$("#postal1_1").prop('required',false);
+				$("#country_region1_1").prop('required',false);
+				$("#Address_type1_1").prop('required',false);
+				$("#email").prop('required',false);
+				$("#mobilenumber1_1").prop('required',false);
+				$("#bill_fname").prop('required',false);
+				$("#bill_lname").prop('required',false);
+			}
+		});
+
+		var provinces_bill = [];
+		$.getJSON("{{ asset('/json/provinces.json') }}", function(obj){
+			$.each(obj.results, function(e, i) {
+				provinces_bill.push({
+					id: i.text,
+					code: i.provCode,
+					text: i.text
+				});
+			});
+
+			$('#province1_1').select2({
+				placeholder: 'Select Province',
+				data: provinces_bill
+			});
+
+			$('#City_Municipality1_1').select2({
+				placeholder: 'Select City',
+			});
+
+			$('#Barangay1_1').select2({
+				placeholder: 'Select Barangay',
+			});
+		});
+
+		$(document).on('select2:select', '#province1_1', function(e){
+			var data = e.params.data;
+			var select_el = $('#City_Municipality1_1');
+			var cities_bill = [];
+
+			select_el.empty();
+			$.getJSON("{{ asset('/json/cities.json') }}", function(obj){
+				var filtered_cities = $.grep(obj.results, function(v) {
+					return v.provCode === data.code;
+				});
+
+				$.each(filtered_cities, function(e, i) {
+					cities_bill.push({
+						id: i.text,
+						code: i.citymunCode,
+						text: i.text,
+						
+					});
+				});
+
+				select_el.select2({
+					placeholder: 'Select City',
+					data: cities_bill
+				});
+			});
+		});
+
+		$(document).on('select2:select', '#City_Municipality1_1', function(e){
+			var data = e.params.data;
+			var select_el = $('#Barangay1_1');
+			var brgy_bill = [];
+
+			select_el.empty();
+			$.getJSON("{{ asset('/json/brgy.json') }}", function(obj){
+				var filtered = $.grep(obj.results, function(v) {
+					return v.citymunCode === data.code;
+				});
+
+				$.each(filtered, function(e, i) {
+					brgy_bill.push({
+						id: i.brgyDesc,
+						text: i.brgyDesc
+					});
+				});
+
+				select_el.select2({
+					placeholder: 'Select Barangay',
+					data: brgy_bill
+				});
+			});
+		});
+
+	});
+
+</script>
+@endsection
+
