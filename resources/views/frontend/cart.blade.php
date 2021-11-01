@@ -342,6 +342,7 @@
             var total = parseFloat(shipping_fee) + subtotal;
 
             total = (isNaN(total)) ? 0 : total;
+            subtotal = (isNaN(subtotal)) ? 0 : subtotal;
 
             $('#cart-subtotal').text('P ' + subtotal.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,"));
             $('#grand-total').text('P ' + total.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,"));
