@@ -288,19 +288,19 @@ class CartController extends Controller
                 ->where('user_idx', $user_id)->where('address_class', 'Billing')->first();
             if ($billing_address) {
                 $billing_details = [
-                    'fname' => $shipping_address->xcontactname1,
-                    'lname' => $shipping_address->xcontactlastname1,
-                    'address_line1' => $shipping_address->xadd1,
-                    'address_line2' => $shipping_address->xadd2,
-                    'province' => $shipping_address->xprov,
-                    'city' => $shipping_address->xcity,
-                    'brgy' => $shipping_address->xbrgy,
-                    'postal_code' => $shipping_address->xpostal,
-                    'country' => $shipping_address->xcountry,
-                    'address_type' => $shipping_address->add_type,
-                    'email_address' => $shipping_address->xcontactemail1,
-                    'mobile_no' => $shipping_address->xmobile_number,
-                    'contact_no' => $shipping_address->xcontactnumber1,
+                    'fname' => $billing_address->xcontactname1,
+                    'lname' => $billing_address->xcontactlastname1,
+                    'address_line1' => $billing_address->xadd1,
+                    'address_line2' => $billing_address->xadd2,
+                    'province' => $billing_address->xprov,
+                    'city' => $billing_address->xcity,
+                    'brgy' => $billing_address->xbrgy,
+                    'postal_code' => $billing_address->xpostal,
+                    'country' => $billing_address->xcountry,
+                    'address_type' => $billing_address->add_type,
+                    'email_address' => $billing_address->xcontactemail1,
+                    'mobile_no' => $billing_address->xmobile_number,
+                    'contact_no' => $billing_address->xcontactnumber1,
                     'same_as_billing' => 0
                 ];
 

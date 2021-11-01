@@ -289,6 +289,7 @@ class CheckoutController extends Controller
 				'xcountry' => ($billing_details) ? $billing_details['country'] : $shipping_details['country'],
 				'xaddresstype' => ($billing_details) ? $billing_details['address_type'] : $shipping_details['address_type'],
 				'xemail' => ($billing_details) ? $billing_details['email_address'] : $shipping_details['email_address'],
+				'xemail_shipping' => $shipping_details['email_address'],
 				'xmobile' => ($billing_details) ? $billing_details['mobile_no'] : $shipping_details['mobile_no'],
 				'xcontact' => $shipping_details['contact_no'],
 				'xshippadd1' => $shipping_details['address_line1'],
@@ -305,7 +306,7 @@ class CheckoutController extends Controller
 				'order_shipping_type' => null, 
 				'order_ip' => $request->ip(),
 				'xusertype' => (Auth::check()) ? 'Member' : 'Guest',
-				'xusernamex' => (Auth::check()) ? Auth::user()->username : $shipping_details['email_address'],
+				'xusernamex' => (Auth::check()) ? Auth::user()->username : null,
 				'xstatus' => 2,
 				'xuser_id' => (Auth::check()) ? Auth::user()->id : null,
 				'shipping_name' => $request->s_name,
@@ -451,7 +452,7 @@ class CheckoutController extends Controller
 					'order_ship_postal' => $temp->xshippostalcode,
 					'order_ship_country' => $temp->xshipcountry,
 					'order_ship_type' => $temp->xshiptype,
-					'order_email' => $temp->xemail,
+					'order_email' => $temp->xemail_shipping,
 					'order_contact' => $temp->xcontact,
 					'order_subtotal' => $subtotal,
 					'order_shipping' => $temp->shipping_name,
@@ -518,7 +519,7 @@ class CheckoutController extends Controller
 				'items' => $items
 			];
 
-			$emails = array_unique([trim($order_details->order_bill_email), trim($order_details->order_email)]);
+			$emails = array_unique([trim($order_details->order_bill_email), trim($order_details->order_email), trim($temp->xusernamex)]);
 			Mail::to($emails)
 				->queue(new OrderSuccess($order));
 
