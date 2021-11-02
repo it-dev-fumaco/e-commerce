@@ -95,7 +95,7 @@ class CartController extends Controller
         }
         // if cart not empty then check if this product exist then increment quantity
         if(isset($cart[$id])) {
-            $cart[$id]['quantity']++;
+            $cart[$id]['quantity'] = $cart[$id]['quantity'] + $data['quantity'];
 
             session()->put('fumCart', $cart);
 
@@ -108,7 +108,7 @@ class CartController extends Controller
         // if item not exist in cart then add to cart with quantity = 1
         $cart[$id] = [
             "item_code" => $product_details->f_idcode,
-            "quantity" => 1,
+            "quantity" => $data['quantity'],
             "price" => ($product_details->f_price > 0) ? $product_details->f_price : $product_details->f_original_price,
         ];
 
