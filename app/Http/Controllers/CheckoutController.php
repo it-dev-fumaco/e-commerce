@@ -467,7 +467,8 @@ class CheckoutController extends Controller
 					'bank_ref_no' => $request->BankRefNo,
 					'issuing_bank' => $request->IssuingBank,
 					'payment_transaction_time' => $request->RespTime,
-					'amount_paid' => $request->Amount
+					'amount_paid' => $request->Amount,
+					'order_type' => $temp->xusertype
 				]);
 
 				// insert order in tracking order table
@@ -478,7 +479,7 @@ class CheckoutController extends Controller
 					'track_description' => 'Your order is on processing',
 					'track_status' => 'Order Placed',
 					'track_ip' => $temp->order_ip,
-					'transaction_member' => (Auth::check()) ? Auth::user()->id : 'Guest'
+					'transaction_member' => $temp->xusertype
 				]);
 			}
 
