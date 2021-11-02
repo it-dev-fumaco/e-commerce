@@ -540,7 +540,7 @@ class CheckoutController extends Controller
 				'items' => $items
 			];
 
-			$emails = array_unique([trim($order_details->order_bill_email), trim($order_details->order_email), trim($temp->xusernamex)]);
+			$emails = array_filter(array_unique([trim($order_details->order_bill_email), trim($order_details->order_email), trim($temp->xusernamex)]));
 			Mail::to($emails)
 				->queue(new OrderSuccess($order));
 
