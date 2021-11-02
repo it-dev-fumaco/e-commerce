@@ -95,12 +95,10 @@
                 <img src="{!!  asset('/assets/site-img/'. $b->{'blogprimayimage-home'}) !!}" alt="" class="img-responsive" style="width: 100% !important;">
               </picture>
               <br><br>
-              {{-- <h5 class="font-style-thin fumacoFont_card_title" style="font-family: 'poppins', sans-serif !important; color:#ffffff !important; line-height: 26px !important;">{{ substr($b->blogtitle, 0, 39) }}</h5><br> --}}
-              <h5 class="font-style-thin fumacoFont_card_title" style="font-family: 'poppins', sans-serif !important; color:#ffffff !important; line-height: 26px !important; font-size: 18px !important">{{ $b->blogtitle }}</h5><br>
-              <p class="abt_standard" style="font-size: 14px; margin-left: 0rem !important; color:#ffffff !important; font-weight: 300">
+              <h5 class="font-style-thin fumacoFont_card_title article-title" style="font-family: 'poppins', sans-serif !important; color:#ffffff !important; line-height: 26px !important; font-size: 18px !important;">{{ $b->blogtitle }}</h5>
+              <p class="abt_standard align-bottom" style="font-size: 14px; margin-left: 0rem !important; color:#ffffff !important; font-weight: 300">
                 <a href="blog?id={{ $b->id }}" style="color:#ffffff !important; text-decoration: none !important; text-transform: none !important">{{ substr($b->blog_caption, 0, 100) }}...</a>
               </p>
-              {{-- <p class="abt_standard font-style-thin" style="margin-left: 0rem !important; color:#ffffff !important;"><a href="blog?id={{ $b->id }}" class="fumacoFont_card_readmore"><span style="color:#ffffff !important;font-size: 14px;">Read More &#x2192;</span></a></p> --}}
             </div>
             <p class="abt_standard font-style-thin" style="margin-left: 0rem !important; color:#ffffff !important;"><a href="blog?id={{ $b->id }}" class="fumacoFont_card_readmore"><span style="color:#ffffff !important;font-size: 14px; position: absolute; bottom: 0 !important;">Read More &#x2192;</span></a></p>
           </div>

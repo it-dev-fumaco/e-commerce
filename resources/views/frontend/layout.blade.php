@@ -248,6 +248,9 @@
       .search-bar{
         width: 400px !important;
       }
+      .article-title{
+        min-height: 55px !important
+      }
       @media (max-width: 575.98px) {
         header{
           min-height: 50px;
@@ -258,6 +261,9 @@
         }
         .track-order-eta{
           text-align: left !important;
+        }
+        .article-title{
+          min-height: auto !important
         }
       }
 
@@ -271,6 +277,9 @@
         }
         .track-order-eta{
           text-align: left !important;
+        }
+        .article-title{
+          min-height: auto !important
         }
       }
 
