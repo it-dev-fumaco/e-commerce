@@ -63,7 +63,27 @@
 				<small>Showing {{ $results->firstItem() . ' - ' . $results->lastItem() }} out of {{ $results->total() }}</small>
 			</div>
 			<div class="col-md-6 mt-4 mb-2">
-				<div class="row mb-2">
+				<div class="d-flex  justify-content-end">
+					<div class="p-2"><label class="mt-1 mb-1 mr-0" style="font-size: 0.75rem;">Sort By</label></div>
+					<div class="p-2">
+						<select name="sortby" class="form-control form-control-sm" style="font-size: 0.75rem; display: inline-block;">
+							<option value="Position" data-loc="{{ request()->fullUrlWithQuery(['sortby' => 'Position']) }}" {{ (request()->sortby == 'Position') ? 'selected' : '' }}>Recommended</option>
+							<option value="Product Name" data-loc="{{ request()->fullUrlWithQuery(['sortby' => 'Product Name']) }}" {{ (request()->sortby == 'Product Name') ? 'selected' : '' }}>Product Name</option>
+							<option value="Price" data-loc="{{ request()->fullUrlWithQuery(['sortby' => 'Price']) }}" {{ (request()->sortby == 'Price') ? 'selected' : '' }}>Price</option>
+						</select></div>
+					<div class="p-2">
+						@if ((request()->order == 'desc'))
+						<a href="{{ request()->fullUrlWithQuery(['order' => 'asc']) }}">
+							<i class="fas fa-sort-amount-down-alt"></i>
+						</a>
+						@else
+						<a href="{{ request()->fullUrlWithQuery(['order' => 'desc']) }}">
+							<i class="fas fa-sort-amount-up-alt"></i>
+						</a>
+						@endif
+					</div>
+				  </div>
+				{{-- <div class="row mb-2">
 					<div class="col-md-9 pr-1" style="text-align: right;">
 						<label class="mt-1 mb-1 mr-0" style="font-size: 0.75rem;">Sort By</label>
 					</div>
@@ -74,7 +94,7 @@
 							<option value="Price" data-loc="{{ request()->fullUrlWithQuery(['sortby' => 'Price']) }}" {{ (request()->sortby == 'Price') ? 'selected' : '' }}>Price</option>
 						</select>
 					</div>
-				</div>
+				</div> --}}
 			</div>		
 		</div>
 		@endif
