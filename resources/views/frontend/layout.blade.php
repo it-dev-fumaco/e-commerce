@@ -37,13 +37,13 @@
     @endif
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
     <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XHTGRGDC35"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-VL1DJY5DB9"></script>
     <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
 
-    gtag('config', 'G-XHTGRGDC35');
+    gtag('config', 'G-VL1DJY5DB9');
     </script>
     <style>
 	html,body{
