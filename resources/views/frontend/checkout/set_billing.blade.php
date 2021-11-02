@@ -229,16 +229,22 @@
 
 <script>
 	$(document).ready(function() {
+		var str = "{{ implode(',', $shipping_zones) }}";
+		var res = str.split(",");
 		var provinces = [];
 	$.getJSON("{{ asset('/json/provinces.json') }}", function(obj){
-		$.each(obj.results, function(e, i) {
-			provinces.push({
-				id: i.text,
-				code: i.provCode,
-				text: i.text
+		var filtered_province = $.grep(obj.results, function(v) {
+				return $.inArray(v.text, res) > -1;
 			});
-		});
 
+			$.each(filtered_province, function(e, i) {
+				provinces.push({
+					id: i.text,
+					code: i.provCode,
+					text: i.text
+				});
+			});
+			
 		$('#province1_1').select2({
 			placeholder: 'Select Province',
 			data: provinces

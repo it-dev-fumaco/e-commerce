@@ -30,14 +30,7 @@ class CheckoutController extends Controller
 			}
         }
 
-		// $provinces = public_path() . "/json/provinces.json";
-		// $provinces = json_decode(file_get_contents($provinces), true)['results'];
-
-		// $shipping_zones = DB::table('fumaco_shipping_zone_rate')->distinct()->pluck('province_name')->toArray();
-
-		// $provinces = array_filter($provinces, function($r) use ($shipping_zones) {
-		// 	return in_array($r['text'], $shipping_zones);
-		// });
+		$shipping_zones = DB::table('fumaco_shipping_zone_rate')->distinct()->pluck('province_name')->toArray();
 
 		$has_shipping_address = true;
 		if (Auth::check()) {
@@ -46,11 +39,13 @@ class CheckoutController extends Controller
 				->where('address_class', 'Delivery')->exists();
 		}
 
-		return view('frontend.checkout.billing_address_form', compact('has_shipping_address'));
+		return view('frontend.checkout.billing_address_form', compact('has_shipping_address', 'shipping_zones'));
 	}
 
 	public function setBillingForm($item_code_buy = null, $qty_buy = null){
-		return view('frontend.checkout.set_billing', compact('item_code_buy', 'qty_buy'));
+		$shipping_zones = DB::table('fumaco_shipping_zone_rate')->distinct()->pluck('province_name')->toArray();
+
+		return view('frontend.checkout.set_billing', compact('item_code_buy', 'qty_buy', 'shipping_zones'));
 	}
 
 	public function setBilling(Request $request){
@@ -212,9 +207,6 @@ class CheckoutController extends Controller
 	public function checkoutSummary(Request $request){
         DB::beginTransaction();
 		try{
-
-			// return session()->all();
-
 			$cart = session()->get('fumCart');
 			$cart = (!$cart) ? [] : $cart;
 
