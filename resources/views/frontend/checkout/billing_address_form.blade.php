@@ -188,7 +188,18 @@
 								</select>
 							</div>
 						</div>
-						<br>
+						<br/>
+						<div class="row" id="ship_for_business" style="display: none">
+							<div class="col-md-6">
+								<label for="ship_business_name" class="formslabelfnt">Business Name : <span class="text-danger">*</span></label>
+								<input type="text" class="form-control formslabelfnt" id="ship_business_name" name="ship_business_name" required><br class="d-lg-none d-xl-none"/>
+							</div>
+							<div class="col-md-6">
+								<label for="ship_tin" class="formslabelfnt">TIN Number :</label>
+								<input type="text" class="form-control formslabelfnt" id="ship_tin" name="ship_tin"><br class="d-lg-none d-xl-none"/>
+							</div>
+							<br>&nbsp;
+						</div>
 						<div class="row">
 							<div class="col-md-4">
 								<label for="email1_1" class="formslabelfnt">Email Address : <span class="text-danger">*</span></label>
@@ -281,6 +292,17 @@
 								</div>
 							</div>
 							<br>
+							<div class="row" id="bill_for_business" style="display: none">
+								<div class="col-md-6">
+									<label for="bill_business_name" class="formslabelfnt">Business Name : <span class="text-danger">*</span></label>
+									<input type="text" class="form-control formslabelfnt" id="bill_business_name" name="bill_business_name"><br class="d-lg-none d-xl-none"/>
+								</div>
+								<div class="col-md-6">
+									<label for="bill_tin" class="formslabelfnt">TIN Number :</label>
+									<input type="text" class="form-control formslabelfnt" id="bill_tin" name="bill_tin"><br class="d-lg-none d-xl-none"/>
+								</div>
+								<br>&nbsp;
+							</div>
 							<div class="row">
 								<div class="col-md-6">
 									<label for="email1_1" class="formslabelfnt">Email Address : <span class="text-danger">*</span></label>
@@ -490,7 +512,29 @@
 				$("#bill_fname").prop('required',false);
 				$("#bill_lname").prop('required',false);
 			}
+
+			$('#Address_type1_1').change(function(){
+				if($(this).val() == "Business Address"){
+					$('#bill_for_business').slideDown();
+					$("#bill_business_name").prop('required',true);
+				}else{
+					$('#bill_for_business').slideUp();
+					$("#bill_business_name").prop('required',false);
+				}
+			});
 		});
+
+		$('#ship_Address_type1_1').change(function(){
+			if($(this).val() == "Business Address"){
+				$('#ship_for_business').slideDown();
+				$("#ship_business_name").prop('required',true);
+			}else{
+				$('#ship_for_business').slideUp();
+				$("#ship_business_name").prop('required',false);
+			}
+		});
+
+		
 
 		var provinces_bill = [];
 		$.getJSON("{{ asset('/json/provinces.json') }}", function(obj){
