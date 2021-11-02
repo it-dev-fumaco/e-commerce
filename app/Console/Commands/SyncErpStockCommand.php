@@ -63,7 +63,7 @@ class SyncErpStockCommand extends Command
                     if (count($response['data']) <= 0 && isset($response['data'])) {
                         $actual_stock = 0;
                     } else{
-                        $actual_stock = $response['data'][0]['actual_qty'];
+                        $actual_stock = $response['data'][0]['website_reserved_qty'];
                     }
 
                     DB::table('fumaco_items')->where('f_idcode', $item_code)->where('f_warehouse', $warehouse)
