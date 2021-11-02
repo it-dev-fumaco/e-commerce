@@ -1075,7 +1075,7 @@ class FrontendController extends Controller
             ->join('fumaco_items_attributes as b', 'a.f_idcode', 'b.idcode')
             ->join('fumaco_attributes_per_category as c', 'c.id', 'b.attribute_name_id')
             ->whereIn('c.slug', $attr_names)->whereIn('b.attribute_value', $attr_values)
-            ->where('a.f_status', 1)->where('c.status', 1)
+            ->where('a.f_status', 1)->where('c.status', 1)->where('a.f_parent_code', $request->parent)
             ->select('c.slug', 'b.attribute_value', 'b.idcode')
             ->orderBy('b.idx', 'asc')->get();
 
