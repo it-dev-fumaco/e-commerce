@@ -158,24 +158,30 @@
 															<td style="text-align: left; white-space: nowrap !important">₱ {{ number_format($order['grand_total'], 2) }}</td>
 														</tr>
 													</table>
-													<div class="row d-none d-xl-block">
-														<div class="col-md-10" style="text-align: right;">
-															<span>Subtotal: </span>
+													<div class="d-none d-xl-block">
+														<div class="row">
+															<div class="col-md-10" style="text-align: right;">
+																<span>Subtotal: </span>
+															</div>
+															<div class="col-md-2" style="text-align: left;">
+																<span>₱ {{ number_format($order['subtotal'], 2) }}</span>
+															</div><br/>&nbsp;
 														</div>
-														<div class="col-md-2" style="text-align: left;">
-															<span>₱ {{ number_format($order['subtotal'], 2) }}</span>
+														<div class="row">
+															<div class="col-md-10" style="text-align: right;">
+																<span>Shipping Fee: </span>
+															</div>
+															<div class="col-md-2" style="text-align: left;">
+																<span>₱ {{ number_format($order['shipping_fee'], 2) }}</span>
+															</div><br/>&nbsp;
 														</div>
-														<div class="col-md-10" style="text-align: right;">
-															<span>Shipping Fee: </span>
-														</div>
-														<div class="col-md-2" style="text-align: left;">
-															<span>₱ {{ number_format($order['shipping_fee'], 2) }}</span>
-														</div>
-														<div class="col-md-10" style="text-align: right;">
-															<span style="font-weight: 700">Grand Total: </span>
-														</div>
-														<div class="col-md-2" style="text-align: left;">
-															<span style="font-weight: 700">₱ {{ number_format($order['grand_total'], 2) }}</span>
+														<div class="row">
+															<div class="col-md-10" style="text-align: right;">
+																<span style="font-weight: 700">Grand Total: </span>
+															</div>
+															<div class="col-md-2" style="text-align: left;">
+																<span style="font-weight: 700">₱ {{ number_format($order['grand_total'], 2) }}</span>
+															</div><br/>&nbsp;
 														</div>
 													</div>
 												</div>
