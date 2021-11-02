@@ -87,7 +87,7 @@
       </section>
       <div class="row">
         @foreach($blogs as $b)
-          <div class="col-lg-4 pr-md-1 animated animatedFadeInUp fadeInUp equal-height-columns" style="text-align: left !important;">
+          <div class="col-lg-4 pr-md-1 animated animatedFadeInUp fadeInUp equal-height-columns" style="text-align: left !important; position: relative !important">
             <div class="equal-column-content">
               <picture>
                 <source srcset="{!!  asset('/assets/site-img/'. explode(".", $b->{'blogprimayimage-home'})[0] .'.webp') !!}" type="image/webp" class="img-responsive" style="width: 100% !important;">
@@ -100,8 +100,9 @@
               <p class="abt_standard" style="font-size: 14px; margin-left: 0rem !important; color:#ffffff !important; font-weight: 300">
                 <a href="blog?id={{ $b->id }}" style="color:#ffffff !important; text-decoration: none !important; text-transform: none !important">{{ substr($b->blog_caption, 0, 100) }}...</a>
               </p>
-              <p class="abt_standard font-style-thin" style="margin-left: 0rem !important; color:#ffffff !important;"><a href="blog?id={{ $b->id }}" class="fumacoFont_card_readmore"><span style="color:#ffffff !important;font-size: 14px;">Read More &#x2192;</span></a></p>
+              {{-- <p class="abt_standard font-style-thin" style="margin-left: 0rem !important; color:#ffffff !important;"><a href="blog?id={{ $b->id }}" class="fumacoFont_card_readmore"><span style="color:#ffffff !important;font-size: 14px;">Read More &#x2192;</span></a></p> --}}
             </div>
+            <p class="abt_standard font-style-thin" style="margin-left: 0rem !important; color:#ffffff !important;"><a href="blog?id={{ $b->id }}" class="fumacoFont_card_readmore"><span style="color:#ffffff !important;font-size: 14px; position: absolute; bottom: 0 !important;">Read More &#x2192;</span></a></p>
           </div>
         @endforeach
       </div>
