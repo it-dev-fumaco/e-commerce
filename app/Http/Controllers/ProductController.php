@@ -475,7 +475,7 @@ class ProductController extends Controller
         $search_str = explode(' ', $q_string);
         $product_list = DB::table('fumaco_items')->where('f_brand', 'LIKE', "%".$request->brands."%")
             ->where('f_parent_code', 'LIKE', "%".$request->parent_code."%")
-            ->where('f_category', 'LIKE', "%".$request->category."%")
+            ->where('f_cat_id', 'LIKE', "%".$request->category."%")
             ->when($request->is_featured, function($c) use ($request) {
                 $c->where('f_featured', $request->is_featured);
             })

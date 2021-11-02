@@ -63,7 +63,7 @@
 												<select class="form-control" name="category">
                                                     <option {{ (request()->get('category') == '') ? 'selected' : '' }}  disabled value="">Select Category</option>
                                                     @foreach ($categories as $c)
-														<option {{ (request()->get('category') == $c->name) ? 'selected' : ''}} value="{{ $c->name }}">{{ $c->name }}</option>
+														<option {{ (request()->get('category') == $c->id) ? 'selected' : ''}} value="{{ $c->id }}">{{ $c->name }}</option>
 													@endforeach
                                                 </select>
 											</div>
