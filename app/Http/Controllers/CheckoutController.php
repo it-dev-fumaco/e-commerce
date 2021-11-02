@@ -129,7 +129,7 @@ class CheckoutController extends Controller
 				'address_class' => 'Delivery',
 				'user_idx' => $user_id,
 				'add_type' => $request->ship_Address_type1_1,
-				'xbusiness_namex' => $request->ship_business_name,
+				'xbusiness_name' => $request->ship_business_name,
 				'xtin_no' => $request->ship_tin,
 				'add_type' => $request->ship_Address_type1_1,
 				'xadd1' => $request->ship_Address1_1,
@@ -152,7 +152,7 @@ class CheckoutController extends Controller
 					'address_class' => 'Billing',
 					'user_idx' => $user_id,
 					'add_type' => $request->ship_Address_type1_1,
-					'xbusiness_namex' => $request->ship_business_name,
+					'xbusiness_name' => $request->ship_business_name,
 					'xtin_no' => $request->ship_tin,
 					'xadd1' => $request->ship_Address1_1,
 					'xadd2' => ($request->ship_Address2_1) ? $request->ship_Address2_1 : " ",
@@ -173,7 +173,7 @@ class CheckoutController extends Controller
 					'address_class' => 'Billing',
 					'user_idx' => $user_id,
 					'add_type' => $request->Address_type1_1,
-					'xbusiness_namex' => $request->bill_business_name,
+					'xbusiness_name' => $request->bill_business_name,
 					'xtin_no' => $request->bill_tin,
 					'xadd1' => $request->Address1_1,
 					'xadd2' => ($request->Address2_1) ? $request->Address2_1 : " ",
@@ -290,7 +290,7 @@ class CheckoutController extends Controller
 				'xcountry' => ($billing_details) ? $billing_details['country'] : $shipping_details['country'],
 				'xaddresstype' => ($billing_details) ? $billing_details['address_type'] : $shipping_details['address_type'],
 				'xbusiness_name' => ($billing_details) ? $billing_details['business_name'] : $shipping_details['business_name'],
-				'xtin' => ($billing_details) ? $billing_details['tin'] : $shipping_details['tin'],
+				'xtin_no' => ($billing_details) ? $billing_details['tin'] : $shipping_details['tin'],
 				'xemail' => ($billing_details) ? $billing_details['email_address'] : $shipping_details['email_address'],
 				'xemail_shipping' => $shipping_details['email_address'],
 				'xmobile' => ($billing_details) ? $billing_details['mobile_no'] : $shipping_details['mobile_no'],
@@ -478,7 +478,7 @@ class CheckoutController extends Controller
 					'shipping_business_name' => $temp->xship_business_name,
 					'shipping_tin' => $temp->xship_tin,
 					'billing_business_name' => $temp->xbusiness_name,
-					'billing_tin' => $temp->xtin
+					'billing_tin' => $temp->xtin_no
 				]);
 
 				// insert order in tracking order table
