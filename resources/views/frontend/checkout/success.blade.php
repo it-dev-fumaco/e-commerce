@@ -63,7 +63,7 @@
                   		</center>
 						<div style="color:#58595A !important;">
 							<h6 class="font-weight-bold mt-2">Order no.: <b>{{ $order_details->order_number }}</b></h6>
-							<p class="mt-3 mb-5">Your order has been placed, a confirmation will be sent to your email with the details of your order.</p>
+							<p class="mt-3 mb-5">Your order has been placed, a confirmation will be sent to your email <b>{{ $loggedin }}</b> with the details of your order.</p>
 							<h6 class="font-weight-bold mt-2"><b>SHIPPING TO:</b></h6>
 							<span class="d-inline-block" style="width: 100px;"><strong>Customer: </strong></span>
 							{{ $order_details->order_name .' ' . $order_details->order_lastname }}

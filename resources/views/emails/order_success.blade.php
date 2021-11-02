@@ -20,7 +20,7 @@
      <tr>
         <td class="bodycopy borderbottom" style="padding: 5%;">
 			Hi {{ $order['order_details']->order_name . ' ' . $order['order_details']->order_lastname }},<br><br>
-			Thank you for your order! <br><br> We received your order and will contact you as soon as your package is shipped. You can find your purchase information below. 	<br><br>
+			Thank you for your order! <br><br> We received your order and will contact you as soon as your package is shipped. You can find your purchase information below.<br><br>
 			Order Summary : {{ date("Y-m-d h:i a") }}
 			<br>
 			<br>

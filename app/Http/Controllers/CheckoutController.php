@@ -482,6 +482,8 @@ class CheckoutController extends Controller
 				]);
 			}
 
+			$loggedin = ($temp->xusernamex) ? $temp->xusernamex : $temp->xemail_shipping;
+
 			$order_details = DB::table('fumaco_order')->where('order_number', $temp->xlogs)->first();
 
 			$items = [];
@@ -523,7 +525,7 @@ class CheckoutController extends Controller
 			Mail::to($emails)
 				->queue(new OrderSuccess($order));
 
-			return view('frontend.checkout.success', compact('order_details', 'items'));
+			return view('frontend.checkout.success', compact('order_details', 'items', 'loggedin'));
 		} catch (Exception $e) {
 			DB::rollback();
 
