@@ -479,6 +479,9 @@ class ProductController extends Controller
             ->when($request->is_featured, function($c) use ($request) {
                 $c->where('f_featured', $request->is_featured);
             })
+            ->when($request->on_sale, function($c) use ($request) {
+                $c->where('f_onsale', $request->on_sale);
+            })
             ->when($q_string, function ($query) use ($search_str, $q_string) {
                 return $query->where(function($q) use ($search_str, $q_string) {
                     foreach ($search_str as $str) {

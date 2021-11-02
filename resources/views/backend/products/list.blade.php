@@ -73,7 +73,13 @@
 													<label class="form-check-label" for="is_featured">Is Featured</label>
 												  </div>
 											</div>
-											<div class="col-md-2">
+											<div class="col-md-1">
+												<div class="form-check mt-2">
+													<input type="checkbox" class="form-check-input" id="on-sale" value="1" name="on_sale" {{ (request()->on_sale) ? 'checked' : '' }}>
+													<label class="form-check-label" for="on-sale">On Sale</label>
+												  </div>
+											</div>
+											<div class="col-md-1">
 												<button type="submit" class="btn btn-primary">Search</button>
 											</div>
 										</div>
