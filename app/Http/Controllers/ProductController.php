@@ -100,10 +100,10 @@ class ProductController extends Controller
                 'package_dimension_uom' => $response['data'][0]['package_dimension_uom'],
                 'weight_uom' => $response['data'][0]['weight_uom'],
                 'weight_per_unit' => $response['data'][0]['weight_per_unit'],
-                'package_length' => $response['data'][0]['package_length'],
-                'package_width' => $response['data'][0]['package_width'],
-                'package_height' => $response['data'][0]['package_height'],
-                'package_weight' => $response['data'][0]['package_weight'],
+                'package_length' => floatval($response['data'][0]['package_length']),
+                'package_width' => floatval($response['data'][0]['package_width']),
+                'package_height' => floatval($response['data'][0]['package_height']),
+                'package_weight' => floatval($response['data'][0]['package_weight']),
             ];
 
             // get stock quantity of selected item code
