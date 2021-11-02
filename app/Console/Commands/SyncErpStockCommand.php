@@ -69,6 +69,29 @@ class SyncErpStockCommand extends Command
                     DB::table('fumaco_items')->where('f_idcode', $item_code)->where('f_warehouse', $warehouse)
                         ->update(['f_qty' => $actual_stock]);
                 }
+
+                 // get item price
+                $fields = '?fields=["item_code","price_list","price_list_rate","currency"]';
+                $filter = '&filters=[["item_code","=","' . $item_code . '"],["price_list","=","Website Price List"]]';
+
+                $params = $fields . '' . $filter;
+                
+                $response = Http::withHeaders([
+                    'Content-Type' => 'application/json',
+                    'Authorization' => 'token '. $erp_api->api_key. ':' . $erp_api->api_secret_key . '',
+                    'Accept-Language' => 'en'
+                ])->get($erp_api->base_url . '/api/resource/Item Price' . $params);
+
+                if ($response->successful()) {
+                    if (count($response['data']) <= 0 && isset($response['data'])) {
+                        $item_price = 0;
+                    } else{
+                        $item_price = $response['data'][0]['price_list_rate'];
+                    }
+
+                    DB::table('fumaco_items')->where('f_idcode', $item_code)->where('f_warehouse', $warehouse)
+                        ->update(['f_original_price' => $item_price]);
+                }
             }
 
             DB::table('api_setup')->where('type', 'erp_api')->update(['last_sync_date' => Carbon::now()]);
