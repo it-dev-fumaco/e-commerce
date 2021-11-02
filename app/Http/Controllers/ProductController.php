@@ -444,6 +444,26 @@ class ProductController extends Controller
         }
     }
 
+    public function featureItem($id) {
+        DB::beginTransaction();
+        try {
+
+            $details = DB::table('fumaco_items')->where('id', $id)->first();
+            if ($details) {
+                $featured = ($details->f_featured) ? 0 : 1;
+                DB::table('fumaco_items')->where('id', $id)->update(['f_featured' => $featured]);
+            }
+
+            DB::commit();
+
+            return redirect()->back();
+        } catch (Exception $e) {
+            DB::rollback();
+
+            return redirect()->back()->with('error', 'An error occured. Please try again.');
+        }
+    }
+
 	public function viewAddForm() {
         $item_categories = DB::table('fumaco_categories')->get();
 
@@ -453,7 +473,12 @@ class ProductController extends Controller
     public function viewList(Request $request) {
         $q_string = $request->q;
         $search_str = explode(' ', $q_string);
-        $product_list = DB::table('fumaco_items')->where('f_brand', 'LIKE', "%".$request->brands."%")->where('f_parent_code', 'LIKE', "%".$request->parent_code."%")->where('f_category', 'LIKE', "%".$request->category."%")
+        $product_list = DB::table('fumaco_items')->where('f_brand', 'LIKE', "%".$request->brands."%")
+            ->where('f_parent_code', 'LIKE', "%".$request->parent_code."%")
+            ->where('f_category', 'LIKE', "%".$request->category."%")
+            ->when($request->is_featured, function($c) use ($request) {
+                $c->where('f_featured', $request->is_featured);
+            })
             ->when($q_string, function ($query) use ($search_str, $q_string) {
                 return $query->where(function($q) use ($search_str, $q_string) {
                     foreach ($search_str as $str) {
@@ -490,6 +515,7 @@ class ProductController extends Controller
                 'brand' => $product->f_brand,
                 'on_sale' => $product->f_onsale,
                 'status' => $product->f_status,
+                'featured' => $product->f_featured
             ];
         }
 

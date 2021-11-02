@@ -59,13 +59,19 @@
 													@endforeach
                                                 </select>
 											</div>
-											<div class="col-md-3">
+											<div class="col-md-2">
 												<select class="form-control" name="category">
                                                     <option {{ (request()->get('category') == '') ? 'selected' : '' }}  disabled value="">Select Category</option>
                                                     @foreach ($categories as $c)
 														<option {{ (request()->get('category') == $c->name) ? 'selected' : ''}} value="{{ $c->name }}">{{ $c->name }}</option>
 													@endforeach
                                                 </select>
+											</div>
+											<div class="col-md-1">
+												<div class="form-check mt-2">
+													<input type="checkbox" class="form-check-input" id="is_featured" value="1" name="is_featured" {{ (request()->is_featured) ? 'checked' : '' }}>
+													<label class="form-check-label" for="is_featured">Is Featured</label>
+												  </div>
 											</div>
 											<div class="col-md-2">
 												<button type="submit" class="btn btn-primary">Search</button>
@@ -101,6 +107,7 @@
 										<th class="text-center">Reserved Qty</th>
 										<th class="text-center"h>Category</th>
 										<th class="text-center">Brand</th>
+										<th class="text-center">Featured</th>
 										<th class="text-center">On Sale</th>
 										<th class="text-center">Status</th>
 										<th class="text-center">Action</th>
@@ -129,6 +136,9 @@
 										<td class="text-center">{{ number_format($item['reserved_qty']) }}</td>
 										<td class="text-center">{{ $item['product_category'] }}</td>
 										<td class="text-center">{{ $item['brand'] }}</td>
+										<td class="text-center" style="font-size: 1.2rem;">
+											<a href="/admin/product/{{ $item['id'] }}/featured">	{!! ($item['featured']) ? '<i class="fas fa-star"></i>' : '<i class="far fa-star"></i>' !!}</a>
+										</td>
 										<td class="text-center">
 											@if ($item['on_sale'] == 1)
 												 <span class="badge badge-danger">On Sale</span>
