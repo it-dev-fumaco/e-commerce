@@ -227,7 +227,7 @@
 											<option value="Product Name" data-loc="{{ request()->fullUrlWithQuery(['sortby' => 'Product Name']) }}" {{ (request()->sortby == 'Product Name') ? 'selected' : '' }}>Product Name</option>
 											<option value="Price" data-loc="{{ request()->fullUrlWithQuery(['sortby' => 'Price']) }}" {{ (request()->sortby == 'Price') ? 'selected' : '' }}>Price</option>
 										</select></div>
-									<div class="p-2">
+									<div class="p-2" style="font-size: 1.3rem;">
 										@if ((request()->order == 'desc'))
 										<a href="{{ request()->fullUrlWithQuery(['order' => 'asc']) }}">
 											<i class="fas fa-sort-amount-down-alt"></i>
