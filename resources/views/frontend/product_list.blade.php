@@ -88,7 +88,7 @@
 			display: inline-block;
 			word-wrap: break-word;
 			overflow: hidden;
-			max-height: 4.8em;
+			max-height: 4.6em;
 			line-height: 1.5em;
 			text-align: left;
 			font-size: 16px !important;
