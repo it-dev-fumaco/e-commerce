@@ -25,7 +25,7 @@
      </tr>
      <tr>
         <td class="button borderbottom" style="padding: 6% 5% 6% 5%; text-align: left;">
-            <a href="{{ route('login') }}" style="background: #e05443; padding: 2% 5%;">Shop Now!</a>
+            <a href="{{ route('website') }}" style="background: #e05443; padding: 2% 5%;">Shop Now!</a>
         </td>
      </tr>
 
