@@ -114,9 +114,9 @@
 							<strong>Your Order No : <span id="order-no">{{ $order_no }}</span></strong>
 						</div>
 						<div class="card-body he1x" style="padding-bottom: 0px !important;">
-							Customer Name :  {{ $shipping_fname." ".$shipping_lname }}
+							Customer Name :  {{ (Auth::check()) ? Auth::user()->f_name . " " . Auth::user()->f_lname : $shipping_fname." ".$shipping_lname }}
 						</div>
-						<div class="card-body he1x" style="padding-bottom: 0px !important;">Email Address :  {{ $shipping_email }}
+						<div class="card-body he1x" style="padding-bottom: 0px !important;">Email Address :  {{ (Auth::check()) ? Auth::user()->username : $shipping_email }}
 							<div class="card-body he1x" style="padding-bottom: 0px !important;">
 								<div class="accordion" id="accordionExample">
 									<div class="row">

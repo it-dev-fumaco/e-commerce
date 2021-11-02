@@ -70,9 +70,14 @@ class OrderController extends Controller
                 'estimated_delivery_date' => $o->estimated_delivery_date,
                 'payment_id' => $o->payment_id,
                 'payment_method' => $o->order_payment_method,
-                'subtotal' => $o->order_subtotal
+                'subtotal' => $o->order_subtotal,
+                'order_type' => $o->order_type,
+                'user_email' => $o->user_email,
+                'billing_business_name' => $o->billing_business_name,
+                'shipping_business_name' => $o->shipping_business_name
             ];
         }
+
         return view('backend.orders.order_list', compact('orders_arr', 'orders'));
     }
 

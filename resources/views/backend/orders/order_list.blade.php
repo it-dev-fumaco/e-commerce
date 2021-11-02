@@ -111,12 +111,25 @@
 													<div class="modal-dialog modal-xl" style="min-width: 70%;">
 														<div class="modal-content">
 															<div class="modal-header">
-																<h4 class="modal-title">ORDER NO. {{ $order['order_no'] }}</h4>
+																<div class="row container-fluid">
+																	<div class="col-md-6">
+																		<h4 class="modal-title">ORDER NO. {{ $order['order_no'] }}</h4>
+																	</div>
+																	<div class="col-md-6">
+																		<div class="float-right font-italic m-1" style="font-size: 1.2rem;"><strong>Est. Delivery Date : </strong> {{ $order['estimated_delivery_date'] }}</div>
+																	</div>
+																</div>
 																<button type="button" class="close" data-dismiss="modal">&times;</button>
 															</div>
 															<div class="modal-body">
 																<div class="row {{ ($order['status'] == 'Delivered') ? 'd-none' : '' }}">
-																	<div class="col-md-6"></div>
+																	<div class="col-md-6">
+																		<p class="mt-3 mb-0"><strong>Customer Name : </strong> {{ $order['first_name'] . " " . $order['last_name'] }}</p>
+																		@if($order['user_email'])
+																		<p class="mb-0"><strong>Email Address : </strong> {{ $order['user_email'] }}</p>
+																		@endif
+																		<p class="text-muted mb-0"><strong>{{ $order['order_type'] }} Checkout</strong></p>
+																	</div>
 																	<div class="col-md-6">
 																		<form class="btn-group" action="/admin/order/status_update" method="POST" style="width: 100%; height: 40px !important;">
 																			@csrf
@@ -135,13 +148,6 @@
 																</div>
 																<br/>
 																<div class="row">
-																	<div class="col-md-8"> 
-																		<p><strong>Customer Name : </strong> {{ $order['first_name'] . " " . $order['last_name'] }}</p>
-																	</div>
-																	<div class="col-md-4">
-																		<p><strong>Est. Delivery Date : </strong> {{ $order['estimated_delivery_date'] }}
-																		</p>
-																	</div>
 																	<div class="col-md-4">
 																		<p>
 																			<strong>Order ID : </strong> {{ $order['order_no'] }} <br>
@@ -154,6 +160,7 @@
 																	<div class="col-md-4">
 																		<p>
 																			<strong>Billing Address : </strong><br>
+																			<strong>Bill to :</strong> {{ ($order['billing_business_name']) ? $order['billing_business_name'] : $order['bill_contact_person'] }}<br>
 																			{!! $order['bill_address1'] . " " . $order['bill_address2'] . ", <br>" . $order['bill_brgy'] . ", " . $order['bill_city'] . "<br>" . $order['bill_province'] . ', ' .  $order['bill_country'] . ' ' . $order['bill_postal'] !!}<br/>
 																			{{ $order['bill_email'] }}<br/>
 																			{{ $order['bill_contact'] }}
@@ -162,6 +169,7 @@
 																	<div class="col-md-4">
 																		<p>
 																			<strong>Shipping Address : </strong><br>
+																			<strong>Ship to :</strong> {{ ($order['shipping_business_name']) ? $order['shipping_business_name'] : $order['ship_contact_person'] }}<br>
 																			{!! $order['ship_address1'] . " " . $order['ship_address2'] . ", <br>" . $order['ship_brgy'] . ", " . $order['ship_city'] . "<br>" . $order['ship_province'] . ', ' .  $order['ship_country'] . ' ' . $order['ship_postal'] !!}<br/>
 																			{{ $order['email'] }}<br/>
 																			{{ $order['contact'] }}

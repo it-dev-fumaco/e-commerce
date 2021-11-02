@@ -206,6 +206,8 @@ class CheckoutController extends Controller
         DB::beginTransaction();
 		try{
 
+			// return session()->all();
+
 			$cart = session()->get('fumCart');
 			$cart = (!$cart) ? [] : $cart;
 
@@ -276,8 +278,8 @@ class CheckoutController extends Controller
 			
 			$temp_data = [
 				'xtempcode' => uniqid(),
-				'xfname' => $shipping_details['fname'],
-				'xlname' => $shipping_details['lname'],
+				'xfname' => (Auth::check()) ? Auth::user()->f_name : $shipping_details['fname'],
+				'xlname' => (Auth::check()) ? Auth::user()->f_lname : $shipping_details['lname'],
 				'xcontact_person' => $billing_details['fname']. " " . $billing_details['lname'],
 				'xshipcontact_person' => $shipping_details['fname']. " " . $shipping_details['lname'],
 				'xadd1' => ($billing_details) ? $billing_details['address_line1'] : $shipping_details['address_line1'],
@@ -468,7 +470,8 @@ class CheckoutController extends Controller
 					'issuing_bank' => $request->IssuingBank,
 					'payment_transaction_time' => $request->RespTime,
 					'amount_paid' => $request->Amount,
-					'order_type' => $temp->xusertype
+					'order_type' => $temp->xusertype,
+					'user_email' => $temp->xusernamex
 				]);
 
 				// insert order in tracking order table
