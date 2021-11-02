@@ -561,7 +561,7 @@
       bottom: 4px;
     }
 
-		@media (max-width: 575.98px) {
+		@media (max-width: 575.98px) { /* Mobile */
         header{
           min-height: 50px;
         }
@@ -598,7 +598,7 @@
 		}
       }
 
-      @media (max-width: 767.98px) {
+      @media (max-width: 767.98px) { /* Mobile */
         header{
           min-height: 50px;
         }

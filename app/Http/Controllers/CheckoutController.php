@@ -204,6 +204,122 @@ class CheckoutController extends Controller
 		}	
 	}
 
+	public function updateShipping(Request $request){
+		DB::beginTransaction();
+		try{
+			$insert = [
+				'address_class' => 'Delivery',
+				'add_type' => $request->ship_Address_type1_1,
+				'xbusiness_name' => $request->ship_business_name,
+				'xtin_no' => $request->ship_tin,
+				'xadd1' => $request->ship_Address1_1,
+				'xadd2' => $request->ship_Address2_1,
+				'xprov' => $request->ship_province1_1,
+				'xcity' => $request->ship_City_Municipality1_1,
+				'xbrgy' => $request->ship_Barangay1_1,
+				'xpostal' => $request->ship_postal1_1,
+				'xcountry' => $request->ship_country_region1_1,
+				'xmobile_number' => $request->ship_mobilenumber1_1,
+				'xcontactname1' => $request->fname,
+				'xcontactlastname1' => $request->lname,
+				'xcontactnumber1' => $request->contactnumber1_1,
+				'xcontactemail1' => $request->ship_email,
+				'user_idx' => Auth::user()->id,
+				'xdefault' => 1
+			];
+
+			DB::table('fumaco_user_add')->where('user_idx', Auth::user()->id)->where('address_class', 'Delivery')->update(['xdefault' => 0]);
+
+			$billing_details = session()->get('fumBillDet');
+
+			$shipping_details = [
+                'fname' => $request->fname,
+                'lname' => $request->lname,
+                'address_line1' => $request->ship_Address1_1,
+                'address_line2' => $request->ship_Address2_1,
+                'province' => $request->ship_province1_1,
+                'city' => $request->ship_City_Municipality1_1,
+                'brgy' => $request->ship_Barangay1_1,
+                'postal_code' => $request->ship_postal1_1,
+                'country' => $request->ship_country_region1_1,
+                'address_type' => $request->ship_Address_type1_1,
+                'business_name' => $request->ship_business_name,
+                'tin' => $request->ship_tin,
+                'email_address' => $request->ship_email,
+                'mobile_no' => $request->ship_mobilenumber1_1,
+                'contact_no' => $request->contactnumber1_1,
+                'same_as_billing' => 0
+            ];
+
+            session()->put('fumShipDet', $shipping_details);
+
+			DB::table('fumaco_user_add')->insert($insert);
+
+			DB::commit();
+			return redirect()->back()->with('success', 'Address Updated.');
+		}catch(Exception $e){
+			DB::rollback();
+			return redirect()->back()->with('error', 'An error occured. Please try again.');
+		}
+	}
+
+	public function updateBilling(Request $request){
+		DB::beginTransaction();
+		try{
+			$insert = [
+				'address_class' => 'Billing',
+				'add_type' => $request->Address_type1_1,
+				'xbusiness_name' => $request->bill_business_name,
+				'xtin_no' => $request->bill_tin,
+				'xadd1' => $request->Address1_1,
+				'xadd2' => $request->Address2_1,
+				'xprov' => $request->province1_1,
+				'xcity' => $request->City_Municipality1_1,
+				'xbrgy' => $request->Barangay1_1,
+				'xpostal' => $request->postal1_1,
+				'xcountry' => $request->country_region1_1,
+				'xmobile_number' => $request->mobilenumber1_1,
+				'xcontactname1' => $request->bill_fname,
+				'xcontactlastname1' => $request->bill_lname,
+				'xcontactemail1' => $request->email,
+				'user_idx' => Auth::user()->id,
+				'xdefault' => 1
+			];
+
+			DB::table('fumaco_user_add')->where('user_idx', Auth::user()->id)->where('address_class', 'Billing')->update(['xdefault' => 0]);
+
+			$shipping_details = session()->get('fumShipDet');
+
+			$billing_details = [
+                'fname' => $request->bill_fname,
+                'lname' => $request->bill_lname,
+                'address_line1' => $request->Address1_1,
+                'address_line2' => $request->Address2_1,
+                'province' => $request->province1_1,
+                'city' => $request->City_Municipality1_1,
+                'brgy' => $request->Barangay1_1,
+                'postal_code' => $request->postal1_1,
+                'country' => $request->country_region1_1,
+                'address_type' => $request->Address_type1_1,
+                'business_name' => $request->bill_business_name,
+                'tin' => $request->bill_tin,
+                'email_address' => $request->email,
+                'mobile_no' => $request->mobilenumber1_1,
+                'same_as_billing' => 0
+            ];
+
+            session()->put('fumBillDet', $billing_details);
+
+			DB::table('fumaco_user_add')->insert($insert);
+
+			DB::commit();
+			return redirect()->back()->with('success', 'Address Updated.');
+		}catch(Exception $e){
+			DB::rollback();
+			return redirect()->back()->with('error', 'An error occured. Please try again.');
+		}
+	}
+
 	public function checkoutSummary(Request $request){
         DB::beginTransaction();
 		try{
@@ -261,7 +377,12 @@ class CheckoutController extends Controller
 
 			$shipping_rates = $this->getShippingRates();
 
-			return view('frontend.checkout.check_out_summary', compact('shipping_details', 'billing_details', 'shipping_rates', 'order_no', 'cart_arr'));
+			$shipping_add = DB::table('fumaco_user_add')->where('user_idx', Auth::user()->id)->where('address_class','Delivery')->get();
+			$billing_add = DB::table('fumaco_user_add')->where('user_idx', Auth::user()->id)->where('address_class','Billing')->get();
+
+			$shipping_zones = DB::table('fumaco_shipping_zone_rate')->distinct()->pluck('province_name')->toArray();
+
+			return view('frontend.checkout.check_out_summary', compact('shipping_details', 'billing_details', 'shipping_rates', 'order_no', 'cart_arr', 'shipping_add', 'billing_add', 'shipping_zones'));
 		}catch(Exception $e){
 			DB::rollback();
 			return redirect()->back()->with('error', 'An error occured. Please try again.');
