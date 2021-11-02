@@ -544,7 +544,19 @@
 
 		var provinces_bill = [];
 		$.getJSON("{{ asset('/json/provinces.json') }}", function(obj){
-			$.each(obj.results, function(e, i) {
+			var filtered_province_bill = $.grep(obj.results, function(v) {
+				return $.inArray(v.text, res) > -1;
+			});
+
+			$.each(filtered_province_bill, function(e, i) {
+				provinces.push({
+					id: i.text,
+					code: i.provCode,
+					text: i.text
+				});
+			});
+			
+			$.each(filtered_province_bill, function(e, i) {
 				provinces_bill.push({
 					id: i.text,
 					code: i.provCode,

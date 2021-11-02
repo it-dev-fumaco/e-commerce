@@ -1019,7 +1019,9 @@ class FrontendController extends Controller
                     'xcontactlastname1' => $request->last_name,
                     'xcontactnumber1' => $request->contact_no,
                     'xmobile_number' => $request->mobile_no,
-                    'xcontactemail1' => $request->email_address
+                    'xcontactemail1' => $request->email_address,
+                    'xbusiness_name' => ($request->address_type == 'Business Address') ? $request->business_name : null,
+                    'xtin_no' => $request->tin_no,
                 ]
             );
 
