@@ -334,7 +334,8 @@ class CheckoutController extends Controller
 			
 			$cart_arr = [];
 			foreach ($cart_items as $n => $item) {
-				if ($cart[$item->f_idcode]['quantity'] > $item->f_qty) {
+				$available_qty = ($item->f_qty - $item->f_reserved_qty);
+				if ($cart[$item->f_idcode]['quantity'] > $available_qty) {
 					return redirect()->back()->with('error', 'Insufficient stock for <b>' . $item->f_name_name . '</b>');
 				}
 			}
