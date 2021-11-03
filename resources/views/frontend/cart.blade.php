@@ -70,6 +70,23 @@
         animation-name: fadeInUp;
         -webkit-animation-name: fadeInUp;
     }
+    @media (max-width: 575.98px) {
+        .tbl-qtr{
+            width: 20% !important;
+        }
+        .tbl-half{
+            width: 60% !important;
+        }
+    }
+
+    @media (max-width: 767.98px) {
+        .tbl-qtr{
+            width: 20% !important;
+        }
+        .tbl-half{
+            width: 60% !important;
+        }
+    }
 </style>
 
 <main style="background-color:#0062A5;">
@@ -123,7 +140,7 @@
                             <th class="he1x"></th>
                             <th class="he1x d-none d-sm-table-cell">Price</th>
                             <th class="he1x d-none d-sm-table-cell">Quantity</th>
-                            <th class="he1x"></th>
+                            <th class="he1x d-none d-sm-table-cell"></th>
                             <th class="he1x d-none d-sm-table-cell">Total</th>
                             <th class="he1x"></th>
                         </tr>
@@ -131,10 +148,10 @@
                     <tbody>
                         @forelse ($cart_arr as $cart)
                         <tr class="he2x2">
-                            <td>
+                            <td class="tbl-qtr">
                                 <img src="{{ asset('/storage/item_images/'.$cart['item_code'].'/gallery/preview/'.$cart['item_image']) }}" class="img-responsive" alt="" width="55" height="55">
                             </td>
-                            <td class="tbls" style="width:40% !important;"><a href="/product/{{ $cart['item_code'] }}" style="text-decoration: none !important; color: #000;">{{ $cart['item_description'] }}</a>
+                            <td class="tbls tbl-half" style="width:40% !important;"><a href="/product/{{ $cart['item_code'] }}" style="text-decoration: none !important; color: #000;">{{ $cart['item_description'] }}</a>
                                 <br/>{{-- for mobile --}}
                             <span class="formatted-price d-md-none d-lg-none d-xl-none"><br/><b>P {{ number_format($cart['price'], 2, '.', ',') }}</b></span>
                             <br/><br/>
@@ -171,9 +188,9 @@
                                 <small class="text-success d-block m-2 stock-status">Available :  {{ $cart['stock_qty'] }}</small>
                                 @endif
                             </td>
-                            <td class="tbls">&nbsp;</td>
+                            <td class="tbls d-none d-sm-table-cell">&nbsp;</td>
                             <td class="tbls d-none d-sm-table-cell"><p style="white-space: nowrap !important;">P <span class="formatted-amount">{{ number_format($cart['amount'], 2, '.', ',') }}</span></p><span class="amount d-none">{{ $cart['amount'] }}</span></td>
-                            <td class="tbls">
+                            <td class="tbls tbl-qtr">
                                 <a class="btn btn-sm btn-outline-primary remove-from-cart-btn" href="#" role="button" data-id="{{ $cart['item_code'] }}">&#x2715;</a>
                             </td>
                         </tr>
