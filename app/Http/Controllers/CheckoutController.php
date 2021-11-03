@@ -109,51 +109,30 @@ class CheckoutController extends Controller
 	public function setAddress(Request $request){
 		DB::beginTransaction();
 		try{
-			$o_email = Auth::user()->username;
+			if ($request->ajax()) {
+				$o_email = Auth::user()->username;
 
-			$user = DB::table('fumaco_users')->where('username', $o_email)->first();
-			$user_id = $user->id;
-
-			$bill_address = DB::table('fumaco_user_add')->where('xdefault', 1)->where('user_idx', $user_id)->where('address_class', 'Billing')->get();
-			$ship_address = DB::table('fumaco_user_add')->where('xdefault', 1)->where('user_idx', $user_id)->where('address_class', 'Delivery')->get();
-			if(count($bill_address) > 0)
-			{
-				DB::table('fumaco_user_add')->where('user_idx', $user_id)->where('address_class', 'Billing')->update(['xdefault' => 0]);
-			}
-
-			if(count($ship_address) > 0){
-				DB::table('fumaco_user_add')->where('user_idx', $user_id)->where('address_class', 'Delivery')->update(['xdefault' => 0]);
-			}
-
-			$ship_address_arr = [
-				'address_class' => 'Delivery',
-				'user_idx' => $user_id,
-				'add_type' => $request->ship_Address_type1_1,
-				'xbusiness_name' => $request->ship_business_name,
-				'xtin_no' => $request->ship_tin,
-				'add_type' => $request->ship_Address_type1_1,
-				'xadd1' => $request->ship_Address1_1,
-				'xadd2' => ($request->ship_Address2_1) ? $request->ship_Address2_1 : " ",
-				'xprov' => $request->ship_province1_1,
-				'xcity' => $request->ship_City_Municipality1_1,
-				'xbrgy' => $request->ship_Barangay1_1,
-				'xpostal' => $request->ship_postal1_1,
-				'xcountry' => $request->ship_country_region1_1,
-				'xcontactname1' => $request->fname,
-				'xcontactlastname1' => $request->lname,
-				'xcontactnumber1' => ($request->contactnumber1_1) ? $request->contactnumber1_1 : 0,
-				'xmobile_number' => $request->ship_mobilenumber1_1,
-				'xcontactemail1' => $request->ship_email,
-				'xdefault' => 1
-			];
-
-			if (isset($request->same_as_billing)){
-				$bill_address_arr = [
-					'address_class' => 'Billing',
+				$user = DB::table('fumaco_users')->where('username', $o_email)->first();
+				$user_id = $user->id;
+	
+				$bill_address = DB::table('fumaco_user_add')->where('xdefault', 1)->where('user_idx', $user_id)->where('address_class', 'Billing')->get();
+				$ship_address = DB::table('fumaco_user_add')->where('xdefault', 1)->where('user_idx', $user_id)->where('address_class', 'Delivery')->get();
+				if(count($bill_address) > 0)
+				{
+					DB::table('fumaco_user_add')->where('user_idx', $user_id)->where('address_class', 'Billing')->update(['xdefault' => 0]);
+				}
+	
+				if(count($ship_address) > 0){
+					DB::table('fumaco_user_add')->where('user_idx', $user_id)->where('address_class', 'Delivery')->update(['xdefault' => 0]);
+				}
+	
+				$ship_address_arr = [
+					'address_class' => 'Delivery',
 					'user_idx' => $user_id,
 					'add_type' => $request->ship_Address_type1_1,
 					'xbusiness_name' => $request->ship_business_name,
 					'xtin_no' => $request->ship_tin,
+					'add_type' => $request->ship_Address_type1_1,
 					'xadd1' => $request->ship_Address1_1,
 					'xadd2' => ($request->ship_Address2_1) ? $request->ship_Address2_1 : " ",
 					'xprov' => $request->ship_province1_1,
@@ -168,36 +147,60 @@ class CheckoutController extends Controller
 					'xcontactemail1' => $request->ship_email,
 					'xdefault' => 1
 				];
-			}else{
-				$bill_address_arr = [
-					'address_class' => 'Billing',
-					'user_idx' => $user_id,
-					'add_type' => $request->Address_type1_1,
-					'xbusiness_name' => $request->bill_business_name,
-					'xtin_no' => $request->bill_tin,
-					'xadd1' => $request->Address1_1,
-					'xadd2' => ($request->Address2_1) ? $request->Address2_1 : " ",
-					'xprov' => $request->province1_1,
-					'xcity' => $request->City_Municipality1_1,
-					'xbrgy' => $request->Barangay1_1,
-					'xpostal' => $request->postal1_1,
-					'xcountry' => $request->country_region1_1,
-					'xcontactname1' => $request->fname,
-					'xcontactlastname1' => $request->lname,
-					'xcontactnumber1' => ($request->contactnumber1_1) ? $request->contactnumber1_1 : 0,
-					'xmobile_number' => $request->mobilenumber1_1,
-					'xcontactemail1' => $request->email,
-					'xdefault' => 1
-				];
-				
+	
+				if (isset($request->same_as_billing)){
+					$bill_address_arr = [
+						'address_class' => 'Billing',
+						'user_idx' => $user_id,
+						'add_type' => $request->ship_Address_type1_1,
+						'xbusiness_name' => $request->ship_business_name,
+						'xtin_no' => $request->ship_tin,
+						'xadd1' => $request->ship_Address1_1,
+						'xadd2' => ($request->ship_Address2_1) ? $request->ship_Address2_1 : " ",
+						'xprov' => $request->ship_province1_1,
+						'xcity' => $request->ship_City_Municipality1_1,
+						'xbrgy' => $request->ship_Barangay1_1,
+						'xpostal' => $request->ship_postal1_1,
+						'xcountry' => $request->ship_country_region1_1,
+						'xcontactname1' => $request->fname,
+						'xcontactlastname1' => $request->lname,
+						'xcontactnumber1' => ($request->contactnumber1_1) ? $request->contactnumber1_1 : 0,
+						'xmobile_number' => $request->ship_mobilenumber1_1,
+						'xcontactemail1' => $request->ship_email,
+						'xdefault' => 1
+					];
+				}else{
+					$bill_address_arr = [
+						'address_class' => 'Billing',
+						'user_idx' => $user_id,
+						'add_type' => $request->Address_type1_1,
+						'xbusiness_name' => $request->bill_business_name,
+						'xtin_no' => $request->bill_tin,
+						'xadd1' => $request->Address1_1,
+						'xadd2' => ($request->Address2_1) ? $request->Address2_1 : " ",
+						'xprov' => $request->province1_1,
+						'xcity' => $request->City_Municipality1_1,
+						'xbrgy' => $request->Barangay1_1,
+						'xpostal' => $request->postal1_1,
+						'xcountry' => $request->country_region1_1,
+						'xcontactname1' => $request->fname,
+						'xcontactlastname1' => $request->lname,
+						'xcontactnumber1' => ($request->contactnumber1_1) ? $request->contactnumber1_1 : 0,
+						'xmobile_number' => $request->mobilenumber1_1,
+						'xcontactemail1' => $request->email,
+						'xdefault' => 1
+					];
+					
+				}
+	
+				$bill_insert = DB::table('fumaco_user_add')->insert($bill_address_arr);
+				$ship_insert = DB::table('fumaco_user_add')->insert($ship_address_arr);
+	
+				DB::commit();
+
+				return response()->json(['status' => 1, 'message' => '/setdetails']);
 			}
-
-			$bill_insert = DB::table('fumaco_user_add')->insert($bill_address_arr);
-			$ship_insert = DB::table('fumaco_user_add')->insert($ship_address_arr);
-
-			DB::commit();
-
-			return redirect('/setdetails');
+			
 		}catch(Exception $e){
 			DB::rollback();
 			return redirect()->back()->with('error', 'An error occured. Please try again.');
@@ -376,9 +379,12 @@ class CheckoutController extends Controller
 			}
 
 			$shipping_rates = $this->getShippingRates();
-
-			$shipping_add = DB::table('fumaco_user_add')->where('user_idx', Auth::user()->id)->where('address_class','Delivery')->get();
-			$billing_add = DB::table('fumaco_user_add')->where('user_idx', Auth::user()->id)->where('address_class','Billing')->get();
+			
+			$shipping_add = $billing_add = [];
+			if (Auth::check()) {
+				$shipping_add = DB::table('fumaco_user_add')->where('user_idx', Auth::user()->id)->where('address_class','Delivery')->get();
+				$billing_add = DB::table('fumaco_user_add')->where('user_idx', Auth::user()->id)->where('address_class','Billing')->get();
+			}
 
 			$shipping_zones = DB::table('fumaco_shipping_zone_rate')->distinct()->pluck('province_name')->toArray();
 

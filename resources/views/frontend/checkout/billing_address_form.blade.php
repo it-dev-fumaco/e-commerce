@@ -76,28 +76,17 @@
 	
 	<main style="background-color:#ffffff; min-height: 700px;" class="products-head">
 		<div class="container-fluid">
-			@if(session()->has('error'))
-				<div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
-					{!! session()->get('error') !!}
-				</div>
-			@endif
-			@if(count($errors->all()) > 0)
-              <div class="alert alert-warning alert-dismissible fade show text-center" role="alert">
-                @foreach ($errors->all() as $error)
-                  <span class="d-block">{!! $error !!}</span>
-                @endforeach
-              </div>
-            @endif
 			@php
 				$form_action = '/setdetails';
 				if (!$has_shipping_address) {
 					$form_action = '/checkout/set_address';
 				}
 			@endphp
-			<form action="{{ $form_action }}" method="post">
+			<form action="{{ $form_action }}" method="post" id="checkout-form">
 				@csrf
 				<div class="row">
 					<div class="col-md-8 mx-auto">
+						<div class="alert alert-warning alert-dismissible fade show text-center d-none" id="alert-message" role="alert"></div>
 						<table class="table">
 							<tr>
 								<td class='col-md-9'>
@@ -136,12 +125,6 @@
 						<div class="row">
 							<div class="col-md-4">
 								<label for="ship_province1_1" class="formslabelfnt">Province : <span class="text-danger">*</span></label>
-								{{-- <select class="form-control formslabelfnt" id="ship_province1_1" name="ship_province1_1" required>
-									<option value="">Select Province</option>
-									@foreach ($provinces as $province)
-									<option value="{{ $province['text'] }}" data-id="{{ $province['provCode'] }}">{{ $province['text'] }}</option>
-									@endforeach
-								</select> --}}
 								<input type="text" class="form-control formslabelfnt" id="ship_province1_1" name="ship_province1_1" required value="{{ old('ship_province1_1') }}">
 								<br class="d-lg-none d-xl-none"/>
 							</div>
@@ -319,13 +302,6 @@
 						</div>
 					</div>
 				</div>
-				{{-- <div class="row">
-					<br/>&nbsp;
-					<div class="col-md-8 mx-auto">
-						<a href="/cart" class="btn btn-lg btn-outline-primary col-md-5 mx-auto" role="button" style="background-color: #777575 !important; border-color: #777575 !important;">BACK</a>
-						<input type="submit" class="btn btn-lg btn-outline-primary col-md-5 mx-auto" role="button" style="float: right;" value="PROCEED">
-					</div>
-				</div> --}}
 				<div class="row mb-4">
 					<div class="col-md-8 mx-auto">
 						<div class="col-md-4 d-none d-md-block d-lg-block d-xl-block">
@@ -387,26 +363,63 @@
 		</div>
 	</main>
 
+	<div id="custom-overlay" style="display: none;">
+		<div class="custom-spinner"></div>
+		<br/>
+		Loading...
+	</div>
 
 	<style>
 		.select2-selection__rendered {
-				line-height: 34px !important;
+			line-height: 34px !important;
+		}
+		.select2-container .select2-selection--single {
+			height: 37px !important;
+		}
+		.select2-selection__arrow {
+			height: 35px !important;
+		}
+		#custom-overlay {
+			background: #ffffff;
+			color: #666666;
+			position: fixed;
+			height: 100%;
+			width: 100%;
+			z-index: 5000;
+			top: 0;
+			left: 0;
+			float: left;
+			text-align: center;
+			padding-top: 25%;
+			opacity: .80;
+		}
+		.custom-spinner {
+			margin: 0 auto;
+			height: 64px;
+			width: 64px;
+			animation: rotate 0.8s infinite linear;
+			border: 5px solid firebrick;
+			border-right-color: transparent;
+			border-radius: 50%;
+		}
+		@keyframes rotate {
+			0% {
+				transform: rotate(0deg);
 			}
-			.select2-container .select2-selection--single {
-				height: 37px !important;
+			100% {
+				transform: rotate(360deg);
 			}
-			.select2-selection__arrow {
-				height: 35px !important;
-			}
+		}
 	</style>
 @endsection
 
 @section('script')
 <!-- Select2 -->
 <script src="{{ asset('/assets/admin/plugins/select2/js/select2.full.min.js') }}"></script>
-
 <script>
 	$(document).ready(function() {
+		$('form').each(function() { this.reset() });
+		$('#ship_province1_1').empty();
 		var str = "{{ implode(',', $shipping_zones) }}";
 		var res = str.split(",");
 		var provinces = [];
@@ -540,8 +553,6 @@
 			}
 		});
 
-		
-
 		var provinces_bill = [];
 		$.getJSON("{{ asset('/json/provinces.json') }}", function(obj){
 			var filtered_province_bill = $.grep(obj.results, function(v) {
@@ -630,6 +641,24 @@
 			});
 		});
 
+		$('#checkout-form').submit(function(e){
+			e.preventDefault();
+			$('#custom-overlay').fadeIn();
+			$.ajax({
+				type:"POST",
+				url: $(this).attr('action'),
+				data: $(this).serialize(),
+				success:function(response){
+					if (response.status == 'error'){
+						window.scrollTo(0, 0);
+						$('#alert-message').removeClass('d-none').html(response.message);
+						$('#custom-overlay').fadeOut();
+					} else {
+						window.location.href = response.message;
+					}
+				}
+      		});
+		});
 	});
 
 </script>

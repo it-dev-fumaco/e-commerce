@@ -317,56 +317,58 @@ class CartController extends Controller
         }
         
         if($request->isMethod('POST')) {
-            $request->validate([
-                'ship_email' => 'required|email|unique:fumaco_users,username',
-            ],
-            [
-                'unique' => 'Email already exists, please <a href="'. route('login') .'">login</a>.'
-            ]);
-            
-            $shipping_details = [
-                'fname' => $request->fname,
-                'lname' => $request->lname,
-                'address_line1' => $request->ship_Address1_1,
-                'address_line2' => $request->ship_Address2_1,
-                'province' => $request->ship_province1_1,
-                'city' => $request->ship_City_Municipality1_1,
-                'brgy' => $request->ship_Barangay1_1,
-                'postal_code' => $request->ship_postal1_1,
-                'country' => $request->ship_country_region1_1,
-                'address_type' => $request->ship_Address_type1_1,
-                'business_name' => $request->ship_business_name,
-                'tin' => $request->ship_tin,
-                'email_address' => $request->ship_email,
-                'mobile_no' => $request->ship_mobilenumber1_1,
-                'contact_no' => $request->contactnumber1_1,
-                'same_as_billing' => ($request->same_as_billing) ? 1 : 0
-            ];
-    
-            if(!$request->same_as_billing) {
-                $billing_details = [
-                    'fname' => $request->bill_fname,
-                    'lname' => $request->bill_lname,
-                    'address_line1' => $request->Address1_1,
-                    'address_line2' => $request->Address2_1,
-                    'province' => $request->province1_1,
-                    'city' => $request->City_Municipality1_1,
-                    'brgy' => $request->Barangay1_1,
-                    'postal_code' => $request->postal1_1,
-                    'country' => $request->country_region1_1,
-                    'address_type' => $request->Address_type1_1,
-                    'business_name' => $request->bill_business_name,
-                    'tin' => $request->bill_tin,
-                    'email_address' => $request->email,
-                    'mobile_no' => $request->mobilenumber1_1,
+            if ($request->ajax()) {
+                $existing_account = DB::table('fumaco_users')->where('username', $request->ship_email)->exists();
+                if ($existing_account) {
+                    return response()->json(['status' => 'error', 'message' => 'Email already exists, please <a href="'. route('login') .'">login</a>.']);
+                }
+                
+                $shipping_details = [
+                    'fname' => $request->fname,
+                    'lname' => $request->lname,
+                    'address_line1' => $request->ship_Address1_1,
+                    'address_line2' => $request->ship_Address2_1,
+                    'province' => $request->ship_province1_1,
+                    'city' => $request->ship_City_Municipality1_1,
+                    'brgy' => $request->ship_Barangay1_1,
+                    'postal_code' => $request->ship_postal1_1,
+                    'country' => $request->ship_country_region1_1,
+                    'address_type' => $request->ship_Address_type1_1,
+                    'business_name' => $request->ship_business_name,
+                    'tin' => $request->ship_tin,
+                    'email_address' => $request->ship_email,
+                    'mobile_no' => $request->ship_mobilenumber1_1,
+                    'contact_no' => $request->contactnumber1_1,
+                    'same_as_billing' => ($request->same_as_billing) ? 1 : 0
                 ];
+        
+                if(!$request->same_as_billing) {
+                    $billing_details = [
+                        'fname' => $request->bill_fname,
+                        'lname' => $request->bill_lname,
+                        'address_line1' => $request->Address1_1,
+                        'address_line2' => $request->Address2_1,
+                        'province' => $request->province1_1,
+                        'city' => $request->City_Municipality1_1,
+                        'brgy' => $request->Barangay1_1,
+                        'postal_code' => $request->postal1_1,
+                        'country' => $request->country_region1_1,
+                        'address_type' => $request->Address_type1_1,
+                        'business_name' => $request->bill_business_name,
+                        'tin' => $request->bill_tin,
+                        'email_address' => $request->email,
+                        'mobile_no' => $request->mobilenumber1_1,
+                    ];
+        
+                    session()->put('fumBillDet', $billing_details);
+                } else {
+                    session()->forget('fumBillDet');
+                }
     
-                session()->put('fumBillDet', $billing_details);
-            } else {
-                session()->forget('fumBillDet');
+                session()->put('fumShipDet', $shipping_details);
+    
+                return response()->json(['status' => 'success', 'message' => '/checkout/summary']);
             }
-
-            session()->put('fumShipDet', $shipping_details);
         }
     
         return redirect('/checkout/summary');

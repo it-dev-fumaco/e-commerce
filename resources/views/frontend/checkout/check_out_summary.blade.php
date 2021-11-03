@@ -914,8 +914,6 @@
 			</div>
 		</div>
 	</div>
-	
-	{{-- Update Address Modal --}}
 
 	<div id="custom-overlay" style="display: none;">
 		<div class="custom-spinner"></div>
@@ -1013,7 +1011,6 @@
 		});
 
 		function callback(data) {
-			console.log(data);
 			if(data.status == 2) {
 				alert(data.message);
 				// window.location.href = '/';
