@@ -164,8 +164,8 @@
                                                         <div class="card-body he1x" style="padding-bottom: 0px !important;"><b>{{ $shipping_address_type }}</b></div>
 														@if($shipping_details['address_type'] == 'Business Address' )
 															<div class="card-body he1x" style="padding-bottom: 0px !important;">
-																Business Name: {{ $shipping_business_name }}<br/>
-																{{ $shipping_tin }}
+																Business Name : {{ $shipping_business_name }}<br/>
+																TIN : {{ $shipping_tin }}
 															</div>
 														@endif
 														<div class="card-body he1x" style="padding-bottom: 0px !important;">Contact Person :  {{ $shipping_fname. " " .$shipping_lname }}</div>
@@ -233,7 +233,7 @@
 
 				<div class="col-md-4 mx-auto">
 					<div class="card" style="background-color: #f4f4f4 !important; border-radius: 0rem !important;">
-						<div class="card-body he1x" style="padding-bottom: 0px !important;">Cart Total<hr></div>
+						<div class="card-body he1x" style="padding-bottom: 0px !important;">Order Summary<hr></div>
 						<table class="table" id="cart-items">
 							<thead>
 							<tr style="font-size: 0.8rem !important;">
