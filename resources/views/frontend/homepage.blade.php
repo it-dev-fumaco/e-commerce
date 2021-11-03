@@ -21,6 +21,16 @@
       text-align: left;
     }
 
+    .carousel-text-concat {
+      position: relative;
+      display: inline-block;
+      word-wrap: break-word;
+      overflow: hidden;
+      max-height: 4.8em;
+			line-height: 1.4em;
+      text-align: left;
+    }
+
     .text.ellipsis::after {
       position: absolute;
       right: -12px;
@@ -66,7 +76,7 @@
               <div class="carousel-caption text-start">
                 <h3 class="carousel-header-font fumacoFont1">{{ $carousel->fumaco_title }}</h3>
                 <div class="text ellipsis">
-                  <p class="carousel-caption-font fumacoFont2 text-concat" style="text-align: left; text-justify: left; letter-spacing: 1px;">{{ $string }}</p>
+                  <p class="carousel-caption-font fumacoFont2 carousel-text-concat" style="text-align: left; text-justify: left; letter-spacing: 1px;">{{ $string }}</p>
                 </div>
                 {{-- <p class="carousel-caption-font fumacoFont2" style="text-align: left; text-justify: inter-word; letter-spacing: 1px;">{{ $string }}</p> --}}
                 <p><a class="btn btn-lg btn-primary btn-fumaco fumacoFont_btn" href="{{ $carousel->fumaco_url }}"role="button">{{ $carousel->fumaco_btn_name }}</a></p>
