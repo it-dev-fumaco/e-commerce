@@ -60,14 +60,10 @@ class SyncErpStockCommand extends Command
                 ])->get($erp_api->base_url . '/api/resource/Bin' . $params);
 
                 if ($response->successful()) {
-                    if (count($response['data']) <= 0 && isset($response['data'])) {
-                        $actual_stock = 0;
-                    } else{
-                        $actual_stock = $response['data'][0]['website_reserved_qty'];
-                    }
-
-                    DB::table('fumaco_items')->where('f_idcode', $item_code)->where('f_warehouse', $warehouse)
-                        ->update(['f_qty' => $actual_stock]);
+                    if (count($response['data']) > 0 && isset($response['data'])) {
+                        DB::table('fumaco_items')->where('f_idcode', $item_code)->where('f_warehouse', $warehouse)
+                            ->update(['f_qty' => $response['data'][0]['website_reserved_qty']]);
+                    }                   
                 }
 
                  // get item price
@@ -83,14 +79,10 @@ class SyncErpStockCommand extends Command
                 ])->get($erp_api->base_url . '/api/resource/Item Price' . $params);
 
                 if ($response->successful()) {
-                    if (count($response['data']) <= 0 && isset($response['data'])) {
-                        $item_price = 0;
-                    } else{
-                        $item_price = $response['data'][0]['price_list_rate'];
+                    if (count($response['data']) > 0 && isset($response['data'])) {
+                        DB::table('fumaco_items')->where('f_idcode', $item_code)->where('f_warehouse', $warehouse)
+                            ->update(['f_original_price' => $response['data'][0]['price_list_rate']]);
                     }
-
-                    DB::table('fumaco_items')->where('f_idcode', $item_code)->where('f_warehouse', $warehouse)
-                        ->update(['f_original_price' => $item_price]);
                 }
             }
 
