@@ -10,7 +10,8 @@ use DB;
 class DashboardController extends Controller
 {
 	public function index() {
-		return view('backend.dashboard.index');
+		$name = Auth::user()->account_name;
+		return view('backend.dashboard.index', compact('name'));
 	}
 
 }
