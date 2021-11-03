@@ -124,17 +124,23 @@
 						<br>
 						<div class="row">
 							<div class="col-md-4">
-								<label for="ship_province1_1" class="formslabelfnt">Province : <span class="text-danger">*</span></label>
-								<input type="text" class="form-control formslabelfnt" id="ship_province1_1" name="ship_province1_1" required value="{{ old('ship_province1_1') }}">
-								<br class="d-lg-none d-xl-none"/>
+								<div class="form-group">
+									<label for="ship_province1_1" class="formslabelfnt">Province : <span class="text-danger">*</span></label>
+									<input type="text" class="form-control formslabelfnt" id="ship_province1_1" name="ship_province1_1" value="{{ old('ship_province1_1') }}">
+									<br class="d-lg-none d-xl-none"/>
+								</div>
 							</div>
 							<div class="col-md-4">
-								<label for="ship_City_Municipality1_1" class="formslabelfnt">City / Municipality : <span class="text-danger">*</span></label>
-								<input type="text" class="form-control formslabelfnt" id="ship_City_Municipality1_1" name="ship_City_Municipality1_1" required value="{{ old('ship_City_Municipality1_1') }}"><br class="d-lg-none d-xl-none"/>
+								<div class="form-group">
+									<label for="ship_City_Municipality1_1" class="formslabelfnt">City / Municipality : <span class="text-danger">*</span></label>
+									<input type="text" class="form-control formslabelfnt" id="ship_City_Municipality1_1" name="ship_City_Municipality1_1" value="{{ old('ship_City_Municipality1_1') }}"><br class="d-lg-none d-xl-none"/>
+								</div>
 							</div>
 							<div class="col-md-4">
-								<label for="ship_Barangay1_1" class="formslabelfnt">Barangay : <span class="text-danger">*</span></label>
-								<input type="text" class="form-control formslabelfnt" id="ship_Barangay1_1" name="ship_Barangay1_1" required value="{{ old('ship_Barangay1_1') }}">
+								<div class="form-group">
+									<label for="ship_Barangay1_1" class="formslabelfnt">Barangay : <span class="text-danger">*</span></label>
+									<input type="text" class="form-control formslabelfnt" id="ship_Barangay1_1" name="ship_Barangay1_1" value="{{ old('ship_Barangay1_1') }}">
+								</div>
 							</div>
 						</div>
 						<br>
@@ -200,7 +206,7 @@
 						<small style="font-style: italic; font-size: 0.75rem; margin-top: 20px; display: block;">Note: * Required information</small>
 						<br>
 						<div class="form-check">
-							<input class="form-check-input" type="checkbox" id="myCheck" name="same_as_billing"  checked>
+							<input class="form-check-input" type="checkbox" id="myCheck" name="same_as_billing" checked>
 							<label class="form-check-label" for="flexCheckChecked" class="formslabelfnt" style="font-size: 14px;">Billing address is the same as above</label>
 						</div>
 						<br/>
@@ -231,16 +237,22 @@
 							<br>
 							<div class="row">
 								<div class="col-md-4">
-									<label for="province1_1" class="formslabelfnt">Province : <span class="text-danger">*</span></label>
-									<input type="text" class="form-control formslabelfnt" id="province1_1" name="province1_1" value="{{ old('province1_1') }}">
+									<div class="form-group">
+										<label for="province1_1" class="formslabelfnt">Province : <span class="text-danger">*</span></label>
+										<input type="text" class="form-control formslabelfnt" id="province1_1" name="province1_1" value="{{ old('province1_1') }}">
+									</div>
 								</div>
 								<div class="col-md-4">
-									<label for="City_Municipality1_1" class="formslabelfnt">City / Municipality : <span class="text-danger">*</span></label>
-									<input type="text" class="form-control formslabelfnt" id="City_Municipality1_1" name="City_Municipality1_1" value="{{ old('City_Municipality1_1') }}">
+									<div class="form-group">
+										<label for="City_Municipality1_1" class="formslabelfnt">City / Municipality : <span class="text-danger">*</span></label>
+										<input type="text" class="form-control formslabelfnt" id="City_Municipality1_1" name="City_Municipality1_1" value="{{ old('City_Municipality1_1') }}">
+									</div>
 								</div>
 								<div class="col-md-4">
-									<label for="Barangay1_1" class="formslabelfnt">Barangay : <span class="text-danger">*</span></label>
-									<input type="text" class="form-control formslabelfnt" id="Barangay1_1" name="Barangay1_1" value="{{ old('Barangay1_1') }}">
+									<div class="form-group">
+										<label for="Barangay1_1" class="formslabelfnt">Barangay : <span class="text-danger">*</span></label>
+										<input type="text" class="form-control formslabelfnt" id="Barangay1_1" name="Barangay1_1" value="{{ old('Barangay1_1') }}">
+									</div>
 								</div>
 							</div>
 							<br>
@@ -268,7 +280,7 @@
 								<div class="col-md-4">
 									<label for="Address_type1_1" class="formslabelfnt">Address Type : <span class="text-danger">*</span></label>
 									<select class="form-control formslabelfnt" id="Address_type1_1" name="Address_type1_1">
-										<option disabled value="">Choose...</option>
+										<option value="">Choose...</option>
 										<option value="Business Address" {{ old('ship_Address_type1_1') == 'Business Address' ? 'selected' : '' }}>Business Address</option>
 										<option value="Home Address" {{ old('ship_Address_type1_1') == 'Home Address' ? 'selected' : '' }}>Home Address</option>
 									</select>
@@ -370,6 +382,9 @@
 	</div>
 
 	<style>
+		.is-invalid .select2-container--default .select2-selection--single {
+			border-color: #dc3545;
+		}
 		.select2-selection__rendered {
 			line-height: 34px !important;
 		}
@@ -418,7 +433,7 @@
 <script src="{{ asset('/assets/admin/plugins/select2/js/select2.full.min.js') }}"></script>
 <script>
 	$(document).ready(function() {
-		$('form').each(function() { this.reset() });
+		$('input[type="checkbox"]').prop("checked", true);
 		$('#ship_province1_1').empty();
 		var str = "{{ implode(',', $shipping_zones) }}";
 		var res = str.split(",");
@@ -501,14 +516,15 @@
 			});
 		});
 
+		$('#ship_province1_1').val(null).trigger('change');
+		$('#ship_City_Municipality1_1').val(null).trigger('change');
+		$('#ship_Barangay1_1').val(null).trigger('change');
+
 		$('input[type="checkbox"]').click(function() {
 			if($(this).prop("checked") == false) {
 				$('#billAddress').slideDown();
 				$("#Address1_1").prop('required',true);
 				$("#email").prop('required',true);
-				$("#province1_1").prop('required',true);
-				$("#City_Municipality1_1").prop('required',true);
-				$("#Barangay1_1").prop('required',true);
 				$("#postal1_1").prop('required',true);
 				$("#country_region1_1").prop('required',true);
 				$("#Address_type1_1").prop('required',true);
@@ -532,25 +548,41 @@
 				$("#bill_lname").prop('required',false);
 			}
 
-			$('#Address_type1_1').change(function(){
-				if($(this).val() == "Business Address"){
-					$('#bill_for_business').slideDown();
-					$("#bill_business_name").prop('required',true);
-				}else{
-					$('#bill_for_business').slideUp();
-					$("#bill_business_name").prop('required',false);
-				}
-			});
+			toggleBillBusinessName($('#Address_type1_1').val());
 		});
 
-		$('#ship_Address_type1_1').change(function(){
-			if($(this).val() == "Business Address"){
+		$('#Address_type1_1').change(function(){
+			toggleBillBusinessName($(this).val());
+		});
+
+		if ($('input[type="checkbox"]').prop("checked") == false) {
+			toggleBillBusinessName($('#Address_type1_1').val());
+		}
+
+		toggleShipBusinessName($('#ship_Address_type1_1').val());
+		toggleBillBusinessName($('#Address_type1_1').val());
+		function toggleShipBusinessName (address_type) {
+			if(address_type == "Business Address"){
 				$('#ship_for_business').slideDown();
 				$("#ship_business_name").prop('required',true);
 			}else{
 				$('#ship_for_business').slideUp();
 				$("#ship_business_name").prop('required',false);
 			}
+		}
+
+		function toggleBillBusinessName (address_type) {
+			if(address_type == "Business Address"){
+				$('#bill_for_business').slideDown();
+				$("#bill_business_name").prop('required',true);
+			}else{
+				$('#bill_for_business').slideUp();
+				$("#bill_business_name").prop('required',false);
+			}
+		}
+
+		$('#ship_Address_type1_1').change(function(){
+			toggleShipBusinessName($(this).val());
 		});
 
 		var provinces_bill = [];
@@ -641,8 +673,61 @@
 			});
 		});
 
+		$('#province1_1').val(null).trigger('change');
+		$('#City_Municipality1_1').val(null).trigger('change');
+		$('#Barangay1_1').val(null).trigger('change');
+
 		$('#checkout-form').submit(function(e){
 			e.preventDefault();
+
+			var s1 = $('#ship_province1_1');
+			var s2 = $('#ship_City_Municipality1_1');
+			var s3 = $('#ship_Barangay1_1');
+
+			s1.parent('.form-group').removeClass('is-invalid');
+			if (s1.val() === '') {
+				s1.parents('.form-group').addClass('is-invalid');
+				e.preventDefault();
+				return false;
+			}
+			s2.parent('.form-group').removeClass('is-invalid');
+			if (s2.val() === '') {
+				s2.parents('.form-group').addClass('is-invalid');
+				e.preventDefault();
+				return false;
+			}
+			s3.parent('.form-group').removeClass('is-invalid');
+			if (s3.val() === '') {
+				s3.parents('.form-group').addClass('is-invalid');
+				e.preventDefault();
+				return false;
+			}
+
+			if ($('input[type="checkbox"]').prop("checked") == false) {
+				var s4 = $('#province1_1');
+				var s5 = $('#City_Municipality1_1');
+				var s6 = $('#Barangay1_1');
+
+				s4.parent('.form-group').removeClass('is-invalid');
+				if (s4.val() === '') {
+					s4.parents('.form-group').addClass('is-invalid');
+					e.preventDefault();
+					return false;
+				}
+				s5.parent('.form-group').removeClass('is-invalid');
+				if (s5.val() === '') {
+					s5.parents('.form-group').addClass('is-invalid');
+					e.preventDefault();
+					return false;
+				}
+				s6.parent('.form-group').removeClass('is-invalid');
+				if (s6.val() === '') {
+					s6.parents('.form-group').addClass('is-invalid');
+					e.preventDefault();
+					return false;
+				}
+			}
+
 			$('#custom-overlay').fadeIn();
 			$.ajax({
 				type:"POST",
@@ -650,9 +735,9 @@
 				data: $(this).serialize(),
 				success:function(response){
 					if (response.status == 'error'){
-						window.scrollTo(0, 0);
 						$('#alert-message').removeClass('d-none').html(response.message);
 						$('#custom-overlay').fadeOut();
+						window.scrollTo(0, 0);
 					} else {
 						window.location.href = response.message;
 					}
