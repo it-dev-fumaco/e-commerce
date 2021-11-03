@@ -252,8 +252,11 @@
         min-height: 55px !important
       }
       .menu-burger{
-          float: right !important
-        }
+        float: right !important
+      }
+      .prod-sort{
+        margin-right: 5%;
+      }
       @media (max-width: 575.98px) {
         header{
           min-height: 50px;
@@ -268,9 +271,7 @@
         .article-title{
           min-height: auto !important
         }
-        .sort-by{
-          white-space: nowrap !important;
-        }
+
       }
 
       @media (max-width: 767.98px) {
@@ -287,9 +288,6 @@
         .article-title{
           min-height: auto !important
         }
-        .sort-by{
-          white-space: nowrap !important;
-        }
       }
 
       @media (max-width: 1199.98px) {/* tablet */
@@ -305,6 +303,9 @@
         }
         .search-bar{
           width: auto !important;
+        }
+        .mb-pad{
+          padding: 0 !important;
         }
       }
 

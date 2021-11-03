@@ -107,6 +107,36 @@
 .modal.fade .modal-dialog.modal-dialog-slideout {-webkit-transform: translate(100%, 0);transform: translate(100%, 0);}
 .modal.fade.show .modal-dialog.modal-dialog-slideout {-webkit-transform: translate(0,0);transform: translate(0,0);flex-flow: column;}
 .modal-dialog-slideout .modal-content{border: 0;}
+
+	@media (max-width: 575.98px) {
+        .sort-by{
+          white-space: nowrap !important;
+        }
+        .mb-pad{
+          padding: 0 !important;
+        }
+        .prod-sort{
+          margin-right: 0 !important;
+        }
+        .prod-list-pad{
+          padding: 5% !important;
+        }
+      }
+
+      @media (max-width: 767.98px) {
+        .sort-by{
+          white-space: nowrap !important;
+        }
+        .mb-pad{
+          padding: 0 !important;
+        }
+        .prod-sort{
+          margin-right: 0 !important;
+        }
+        .prod-list-pad{
+          padding: 5% !important;
+        }
+      }
 	</style>
 	<script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>
 	<script type='text/javascript' src='https://stackpath.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.bundle.min.js'></script>
@@ -140,7 +170,7 @@
 		<hr class="singleline">
 	</main>
 
-	<main style="background-color:#ffffff;" class="products-head">
+	<main style="background-color:#ffffff;" class="products-head prod-list-pad">
 		<div class="container" style="max-width: 100% !important;">
 			<div class="row">
 				<!--sidebar-->
@@ -219,7 +249,7 @@
 							</a>
 							<div class="col-md-4 offset-md-8">
 								
-								<div class="d-flex  justify-content-end" style="margin-right: 5%;">
+								<div class="d-flex justify-content-end prod-sort">
 									<div>
 										<a class="btn d-sm-block d-md-none" data-toggle="modal" data-target="#filterModal2" style="font-size: 0.75rem !important; float: left !important; margin-top: 6%">
 											<i class="fas fa-filter"></i>&nbsp; Filters
@@ -335,9 +365,9 @@
 							</div>
 						</form>
 
-						<div class="row animated animatedFade1InUp fadeInUp">
+						<div class="row animated animatedFade1InUp fadeInUp mb-pad">
 							@forelse ($products_arr as $product)
-							<div class="col-md-4 mb-3 btmp">
+							<div class="col-md-4 mb-3 btmp mb-pad">
 								{{-- <div class="col-md-4 btmp animated animatedFadeInUp fadeInUp equal-height-columns"> --}}
 							<a href="/product/{{ $product['item_code'] }}" style="text-decoration: none !important; text-transform: none !important;">
 	
