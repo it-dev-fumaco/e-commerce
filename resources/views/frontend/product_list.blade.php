@@ -365,7 +365,7 @@
 							</div>
 						</form>
 
-						<div class="row animated animatedFade1InUp fadeInUp mb-pad">
+						<div class="row animated animatedFade1InUp fadeInUp mx-auto">
 							@forelse ($products_arr as $product)
 							<div class="col-md-4 mb-3 btmp mb-pad">
 								{{-- <div class="col-md-4 btmp animated animatedFadeInUp fadeInUp equal-height-columns"> --}}
