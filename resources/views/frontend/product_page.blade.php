@@ -545,14 +545,13 @@
 			}
 
     .text-concat {
-      position: relative;
-      display: inline-block;
-      word-wrap: break-word;
-      overflow: hidden;
-      max-height: 4.3em;
-      /* line-height: 1.2em; */
-      line-height: 1.4em;
-      text-align: left;
+		position: relative;
+		display: inline-block;
+		word-wrap: break-word;
+		overflow: hidden;
+		max-height: 5.7em;
+		line-height: 1.4em;
+		text-align: left;
     }
 
     .text.ellipsis::after {
@@ -882,7 +881,7 @@
 
 													<div class="card-body">
 														<div class="text ellipsis">
-															<p class="card-text product-head fumacoFont_card_title text-concat prod_desc" style="color:#0062A5 !important;  height: 80px;">{{ $rp['item_name'] }}</p>
+															<p class="card-text product-head fumacoFont_card_title text-concat prod_desc" style="color:#0062A5 !important;  min-height: 80px;">{{ $rp['item_name'] }}</p>
 														</div>
 														<p class="card-text fumacoFont_card_price" style="color:#000000 !important; ">
 															@if ($rp['is_discounted'])

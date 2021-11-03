@@ -88,8 +88,8 @@
 			display: inline-block;
 			word-wrap: break-word;
 			overflow: hidden;
-			max-height: 4.6em;
-			line-height: 1.5em;
+			max-height: 5.7em;
+			line-height: 1.4em;
 			text-align: left;
 			font-size: 16px !important;
 		}
@@ -228,7 +228,7 @@
 									<div class="p-2"><label class="mt-1 mb-1 mr-0 sort-by" style="font-size: 0.75rem;">Sort By</label></div>
 									<div class="p-2">
 										<select name="sortby" class="form-control form-control-sm" style="font-size: 0.75rem; display: inline-block;">
-											<option value="Position" data-loc="{{ request()->fullUrlWithQuery(['sortby' => 'Position']) }}" {{ (request()->sortby == 'Position') ? 'selected' : '' }}>Recommended</option>
+											<option value="Position" data-loc="{{ request()->fullUrlWithQuery(['sortby' => 'Position']) }}" {{ (request()->sortby == 'Position') ? 'selected' : '' }}>Recommended&nbsp;</option>
 											<option value="Product Name" data-loc="{{ request()->fullUrlWithQuery(['sortby' => 'Product Name']) }}" {{ (request()->sortby == 'Product Name') ? 'selected' : '' }}>Product Name</option>
 											<option value="Price" data-loc="{{ request()->fullUrlWithQuery(['sortby' => 'Price']) }}" {{ (request()->sortby == 'Price') ? 'selected' : '' }}>Price</option>
 										</select></div>
@@ -356,7 +356,7 @@
 								
 										<div class="card-body">
 											<div class="text ellipsis">
-												<p class="card-text fumacoFont_card_title text-concat prod-desc" style="color:#0062A5 !important; height: 80px; font-size: 16px !important; font-weight: 500 !important;">{{ $product['item_name'] }}</p>
+												<p class="card-text fumacoFont_card_title text-concat prod-desc" style="color:#0062A5 !important; min-height: 80px; font-size: 16px !important; font-weight: 500 !important;">{{ $product['item_name'] }}</p>
 											</div>
 											<p class="card-text fumacoFont_card_price" style="color:#000000 !important;">
 												@if($product['is_discounted'])
