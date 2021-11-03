@@ -20,12 +20,13 @@ class OrderController extends Controller
         $orders = DB::table('fumaco_order')->where('order_number', 'LIKE', '%'.$search_id.'%')->where('order_status', 'LIKE', '%'.$order_status.'%')->where('order_status', '!=', 'Cancelled')->where('order_status', '!=', 'Delivered')->orderBy('id', 'desc')->paginate(10);
 
         $orders_arr = [];
-        $items_arr = [];
 
         foreach($orders as $o){
+            $items_arr = [];
             $items = DB::table('fumaco_order_items')->where('order_number', $o->order_number)->get();
             foreach($items as $i){
                 $items_arr[] = [
+                    'order_number' => $i->order_number,
                     'item_code' => $i->item_code,
                     'item_name' => $i->item_name,
                     'item_qty' => $i->item_qty,
@@ -86,9 +87,9 @@ class OrderController extends Controller
         $orders = DB::table('fumaco_order')->where('order_number', 'LIKE', '%'.$search_id.'%')->where('order_status', 'Cancelled')->orderBy('id', 'desc')->paginate(10);
 
         $orders_arr = [];
-        $items_arr = [];
 
         foreach($orders as $o){
+            $items_arr = [];
             $items = DB::table('fumaco_order_items')->where('order_number', $o->order_number)->get();
             foreach($items as $i){
                 $items_arr[] = [
@@ -145,9 +146,9 @@ class OrderController extends Controller
         $orders = DB::table('fumaco_order')->where('order_number', 'LIKE', '%'.$search_id.'%')->where('order_status', 'Delivered')->orderBy('id', 'desc')->paginate(10);
 
         $orders_arr = [];
-        $items_arr = [];
 
         foreach($orders as $o){
+            $items_arr = [];
             $items = DB::table('fumaco_order_items')->where('order_number', $o->order_number)->get();
             foreach($items as $i){
                 $items_arr[] = [
