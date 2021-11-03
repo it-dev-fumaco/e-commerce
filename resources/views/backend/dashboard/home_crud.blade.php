@@ -239,16 +239,6 @@
                                         <input type="text" name="title" class="form-control" value="{{ $page->page_title }}" required/>
                                     </div>
                                 </div>
-                                <div class="row">
-                                    <div class="form-group col-md-6">
-                                        <label>Header</label>
-                                        <input type="text" name="header" class="form-control" value="{{ $page->header }}"/>
-                                    </div>
-                                    <div class="form-group col-md-6">
-                                        <label>Slug *</label>
-                                        <input type="text" name="slug" class="form-control" value="{{ $page->slug }}" required/>
-                                    </div>
-                                </div>
                                 <h5 class="mt-3">Search Engine Optimization (SEO)</h5>
                                 <hr>
                                 <div class="form-group">
@@ -259,6 +249,7 @@
                                     <label for="product-meta-description">Meta Description *</label>
                                     <textarea class="form-control" rows="3" name="meta_description" required>{{ $page->meta_description }}</textarea>
                                     <input type="text" name="content1" value="for homepage" hidden>
+                                    <input type="text" name="slug" value="/" hidden>
                                 </div>
                             </div>
                             <!-- /.card-body -->
