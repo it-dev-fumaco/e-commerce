@@ -1,5 +1,5 @@
 @extends('frontend.layout', [
-  'namePage' => 'Fumaco Inc.',
+  'namePage' => 'Fumaco',
   'activePage' => 'homepage'
 ])
 
