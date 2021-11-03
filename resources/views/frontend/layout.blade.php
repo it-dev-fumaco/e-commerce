@@ -268,6 +268,9 @@
         .article-title{
           min-height: auto !important
         }
+        .sort-by{
+          white-space: nowrap !important;
+        }
       }
 
       @media (max-width: 767.98px) {
@@ -283,6 +286,9 @@
         }
         .article-title{
           min-height: auto !important
+        }
+        .sort-by{
+          white-space: nowrap !important;
         }
       }
 
