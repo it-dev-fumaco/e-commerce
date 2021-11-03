@@ -59,7 +59,7 @@
           <p style="color:#186EA9 !important;" class="fumacoFont_card_title animated animatedFadeInUp fadeInUp">SOCIAL</p>
           <p style="color:#58595A !important;" class="fumacoFont_card_caption animated animatedFadeInUp fadeInUp">Like & Follow Us</p>
           <p style="color:#58595A !important;" class="fumacoFont_card_caption animated animatedFadeInUp fadeInUp">
-            <i class="fa fa-twitter" aria-hidden="true" style="font-size: 15pt !important"></i>&nbsp;&nbsp;<i class="fa fa-facebook-square" aria-hidden="true" style="font-size: 15pt !important"></i>&nbsp;&nbsp;<i class="fa fa-instagram" aria-hidden="true" style="font-size: 15pt !important"></i>
+            <a href="https://www.facebook.com/fumaco.inc/"><i class="fa fa-facebook-square" aria-hidden="true" style="font-size: 28pt !important" ></a></i>&nbsp;&nbsp;<a href="https://twitter.com/fumaco_lights?lang=en"><i class="fa fa-twitter" aria-hidden="true" style="font-size: 28pt !important"></i></a>
           </p>
         </center>
         <br>
