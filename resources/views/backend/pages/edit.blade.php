@@ -57,7 +57,7 @@
                                             </div>
                                             <div class="form-group col-md-6">
                                                 <label>Slug *</label>
-                                                <input type="text" name="slug" value="{{ $policy->slug }}" class="form-control"/>
+                                                <input type="text" name="slug" value="{{ $policy->slug }}" class="form-control" required/>
                                             </div>
                                         </div>
                                         <div class="row">

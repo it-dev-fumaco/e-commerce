@@ -69,8 +69,13 @@
                             @endif
 
                             @if(session()->has('success'))
-                                <div class="alert alert-success">
+                                <div class="alert alert-success fade show" role="alert">
                                     {{ session()->get('success') }}
+                                </div>
+                            @endif
+                            @if(session()->has('error'))
+                                <div class="alert alert-warning fade show" role="alert">
+                                    {{ session()->get('error') }}
                                 </div>
                             @endif
                             <table id="example2" data-pagination="true" class="table table-bordered table-hover">
@@ -113,25 +118,6 @@
                                                             <input type="text" name="id" value="{{ $carousel['id'] }}" readonly hidden/>
                                                             <input type="submit" role="menuitem" value="Delete" class="menu"/>
                                                         </form>
-                                                        {{-- <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#myModal{{ $carousel['id'] }}" style="width: 100%;padding: 12px 16px; text-decoration: none;display: block;">View</button>
-                                                        <hr style="margin-top: 0.5rem;margin-bottom: 0.5rem;">
-                                                        <form action="/admin/delete_header" method="post">
-                                                            @csrf
-                                                            <input type="text" name="id" value="{{ $carousel['id'] }}" readonly hidden/>
-                                                            <button type="submit" class="btn btn-warning btn-sm active" style="width: 100%; padding-top: 13px; padding-bottom: 13px;">Delete</button>
-                                                        </form>
-                                                        <hr style="margin-top: 0.5rem;margin-bottom: 0.5rem;">
-                                                        <form action="/admin/set_active" method="post">
-                                                            @csrf
-                                                            <input type="text" name="id" value="{{ $carousel['id'] }}" readonly hidden/>
-                                                            <button type="submit" class="btn btn-success btn-sm active" style="width: 100%; padding-top: 13px; padding-bottom: 13px;">Set Active</button>
-                                                        </form>
-                                                        <hr style="margin-top: 0.5rem;margin-bottom: 0.5rem;">
-                                                        <form action="/admin/remove_active" method="post">
-                                                            @csrf
-                                                            <input type="text" name="id" value="{{ $carousel['id'] }}" readonly hidden/>
-                                                            <button type="submit" class="btn btn-danger btn-sm active" style="width: 100%; padding-top: 13px; padding-bottom: 13px;">Remove Active</button>
-                                                        </form> --}}
                                                     </div>
                                                 </div>
                                                 <script>
@@ -216,19 +202,6 @@
                                     <input type="text" class="form-control" id="url" name="url" value="" required>
                                 </div>
 
-                                {{-- <div class="form-group">
-                                    <label for="fileToUpload">File input</label>
-                                    <div class="input-group">
-                                        <div class="custom-file">
-                                            <input type="file" class="custom-file-input" name="fileToUpload" id="fileToUpload">
-                                            <label class="custom-file-label" for="exampleInputFile">Choose file</label>
-                                        </div>
-                                        <div class="input-group-append">
-                                            <span class="input-group-text" id="">Add Record</span>
-                                        </div>
-                                    </div>
-                                </div> --}}
-
                                 <div class="input-group">
                                     <div class="input-group-prepend">
                                       <span class="input-group-text" id="inputGroupFileAddon01">Upload</span>
@@ -237,11 +210,60 @@
                                       <input type="file" class="custom-file-input" name="fileToUpload" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01" required>
                                       <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
                                     </div>
-                                  </div>
+                                </div>
                             </div>
                             <!-- /.card-body -->
                             <div class="card-footer">
                                 <input type="submit" class="btn btn-primary" value="Upload">
+                            </div>
+                        </form>
+                    </div>
+                    <!-- /.card -->
+                </div>
+                <div class="col-md-12">
+                    <div class="card card-primary">
+                        <div class="card-header">
+                            <h3 class="card-title">Meta Data/Description</h3>
+                        </div>
+                        <form role="form" action="/admin/edit/3" method="post" enctype="multipart/form-data">
+                            @csrf
+                            <div class="card-body">
+                                <h4>Home Page</h4>
+                                <div class="row">
+                                    <div class="form-group col-md-6">
+                                        <label>Page Name *</label>
+                                        <input type="text" name="name" class="form-control" value="{{ $page->page_name }}" required>
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label>Page Title *</label>
+                                        <input type="text" name="title" class="form-control" value="{{ $page->page_title }}" required/>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="form-group col-md-6">
+                                        <label>Header</label>
+                                        <input type="text" name="header" class="form-control" value="{{ $page->header }}"/>
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label>Slug *</label>
+                                        <input type="text" name="slug" class="form-control" value="{{ $page->slug }}" required/>
+                                    </div>
+                                </div>
+                                <h5 class="mt-3">Search Engine Optimization (SEO)</h5>
+                                <hr>
+                                <div class="form-group">
+                                    <label for="product-keywords">Meta Keywords *</label>
+                                    <textarea class="form-control" rows="3" name="meta_keywords" required>{{ $page->meta_keywords }}</textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="product-meta-description">Meta Description *</label>
+                                    <textarea class="form-control" rows="3" name="meta_description" required>{{ $page->meta_description }}</textarea>
+                                    <input type="text" name="content1" value="for homepage" hidden>
+                                </div>
+                            </div>
+                            <!-- /.card-body -->
+                            <div class="card-footer text-center">
+                                <button type="submit" class="btn btn-primary btn-lg">SUBMIT</button>
                             </div>
                         </form>
                     </div>

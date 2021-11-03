@@ -12,7 +12,7 @@ use Carbon\Carbon;
 class PagesController extends Controller
 {
     public function viewPages(){
-        $pages = DB::table('fumaco_pages')->get();
+        $pages = DB::table('fumaco_pages')->where('is_homepage', 0)->get();
 
         // return view('backend.pages.list', compact('pages'));
         return response()->json($pages);
@@ -53,5 +53,6 @@ class PagesController extends Controller
             
             return redirect()->back()->with('error', 'An error occured. Please try again.');
         }
+    
     }
 }

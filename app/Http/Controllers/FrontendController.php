@@ -211,7 +211,9 @@ class FrontendController extends Controller
             ];
         }
 
-        return view('frontend.homepage', compact('carousel_data', 'blogs', 'best_selling_arr', 'on_sale_arr'));
+        $page_meta = DB::table('fumaco_pages')->where('is_homepage', 1)->first();
+
+        return view('frontend.homepage', compact('carousel_data', 'blogs', 'best_selling_arr', 'on_sale_arr', 'page_meta'));
     }
 
     public function newsletterSubscription(Request $request){
@@ -281,7 +283,7 @@ class FrontendController extends Controller
 
     public function pagesList(){
         // Policy Pages
-        $pages = DB::table('fumaco_pages')->get();
+        $pages = DB::table('fumaco_pages')->where('is_homepage', 0)->get();
 
         return response()->json($pages);
     }

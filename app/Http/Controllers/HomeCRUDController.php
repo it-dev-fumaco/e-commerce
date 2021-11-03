@@ -30,8 +30,9 @@ class HomeCRUDController extends Controller
 				'status' => $carousel->fumaco_status == 1 ? 'primary' : 'danger'
 			];
 		}
+        $page = DB::table('fumaco_pages')->where('is_homepage', 1)->first();
 
-		return view('backend.dashboard.home_crud', compact('carousel_arr'));
+		return view('backend.dashboard.home_crud', compact('carousel_arr', 'page'));
 	}
 
 	public function add_header_carousel(Request $request){

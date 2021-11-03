@@ -1,7 +1,12 @@
 @extends('frontend.layout', [
-  'namePage' => 'Fumaco',
+  'namePage' => $page_meta->page_title,
   'activePage' => 'homepage'
 ])
+
+@section('meta')
+<meta name="description" content="{{ $page_meta->meta_description }}">
+	<meta name="keywords" content="{{ $page_meta->meta_keywords }}" />
+@endsection
 
 @section('content')
   <style>
