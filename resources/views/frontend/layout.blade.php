@@ -355,13 +355,13 @@
             <i class="far fa-user user-icon" style=""></i>
           </a> --}}
           <div class="d-flex justify-content-end">
-          <a class="d-md-none d-lg-none d-xl-none mb-cart p-2" href="/cart" style="text-decoration: none !important; margin-left:33px !important">
+          <a class="d-md-block d-lg-none d-xl-none mb-cart" href="/cart" style="text-decoration: none !important; margin-left:33px !important; padding-top: 8px">
             <div class="" style="width: 50px !important; padding: 0 !important;">
               <i class="fa" style="font-size:24px; color:#126cb6;">&#xf07a;</i><span class="badge badge-warning count-cart-items" id="lblCartCount" style="font-size: 12px; background: #ff0000; color: #fff; padding: 4px 7px; vertical-align: top; margin-left: -10px;display: unset !important; font-weight: 500 !important; border-radius: 1rem !important; margin-top: -15px;">0</span>
             </div>
           </a>
     
-          <button class="navbar-toggler menu-burger" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" style="float: right !important">
             <span class="navbar-toggler-icon"></span>
           </button>
           </div>
@@ -384,13 +384,13 @@
                 <a class="nav-link" href="/contact">CONTACT</a>
               </li>
             </ul>
-            <form class="d-none d-md-block search-bar" action="/" method="GET">
+            <form class="d-none d-lg-block search-bar" action="/" method="GET">
               <div class="input-group mb-0 searchbar search-bar">
                 <input type="text" placeholder="Search" name="s" value="{{ request()->s }}" class="form-control searchstyle" aria-label="Text input with dropdown button">
                   <button class="btn btn-outline-secondary searchstyle" type="submit"><i class="fas fa-search"></i></button>
               </div>
             </form>
-            <ul class="navbar-nav">
+            <ul class="navbar-nav d-lg-inline-block">
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle navbar-header welcome-msg" href="#" id="navbarDarkDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">Welcome, {{ (Auth::check()) ? Auth::user()->f_name : 'Guest' }}</a>
                 <a class="nav-link dropdown-toggle navbar-header mbl-welcome" href="#" id="navbarDarkDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="far fa-user" style="font-size: 20px"></i></a>
@@ -434,13 +434,13 @@
     
           </div>
           {{-- Cart Icon --}}
-          <a class="d-none d-md-block pc-cart" style="text-decoration: none !important" href="/cart">
+          <a class="d-none d-lg-block pc-cart" style="text-decoration: none !important" href="/cart">
             <div class="" style="width: 50px !important; padding: 0 !important; margin-right: -20px !important">
               <i class="fa" style="font-size:24px; color:#126cb6;">&#xf07a;</i><span class="badge badge-warning count-cart-items" id="lblCartCount" style="font-size: 12px; background: #ff0000; color: #fff; padding: 4px 7px; vertical-align: top; margin-left: -10px;display: unset !important; font-weight: 500 !important; border-radius: 1rem !important; margin-top: -15px;">0</span>
             </div>
           </a>
           {{-- Cart Icon --}}
-          <div class="d-sm-block d-md-none d-lg-none d-xl-none mob-srch" style="width: 100% !important">
+          <div class="d-md-block d-lg-none mob-srch" style="width: 100% !important">
             <div class="col-md-12">
               <form action="/" method="GET">
                 <div class="input-group mb-0 searchbar" style="width: 100% !important;">
