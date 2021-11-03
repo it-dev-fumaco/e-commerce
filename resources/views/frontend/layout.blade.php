@@ -251,6 +251,9 @@
       .article-title{
         min-height: 55px !important
       }
+      .menu-burger{
+          float: right !important
+        }
       @media (max-width: 575.98px) {
         header{
           min-height: 50px;
@@ -300,11 +303,36 @@
       }
 
       @media only screen and (min-device-width : 768px) and (max-device-width : 1024px) and (orientation : portrait) {/* portrait tablet */
-        .filter-btn, .filter-slide, .mbl-welcome{
+        .filter-btn, .filter-slide, .mob-srch{
           display: inline-block !important;
         }
-        .welcome-msg{
+        .pc-cart, .search-bar{
           display: none !important;
+        }
+        .mb-cart{
+          display: inline-block !important;
+        }
+        .menu-burger{
+          float: right !important
+        }
+        .sort-by{
+          white-space: nowrap !important;
+        }
+      }
+
+      @media only screen and (min-device-height : 427.98px) and (max-device-height : 767.98px) and (orientation : landscape) {/* landscape mobile */
+        .filter-btn, .filter-slide, .mob-srch{
+          display: inline-block !important;
+        }
+        .pc-cart, .search-bar{
+          display: none !important;
+        }
+        .mb-cart{
+          display: inline-block !important;
+        }
+        
+        .sort-by{
+          white-space: nowrap !important;
         }
       }
 
@@ -316,7 +344,7 @@
       <div class="spinner"></div>
     </div>
     <header>
-      <nav class="navbar navbar-expand-lg navbar-light fixed-top bg-light" style="padding-bottom:0px; border-bottom: 1px solid #e4e4e4;">
+      <nav class="navbar navbar-expand-lg navbar-light fixed-top bg-light" style="padding-left: 20px; padding-right: 20px; padding-bottom:0px; border-bottom: 1px solid #e4e4e4;">
         <div class="container-fluid">
           <a class="navbar-brand" href="/" id="navbar-brand">
             <img src="{{ asset('/assets/site-img/logo-sm.png') }}" alt="" width="155" height="54">
@@ -326,18 +354,19 @@
           {{-- <a class="d-md-none d-lg-none d-xl-none" style="color: #000; margin-left: 10px !important" href="/login">
             <i class="far fa-user user-icon" style=""></i>
           </a> --}}
-
-          <a class="d-md-none d-lg-none d-xl-none" href="/cart" style="text-decoration: none !important; margin-left:30px !important">
+          <div class="d-flex justify-content-end">
+          <a class="d-md-none d-lg-none d-xl-none mb-cart p-2" href="/cart" style="text-decoration: none !important; margin-left:33px !important">
             <div class="" style="width: 50px !important; padding: 0 !important;">
               <i class="fa" style="font-size:24px; color:#126cb6;">&#xf07a;</i><span class="badge badge-warning count-cart-items" id="lblCartCount" style="font-size: 12px; background: #ff0000; color: #fff; padding: 4px 7px; vertical-align: top; margin-left: -10px;display: unset !important; font-weight: 500 !important; border-radius: 1rem !important; margin-top: -15px;">0</span>
             </div>
           </a>
-
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+    
+          <button class="navbar-toggler menu-burger" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
+          </div>
           {{-- Mobile Icons --}}
-
+    
           <div class="collapse navbar-collapse nav_fumaco_res nav-a" id="navbarCollapse">
             <ul class="navbar-nav me-auto mb-2 mb-md-0 navbar-header">
               <li class="nav-item dropdown">
@@ -355,7 +384,7 @@
                 <a class="nav-link" href="/contact">CONTACT</a>
               </li>
             </ul>
-            <form class="d-none d-md-block" action="/" method="GET">
+            <form class="d-none d-md-block search-bar" action="/" method="GET">
               <div class="input-group mb-0 searchbar search-bar">
                 <input type="text" placeholder="Search" name="s" value="{{ request()->s }}" class="form-control searchstyle" aria-label="Text input with dropdown button">
                   <button class="btn btn-outline-secondary searchstyle" type="submit"><i class="fas fa-search"></i></button>
@@ -366,11 +395,6 @@
                 <a class="nav-link dropdown-toggle navbar-header welcome-msg" href="#" id="navbarDarkDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">Welcome, {{ (Auth::check()) ? Auth::user()->f_name : 'Guest' }}</a>
                 <a class="nav-link dropdown-toggle navbar-header mbl-welcome" href="#" id="navbarDarkDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="far fa-user" style="font-size: 20px"></i></a>
                 <ul class="dropdown-menu dropdown-menu-light navbar-header" aria-labelledby="navbarDarkDropdownMenuLink" style="right: 14px !important; left: auto !important;">
-                  {{-- <li>
-                    <a class="dropdown-item" style="font-weight: 300 !important;" href="/cart">
-                      <img src="{{ asset('/assets/site-img/icon/nav11.jpg') }}" alt="cart" width="30">&nbsp;&nbsp;My Cart <span class="badge badge-primary count-cart-items" style="background-color:#186eaa; vertical-align: top;">0</span>
-                    </a>
-                  </li> --}}
                   @if(Auth::check())
                   <li>
                     <a class="dropdown-item" style="font-weight: 300 !important;" href="/mywishlist">
@@ -407,10 +431,10 @@
                 </ul>
               </li>
             </ul>
-
+    
           </div>
           {{-- Cart Icon --}}
-          <a class="d-none d-md-block d-lg-block d-xl-block" style="text-decoration: none !important" href="/cart">
+          <a class="d-none d-md-block pc-cart" style="text-decoration: none !important" href="/cart">
             <div class="" style="width: 50px !important; padding: 0 !important; margin-right: -20px !important">
               <i class="fa" style="font-size:24px; color:#126cb6;">&#xf07a;</i><span class="badge badge-warning count-cart-items" id="lblCartCount" style="font-size: 12px; background: #ff0000; color: #fff; padding: 4px 7px; vertical-align: top; margin-left: -10px;display: unset !important; font-weight: 500 !important; border-radius: 1rem !important; margin-top: -15px;">0</span>
             </div>
@@ -426,11 +450,10 @@
               </form><br/>
             </div>
           </div>
-
+    
         </div>
-
+    
       </nav>
-
     </header>
 
   @yield('content')

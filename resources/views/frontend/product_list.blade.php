@@ -144,7 +144,7 @@
 		<div class="container" style="max-width: 100% !important;">
 			<div class="row">
 				<!--sidebar-->
-				<div class="col-lg-2 checkersxx">
+				<div class="col-lg-2 checkersxx d-none d-lg-block">
 					<div class="d-flex justify-content-between align-items-center he1" style="font-weight: 500 !important"><b>Filter Results</b>
 						<a href="/products/{{ $product_category->id }}" style="text-decoration: none;">
 							<small class="stylecap he2 text-dark" style="font-weight:400 !important;">Clear All</small>
@@ -214,13 +214,18 @@
 				<div class="col-lg-10">
 					<div class="row g-6">
 						<form id="sortForm" class="d-inline-block">
-							<a class="btn d-sm-block d-md-none filter-btn" data-toggle="modal" data-target="#filterModal2" style="font-size: 0.75rem !important; float: left !important">
+							<a class="btn d-none d-md-block filter-btn" data-toggle="modal" data-target="#filterModal2" style="font-size: 0.75rem !important; float: left !important">
 								<i class="fas fa-filter"></i>&nbsp; Filters
 							</a>
 							<div class="col-md-4 offset-md-8">
 								
 								<div class="d-flex  justify-content-end" style="margin-right: 5%;">
-									<div class="p-2"><label class="mt-1 mb-1 mr-0" style="font-size: 0.75rem;">Sort By</label></div>
+									<div>
+										<a class="btn d-sm-block d-md-none" data-toggle="modal" data-target="#filterModal2" style="font-size: 0.75rem !important; float: left !important; margin-top: 6%">
+											<i class="fas fa-filter"></i>&nbsp; Filters
+										</a>
+									</div>
+									<div class="p-2"><label class="mt-1 mb-1 mr-0 sort-by" style="font-size: 0.75rem;">Sort By</label></div>
 									<div class="p-2">
 										<select name="sortby" class="form-control form-control-sm" style="font-size: 0.75rem; display: inline-block;">
 											<option value="Position" data-loc="{{ request()->fullUrlWithQuery(['sortby' => 'Position']) }}" {{ (request()->sortby == 'Position') ? 'selected' : '' }}>Recommended</option>
@@ -241,9 +246,9 @@
 								  </div>
 								<div class="row mb-2">
 									<div class="col-md-6 pr-1" style="text-align: right;">
-										<a class="btn d-sm-block d-md-none" data-toggle="modal" data-target="#filterModal2" style="font-size: 0.75rem !important; float: left !important">
+										{{-- <a class="btn d-sm-block d-md-none" data-toggle="modal" data-target="#filterModal2" style="font-size: 0.75rem !important; float: left !important">
 											<i class="fas fa-filter"></i>&nbsp; Filters
-										</a>
+										</a> --}}
 										{{-- <label class="mt-1 mb-1 mr-0" style="font-size: 0.75rem;">Sort By</label> --}}
 									</div>
 									<div class="col-md-6" style="padding: 0; float: right !important; min-width: 120px !important; padding-right: 5%;">
