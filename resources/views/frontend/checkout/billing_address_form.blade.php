@@ -206,7 +206,7 @@
 						<small style="font-style: italic; font-size: 0.75rem; margin-top: 20px; display: block;">Note: * Required information</small>
 						<br>
 						<div class="form-check">
-							<input class="form-check-input" type="checkbox" id="myCheck" name="same_as_billing" checked>
+							<input class="form-check-input" type="checkbox" id="myCheck" name="same_as_billing" value="1" checked>
 							<label class="form-check-label" for="flexCheckChecked" class="formslabelfnt" style="font-size: 14px;">Billing address is the same as above</label>
 						</div>
 						<br/>

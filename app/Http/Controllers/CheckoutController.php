@@ -110,6 +110,14 @@ class CheckoutController extends Controller
 		DB::beginTransaction();
 		try{
 			if ($request->ajax()) {
+				if ($request->same_as_billing) {
+					$shipping_session = session()->get('fumShipDet');
+
+					$shipping_session['same_as_billing'] = 1;
+
+					session()->put('fumShipDet', $shipping_session);
+				}
+			
 				$o_email = Auth::user()->username;
 
 				$user = DB::table('fumaco_users')->where('username', $o_email)->first();

@@ -305,7 +305,6 @@ class CartController extends Controller
                     'email_address' => $billing_address->xcontactemail1,
                     'mobile_no' => $billing_address->xmobile_number,
                     'contact_no' => $billing_address->xcontactnumber1,
-                    'same_as_billing' => 0
                 ];
 
                 session()->put('fumBillDet', $billing_details);
@@ -318,11 +317,13 @@ class CartController extends Controller
         
         if($request->isMethod('POST')) {
             if ($request->ajax()) {
-                $existing_account = DB::table('fumaco_users')->where('username', $request->ship_email)->exists();
-                if ($existing_account) {
-                    return response()->json(['status' => 'error', 'message' => 'Email already exists, please <a href="'. route('login') .'">login</a>.']);
+                if (!Auth::check()) {
+                    $existing_account = DB::table('fumaco_users')->where('username', $request->ship_email)->exists();
+                    if ($existing_account) {
+                        return response()->json(['status' => 'error', 'message' => 'Email already exists, please <a href="'. route('login') .'">login</a>.']);
+                    }
                 }
-                
+               
                 $shipping_details = [
                     'fname' => $request->fname,
                     'lname' => $request->lname,
