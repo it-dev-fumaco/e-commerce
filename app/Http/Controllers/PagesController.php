@@ -18,8 +18,8 @@ class PagesController extends Controller
         return response()->json($pages);
     }
 
-    public function editForm($slug){
-        $policy = DB::table('fumaco_pages')->where('slug', $slug)->first();
+    public function editForm($page_id){
+        $policy = DB::table('fumaco_pages')->where('page_id', $page_id)->first();
 
         return view('backend.pages.edit', compact('policy'));
     }

@@ -197,7 +197,7 @@ Route::prefix('admin')->group(function () {
         Route::post('/user_management/change_user_password/', 'UserManagementController@userChangePassword');
 
         Route::get('/pages/list', 'PagesController@viewPages');
-        Route::get('/pages/edit/{slug}', 'PagesController@editForm');
+        Route::get('/pages/edit/{page_id}', 'PagesController@editForm');
         Route::post('/edit/{id}', 'PagesController@editPage');
 
         // SHIPPING SERVICES ROUTES CMS

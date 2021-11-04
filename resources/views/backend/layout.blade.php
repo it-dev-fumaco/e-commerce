@@ -533,7 +533,7 @@
           var activePage = {!! str_replace("'", "\'", json_encode($activePage)) !!};
           
           $(response).each(function(i, d){
-            var link = '/admin/pages/edit/' + d.slug;
+            var link = '/admin/pages/edit/' + d.page_id;
             if(activePage == d.slug){
               active = 'active';
             }else{

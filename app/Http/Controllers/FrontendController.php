@@ -291,6 +291,10 @@ class FrontendController extends Controller
     public function viewPage($slug){
         $pages = DB::table('fumaco_pages')->where('slug', $slug)->first();
 
+        if(!$pages){
+            return abort(404);
+        }
+
         return view('frontend.policy_page', compact('pages'));
     }
 
