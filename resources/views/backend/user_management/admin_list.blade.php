@@ -27,6 +27,16 @@
                         <div class="col-md-12">
                             <div class="card card-primary">
                                 <div class="card-body">
+                                    @if(session()->has('success'))
+                                        <div class="alert alert-success">
+                                            {{ session()->get('success') }}
+                                        </div>
+                                    @endif
+                                    @if(session()->has('error'))
+                                        <div class="alert alert-warning">
+                                            {{ session()->get('error') }}
+                                        </div>
+                                    @endif
                                     <form action="/admin/user_management/list" method="GET">
                                         <div class="form-group row">
                                             <div class="col-md-3">
@@ -48,10 +58,10 @@
                                                 <th>Username</th>
                                                 <th>User Type</th>
                                                 <th>Account Name</th>
-                                                <th>Action</th>
                                                 <th>Last Login</th>
                                                 <th>Last Login IP</th>
                                                 <th>Active</th>
+                                                <th class="text-center">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -61,10 +71,27 @@
                                                     <td>{{ $a->username }}</td>
                                                     <td>{{ $a->user_type }}</td>
                                                     <td>{{ $a->account_name }}</td>
+                                                    <td>{{ date('M d, Y h:i A', strtotime($a->last_login)) }}</td>
+                                                    <td>{{ $a->last_login_ip }}</td>
                                                     <td>
-                                                        <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#adminModal-{{ $a->id }}">
-                                                            Edit
-                                                        </button>
+                                                        <center>
+                                                            <label class="switch">
+                                                                <input type="checkbox" class="toggle" id="toggle_{{ $a->id }}" name="status" {{ ($a->xstatus == 1) ? 'checked' : '' }} value="{{ $a->id }}"/>
+                                                                <span class="slider round"></span>
+                                                            </label>
+                                                        </center>
+                                                    </td>
+                                                    <td>
+                                                        <center>
+                                                            <div class="dropdown">
+                                                                <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Action
+                                                                </button>
+                                                                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
+                                                                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#adminModal-{{ $a->id }}">Edit Details</a>
+                                                                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#changePassModal-{{ $a->id }}">Change Password</a>
+                                                                </div>
+                                                            </div>
+                                                        </center>
 
                                                         <div class="modal fade" id="adminModal-{{ $a->id }}" tabindex="-1" aria-labelledby="adminModalLabel" aria-hidden="true">
                                                             <div class="modal-dialog">
@@ -101,16 +128,41 @@
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                    </td>
-                                                    <td>{{ date('M d, Y h:i A', strtotime($a->last_login)) }}</td>
-                                                    <td>{{ $a->last_login_ip }}</td>
-                                                    <td>
-                                                        <center>
-                                                            <label class="switch">
-                                                                <input type="checkbox" class="toggle" id="toggle_{{ $a->id }}" name="status" {{ ($a->xstatus == 1) ? 'checked' : '' }} value="{{ $a->id }}"/>
-                                                                <span class="slider round"></span>
-                                                            </label>
-                                                        </center>
+
+                                                        <div class="modal fade" id="changePassModal-{{ $a->id }}" tabindex="-1" aria-labelledby="adminModalLabel" aria-hidden="true">
+                                                            <div class="modal-dialog">
+                                                                <div class="modal-content">
+                                                                    <div class="modal-header">
+                                                                        <h5 class="modal-title" id="adminModalLabel">Edit Information</h5>
+                                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                            <span aria-hidden="true">&times;</span>
+                                                                        </button>
+                                                                    </div>
+                                                                    <form action="/admin/user_management/change_password/{{ $a->id }}" method="post">
+                                                                        <div class="modal-body">
+                                                                            @csrf
+                                                                            <label>Username:</label> {{ $a->username }}
+                                                                            <div class="form-group">
+                                                                                <label for="current">Current Password</label>
+                                                                                <input type="password" class="form-control" name="current" placeholder="Current Password" required>
+                                                                            </div>
+                                                                            <div class="form-group">
+                                                                                <label for="password">New Password</label>
+                                                                                <input type="password" class="form-control" name="password" placeholder="Password" required>
+                                                                            </div>
+                                                                            <div class="form-group">
+                                                                                <label for="confirm">Confirm New Password</label>
+                                                                                <input type="password" class="form-control" name="confirm" placeholder="Confirm Password" required>
+                                                                            </div>                                                                    
+                                                                        </div>
+                                                                        <div class="modal-footer">
+                                                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                                            <button type="submit" class="btn btn-primary">Save changes</button>
+                                                                        </div>
+                                                                    </form>
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                                     </td>
                                                 </tr>
                                             @endforeach

@@ -91,14 +91,16 @@ class UserManagementController extends Controller
         return view('backend.user_management.change_password');
     }
 
-    public function adminChangePassword(Request $request){
+    public function adminChangePassword(Request $request, $id){
         DB::beginTransaction();
         try {
             if($request->password != $request->confirm){
                 return redirect()->back()->with("error","New password/s do not match");
             }
 
-            if (!(Hash::check($request->get('current'), Auth::user()->password))) {
+            $user = DB::table('fumaco_admin_user')->where('id', $id)->first();
+
+            if (!(Hash::check($request->get('current'), $user->password))) {
                 return redirect()->back()->with("error","Your current password does not match with the password you provided. Please try again.");
             }
     
@@ -119,7 +121,7 @@ class UserManagementController extends Controller
 				return redirect()->back()->with('error', 'Password should be at least 4 characters');
 			}
 
-            DB::table('fumaco_admin_user')->where('id', Auth::user()->id)->update(['password' => password_hash($request->password, PASSWORD_DEFAULT)]);
+            DB::table('fumaco_admin_user')->where('id', $id)->update(['password' => password_hash($request->password, PASSWORD_DEFAULT)]);
             DB::commit();
 
             return redirect()->back()->with('success', 'Password Changed.');

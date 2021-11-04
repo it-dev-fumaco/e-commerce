@@ -463,12 +463,6 @@
                   <p>Admin</p>
                 </a>
               </li>
-              <li class="nav-item">
-                <a href="/admin/user_management/change_pass" class="nav-link {{ $activePage == 'change_password' ? 'active' : '' }}">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Change Password</p>
-                </a>
-              </li>
             </ul>
           </li>
         </ul>
