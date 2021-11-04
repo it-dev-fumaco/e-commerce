@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use DB;
+use Cache;
 
 class SettingsController extends Controller
 {
@@ -146,7 +147,7 @@ class SettingsController extends Controller
             } else {
                 DB::table('email_config')->insert($data);
             }
-
+            Cache::forget('mail_config');
             DB::commit();
 
             return redirect()->back()->with('success', 'Email Configuration has been saved.');
