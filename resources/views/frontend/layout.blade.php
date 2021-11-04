@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
 <html lang="en">
   <head>
     <meta charset="utf-8">
@@ -337,7 +337,7 @@
         .mb-cart{
           display: inline-block !important;
         }
-        
+
         .sort-by{
           white-space: nowrap !important;
         }
@@ -367,13 +367,13 @@
               <i class="fa" style="font-size:24px; color:#126cb6;">&#xf07a;</i><span class="badge badge-warning count-cart-items" id="lblCartCount" style="font-size: 12px; background: #ff0000; color: #fff; padding: 4px 7px; vertical-align: top; margin-left: -10px;display: unset !important; font-weight: 500 !important; border-radius: 1rem !important; margin-top: -15px;">0</span>
             </div>
           </a>
-    
+
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" style="float: right !important">
             <span class="navbar-toggler-icon"></span>
           </button>
           </div>
           {{-- Mobile Icons --}}
-    
+
           <div class="collapse navbar-collapse nav_fumaco_res nav-a" id="navbarCollapse">
             <ul class="navbar-nav me-auto mb-2 mb-md-0 navbar-header">
               <li class="nav-item dropdown">
@@ -438,7 +438,7 @@
                 </ul>
               </li>
             </ul>
-    
+
           </div>
           {{-- Cart Icon --}}
           <a class="d-none d-lg-block pc-cart" style="text-decoration: none !important" href="/cart">
@@ -457,9 +457,9 @@
               </form><br/>
             </div>
           </div>
-    
+
         </div>
-    
+
       </nav>
     </header>
 
