@@ -11,7 +11,7 @@
 		 <div class="row mb-2">
 			<div class="col-sm-6">
 			  <h1 class="m-0">Dashboard</h1>
-			  <p>You are logged in as {{ $name }}</p>
+			  <p>You are logged in as {{ Auth::user()->account_name }}</p>
 			</div><!-- /.col -->
 			<div class="col-sm-6">
 			  <ol class="breadcrumb float-sm-right">
@@ -33,9 +33,9 @@
 			  <!-- small box -->
 			  <div class="small-box bg-info">
 				 <div class="inner">
-					<h3>0</h3>
+					<h3>{{ $new_orders }}</h3>
 
-					<p>New Orders</p>
+					<p>New Order(s)</p>
 				 </div>
 				 <div class="icon">
 					<i class="ion ion-bag"></i>
@@ -47,9 +47,9 @@
 			  <!-- small box -->
 			  <div class="small-box bg-success">
 				 <div class="inner">
-					<h3>0</h3>
+					<h3>{{ $total_orders }}</h3>
 
-					<p>Total Order</p>
+					<p>Total Order(s)</p>
 				 </div>
 				 <div class="icon">
 					<i class="ion ion-stats-bars"></i>
@@ -61,9 +61,9 @@
 			  <!-- small box -->
 			  <div class="small-box bg-warning">
 				 <div class="inner">
-					<h3>0</h3>
+					<h3>{{ $users }}</h3>
 
-					<p>User Registrations</p>
+					<p>User Registration(s)</p>
 				 </div>
 				 <div class="icon">
 					<i class="ion ion-person-add"></i>

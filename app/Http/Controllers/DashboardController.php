@@ -10,8 +10,13 @@ use DB;
 class DashboardController extends Controller
 {
 	public function index() {
-		$name = Auth::user()->account_name;
-		return view('backend.dashboard.index', compact('name'));
+		$new_orders = DB::table('fumaco_order')->where('order_status', '!=', 'Cancelled')->where('order_status', '!=', 'Delivered')->count();
+
+		$total_orders = DB::table('fumaco_order')->count();
+
+		$users = DB::table('fumaco_users')->count();
+
+		return view('backend.dashboard.index', compact('new_orders', 'total_orders', 'users'));
 	}
 
 }
