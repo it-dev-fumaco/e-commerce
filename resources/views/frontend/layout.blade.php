@@ -546,7 +546,7 @@
               // for footer links
               f += '<tr style="border-style: unset !important;">' +
                 '<td class="tdfooter footer2nd" style="border-style: unset !important;">' +
-                '<a style="text-decoration:none; color: #0062A5;" href="'+ link +'" target="_blank" >' + d.page_title +'</a>' +
+                '<a style="text-decoration:none; color: #0062A5;" href="'+ link +'" >' + d.page_title +'</a>' +
               '</td></tr>';
             });
 
