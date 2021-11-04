@@ -192,6 +192,8 @@ Route::prefix('admin')->group(function () {
         Route::post('/user_management/add_admin', 'UserManagementController@addAdmin');
         Route::post('/user_management/edit', 'UserManagementController@editAdmin');
         Route::post('/user_management/change_status', 'UserManagementController@adminChangeStatus');
+        Route::get('/user_management/change_pass', 'UserManagementController@adminPasswordForm');
+        Route::post('/user_management/change_password', 'UserManagementController@adminChangePassword');
 
         Route::get('/pages/list', 'PagesController@viewPages');
         Route::get('/pages/edit/{slug}', 'PagesController@editForm');

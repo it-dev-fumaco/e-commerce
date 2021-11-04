@@ -448,7 +448,7 @@
             </ul>
           </li>
           @php
-              $user_mgt_pages = ['admin_list']
+              $user_mgt_pages = ['admin_list', 'change_password']
           @endphp
           <li class="nav-header">User Management</li>
           <li class="nav-item {{ (in_array($activePage, $user_mgt_pages) ? 'menu-open' : '') }}">
@@ -463,12 +463,12 @@
                   <p>Admin</p>
                 </a>
               </li>
-              {{-- <li class="nav-item">
-                <a href=" " class="nav-link {{ $activePage == 'erp_api_setup' ? 'active' : '' }}">
+              <li class="nav-item">
+                <a href="/admin/user_management/change_pass" class="nav-link {{ $activePage == 'change_password' ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>User</p>
+                  <p>Change Password</p>
                 </a>
-              </li> --}}
+              </li>
             </ul>
           </li>
         </ul>
