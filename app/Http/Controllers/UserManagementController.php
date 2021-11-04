@@ -88,10 +88,11 @@ class UserManagementController extends Controller
     }
 
     public function adminPasswordForm(){
-        return view('backend.user_management.change_password');
+        $user = DB::table('fumaco_admin_user')->where('id', Auth::user()->id)->first();
+        return view('backend.user_management.change_password', compact('user'));
     }
 
-    public function adminChangePassword(Request $request, $id){
+    public function adminChangePassword(Request $request, $id){ //For System Admin
         DB::beginTransaction();
         try {
             if($request->password != $request->confirm){
@@ -122,6 +123,44 @@ class UserManagementController extends Controller
 			}
 
             DB::table('fumaco_admin_user')->where('id', $id)->update(['password' => password_hash($request->password, PASSWORD_DEFAULT)]);
+            DB::commit();
+
+            return redirect()->back()->with('success', 'Password Changed.');
+        } catch (Exception $e) {
+            DB::rollback();
+            return redirect()->back()->with('error', 'An error occured. Please try again.');
+        }
+    }
+
+    public function userChangePassword(Request $request){ //For Logged in User
+        DB::beginTransaction();
+        try {
+            if($request->password != $request->confirm){
+                return redirect()->back()->with("error","New password/s do not match");
+            }
+
+            if (!(Hash::check($request->get('current'), Auth::user()->password))) {
+                return redirect()->back()->with("error","Your current password does not match with the password you provided. Please try again.");
+            }
+    
+            if(strcmp($request->get('current'), $request->get('password')) == 0){
+                //Current password and new password are same
+                return redirect()->back()->with("error","New password cannot be same as your current password. Please choose a different password.");
+            }
+    
+            $rules = array(
+                'current' => 'required',
+                'password' => 'required|string|min:4|max:255',
+                'confirm' => 'required|string'
+            );
+
+			$validation = Validator::make($request->all(), $rules);
+
+            if($validation->fails()){
+				return redirect()->back()->with('error', 'Password should be at least 4 characters');
+			}
+
+            DB::table('fumaco_admin_user')->where('id', Auth::user()->id)->update(['password' => password_hash($request->password, PASSWORD_DEFAULT)]);
             DB::commit();
 
             return redirect()->back()->with('success', 'Password Changed.');

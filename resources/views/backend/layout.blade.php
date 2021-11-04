@@ -450,17 +450,23 @@
           @php
               $user_mgt_pages = ['admin_list', 'change_password']
           @endphp
-          <li class="nav-header {{ Auth::user()->user_type != 'System Admin' ? 'd-none' : ''  }}">USER MANAGEMENT</li>
-          <li class="nav-item {{ Auth::user()->user_type != 'System Admin' ? 'd-none' : ''  }} {{ (in_array($activePage, $user_mgt_pages) ? 'menu-open' : '') }}">
+          <li class="nav-header">USER MANAGEMENT</li>
+          <li class="nav-item {{ (in_array($activePage, $user_mgt_pages) ? 'menu-open' : '') }}">
             <a href="#" class="nav-link {{ (in_array($activePage, $user_mgt_pages) ? 'active' : '') }}">
                 <i class="fas fa-users"></i>
               <p>Users <i class="fas fa-angle-left right"></i></p>
             </a>
             <ul class="nav nav-treeview">
-              <li class="nav-item">
+              <li class="nav-item {{ Auth::user()->user_type != 'System Admin' ? 'd-none' : ''  }}">
                 <a href="/admin/user_management/list" class="nav-link {{ $activePage == 'admin_list' ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Admin</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="/admin/user_management/change_pass" class="nav-link {{ $activePage == 'change_password' ? 'active' : '' }}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Change Password</p>
                 </a>
               </li>
             </ul>
