@@ -390,11 +390,11 @@
             </ul>
           </li>
 
-          <li class="nav-header">SYSTEM SETTINGS</li>
+          <li class="nav-header {{ Auth::user()->user_type != 'System Admin' ? 'd-none' : ''  }}">SYSTEM SETTINGS</li>
           @php
             $settings_pages = ['erp_api_setup', 'payment_api_setup', 'google_api_setup'];
           @endphp
-          <li class="nav-item {{ (in_array($activePage, $settings_pages) ? 'menu-open' : '') }}">
+          <li class="nav-item {{ Auth::user()->user_type != 'System Admin' ? 'd-none' : ''  }} {{ (in_array($activePage, $settings_pages) ? 'menu-open' : '') }}">
             <a href="#" class="nav-link {{ (in_array($activePage, $settings_pages) ? 'active' : '') }}">
               <i class="nav-icon fas fa-cogs"></i>
               <p>API Management <i class="fas fa-angle-left right"></i></p>
@@ -426,7 +426,7 @@
               </li>
             </ul>
           </li>
-          <li class="nav-item {{ (in_array($activePage, ['email_setup']) ? 'menu-open' : '') }}">
+          <li class="nav-item {{ Auth::user()->user_type != 'System Admin' ? 'd-none' : ''  }} {{ (in_array($activePage, ['email_setup']) ? 'menu-open' : '') }}">
             <a href="#" class="nav-link {{ (in_array($activePage, ['email_setup']) ? 'active' : '') }}">
               <i class="nav-icon fas fa-cogs"></i>
 
@@ -450,8 +450,8 @@
           @php
               $user_mgt_pages = ['admin_list', 'change_password']
           @endphp
-          <li class="nav-header">User Management</li>
-          <li class="nav-item {{ (in_array($activePage, $user_mgt_pages) ? 'menu-open' : '') }}">
+          <li class="nav-header {{ Auth::user()->user_type != 'System Admin' ? 'd-none' : ''  }}">USER MANAGEMENT</li>
+          <li class="nav-item {{ Auth::user()->user_type != 'System Admin' ? 'd-none' : ''  }} {{ (in_array($activePage, $user_mgt_pages) ? 'menu-open' : '') }}">
             <a href="#" class="nav-link {{ (in_array($activePage, $user_mgt_pages) ? 'active' : '') }}">
                 <i class="fas fa-users"></i>
               <p>Users <i class="fas fa-angle-left right"></i></p>
