@@ -1,15 +1,33 @@
 <?php return array(
     'root' => array(
-        'pretty_version' => 'v8.6.2',
-        'version' => '8.6.2.0',
+        'pretty_version' => 'dev-master',
+        'version' => 'dev-master',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
-        'reference' => NULL,
+        'reference' => '65d1f90294f23141a910e7bee260e45c1214814a',
         'name' => 'laravel/laravel',
         'dev' => true,
     ),
     'versions' => array(
+        'alexpechkarev/geometry-library' => array(
+            'pretty_version' => '1.0.2',
+            'version' => '1.0.2.0',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../alexpechkarev/geometry-library',
+            'aliases' => array(),
+            'reference' => '85a0859e87343e871020f0bc7530309d75ab4a3c',
+            'dev_requirement' => false,
+        ),
+        'alexpechkarev/google-maps' => array(
+            'pretty_version' => '8.0',
+            'version' => '8.0.0.0',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../alexpechkarev/google-maps',
+            'aliases' => array(),
+            'reference' => 'cf10b7a5cbe18d4e0f845acf05d6979647f7b279',
+            'dev_requirement' => false,
+        ),
         'asm89/stack-cors' => array(
             'pretty_version' => 'v2.0.3',
             'version' => '2.0.3.0',
@@ -19,6 +37,15 @@
             'reference' => '9cb795bf30988e8c96dd3c40623c48a877bc6714',
             'dev_requirement' => false,
         ),
+        'biscolab/laravel-recaptcha' => array(
+            'pretty_version' => '5.0.1',
+            'version' => '5.0.1.0',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../biscolab/laravel-recaptcha',
+            'aliases' => array(),
+            'reference' => '21018b259827e1446ea9d829ae423022a0e1025e',
+            'dev_requirement' => false,
+        ),
         'brick/math' => array(
             'pretty_version' => '0.9.3',
             'version' => '0.9.3.0',
@@ -26,6 +53,15 @@
             'install_path' => __DIR__ . '/../brick/math',
             'aliases' => array(),
             'reference' => 'ca57d18f028f84f777b2168cd1911b0dee2343ae',
+            'dev_requirement' => false,
+        ),
+        'buglinjo/laravel-webp' => array(
+            'pretty_version' => '2.1',
+            'version' => '2.1.0.0',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../buglinjo/laravel-webp',
+            'aliases' => array(),
+            'reference' => 'a16aa528dc500e99817f3b314b48c5272614598d',
             'dev_requirement' => false,
         ),
         'cordoval/hamcrest-php' => array(
@@ -370,6 +406,15 @@
                 0 => 'v8.61.0',
             ),
         ),
+        'jbroadway/urlify' => array(
+            'pretty_version' => '1.2.2-stable',
+            'version' => '1.2.2.0',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../jbroadway/urlify',
+            'aliases' => array(),
+            'reference' => '9b227e8548f16268cef55b5eb5d659a801fa824b',
+            'dev_requirement' => false,
+        ),
         'kodova/hamcrest-php' => array(
             'dev_requirement' => true,
             'replaced' => array(
@@ -386,12 +431,12 @@
             'dev_requirement' => false,
         ),
         'laravel/laravel' => array(
-            'pretty_version' => 'v8.6.2',
-            'version' => '8.6.2.0',
+            'pretty_version' => 'dev-master',
+            'version' => 'dev-master',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
-            'reference' => NULL,
+            'reference' => '65d1f90294f23141a910e7bee260e45c1214814a',
             'dev_requirement' => false,
         ),
         'laravel/sail' => array(
@@ -420,6 +465,15 @@
             'aliases' => array(),
             'reference' => '04ad32c1a3328081097a181875733fa51f402083',
             'dev_requirement' => false,
+        ),
+        'laravel/ui' => array(
+            'pretty_version' => 'v3.3.0',
+            'version' => '3.3.0.0',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../laravel/ui',
+            'aliases' => array(),
+            'reference' => '07d725813350c695c779382cbd6dac0ab8665537',
+            'dev_requirement' => true,
         ),
         'league/commonmark' => array(
             'pretty_version' => '1.6.6',
@@ -724,8 +778,8 @@
         'psr/log-implementation' => array(
             'dev_requirement' => false,
             'provided' => array(
-                0 => '1.0|2.0',
-                1 => '1.0.0 || 2.0.0 || 3.0.0',
+                0 => '1.0.0 || 2.0.0 || 3.0.0',
+                1 => '1.0|2.0',
             ),
         ),
         'psr/simple-cache' => array(
@@ -928,6 +982,15 @@
             'aliases' => array(),
             'reference' => 'c6c1022351a901512170118436c764e473f6de8c',
             'dev_requirement' => true,
+        ),
+        'spatie/laravel-cookie-consent' => array(
+            'pretty_version' => '2.12.13',
+            'version' => '2.12.13.0',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../spatie/laravel-cookie-consent',
+            'aliases' => array(),
+            'reference' => '8e93b9efee3a68960e5c832f937170c2fc0b2f37',
+            'dev_requirement' => false,
         ),
         'swiftmailer/swiftmailer' => array(
             'pretty_version' => 'v6.2.7',
@@ -1236,6 +1299,15 @@
             'install_path' => __DIR__ . '/../voku/portable-ascii',
             'aliases' => array(),
             'reference' => '80953678b19901e5165c56752d087fc11526017c',
+            'dev_requirement' => false,
+        ),
+        'voku/stop-words' => array(
+            'pretty_version' => '2.0.1',
+            'version' => '2.0.1.0',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../voku/stop-words',
+            'aliases' => array(),
+            'reference' => '8e63c0af20f800b1600783764e0ce19e53969f71',
             'dev_requirement' => false,
         ),
         'webmozart/assert' => array(
