@@ -516,10 +516,10 @@
             <div class="col-md-12" style="text-align: left !important;">
               <h6 class="footer1st" style="color:#ffffff !important;">WE ACCEPT</h6>
               <div class="row" style="padding-left:1% !important">
-                <div class="d-inline m-2 payment-icons"><img src="{{ asset('/storage/payment_method/Mastercard-logo.svg') }}" alt="Master Card" style="width: 100%; height: 100% !important"></div>
-                <div class="d-inline m-2 payment-icons"><img src="{{ asset('/storage/payment_method/Visa_2021.svg') }}" alt="Visa" style="width: 100%; height: 100% !important"></div>
-                <div class="d-inline m-2 payment-icons" style="position: relative !important"><img src="{{ asset('/storage/payment_method/gcash.svg') }}" alt="GCash" style="max-height: 100%;max-width: 100%;width: auto;height: auto;position: absolute;top: 0;bottom: 0;left: 0;right: 0;margin: auto;"></div>
-                <div class="d-inline m-2 payment-icons" style="position: relative !important"><img src="{{ asset('/storage/payment_method/grabpay2.png') }}" alt="GrabPay" style="max-height: 100%;max-width: 100%;width: auto;height: auto;position: absolute;top: 0;bottom: 0;left: 0;right: 0;margin: auto;"></div>
+                <div class="d-inline m-2 payment-icons"><img src="{{ asset('/assets/payment_method/Mastercard-logo.svg') }}" alt="Master Card" style="width: 100%; height: 100% !important"></div>
+                <div class="d-inline m-2 payment-icons"><img src="{{ asset('/assets/payment_method/Visa_2021.svg') }}" alt="Visa" style="width: 100%; height: 100% !important"></div>
+                <div class="d-inline m-2 payment-icons" style="position: relative !important"><img src="{{ asset('/assets/payment_method/gcash.svg') }}" alt="GCash" style="max-height: 100%;max-width: 100%;width: auto;height: auto;position: absolute;top: 0;bottom: 0;left: 0;right: 0;margin: auto;"></div>
+                <div class="d-inline m-2 payment-icons" style="position: relative !important"><img src="{{ asset('/assets/payment_method/grabpay2.png') }}" alt="GrabPay" style="max-height: 100%;max-width: 100%;width: auto;height: auto;position: absolute;top: 0;bottom: 0;left: 0;right: 0;margin: auto;"></div>
                 {{-- <div class="d-inline mx-auto payment-icons"><img src="{{ asset('/storage/payment_method/PayPal.svg') }}" alt="PayPal" style="width: 100%; height: 100% !important"></div> --}}
               </div>
             </div>
