@@ -224,15 +224,15 @@
 																							<input type="text" name="id" value="{{ $c->id }}" hidden readonly>
 																							<div class="form-group">
 																								<label for="cat_meta_keywords">Meta Keywords :</label>
-																								<input type="text" class="form-control" id="edit_cat_name" name="cat_meta_keywords" value="{{ $c->meta_keywords }}" required>
+																								<input type="text" class="form-control" id="edit_cat_name" name="cat_meta_keywords" value="{{ $c->meta_keywords }}">
 																							</div>
 																							<div class="form-group">
 																								<label for="cat_meta_desc">Meta Description :</label>
-																								<input type="text" class="form-control" id="edit_cat_name" name="cat_meta_desc" value="{{ $c->meta_description }}" required>
+																								<input type="text" class="form-control" id="edit_cat_name" name="cat_meta_desc" value="{{ $c->meta_description }}">
 																							</div>
 																							<div class="form-group">
 																								<label for="edit_cat_slug">Slug :</label>
-																								<input type="text" class="form-control" id="edit_cat_slug" name="edit_cat_slug" value="{{ $c->slug }}" required>
+																								<input type="text" class="form-control" id="edit_cat_slug" name="edit_cat_slug" value="{{ $c->slug }}">
 																							</div>
 																						</div>
 																					</div>
@@ -431,7 +431,7 @@
 											</div>
 											<div class="form-group">
 												<label for="edit_cat_slug">Slug :</label>
-												<input type="text" class="form-control" name="add_cat_slug" required>
+												<input type="text" class="form-control" name="add_cat_slug">
 											</div>
 										</div>
 									</div>

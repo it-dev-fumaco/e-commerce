@@ -19,9 +19,11 @@ class CategoryController extends Controller
     public function editCategory(Request $request, $id){
         DB::beginTransaction();
         try {
-            $checker = DB::table('fumaco_categories')->where('slug', $request->edit_cat_slug)->where('id', '!=', $request->id)->count();
-            if($checker > 0){
-                return redirect()->back()->with('error', 'Slug must be unique.');
+            if($request->edit_cat_slug){
+                $checker = DB::table('fumaco_categories')->where('slug', $request->edit_cat_slug)->where('id', '!=', $request->id)->count();
+                if($checker > 0){
+                    return redirect()->back()->with('error', 'Slug must be unique.');
+                }
             }
             $cat_edit = [
                 'name' => $request->edit_cat_name,
@@ -53,14 +55,15 @@ class CategoryController extends Controller
                 'code' => " ",
                 'external_link' => ($request->is_external_link) ? $request->external_link : null
             ];
-            
-            $rules = array(
-				'slug' => 'required|unique:fumaco_categories,slug'
-			);
+            if($request->add_cat_slug){
+                $rules = array(
+                    'slug' => 'required|unique:fumaco_categories,slug'
+                );
 
-			$validation = Validator::make($request->all(), $rules);
-            if($validation->fails()){
-                return redirect()->back()->with('error', 'Slug must be unique');
+                $validation = Validator::make($request->all(), $rules);
+                if($validation->fails()){
+                    return redirect()->back()->with('error', 'Slug must be unique');
+                }
             }
 
             DB::table('fumaco_categories')->insert($add);
