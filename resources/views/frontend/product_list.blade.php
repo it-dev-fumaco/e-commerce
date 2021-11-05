@@ -176,12 +176,12 @@
 				<!--sidebar-->
 				<div class="col-lg-2 checkersxx d-none d-lg-block">
 					<div class="d-flex justify-content-between align-items-center he1" style="font-weight: 500 !important"><b>Filter Results</b>
-						<a href="/products/{{ $product_category->slug }}" style="text-decoration: none;">
+						<a href="/products/{{ ($product_category->slug) ? $product_category->slug : $product_category->id }}" style="text-decoration: none;">
 							<small class="stylecap he2 text-dark" style="font-weight:400 !important;">Clear All</small>
 						</a>
 					</div>
 					<hr>
-					<form action="/products/{{ $product_category->slug }}" method="POST" id="filter-form" class="mb-5">
+					<form action="/products/{{ ($product_category->slug) ? $product_category->slug : $product_category->id }}" method="POST" id="filter-form" class="mb-5">
 						@csrf
 						@php
 							$a = 0;

@@ -589,7 +589,13 @@
             var l = '';
             var f = '';
             $(response).each(function(i, d){
-              var link = (d.external_link) ? d.external_link : '/products/' + d.slug ;
+              var slug = "";
+              if(d.slug){
+                slug = d.slug;
+              }else{
+                slug = d.id;
+              }
+              var link = (d.external_link) ? d.external_link : '/products/' + slug ;
               var target = (d.external_link) ? 'target="_blank"' : '';
               // for navbar dropdown
               l += '<li><a class="dropdown-item" style="font-weight: 300 !important;" href="' + link +'" ' + target + '>' +
