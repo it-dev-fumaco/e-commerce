@@ -369,7 +369,7 @@
 							@forelse ($products_arr as $product)
 							<div class="col-md-4 mb-3 btmp mb-pad">
 								{{-- <div class="col-md-4 btmp animated animatedFadeInUp fadeInUp equal-height-columns"> --}}
-							<a href="/product/{{ $product['item_code'] }}" style="text-decoration: none !important; text-transform: none !important;">
+							<a href="/product/{{ $product['slug'] }}" style="text-decoration: none !important; text-transform: none !important;">
 	
 								<div class="card">
 									<div class="equal-column-content">
@@ -411,7 +411,7 @@
 											{{-- <a href="/product/{{ $product['item_code'] }}" class="btn btn-outline-primary fumacoFont_card_readmore" role="button" style="width:100% !important;">View</a> --}}
 										</div>
 									</div>
-									<a href="/product/{{ $product['item_code'] }}" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto" role="button" style="width: 90% !important; margin-bottom: 20px">View</a>
+									<a href="/product/{{ $product['slug'] }}" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto" role="button" style="width: 90% !important; margin-bottom: 20px">View</a>
 	
 								</div>
 							</a>

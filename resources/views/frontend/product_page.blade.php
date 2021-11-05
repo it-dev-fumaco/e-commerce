@@ -901,7 +901,7 @@
 															<small class="text-muted stylecap" style="color:#c4cad0 !important; font-weight:100 !important;">( 0 Reviews )</small>
 														</div>
 														<br>
-														<a href="/product/{{ $rp['item_code'] }}" class="btn btn-outline-primary fumacoFont_card_readmore" role="button" style="width:100% !important;">View</a>
+														<a href="/product/{{ $rp['slug'] }}" class="btn btn-outline-primary fumacoFont_card_readmore" role="button" style="width:100% !important;">View</a>
 													</div>
 												</div>
 											</div>

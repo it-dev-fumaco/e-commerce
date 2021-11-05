@@ -294,8 +294,12 @@
                            <textarea class="form-control" rows="3" id="product-keywords" name="keywords">{{ old('keywords') }}{{ $details->keywords }}</textarea>
                          </div>
                          <div class="form-group">
-                           <label for="product-url">URL Title</label>
-                           <input type="text" class="form-control" id="product-url" name="url_title" value="{{ old('url_title') }}{{ $details->url_title }}">
+                           <label for="product-url">* URL Title</label>
+                           <input type="text" class="form-control" id="product-url" name="url_title" value="{{ old('url_title') }}{{ $details->url_title }}" required>
+                         </div>
+                         <div class="form-group">
+                           <label for="product-url">* Slug</label>
+                           <input type="text" class="form-control" id="product-url" name="slug" value="{{ old('slug') }}{{ $details->slug }}" required>
                          </div>
                          <div class="form-group">
                            <label for="product-meta-description">Meta Description</label>

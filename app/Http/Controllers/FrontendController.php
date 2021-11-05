@@ -682,14 +682,15 @@ class FrontendController extends Controller
                 'is_discounted' => $product->f_discount_trigger,
                 'on_sale' => $product->f_onsale,
                 'discount_percent' => $product->f_discount_percent,
+                'slug' => $product->slug
             ];
         }
 
         return view('frontend.product_list', compact('product_category', 'products_arr', 'products', 'filters'));
     }
 
-    public function viewProduct($item_code) { // Product Page
-        $product_details = DB::table('fumaco_items')->where('f_idcode', $item_code)->first();
+    public function viewProduct($slug) { // Product Page
+        $product_details = DB::table('fumaco_items')->where('slug', $slug)->first();
         if (!$product_details) {
             return view('error');
         }
@@ -707,7 +708,7 @@ class FrontendController extends Controller
 
         $attrib = DB::table('fumaco_items_attributes as a')
             ->join('fumaco_attributes_per_category as c', 'c.id', 'a.attribute_name_id')
-            ->where('idcode', $item_code);
+            ->where('idcode', $product_details->f_idcode);
         
         $na_check = DB::table('fumaco_categories')->where('id', $product_details->f_cat_id)->first();
      
@@ -728,12 +729,12 @@ class FrontendController extends Controller
             }
         }
 
-        $product_images = DB::table('fumaco_items_image_v1')->where('idcode', $item_code)->get();
+        $product_images = DB::table('fumaco_items_image_v1')->where('idcode', $product_details->f_idcode)->get();
 
         $related_products_query = DB::table('fumaco_items as a')
             ->join('fumaco_items_relation as b', 'a.f_idcode', 'b.related_item_code')
-            ->where('b.item_code', $item_code)->where('a.f_status', 1)
-            ->select('a.id', 'a.f_idcode', 'a.f_original_price', 'a.f_discount_trigger', 'a.f_price', 'a.f_name_name')
+            ->where('b.item_code', $product_details->f_idcode)->where('a.f_status', 1)
+            ->select('a.id', 'a.f_idcode', 'a.f_original_price', 'a.f_discount_trigger', 'a.f_price', 'a.f_name_name', 'a.slug')
             ->get();
 
         $related_products = [];
@@ -747,7 +748,8 @@ class FrontendController extends Controller
                 'orig_price' => $row->f_original_price,
                 'is_discounted' => $row->f_discount_trigger,
                 'new_price' => $row->f_price,
-                'image' => ($image) ? $image->imgprimayx : null
+                'image' => ($image) ? $image->imgprimayx : null,
+                'slug' => $row->slug
             ];
         }
 
@@ -1130,8 +1132,8 @@ class FrontendController extends Controller
             ->join('fumaco_items_attributes as b', 'a.f_idcode', 'b.idcode')
             ->join('fumaco_attributes_per_category as c', 'c.id', 'b.attribute_name_id')
             ->where('a.f_parent_code', $request->parent)->where('c.slug', $selected_cb)
-            ->where('b.attribute_value', $attr_collection[$selected_cb])->where('a.f_status', 1)->first();
+            ->where('b.attribute_value', $attr_collection[$selected_cb])->where('a.f_status', 1)->select('a.slug')->first();
 
-        return ($item_code) ? $item_code->f_idcode : $request->id;
+        return ($item_code) ? $item_code->slug : $request->id;
     }
 }
