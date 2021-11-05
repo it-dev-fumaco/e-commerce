@@ -229,11 +229,11 @@
                 </div>
                 <div class="form-group">
                   <label for="product-url">* URL Title</label>
-                  <input type="text" class="form-control" id="product-url" name="url_title" value="{{ old('url_title') }}" required>
+                  <input type="text" class="form-control" id="product-url" name="url_title" value="{{ old('url_title') }}">
                 </div>
                 <div class="form-group">
                   <label for="product-url">* Slug</label>
-                  <input type="text" class="form-control" id="product-slug" name="slug" value="{{ old('slug') }}" required>
+                  <input type="text" class="form-control" id="product-slug" name="slug" value="{{ old('slug') }}">
                 </div>
                 <div class="form-group">
                   <label for="product-meta-description">Meta Description</label>

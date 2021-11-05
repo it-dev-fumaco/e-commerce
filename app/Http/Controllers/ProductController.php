@@ -234,16 +234,16 @@ class ProductController extends Controller
             if(!$item_category) {
                 return redirect()->back()->withInput($request->all())->with('error', 'Please select product category.');
             }
+            if($request->slug){
+                $rules = array(
+                    'slug' => 'required|unique:fumaco_items,slug'
+                );
 
-            $rules = array(
-				'slug' => 'required|unique:fumaco_items,slug'
-			);
-
-			$validation = Validator::make($request->all(), $rules);
-            if($validation->fails()){
-                return redirect()->back()->with('error', 'Slug must be unique');
+                $validation = Validator::make($request->all(), $rules);
+                if($validation->fails()){
+                    return redirect()->back()->with('error', 'Slug must be unique');
+                }
             }
-            
             $id = DB::table('fumaco_items')->insertGetId([
                 'f_idcode' => $item['item_code'],
                 'f_parent_code' => $item['parent_item_code'],
@@ -348,10 +348,11 @@ class ProductController extends Controller
 
             $item_category = DB::table('fumaco_categories')->where('id', $request->product_category)->first();
             $item_category = ($item_category) ? $item_category->name : null;
-
-            $slug_check = DB::table('fumaco_items')->where('id', '!=', $id)->where('slug', $request->slug)->count();
-            if($slug_check > 0){
-                return redirect()->back()->with('error', 'Slug must be unique.');
+            if($request->slug){
+                $slug_check = DB::table('fumaco_items')->where('id', '!=', $id)->where('slug', $request->slug)->count();
+                if($slug_check > 0){
+                    return redirect()->back()->with('error', 'Slug must be unique.');
+                }
             }
             DB::table('fumaco_items')->where('id', $id)->update([
                 'f_name_name' => $request->product_name,
