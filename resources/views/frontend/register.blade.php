@@ -73,105 +73,25 @@
                                 </div>
                                 <br>
                                 <div class="row">
-                                    <p class="reg_link" style="white-space: wrap;"><input type="checkbox" name="subscribe"> &nbsp;Yes, I want to receive email updates and notifications.</p>
+                                    <p style="font-size: 9pt; display: inline-block"><input type="checkbox" name="subscribe"> &nbsp;Yes, I want to receive email updates and notifications.</p>
                                     <p class="reg_link" style=""><input type="checkbox" id="terms_checkbox"> I agree to <a href="/pages/privacy_policy" style="display: inline-block !important;">Privacy Policy</a> and <a href="/pages/terms_condition" style="display: inline-block !important;">Terms</a>.</p>
                                     <input type="submit" id="reg_btn" class="btn btn-primary" value="REGISTER" disabled><br/>
                                 </div>
                             </div>
                         </center>
                     </form>
-{{-- 
-                    <form class="form-signin" action="/login" method="POST" style="max-width: 600px !important; border-color: #efefef; border-style: solid; border-width: 1px; border-top: 8px solid #186eaa; ">
-                        @csrf
-                        <h4 style="color: #404040; border-bottom: 2px solid  #e59866 ; padding-bottom: 8px; text-align: center;">Sign Up</h4>
-                        <center>
-                        <div class="col-lg-7" style="text-align: left;">
-                            <br>
-                            <label for="InputUsername" class="login_1" style="padding-bottom:10px;">Email address <span class="text-danger">*</span><br></label>
-                            <label for="InputUsername" class="login_1">&nbsp;</label>
-                            <br>
-
-                            <input type="email" id="username" name="username" class="form-control" required="" autofocus="" value="{{ old('username') }}">
-                            <br>
-                            <label for="InputPassword" class="login_1" style="padding-bottom:10px;">Password <span class="text-danger">*</span></label>
-                            <label for="InputPassword" class="login_1">&nbsp;</label>
-                            <br>
-
-                            <input type="password" id="password" name="password" class="form-control" required="">
-
-                            <br>
-                            <input type="submit" class="btn btn-primary" value="&nbsp;&nbsp;LOGIN&nbsp;&nbsp;">
-
-                            <a href="{{ route('password.request') }}" id="forgot_pswdx" class="forgot-1">Forgot password?</a>
-                            <br>
-                            <label for="InputPassword" class="status-1"></label>
-                        </div>
-                        </center>
-                    </form> --}}
-
                     <form action="/reset/password/" class="form-reset" style="border-color: #efefef; border-style: solid; border-width: 1px; border-top: 8px solid #186eaa; ">
                         <input type="email" id="resetEmail" class="form-control" placeholder="Email address" required="" autofocus="">
                         <button class="btn btn-primary btn-block" type="submit">Reset Password</button>
                         <a href="#" id="cancel_reset"><i class="fas fa-angle-left"></i> Back</a>
                     </form>
-{{-- 
-                    <form action="user_register" class="form-signup" method="post" style="max-width: 600px !important; border-color: #efefef; border-style: solid; border-width: 1px; border-top: 8px solid #186eaa; ">
-                        @csrf
-                        <ul class="nav nav-tabs">
-                            <li class="nav-item" style="width: 50%;">
-                            <a class="nav-link" href="#" id="cancel_signup"><center><span class="login_2">Sign in</span></center></a>
-                            </li>
 
-                            <li class="nav-item" style="width: 50%;">
-                            <a class="nav-link" href="#" type="button" id="btn-signup" style="border-bottom: 3px solid #dc6f12;"><center><span class="login_2">Register</span></center></a>
-                            </li>
-                        </ul>
-
-                        <br>
-                        <center>
-                            <div class="col-lg-7" style="text-align: left;">
-                                <div class="row">
-                                    <label for="mobile_1" class="myprofile-font-form login_1">First Name : <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control caption_1" id="fname" name="first_name" required>
-                                </div>
-                                <br/>
-                                <div class="row">
-                                    <label for="mobile_1" class="myprofile-font-form login_1">Last Name : <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control caption_1" id="lname" name="last_name" required>
-                                </div>
-                                <br/>
-                                <div class="row">
-                                    <label class="login_1">Email address <span class="text-danger">*</span></label>
-                                    <input type="email" name="username" id="username" class="form-control caption_1" value="" required>
-                                    <span class="help-block"></span>
-                                </div>
-                                <br/>
-                                <div class="row">
-                                    <label class="login_1">Password <span class="text-danger">*</span></label>
-                                    <input type="password" name="password" id="password" class="form-control caption_1" value="" required>
-                                    <span class="help-block"></span>
-                                </div>
-                                <br/>
-                                <div class="row">
-                                    <label class="login_1">Confirm Password <span class="text-danger">*</span></label>
-                                    <input type="password" name="confirm_password" id="confirm_password"  class="form-control caption_1" value="" required>
-                                    <span class="help-block"></span>
-                                </div>
-                                <br>
-                                <div class="row">
-                                    <p class="reg_link" style="white-space: wrap;"><input type="checkbox" name="subscribe"> &nbsp;Yes, I want to receive email updates and notifications.</p>
-                                    <p class="reg_link" style=""><input type="checkbox" id="terms_checkbox"> I agree to <a href="/privacy_policy" style="display: inline-block !important;">Privacy Policy</a> and <a href="/terms_condition" style="display: inline-block !important;">Terms</a>.</p>
-                                    <input type="submit" id="reg_btn" class="btn btn-primary" value="REGISTER" disabled><br/>
-                                </div>
-                            </div>
-                        </center>
-                    </form> --}}
                     <br>
                 </div>
             </div>
         </div>
     </div>
-</main>\
+</main>
 
 <main style="background-color:#ffffff;">
     <br>

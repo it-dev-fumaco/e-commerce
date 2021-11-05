@@ -518,10 +518,10 @@
             <div class="col-md-12" style="text-align: left !important;">
               <h6 class="footer1st" style="color:#ffffff !important;">WE ACCEPT</h6>
               <div class="row" style="padding-left:1% !important">
-                <div class="d-inline m-2 payment-icons"><img src="{{ asset('/assets/payment_method/Mastercard-logo.svg') }}" alt="Master Card" style="width: 100%; height: 100% !important"></div>
-                <div class="d-inline m-2 payment-icons"><img src="{{ asset('/assets/payment_method/Visa_2021.svg') }}" alt="Visa" style="width: 100%; height: 100% !important"></div>
-                <div class="d-inline m-2 payment-icons" style="position: relative !important"><img src="{{ asset('/assets/payment_method/gcash.svg') }}" alt="GCash" style="max-height: 100%;max-width: 90%;width: auto;height: auto;position: absolute;top: 0;bottom: 0;left: 0;right: 0;margin: auto;"></div>
-                <div class="d-inline m-2 payment-icons" style="position: relative !important"><img src="{{ asset('/assets/payment_method/grabpay2.png') }}" alt="GrabPay" style="max-height: 100%;max-width: 90%;width: auto;height: auto;position: absolute;top: 0;bottom: 0;left: 0;right: 0;margin: auto;"></div>
+                <div class="d-inline m-2 payment-icons" style="position: relative !important"><img src="{{ asset('/assets/payment_method/mastercard2.webp') }}" alt="Master Card" style="max-height: 100%;max-width: 90%;width: auto;height: auto;position: absolute;top: 0;bottom: 0;left: 0;right: 0;margin: auto;"></div>
+                <div class="d-inline m-2 payment-icons" style="position: relative !important"><img src="{{ asset('/assets/payment_method/visa.webp') }}" alt="Visa" style="max-height: 100%;max-width: 90%;width: auto;height: auto;position: absolute;top: 0;bottom: 0;left: 0;right: 0;margin: auto;"></div>
+                <div class="d-inline m-2 payment-icons" style="position: relative !important"><img src="{{ asset('/assets/payment_method/gcash2.webp') }}" alt="GCash" style="max-height: 100%;max-width: 90%;width: auto;height: auto;position: absolute;top: 0;bottom: 0;left: 0;right: 0;margin: auto;"></div>
+                <div class="d-inline m-2 payment-icons" style="position: relative !important"><img src="{{ asset('/assets/payment_method/grabpay2.webp') }}" alt="GrabPay" style="max-height: 100%;max-width: 90%;width: auto;height: auto;position: absolute;top: 0;bottom: 0;left: 0;right: 0;margin: auto;"></div>
                 {{-- <div class="d-inline mx-auto payment-icons"><img src="{{ asset('/storage/payment_method/PayPal.svg') }}" alt="PayPal" style="width: 100%; height: 100% !important"></div> --}}
               </div>
             </div>
@@ -589,7 +589,13 @@
             var l = '';
             var f = '';
             $(response).each(function(i, d){
-              var link = (d.external_link) ? d.external_link : '/products/' + d.id;
+              var slug = "";
+              if(d.slug){
+                slug = d.slug;
+              }else{
+                slug = d.id;
+              }
+              var link = (d.external_link) ? d.external_link : '/products/' + slug ;
               var target = (d.external_link) ? 'target="_blank"' : '';
               // for navbar dropdown
               l += '<li><a class="dropdown-item" style="font-weight: 300 !important;" href="' + link +'" ' + target + '>' +

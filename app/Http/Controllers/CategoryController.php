@@ -19,15 +19,21 @@ class CategoryController extends Controller
     public function editCategory(Request $request, $id){
         DB::beginTransaction();
         try {
-            $edit = [
+            $checker = DB::table('fumaco_categories')->where('slug', $request->edit_cat_slug)->where('id', '!=', $request->id)->count();
+            if($checker > 0){
+                return redirect()->back()->with('error', 'Slug must be unique.');
+            }
+            $cat_edit = [
                 'name' => $request->edit_cat_name,
                 'image' => $request->edit_cat_icon,
                 'slug' => $request->edit_cat_slug,
                 'hide_none' => (isset($request->hide_na)) ? 1 : 0,
-                'external_link' => ($request->edit_is_external_link) ? $request->external_link : null
+                'external_link' => ($request->edit_is_external_link) ? $request->external_link : null,
+                'meta_keywords' => $request->cat_meta_keywords,
+                'meta_description' => $request->cat_meta_desc
             ];
 
-            DB::table('fumaco_categories')->where('id', $id)->update($edit);
+            DB::table('fumaco_categories')->where('id', $id)->update($cat_edit);
 
             DB::commit();
             return redirect()->back()->with('success', 'Product category '. $request->edit_cat_name .' has been updated.');
@@ -47,6 +53,15 @@ class CategoryController extends Controller
                 'code' => " ",
                 'external_link' => ($request->is_external_link) ? $request->external_link : null
             ];
+            
+            $rules = array(
+				'slug' => 'required|unique:fumaco_categories,slug'
+			);
+
+			$validation = Validator::make($request->all(), $rules);
+            if($validation->fails()){
+                return redirect()->back()->with('error', 'Slug must be unique');
+            }
 
             DB::table('fumaco_categories')->insert($add);
 

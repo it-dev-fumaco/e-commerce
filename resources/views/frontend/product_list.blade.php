@@ -147,7 +147,7 @@
 				<div class="carousel-item active" style="height: 13rem !important;">
 					<img src="{{ asset('/assets/site-img/header3-sm.png') }}" alt="" style="position: absolute; top: 0;left: 0;min-width: 100%;">
 					<div class="container">
-						<div class="carousel-caption text-start" style="bottom: 1rem !important; right: 25% !important; left: 25%; !important;">
+						<div class="carousel-caption text-start mx-auto" style="bottom: 1rem !important;">
 							<center><h3 class="carousel-header-font">{{ $product_category->name }}</h3></center>
 						</div>
 					</div>
@@ -176,12 +176,12 @@
 				<!--sidebar-->
 				<div class="col-lg-2 checkersxx d-none d-lg-block">
 					<div class="d-flex justify-content-between align-items-center he1" style="font-weight: 500 !important"><b>Filter Results</b>
-						<a href="/products/{{ $product_category->id }}" style="text-decoration: none;">
+						<a href="/products/{{ ($product_category->slug) ? $product_category->slug : $product_category->id }}" style="text-decoration: none;">
 							<small class="stylecap he2 text-dark" style="font-weight:400 !important;">Clear All</small>
 						</a>
 					</div>
 					<hr>
-					<form action="/products/{{ $product_category->id }}" method="POST" id="filter-form" class="mb-5">
+					<form action="/products/{{ ($product_category->slug) ? $product_category->slug : $product_category->id }}" method="POST" id="filter-form" class="mb-5">
 						@csrf
 						@php
 							$a = 0;
@@ -294,12 +294,12 @@
 											  <div class="modal-content">
 												<div class="modal-body">
 													<div class="d-flex justify-content-between align-items-center" style="font-weight: 500 !important;  margin: 20px !important"><b>Filter Results</b>
-														<a href="/products/{{ $product_category->id }}" style="text-decoration: none;">
+														<a href="/products/{{ $product_category->slug }}" style="text-decoration: none;">
 															<small class="stylecap he2 text-dark" style="font-weight:400 !important; padding-right: 10px;">Clear All</small>
 														</a>
 													</div>
 													<hr>
-													<form action="/products/{{ $product_category->id }}" method="POST" id="filter-form">
+													<form action="/products/{{ $product_category->slug }}" method="POST" id="filter-form">
 														@csrf
 														@php
 															$a = 0;
@@ -369,7 +369,7 @@
 							@forelse ($products_arr as $product)
 							<div class="col-md-4 mb-3 btmp mb-pad">
 								{{-- <div class="col-md-4 btmp animated animatedFadeInUp fadeInUp equal-height-columns"> --}}
-							<a href="/product/{{ $product['item_code'] }}" style="text-decoration: none !important; text-transform: none !important;">
+							<a href="/product/{{ ($product['slug']) ? $product['slug'] : $product['item_code'] }}" style="text-decoration: none !important; text-transform: none !important;">
 	
 								<div class="card">
 									<div class="equal-column-content">
@@ -411,7 +411,7 @@
 											{{-- <a href="/product/{{ $product['item_code'] }}" class="btn btn-outline-primary fumacoFont_card_readmore" role="button" style="width:100% !important;">View</a> --}}
 										</div>
 									</div>
-									<a href="/product/{{ $product['item_code'] }}" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto" role="button" style="width: 90% !important; margin-bottom: 20px">View</a>
+									<a href="/product/{{ ($product['slug']) ? $product['slug'] : $product['item_code'] }}" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto" role="button" style="width: 90% !important; margin-bottom: 20px">View</a>
 	
 								</div>
 							</a>
