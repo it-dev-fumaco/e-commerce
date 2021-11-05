@@ -91,7 +91,7 @@
             </div>
         </div>
     </div>
-</main>\
+</main>
 
 <main style="background-color:#ffffff;">
     <br>
