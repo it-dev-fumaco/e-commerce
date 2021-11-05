@@ -147,7 +147,7 @@
 				<div class="carousel-item active" style="height: 13rem !important;">
 					<img src="{{ asset('/assets/site-img/header3-sm.png') }}" alt="" style="position: absolute; top: 0;left: 0;min-width: 100%;">
 					<div class="container">
-						<div class="carousel-caption text-start" style="bottom: 1rem !important; right: 25% !important; left: 25%; !important;">
+						<div class="carousel-caption text-start mx-auto" style="bottom: 1rem !important;">
 							<center><h3 class="carousel-header-font">{{ $product_category->name }}</h3></center>
 						</div>
 					</div>
