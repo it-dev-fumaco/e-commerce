@@ -213,6 +213,7 @@ class ProductController extends Controller
                     'website_caption' => 'required',
                     'full_detail' => 'required',
                     'price' => 'required|numeric',
+                    'slug' => 'required'
                 ]
             );
 
@@ -232,6 +233,15 @@ class ProductController extends Controller
             $item_category = ($item_category) ? $item_category->name : null;
             if(!$item_category) {
                 return redirect()->back()->withInput($request->all())->with('error', 'Please select product category.');
+            }
+
+            $rules = array(
+				'slug' => 'required|unique:fumaco_items,slug'
+			);
+
+			$validation = Validator::make($request->all(), $rules);
+            if($validation->fails()){
+                return redirect()->back()->with('error', 'Slug must be unique');
             }
             
             $id = DB::table('fumaco_items')->insertGetId([
@@ -265,7 +275,8 @@ class ProductController extends Controller
                 'f_original_price' => $item['item_price'],
                 'keywords' => $request->keywords,
                 'url_title' => $request->url_title,
-                'meta_description' => $request->meta_description
+                'meta_description' => $request->meta_description,
+                'slug' => $request->slug
             ]);
 
             // insert item attributes
@@ -338,6 +349,10 @@ class ProductController extends Controller
             $item_category = DB::table('fumaco_categories')->where('id', $request->product_category)->first();
             $item_category = ($item_category) ? $item_category->name : null;
 
+            $slug_check = DB::table('fumaco_items')->where('id', '!=', $id)->where('slug', $request->slug)->count();
+            if($slug_check > 0){
+                return redirect()->back()->with('error', 'Slug must be unique.');
+            }
             DB::table('fumaco_items')->where('id', $id)->update([
                 'f_name_name' => $request->product_name,
                 'f_cat_id' => $request->product_category,
@@ -348,7 +363,8 @@ class ProductController extends Controller
                 'f_status' => ($request->is_disabled) ? 0 : 1,
                 'keywords' => $request->keywords,
                 'url_title' => $request->url_title,
-                'meta_description' => $request->meta_description
+                'meta_description' => $request->meta_description,
+                'slug' => $request->slug
             ]);
 
             if($detail->f_cat_id != $request->product_category) {

@@ -53,9 +53,13 @@ class CategoryController extends Controller
                 'code' => " ",
                 'external_link' => ($request->is_external_link) ? $request->external_link : null
             ];
+            
+            $rules = array(
+				'slug' => 'required|unique:fumaco_categories,slug'
+			);
 
-            $slug_checker = DB::table('fumaco_categories')->where('slug', $request->add_cat_slug)->count();
-            if($slug_checker > 0){
+			$validation = Validator::make($request->all(), $rules);
+            if($validation->fails()){
                 return redirect()->back()->with('error', 'Slug must be unique');
             }
 
