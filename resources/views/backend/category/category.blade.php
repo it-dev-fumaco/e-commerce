@@ -221,6 +221,7 @@
 																							</div>
 																						</div>
 																						<div class="col-md-6">
+																							<input type="text" name="id" value="{{ $c->id }}" hidden readonly>
 																							<div class="form-group">
 																								<label for="cat_meta_keywords">Meta Keywords :</label>
 																								<input type="text" class="form-control" id="edit_cat_name" name="cat_meta_keywords" value="{{ $c->meta_keywords }}" required>

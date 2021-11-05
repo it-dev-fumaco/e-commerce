@@ -19,7 +19,7 @@ class CategoryController extends Controller
     public function editCategory(Request $request, $id){
         DB::beginTransaction();
         try {
-            $checker = DB::table('fumaco_categories')->where('slug', $request->edit_cat_slug)->count();
+            $checker = DB::table('fumaco_categories')->where('slug', $request->edit_cat_slug)->where('id', '!=', $request->id)->count();
             if($checker > 0){
                 return redirect()->back()->with('error', 'Slug must be unique.');
             }
