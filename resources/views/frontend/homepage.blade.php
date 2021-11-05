@@ -173,7 +173,7 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
                       {{-- <a href="/product/{{ $bs['item_code'] }}" class="btn btn-outline-primary fumacoFont_card_readmore" role="button" style="width:100% !important;">View</a> --}}
                     </div>
                   </div>
-                  <a href="/product/{{ $bs['item_code'] }}" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto" role="button" style="width: 90% !important; margin-bottom: 20px">View</a>
+                  <a href="/product/{{ ($bs['slug']) ? $bs['slug'] : $bs['item_code'] }}" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto" role="button" style="width: 90% !important; margin-bottom: 20px">View</a>
 
                 </div>
               </div>
@@ -236,7 +236,7 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
                       {{-- <a href="/product/{{ $os['item_code'] }}" class="btn btn-outline-primary fumacoFont_card_readmore" role="button" style="width:100% !important;">View</a> --}}
                     </div>
                   </div>
-                  <a href="/product/{{ $os['item_code'] }}" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto" role="button" style="width: 90% !important; margin-bottom: 20px">View</a>
+                  <a href="/product/{{ ($os['slug']) ? $os['slug'] : $os['item_code'] }}" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto" role="button" style="width: 90% !important; margin-bottom: 20px">View</a>
 
                 </div>
               </div>

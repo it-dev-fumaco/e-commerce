@@ -100,7 +100,8 @@ class FrontendController extends Controller
                     'publish_date' => null,
                     'title' => null,
                     'type' => null,
-                    'caption' => null
+                    'caption' => null,
+                    'slug' => $item->slug
                 ];
             }
 
@@ -152,6 +153,7 @@ class FrontendController extends Controller
                         'on_sale' => $result['on_sale'],
                         'discount_percent' => $result['discount_percent'],
                         'image' => $result['image'],
+                        'slug' => $result['slug']
                     ];
                 } else {
                     $blogs[] = [
@@ -191,7 +193,8 @@ class FrontendController extends Controller
                 'is_discounted' => $bs->f_discount_trigger,
                 'new_price' => $bs->f_price,
                 'discount' => $bs->f_discount_percent,
-                'bs_img' => ($bs_img) ? $bs_img->imgprimayx : null
+                'bs_img' => ($bs_img) ? $bs_img->imgprimayx : null,
+                'slug' => $bs->slug
             ];
         }
 
@@ -207,7 +210,8 @@ class FrontendController extends Controller
                 'is_discounted' => $os->f_discount_trigger,
                 'new_price' => $os->f_price,
                 'os_img' => ($os_img) ? $os_img->imgprimayx : null,
-                'discount_percent' => $os->f_discount_percent
+                'discount_percent' => $os->f_discount_percent,
+                'slug' => $bs->slug
             ];
         }
 
@@ -564,7 +568,8 @@ class FrontendController extends Controller
             return redirect(request()->fullUrlWithQuery($variables));
         }
 
-        $product_category = DB::table('fumaco_categories')->where('slug', $category_id)->first();
+        $product_category = DB::table('fumaco_categories')->where('slug', $category_id)->orWhere('id', $category_id)->first();
+
         if(!$product_category) {
             return view('error');
         }
@@ -690,7 +695,7 @@ class FrontendController extends Controller
     }
 
     public function viewProduct($slug) { // Product Page
-        $product_details = DB::table('fumaco_items')->where('slug', $slug)->first();
+        $product_details = DB::table('fumaco_items')->where('slug', $slug)->orWhere('f_idcode', $slug)->first();
         if (!$product_details) {
             return view('error');
         }
@@ -1132,8 +1137,8 @@ class FrontendController extends Controller
             ->join('fumaco_items_attributes as b', 'a.f_idcode', 'b.idcode')
             ->join('fumaco_attributes_per_category as c', 'c.id', 'b.attribute_name_id')
             ->where('a.f_parent_code', $request->parent)->where('c.slug', $selected_cb)
-            ->where('b.attribute_value', $attr_collection[$selected_cb])->where('a.f_status', 1)->select('a.slug')->first();
+            ->where('b.attribute_value', $attr_collection[$selected_cb])->where('a.f_status', 1)->select('a.slug', 'a.f_idcode')->first();
 
-        return ($item_code) ? $item_code->slug : $request->id;
+        return ($item_code) ? ($item_code->slug) ? $item_code->slug : $item_code->f_idcode : $request->id;
     }
 }
