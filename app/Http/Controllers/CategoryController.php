@@ -54,6 +54,11 @@ class CategoryController extends Controller
                 'external_link' => ($request->is_external_link) ? $request->external_link : null
             ];
 
+            $slug_checker = DB::table('fumaco_categories')->where('slug', $request->add_cat_slug)->count();
+            if($slug_checker > 0){
+                return redirect()->back()->with('error', 'Slug must be unique');
+            }
+
             DB::table('fumaco_categories')->insert($add);
 
             DB::commit();

@@ -422,8 +422,16 @@
 												<input type="text" class="form-control" id="external-link" name="external_link">
 											</div>
 											<div class="form-group">
-												<label for="add_cat_slug">Slug : </label>
-												<input type="text" class="form-control" id="add_cat_slug" name="add_cat_slug">
+												<label for="cat_meta_keywords">Meta Keywords :</label>
+												<input type="text" class="form-control" name="add_meta_keywords">
+											</div>
+											<div class="form-group">
+												<label for="cat_meta_desc">Meta Description :</label>
+												<input type="text" class="form-control" name="add_meta_desc">
+											</div>
+											<div class="form-group">
+												<label for="edit_cat_slug">Slug :</label>
+												<input type="text" class="form-control" name="add_cat_slug" required>
 											</div>
 										</div>
 									</div>
