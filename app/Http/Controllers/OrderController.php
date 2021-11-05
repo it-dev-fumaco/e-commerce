@@ -227,7 +227,7 @@ class OrderController extends Controller
                         $r_qty = $items->f_reserved_qty - $orders->item_qty;
                         $f_qty = $items->f_qty + $orders->item_qty;
 
-                        DB::table('fumaco_items')->where('f_idcode', $orders->item_code)->update(['f_reserved_qty' => $r_qty, 'f_qty' => $f_qty]);
+                        DB::table('fumaco_items')->where('f_idcode', $orders->item_code)->update(['f_reserved_qty' => $r_qty]);
                     }
                 }
 

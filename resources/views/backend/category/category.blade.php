@@ -241,7 +241,7 @@
 														</div>
 													</div>
 												</div>
-												<a {{ (!$c->external_link) ? 'href="/admin/category/settings/' . $c->id .'"' : '' }} class="btn btn-success btn-sm active  {{ ($c->external_link) ? 'disabled' : '' }}" role="button" aria-pressed="true">Sort Items</a>
+												<a href="{{ (!$c->external_link) ? '/admin/category/settings/' . $c->id : '' }}" class="btn btn-success btn-sm active  {{ ($c->external_link) ? 'disabled' : '' }}" role="button" aria-pressed="true">Sort Items</a>
 												<a href="/admin/category/delete/{{ $c->id }}" class="float-right btn btn-danger btn-sm active" role="button" aria-pressed="true">Delete</a>
 											</td>
 											<td class="col-sm-1">

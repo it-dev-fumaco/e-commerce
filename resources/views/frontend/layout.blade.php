@@ -257,6 +257,13 @@
       .prod-sort{
         margin-right: 5%;
       }
+
+      .payment-icons{
+        width: 60px !important;
+        height: 35px !important;
+        background-color: #fff !important;
+        border-radius: 7px;
+      }
       @media (max-width: 575.98px) {
         header{
           min-height: 50px;
@@ -494,21 +501,37 @@
               <tbody style="font-size: 12px; color: #ffffff; border-style: unset !important;" id="product-category-footer"></tbody>
             </table>
           </div>
-          <div class="col-lg-4" style="text-align: right !important;">
-            <h6 class="footer1st" style="color:#ffffff !important;">SUBSCRIBE TO OUR NEWSLETTER</h6>
-            <form action="/subscribe" method="POST">
-              @csrf
-              <div class="input-group mb-3">
-                <input type="email" class="form-control" name="email" placeholder="Email Address" aria-label="Recipient's username" aria-describedby="basic-addon2" required>
-                <button class="input-group-text" id="basic-addon2">Subscribe</button>
+          <div class="col-lg-4">
+            <div class="col-md-12" style="text-align: right !important;">
+              <h6 class="footer1st" style="color:#ffffff !important;">SUBSCRIBE TO OUR NEWSLETTER</h6>
+              <form action="/subscribe" method="POST">
+                @csrf
+                <div class="input-group mb-3">
+                  <input type="email" class="form-control" name="email" placeholder="Email Address" aria-label="Recipient's username" aria-describedby="basic-addon2" required>
+                  <button class="input-group-text" id="basic-addon2">Subscribe</button>
+                </div>
+              </form>
+            </div>
+            <br/>
+            <br/>
+            <br/>
+            <div class="col-md-12" style="text-align: left !important;">
+              <h6 class="footer1st" style="color:#ffffff !important;">WE ACCEPT</h6>
+              <div class="row" style="padding-left:1% !important">
+                <div class="d-inline m-2 payment-icons"><img src="{{ asset('/assets/payment_method/Mastercard-logo.svg') }}" alt="Master Card" style="width: 100%; height: 100% !important"></div>
+                <div class="d-inline m-2 payment-icons"><img src="{{ asset('/assets/payment_method/Visa_2021.svg') }}" alt="Visa" style="width: 100%; height: 100% !important"></div>
+                <div class="d-inline m-2 payment-icons" style="position: relative !important"><img src="{{ asset('/assets/payment_method/gcash.svg') }}" alt="GCash" style="max-height: 100%;max-width: 90%;width: auto;height: auto;position: absolute;top: 0;bottom: 0;left: 0;right: 0;margin: auto;"></div>
+                <div class="d-inline m-2 payment-icons" style="position: relative !important"><img src="{{ asset('/assets/payment_method/grabpay2.png') }}" alt="GrabPay" style="max-height: 100%;max-width: 90%;width: auto;height: auto;position: absolute;top: 0;bottom: 0;left: 0;right: 0;margin: auto;"></div>
+                {{-- <div class="d-inline mx-auto payment-icons"><img src="{{ asset('/storage/payment_method/PayPal.svg') }}" alt="PayPal" style="width: 100%; height: 100% !important"></div> --}}
               </div>
-            </form>
+            </div>
           </div>
         </div>
       </div>
       <br>
       <br>
     </main>
+
   </footer>
   <script src="{{ asset('/assets/dist/js/bootstrap.bundle.min.js') }}"></script>
   <script>

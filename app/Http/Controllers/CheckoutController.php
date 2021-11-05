@@ -651,7 +651,6 @@ class CheckoutController extends Controller
 				$item_details = DB::table('fumaco_items')->where('f_idcode', $row->item_code)->first();
 				if($item_details) {
 					DB::table('fumaco_items')->where('f_idcode', $row->item_code)->update([
-						'f_qty' => $item_details->f_qty - $row->item_qty,
 						'f_reserved_qty' => $item_details->f_reserved_qty + $row->item_qty,
 					]);
 				}
