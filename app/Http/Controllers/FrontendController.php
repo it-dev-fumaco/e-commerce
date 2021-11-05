@@ -564,11 +564,10 @@ class FrontendController extends Controller
             return redirect(request()->fullUrlWithQuery($variables));
         }
 
-        $product_category = DB::table('fumaco_categories')->where('id', $category_id)->first();
+        $product_category = DB::table('fumaco_categories')->where('slug', $category_id)->first();
         if(!$product_category) {
             return view('error');
         }
-
         // get requested filters
         $request_data = $request->except(['page', 'sel_attr', 'sortby', 'brand', 'order']);
         $attribute_name_filter = array_keys($request_data);
@@ -611,7 +610,7 @@ class FrontendController extends Controller
             ->when(count($request_data) > 0, function($c) use ($filtered_items) {
                 $c->whereIn('a.f_idcode', $filtered_items);
             })
-            ->where('a.f_cat_id', $category_id)->where('a.f_status', 1)
+            ->where('a.f_cat_id', $product_category->id)->where('a.f_status', 1)
             ->where('c.status', 1)->select('c.attribute_name', 'b.attribute_value')
             ->groupBy('c.attribute_name', 'b.attribute_value')->get();
 
@@ -620,7 +619,7 @@ class FrontendController extends Controller
         });
 
         // get distinct brands for filtering
-        $brands = DB::table('fumaco_items')->where('f_cat_id', $category_id)
+        $brands = DB::table('fumaco_items')->where('f_cat_id', $product_category->id)
             ->when(count($request_data) > 0, function($c) use ($filtered_items) {
                 $c->whereIn('f_idcode', $filtered_items);
             })
@@ -633,7 +632,7 @@ class FrontendController extends Controller
             $selected_attr = DB::table('fumaco_items as a')
                 ->join('fumaco_items_attributes as b', 'a.f_idcode', 'b.idcode')
                 ->join('fumaco_attributes_per_category as c', 'c.id', 'b.attribute_name_id')
-                ->where('a.f_cat_id', $category_id)->where('a.f_status', 1)
+                ->where('a.f_cat_id', $product_category->id)->where('a.f_status', 1)
                 ->where('c.slug', $request->sel_attr)
                 ->where('c.status', 1)->select('c.attribute_name', 'b.attribute_value')
                 ->groupBy('c.attribute_name', 'b.attribute_value')->get();
@@ -662,7 +661,7 @@ class FrontendController extends Controller
         $orderby = ($request->order) ? $request->order : 'asc';
 
         // get items based on category id
-        $products = DB::table('fumaco_items')->where('f_cat_id', $category_id)
+        $products = DB::table('fumaco_items')->where('f_cat_id', $product_category->id)
             ->when(count($request->except(['page', 'sel_attr', 'sortby', 'order'])) > 0, function($c) use ($filtered_items) {
                 $c->whereIn('f_idcode', $filtered_items);
             })
