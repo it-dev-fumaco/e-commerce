@@ -4,193 +4,6 @@
 ])
 
 @section('content')
-<style>
-    .aboutalign {
-        text-align: right !important;
-    }
-    @media (min-width: 1281px) {
-        .aboutalign {
-            text-align: right !important;
-        }
-    }
-    @media (min-width: 1025px) and (max-width: 1280px) {
-        .aboutalign {
-            text-align: right !important;
-        }
-    }
-    @media (min-width: 768px) and (max-width: 1024px) {
-        .aboutalign {
-            text-align: right !important;
-        }
-    }
-    @media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
-        .aboutalign {
-            text-align: right !important;
-        }
-    }
-    @media (min-width: 481px) and (max-width: 767px) {
-        .aboutalign {
-            text-align: left !important;
-        }
-    }
-    @media (min-width: 320px) and (max-width: 480px) {
-        .aboutalign {
-            text-align: left !important;
-        }
-    }
-    body:after{
-        content:"";
-        position:fixed; /* stretch a fixed position to the whole screen */
-        top:0;
-        height:100vh; /* fix for mobile browser address bar appearing disappearing */
-        left:0;
-        right:0;
-        z-index:-1; /* needed to keep in the background */
-        background: url('{{ asset('/assets/About/'.$about_data->background_1) }}') center center;
-        -webkit-background-size: cover;
-        -moz-background-size: cover;
-        -o-background-size: cover;
-        background-size: cover;
-    }
-    body:after{
-        content:"";
-        position:fixed; /* stretch a fixed position to the whole screen */
-        top:0;
-        height:100vh; /* fix for mobile browser address bar appearing disappearing */
-        left:0;
-        right:0;
-        z-index:-1; /* needed to keep in the background */
-        background: url('{{ asset('/assets/About/'.$about_data->background_1) }}') center center;
-        -webkit-background-size: cover;
-        -moz-background-size: cover;
-        -o-background-size: cover;
-        background-size: cover;
-    }
-    .bodybg1:after {
-        content:"";
-        position:fixed; /* stretch a fixed position to the whole screen */
-        top:0;
-        height:100vh; /* fix for mobile browser address bar appearing disappearing */
-        left:0;
-        right:0;
-        z-index:-1; /* needed to keep in the background */
-        background: url('{{ asset('/assets/About/'.$about_data->background_2) }}')   center center;
-        -webkit-background-size: cover;
-        -moz-background-size: cover;
-        -o-background-size: cover;
-        background-size: 100% 100%;
-    }
-    .bodybg2 {
-        background: url('{{ asset('/assets/About/page2bg1.jpg') }}') no-repeat center center fixed;
-        -webkit-background-size: cover;
-        -moz-background-size: cover;
-        -o-background-size: cover;
-        background-size: cover;
-    }
-    .bodybg3 {
-        background: rgb(0,13,43);
-        background: linear-gradient(90deg, rgba(0,13,43,1) 0%, rgba(5,67,210,1) 50%, rgba(0,13,43,1) 100%);
-    }
-    .bodybg4 {
-        background: url('{{ asset('/assets/About/page3bg1.jpg') }}') no-repeat center center fixed;
-        -webkit-background-size: cover;
-        -moz-background-size: cover;
-        -o-background-size: cover;
-        background-size: cover;
-    }
-    .font1color {
-        color: #ffffff;
-    }
-    .about-main {
-        font-weight: 600 !important;
-        font-size: 50px !important;
-    }
-    .about-head {
-        font-weight: 500 !important;
-        font-size: 30px !important;
-    }
-    .about-subhead {
-        font-weight: 200 !important;
-        font-size: 20px !important;
-        letter-spacing: 3px !important;
-    }
-    .about-main1 {
-        font-weight: 100 !important;
-        font-size: 16px !important;
-        letter-spacing: 3px !important;
-    }
-    .about-para {
-        font-weight: 100 !important;
-        font-size: 15px !important;
-        letter-spacing: 2px !important;
-    }
-    .about-number {
-        font-weight: 700 !important;
-        font-size: 70px !important;
-        letter-spacing: 2px !important;
-    }
-    .about-number-sub {
-        font-weight: 100 !important;
-        font-size: 12px !important;
-        letter-spacing: 2px !important;
-        color: red
-    }
-    .about-quote-sub {
-        font-weight: 400 !important;
-        font-size: 55px !important;
-        color: #196ea4 !important;
-    }
-    .about-quote-title {
-        font-weight: 200 !important;
-        font-size: 25px !important;
-    }
-    .padabout {
-        padding-left:13% !important;
-        padding-right:13% !important;
-    }
-    /* Animation */
-    @keyframes fadeInUp {
-        from {
-            transform: translate3d(0,40px,0)
-        }
-        to {
-            transform: translate3d(0,0,0);
-            opacity: 1
-        }
-    }
-    @-webkit-keyframes fadeInUp {
-        from {
-            transform: translate3d(0,40px,0)
-        }
-        to {
-            transform: translate3d(0,0,0);
-            opacity: 1
-        }
-    }
-    .animated {
-        animation-duration: 1s;
-        animation-fill-mode: both;
-        -webkit-animation-duration: 1s;
-        -webkit-animation-fill-mode: both
-    }
-    .animatedFadeInUp {
-        opacity: 0
-    }
-    .fadeInUp {
-        opacity: 0;
-        animation-name: fadeInUp;
-        -webkit-animation-name: fadeInUp;
-    }
-
-    .fumacoFont_about_caption{
-        font-weight: 200 !important;
-    }
-
-    p{
-        letter-spacing: 0.1em !important;
-    }
-</style>
-
 <main>
     <section class="py-5 container">
 
@@ -424,4 +237,197 @@
         <section class="py-5 text-center container" style="padding-top: 0rem !important; padding-bottom: 1rem !important;"></section>
     </div>
 </main>
+@endsection
+
+@section('style')
+<style>
+    .aboutalign {
+        text-align: right !important;
+    }
+    @media (min-width: 1281px) {
+        .aboutalign {
+            text-align: right !important;
+        }
+    }
+    @media (min-width: 1025px) and (max-width: 1280px) {
+        .aboutalign {
+            text-align: right !important;
+        }
+    }
+    @media (min-width: 768px) and (max-width: 1024px) {
+        .aboutalign {
+            text-align: right !important;
+        }
+    }
+    @media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
+        .aboutalign {
+            text-align: right !important;
+        }
+    }
+    @media (min-width: 481px) and (max-width: 767px) {
+        .aboutalign {
+            text-align: left !important;
+        }
+    }
+    @media (min-width: 320px) and (max-width: 480px) {
+        .aboutalign {
+            text-align: left !important;
+        }
+    }
+    body:after{
+        content:"";
+        position:fixed; /* stretch a fixed position to the whole screen */
+        top:0;
+        height:100vh; /* fix for mobile browser address bar appearing disappearing */
+        left:0;
+        right:0;
+        z-index:-1; /* needed to keep in the background */
+        background: url('{{ asset('/assets/About/'.$about_data->background_1) }}') center center;
+        -webkit-background-size: cover;
+        -moz-background-size: cover;
+        -o-background-size: cover;
+        background-size: cover;
+    }
+    body:after{
+        content:"";
+        position:fixed; /* stretch a fixed position to the whole screen */
+        top:0;
+        height:100vh; /* fix for mobile browser address bar appearing disappearing */
+        left:0;
+        right:0;
+        z-index:-1; /* needed to keep in the background */
+        background: url('{{ asset('/assets/About/'.$about_data->background_1) }}') center center;
+        -webkit-background-size: cover;
+        -moz-background-size: cover;
+        -o-background-size: cover;
+        background-size: cover;
+    }
+    .bodybg1:after {
+        content:"";
+        position:fixed; /* stretch a fixed position to the whole screen */
+        top:0;
+        height:100vh; /* fix for mobile browser address bar appearing disappearing */
+        left:0;
+        right:0;
+        z-index:-1; /* needed to keep in the background */
+        background: url('{{ asset('/assets/About/'.$about_data->background_2) }}')   center center;
+        -webkit-background-size: cover;
+        -moz-background-size: cover;
+        -o-background-size: cover;
+        background-size: 100% 100%;
+    }
+    .bodybg2 {
+        background: url('{{ asset('/assets/About/page2bg1.jpg') }}') no-repeat center center fixed;
+        -webkit-background-size: cover;
+        -moz-background-size: cover;
+        -o-background-size: cover;
+        background-size: cover;
+    }
+    .bodybg3 {
+        background: rgb(0,13,43);
+        background: linear-gradient(90deg, rgba(0,13,43,1) 0%, rgba(5,67,210,1) 50%, rgba(0,13,43,1) 100%);
+    }
+    .bodybg4 {
+        background: url('{{ asset('/assets/About/page3bg1.jpg') }}') no-repeat center center fixed;
+        -webkit-background-size: cover;
+        -moz-background-size: cover;
+        -o-background-size: cover;
+        background-size: cover;
+    }
+    .font1color {
+        color: #ffffff;
+    }
+    .about-main {
+        font-weight: 600 !important;
+        font-size: 50px !important;
+    }
+    .about-head {
+        font-weight: 500 !important;
+        font-size: 30px !important;
+    }
+    .about-subhead {
+        font-weight: 200 !important;
+        font-size: 20px !important;
+        letter-spacing: 3px !important;
+    }
+    .about-main1 {
+        font-weight: 100 !important;
+        font-size: 16px !important;
+        letter-spacing: 3px !important;
+    }
+    .about-para {
+        font-weight: 100 !important;
+        font-size: 15px !important;
+        letter-spacing: 2px !important;
+    }
+    .about-number {
+        font-weight: 700 !important;
+        font-size: 70px !important;
+        letter-spacing: 2px !important;
+    }
+    .about-number-sub {
+        font-weight: 100 !important;
+        font-size: 12px !important;
+        letter-spacing: 2px !important;
+        color: red
+    }
+    .about-quote-sub {
+        font-weight: 400 !important;
+        font-size: 55px !important;
+        color: #196ea4 !important;
+    }
+    .about-quote-title {
+        font-weight: 200 !important;
+        font-size: 25px !important;
+    }
+    .padabout {
+        padding-left:13% !important;
+        padding-right:13% !important;
+    }
+    /* Animation */
+    @keyframes fadeInUp {
+        from {
+            transform: translate3d(0,40px,0)
+        }
+        to {
+            transform: translate3d(0,0,0);
+            opacity: 1
+        }
+    }
+    @-webkit-keyframes fadeInUp {
+        from {
+            transform: translate3d(0,40px,0)
+        }
+        to {
+            transform: translate3d(0,0,0);
+            opacity: 1
+        }
+    }
+    .animated {
+        animation-duration: 1s;
+        animation-fill-mode: both;
+        -webkit-animation-duration: 1s;
+        -webkit-animation-fill-mode: both
+    }
+    .animatedFadeInUp {
+        opacity: 0
+    }
+    .fadeInUp {
+        opacity: 0;
+        animation-name: fadeInUp;
+        -webkit-animation-name: fadeInUp;
+    }
+
+    .fumacoFont_about_caption{
+        font-weight: 200 !important;
+    }
+
+    p{
+        letter-spacing: 0.1em !important;
+    }
+    .abt_standard{
+        font-family: 'poppins', sans-serif !important;
+        text-decoration: none !important;
+    }
+</style>
 @endsection

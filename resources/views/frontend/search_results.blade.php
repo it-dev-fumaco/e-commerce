@@ -4,30 +4,6 @@
 ])
 
 @section('content')
-<style>
-    .text {
-      position: relative;
-      font-size: 14px;
-      width: 100%;
-    }
-
-    .text-concat {
-		position: relative;
-		display: inline-block;
-		word-wrap: break-word;
-		overflow: hidden;
-		max-height: 5.7em;
-		line-height: 1.4em;
-		text-align: left;
-		font-size: 16px !important;
-	}
-
-    .text.ellipsis::after {
-      position: absolute;
-      right: -12px; 
-      bottom: 4px;
-    }
-</style>
 <main style="background-color:#0062A5;">
 	<div id="myCarousel" class="carousel slide" data-bs-ride="carousel">
 		<div class="carousel-inner">
@@ -165,8 +141,8 @@
 						<a href="blog?id={{ $blog['id'] }}" style="text-decoration: none !important;">
 							<p style="color:#373b3e !important;" class="abt_standard fumacoFont_card_title">{{ $blog['title'] }}</p>
 						</a>
-						<div class="text ellipsis">
-                            <p class="text-concat abt_standard">{{ $blog['caption'] }}</p>
+						<div class="blog-text ellipsis">
+                            <p class="blog-text-concat abt_standard">{{ $blog['caption'] }}</p>
                           </div>
 						
                           <a href="/blog?id={{ $blog['id'] }}" class="text-concat mx-auto read-more">Read More</a>
@@ -186,36 +162,67 @@
   	</div>
 </main>
 <style>
-  .text {
-    position: relative;
-    font-size: 12px !important;
-    width: 100%;
-  }
+	
+</style>
+@endsection
 
-  .text-concat {
-    position: relative;
-    display: inline-block;
-    word-wrap: break-word;
-    overflow: hidden;
-    max-height: 4.8em;
-    /* line-height: 1.2em; */
-    line-height: 1.5em;
-    text-align: left;
-    font-weight: 300 !important;
-    color:#404040 !important;
-  }
+@section('style')
+<style>
+    .text {
+      position: relative;
+      font-size: 16px;
+      width: 100%;
+    }
+	.blog-text {
+      position: relative;
+      font-size: 12px !important;
+      width: 100%;
+    }
 
-  .text.ellipsis::after {
-    position: absolute;
-    right: -12px;
-    bottom: 4px;
-  }
+    .text-concat {
+		position: relative;
+		display: inline-block;
+		word-wrap: break-word;
+		overflow: hidden;
+		max-height: 5.6em;
+		line-height: 1.5em;
+		text-align: left;
+		font-size: 16px !important;
+	}
 
-  .read-more{
-    text-decoration: none !important;
-    font-size: 12px !important;
-    border-bottom: 1px solid #404040;
-  }
+	.blog-text-concat {
+		position: relative;
+		display: inline-block;
+		word-wrap: break-word;
+		overflow: hidden;
+		max-height: 4.8em;
+		line-height: 1.5em;
+		text-align: left;
+		font-weight: 300 !important;
+		color:#404040 !important;
+	}
+
+    .text.ellipsis::after {
+      position: absolute;
+      right: -12px; 
+      bottom: 4px;
+    }
+	.read-more{
+		text-transform: none !important;
+		text-decoration: none !important;
+		font-size: 12px !important;
+		color: #000 !important;
+		border-bottom: 1px solid #404040;
+	}
+	.abt_standard{
+		font-family: 'poppins', sans-serif !important;
+		text-decoration: none !important;
+	}
+	.prod_desc{
+        font-size: 16px !important;
+        font-weight: 500 !important;
+        text-align: left !important;
+    }
 </style>
 @endsection
 

@@ -4,45 +4,6 @@
 ])
 
 @section('content')
-	<style>
-		.products-head {
-			margin-top: 10px !important;
-			padding-left: 40px !important;
-			padding-right: 40px !important;
-		}
-		.he1 {
-			font-weight: 300 !important;
-			font-size: 12px !important;
-		}
-		.he2 {
-			font-weight: 200 !important;
-			font-size: 10px !important;
-		}
-		.he1x {
-			font-weight: 600 !important;
-			font-size: 14px !important;
-		}
-		.he2x {
-			font-weight: 200 !important;
-			font-size: 12px !important;
-		}
-		.he2x2 {
-			font-weight: 500 !important;
-			font-size: 14px !important;
-		}
-		.formslabelfnt {
-			font-weight: 400 !important;
-			font-size: 14px !important;
-		}
-		.btmp {
-			margin-bottom: 15px !important;
-		}
-		.tbls {
-			padding-bottom: 25px !important;
-			padding-top: 25px !important;
-		}
-	</style>
-	
 	<main style="background-color:#0062A5;">
 		<div id="myCarousel" class="carousel slide" data-bs-ride="carousel">
 			<div class="carousel-inner">
@@ -380,52 +341,102 @@
 		<br/>
 		Loading...
 	</div>
+@endsection
+@section('style')
+<style>
+	.products-head {
+		margin-top: 10px !important;
+		padding-left: 40px !important;
+		padding-right: 40px !important;
+	}
+	.he1 {
+		font-weight: 300 !important;
+		font-size: 12px !important;
+	}
+	.he2 {
+		font-weight: 200 !important;
+		font-size: 10px !important;
+	}
+	.he1x {
+		font-weight: 600 !important;
+		font-size: 14px !important;
+	}
+	.he2x {
+		font-weight: 200 !important;
+		font-size: 12px !important;
+	}
+	.he2x2 {
+		font-weight: 500 !important;
+		font-size: 14px !important;
+	}
+	.formslabelfnt {
+		font-weight: 400 !important;
+		font-size: 14px !important;
+	}
+	.btmp {
+		margin-bottom: 15px !important;
+	}
+	.tbls {
+		padding-bottom: 25px !important;
+		padding-top: 25px !important;
+	}
+	.is-invalid .select2-container--default .select2-selection--single {
+		border-color: #dc3545;
+	}
+	.select2-selection__rendered {
+		line-height: 34px !important;
+	}
+	.select2-container .select2-selection--single {
+		height: 37px !important;
+	}
+	.select2-selection__arrow {
+		height: 35px !important;
+	}
+	#custom-overlay {
+		background: #ffffff;
+		color: #666666;
+		position: fixed;
+		height: 100%;
+		width: 100%;
+		z-index: 5000;
+		top: 0;
+		left: 0;
+		float: left;
+		text-align: center;
+		padding-top: 25%;
+		opacity: .80;
+	}
+	.custom-spinner {
+		margin: 0 auto;
+		height: 64px;
+		width: 64px;
+		animation: rotate 0.8s infinite linear;
+		border: 5px solid firebrick;
+		border-right-color: transparent;
+		border-radius: 50%;
+	}
+	@keyframes rotate {
+		0% {
+			transform: rotate(0deg);
+		}
+		100% {
+			transform: rotate(360deg);
+		}
+	}
+	@media (max-width: 575.98px) {
+		.breadcrumb{
+			font-size: 8pt !important;
+			font-weight: 500;
+		}
+	}
 
-	<style>
-		.is-invalid .select2-container--default .select2-selection--single {
-			border-color: #dc3545;
+	@media (max-width: 767.98px) {
+		.breadcrumb{
+			font-size: 8pt !important;
+			font-weight: 500;
 		}
-		.select2-selection__rendered {
-			line-height: 34px !important;
-		}
-		.select2-container .select2-selection--single {
-			height: 37px !important;
-		}
-		.select2-selection__arrow {
-			height: 35px !important;
-		}
-		#custom-overlay {
-			background: #ffffff;
-			color: #666666;
-			position: fixed;
-			height: 100%;
-			width: 100%;
-			z-index: 5000;
-			top: 0;
-			left: 0;
-			float: left;
-			text-align: center;
-			padding-top: 25%;
-			opacity: .80;
-		}
-		.custom-spinner {
-			margin: 0 auto;
-			height: 64px;
-			width: 64px;
-			animation: rotate 0.8s infinite linear;
-			border: 5px solid firebrick;
-			border-right-color: transparent;
-			border-radius: 50%;
-		}
-		@keyframes rotate {
-			0% {
-				transform: rotate(0deg);
-			}
-			100% {
-				transform: rotate(360deg);
-			}
-		}
-	</style>
+	}
+</style>
 @endsection
 
 @section('script')

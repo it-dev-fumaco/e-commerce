@@ -111,6 +111,42 @@
     <br>
 </main>
 
+<script>
+
+    function toggleResetPswd(e){
+        e.preventDefault();
+        $('#logreg-forms .form-signin').toggle() // display:block or none
+        $('#logreg-forms .form-reset').toggle() // display:block or none
+    }
+
+    function toggleSignUp(e){
+        e.preventDefault();
+        $('#logreg-forms .form-signin').toggle(); // display:block or none
+        $('#logreg-forms .form-signup').toggle(); // display:block or none
+    }
+
+    $(()=>{
+        // Login Register Form
+        $('#logreg-forms #forgot_pswd').click(toggleResetPswd);
+        $('#logreg-forms #cancel_reset').click(toggleResetPswd);
+        $('#logreg-forms #btn-signup').click(toggleSignUp);
+        $('#logreg-forms #cancel_signup').click(toggleSignUp);
+    })
+
+    $(document).ready(function() {
+        $('#terms_checkbox').click(function() {
+            if($(this).prop("checked") == false) {
+                $("#reg_btn").prop('disabled',true);
+            }else{
+                $("#reg_btn").prop('disabled',false);
+            }
+        });
+    });
+
+	</script>
+@endsection
+
+@section('style')
 <style>
     .reg_link{
         font-size: 9pt;
@@ -229,10 +265,6 @@
         }
 
     }
-
-</style>
-<style>
-
     .products-head {
       margin-top: 10px !important;
       padding-left: 40px !important;
@@ -329,37 +361,4 @@
 
 
       </style>
-<script>
-
-    function toggleResetPswd(e){
-        e.preventDefault();
-        $('#logreg-forms .form-signin').toggle() // display:block or none
-        $('#logreg-forms .form-reset').toggle() // display:block or none
-    }
-
-    function toggleSignUp(e){
-        e.preventDefault();
-        $('#logreg-forms .form-signin').toggle(); // display:block or none
-        $('#logreg-forms .form-signup').toggle(); // display:block or none
-    }
-
-    $(()=>{
-        // Login Register Form
-        $('#logreg-forms #forgot_pswd').click(toggleResetPswd);
-        $('#logreg-forms #cancel_reset').click(toggleResetPswd);
-        $('#logreg-forms #btn-signup').click(toggleSignUp);
-        $('#logreg-forms #cancel_signup').click(toggleSignUp);
-    })
-
-    $(document).ready(function() {
-        $('#terms_checkbox').click(function() {
-            if($(this).prop("checked") == false) {
-                $("#reg_btn").prop('disabled',true);
-            }else{
-                $("#reg_btn").prop('disabled',false);
-            }
-        });
-    });
-
-	</script>
 @endsection

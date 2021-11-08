@@ -285,11 +285,14 @@ class FrontendController extends Controller
         return response()->json($item_categories);
     }
 
-    public function pagesList(){
+    public function pagesList(Request $request){
         // Policy Pages
-        $pages = DB::table('fumaco_pages')->where('is_homepage', 0)->get();
+        if($request->ajax()){
+            $pages = DB::table('fumaco_pages')->select('page_title', 'slug')->where('is_homepage', 0)->get();
 
-        return response()->json($pages);
+            return response()->json($pages);
+        }
+    
     }
 
     public function viewPage($slug){
