@@ -152,7 +152,7 @@
 											</div>
 										</div>
 									</div>
-									<div class="d-lg-none d-xl-none" style="text-align: left;">
+									<div class="d-md-none" style="text-align: left;">
 										<br/>
 										<b>Shipping Name:</b> {{ $order['shipping_name'] }}<br/><br/>
 										<b>Est. Delivery Date:</b> {{ $order['edd'] }}<br/>
