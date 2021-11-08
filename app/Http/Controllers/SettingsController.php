@@ -67,6 +67,8 @@ class SettingsController extends Controller
                         'api_key' => $request->google_analytics_api,
                     ]);
                 }
+
+                Cache::forget('google_api_config');
             } else {
                 $request->validate([
                     'base_url' => 'required|url',
