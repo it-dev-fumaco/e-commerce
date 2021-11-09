@@ -32,7 +32,7 @@ class GoogleApiServiceProvider extends ServiceProvider
                     ->pluck('api_key', 'type');
             });
 
-            $google_maps_api = (array_key_exists('google_maps_api', $config)) ? $config['google_maps_api'] : '';
+            $google_maps_api = (isset($config['google_maps_api'])) ? $config['google_maps_api'] : '';
 
             Config::set('googlemaps.key', $google_maps_api);
             Config::set('google_api', $config);
