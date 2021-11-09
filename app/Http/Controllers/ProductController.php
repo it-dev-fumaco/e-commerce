@@ -264,7 +264,8 @@ class ProductController extends Controller
                 'f_package_height' => $item['package_height'],
                 'f_package_weight' => $item['package_weight'],
                 'f_warehouse' => $item['warehouse'],
-                'f_qty' => $item['stock_qty'],
+                'f_qty' => ($request->is_manual) ? $request->stock_qty : $item['stock_qty'],
+                'is_manual_stock' => ($request->is_manual) ? 1 : 0,
                 'f_alert_qty' => $request->alert_qty,
                 'f_description' => $item['item_description'],
                 'f_caption' => $request->website_caption,
@@ -276,7 +277,8 @@ class ProductController extends Controller
                 'keywords' => $request->keywords,
                 'url_title' => $request->url_title,
                 'meta_description' => $request->meta_description,
-                'slug' => $request->slug
+                'slug' => $request->slug,
+                'created_by' => Auth::user()->username
             ]);
 
             // insert item attributes
@@ -291,7 +293,8 @@ class ProductController extends Controller
                     $attr_id = DB::table('fumaco_attributes_per_category')->insertGetId([
                         'category_id' => $request->product_category,
                         'attribute_name' => $attr['attribute'],
-                        'slug' => Str::slug($attr['attribute'], '-')
+                        'slug' => Str::slug($attr['attribute'], '-'),
+                        'created_by' => Auth::user()->username
                     ]);
                 }
                 // get attribute name id
@@ -307,6 +310,7 @@ class ProductController extends Controller
                     'idcode' => $attr['parent'],
                     'attribute_name_id' => $attr_name_id,
                     'attribute_value' => $attribute_value,
+                    'created_by' => Auth::user()->username
                 ];
             }
 
@@ -362,6 +366,8 @@ class ProductController extends Controller
                 'f_caption' => $request->website_caption,
                 'f_full_description' => $request->full_detail,
                 'f_status' => ($request->is_disabled) ? 0 : 1,
+                'f_qty' => $request->stock_qty,
+                'is_manual_stock' => ($request->is_manual) ? 1 : 0,
                 'keywords' => $request->keywords,
                 'url_title' => $request->url_title,
                 'meta_description' => $request->meta_description,

@@ -81,7 +81,7 @@ class SyncErpStockCommand extends Command
                 if ($response->successful()) {
                     if (count($response['data']) > 0 && isset($response['data'])) {
                         DB::table('fumaco_items')->where('f_idcode', $item_code)->where('f_warehouse', $warehouse)
-                            ->update(['f_original_price' => $response['data'][0]['price_list_rate']]);
+                            ->where('is_manual_stock', 0)->update(['f_original_price' => $response['data'][0]['price_list_rate']]);
                     }
                 }
             }
