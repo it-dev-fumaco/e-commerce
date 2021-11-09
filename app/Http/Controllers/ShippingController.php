@@ -8,6 +8,7 @@ use App\Models\ShippingZoneRate;
 use App\Models\ShippingCondition;
 use DB;
 use Carbon\Carbon;
+use Auth;
 
 class ShippingController extends Controller
 {
@@ -64,7 +65,9 @@ class ShippingController extends Controller
         try {
             $insert = [
                 'holiday_date' => $request->date,
-                'holiday_name' => $request->name
+                'holiday_name' => $request->name,
+                'created_by' => Auth::user()->username,
+                'last_modified_by' => Auth::user()->username,
             ];
 
             DB::table('fumaco_holiday')->insert($insert);
@@ -81,7 +84,8 @@ class ShippingController extends Controller
         try {
             $update = [
                 'holiday_date' => $request->date,
-                'holiday_name' => $request->name
+                'holiday_name' => $request->name,
+                'last_modified_by' => Auth::user()->username,
             ];
 
             DB::table('fumaco_holiday')->where('holiday_id', $request->id)->update($update);
@@ -144,6 +148,8 @@ class ShippingController extends Controller
             $shipping_service->amount = $amount;
             $shipping_service->min_charge_amount = $min_charge_amount;
             $shipping_service->max_charge_amount = $max_charge_amount;
+            $shipping_service->created_by = Auth::user()->username;
+            $shipping_service->last_modified_by = Auth::user()->username;
             $shipping_service->save();
             $shipping_service->shipping_service_id;
 
@@ -167,6 +173,8 @@ class ShippingController extends Controller
                         $stores[] = [
                             'shipping_service_id' => $shipping_service->shipping_service_id,
                             'store_location_id' => $request->store[$e],
+                            'created_by' => Auth::user()->username,
+                            'last_modified_by' => Auth::user()->username,
                         ];
                     }
 
@@ -210,6 +218,8 @@ class ShippingController extends Controller
                             'city_name' => $request->city_text[$e],
                             'latitude' => $latitude,
                             'longitude' => $longitude,
+                            'created_by' => Auth::user()->username,
+                            'last_modified_by' => Auth::user()->username,
                         ];
                     }
                 }
@@ -233,6 +243,8 @@ class ShippingController extends Controller
                                 'conditional_operator' => $request->conditional_op[$e],
                                 'value' => $request->value[$e],
                                 'shipping_amount' => $request->shipping_amount[$e],
+                                'created_by' => Auth::user()->username,
+                                'last_modified_by' => Auth::user()->username,
                             ];
                         }
                     }
@@ -305,6 +317,7 @@ class ShippingController extends Controller
             $shipping_service->amount = $amount;
             $shipping_service->min_charge_amount = $min_charge_amount;
             $shipping_service->max_charge_amount = $max_charge_amount;
+            $shipping_service->last_modified_by = Auth::user()->username;
             $shipping_service->save();
 
             if(!isset($request->province)){
@@ -402,6 +415,8 @@ class ShippingController extends Controller
                                 'city_name' => $request->city_text[$e],
                                 'latitude' => $latitude,
                                 'longitude' => $longitude,
+                                'created_by' => Auth::user()->username,
+                                'last_modified_by' => Auth::user()->username,
                             ];
                         }
                     }
@@ -428,6 +443,8 @@ class ShippingController extends Controller
                                 'conditional_operator' => $request->conditional_op[$e],
                                 'value' => $request->value[$e],
                                 'shipping_amount' => $request->shipping_amount[$e],
+                                'created_by' => Auth::user()->username,
+                                'last_modified_by' => Auth::user()->username,
                             ];
                         }
                     }

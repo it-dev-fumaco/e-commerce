@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Http;
 use DB;
 use Carbon\Carbon;
+use Auth;
 
 class PagesController extends Controller
 {
@@ -40,7 +41,8 @@ class PagesController extends Controller
                 'content2' => $request->content2,
                 'content3' => $request->content3,
                 'meta_description' => $request->meta_description,
-                'meta_keywords' => $request->meta_keywords
+                'meta_keywords' => $request->meta_keywords,
+                'last_modified_by' => Auth::user()->username,
             ];
 
             DB::table('fumaco_pages')->where('page_id', $id)->update($update);

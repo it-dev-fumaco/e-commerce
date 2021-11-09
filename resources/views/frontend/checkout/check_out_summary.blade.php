@@ -292,7 +292,7 @@
 							</tr>
 						</thead>
 						<tbody>
-							@forelse ($shipping_add as $shipping_address)
+							@forelse ($shipping_add as $key => $shipping_address)
 							<tr>
 								<td>
 									<a href="/myprofile/address/{{ $shipping_address->id }}/shipping/change_default">
@@ -307,13 +307,13 @@
 								<td class="addressModal">{{ $shipping_address->xcontactlastname1 .', '.$shipping_address->xcontactname1 }}</td>
 								<td class="addressModal">{{ $shipping_address->add_type }}</td>
 								<td class="addressModal">
-									<button type="button" class="btn btn-success btn-xs" data-toggle="modal" data-target="#shipping-view{{ $shipping_address->id }}">
+									<button type="button" class="btn btn-success btn-xs shipping {{ $key }}" data-toggle="modal" data-target="#shipping-view{{ $shipping_address->id }}">
 										<i class="fas fa-eye"></i>
 									</button>
 									<button type="button" class="btn btn-danger btn-xs" data-toggle="modal" data-target="#shipping-del{{ $shipping_address->id }}">
 										<i class="fas fa-trash-alt"></i>
 									</button>
-									@if($shipping_address->xdefault)
+									{{-- @if($shipping_address->xdefault)
 									<div id="shipping-del{{ $shipping_address->id }}" class="modal fade" role="dialog">
 										<div class="modal-dialog">
 											<div class="modal-content">
@@ -329,7 +329,7 @@
 											</div>
 										</div>
 									</div>
-									@else
+									@else --}}
 									<div id="shipping-del{{ $shipping_address->id }}" class="modal fade" role="dialog">
 										<form action="/myprofile/address/{{ $shipping_address->id }}/shipping/delete" method="POST">
 											@csrf
@@ -350,13 +350,18 @@
 											</div>
 										</form>
 									</div>
-									@endif
+									{{-- @endif --}}
 									<div id="shipping-view{{ $shipping_address->id }}" class="modal fade" role="dialog">
 										<div class="modal-dialog" style="max-width: 80% !important;">
 											<div class="modal-content">
 												<div class="modal-header">
 													<h4 class="modal-title">Shipping Information</h4>
+													<a type="button" class="close clear-btn" data-dismiss="modal" aria-label="Close">
+														<span aria-hidden="true">&times;</span>
+													</a>
 												</div>
+												<form action="/myprofile/address/{{ $shipping_address->id }}/shipping/update" method="post">
+													@csrf
 												<div class="modal-body">
 													<div class="row">
 														<div class="col">
@@ -365,24 +370,28 @@
 														</div>
 													</div>
 													<div class="row">
-														<div class="col">
-															<label for="Address1_1" class="myprofile-font-form">First Name : </label>
-															<input type="text" class="form-control caption_1" value="{{ $shipping_address->xcontactname1 }}">
+														<div class="col-md-6">
+															<label for="Address1_1" class="myprofile-font-form">First Name : <span class="text-danger">*</span></label>
+															<input type="text" name="first_name" class="form-control caption_1" value="{{ $shipping_address->xcontactname1 }}" required>
 														</div>
-														<div class="col">
-															<label for="Address2_1" class="myprofile-font-form">Last Name : </label>
-															<input type="text" class="form-control caption_1" value="{{ $shipping_address->xcontactlastname1 }}">
+														<div class="col-md-6">
+															<label for="Address2_1" class="myprofile-font-form">Last Name : <span class="text-danger">*</span></label>
+															<input type="text" name="last_name" class="form-control caption_1" value="{{ $shipping_address->xcontactlastname1 }}" required>
 														</div>
 													</div>
 													<div class="row"><br></div>
 													<div class="row">
-														<div class="col">
-															<label for="Address1_1" class="myprofile-font-form">Contact Number : </label>
-															<input type="text" class="form-control caption_1" value="{{ $shipping_address->xcontactnumber1 }}">
+														<div class="col-md-4">
+															<label class="myprofile-font-form">Contact Number : </label>
+															<input type="text" name="contact" class="form-control caption_1" value="{{ $shipping_address->xcontactnumber1 }}">
 														</div>
-														<div class="col">
-															<label for="Address2_1" class="myprofile-font-form">Contact Email : </label>
-															<input type="text" class="form-control caption_1" value="{{ $shipping_address->xcontactemail1 }}">
+														<div class="col-md-4">
+															<label class="myprofile-font-form">Mobile Number : <span class="text-danger">*</span></label>
+															<input type="text" name="mobile" class="form-control caption_1" value="{{ $shipping_address->xmobile_number }}" required>
+														</div>
+														<div class="col-md-4">
+															<label class="myprofile-font-form">Contact Email : <span class="text-danger">*</span></label>
+															<input type="text" name="email" class="form-control caption_1" value="{{ $shipping_address->xcontactemail1 }}" required>
 														</div>
 													</div>
 													<div class="row">
@@ -393,49 +402,67 @@
 														</div>
 													</div>
 													<div class="row">
-														<div class="col">
-															<label for="Address1_1" class="myprofile-font-form">Address Line 1 : </label>
-															<input type="text" class="form-control caption_1" value="{{ $shipping_address->xadd1 }}">
+														<div class="col-md-6">
+															<label for="Address1_1" class="myprofile-font-form">Address Line 1 : <span class="text-danger">*</span></label>
+															<input type="text" name="address1" class="form-control caption_1" value="{{ $shipping_address->xadd1 }}" required>
 														</div>
-														<div class="col">
+														<div class="col-md-6">
 															<label for="Address2_1" class="myprofile-font-form">Address Line 2 : </label>
-															<input type="text" class="form-control caption_1" value="{{ $shipping_address->xadd2 }}">
+															<input type="text" name="address2" class="form-control caption_1" value="{{ $shipping_address->xadd2 }}">
 														</div>
 													</div>
 													<br>
 													<div class="row">
-														<div class="col">
-															<label class="myprofile-font-form">Province : </label>
-															<input type="text" class="form-control caption_1" value="{{ $shipping_address->xprov }}">
+														<div class="col-md-4">
+															<label class="myprofile-font-form">Province : <span class="text-danger">*</span></label>
+															<input type="text" name="province" id="province1_1_{{ $key }}" class="form-control caption_1" required>
 														</div>
-														<div class="col">
-															<label class="myprofile-font-form">City / Municipality : </label>
-															<input type="text" class="form-control caption_1" value="{{ $shipping_address->xcity }}">
+														<div class="col-md-4">
+															<label class="myprofile-font-form">City / Municipality : <span class="text-danger">*</span></label>
+															<input type="text" name="city" id="City_Municipality1_1_{{ $key }}" class="form-control caption_1" required>
 														</div>
-														<div class="col">
-															<label class="myprofile-font-form">Barangay : </label>
-															<input type="text" class="form-control caption_1" value="{{ $shipping_address->xbrgy }}">
+														<div class="col-md-4">
+															<label class="myprofile-font-form">Barangay : <span class="text-danger">*</span></label>
+															<input type="text" name="brgy" id="Barangay1_1_{{ $key }}" class="form-control caption_1" required>
 														</div>
 													</div>
 													<br>
 													<div class="row">
-														<div class="col">
-															<label for="postal1_1" class="myprofile-font-form">Postal Code : </label>
-															<input type="text" class="form-control caption_1" value="{{ $shipping_address->xpostal }}">
+														<div class="col-md-4">
+															<label for="postal1_1" class="myprofile-font-form">Postal Code : <span class="text-danger">*</span></label>
+															<input type="text" name="postal" class="form-control caption_1" value="{{ $shipping_address->xpostal }}" required>
 														</div>
-														<div class="col">
-															<label for="country_region1_1" class="myprofile-font-form">Country / Region : </label>
-															<input type="text" class="form-control caption_1" value="{{ $shipping_address->xcountry }}">
+														<div class="col-md-4">
+															<label for="country_region1_1" class="myprofile-font-form">Country / Region : <span class="text-danger">*</span></label>
+															<input type="text" name="country" class="form-control caption_1" value="{{ $shipping_address->xcountry }}" required>
 														</div>
-														<div class="col">
-															<label for="Address_type1_1" class="myprofile-font-form">Address Type :</label>
-															<input type="text" class="form-control caption_1" value="{{ $shipping_address->add_type }}">
+														<div class="col-md-4">
+															<label for="Address_type1_1" class="formslabelfnt">Address Type : <span class="text-danger">*</span></label>
+															<select class="form-control formslabelfnt ship_type" name="Address_type1_1">
+																<option value="" selected>Choose...</option>
+																<option value="Business Address">Business Address</option>
+																<option value="Home Address">Home Address</option>
+															</select>
 														</div>
+													</div>
+													<br/>
+													<div class="row" class="ship_for_business" id="ship_for_business_{{ $key }}" style="display: none">
+														<div class="col-md-6">
+															<label for="business_name" class="formslabelfnt">Business Name : <span class="text-danger">*</span></label>
+															<input type="text" class="form-control formslabelfnt" id="ship_business_name_{{ $key }}" name="business_name" value="{{ $shipping_address->xbusiness_name }}"><br class="d-lg-none d-xl-none"/>
+														</div>
+														<div class="col-md-6">
+															<label for="tin" class="formslabelfnt">TIN Number :</label>
+														<input type="checkbox" name="checkout" checked hidden />
+														<input type="text" class="form-control formslabelfnt" id="tin" name="tin" value="{{ $shipping_address->xtin_no }}"><br class="d-lg-none d-xl-none"/>
+														</div>
+														<br>&nbsp;
 													</div>
 												</div>
 												<div class="modal-footer">
-													<button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+													<button type="submit" class="btn btn-primary">Save Changes</button>
 												</div>
+												</form>
 											</div>
 										</div>
 									</div>
@@ -473,7 +500,7 @@
 						</tr>
 					</thead>
 					<tbody>
-						@forelse ($billing_add as $billing_address)
+						@forelse ($billing_add as $key => $billing_address)
 						<tr>
 							<td class="addressModal">
 								<a href="/myprofile/address/{{ $billing_address->id }}/billing/change_default/">
@@ -488,7 +515,7 @@
 							<td class="addressModal">{{ $billing_address->xcontactlastname1 . ', ' . $billing_address->xcontactname1 }}</td>
 							<td class="addressModal">{{ $billing_address->add_type }}</td>
 							<td class="addressModal">
-								<button type="button" class="btn btn-success btn-xs" data-toggle="modal" data-target="#myadd{{ $billing_address->id }}">
+								<button type="button" class="btn btn-success btn-xs billing {{ $key }}" data-toggle="modal" data-target="#myadd{{ $billing_address->id }}">
 									<i class="fas fa-eye"></i>
 								</button>
 								
@@ -497,7 +524,12 @@
 										<div class="modal-content">
 											<div class="modal-header">
 												<h4 class="modal-title">Billing Information</h4>
+												<a type="button" class="close clear-btn" data-dismiss="modal" aria-label="Close">
+													<span aria-hidden="true">&times;</span>
+												</a>
 											</div>
+											<form action="/myprofile/address/{{ $billing_address->id }}/billing/update" method="post">
+												@csrf
 											<div class="modal-body">
 												<div class="row">
 													<div class="col">
@@ -507,23 +539,27 @@
 												</div>
 												<div class="row">
 													<div class="col">
-														<label for="Address1_1" class="myprofile-font-form">First Name : </label>
-														<input type="text" class="form-control caption_1" value="{{ $billing_address->xcontactname1 }}">
+														<label for="Address1_1" class="myprofile-font-form">First Name : <span class="text-danger">*</span></label>
+														<input type="text" name="first_name" class="form-control caption_1" value="{{ $billing_address->xcontactname1 }}" required>
 													</div>
 													<div class="col">
-														<label for="Address2_1" class="myprofile-font-form">Last Name : </label>
-														<input type="text" class="form-control caption_1" value="{{ $billing_address->xcontactlastname1 }}">
+														<label for="Address2_1" class="myprofile-font-form">Last Name : <span class="text-danger">*</span></label>
+														<input type="text" name="last_name" class="form-control caption_1" value="{{ $billing_address->xcontactlastname1 }}" required>
 													</div>
 												</div>
 												<div class="row"><br></div>
 												<div class="row">
 													<div class="col">
 														<label for="Address1_1" class="myprofile-font-form">Contact Number : </label>
-														<input type="text" class="form-control caption_1" value="{{ $billing_address->xcontactnumber1 }}">
+														<input type="text" name="contact" class="form-control caption_1" value="{{ $billing_address->xcontactnumber1 == 0 ? '' : $billing_address->xcontactnumber1 }}">
 													</div>
 													<div class="col">
-														<label for="Address2_1" class="myprofile-font-form">Contact Email : </label>
-														<input type="text" class="form-control caption_1" value="{{ $billing_address->xcontactemail1 }}">
+														<label for="Address1_1" class="myprofile-font-form">Mobile Number : <span class="text-danger">*</span></label>
+														<input type="text" name="mobile" class="form-control caption_1" value="{{ $billing_address->xmobile_number }}" required>
+													</div>
+													<div class="col">
+														<label for="Address2_1" class="myprofile-font-form">Contact Email : <span class="text-danger">*</span></label>
+														<input type="text" name="email" class="form-control caption_1" value="{{ $billing_address->xcontactemail1 }}" required>
 													</div>
 												</div>
 												<div class="row">
@@ -535,48 +571,66 @@
 												</div>
 												<div class="row">
 													<div class="col">
-														<label for="Address1_1" class="myprofile-font-form">Address Line 1 : </label>
-														<input type="text" class="form-control caption_1" value="{{ $billing_address->xadd1 }}">
+														<label for="Address1_1" class="myprofile-font-form">Address Line 1 : <span class="text-danger">*</span></label>
+														<input type="text" name="address1" class="form-control caption_1" value="{{ $billing_address->xadd1 }}" required>
 													</div>
 													<div class="col">
 														<label for="Address2_1" class="myprofile-font-form">Address Line 2 : </label>
-														<input type="text" class="form-control caption_1" value="{{ $billing_address->xadd2 }}">
+														<input type="text" name="address2" class="form-control caption_1" value="{{ $billing_address->xadd2 }}">
 													</div>
 												</div>
 												<br>
 												<div class="row">
 													<div class="col">
-														<label class="myprofile-font-form">Province : </label>
-														<input type="text" class="form-control caption_1" value="{{ $billing_address->xprov }}">
+														<label class="myprofile-font-form">Province : <span class="text-danger">*</span></label>
+														<input type="text" name="province" id="bill_province1_1_{{ $key }}" class="form-control caption_1" required>
 													</div>
 													<div class="col">
-														<label class="myprofile-font-form">City / Municipality : </label>
-														<input type="text" class="form-control caption_1" value="{{ $billing_address->xcity }}">
+														<label class="myprofile-font-form">City / Municipality : <span class="text-danger">*</span></label>
+														<input type="text" name="city" id="bill_City_Municipality1_1_{{ $key }}" class="form-control caption_1"  required>
 													</div>
 													<div class="col">
-														<label class="myprofile-font-form">Barangay : </label>
-														<input type="text" class="form-control caption_1" value="{{ $billing_address->xbrgy }}">
+														<label class="myprofile-font-form">Barangay : <span class="text-danger">*</span></label>
+														<input type="text" name="brgy" id="bill_Barangay1_1_{{ $key }}" class="form-control caption_1" required>
 													</div>
 												</div>
 												<br>
 												<div class="row">
 													<div class="col">
-														<label for="postal1_1" class="myprofile-font-form">Postal Code : </label>
-														<input type="text" class="form-control caption_1" value="{{ $billing_address->xpostal }}">
+														<label for="postal1_1" class="myprofile-font-form">Postal Code : <span class="text-danger">*</span></label>
+														<input type="text" name="postal" class="form-control caption_1" value="{{ $billing_address->xpostal }}" required>
 													</div>
 													<div class="col">
-														<label for="country_region1_1" class="myprofile-font-form">Country / Region : </label>
-														<input type="text" class="form-control caption_1" value="{{ $billing_address->xcountry }}">
+														<label for="country_region1_1" class="myprofile-font-form">Country / Region : <span class="text-danger">*</span></label>
+														<input type="text" name="country" class="form-control caption_1" value="{{ $billing_address->xcountry }}" required>
 													</div>
-													<div class="col">
-														<label for="Address_type1_1" class="myprofile-font-form">Address Type :</label>
-														<input type="text" class="form-control caption_1" value="{{ $billing_address->add_type }}">
+													<div class="col-md-4">
+														<label for="Address_type1_1" class="formslabelfnt">Address Type : <span class="text-danger">*</span></label>
+														<select class="form-control formslabelfnt bill_type" id="bill_Address_type1_1" name="Address_type1_1" required>
+															<option value="">Choose...</option>
+															<option value="Business Address">Business Address</option>
+															<option value="Home Address">Home Address</option>
+														</select>
 													</div>
+												</div>
+												<br/>
+												<div class="row" id="bill_for_business_{{ $key }}" style="display: none">
+													<div class="col-md-6">
+														<label for="business_name" class="formslabelfnt">Business Name : <span class="text-danger">*</span></label>
+														<input type="text" class="form-control formslabelfnt" id="bill_business_name_{{ $key }}" name="business_name" value="{{ $billing_address->xbusiness_name }}"><br class="d-lg-none d-xl-none"/>
+													</div>
+													<div class="col-md-6">
+														<input type="checkbox" name="checkout" checked hidden />
+														<label for="tin" class="formslabelfnt">TIN Number :</label>
+														<input type="text" class="form-control formslabelfnt" id="tin" name="tin" value="{{ $billing_address->xtin_no }}"><br class="d-lg-none d-xl-none"/>
+													</div>
+													<br>&nbsp;
 												</div>
 											</div>
 											<div class="modal-footer">
-												<button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+												<button type="submit" class="btn btn-primary">Save Changes</button>
 											</div>
+											</form>
 										</div>
 									</div>
 								</div>
@@ -584,7 +638,7 @@
 								<button type="button" class="btn btn-danger btn-xs" data-toggle="modal" data-target="#myDelete{{ $billing_address->id }}">
 									<i class="fas fa-trash-alt"></i>
 								</button>
-								@if ($billing_address->xdefault)
+								{{-- @if ($billing_address->xdefault)
 								<div id="myDelete{{ $billing_address->id }}" class="modal fade" role="dialog">
 									<div class="modal-dialog">
 											<div class="modal-content">
@@ -600,7 +654,7 @@
 											</div>
 									</div>
 								</div>
-								@else
+								@else --}}
 								<div id="myDelete{{ $billing_address->id }}" class="modal fade" role="dialog">
 									<form action="/myprofile/address/{{ $billing_address->id }}/billing/delete" method="POST">
 										@csrf
@@ -621,7 +675,7 @@
 										</div>
 									</form>
 								</div>
-								@endif
+								{{-- @endif --}}
 							</td>
 						</tr> 
 						@empty
@@ -639,6 +693,8 @@
 	</div>
 
 	{{-- Update Address Modal --}}
+
+	{{-- Add Address Modal --}}
 
 	<div class="modal fade" id="addShippingModal" tabindex="-1" role="dialog" aria-labelledby="addShippingModal" aria-hidden="true">
 		<div class="modal-dialog modal-xl" role="document">
@@ -716,8 +772,8 @@
 								<label for="Address_type1_1" class="formslabelfnt">Address Type : <span class="text-danger">*</span></label>
 								<select class="form-control formslabelfnt" id="ship_Address_type1_1" name="ship_Address_type1_1" required>
 									<option selected disabled value="">Choose...</option>
-									<option value="Business Address" {{ old('ship_Address_type1_1') == 'Business Address' ? 'selected' : '' }}>Business Address</option>
-									<option value="Home Address" {{ old('ship_Address_type1_1') == 'Home Address' ? 'selected' : '' }}>Home Address</option><br class="d-lg-none d-xl-none"/>
+									<option value="Business Address">Business Address</option>
+									<option value="Home Address">Home Address</option><br class="d-lg-none d-xl-none"/>
 								</select>
 							</div>
 						</div>
@@ -959,6 +1015,17 @@
 		border-right-color: transparent;
 		border-radius: 50%;
 	}
+	.clear-btn{
+		border: none !important;
+		background-color: rgba(0,0,0,0);
+		color: #000;
+		font-size: 24px;
+		text-decoration: none !important;
+		text-transform: none !important;
+	}
+	.clear-btn:hover{
+		color: #000;
+	}
 	@keyframes rotate {
 		0% {
 			transform: rotate(0deg);
@@ -991,6 +1058,7 @@
 	$(document).ready(function() {
 		updateTotal();
 
+		// Add Address
 		$('#ship_province1_1').select2({
 			dropdownParent: $('#addShippingModal')
 		});
@@ -1013,6 +1081,28 @@
 
 		$('#Barangay1_1').select2({
 			dropdownParent: $('#addBillingModal')
+		});
+		// Add Address
+
+		$('#ship_Address_type1_1').change(function(){
+			console.log($(this).val());
+			if($(this).val() == "Business Address"){
+				$('#ship_for_business').slideDown();
+				$("#ship_business_name").prop('required',true);
+			}else{
+				$('#ship_for_business').slideUp();
+				$("#ship_business_name").prop('required',false);
+			}
+		});
+
+		$('#Address_type1_1').change(function(){
+			if($(this).val() == "Business Address"){
+				$('#bill_for_business').slideDown();
+				$("#bill_business_name").prop('required',true);
+			}else{
+				$('#bill_for_business').slideUp();
+				$("#bill_business_name").prop('required',false);
+			}
 		});
 
 		$(document).on('change', 'input[name="shipping_fee"]', function(){
@@ -1098,25 +1188,190 @@
 			$("#total_amount").val($('#grand-total').text());
 		}
 		
-		$('#ship_Address_type1_1').change(function(){
-			if($(this).val() == "Business Address"){
-				$('#ship_for_business').slideDown();
-				$("#ship_business_name").prop('required',true);
-			}else{
-				$('#ship_for_business').slideUp();
-				$("#ship_business_name").prop('required',false);
-			}
-		});
+		var provinces_edit = [];
+		// Edit Shipping Address
+		$('.shipping').click(function(){ 
+			var ship_key = $(this).attr('class').split(' ').pop();
 
-		$('#Address_type1_1').change(function(){
-			if($(this).val() == "Business Address"){
-				$('#bill_for_business').slideDown();
-				$("#bill_business_name").prop('required',true);
-			}else{
-				$('#bill_for_business').slideUp();
-				$("#bill_business_name").prop('required',false);
-			}
+			$('.ship_type').change(function(){
+				if($(this).val() == "Business Address"){
+					$("#ship_for_business_"+ship_key).slideDown();
+					$("#ship_business_name_"+ship_key).prop('required',true); 	
+				}else{
+					$("#ship_for_business_"+ship_key).slideUp();
+					$("#ship_business_name_"+ship_key).prop('required',false);
+				}
+			});
+
+			$.getJSON("{{ asset('/json/provinces.json') }}", function(obj){
+				$.each(obj.results, function(e, i) {
+					provinces.push({
+						id: i.text,
+						code: i.provCode,
+						text: i.text
+					});
+				});
+
+				$('#province1_1_'+ship_key).select2({
+					placeholder: 'Select Province',
+					data: provinces
+				});
+
+				$('#City_Municipality1_1_'+ship_key).select2({
+					placeholder: 'Select City',
+				});
+
+				$('#Barangay1_1_'+ship_key).select2({
+					placeholder: 'Select Barangay',
+				});
+			});
+
+			$(document).on('select2:select', '#province1_1_'+ship_key, function(e){
+				var data = e.params.data;
+				var select_el = $('#City_Municipality1_1_'+ship_key);
+				var cities = [];
+
+				select_el.empty();
+				$.getJSON("{{ asset('/json/cities.json') }}", function(obj){
+					var filtered_cities = $.grep(obj.results, function(v) {
+						return v.provCode === data.code;
+					});
+
+					$.each(filtered_cities, function(e, i) {
+						cities.push({
+							id: i.text,
+							code: i.citymunCode,
+							text: i.text,
+						});
+					});
+
+					select_el.select2({
+						placeholder: 'Select City',
+						data: cities
+					});
+				});
+			});
+
+			$(document).on('select2:select', '#City_Municipality1_1_'+ship_key, function(e){
+				var data = e.params.data;
+				var select_el = $('#Barangay1_1_'+ship_key);
+				var brgy = [];
+
+				select_el.empty();
+				$.getJSON("{{ asset('/json/brgy.json') }}", function(obj){
+					var filtered = $.grep(obj.results, function(v) {
+						return v.citymunCode === data.code;
+					});
+
+					$.each(filtered, function(e, i) {
+						brgy.push({
+							id: i.brgyDesc,
+							text: i.brgyDesc
+						});
+					});
+
+					select_el.select2({
+						placeholder: 'Select Barangay',
+						data: brgy
+					});
+				});
+			});
 		});
+		// Edit Shipping Address
+		
+		// Edit Billing Address
+		$('.billing').click(function(){
+			var bill_key = $(this).attr('class').split(' ').pop();
+			console.log(bill_key);
+			$('.bill_type').change(function(){
+				if($(this).val() == "Business Address"){
+					$("#bill_for_business_"+bill_key).slideDown();
+					$("#bill_business_name_"+bill_key).prop('required',true); 	
+				}else{
+					$("#bill_for_business_"+bill_key).slideUp();
+					$("#bill_business_name_"+bill_key).prop('required',false);
+				}
+			});
+
+			var provinces_bill = [];
+			$.getJSON("{{ asset('/json/provinces.json') }}", function(obj){
+				$.each(obj.results, function(e, i) {
+					provinces_bill.push({
+						id: i.text,
+						code: i.provCode,
+						text: i.text
+					});
+				});
+
+				$('#bill_province1_1_'+bill_key).select2({
+					placeholder: 'Select Province',
+					data: provinces_bill
+				});
+
+				$('#bill_City_Municipality1_1_'+bill_key).select2({
+					placeholder: 'Select City',
+				});
+
+				$('#bill_Barangay1_1_'+bill_key).select2({
+					placeholder: 'Select Barangay',
+				});
+			});
+
+			$(document).on('select2:select', '#bill_province1_1_'+bill_key, function(e){
+				var data = e.params.data;
+				var select_el = $('#bill_City_Municipality1_1_'+bill_key);
+				var cities_bill = [];
+
+				select_el.empty();
+				$.getJSON("{{ asset('/json/cities.json') }}", function(obj){
+					var filtered_cities = $.grep(obj.results, function(v) {
+						return v.provCode === data.code;
+					});
+
+					$.each(filtered_cities, function(e, i) {
+						cities_bill.push({
+							id: i.text,
+							code: i.citymunCode,
+							text: i.text,
+							
+						});
+					});
+
+					select_el.select2({
+						placeholder: 'Select City',
+						data: cities_bill
+					});
+				});
+			});
+
+			$(document).on('select2:select', '#bill_City_Municipality1_1_'+bill_key, function(e){
+				var data = e.params.data;
+				var select_el = $('#bill_Barangay1_1_'+bill_key);
+				var brgy_bill = [];
+
+				select_el.empty();
+				$.getJSON("{{ asset('/json/brgy.json') }}", function(obj){
+					var filtered = $.grep(obj.results, function(v) {
+						return v.citymunCode === data.code;
+					});
+
+					$.each(filtered, function(e, i) {
+						brgy_bill.push({
+							id: i.brgyDesc,
+							text: i.brgyDesc
+						});
+					});
+
+					select_el.select2({
+						placeholder: 'Select Barangay',
+						data: brgy_bill
+					});
+				});
+			});
+		});
+		// Edit Billing Address
+
+		// Add Address
 
 		var str = "{{ implode(',', $shipping_zones) }}";
 		var res = str.split(",");

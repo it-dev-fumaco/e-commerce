@@ -117,6 +117,7 @@
                                                                                     <option {{ ($a->user_type == "" ) ? 'selected' : '' }} disabled value="">Select User Type</option>
                                                                                     <option value="System Admin" {{ ($a->user_type == "System Admin" ) ? 'selected' : '' }}>System Admin</option>
                                                                                     <option value="Sales Admin" {{ ($a->user_type == "Sales Admin" ) ? 'selected' : '' }}>Sales Admin</option>
+                                                                                    <option value="Marketing Admin" {{ ($a->user_type == "Marketing Admin" ) ? 'selected' : '' }}>Marketing Admin</option>
                                                                                 </select>
                                                                             </div>                                                                    
                                                                         </div>
@@ -142,10 +143,6 @@
                                                                         <div class="modal-body">
                                                                             @csrf
                                                                             <label>Username:</label> {{ $a->username }}
-                                                                            <div class="form-group">
-                                                                                <label for="current">Current Password</label>
-                                                                                <input type="password" class="form-control" name="current" placeholder="Current Password" required>
-                                                                            </div>
                                                                             <div class="form-group">
                                                                                 <label for="password">New Password</label>
                                                                                 <input type="password" class="form-control" name="password" placeholder="Password" required>

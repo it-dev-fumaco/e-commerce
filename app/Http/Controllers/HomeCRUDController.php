@@ -82,7 +82,9 @@ class HomeCRUDController extends Controller
 				'fumaco_active' => 0,
 				'fumaco_status' => 1,
 				'fumaco_image1' => $image_name,
-				'fumaco_image2' => $image_name
+				'fumaco_image2' => $image_name,
+				'created_by' => Auth::user()->username,
+				'last_modified_by' => Auth::user()->username,
 			];
 
 			$webp = Webp::make($request->file('fileToUpload'));
@@ -114,7 +116,7 @@ class HomeCRUDController extends Controller
 				return redirect()->back()->with('disabled', 'Header is disabled');
 			}
 
-			$update = DB::table('fumaco_header')->where('id', $request->id)->update(['fumaco_active' => 1]);
+			$update = DB::table('fumaco_header')->where('id', $request->id)->update(['fumaco_active' => 1, 'last_modified_by' => Auth::user()->username]);
             DB::commit();
 			return redirect()->back()->with('active_success', 'Record Updated Successfully');
 		}catch(Exception $e){
@@ -131,7 +133,7 @@ class HomeCRUDController extends Controller
 				return redirect()->back()->with('remove_active', 'Header is not active');
 			}
 
-			$update = DB::table('fumaco_header')->where('id', $request->id)->update(['fumaco_active' => 0]);
+			$update = DB::table('fumaco_header')->where('id', $request->id)->update(['fumaco_active' => 0, 'last_modified_by' => Auth::user()->username]);
             DB::commit();
 			return redirect()->back()->with('remove_success', 'Record Updated Successfully');
 		}catch(Exception $e){

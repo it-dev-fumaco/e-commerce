@@ -57,6 +57,7 @@
                                                     <option selected disabled value="">Select User Type</option>
                                                     <option value="System Admin">System Admin</option>
                                                     <option value="Sales Admin">Sales Admin</option>
+                                                    <option value="Marketing Admin">Marketing Admin</option>
                                                 </select>
                                             </div>
                                         </div>
