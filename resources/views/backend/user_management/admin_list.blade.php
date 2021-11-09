@@ -144,10 +144,6 @@
                                                                             @csrf
                                                                             <label>Username:</label> {{ $a->username }}
                                                                             <div class="form-group">
-                                                                                <label for="current">Current Password</label>
-                                                                                <input type="password" class="form-control" name="current" placeholder="Current Password" required>
-                                                                            </div>
-                                                                            <div class="form-group">
                                                                                 <label for="password">New Password</label>
                                                                                 <input type="password" class="form-control" name="password" placeholder="Password" required>
                                                                             </div>

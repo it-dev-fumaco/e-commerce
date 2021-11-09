@@ -100,18 +100,8 @@ class UserManagementController extends Controller
             }
 
             $user = DB::table('fumaco_admin_user')->where('id', $id)->first();
-
-            if (!(Hash::check($request->get('current'), $user->password))) {
-                return redirect()->back()->with("error","Your current password does not match with the password you provided. Please try again.");
-            }
-    
-            if(strcmp($request->get('current'), $request->get('password')) == 0){
-                //Current password and new password are same
-                return redirect()->back()->with("error","New password cannot be same as your current password. Please choose a different password.");
-            }
     
             $rules = array(
-                'current' => 'required',
                 'password' => 'required|string|min:4|max:255',
                 'confirm' => 'required|string'
             );
