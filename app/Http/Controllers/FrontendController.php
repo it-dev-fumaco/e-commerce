@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\WelcomeEmail;
 use DB;
@@ -990,6 +991,90 @@ class FrontendController extends Controller
             }
            
             return redirect()->back()->with('success', 'Address has been deleted.');
+        } catch (Exception $e) {
+            DB::rollback();
+
+            return redirect()->back()->with('error', 'An error occured. Please try again.');
+        }
+    }
+
+    public function updateAddress(Request $request, $id, $type){
+        DB::beginTransaction();
+        try {
+            // return $request->all();
+            $rules = array(
+                'first_name' => 'required',
+                'last_name' => 'required',
+                'mobile' => 'required',
+                'email' => 'required|email',
+                'address1' => 'required',
+                'province' => 'required',
+                'city' => 'required',
+                'brgy' => 'required',
+                'postal' => 'required',
+                'country' => 'required',
+                'Address_type1_1' => 'required',
+                'business_name' => $request->Address_type1_1 == 'Business Address' ? 'required' : ''
+            );
+            $validator = Validator::make($request->all(), $rules);
+
+            if($validator->fails()){
+                return redirect()->back()->with('error', 'All fields with * are required.');
+            }
+            $update = [
+                'add_type' => $request->Address_type1_1,
+                'xbusiness_name' => $request->business_name,
+                'xtin_no' => $request->tin,
+                'xadd1' => $request->address1,
+                'xadd2' => $request->address2,
+                'xprov' => $request->province,
+                'xcity' => $request->city,
+                'xbrgy' => $request->brgy,
+                'xpostal' => $request->postal,
+                'xcountry' => $request->country,
+                'xmobile_number' => $request->mobile,
+                'xcontactname1' => $request->first_name,
+                'xcontactlastname1' => $request->last_name,
+                'xcontactnumber1' => $request->contact,
+                'xcontactemail1' => $request->email 
+            ];
+
+            DB::table('fumaco_user_add')->where('id', $id)->update($update);
+
+            DB::commit();
+
+            $address = DB::table('fumaco_user_add')->where('id', $id)->first();
+
+            if(isset($request->checkout) and $address->xdefault == 1){ // Edit from order summary page
+                $address_class = $type == 'shipping' ? 'Delivery' : 'Billing';
+
+                $address_details = [
+                    'fname' => $address->xcontactname1,
+                    'lname' => $address->xcontactlastname1,
+                    'address_line1' => $address->xadd1,
+                    'address_line2' => $address->xadd2,
+                    'province' => $address->xprov,
+                    'city' => $address->xcity,
+                    'brgy' => $address->xbrgy,
+                    'postal_code' => $address->xpostal,
+                    'country' => $address->xcountry,
+                    'address_type' => $address->add_type,
+                    'business_name' => $address->xbusiness_name,
+                    'tin' => $address->xtin_no,
+                    'email_address' => $address->xcontactemail1,
+                    'mobile_no' => $address->xmobile_number,
+                    'contact_no' => $address->xcontactnumber1,
+                    'same_as_billing' => 0
+                ];
+
+                if($address_class == 'Delivery'){
+                    session()->put('fumShipDet', $address_details);
+                }else{
+                    session()->put('fumBillDet', $address_details);
+                }
+            }
+
+            return redirect()->back()->with('success', 'Address Updated');
         } catch (Exception $e) {
             DB::rollback();
 
