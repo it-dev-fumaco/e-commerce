@@ -951,8 +951,8 @@ class FrontendController extends Controller
         try {
             $address_details = DB::table('fumaco_user_add')->where('id', $id)->first();
             if($address_details) {
+                $default = DB::table('fumaco_user_add')->where('user_idx', $address_details->user_idx)->where('address_class', $address_details->address_class)->first();
                 if ($address_details->xdefault) {
-                    $default = DB::table('fumaco_user_add')->where('user_idx', $address_details->user_idx)->where('address_class', $address_details->address_class)->first();
                     DB::table('fumaco_user_add')->where('id', $default->id)->update(['xdefault' => 1]);
                 }
     
