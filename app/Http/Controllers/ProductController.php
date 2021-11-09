@@ -651,7 +651,7 @@ class ProductController extends Controller
             $original = storage_path('/app/public/item_images/'.$img->idcode.'/gallery/original/') . $img->imgoriginalx;
 
             $primary_webp = storage_path('/app/public/item_images/'.$img->idcode.'/gallery/preview/') . $primary_img .'.webp';
-            $original_webp = storage_path('/app/public/item_images/'.$img->idcode.'/gallery/original/') . $primary_img .'.webp';
+            $original_webp = storage_path('/app/public/item_images/'.$img->idcode.'/gallery/original/') . $original_img .'.webp';
    
 			if (file_exists($primary)) {
 				unlink($primary);
