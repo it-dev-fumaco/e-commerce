@@ -117,6 +117,7 @@
                                                                                     <option {{ ($a->user_type == "" ) ? 'selected' : '' }} disabled value="">Select User Type</option>
                                                                                     <option value="System Admin" {{ ($a->user_type == "System Admin" ) ? 'selected' : '' }}>System Admin</option>
                                                                                     <option value="Sales Admin" {{ ($a->user_type == "Sales Admin" ) ? 'selected' : '' }}>Sales Admin</option>
+                                                                                    <option value="Marketing Admin" {{ ($a->user_type == "Marketing Admin" ) ? 'selected' : '' }}>Marketing Admin</option>
                                                                                 </select>
                                                                             </div>                                                                    
                                                                         </div>
