@@ -48,6 +48,9 @@
       <li class="nav-item">
         <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
       </li>
+      <li class="nav-item">
+        <p class="mt-2 mb-0">You are logged in as <b>{{ Auth::user()->account_name }}</b></p>
+      </li>
     </ul>
 
     <!-- Right navbar links -->
