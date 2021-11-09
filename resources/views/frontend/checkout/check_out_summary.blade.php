@@ -313,7 +313,7 @@
 									<button type="button" class="btn btn-danger btn-xs" data-toggle="modal" data-target="#shipping-del{{ $shipping_address->id }}">
 										<i class="fas fa-trash-alt"></i>
 									</button>
-									@if($shipping_address->xdefault)
+									{{-- @if($shipping_address->xdefault)
 									<div id="shipping-del{{ $shipping_address->id }}" class="modal fade" role="dialog">
 										<div class="modal-dialog">
 											<div class="modal-content">
@@ -329,7 +329,7 @@
 											</div>
 										</div>
 									</div>
-									@else
+									@else --}}
 									<div id="shipping-del{{ $shipping_address->id }}" class="modal fade" role="dialog">
 										<form action="/myprofile/address/{{ $shipping_address->id }}/shipping/delete" method="POST">
 											@csrf
@@ -350,7 +350,7 @@
 											</div>
 										</form>
 									</div>
-									@endif
+									{{-- @endif --}}
 									<div id="shipping-view{{ $shipping_address->id }}" class="modal fade" role="dialog">
 										<div class="modal-dialog" style="max-width: 80% !important;">
 											<div class="modal-content">

@@ -951,12 +951,42 @@ class FrontendController extends Controller
             $address_details = DB::table('fumaco_user_add')->where('id', $id)->first();
             if($address_details) {
                 if ($address_details->xdefault) {
-                    return redirect()->back()->with('error', 'Cannot delete default billing address.');
+                    $default = DB::table('fumaco_user_add')->where('user_idx', $address_details->user_idx)->where('address_class', $address_details->address_class)->first();
+                    DB::table('fumaco_user_add')->where('id', $default->id)->update(['xdefault' => 1]);
                 }
     
                 DB::table('fumaco_user_add')->where('id', $id)->delete();
 
                 DB::commit();
+
+                $address_class = $type == 'shipping' ? 'Delivery' : 'Billing';
+
+                $address = DB::table('fumaco_user_add')->where('id', $default->id)->first();
+
+                $address_details = [
+                    'fname' => $address->xcontactname1,
+                    'lname' => $address->xcontactlastname1,
+                    'address_line1' => $address->xadd1,
+                    'address_line2' => $address->xadd2,
+                    'province' => $address->xprov,
+                    'city' => $address->xcity,
+                    'brgy' => $address->xbrgy,
+                    'postal_code' => $address->xpostal,
+                    'country' => $address->xcountry,
+                    'address_type' => $address->add_type,
+                    'business_name' => $address->xbusiness_name,
+                    'tin' => $address->xtin_no,
+                    'email_address' => $address->xcontactemail1,
+                    'mobile_no' => $address->xmobile_number,
+                    'contact_no' => $address->xcontactnumber1,
+                    'same_as_billing' => 0
+                ];
+
+                if($address_class == 'Delivery'){
+                    session()->put('fumShipDet', $address_details);
+                }else{
+                    session()->put('fumBillDet', $address_details);
+                }
             }
            
             return redirect()->back()->with('success', 'Address has been deleted.');
