@@ -237,6 +237,10 @@
 									</table>
 							  </div>
 							</div>
+							<div class="float-right font-italic">
+								<small>Last modified by: {{ $details->last_modified_by }} - {{ $details->last_modified_at }}</small><br>
+								<small>Created by: {{ $details->created_by }} - {{ $details->created_at }}</small>
+							</div>
 						</div>
 						<!-- /.card-body -->
 					</div>

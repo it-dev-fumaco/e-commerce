@@ -65,6 +65,9 @@
 									<label for="google-analytics-api">Google Analytics API</label>
 									<input type="text" class="form-control" id="google-analytics-api" name="google_analytics_api" value="{{ ($ganalytics) ? $ganalytics->api_key : old('google_analytics_api') }}" required>
 								</div>
+								<div class="float-right font-italic">
+									<small>Last modified by: {{ ($gmap) ? $gmap->last_modified_by . ' - ' . $gmap->last_modified_at : '' }}</small>
+								</div>
 							</div>
 							<!-- /.card-body -->
 							<div class="card-footer">

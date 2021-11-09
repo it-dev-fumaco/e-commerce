@@ -88,6 +88,9 @@
 									<label for="name">Sender Name</label>
 									<input type="text" class="form-control" id="name" name="name" value="{{ ($details) ? $details->name : old('name') }}" required>
 								</div>
+								<div class="float-right font-italic">
+									<small>Last modified by: {{ ($details) ? $details->last_modified_by . ' - ' . $details->modified_date : '' }}</small>
+								</div>
 							</div>
 							<!-- /.card-body -->
 							<div class="card-footer">

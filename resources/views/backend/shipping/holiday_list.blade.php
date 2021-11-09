@@ -116,7 +116,11 @@
 
                                                                                 <label for="name">Holiday Date</label>
                                                                                 <input type="text" name="date" id="holiday-edit" class="edit-holiday form-control" value="{{ date('Y-m-d', strtotime($holiday['date'])) }}" required/>
-                                                                                <br/>
+                                                                                <div class="text-right font-italic">
+                                                                                    <small>Last modified by: {{ $holiday['last_modified_by'] }} - {{ $holiday['last_modified_at'] }}</small><br>
+                                                                                    <small>Created by: {{ $holiday['created_by'] }} - {{ $holiday['created_at'] }}</small>
+                                                                                </div>
+                                                                                <br>
                                                                                 <button type="submit" class="btn btn-primary float-right">Save</button>
                                                                             </div>
                                                                         </form>

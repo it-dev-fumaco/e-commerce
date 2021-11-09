@@ -96,6 +96,12 @@
 											</div>
 										</div>
 									</div>
+									<div class="col-md-12">
+										<div class="text-right font-italic">
+											<small>Last modified by: {{ $store->last_modified_by }} - {{ $store->updated_at }}</small><br>
+											<small>Created by: {{ $store->created_by }} - {{ $store->created_at }}</small>
+										</div>
+									</div>
 								</div>
 							</div>
 						</div>
