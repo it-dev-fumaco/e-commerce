@@ -3,8 +3,6 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    {{-- @if($activePage == 'product_page')
-@yield('product_meta') --}}
     @hasSection('meta')
 @yield('meta')
     @else
@@ -24,26 +22,26 @@
 
     <link href="{{ asset('/assets/dist/css/bootstrap.min.css') }}" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.gstatic.com">
-    <script src="https://kit.fontawesome.com/ec0415ab92.js"></script>
+    {{-- <script src="https://kit.fontawesome.com/ec0415ab92.js"></script> --}}
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
     <link href="{{ asset('/assets/fumaco.css') }}" rel="stylesheet">
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    {{-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     @if($activePage == 'contact')
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     @endif
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script> --}}
     <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-VL1DJY5DB9"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ Config::get('google_api.google_analytics_api') }}"></script>
     <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
 
-    gtag('config', 'G-VL1DJY5DB9');
+    gtag('config', '{{ Config::get('google_api.google_analytics_api') }}');
     </script>
     <style>
 	html,body{
@@ -64,11 +62,9 @@
           font-family: 'poppins', sans-serif !important; font-weight:200 !important; font-size: 16px !important;
       }
       .fumacoFont_card_title {
-          /* font-family: 'Montserrat', sans-serif !important; font-weight:600 !important; font-size: 16px !important; */
           font-family: 'poppins', sans-serif !important; font-weight:500 !important; font-size: 20px !important;
       }
       .fumacoFont_card_caption {
-          /* font-family: 'Roboto', sans-serif !important; font-weight:200 !important; font-size: 16px !important; */
           font-family: 'poppins', sans-serif !important; font-weight:300 !important; font-size: 16px !important;
       }
       .fumacoFont_card_readmore {
@@ -77,13 +73,14 @@
       .fumacoFont_card_price {
           font-family: 'poppins', sans-serif !important; font-weight:600 !important; font-size: 16px !important; text-decoration: none !important;
       }
-      .carousel-item > img {
+      /* homepage */
+      /* .carousel-item > img {
           position: absolute !important;
           top: 0 !important;
           left: 0 !important;
           max-width: 100% !important;
           height: 100% !important;
-      }
+      } */
       .spinner-wrapper {
           position: fixed;
           top: 0;
@@ -213,33 +210,25 @@
           animation-name: fadeInUp;
           -webkit-animation-name: fadeInUp;
       }
-
-      .abt_standard{
+      /* About, Journals, Homepage, product page, search results */
+      /* .abt_standard{
         font-family: 'poppins', sans-serif !important;
-        /* font-weight: 200 !important; */
-        /* font-size: 17px !important; */
         text-decoration: none !important;
-        /* letter-spacing: 0.1em; */
-      }
-
-      .prod_desc{
+      } */
+      /* Product Page, Homepage */
+      /* .prod_desc{
         font-size: 16px !important;
         font-weight: 500 !important;
         text-align: left !important;
-      }
-
-      .prod_standard{
+      } */
+      /* Product Page */
+      /* .prod_standard{
         font-family: 'poppins', sans-serif !important;
         font-weight: 300 !important;
-        /* font-size: 17px !important; */
         text-decoration: none !important;
-      }
-
-      .prod-desc{
-        /* font-size: 160px !important; */
-        font-weight: 500 !important;
-      }
-      .filter-btn, .mbl-welcome{
+      } */
+      /* Product List Page */
+      /*.filter-btn, */.mbl-welcome{
         display: none !important;
       }
       .user-icon{
@@ -248,15 +237,17 @@
       .search-bar{
         width: 400px !important;
       }
-      .article-title{
+       /* homepage */
+      /* .article-title{
         min-height: 55px !important
-      }
-      .menu-burger{
+      } */
+      /* .menu-burger{
         float: right !important
-      }
-      .prod-sort{
+      } */
+      /* Product List Page */
+      /* .prod-sort{
         margin-right: 5%;
-      }
+      } */
 
       .payment-icons{
         width: 60px !important;
@@ -268,16 +259,19 @@
         header{
           min-height: 50px;
         }
-        .breadcrumb{
+        /* Ordering Pages */
+        /* .breadcrumb{
           font-size: 8pt !important;
           font-weight: 500;
-        }
-        .track-order-eta{
+        } */
+        /* Track Order */
+        /* .track-order-eta{
           text-align: left !important;
-        }
-        .article-title{
+        } */
+       /* homepage */
+        /* .article-title{
           min-height: auto !important
-        }
+        } */
 
       }
 
@@ -285,16 +279,19 @@
         header{
           min-height: 50px;
         }
-        .breadcrumb{
+        /* Ordering Pages */
+        /* .breadcrumb{
           font-size: 8pt !important;
           font-weight: 500;
-        }
-        .track-order-eta{
+        } */
+        /* Track Order */
+        /* .track-order-eta{
           text-align: left !important;
-        }
-        .article-title{
+        } */
+        /* homepage */
+        /* .article-title{
           min-height: auto !important
-        }
+        } */
       }
 
       @media (max-width: 1199.98px) {/* tablet */
@@ -311,13 +308,15 @@
         .search-bar{
           width: auto !important;
         }
-        .mb-pad{
+        /* Product List Page */
+        /* .mb-pad{
           padding: 0 !important;
-        }
+        } */
       }
 
       @media only screen and (min-device-width : 768px) and (max-device-width : 1024px) and (orientation : portrait) {/* portrait tablet */
-        .filter-btn, .filter-slide, .mob-srch{
+        /* Product List Page */
+        /* .filter-btn, .filter-slide,  */.mob-srch{
           display: inline-block !important;
         }
         .pc-cart, .search-bar{
@@ -326,16 +325,18 @@
         .mb-cart{
           display: inline-block !important;
         }
-        .menu-burger{
+        /* .menu-burger{
           float: right !important
-        }
-        .sort-by{
+        } */
+        /* Product List Page */
+        /* .sort-by{
           white-space: nowrap !important;
-        }
+        } */
       }
 
       @media only screen and (min-device-height : 427.98px) and (max-device-height : 767.98px) and (orientation : landscape) {/* landscape mobile */
-        .filter-btn, .filter-slide, .mob-srch{
+        /* Product List Page */
+        /* .filter-btn, .filter-slide,  */.mob-srch{
           display: inline-block !important;
         }
         .pc-cart, .search-bar{
@@ -344,14 +345,16 @@
         .mb-cart{
           display: inline-block !important;
         }
-
-        .sort-by{
+        /* Product List Page */
+        /* .sort-by{
           white-space: nowrap !important;
-        }
+        } */
       }
-
     </style>
-    {!! ReCaptcha::htmlScriptTagJsApi() !!}
+    @yield('style')
+    @if($activePage == 'contact')
+      {!! ReCaptcha::htmlScriptTagJsApi() !!}
+    @endif
   </head>
   <body>
     <div class="spinner-wrapper">
@@ -380,7 +383,6 @@
           </button>
           </div>
           {{-- Mobile Icons --}}
-
           <div class="collapse navbar-collapse nav_fumaco_res nav-a" id="navbarCollapse">
             <ul class="navbar-nav me-auto mb-2 mb-md-0 navbar-header">
               <li class="nav-item dropdown">
@@ -533,6 +535,13 @@
     </main>
 
   </footer>
+  <script src="https://kit.fontawesome.com/ec0415ab92.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  @if($activePage == 'contact')
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+  @endif
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
   <script src="{{ asset('/assets/dist/js/bootstrap.bundle.min.js') }}"></script>
   <script>
     $(document).ready(function() {
@@ -572,6 +581,7 @@
                 '<a style="text-decoration:none; color: #0062A5;" href="'+ link +'" >' + d.page_title +'</a>' +
               '</td></tr>';
             });
+
 
             $('#policy-pages-footer').append(f);
           }

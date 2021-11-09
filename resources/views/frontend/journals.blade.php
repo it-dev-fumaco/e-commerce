@@ -112,6 +112,10 @@
         
     </div>
 </main>
+
+@endsection
+
+@section('style')
 <style>
   .text {
     position: relative;
@@ -125,7 +129,6 @@
     word-wrap: break-word;
     overflow: hidden;
     max-height: 4.8em;
-    /* line-height: 1.2em; */
     line-height: 1.5em;
     text-align: left;
     font-weight: 300 !important;
@@ -142,6 +145,10 @@
     text-decoration: none !important;
     font-size: 12px !important;
     border-bottom: 1px solid #404040;
+  }
+  .abt_standard{
+    font-family: 'poppins', sans-serif !important;
+    text-decoration: none !important;
   }
 </style>
 @endsection

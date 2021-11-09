@@ -1,146 +1,9 @@
 @extends('frontend.layout', [
     'namePage' => $product_category->name,
-    'activePage' => 'product_page'
+    'activePage' => 'product_list'
 ])
 
 @section('content')
-	<style>
-		.pagination {
-			display: flex;
-			padding-left: 0;
-			list-style: none;
-		}
-		.checkersxx {
-			display: block;
-		}
-		@media only screen and (max-width: 768px) {
-			.pagination {
-					display: -webkit-inline-box;
-					padding-left: 0;
-					list-style: none;
-			}
-			.checkersxx {
-					display: none;
-			}
-		}
-		.pagex_link {
-			color: #5f6773 !important;
-			text-decoration: none !important;
-		}
-		.products-head {
-			margin-top: 10px !important;
-			padding-left: 40px !important;
-			padding-right: 40px !important;
-		}
-		.he1 {
-			font-weight: 300 !important;
-			font-size: 12px !important;
-		}
-		.he2 {
-			font-weight: 200 !important;
-			font-size: 10px !important;
-		}
-		.btmp {
-			margin-bottom: 15px !important;
-		}
-		/* Animation */
-		@keyframes fadeInUp {
-			from {
-					transform: translate3d(0,40px,0)
-			}
-			to {
-					transform: translate3d(0,0,0);
-					opacity: 1
-			}
-		}
-		@-webkit-keyframes fadeInUp {
-			from {
-					transform: translate3d(0,40px,0)
-			}
-			to {
-					transform: translate3d(0,0,0);
-					opacity: 1
-			}
-		}
-		.animated {
-			animation-duration: 1s;
-			animation-fill-mode: both;
-			-webkit-animation-duration: 1s;
-			-webkit-animation-fill-mode: both
-		}
-		.animatedFadeInUp {
-			opacity: 0
-		}
-		.fadeInUp {
-			opacity: 0;
-			animation-name: fadeInUp;
-			-webkit-animation-name: fadeInUp;
-		}
-
-		.text {
-			position: relative;
-			font-size: 16px !important;
-			width: 100%;
-		}
-
-		.text-concat {
-			position: relative;
-			display: inline-block;
-			word-wrap: break-word;
-			overflow: hidden;
-			max-height: 5.7em;
-			line-height: 1.4em;
-			text-align: left;
-			font-size: 16px !important;
-		}
-
-		.text.ellipsis::after {
-			position: absolute;
-			right: -12px;
-			bottom: 4px;
-		}
-		
-		/*Required*/
-@media (max-width: 576px){.modal-dialog.modal-dialog-slideout {width: 80%}}
-.modal-dialog-slideout {min-height: 100%; margin: 0 0 0 auto ;background: #fff;}
-/* .modal.fade .modal-dialog.modal-dialog-slideout {-webkit-transform: translate(-100%,0);transform: translate(-100%,0);} */
-.modal.fade .modal-dialog.modal-dialog-slideout {-webkit-transform: translate(100%, 0);transform: translate(100%, 0);}
-.modal.fade.show .modal-dialog.modal-dialog-slideout {-webkit-transform: translate(0,0);transform: translate(0,0);flex-flow: column;}
-.modal-dialog-slideout .modal-content{border: 0;}
-
-	@media (max-width: 575.98px) {
-        .sort-by{
-          white-space: nowrap !important;
-        }
-        .mb-pad{
-          padding: 0 !important;
-        }
-        .prod-sort{
-          margin-right: 0 !important;
-        }
-        .prod-list-pad{
-          padding: 5% !important;
-        }
-      }
-
-      @media (max-width: 767.98px) {
-        .sort-by{
-          white-space: nowrap !important;
-        }
-        .mb-pad{
-          padding: 0 !important;
-        }
-        .prod-sort{
-          margin-right: 0 !important;
-        }
-        .prod-list-pad{
-          padding: 5% !important;
-        }
-      }
-	</style>
-	<script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>
-	<script type='text/javascript' src='https://stackpath.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.bundle.min.js'></script>
-
 	<main style="background-color:#0062A5;">
 		<div id="myCarousel" class="carousel slide" data-bs-ride="carousel">
 			<div class="carousel-inner">
@@ -244,7 +107,7 @@
 				<div class="col-lg-10">
 					<div class="row g-6">
 						<form id="sortForm" class="d-inline-block">
-							<a class="btn d-none d-md-block filter-btn" data-toggle="modal" data-target="#filterModal2" style="font-size: 0.75rem !important; float: left !important">
+							<a class="btn d-md-block d-lg-none filter-btn" data-toggle="modal" data-target="#filterModal2" style="font-size: 0.75rem !important; float: left !important">
 								<i class="fas fa-filter"></i>&nbsp; Filters
 							</a>
 							<div class="col-md-4 offset-md-8">
@@ -433,6 +296,177 @@
 			</div>
 		</div>
 	</main>
+@endsection
+
+@section('style')
+<style>
+	.pagination {
+		display: flex;
+		padding-left: 0;
+		list-style: none;
+	}
+	.checkersxx {
+		display: block;
+	}
+	@media only screen and (max-width: 768px) {
+		.pagination {
+				display: -webkit-inline-box;
+				padding-left: 0;
+				list-style: none;
+		}
+		.checkersxx {
+				display: none;
+		}
+	}
+	.pagex_link {
+		color: #5f6773 !important;
+		text-decoration: none !important;
+	}
+	.products-head {
+		margin-top: 10px !important;
+		padding-left: 40px !important;
+		padding-right: 40px !important;
+	}
+	.he1 {
+		font-weight: 300 !important;
+		font-size: 12px !important;
+	}
+	.he2 {
+		font-weight: 200 !important;
+		font-size: 10px !important;
+	}
+	.btmp {
+		margin-bottom: 15px !important;
+	}
+	/* Animation */
+	@keyframes fadeInUp {
+		from {
+				transform: translate3d(0,40px,0)
+		}
+		to {
+				transform: translate3d(0,0,0);
+				opacity: 1
+		}
+	}
+	@-webkit-keyframes fadeInUp {
+		from {
+				transform: translate3d(0,40px,0)
+		}
+		to {
+				transform: translate3d(0,0,0);
+				opacity: 1
+		}
+	}
+	.animated {
+		animation-duration: 1s;
+		animation-fill-mode: both;
+		-webkit-animation-duration: 1s;
+		-webkit-animation-fill-mode: both
+	}
+	.animatedFadeInUp {
+		opacity: 0
+	}
+	.fadeInUp {
+		opacity: 0;
+		animation-name: fadeInUp;
+		-webkit-animation-name: fadeInUp;
+	}
+
+	.text {
+		position: relative;
+		font-size: 16px !important;
+		width: 100%;
+	}
+
+	.text-concat {
+		position: relative;
+		display: inline-block;
+		word-wrap: break-word;
+		overflow: hidden;
+		max-height: 5.7em;
+		line-height: 1.4em;
+		text-align: left;
+		font-size: 16px !important;
+	}
+
+	.text.ellipsis::after {
+		position: absolute;
+		right: -12px;
+		bottom: 4px;
+	}
+	.prod-sort{
+		margin-right: 5%;
+	}
+	/*Required*/
+@media (max-width: 576px){.modal-dialog.modal-dialog-slideout {width: 80%}}
+.modal-dialog-slideout {min-height: 100%; margin: 0 0 0 auto ;background: #fff;}
+/* .modal.fade .modal-dialog.modal-dialog-slideout {-webkit-transform: translate(-100%,0);transform: translate(-100%,0);} */
+.modal.fade .modal-dialog.modal-dialog-slideout {-webkit-transform: translate(100%, 0);transform: translate(100%, 0);}
+.modal.fade.show .modal-dialog.modal-dialog-slideout {-webkit-transform: translate(0,0);transform: translate(0,0);flex-flow: column;}
+.modal-dialog-slideout .modal-content{border: 0;}
+
+@media (max-width: 575.98px) {
+	.sort-by{
+	  white-space: nowrap !important;
+	}
+	.mb-pad{
+	  padding: 0 !important;
+	}
+	.prod-sort{
+	  margin-right: 0 !important;
+	}
+	.prod-list-pad{
+	  padding: 5% !important;
+	}
+	.filter-btn, .filter-slide{
+	  display: inline-block !important;
+	}
+  }
+
+  @media (max-width: 767.98px) {
+	.sort-by{
+	  white-space: nowrap !important;
+	}
+	.mb-pad{
+	  padding: 0 !important;
+	}
+	.prod-sort{
+	  margin-right: 0 !important;
+	}
+	.prod-list-pad{
+	  padding: 5% !important;
+	}
+	.filter-btn, .filter-slide{
+	  display: inline-block !important;
+	}
+  }
+  @media (max-width: 1199.98px) {/* tablet */
+	.mb-pad{
+	  padding: 10px !important;
+	}
+	.filter-btn, .filter-slide{
+	  display: none !important;
+	}
+  }
+
+  @media only screen and (min-device-width : 768px) and (max-device-width : 1024px) and (orientation : portrait) {/* portrait tablet */
+	.sort-by{
+	  white-space: nowrap !important;
+	}
+	.filter-btn, .filter-slide{
+	  display: inline-block !important;
+	}
+  }
+
+  @media only screen and (min-device-height : 427.98px) and (max-device-height : 767.98px) and (orientation : landscape) {/* landscape mobile */
+	.sort-by{
+	  white-space: nowrap !important;
+	}
+	.filter-btn, .filter-slide{
+	  display: inline-block !important;
+	}
+  }
+</style>
 @endsection
 
 @section('script')

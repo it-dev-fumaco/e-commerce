@@ -4,45 +4,6 @@
 ])
 
 @section('content')
-	<style>
-		.products-head {
-			margin-top: 10px !important;
-			padding-left: 40px !important;
-			padding-right: 40px !important;
-		}
-		.he1 {
-			font-weight: 300 !important;
-			font-size: 12px !important;
-		}
-		.he2 {
-			font-weight: 200 !important;
-			font-size: 10px !important;
-		}
-		.btmp {
-			margin-bottom: 15px !important;
-		}
-		.caption_1 {
-			font-weight: 200 !important;
-			font-size: 14px !important;
-		}
-		.caption_2 {
-			font-weight: 200 !important;
-			font-size: 10px !important;
-		}
-		.order-font {
-			font-weight: 200 !important;
-			font-size: 14px !important;
-		}
-		.order-font-sub {
-			font-weight: 200 !important;
-			font-size: 10px !important;
-		}
-		.order-font-sub-b {
-			font-weight: 300 !important;
-			font-size: 14px !important;
-		}
-	</style>
-
 	<main style="background-color:#0062A5;">
 		<div id="myCarousel" class="carousel slide" data-bs-ride="carousel">
 			<div class="carousel-inner">
@@ -191,7 +152,7 @@
 											</div>
 										</div>
 									</div>
-									<div class="d-lg-none d-xl-none" style="text-align: left;">
+									<div class="d-md-none" style="text-align: left;">
 										<br/>
 										<b>Shipping Name:</b> {{ $order['shipping_name'] }}<br/><br/>
 										<b>Est. Delivery Date:</b> {{ $order['edd'] }}<br/>
@@ -219,4 +180,45 @@
 		<br/>&nbsp;
 	</main>
 
+@endsection
+
+@section('style')
+<style>
+	.products-head {
+		margin-top: 10px !important;
+		padding-left: 40px !important;
+		padding-right: 40px !important;
+	}
+	.he1 {
+		font-weight: 300 !important;
+		font-size: 12px !important;
+	}
+	.he2 {
+		font-weight: 200 !important;
+		font-size: 10px !important;
+	}
+	.btmp {
+		margin-bottom: 15px !important;
+	}
+	.caption_1 {
+		font-weight: 200 !important;
+		font-size: 14px !important;
+	}
+	.caption_2 {
+		font-weight: 200 !important;
+		font-size: 10px !important;
+	}
+	.order-font {
+		font-weight: 200 !important;
+		font-size: 14px !important;
+	}
+	.order-font-sub {
+		font-weight: 200 !important;
+		font-size: 10px !important;
+	}
+	.order-font-sub-b {
+		font-weight: 300 !important;
+		font-size: 14px !important;
+	}
+</style>
 @endsection

@@ -4,91 +4,6 @@
 ])
 
 @section('content')
-<style>
-    .products-head {
-        margin-top: 10px !important;
-        padding-left: 40px !important;
-        padding-right: 40px !important;
-    }
-    .he1 {
-        font-weight: 300 !important;
-        font-size: 12px !important;
-    }
-    .he2 {
-        font-weight: 200 !important;
-        font-size: 10px !important;
-    }
-    .he1x {
-        font-weight: 600 !important;
-        font-size: 14px !important;
-    }
-    .he2x {
-        font-weight: 200 !important;
-        font-size: 12px !important;
-    }
-    .he2x2 {
-        font-weight: 500 !important;
-        font-size: 12px !important;
-    }
-    .btmp {
-        margin-bottom: 15px !important;
-    }
-    .tbls {
-        padding-bottom: 25px !important;
-        padding-top: 25px !important;
-    }
-    /* Animation */
-    @keyframes fadeInUp {
-        from {
-            transform: translate3d(0,40px,0)
-        }
-        to {
-            transform: translate3d(0,0,0);
-            opacity: 1
-        }
-    }
-    @-webkit-keyframes fadeInUp {
-        from {
-            transform: translate3d(0,40px,0)
-        }
-        to {
-            transform: translate3d(0,0,0);
-            opacity: 1
-        }
-    }
-    .animated {
-        animation-duration: 1s;
-        animation-fill-mode: both;
-        -webkit-animation-duration: 1s;
-        -webkit-animation-fill-mode: both
-    }
-    .animatedFadeInUp {
-        opacity: 0
-    }
-    .fadeInUp {
-        opacity: 0;
-        animation-name: fadeInUp;
-        -webkit-animation-name: fadeInUp;
-    }
-    @media (max-width: 575.98px) {
-        .tbl-qtr{
-            width: 20% !important;
-        }
-        .tbl-half{
-            width: 60% !important;
-        }
-    }
-
-    @media (max-width: 767.98px) {
-        .tbl-qtr{
-            width: 20% !important;
-        }
-        .tbl-half{
-            width: 60% !important;
-        }
-    }
-</style>
-
 <main style="background-color:#0062A5;">
     <div id="myCarousel" class="carousel slide" data-bs-ride="carousel">
         <div class="carousel-inner">
@@ -259,7 +174,78 @@
 </div>
 
 <style>
-	#custom-overlay {
+	
+</style>
+@endsection
+
+@section('style')
+<style>
+    .products-head {
+        margin-top: 10px !important;
+        padding-left: 40px !important;
+        padding-right: 40px !important;
+    }
+    .he1 {
+        font-weight: 300 !important;
+        font-size: 12px !important;
+    }
+    .he2 {
+        font-weight: 200 !important;
+        font-size: 10px !important;
+    }
+    .he1x {
+        font-weight: 600 !important;
+        font-size: 14px !important;
+    }
+    .he2x {
+        font-weight: 200 !important;
+        font-size: 12px !important;
+    }
+    .he2x2 {
+        font-weight: 500 !important;
+        font-size: 12px !important;
+    }
+    .btmp {
+        margin-bottom: 15px !important;
+    }
+    .tbls {
+        padding-bottom: 25px !important;
+        padding-top: 25px !important;
+    }
+    /* Animation */
+    @keyframes fadeInUp {
+        from {
+            transform: translate3d(0,40px,0)
+        }
+        to {
+            transform: translate3d(0,0,0);
+            opacity: 1
+        }
+    }
+    @-webkit-keyframes fadeInUp {
+        from {
+            transform: translate3d(0,40px,0)
+        }
+        to {
+            transform: translate3d(0,0,0);
+            opacity: 1
+        }
+    }
+    .animated {
+        animation-duration: 1s;
+        animation-fill-mode: both;
+        -webkit-animation-duration: 1s;
+        -webkit-animation-fill-mode: both
+    }
+    .animatedFadeInUp {
+        opacity: 0
+    }
+    .fadeInUp {
+        opacity: 0;
+        animation-name: fadeInUp;
+        -webkit-animation-name: fadeInUp;
+    }
+    #custom-overlay {
 		background: #ffffff;
 		color: #666666;
 		position: fixed;
@@ -290,6 +276,31 @@
 			transform: rotate(360deg);
 		}
 	}
+    @media (max-width: 575.98px) {
+        .tbl-qtr{
+            width: 20% !important;
+        }
+        .tbl-half{
+            width: 60% !important;
+        }
+        .breadcrumb{
+            font-size: 8pt !important;
+            font-weight: 500;
+        }
+    }
+
+    @media (max-width: 767.98px) {
+        .tbl-qtr{
+            width: 20% !important;
+        }
+        .tbl-half{
+            width: 60% !important;
+        }
+        .breadcrumb{
+            font-size: 8pt !important;
+            font-weight: 500;
+        }
+    }
 </style>
 @endsection
 

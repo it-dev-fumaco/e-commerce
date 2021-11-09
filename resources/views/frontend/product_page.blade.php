@@ -9,7 +9,294 @@
 @endsection
 
 @section('content')
-	<style>
+	<main style="background-color:#ffffff;" class="products-head">
+		<nav>
+			<ol class="breadcrumb" style="font-weight: 300 !important; font-size: 14px !important;">
+				<li class="breadcrumb-item"><a href="/" style="color: #000000 !important; text-decoration: none;">Home</a></li>
+				<li class="breadcrumb-item active"><a href="/products/{{ $product_details->f_cat_id }}" style="color: #000000 !important; text-decoration: none;">{{ $product_details->f_category }}</a></li>
+				<li class="breadcrumb-item active"><a href="#" style="color: #000000 !important; text-decoration: underline;">{{ $product_details->f_brand }}</a></li>
+			</ol>
+		</nav>
+	</main>
+	<br>
+	<div class="container"></div>
+	<form action="/product_actions" method="POST" autocomplete="off">
+		@csrf
+		<main class="prod-main" style="background-color:#ffffff;">
+			<div class="container marketing">
+				<div class="single_product prod-main" style="padding-bottom: 0px !important;">
+					<div class="container-fluid" style=" background-color: #fff; padding: 11px;">
+						<div class="row">
+							<div class="col-lg-4">
+								<div class="xzoom-container" style="width: 100% !important;">
+									@php
+									$src = (count($product_images) > 0) ? '/storage/item_images/'. $product_images[0]->idcode.'/gallery/preview/'. $product_images[0]->imgprimayx : '/storage/no-photo-available.png';
+									$xoriginal = (count($product_images) > 0)  ? '/storage/item_images/'. $product_images[0]->idcode.'/gallery/original/'. $product_images[0]->imgoriginalx : '/storage/no-photo-available.png';
+									@endphp
+									<img style="width: 100% !important;" class="xzoom4 imgx" id="xzoom-fancy" src="{{ asset($src) }}" xoriginal="{{ asset($xoriginal) }}" />
+									<br><br>
+									<div class="xzoom-thumbs">
+										@foreach ($product_images as $image)
+										<a href="{{ asset('/storage/item_images/'. $image->idcode.'/gallery/original/'. $image->imgoriginalx) }}"><img class="xzoom-gallery4" width="60" src="{{ asset('/storage/item_images/'. $image->idcode.'/gallery/preview/'. $image->imgprimayx) }}" /></a>
+										@endforeach
+									</div>
+								</div>
+							</div>
+							<div class="col-lg-8 order-3">
+								<div class="product_description">
+									<div class="message_box" style="margin:10px 0px;">
+										@if ($message = Session::get('success'))
+										<div class="alert alert-success alert-dismissible fade show" role="alert">{{ $message }}</div>
+										@endif
+									</div>
+									<div class="product_name fumacoFont_item_title">{{ $product_details->f_name_name }}</div>
+									<div class="product-rating">
+										<div class="d-flex justify-content-between align-items-center">
+											<div class="btn-group stylecap">
+												<span class="fa fa-star starcolorgrey"></span>
+												<span class="fa fa-star starcolorgrey"></span>
+												<span class="fa fa-star starcolorgrey"></span>
+												<span class="fa fa-star starcolorgrey"></span>
+												<span class="fa fa-star starcolorgrey"></span>
+												<span style="color:#000000 !important; font-weight:200 !important;">&nbsp;&nbsp;( 0 Reviews )</span>
+											</div>
+										</div>
+										<div id="fb-root"></div>
+										<script>
+											(function(d, s, id) {
+												var js, fjs = d.getElementsByTagName(s)[0];
+												if (d.getElementById(id)) return;
+												js = d.createElement(s); js.id = id;
+												js.src = "https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.0";
+												fjs.parentNode.insertBefore(js, fjs);
+											}(document, 'script', 'facebook-jssdk'));
+										</script>
+										<script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v11.0&appId=974569840046115&autoLogAppEvents=1" nonce="1VBl9fa6"></script>
+										<!-- Your share button code -->
+										<div class="fb-like" data-href="{{ \Request::fullUrl() }}" data-width="" data-layout="standard" data-action="like" data-size="small" data-share="true"></div>
+									</div>
+									<div>
+										@if ($product_details->f_discount_trigger)
+										<span class="product_price fumacoFont_item_price">₱ {{ number_format(str_replace(",","",$product_details->f_price), 2) }}</span>
+										<s class="product_discount">
+											<span style='color:black; '>₱ {{ number_format(str_replace(",","",$product_details->f_original_price), 2) }}<span>
+										</s>
+										
+										@else
+										<span class="product_price fumacoFont_item_price">₱ {{ number_format(str_replace(",","",$product_details->f_original_price), 2) }}</span>
+										@endif
+										<span class="badge badge-danger" style="margin-left: 8px; vertical-align: middle;background-color: red; display: {{ ($product_details->f_discount_trigger) ? 'inline' : 'none' }} !important;">{{ $product_details->f_discount_percent }}% OFF</span>
+									</div>
+									<br class="d-md-none"/>
+									<div><span class="prod-font-size">{!! $product_details->f_caption !!}</span>
+										<p class="card-text fumacoFont_card_caption">
+											<ul style="margin-top: -12px !important;">
+												<li>
+													<a href="#product_details" style="text-decoration: none;">
+														<span style="text-decoration: none;color: #1a6ea9 !important;font-size: 12px !important; font-weight: 400 !important;">See more products details</span>
+													</a>
+												</li>
+											</ul>
+										</p>
+										<input type="hidden" name="item_code" value="{{ $product_details->f_idcode }}">
+										<p class="card-text">QTY&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;   <input type="number" value="1" id="quantity" name="quantity" min="1" max="{{ ($product_details->f_qty > 0) ? $product_details->f_qty : 1 }}" style="width: 70px;"></p>
+										<p class="card-text">
+											@if($product_details->f_qty < 1)
+											<span style='color:red;';>Not Available</span>
+											@else
+											<span style='color:green;';>Available</span>
+											@endif
+											&nbsp;&nbsp; <i class="fas fa-bell"></i>
+										</p>
+									</div>
+									<hr class="singleline">
+									@php
+										$variant_diff = array_diff(array_keys($variant_attr_arr), array_keys($attributes->toArray()));
+									@endphp
+									@if (count($variant_diff) > 0)
+									<div class="alert alert-danger fade show mb-0" role="alert">Error in Variants.</div>
+									@endif
+									@foreach ($variant_attr_arr as $attr => $row)
+									@if (count($row) > 1)
+									@php
+										$x = 0;
+										$opt_name = preg_replace('/\s+/', '', strtolower($attr));
+									@endphp
+									<label>{{ $attr }} : </label><br class="d-md-none"/>
+									<div class="btn-group" role="group" aria-label="Select Variants" style="display: unset !important;">
+										@foreach ($row as $attr_value => $items)
+										@php
+											$x++;
+											$is_active = [1];
+										@endphp
+										@if (isset($attributes[$attr]))
+										<input type="radio" class="btn-check attr-radio" {{ ($attributes[$attr] == $attr_value) ? 'checked' : '' }} name="{{ $opt_name }}" id="{{ $opt_name . $x }}" autocomplete="off" value="{{ $attr_value }}" data-attribute="{{ Str::slug($attr, '-') }}" {{ (count($is_active) > 0) ? '' : 'disabled' }}>
+										<label class="btn btn-outline-{{ (count($is_active) > 0) ? 'info' : 'secondary' }} btn-sm mb-2 mt-2" for="{{ $opt_name . $x }}">
+											@if(count($is_active) > 0)
+											{{ $attr_value }}
+											@else
+											<del>{{ $attr_value }}</del>
+											@endif
+										</label>
+										@else
+										error
+										@endif
+										@endforeach
+									</div><br>
+									@endif
+									@endforeach
+									<div class="row mt-5" id="product_details">
+										<div class="col-xs-6 d-none d-md-block">
+											<button type="submit" class="btn btn-lg btn-outline-primary fumacoFont_card_readmore" name="addtocart" style="padding: 1rem 1.5rem !important; color: #ffffff;background-color: #0062A5;border-color: #7cc;border-radius: 0 !important; {{ ($product_details->f_qty < 1) ? 'display: none;' : '' }}" value="1"><i class="fas fa-shopping-cart"></i> Add to Cart</button>
+											<button type="submit" class="btn btn-lg btn-outline-primary fumacoFont_card_readmore" name="buynow" style="padding: 1rem 1.5rem !important; color: #ffffff;background-color: #0062A5;border-color: #7cc;border-radius: 0 !important; {{ ($product_details->f_qty < 1) ? 'display: none;' : '' }}"  value="1"><i class="fas fa-wallet"></i> Buy Now</button>
+											@if($product_details->f_qty < 1)
+											<button type="submit" class="btn btn-lg btn-outline-primary fumacoFont_card_readmore" style="padding: 1rem 1.5rem !important; color: #ffffff;background-color: #0062A5;border-color: #7cc;border-radius: 0 !important;" name="addtowishlist" value="1"><i class="fas fa-heart"></i> Add to Wish List</button>
+											@endif
+										</div>
+
+										<div class="col-xs-6 d-md-none">
+											<div class="col-sm-12">
+												<button type="submit" class="btn btn-lg btn-outline-primary fumacoFont_card_readmore col-sm-12" name="addtocart" style="padding: 1rem 1.5rem !important; color: #ffffff;background-color: #0062A5;border-color: #7cc;border-radius: 0 !important; {{ ($product_details->f_qty < 1) ? 'display: none;' : '' }}; width: 100% !important" value="1"><i class="fas fa-shopping-cart"></i> Add to Cart</button>
+											</div><br/>
+											<div class="col-md-12">
+												<button type="submit" class="btn btn-lg btn-outline-primary fumacoFont_card_readmore col-sm-12" name="buynow" style="padding: 1rem 1.5rem !important; color: #ffffff;background-color: #0062A5;border-color: #7cc;border-radius: 0 !important; {{ ($product_details->f_qty < 1) ? 'display: none;' : '' }}; width: 100% !important"  value="1"><i class="fas fa-wallet"></i> Buy Now</button>
+											</div>
+											@if($product_details->f_qty < 1)
+											<div class="col-md-12">
+												<button type="submit" class="btn btn-lg btn-outline-primary fumacoFont_card_readmore col-sm-12" style="padding: 1rem 1.5rem !important; color: #ffffff;background-color: #0062A5;border-color: #7cc;border-radius: 0 !important; width: 100% !important" name="addtowishlist" value="1"><i class="fas fa-heart"></i> Add to Wish List</button>
+											</div>
+											@endif
+										</div>
+										<div class="row"><br></div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</main>
+		</form>
+		<main  style="background-color:#ffffff; margin-top: 0px !important;" class="products-head2 prod-details" >
+			<div class="container">
+				<div class="row">
+					<br>
+					<div class="col-lg-12">
+						<br>
+						<div class="accordion" id="accordionExample">
+							<div class="card">
+								<div class="card-header" id="headingOne">
+									<h2 class="mb-0">
+										<button  class="btn btn-link collapsed fumacoFont_collapse_title abt_standard" type="button" data-toggle="collapse" data-target="" aria-expanded="false" aria-controls="collapseOne">PRODUCT DETAIL</button>
+									</h2>
+								</div>
+								<div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample">
+									<div class="card-body prod_standard p-0">
+										<p class="card-text">
+											<table class="table">
+												<tbody style="border-style: inset !important;">
+													@foreach ($filtered_attributes as $attr => $value)
+													<tr>
+														<td>{{ $attr }}</td>
+														<td>{{ $value }}</td>
+													</tr>
+													@endforeach
+												</tbody>
+											</table>
+                              </p>
+                           </div>
+                        </div>
+							</div>
+							<div class="card">
+								<div class="card-header" id="headingTwo">
+									<h2 class="mb-0">
+										<button class="btn btn-link collapsed fumacoFont_collapse_title abt_standard" type="button" data-toggle="collapse" data-target="" aria-expanded="false" aria-controls="collapseTwo">ADDITIONAL INFORMATION</button>
+									</h2>
+								</div>
+								<div id="collapseTwo" class="collapse show" aria-labelledby="headingTwo" data-parent="#accordionExample">
+									<div class="card-body prod_standard">
+										<p class="card-text">{!! $product_details->f_full_description !!}</p>
+									</div>
+								</div>
+							</div>
+
+                    @if (count($related_products) > 0)
+							<section class="py-5 text-center container" style="padding-bottom: 0rem !important;">
+								<div class="row py-lg-5">
+									<div class="col-lg-6 col-md-8 mx-auto">
+										<h4 class="fw-light bestsellinghead fumacoFont1 animated animatedFadeInUp fadeInUp" style="color:#000000 !important;">RELATED PRODUCT(S)</h4>
+									</div>
+								</div>
+							</section>
+
+							<div class="album py-5">
+								<div class="container related-prod">
+									<div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4">
+										@foreach($related_products as $rp)
+										<div class="col animated animatedFadeInUp fadeInUp equal-height-columns">
+											<div class="card shadow-sm">
+												<div class="equal-column-content" style="border: 1px solid  #d5dbdb; position: relative;">
+													@php
+														$img = ($rp['image']) ? '/storage/item_images/'. $rp['item_code'] .'/gallery/preview/'. $rp['image'] : '/storage/no-photo-available.png';
+														$img_webp = ($rp['image']) ? '/storage/item_images/'. $rp['item_code'] .'/gallery/preview/'. explode(".", $rp['image'])[0] .'.webp' : '/storage/no-photo-available.png';
+													@endphp
+
+
+<picture>
+	<source srcset="{{ asset($img_webp) }}" type="image/webp" class="img-responsive" style="width: 100% !important;">
+	<source srcset="{{ asset($img) }}" type="image/jpeg" class="img-responsive" style="width: 100% !important;">
+	<img src="{{ asset($img) }}" alt="{{ $rp['item_code'] }}" class="img-responsive" style="width: 100% !important;">
+  </picture>
+
+
+													<div class="card-body">
+														<div class="text ellipsis">
+															<p class="card-text product-head fumacoFont_card_title text-concat prod_desc" style="color:#0062A5 !important;  min-height: 80px;">{{ $rp['item_name'] }}</p>
+														</div>
+														<p class="card-text fumacoFont_card_price" style="color:#000000 !important; ">
+															@if ($rp['is_discounted'])
+															<span style="white-space: nowrap !important">₱ {{ number_format(str_replace(",","",$rp['new_price']), 2) }}</span>&nbsp;<br class="d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$rp['orig_price']), 2) }}</s>
+															@else
+															₱ {{ number_format(str_replace(",","",$rp['orig_price']), 2) }}
+															@endif
+															</p>
+														<div class="d-flex justify-content-between align-items-center">
+															<div class="btn-group stylecap">
+															<span class="fa fa-star starcolorgrey"></span>
+															<span class="fa fa-star starcolorgrey"></span>
+															<span class="fa fa-star starcolorgrey"></span>
+															<span class="fa fa-star starcolorgrey"></span>
+															<span class="fa fa-star starcolorgrey"></span>
+															</div>
+															<small class="text-muted stylecap" style="color:#c4cad0 !important; font-weight:100 !important;">( 0 Reviews )</small>
+														</div>
+														<br>
+														<a href="/product/{{ ($rp['slug']) ? $rp['slug'] : $rp['item_code'] }}" class="btn btn-outline-primary fumacoFont_card_readmore" role="button" style="width:100% !important;">View</a>
+													</div>
+												</div>
+											</div>
+										</div>
+										@endforeach
+									</div>
+								</div>
+							</div>
+						@endif
+						</div>
+					</div>
+				</div>
+			</div>
+		</main>
+
+		<main style="background-color:#ffffff;">
+			<br><br><br><br><br>
+		</main>
+@endsection
+
+@section('style')
+<link type="text/css" rel="stylesheet" media="all" href="{{ asset('/item/fancybox/source/jquery.fancybox.css') }}" />
+<link type="text/css" rel="stylesheet" media="all" href="{{ asset('/item/magnific-popup/css/magnific-popup.css') }}" />
+<link rel="stylesheet" type="text/css" href="{{ asset('/item/dist/xzoom.css') }}" media="all" />
+<link type="text/css" rel="stylesheet" href="{{ asset('/assets/loading.css') }}" />
+<style>
 	
 	._1yv {
 			box-shadow: 0 0px 0px rgb(0 0 0 / 30%), 0 0 0 1px rgb(0 0 0) !important;
@@ -560,7 +847,11 @@
       bottom: 4px;
     }
 
-		@media (max-width: 575.98px) { /* Mobile */
+	.abt_standard{
+		font-family: 'poppins', sans-serif !important;
+		text-decoration: none !important;
+	}
+	@media (max-width: 575.98px) { /* Mobile */
         header{
           min-height: 50px;
         }
@@ -568,10 +859,6 @@
           font-size: 8pt !important;
           font-weight: 500;
         }
-        .track-order-eta{
-          text-align: left !important;
-        }
-
         .prod-details{
           padding: 10px !important;
 		  font-size: 12px !important;
@@ -605,10 +892,6 @@
           font-size: 8pt !important;
           font-weight: 500;
         }
-        .track-order-eta{
-          text-align: left !important;
-        }
-
         .prod-details{
           padding: 10px !important;
 		  font-size: 12px !important;
@@ -632,294 +915,23 @@
 		.products-head{
 			padding-left: 20px !important;
 		}
+		.prod_desc{
+			font-size: 16px !important;
+			font-weight: 500 !important;
+			text-align: left !important;
+		}
+		.prod_standard{
+			font-family: 'poppins', sans-serif !important;
+			font-weight: 300 !important;
+			text-decoration: none !important;
+		}
+      }
+	  @media (max-width: 1199.98px) {/* tablet */
+        .prod_desc{
+			font-size: 16px !important;
+		}
       }
 	</style>
-
-	<link type="text/css" rel="stylesheet" media="all" href="{{ asset('/item/fancybox/source/jquery.fancybox.css') }}" />
-	<link type="text/css" rel="stylesheet" media="all" href="{{ asset('/item/magnific-popup/css/magnific-popup.css') }}" />
-	<link rel="stylesheet" type="text/css" href="{{ asset('/item/dist/xzoom.css') }}" media="all" />
-	<link type="text/css" rel="stylesheet" href="{{ asset('/assets/loading.css') }}" />
-
-	<main style="background-color:#ffffff;" class="products-head">
-		<nav>
-			<ol class="breadcrumb" style="font-weight: 300 !important; font-size: 14px !important;">
-				<li class="breadcrumb-item"><a href="/" style="color: #000000 !important; text-decoration: none;">Home</a></li>
-				<li class="breadcrumb-item active"><a href="/products/{{ $product_details->f_cat_id }}" style="color: #000000 !important; text-decoration: none;">{{ $product_details->f_category }}</a></li>
-				<li class="breadcrumb-item active"><a href="#" style="color: #000000 !important; text-decoration: underline;">{{ $product_details->f_brand }}</a></li>
-			</ol>
-		</nav>
-	</main>
-	<br>
-	<div class="container"></div>
-	<form action="/product_actions" method="POST" autocomplete="off">
-		@csrf
-		<main class="prod-main" style="background-color:#ffffff;">
-			<div class="container marketing">
-				<div class="single_product prod-main" style="padding-bottom: 0px !important;">
-					<div class="container-fluid" style=" background-color: #fff; padding: 11px;">
-						<div class="row">
-							<div class="col-lg-4">
-								<div class="xzoom-container" style="width: 100% !important;">
-									@php
-									$src = (count($product_images) > 0) ? '/storage/item_images/'. $product_images[0]->idcode.'/gallery/preview/'. $product_images[0]->imgprimayx : '/storage/no-photo-available.png';
-									$xoriginal = (count($product_images) > 0)  ? '/storage/item_images/'. $product_images[0]->idcode.'/gallery/original/'. $product_images[0]->imgoriginalx : '/storage/no-photo-available.png';
-									@endphp
-									<img style="width: 100% !important;" class="xzoom4 imgx" id="xzoom-fancy" src="{{ asset($src) }}" xoriginal="{{ asset($xoriginal) }}" />
-									<br><br>
-									<div class="xzoom-thumbs">
-										@foreach ($product_images as $image)
-										<a href="{{ asset('/storage/item_images/'. $image->idcode.'/gallery/original/'. $image->imgoriginalx) }}"><img class="xzoom-gallery4" width="60" src="{{ asset('/storage/item_images/'. $image->idcode.'/gallery/preview/'. $image->imgprimayx) }}" /></a>
-										@endforeach
-									</div>
-								</div>
-							</div>
-							<div class="col-lg-8 order-3">
-								<div class="product_description">
-									<div class="message_box" style="margin:10px 0px;">
-										@if ($message = Session::get('success'))
-										<div class="alert alert-success alert-dismissible fade show" role="alert">{{ $message }}</div>
-										@endif
-									</div>
-									<div class="product_name fumacoFont_item_title">{{ $product_details->f_name_name }}</div>
-									<div class="product-rating">
-										<div class="d-flex justify-content-between align-items-center">
-											<div class="btn-group stylecap">
-												<span class="fa fa-star starcolorgrey"></span>
-												<span class="fa fa-star starcolorgrey"></span>
-												<span class="fa fa-star starcolorgrey"></span>
-												<span class="fa fa-star starcolorgrey"></span>
-												<span class="fa fa-star starcolorgrey"></span>
-												<span style="color:#000000 !important; font-weight:200 !important;">&nbsp;&nbsp;( 0 Reviews )</span>
-											</div>
-										</div>
-										<div id="fb-root"></div>
-										<script>
-											(function(d, s, id) {
-												var js, fjs = d.getElementsByTagName(s)[0];
-												if (d.getElementById(id)) return;
-												js = d.createElement(s); js.id = id;
-												js.src = "https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.0";
-												fjs.parentNode.insertBefore(js, fjs);
-											}(document, 'script', 'facebook-jssdk'));
-										</script>
-										<script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v11.0&appId=974569840046115&autoLogAppEvents=1" nonce="1VBl9fa6"></script>
-										<!-- Your share button code -->
-										<div class="fb-like" data-href="{{ \Request::fullUrl() }}" data-width="" data-layout="standard" data-action="like" data-size="small" data-share="true"></div>
-									</div>
-									<div>
-										@if ($product_details->f_discount_trigger)
-										<span class="product_price fumacoFont_item_price">₱ {{ number_format(str_replace(",","",$product_details->f_price), 2) }}</span>
-										<s class="product_discount">
-											<span style='color:black; '>₱ {{ number_format(str_replace(",","",$product_details->f_original_price), 2) }}<span>
-										</s>
-										
-										@else
-										<span class="product_price fumacoFont_item_price">₱ {{ number_format(str_replace(",","",$product_details->f_original_price), 2) }}</span>
-										@endif
-										<span class="badge badge-danger" style="margin-left: 8px; vertical-align: middle;background-color: red; display: {{ ($product_details->f_discount_trigger) ? 'inline' : 'none' }} !important;">{{ $product_details->f_discount_percent }}% OFF</span>
-									</div>
-									<br class="d-md-none"/>
-									<div><span class="prod-font-size">{!! $product_details->f_caption !!}</span>
-										<p class="card-text fumacoFont_card_caption">
-											<ul style="margin-top: -12px !important;">
-												<li>
-													<a href="#product_details" style="text-decoration: none;">
-														<span style="text-decoration: none;color: #1a6ea9 !important;font-size: 12px !important; font-weight: 400 !important;">See more products details</span>
-													</a>
-												</li>
-											</ul>
-										</p>
-										<input type="hidden" name="item_code" value="{{ $product_details->f_idcode }}">
-										<p class="card-text">QTY&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;   <input type="number" value="1" id="quantity" name="quantity" min="1" max="{{ ($product_details->f_qty > 0) ? $product_details->f_qty : 1 }}" style="width: 70px;"></p>
-										<p class="card-text">
-											@if($product_details->f_qty < 1)
-											<span style='color:red;';>Not Available</span>
-											@else
-											<span style='color:green;';>Available</span>
-											@endif
-											&nbsp;&nbsp; <i class="fas fa-bell"></i>
-										</p>
-									</div>
-									<hr class="singleline">
-									@php
-										$variant_diff = array_diff(array_keys($variant_attr_arr), array_keys($attributes->toArray()));
-									@endphp
-									@if (count($variant_diff) > 0)
-									<div class="alert alert-danger fade show mb-0" role="alert">Error in Variants.</div>
-									@endif
-									@foreach ($variant_attr_arr as $attr => $row)
-									@if (count($row) > 1)
-									@php
-										$x = 0;
-										$opt_name = preg_replace('/\s+/', '', strtolower($attr));
-									@endphp
-									<label>{{ $attr }} : </label><br class="d-md-none"/>
-									<div class="btn-group" role="group" aria-label="Select Variants" style="display: unset !important;">
-										@foreach ($row as $attr_value => $items)
-										@php
-											$x++;
-											$is_active = [1];
-										@endphp
-										@if (isset($attributes[$attr]))
-										<input type="radio" class="btn-check attr-radio" {{ ($attributes[$attr] == $attr_value) ? 'checked' : '' }} name="{{ $opt_name }}" id="{{ $opt_name . $x }}" autocomplete="off" value="{{ $attr_value }}" data-attribute="{{ Str::slug($attr, '-') }}" {{ (count($is_active) > 0) ? '' : 'disabled' }}>
-										<label class="btn btn-outline-{{ (count($is_active) > 0) ? 'info' : 'secondary' }} btn-sm mb-2 mt-2" for="{{ $opt_name . $x }}">
-											@if(count($is_active) > 0)
-											{{ $attr_value }}
-											@else
-											<del>{{ $attr_value }}</del>
-											@endif
-										</label>
-										@else
-										error
-										@endif
-										@endforeach
-									</div><br>
-									@endif
-									@endforeach
-									<div class="row mt-5" id="product_details">
-										<div class="col-xs-6 d-none d-md-block">
-											<button type="submit" class="btn btn-lg btn-outline-primary fumacoFont_card_readmore" name="addtocart" style="padding: 1rem 1.5rem !important; color: #ffffff;background-color: #0062A5;border-color: #7cc;border-radius: 0 !important; {{ ($product_details->f_qty < 1) ? 'display: none;' : '' }}" value="1"><i class="fas fa-shopping-cart"></i> Add to Cart</button>
-											<button type="submit" class="btn btn-lg btn-outline-primary fumacoFont_card_readmore" name="buynow" style="padding: 1rem 1.5rem !important; color: #ffffff;background-color: #0062A5;border-color: #7cc;border-radius: 0 !important; {{ ($product_details->f_qty < 1) ? 'display: none;' : '' }}"  value="1"><i class="fas fa-wallet"></i> Buy Now</button>
-											@if($product_details->f_qty < 1)
-											<button type="submit" class="btn btn-lg btn-outline-primary fumacoFont_card_readmore" style="padding: 1rem 1.5rem !important; color: #ffffff;background-color: #0062A5;border-color: #7cc;border-radius: 0 !important;" name="addtowishlist" value="1"><i class="fas fa-heart"></i> Add to Wish List</button>
-											@endif
-										</div>
-
-										<div class="col-xs-6 d-md-none">
-											<div class="col-sm-12">
-												<button type="submit" class="btn btn-lg btn-outline-primary fumacoFont_card_readmore col-sm-12" name="addtocart" style="padding: 1rem 1.5rem !important; color: #ffffff;background-color: #0062A5;border-color: #7cc;border-radius: 0 !important; {{ ($product_details->f_qty < 1) ? 'display: none;' : '' }}; width: 100% !important" value="1"><i class="fas fa-shopping-cart"></i> Add to Cart</button>
-											</div><br/>
-											<div class="col-md-12">
-												<button type="submit" class="btn btn-lg btn-outline-primary fumacoFont_card_readmore col-sm-12" name="buynow" style="padding: 1rem 1.5rem !important; color: #ffffff;background-color: #0062A5;border-color: #7cc;border-radius: 0 !important; {{ ($product_details->f_qty < 1) ? 'display: none;' : '' }}; width: 100% !important"  value="1"><i class="fas fa-wallet"></i> Buy Now</button>
-											</div>
-											@if($product_details->f_qty < 1)
-											<div class="col-md-12">
-												<button type="submit" class="btn btn-lg btn-outline-primary fumacoFont_card_readmore col-sm-12" style="padding: 1rem 1.5rem !important; color: #ffffff;background-color: #0062A5;border-color: #7cc;border-radius: 0 !important; width: 100% !important" name="addtowishlist" value="1"><i class="fas fa-heart"></i> Add to Wish List</button>
-											</div>
-											@endif
-										</div>
-										<div class="row"><br></div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</main>
-		</form>
-		<main  style="background-color:#ffffff; margin-top: 0px !important;" class="products-head2 prod-details" >
-			<div class="container">
-				<div class="row">
-					<br>
-					<div class="col-lg-12">
-						<br>
-						<div class="accordion" id="accordionExample">
-							<div class="card">
-								<div class="card-header" id="headingOne">
-									<h2 class="mb-0">
-										<button  class="btn btn-link collapsed fumacoFont_collapse_title abt_standard" type="button" data-toggle="collapse" data-target="" aria-expanded="false" aria-controls="collapseOne">PRODUCT DETAIL</button>
-									</h2>
-								</div>
-								<div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample">
-									<div class="card-body prod_standard p-0">
-										<p class="card-text">
-											<table class="table">
-												<tbody style="border-style: inset !important;">
-													@foreach ($filtered_attributes as $attr => $value)
-													<tr>
-														<td>{{ $attr }}</td>
-														<td>{{ $value }}</td>
-													</tr>
-													@endforeach
-												</tbody>
-											</table>
-                              </p>
-                           </div>
-                        </div>
-							</div>
-							<div class="card">
-								<div class="card-header" id="headingTwo">
-									<h2 class="mb-0">
-										<button class="btn btn-link collapsed fumacoFont_collapse_title abt_standard" type="button" data-toggle="collapse" data-target="" aria-expanded="false" aria-controls="collapseTwo">ADDITIONAL INFORMATION</button>
-									</h2>
-								</div>
-								<div id="collapseTwo" class="collapse show" aria-labelledby="headingTwo" data-parent="#accordionExample">
-									<div class="card-body prod_standard">
-										<p class="card-text">{!! $product_details->f_full_description !!}</p>
-									</div>
-								</div>
-							</div>
-
-                    @if (count($related_products) > 0)
-							<section class="py-5 text-center container" style="padding-bottom: 0rem !important;">
-								<div class="row py-lg-5">
-									<div class="col-lg-6 col-md-8 mx-auto">
-										<h4 class="fw-light bestsellinghead fumacoFont1 animated animatedFadeInUp fadeInUp" style="color:#000000 !important;">RELATED PRODUCT(S)</h4>
-									</div>
-								</div>
-							</section>
-
-							<div class="album py-5">
-								<div class="container related-prod">
-									<div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4">
-										@foreach($related_products as $rp)
-										<div class="col animated animatedFadeInUp fadeInUp equal-height-columns">
-											<div class="card shadow-sm">
-												<div class="equal-column-content" style="border: 1px solid  #d5dbdb; position: relative;">
-													@php
-														$img = ($rp['image']) ? '/storage/item_images/'. $rp['item_code'] .'/gallery/preview/'. $rp['image'] : '/storage/no-photo-available.png';
-														$img_webp = ($rp['image']) ? '/storage/item_images/'. $rp['item_code'] .'/gallery/preview/'. explode(".", $rp['image'])[0] .'.webp' : '/storage/no-photo-available.png';
-													@endphp
-
-
-<picture>
-	<source srcset="{{ asset($img_webp) }}" type="image/webp" class="img-responsive" style="width: 100% !important;">
-	<source srcset="{{ asset($img) }}" type="image/jpeg" class="img-responsive" style="width: 100% !important;">
-	<img src="{{ asset($img) }}" alt="{{ $rp['item_code'] }}" class="img-responsive" style="width: 100% !important;">
-  </picture>
-
-
-													<div class="card-body">
-														<div class="text ellipsis">
-															<p class="card-text product-head fumacoFont_card_title text-concat prod_desc" style="color:#0062A5 !important;  min-height: 80px;">{{ $rp['item_name'] }}</p>
-														</div>
-														<p class="card-text fumacoFont_card_price" style="color:#000000 !important; ">
-															@if ($rp['is_discounted'])
-															<span style="white-space: nowrap !important">₱ {{ number_format(str_replace(",","",$rp['new_price']), 2) }}</span>&nbsp;<br class="d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$rp['orig_price']), 2) }}</s>
-															@else
-															₱ {{ number_format(str_replace(",","",$rp['orig_price']), 2) }}
-															@endif
-															</p>
-														<div class="d-flex justify-content-between align-items-center">
-															<div class="btn-group stylecap">
-															<span class="fa fa-star starcolorgrey"></span>
-															<span class="fa fa-star starcolorgrey"></span>
-															<span class="fa fa-star starcolorgrey"></span>
-															<span class="fa fa-star starcolorgrey"></span>
-															<span class="fa fa-star starcolorgrey"></span>
-															</div>
-															<small class="text-muted stylecap" style="color:#c4cad0 !important; font-weight:100 !important;">( 0 Reviews )</small>
-														</div>
-														<br>
-														<a href="/product/{{ ($rp['slug']) ? $rp['slug'] : $rp['item_code'] }}" class="btn btn-outline-primary fumacoFont_card_readmore" role="button" style="width:100% !important;">View</a>
-													</div>
-												</div>
-											</div>
-										</div>
-										@endforeach
-									</div>
-								</div>
-							</div>
-						@endif
-						</div>
-					</div>
-				</div>
-			</div>
-		</main>
-
-		<main style="background-color:#ffffff;">
-			<br><br><br><br><br>
-		</main>
 @endsection
 
 @section('script')

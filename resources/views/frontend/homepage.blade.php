@@ -9,43 +9,6 @@
 @endsection
 
 @section('content')
-  <style>
-    .text, .carousel-text {
-      position: relative;
-      font-size: 16px !important;
-      width: 100%;
-    }
-
-    .text-concat {
-      position: relative;
-      display: inline-block;
-      word-wrap: break-word;
-      overflow: hidden;
-      max-height: 5.7em;
-			line-height: 1.4em;
-      text-align: left;
-    }
-
-    .carousel-text-concat {
-      position: relative;
-      display: inline-block;
-      word-wrap: break-word;
-      overflow: hidden;
-      max-height: 4.8em;
-			line-height: 1.4em;
-      text-align: left;
-    }
-
-    .text.ellipsis::after {
-      position: absolute;
-      right: -12px;
-      bottom: 4px;
-    }
-    .carousel-text.ellipsis::after {
-      position: absolute;
-      right: -12px;
-    }
-  </style>
   <main style="background-color:#0062A5;">
     <div id="myCarousel" class="carousel slide" data-bs-ride="carousel">
       <ol class="carousel-indicators">
@@ -246,4 +209,79 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
     </div>
   </div>
 
+@endsection
+@section('style')
+  <style>
+    .text, .carousel-text {
+      position: relative;
+      font-size: 16px !important;
+      width: 100%;
+    }
+
+    .text-concat {
+      position: relative;
+      display: inline-block;
+      word-wrap: break-word;
+      overflow: hidden;
+      max-height: 5.7em;
+      line-height: 1.4em;
+      text-align: left;
+    }
+
+    .carousel-text-concat {
+      position: relative;
+      display: inline-block;
+      word-wrap: break-word;
+      overflow: hidden;
+      max-height: 4.8em;
+      line-height: 1.4em;
+      text-align: left;
+    }
+
+    .text.ellipsis::after {
+      position: absolute;
+      right: -12px;
+      bottom: 4px;
+    }
+    .carousel-text.ellipsis::after {
+      position: absolute;
+      right: -12px;
+    }
+    .carousel-item > img {
+      position: absolute !important;
+      top: 0 !important;
+      left: 0 !important;
+      max-width: 100% !important;
+      height: 100% !important;
+    }
+    .article-title{
+      min-height: 55px !important
+    }
+    .abt_standard{
+      font-family: 'poppins', sans-serif !important;
+      text-decoration: none !important;
+    }
+    @media (max-width: 575.98px) {
+      .article-title{
+        min-height: auto !important
+      }
+      .prod_desc{
+        font-size: 12px !important;
+      }
+
+    }
+    @media (max-width: 767.98px) {
+      .article-title{
+        min-height: auto !important
+      }
+      .prod_desc{
+        font-size: 12px !important;
+      }
+    }
+    @media (max-width: 1199.98px) {/* tablet */
+      .prod_desc{
+        font-size: 16px !important;
+      }
+    }
+  </style>
 @endsection
