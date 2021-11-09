@@ -73,6 +73,9 @@
                                     <label for="password">Password</label>
                                     <input type="text" class="form-control" id="password" name="password" value="{{ ($api_details) ? $api_details->password : old('password') }}" required>
                                 </div>
+								<div class="float-right font-italic">
+									<small>Last modified by: {{ ($api_details) ? $api_details->last_modified_by . ' - ' . $api_details->last_modified_at : '' }}</small>
+								</div>
 							</div>
 							<!-- /.card-body -->
 							<div class="card-footer">

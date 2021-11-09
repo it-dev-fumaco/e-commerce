@@ -49,7 +49,11 @@ class ShippingController extends Controller
                 'id' => $holiday->holiday_id,
                 'name' => $holiday->holiday_name,
                 'date' => Carbon::parse($holiday->holiday_date)->format('M d'),
-                'year' => Carbon::parse($holiday->holiday_date)->format('Y')
+                'year' => Carbon::parse($holiday->holiday_date)->format('Y'),
+                'created_at' => $holiday->created_by,
+                'last_modified_at' => $holiday->last_modified_at,
+                'created_by' => $holiday->created_by,
+                'last_modified_by' => $holiday->last_modified_by,
             ];
         }
 

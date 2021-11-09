@@ -234,6 +234,10 @@
 																								<label for="edit_cat_slug">Slug :</label>
 																								<input type="text" class="form-control" id="edit_cat_slug" name="edit_cat_slug" value="{{ $c->slug }}">
 																							</div>
+																							<div class="float-right font-italic">
+																								<small>Last modified by: {{ $c->last_modified_by }} - {{ $c->last_modified_at }}</small><br>
+																								<small>Created by: {{ $c->created_by }} - {{ $c->created_at }}</small>
+																							</div>
 																						</div>
 																					</div>
 																				</div>

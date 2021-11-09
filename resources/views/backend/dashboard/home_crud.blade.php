@@ -251,6 +251,10 @@
                                     <input type="text" name="content1" value="for homepage" hidden>
                                     <input type="text" name="slug" value="/" hidden>
                                 </div>
+
+                                <div class="float-right font-italic">
+                                    <small>Last modified by: {{ $page->last_modified_by }} - {{ $page->date_updated }}</small>
+                                </div>
                             </div>
                             <!-- /.card-body -->
                             <div class="card-footer text-center">

@@ -119,7 +119,10 @@
                                                                                     <option value="Sales Admin" {{ ($a->user_type == "Sales Admin" ) ? 'selected' : '' }}>Sales Admin</option>
                                                                                     <option value="Marketing Admin" {{ ($a->user_type == "Marketing Admin" ) ? 'selected' : '' }}>Marketing Admin</option>
                                                                                 </select>
-                                                                            </div>                                                                    
+                                                                            </div>  
+                                                                            <div class="float-right font-italic">
+                                                                                <small>Last modified by: {{ ($a) ? $a->last_modified_by . ' - ' . $a->last_modified_at : '' }}</small>
+                                                                            </div>                                                                  
                                                                         </div>
                                                                         <div class="modal-footer">
                                                                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
