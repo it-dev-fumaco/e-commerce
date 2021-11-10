@@ -37,7 +37,7 @@ Route::get('/about', 'FrontendController@viewAboutPage');
 Route::get('/journals', 'FrontendController@viewJournalsPage');
 Route::get('/privacy_policy', 'FrontendController@viewPrivacyPage');
 Route::get('/terms_condition', 'FrontendController@viewTermsPage');
-Route::get('/blog', 'FrontendController@viewBlogPage');
+Route::get('/blog/{slug}', 'FrontendController@viewBlogPage');
 Route::post('/add_comment', 'FrontendController@addComment');
 Route::post('/add_reply', 'FrontendController@addReply');
 Route::get('/contact', 'FrontendController@viewContactPage')->name('contact');
@@ -183,6 +183,14 @@ Route::prefix('admin')->group(function () {
         Route::post('/order/payment_status', 'OrderController@checkPaymentStatus');
         
         Route::get('/customer/list', 'CustomerController@viewCustomers');
+
+        Route::get('/blog/list', 'BlogController@viewBlogs');
+        Route::post('/blog/publish', 'BlogController@publishBlog');
+        Route::post('/blog/feature', 'BlogController@featuredBlog');
+        Route::get('/blog/edit/form/{id}', 'BlogController@editBlogForm');
+        Route::post('/blog/edit/{id}', 'BlogController@editBlog');
+        Route::get('/blog/delete/{id}', 'BlogController@deleteBlog');
+        Route::get('/blog/set_active/{id}', 'BlogController@setBlogActive');
 
         Route::get('/blog/subscribers', 'BlogController@viewSubscribers');
         Route::post('/subscribe/change_status', 'BlogController@subscriberChangeStatus');

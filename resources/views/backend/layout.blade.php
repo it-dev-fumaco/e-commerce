@@ -209,7 +209,7 @@
             </ul>
           </li>
           @php
-              $blog_pages = ['subscribers_list'];
+              $blog_pages = ['subscribers_list', 'blog_list'];
           @endphp
           <li class="nav-item {{ (in_array($activePage, $blog_pages) ? 'menu-open' : '') }}">
             <a href="#" class="nav-link {{ (in_array($activePage, $blog_pages) ? 'active' : '') }}">
@@ -218,7 +218,7 @@
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="/admin/blog/list" class="nav-link">
+                <a href="/admin/blog/list" class="nav-link {{ $activePage == 'blog_list' ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Blog List</p>
                 </a>

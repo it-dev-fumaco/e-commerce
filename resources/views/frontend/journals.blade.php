@@ -27,7 +27,7 @@
                     }
                 @endphp
                 <div class="carousel-item {{ $loop->first ? "active" : "" }}">
-                    <img src="{{ asset('/assets/journal/'. $carousel->blogprimaryimage) }}" alt="{{ $carousel->blogtitle }}" style="object-fit: cover; opacity: 0.6;">
+                    <img src="{{ asset('/storage/journals/'. $carousel->blogprimaryimage) }}" alt="{{ $carousel->blogtitle }}" style="object-fit: cover; opacity: 0.6;">
                     <div class="container">
                         <div class="carousel-caption text-start">
                             <h3 class="fumacoFont1" style="font-family: 'poppins', sans-serif !important;">{{ $carousel->blogtitle }}</h3>
@@ -91,17 +91,17 @@
             @foreach($blogs_arr as $blogs)
                 <div class="col-lg-4 d-flex align-items-stretch animated animatedFadeInUp fadeInUp">
                     <div class="card" style="border: 0px solid rgba(0, 0, 0, 0.125) !important; padding: 20px !important">
-                        <img class="card-img-top" src="{{ asset('/assets/journal/'. $blogs['image']) }}" alt="">
+                        <img class="card-img-top" src="{{ asset('/storage/journals/'. $blogs['image']) }}" alt="">
                         <div class="card-body align-items-stretch">
                             {{-- <p style="color:#000 !important; font-size: 10pt !important; font-weight: 300;" class="abt_standard">{{ $blogs['publish_date'] }} | {{ $blogs['comment_count'] }} Comment(s)</p> --}}
-                            <a href="blog?id={{ $blogs['id'] }}" style="text-decoration: none !important;">
+                            <a href="blog/{{ $blogs['slug'] ? $blogs['slug'] : $blogs['id'] }}" style="text-decoration: none !important;">
                                 <p style="color:#373b3e !important;" class="abt_standard fumacoFont_card_title">{{ $blogs['title'] }}</p></a>
 
                           <div class="text ellipsis">
                             <p class="text-concat abt_standard">{{ $blogs['caption'] }}</p>
                           </div>
 
-                          <a href="/blog?id={{ $blogs['id'] }}" class="text-concat mx-auto read-more">Read More</a>
+                          <a href="/blog/{{ $blogs['slug'] ? $blogs['slug'] : $blogs['id'] }}" class="text-concat mx-auto read-more">Read More</a>
                         </div>
                         {{-- <p style="color:#000 !important; font-size: 10pt !important; font-weight: 300;" class="abt_standard">&nbsp;&nbsp;&nbsp;{{ $blogs['type'] }}</p> --}}
                       </div>
