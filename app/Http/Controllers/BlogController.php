@@ -299,6 +299,77 @@ class BlogController extends Controller
         }
     }
 
+    public function viewComments(Request $request){
+        $comments = DB::table('fumaco_comments')->where('blog_email', 'LIKE', '%'.$request->q.'%')->orderBy('blog_date', 'desc')->paginate(10);
+
+        return view('backend.blog.comments', compact('comments'));
+    }
+
+    public function commentStatus(Request $request){
+        DB::beginTransaction();
+        try{
+            DB::table('fumaco_comments')->where('id', $request->comment_id)->update(['blog_status' => $request->approve]);
+            DB::commit();
+            return response()->json(['status' => 1, 'message' => 'Status Changed']);
+        }catch(Exception $e){
+            DB::rollback();
+        }
+    }
+
+    public function deleteComment($id){
+        DB::beginTransaction();
+        try{
+            DB::table('fumaco_comments')->where('id', $id)->delete();
+            DB::commit();
+            return redirect()->back()->with('success', 'Comment deleted.');
+        }catch(Exception $e){
+            DB::rollback();
+            return redirect()->back()->with('error', 'An Error Occured. Please try again later.');
+        }
+    }
+
+    public function addComment(Request $request){
+        DB::beginTransaction();
+        try{
+            $add_comment = [
+                'blog_type' => '1',
+                'reply_id' => '0',
+                'blog_id' => $request->idcode,
+                'blog_name' => $request->fullname,
+                'blog_email' => $request->fullemail,
+                'blog_ip' => $request->ip(),
+                'blog_comments' => $request->comment
+            ];
+
+            $insert = DB::table('fumaco_comments')->insert($add_comment);
+            DB::commit();
+            return redirect()->back()->with('comment_message', 'Hello! Your comment has been received, please wait for approval.');
+        }catch(Exception $e){
+            DB::rollback();
+        }
+    }
+
+    public function addReply(Request $request){
+        DB::beginTransaction();
+        try{
+            $add_reply = [
+                'blog_type' => '2',
+                'reply_id' => $request->reply_replyId,
+                'blog_id' => $request->reply_blogId,
+                'blog_name' => $request->reply_name,
+                'blog_email' => $request->reply_email,
+                'blog_ip' => $request->ip(),
+                'blog_comments' => $request->reply_comment
+            ];
+
+            $insert = DB::table('fumaco_comments')->insert($add_reply);
+            DB::commit();
+            return redirect()->back()->with('reply_message', 'Hello! Your reply has been received, please wait for approval.');
+        }catch(Exception $e){
+            DB::rollback();
+        }
+    }
+
     public function viewSubscribers(Request $request){
         $email_str = $request->email;
         $subscribers = DB::table('fumaco_subscribe')->where('email', 'LIKE', '%'.$email_str.'%')->paginate(10);

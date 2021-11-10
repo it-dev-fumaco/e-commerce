@@ -438,48 +438,6 @@ class FrontendController extends Controller
         return view('frontend.blogs', compact('blog', 'comments_arr', 'id', 'date', 'comment_count'));
     }
 
-    public function addComment(Request $request){
-        DB::beginTransaction();
-        try{
-            $add_comment = [
-                'blog_type' => '1',
-                'reply_id' => '0',
-                'blog_id' => $request->idcode,
-                'blog_name' => $request->fullname,
-                'blog_email' => $request->fullemail,
-                'blog_ip' => $request->ip(),
-                'blog_comments' => $request->comment
-            ];
-
-            $insert = DB::table('fumaco_comments')->insert($add_comment);
-            DB::commit();
-            return redirect()->back()->with('comment_message', 'Hello! Your comment has been received, please wait for approval.');
-        }catch(Exception $e){
-            DB::rollback();
-        }
-    }
-
-    public function addReply(Request $request){
-        DB::beginTransaction();
-        try{
-            $add_reply = [
-                'blog_type' => '2',
-                'reply_id' => $request->reply_replyId,
-                'blog_id' => $request->reply_blogId,
-                'blog_name' => $request->reply_name,
-                'blog_email' => $request->reply_email,
-                'blog_ip' => $request->ip(),
-                'blog_comments' => $request->reply_comment
-            ];
-
-            $insert = DB::table('fumaco_comments')->insert($add_reply);
-            DB::commit();
-            return redirect()->back()->with('reply_message', 'Hello! Your reply has been received, please wait for approval.');
-        }catch(Exception $e){
-            DB::rollback();
-        }
-    }
-
     public function viewContactPage() {
         $fumaco_contact = DB::table('fumaco_contact')->get();
 

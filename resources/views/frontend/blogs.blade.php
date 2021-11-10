@@ -136,7 +136,7 @@
         <div class="row" style="background-color:#f4f4f4;">
             <div class="col-lg-12">
                 <div class="row">
-                    <form action="add_comment" method="post">
+                    <form action="/add_comment" method="post">
                         @csrf
                         <div class="row">
                             <div class="col">
@@ -172,7 +172,7 @@
 
                             <div class="col">
                                 <input type="email" class="form-control caption_1 animated animatedFadeInUp fadeInUp" placeholder="Email *" name="fullemail" id="fullemail" required>
-                                <input type="hidden" class="form-control caption_1 animated animatedFadeInUp fadeInUp" name="idcode" id="idcode" value="{{ $id }}" required>
+                                <input type="text" class="form-control caption_1 animated animatedFadeInUp fadeInUp" name="idcode" id="idcode" value="{{ $id }}" required hidden>
                             </div>
                         </div>
                         <input class="btn btn-primary mt-3 caption_1 animated animatedFadeInUp fadeInUp" type="submit" value="POST COMMENT">
@@ -207,7 +207,7 @@
 
             <div class="col-lg-12 animated animatedFadeInUp fadeInUp">
               <!-- comments -->
-                @foreach($comments_arr as $comment)
+                @foreach($comments_arr as $key => $comment)
                 <div class="row">
                     @php
                         $useravatar = md5( strtolower( trim( $comment['email'] ) ) );
@@ -221,18 +221,10 @@
                         <span style="font-family: 'poppins', sans-serif !important;"  class="fumacoFont_card_caption">{{ $comment['comment'] }}</span>
                         <br>
                         <br>
-                        <button type="button" class="btn btn-sm btn-outline-secondary" id="x1{{ $comment['id'] }}">Reply</button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary reply {{ $key }}" id="x1{{ $comment['id'] }}">Reply</button>
                         <br>
-                        <script>
-                            $(document).ready(function(){
-                                $("#x1{{ $comment['id'] }}").click(function(){
-                                    $("#x2{{ $comment['id'] }}").show();
-                                });
-                            });
-                        </script>
-                        <!--reply to replycomment -->
-                        <div class="row" id="x2{{ $comment['id'] }}" style="display:none;">
-                            <form action="add_reply" method="post" name="form2">
+                        <div class="row" id="reply-field-{{ $key }}" style="display:none;">
+                            <form action="/add_reply" method="post" name="form2">
                                 @csrf
                                 <div class="row">
                                     <div class="col">
@@ -268,7 +260,7 @@
                             <br>
                             <br>
                         </div>
-                        <br>
+                        <br>&nbsp;
                         <!-- reply comment -->
                         @foreach($comment['reply_comment'] as $reply)
                             <div class="row">
@@ -282,7 +274,7 @@
                                     <span style="font-family: 'poppins', sans-serif !important;"  class="fumacoFont_card_caption">{{ $reply->blog_comments }}</span>
                                     <br><br>
                                 </div>
-                                <br>
+                                <br><br>&nbsp;
                             </div>
                         @endforeach
                         <br>
@@ -314,4 +306,16 @@
         font-family: 'poppins', sans-serif !important;
     }
 </style>
+@endsection
+
+@section('script')
+    <script>
+        $(document).ready(function(){
+            $('.reply').click(function(){
+                var key = $(this).attr('class').split(' ').pop();
+                $('#reply-field-'+key).show();
+            });
+
+        });
+    </script>
 @endsection

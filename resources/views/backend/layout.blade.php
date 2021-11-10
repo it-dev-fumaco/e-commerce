@@ -209,7 +209,7 @@
             </ul>
           </li>
           @php
-              $blog_pages = ['subscribers_list', 'blog_list'];
+              $blog_pages = ['subscribers_list', 'blog_list', 'blog_comments_list'];
           @endphp
           <li class="nav-item {{ (in_array($activePage, $blog_pages) ? 'menu-open' : '') }}">
             <a href="#" class="nav-link {{ (in_array($activePage, $blog_pages) ? 'active' : '') }}">
@@ -224,7 +224,7 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a href="/admin/blog/comments" class="nav-link">
+                <a href="/admin/blog/comments" class="nav-link {{ $activePage == 'blog_comments_list' ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Blog Comments</p>
                 </a>
