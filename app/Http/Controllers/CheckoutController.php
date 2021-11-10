@@ -666,9 +666,16 @@ class CheckoutController extends Controller
 			
 			DB::commit();
 
+			$store_address = null;
+			if($order_details->order_shipping == 'Store Pickup') {
+				$store = DB::table('fumaco_store')->where('store_name', $order_details->store_location)->first();
+				$store_address = ($store) ? $store->address : null;
+			}
+
 			$order = [
 				'order_details' => $order_details,
-				'items' => $items
+				'items' => $items,
+				'store_address' => $store_address
 			];
 
 			$emails = array_filter(array_unique([trim($order_details->order_bill_email), trim($order_details->order_email), trim($temp->xusernamex)]));
