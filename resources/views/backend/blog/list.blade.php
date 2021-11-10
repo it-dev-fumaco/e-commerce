@@ -46,6 +46,10 @@
                                             <div class="col-sm-3">
                                                 <button type="submit" class="btn btn-primary">Search</button>
                                             </div>
+
+                                            <div class="col-sm-6">
+                                                <a href="/admin/blog/new" class="btn btn-primary float-right">Add New Blog</a>
+                                            </div>
                                         </div>
                                     </form>
                                     <table class="table table-bordered table-hover">

@@ -185,6 +185,8 @@ Route::prefix('admin')->group(function () {
         Route::get('/customer/list', 'CustomerController@viewCustomers');
 
         Route::get('/blog/list', 'BlogController@viewBlogs');
+        Route::get('/blog/new', 'BlogController@newBlog');
+        Route::post('/blog/add', 'BlogController@addBlog');
         Route::post('/blog/publish', 'BlogController@publishBlog');
         Route::post('/blog/feature', 'BlogController@featuredBlog');
         Route::get('/blog/edit/form/{id}', 'BlogController@editBlogForm');
