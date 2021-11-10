@@ -404,23 +404,24 @@ class FrontendController extends Controller
                 'publish_date' => $blogs->datepublish,
                 'title' => $blogs->blogtitle,
                 'caption' => $blogs->blog_caption,
-                'type' => $blogs->blogtype
+                'type' => $blogs->blogtype,
+                'slug' => $blogs->slug
             ];
         }
 
         return view('frontend.journals', compact('blog_carousel', 'blog_count', 'app_count', 'soln_count', 'prod_count', 'blog_list', 'blogs_arr'));
     }
 
-    public function viewBlogPage(Request $request) {
-        $blog = DB::table('fumaco_blog')->where('id', $request->id)->first();
+    public function viewBlogPage($slug) {
+        $blog = DB::table('fumaco_blog')->where('slug', $slug)->orWhere('id', $slug)->first();
 
-        $blog_comment = DB::table('fumaco_comments')->where('blog_id', $request->id)->where('blog_type', 1)->where('blog_status', 1)->get();
+        $blog_comment = DB::table('fumaco_comments')->where('blog_id', $blog->id)->where('blog_type', 1)->where('blog_status', 1)->get();
 
-        $comment_count = DB::table('fumaco_comments')->where('blog_id', $request->id)->where('blog_status', 1)->get();
+        $comment_count = DB::table('fumaco_comments')->where('blog_id', $blog->id)->where('blog_status', 1)->get();
 
         $comments_arr = [];
         foreach($blog_comment as $comment){
-            $blog_reply = DB::table('fumaco_comments')->where('blog_id', $request->id)->where('blog_type', 2)->where('reply_id', $comment->id)->where('blog_status', 1)->get();
+            $blog_reply = DB::table('fumaco_comments')->where('blog_id', $blog->id)->where('blog_type', 2)->where('reply_id', $comment->id)->where('blog_status', 1)->get();
 
             $comments_arr[] = [
                 'id' => $comment->id,
@@ -431,7 +432,7 @@ class FrontendController extends Controller
             ];
         }
 
-        $id = $request->id;
+        $id = $blog->id;
         $date = Carbon::now();
 
         return view('frontend.blogs', compact('blog', 'comments_arr', 'id', 'date', 'comment_count'));

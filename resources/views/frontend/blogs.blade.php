@@ -32,7 +32,7 @@
         <div class="row">
             <div class="col-lg-12 animated animatedFadeInUp fadeInUp">
                 <center>
-                    <img src="{{ asset('/assets/journal/'.$blog->blogprimaryimage) }}" alt="fumaco"
+                    <img src="{{ asset('/storage/journals/'.$blog->blogprimaryimage) }}" alt="fumaco"
                         class="img-responsive" style="width: 100% !important;">
                 </center>
                 <br>
