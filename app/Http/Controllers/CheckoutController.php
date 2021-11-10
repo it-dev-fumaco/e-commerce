@@ -454,7 +454,7 @@ class CheckoutController extends Controller
 				'shipping_amount' => $request->s_amount,
 				'estimated_delivery_date' => $request->estimated_del,
 				'xstore_location' => ($request->s_name == 'Store Pickup') ? $request->storeloc : null,
-				'xpickup_date' => ($request->s_name == 'Store Pickup') ? Carbon::parse($request->picktime) : null,
+				'xpickup_date' => ($request->s_name == 'Store Pickup') ? Carbon::parse($request->picktime)->format('Y-m-d') : null,
 			];
 
 			$existing_order_temp = DB::table('fumaco_temp')->where('order_tracker_code', $order_no)->exists();
@@ -681,6 +681,16 @@ class CheckoutController extends Controller
 			$emails = array_filter(array_unique([trim($order_details->order_bill_email), trim($order_details->order_email), trim($temp->xusernamex)]));
 			Mail::to($emails)
 				->queue(new OrderSuccess($order));
+
+			// send email to fumaco staff
+			$email_recipient = DB::table('email_config')->first();
+			$email_recipient = ($email_recipient) ? explode(",", $email_recipient->email_recipients) : [];
+			if (count(array_filter($email_recipient)) > 0) {
+				Mail::send('emails.new_order', $order, function($message) use ($email_recipient) {
+					$message->to($email_recipient);
+					$message->subject('New Order - FUMACO');
+				});
+			}
 
 			return view('frontend.checkout.success', compact('order_details', 'items', 'loggedin'));
 		} catch (Exception $e) {
