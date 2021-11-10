@@ -4,6 +4,8 @@
 ])
 
 @section('content')
+<!-- bootstrap datepicker -->
+<link rel="stylesheet" href="{{ asset('/datepicker/datepicker3.css') }}">
 	<main style="background-color:#0062A5;">
 		<div id="myCarousel" class="carousel slide" data-bs-ride="carousel">
 			<div class="carousel-inner">
@@ -227,17 +229,42 @@
 							<hr>
 						</div>
 						<div class="card-body he1x" id="ship_blk" style="padding-top: 0px !important; padding-bottom: 0px !important;">Select Shipping Method
+							<div class="alert alert-warning alert-dismissible fade show text-center m-1 p-3 d-none" role="alert" id="alert-box"></div>
 							<div class="form-check">
 								<label class="form-check-label" for="shipradio">&nbsp;</label>
 							</div>
 							@forelse ($shipping_rates as $l => $srate)
 							<div class="d-flex justify-content-between align-items-center">
 								<div class="form-check">
-									<input class="form-check-input" type="radio" name="shipping_fee" id="{{ 'sr' . $l }}" value="{{ $srate['shipping_cost'] }}" data-sname="{{ $srate['shipping_service_name'] }}" data-est="{{ $srate['expected_delivery_date'] }}" required checked>
-									<label class="form-check-label" for="{{ 'sr' . $l }}">{{ $srate['shipping_service_name'] }} <br class="d-xl-none"/><small class="fst-italic">({{ $srate['min_lead_time'] . " - ". $srate['max_lead_time'] . " Days" }})</small></label>
+									<input class="form-check-input" type="radio" name="shipping_fee" id="{{ 'sr' . $l }}" value="{{ $srate['shipping_cost'] }}" data-sname="{{ $srate['shipping_service_name'] }}" data-est="{{ $srate['expected_delivery_date'] }}" data-pickup="{{ $srate['pickup'] }}" required {{ $loop->first ? 'checked' : '' }}>
+									<label class="form-check-label" for="{{ 'sr' . $l }}">{{ $srate['shipping_service_name'] }} <br class="d-xl-none"/>
+										@if (count($srate['stores']) <= 0)<small class="fst-italic">({{ $srate['min_lead_time'] . " - ". $srate['max_lead_time'] . " Days" }})</small>@endif</label>
 								</div>
 								<small class="text-muted stylecap he1x" style="white-space: nowrap !important">₱ {{ number_format($srate['shipping_cost'], 2, '.', ',') }}</small>
 							</div>
+							@if (count($srate['stores']) > 0)
+							<div class="row d-none" id="for-store-pickup">
+								<div class="col-md-6 offset-md-3">
+									<div class="form-group">
+										<label for="store-selection">Select Store</label>
+										<select id="store-selection" class="form-control formslabelfnt" style="text-align: center;">
+											<option value="">Select Store</option>
+											@foreach ($srate['stores'] as $store)
+											<option value="{{ $store->store_name }}" data-address="{{ $store->address }}" data-available-time="Available Time: <br>{{ date("h:i A", strtotime($store->available_from)) . ' - ' . date("h:i A", strtotime($store->available_to)) }}">{{ $store->store_name }}</option>
+											@endforeach
+										</select>
+										<div class="m-1 text-center" id="store-address"></div>
+										<div class="m-1 text-center" id="available-time"></div>
+									</div>
+								</div>
+								<div class="col-md-6 offset-md-3 bootstrap-timepicker">
+									<div class="form-group">
+										<label for="pickup-time">Pickup Date</label>
+										<input type="text" class="form-control" id="pickup-time" value="{{ date('m-d-Y') }}" style="text-align: center;">
+									</div>
+								</div>
+							</div>
+							@endif
 							@empty
 								<h6>No available shipping methods.</h6>
 							@endforelse
@@ -257,7 +284,6 @@
 					<div class="col-md-4 d-none d-md-block d-xl-block">
 						<a href="javascript:history.back()" class="btn btn-lg btn-outline-primary" role="button" style="background-color: #777575 !important; border-color: #777575 !important; float: left; width: 94%;">BACK</a>
 					</div>
-					{{-- <a href="javascript:history.back()" class="btn btn-lg btn-outline-primary col-md-4" role="button" style="background-color: #777575 !important; border-color: #777575 !important; float: left;">BACK</a> --}}
 				</div>
 				<div class="col-md-4 mx-auto">
 					<div class="card">
@@ -879,6 +905,17 @@
 
 @section('style')
 <style>
+	#available-time {
+		font-weight: normal;
+	}
+	#store-address {
+		font-weight: normal;
+	}
+	.datepicker table tr td.disabled, .datepicker table tr td.disabled:hover {	
+		background: none !important;
+		color: #999 !important;
+		cursor: default !important;
+	}
 	.products-head {
 		margin-top: 10px !important;
 		padding-left: 40px !important;
@@ -987,6 +1024,9 @@
 <!-- Select2 -->
 <script src="{{ asset('/assets/admin/plugins/select2/js/select2.full.min.js') }}"></script>
 
+<!-- bootstrap datepicker -->
+<script src="{{ asset('/datepicker/bootstrap-datepicker.js') }}"></script>
+
 <script>
 	$(document).ready(function() {
 		updateTotal();
@@ -1058,21 +1098,30 @@
 			var s_name = $("input[name='shipping_fee']:checked").data('sname');
 			var s_amount = $("input[name='shipping_fee']:checked").val();
 			var estimated_del = $("input[name='shipping_fee']:checked").data('est');
+
+			var ispick = $("input[name='shipping_fee']:checked").data('pickup');
+			var picktime = $('#pickup-time').val();
+			var storeloc = $("#store-selection").val();
+			
 			var data = {
-				estimated_del, s_name, s_amount, _token: '{{ csrf_token() }}'
+				estimated_del, s_name, s_amount, _token: '{{ csrf_token() }}', storeloc, picktime
 			}
 
-			$('#custom-overlay').fadeIn();
+			if(ispick && (!storeloc || !picktime)) {
+				$('#alert-box').removeClass('d-none').text('Please select store and pickup date');
+			} else {
+				$('#custom-overlay').fadeIn();
 
-			$.ajax({
-				url: '/order/save',
-				type:"POST",
-				data: data,
-				success: callback,
-				error : function(data) {
-					console.log('error updating');
-				}
-			});
+				$.ajax({
+					url: '/order/save',
+					type:"POST",
+					data: data,
+					success: callback,
+					error : function(data) {
+						$('#alert-box').removeClass('d-none').text('An error occured. Please try again.');
+					}
+				});
+			}
 		}
 
 		function updateTotal() {
@@ -1089,6 +1138,20 @@
 			if (estimated_del) {
 				$('#est-div').removeClass('d-none');
 				$('#estimated-delivery-date').text(estimated_del);
+			} else {
+				$('#est-div').addClass('d-none');
+				$('#estimated-delivery-date').text('');
+			}
+
+			if($("input[name='shipping_fee']:checked").data('pickup')) {
+				$('#for-store-pickup').removeClass('d-none');
+				$('#store-selection').val('');
+				$('#store-selection').attr('required', true);
+			}else{
+				$('#for-store-pickup').addClass('d-none');
+				$('#store-selection').removeAttr('required');
+				$('#available-time').text('');
+				$('#store-address').text('');
 			}
 
 			total = (isNaN(total)) ? 0 : total;
@@ -1285,6 +1348,25 @@
 					data: brgy_bill
 				});
 			});
+		});
+
+		$("#pickup-time").datepicker({
+			showInputs: false,
+			startDate: new Date(),
+			format: 'mm-dd-yyyy',
+			autoclose: true,
+			daysOfWeekDisabled: [0]
+		});
+
+		$('#store-selection').on('change', function(e){
+			if ($(this).val()) {
+				var available_time = $(this).find(':selected').data('available-time');
+				$('#available-time').html(available_time);
+				$('#store-address').text('Address: ' + $(this).find(':selected').data('address'));
+			} else {
+				$('#available-time').text('');
+				$('#store-address').text('');
+			}
 		});
 	});
 

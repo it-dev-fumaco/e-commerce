@@ -388,7 +388,7 @@ class CheckoutController extends Controller
 			}
 
 			$shipping_rates = $this->getShippingRates();
-			
+
 			$shipping_add = $billing_add = [];
 			if (Auth::check()) {
 				$shipping_add = DB::table('fumaco_user_add')->where('user_idx', Auth::user()->id)->where('address_class','Delivery')->get();
@@ -453,6 +453,8 @@ class CheckoutController extends Controller
 				'shipping_name' => $request->s_name,
 				'shipping_amount' => $request->s_amount,
 				'estimated_delivery_date' => $request->estimated_del,
+				'xstore_location' => ($request->s_name == 'Store Pickup') ? $request->storeloc : null,
+				'xpickup_date' => ($request->s_name == 'Store Pickup') ? Carbon::parse($request->picktime) : null,
 			];
 
 			$existing_order_temp = DB::table('fumaco_temp')->where('order_tracker_code', $order_no)->exists();
@@ -614,7 +616,9 @@ class CheckoutController extends Controller
 					'shipping_business_name' => $temp->xship_business_name,
 					'shipping_tin' => $temp->xship_tin,
 					'billing_business_name' => $temp->xbusiness_name,
-					'billing_tin' => $temp->xtin_no
+					'billing_tin' => $temp->xtin_no,
+					'store_location' => $temp->xstore_location,
+					'pickup_date' => $temp->xpickup_date
 				]);
 
 				// insert order in tracking order table
@@ -912,6 +916,26 @@ class CheckoutController extends Controller
                 ];
             }
         }
+
+		$store_pickup_query = ShippingService::where('shipping_service_name', 'Store Pickup')->get();
+		foreach($store_pickup_query as $row){
+			$stores = DB::table('fumaco_store')
+				->join('fumaco_shipping_service_store', 'fumaco_shipping_service_store.store_location_id', 'fumaco_store.store_id')
+				->where('shipping_service_id', $row->shipping_service_id)->select('store_name', 'available_from', 'available_to', 'address')->get();
+
+			$shipping_offer_rates[] = [
+				'shipping_service_name' => $row->shipping_service_name,
+				'expected_delivery_date' => null,
+				'min_lead_time' => null, //
+				'max_lead_time' => null, //
+				'shipping_cost' => 0,
+				'external_carrier' => false,
+				'allow_delivery_after' => 0,
+				'pickup' => true,
+				'stores' => $stores,
+			];
+		}
+	
 
 		return $shipping_offer_rates;
 	}

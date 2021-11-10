@@ -75,7 +75,8 @@ class OrderController extends Controller
                 'order_type' => $o->order_type,
                 'user_email' => $o->user_email,
                 'billing_business_name' => $o->billing_business_name,
-                'shipping_business_name' => $o->shipping_business_name
+                'shipping_business_name' => $o->shipping_business_name,
+                'pickup_date' => Carbon::parse($o->pickup_date)->format('M d, Y')
             ];
         }
 
