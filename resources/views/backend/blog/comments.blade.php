@@ -60,36 +60,36 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @forelse($comments as $c)
+                                            @forelse($comments_arr as $c)
                                                 <tr>
-                                                    <td>{{ $c->blog_id }}</td>
+                                                    <td>{{ $c['blog_id'] }}</td>
                                                     <td>
-                                                        {{ $c->blog_name }}<br/>
-                                                        {{ $c->blog_email }}<br/>
-                                                        {{ $c->blog_ip }}
+                                                        {{ $c['blog_name'] }}<br/>
+                                                        {{ $c['blog_email'] }}<br/>
+                                                        {{ $c['blog_ip'] }}
                                                     </td>
                                                     <td>
-                                                        {{ $c->blog_comments }}
+                                                        {{ $c['blog_comments'] }}
                                                     </td>
-                                                    <td>{{ $c->blog_date }}</td>
+                                                    <td>{{ $c['blog_date'] }}</td>
                                                     <td>
                                                         <center>
                                                             <label class="switch">
-                                                                <input type="checkbox" class="toggle" id="toggle_{{ $c->id }}" name="approve" {{ ($c->blog_status == 1) ? 'checked' : '' }} value="{{ $c->id }}"/>
+                                                                <input type="checkbox" class="toggle" id="toggle_{{ $c['id']}}" name="approve" {{ ($c['blog_status'] == 0) ? '' : 'checked' }} value="{{ $c['id'] }}"/>
                                                                 <span class="slider round"></span>
                                                             </label>
                                                         </center>
                                                     </td>
                                                     <td>
                                                         <center>
-                                                            <a href="#" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#deleteComment-{{ $c->id }}">Delete</a>
+                                                            <a href="#" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#deleteComment-{{ $c['id'] }}">Delete</a>
                                                         </center>
 
-                                                        <div class="modal fade" id="deleteComment-{{ $c->id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                        <div class="modal fade" id="deleteComment-{{ $c['id'] }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                                             <div class="modal-dialog" role="document">
                                                                 <div class="modal-content">
                                                                     <div class="modal-header">
-                                                                        <h5 class="modal-title" id="exampleModalLabel">{{ $c->blog_email }}</h5>
+                                                                        <h5 class="modal-title" id="exampleModalLabel">{{ $c['blog_email'] }}</h5>
                                                                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                                                         <span aria-hidden="true">&times;</span>
                                                                     </button>
@@ -99,13 +99,63 @@
                                                                     </div>
                                                                     <div class="modal-footer">
                                                                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                                                    <a href="/admin/blog/comment/delete/{{ $c->id }}" type="button" class="btn btn-primary">Delete</a>
+                                                                    <a href="/admin/blog/comment/delete/{{ $c['id'] }}" type="button" class="btn btn-primary">Delete</a>
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </td>
                                                 </tr>
+                                                @if ($c['replies'])
+                                                    @foreach ($c['replies'] as $r)
+                                                        <tr>
+                                                            <td>{{ $r['blog_id'] }}</td>
+                                                            <td>
+                                                                <small>Replying to <b>{{ $c['blog_name'] }}</b></small><br/>
+                                                                {{ $r['blog_name'] }}<br/>
+                                                                {{ $r['blog_email'] }}<br/>
+                                                                {{ $r['blog_ip'] }}
+                                                            </td>
+                                                            <td>
+                                                                {{ $r['blog_comments'] }}
+                                                            </td>
+                                                            <td>{{ $r['blog_date'] }}</td>
+                                                            <td>
+                                                                <center>
+                                                                    <label class="switch">
+                                                                        <input type="checkbox" class="toggle" id="toggle_{{ $r['id']}}" name="approve" {{ ($r['blog_status'] == 1) ? 'checked' : '' }} value="{{ $r['id'] }}"/>
+                                                                        <span class="slider round"></span>
+                                                                    </label>
+                                                                </center>
+                                                            </td>
+                                                            <td>
+                                                                <center>
+                                                                    <a href="#" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#deleteComment-{{ $r['id'] }}">Delete</a>
+                                                                </center>
+        
+                                                                <div class="modal fade" id="deleteComment-{{ $r['id'] }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                                    <div class="modal-dialog" role="document">
+                                                                        <div class="modal-content">
+                                                                            <div class="modal-header">
+                                                                                <h5 class="modal-title" id="exampleModalLabel">{{ $r['blog_email'] }}</h5>
+                                                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                                <span aria-hidden="true">&times;</span>
+                                                                            </button>
+                                                                            </div>
+                                                                            <div class="modal-body">
+                                                                                Delete Comment?
+                                                                            </div>
+                                                                            <div class="modal-footer">
+                                                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                                            <a href="/admin/blog/comment/delete/{{ $r['id'] }}" type="button" class="btn btn-primary">Delete</a>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    @endforeach
+                                                @endif
                                             @empty
                                                 <tr>
                                                     <td colspan=5 class="text-center">No Comment(s) Listed</td>
