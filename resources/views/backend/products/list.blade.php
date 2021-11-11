@@ -92,7 +92,7 @@
 								</div>
 							</form>
 							<table class="table table-bordered table-hover">
-								<col style="width: 5%;">
+								{{-- <col style="width: 5%;">
 								<col style="width: 30%;">
 								<col style="width: 7%;">
 								<col style="width: 7%;">
@@ -102,21 +102,26 @@
 								<col style="width: 8%;">
 								<col style="width: 5%;">
 								<col style="width: 5%;">
-								<col style="width: 6%;">
+								<col style="width: 6%;"> --}}
 								<thead>
 									<tr>
-										<th class="text-center">Image</th>
-										<th class="text-center">Item Name</th>
-										<th class="text-center">Parent Item</th>
-										<th class="text-center">Price</th>
-										<th class="text-center">Qty</th>
-										<th class="text-center">Reserved Qty</th>
-										<th class="text-center"h>Category</th>
-										<th class="text-center">Brand</th>
-										<th class="text-center">Featured</th>
-										<th class="text-center">On Sale</th>
-										<th class="text-center">Status</th>
-										<th class="text-center">Action</th>
+										<th class="text-center align-middle" rowspan="2">Image</th>
+										<th class="text-center align-middle" rowspan="2">Item Name</th>
+										<th class="text-center align-middle" rowspan="2">Parent</th>
+										<th class="text-center align-middle" rowspan="2">Price</th>
+										<th class="text-center p-1" colspan="3">Inventory</th>
+										<th class="text-center align-middle" rowspan="2">Category</th>
+										<th class="text-center align-middle" rowspan="2">Brand</th>
+										<th class="text-center align-middle" rowspan="2">Featured</th>
+										<th class="text-center align-middle" rowspan="2">On Sale</th>
+										<th class="text-center align-middle" rowspan="2">Status</th>
+										<th class="text-center align-middle" rowspan="2">Action</th>
+									</tr>
+									<tr>
+										<th class="text-center p-1">Actual</th>
+										<th class="text-center p-1">Reserved</th>
+										<th class="text-center p-1">Available</th>
+									
 									</tr>
 								</thead>
 								<tbody>
@@ -138,8 +143,9 @@
 										</td>
 										<td class="text-center">{{ $item['product_code'] }}</td>
 										<td class="text-center">{{ 'P ' . number_format((float)$item['price'], 2, '.', ',') }}</td>
-										<td class="text-center">{{ number_format($item['qty']) }}</td>
+										<td class="text-center">{{ number_format($item['qty']) }}<br><span class="badge badge-info">ERP Stock</span></td>
 										<td class="text-center">{{ number_format($item['reserved_qty']) }}</td>
+										<td class="text-center font-weight-bold" style="font-size: 1.2rem;">{{ number_format($item['qty'] - $item['reserved_qty']) }}</td>
 										<td class="text-center">{{ $item['product_category'] }}</td>
 										<td class="text-center">{{ $item['brand'] }}</td>
 										<td class="text-center" style="font-size: 1.2rem;">
