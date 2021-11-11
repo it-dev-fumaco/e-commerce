@@ -115,15 +115,20 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
                       <div class="text ellipsis">
                         <p class="card-text product-head fumacoFont_card_title text-concat prod_desc" style="color:#0062A5 !important;  min-height: 100px;">{{ $bs['item_name'] }}</p>
                       </div>
-                      <p class="card-text fumacoFont_card_price price-card" style="color:#000000 !important; ">
+                      <p class="card-text fumacoFont_card_price price-card d-none d-md-block d-lg-none" style="color:#000000 !important; ">
                         @if ($bs['is_discounted'])
                         ₱ {{ number_format(str_replace(",","",$bs['new_price']), 2) }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$bs['orig_price']), 2) }}</s>&nbsp;&nbsp;&nbsp;<span class="badge badge-danger" style="vertical-align: middle;background-color: red;">{{ $bs['discount'] }}% OFF</span>
                         @else
                         ₱ {{ number_format(str_replace(",","",$bs['orig_price']), 2) }}
                         @endif
-                        </p>
-                      
-                      {{-- <a href="/product/{{ $bs['item_code'] }}" class="btn btn-outline-primary fumacoFont_card_readmore" role="button" style="width:100% !important;">View</a> --}}
+                      </p>
+                      <p class="card-text fumacoFont_card_price d-sm-block d-md-none d-lg-block" style="color:#000000 !important; ">
+                        @if ($bs['is_discounted'])
+                        ₱ {{ number_format(str_replace(",","",$bs['new_price']), 2) }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$bs['orig_price']), 2) }}</s>&nbsp;&nbsp;&nbsp;<span class="badge badge-danger" style="vertical-align: middle;background-color: red;">{{ $bs['discount'] }}% OFF</span>
+                        @else
+                        ₱ {{ number_format(str_replace(",","",$bs['orig_price']), 2) }}
+                        @endif
+                      </p>
                     </div>
                     <div class="mx-auto" style="width: 90%;">
                       <div class="d-flex justify-content-between align-items-center">
@@ -180,7 +185,7 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
                       <div class="text ellipsis">
                         <p class="card-text product-head fumacoFont_card_title text-concat prod_desc" style="color:#0062A5 !important; min-height: 100px;">{{ $os['item_name'] }}</p>
                       </div>
-                      <p class="card-text fumacoFont_card_price price-card" style="color:#000000 !important; ">
+                      <p class="card-text fumacoFont_card_price price-card d-none d-md-block d-lg-none" style="color:#000000 !important; min-height: 30px">
                         @if ($os['is_discounted'])
                         ₱ {{ number_format(str_replace(",","",$os['new_price']), 2) }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$os['orig_price']), 2) }}</s>
                         @else
@@ -188,17 +193,14 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
                         @endif
                         &nbsp;&nbsp;<span class="badge badge-danger" style="vertical-align: middle;background-color: red;">{{ $os['discount_percent'] }}% OFF</span>
                       </p>
-                      {{-- <div class="d-flex justify-content-between align-items-center">
-                        <div class="btn-group stylecap">
-                          <span class="fa fa-star starcolorgrey"></span>
-                          <span class="fa fa-star starcolorgrey"></span>
-                          <span class="fa fa-star starcolorgrey"></span>
-                          <span class="fa fa-star starcolorgrey"></span>
-                          <span class="fa fa-star starcolorgrey"></span>
-                        </div>
-                        <small class="text-muted stylecap" style="color:#c4cad0 !important; font-weight:100 !important;">( 0 Reviews )</small>
-                      </div> --}}
-                      {{-- <a href="/product/{{ $os['item_code'] }}" class="btn btn-outline-primary fumacoFont_card_readmore" role="button" style="width:100% !important;">View</a> --}}
+                      <p class="card-text fumacoFont_card_price d-sm-block d-md-none d-lg-block" style="color:#000000 !important; min-height: 30px">
+                        @if ($os['is_discounted'])
+                        ₱ {{ number_format(str_replace(",","",$os['new_price']), 2) }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$os['orig_price']), 2) }}</s>
+                        @else
+                        ₱ {{ number_format(str_replace(",","",$os['orig_price']), 2) }}
+                        @endif
+                        &nbsp;&nbsp;<span class="badge badge-danger" style="vertical-align: middle;background-color: red;">{{ $os['discount_percent'] }}% OFF</span>
+                      </p>
                     </div>
                     <div class="mx-auto" style="width: 90%;">
                       <div class="d-flex justify-content-between align-items-center">
@@ -278,6 +280,7 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
       font-family: 'poppins', sans-serif !important;
       text-decoration: none !important;
     }
+
     @media (max-width: 575.98px) {
       .article-title{
         min-height: auto !important
@@ -285,7 +288,6 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
       .prod_desc{
         font-size: 12px !important;
       }
-
     }
     @media (max-width: 767.98px) {
       .article-title{
@@ -300,7 +302,7 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
         font-size: 16px !important;
       }
       .price-card{
-        min-height: 80px !important;
+        min-height: 70px !important;
       }
     }
   </style>

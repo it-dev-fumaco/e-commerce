@@ -251,7 +251,15 @@
 											<div class="text ellipsis">
 												<p class="card-text fumacoFont_card_title text-concat prod-desc" style="color:#0062A5 !important; min-height: 100px; font-size: 16px !important; font-weight: 500 !important;">{{ $product['item_name'] }}</p>
 											</div>
-											<p class="card-text fumacoFont_card_price" style="color:#000000 !important;">
+											<p class="card-text fumacoFont_card_price price-card d-none d-md-block d-lg-none" style="color:#000000 !important;">
+												@if($product['is_discounted'])
+												₱ {{ number_format(str_replace(",","",$product['discounted_price']), 2) }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$product['price']), 2) }}</s>
+												&nbsp;<span class="badge badge-danger" style="vertical-align: middle;background-color: red; display: {{ ($product['on_sale']) ? 'inline' : 'none' }} !important;">{{ $product['discount_percent'] }}% OFF</span>
+												@else
+												₱ {{ number_format(str_replace(",","",$product['price']), 2) }}
+												@endif
+											</p>
+											<p class="card-text fumacoFont_card_price d-sm-block d-md-none d-lg-block" style="color:#000000 !important;">
 												@if($product['is_discounted'])
 												₱ {{ number_format(str_replace(",","",$product['discounted_price']), 2) }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$product['price']), 2) }}</s>
 												&nbsp;<span class="badge badge-danger" style="vertical-align: middle;background-color: red; display: {{ ($product['on_sale']) ? 'inline' : 'none' }} !important;">{{ $product['discount_percent'] }}% OFF</span>
@@ -448,7 +456,7 @@
 	  display: none !important;
 	}
 	.price-card{
-		min-height: 80px !important;
+		min-height: 50px !important;
 	}
   }
 
