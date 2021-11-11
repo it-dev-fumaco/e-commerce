@@ -32,7 +32,7 @@
                         <div class="carousel-caption text-start">
                             <h3 class="fumacoFont1" style="font-family: 'poppins', sans-serif !important;">{{ $carousel->blogtitle }}</h3>
                             <p class="abt_standard fumacoFont2" style="text-align: left; text-justify: inter-word;">{{ $string }}</p>
-                            <p><a class="abt_standard btn btn-lg btn-primary btn-fumaco fumacoFont_btn" href="blog?id={{ $carousel->id }}" role="button">Read More</a></p>
+                            <p><a class="abt_standard btn btn-lg btn-primary btn-fumaco fumacoFont_btn" href="/blog/{{ $carousel->slug ? $carousel->id : $carousel->id }}" role="button">Read More</a></p>
                         </div>
                     </div>
                 </div>
