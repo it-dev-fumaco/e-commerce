@@ -68,6 +68,12 @@
                                         </thead>
                                         <tbody>
                                             @forelse($blogs as $b)
+                                            @php
+                                                $toggle = '';
+                                                if($b->blog_active == 1 or $b->blog_status == 0){
+                                                    $toggle = "disabled";
+                                                }
+                                            @endphp
                                                 <tr>
                                                     <td>{{ $b->blogtitle }}</td>
                                                     <td>{{ $b->blogtype }}</td>
@@ -82,7 +88,7 @@
                                                     <td>
                                                         <center>
                                                             <label class="switch">
-                                                                <input type="checkbox" class="feature-toggle" id="toggle_{{ $b->id }}" name="featured" {{ ($b->blog_featured == 1) ? 'checked' : '' }} value="{{ $b->id }}" {{ $b->blog_active == 1 ? 'disabled' : '' }}/>
+                                                                <input type="checkbox" class="feature-toggle" id="toggle_{{ $b->id }}" name="featured" {{ ($b->blog_featured == 1) ? 'checked' : '' }} value="{{ $b->id }}" {{ $toggle }}/>
                                                                 <span class="slider round"></span>
                                                             </label>
                                                         </center>
@@ -90,7 +96,7 @@
                                                     <td>
                                                         <center>
                                                             <label class="switch">
-                                                                <input type="checkbox" class="toggle" id="toggle_{{ $b->id }}" name="publish" {{ ($b->blog_enable == 1) ? 'checked' : '' }} value="{{ $b->id }}" {{ $b->blog_active == 1 ? 'disabled' : '' }}/>
+                                                                <input type="checkbox" class="toggle" id="toggle_{{ $b->id }}" name="publish" {{ ($b->blog_enable == 1) ? 'checked' : '' }} value="{{ $b->id }}" {{ $toggle }}/>
                                                                 <span class="slider round"></span>
                                                             </label>
                                                         </center>

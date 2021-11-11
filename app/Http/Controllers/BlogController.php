@@ -167,60 +167,12 @@ class BlogController extends Controller
     public function editBlog(Request $request, $id){
         DB::beginTransaction();
         try {
-            $img_primary = $request->file('img_primary');
-            $img_mb = $request->file('img_mb');
-            $img_home = $request->file('img_home');
-            $img_journals = $request->file('img_journals');
-
-			$image_error = '';
-
-			$rules = array(
-				'uploadFile' => 'image|max:500000'
-			);
-            
-            $name_primary = pathinfo($img_primary->getClientOriginalName(), PATHINFO_FILENAME);
-			$ext_primary = pathinfo($img_primary->getClientOriginalName(), PATHINFO_EXTENSION);
-
-            $name_mb = pathinfo($img_mb->getClientOriginalName(), PATHINFO_FILENAME);
-			$ext_mb = pathinfo($img_mb->getClientOriginalName(), PATHINFO_EXTENSION);
-
-            $name_home = pathinfo($img_home->getClientOriginalName(), PATHINFO_FILENAME);
-			$ext_home = pathinfo($img_home->getClientOriginalName(), PATHINFO_EXTENSION);
-
-            $name_journals = pathinfo($img_journals->getClientOriginalName(), PATHINFO_FILENAME);
-			$ext_journals = pathinfo($img_journals->getClientOriginalName(), PATHINFO_EXTENSION);
-
-			$name_primary = Str::slug($name_primary, '-');
-			$name_mb = Str::slug($name_mb, '-');
-			$name_home = Str::slug($name_home, '-');
-			$name_journals = Str::slug($name_journals, '-');
-
-			$primary_image_name = $name_primary.".".$ext_primary;
-			$mb_image_name = $name_mb.".".$ext_mb;
-			$home_image_name = $name_home.".".$ext_home;
-			$journals_image_name = $name_journals.".".$ext_journals;
-
-			$validation = Validator::make($request->all(), $rules);
-
-            if ($validation->fails()){
-				$image_error = "Sorry, your file is too large.";
-				return redirect()->back()->with('image_error', $image_error);
-			}
-
-            $allowed_extensions = array('jpg', 'png', 'jpeg', 'gif');
-
-            if(!in_array($ext_primary, $allowed_extensions) or !in_array($ext_mb, $allowed_extensions) or !in_array($ext_home, $allowed_extensions) or !in_array($ext_journals, $allowed_extensions)){
-                $image_error = "Sorry, only JPG, JPEG, PNG and GIF files are allowed.";
-				return redirect()->back()->with('image_error', $image_error);
-            }
-
             if(strip_tags($request->blog_content) == ''){
-                $image_error = "Sorry, blog content cannot be empty.";
-				return redirect()->back()->with('image_error', $image_error);
+                return redirect()->back()->with('image_error', 'Blog content cannot be empty');
             }
 
             if($request->slug){
-                $slug_check = DB::table('fumaco_blog')->where('id', '!=', $id)->where('slug', $request->slug)->count();
+                $slug_check = DB::table('fumaco_blog')->where('id', '!=', $id)->where('slug', Str::slug($request->slug, '-'))->count();
                 if($slug_check > 0){
                     $image_error = "Sorry, slug must be unique.";
 				    return redirect()->back()->with('image_error', $image_error);
@@ -234,38 +186,135 @@ class BlogController extends Controller
                 'blog_caption' => $request->blog_caption,
                 'blogcontent' => $request->blog_content,
                 'blogtags' => 0,
-                'blogprimaryimage' => $primary_image_name,
-                'blogprimayimage-mob' => $mb_image_name,
-                'blogprimayimage-main' => $primary_image_name,
-                'blogprimayimage-journal' => $journals_image_name,
-                'blogprimayimage-home' => $home_image_name,
                 'last_modified_by' => Auth::user()->username
             ];
 
-            $webp_pr = Webp::make($request->file('img_primary'));
-            $webp_mb = Webp::make($request->file('img_mb'));
-            $webp_hm = Webp::make($request->file('img_home'));
-            $webp_jr = Webp::make($request->file('img_journals'));
+            DB::table('fumaco_blog')->where('id', $id)->update($blogs_update);
+            DB::commit();
+            return redirect()->back()->with('success', 'Blog Updated.');
+        } catch (Exception $e) {
+            DB::rollback();
+            return redirect()->back()->with('error', 'An error occured. Please try again.');
+        }
+    }
+
+    public function editBlogImages(Request $request, $id){
+        DB::beginTransaction();
+        try {
+            $rules = array(
+				'uploadFile' => 'image|max:500000'
+			);
+
+			$validation = Validator::make($request->all(), $rules);
+
+            if ($validation->fails()){
+				$image_error = "Sorry, your file is too large.";
+				return redirect()->back()->with('image_error', $image_error);
+			}
+
+            $allowed_extensions = array('jpg', 'png', 'jpeg', 'gif');
+            $extension_error = "Sorry, only JPG, JPEG, PNG and GIF files are allowed.";
 
             $destinationPath = storage_path('/app/public/journals/');
 
-			if ($webp_pr->save(storage_path('/app/public/journals/'.$name_primary.'.webp'))) {
-				$img_primary->move($destinationPath, $primary_image_name);
-			}
+            if($request->hasFile('img_primary')){
+                $img_primary = $request->file('img_primary');
 
-            if ($webp_mb->save(storage_path('/app/public/journals/'.$name_mb.'.webp'))) {
-				$img_mb->move($destinationPath, $mb_image_name);
-			}
+                $name_primary = pathinfo($img_primary->getClientOriginalName(), PATHINFO_FILENAME);
+			    $ext_primary = pathinfo($img_primary->getClientOriginalName(), PATHINFO_EXTENSION);
 
-            if ($webp_hm->save(storage_path('/app/public/journals/'.$name_home.'.webp'))) {
-				$img_home->move($destinationPath, $home_image_name);
-			}
+                $name_primary = Str::slug($name_primary, '-');
 
-            if ($webp_jr->save(storage_path('/app/public/journals/'.$name_journals.'.webp'))) {
-				$img_journals->move($destinationPath, $journals_image_name);
-			}
+                $primary_image_name = $name_primary.".".$ext_primary;
 
-            DB::table('fumaco_blog')->where('id', $id)->update($blogs_update);
+                if(!in_array($ext_primary, $allowed_extensions)){
+                    return redirect()->back()->with('image_error', $extension_error);
+                }
+
+                $webp_pr = Webp::make($request->file('img_primary'));
+
+                if ($webp_pr->save(storage_path('/app/public/journals/'.$name_primary.'.webp'))) {
+                    $img_primary->move($destinationPath, $primary_image_name);
+                }
+
+                DB::table('fumaco_blog')->where('id', $id)->update(['blogprimaryimage' => $primary_image_name, 'last_modified_by' => Auth::user()->username]);
+            }
+
+            if($request->hasFile('img_mb')){
+                $img_mb = $request->file('img_mb');
+
+                $name_mb = pathinfo($img_mb->getClientOriginalName(), PATHINFO_FILENAME);
+			    $ext_mb = pathinfo($img_mb->getClientOriginalName(), PATHINFO_EXTENSION);
+
+                $name_mb = Str::slug($name_mb, '-');
+                
+                $mb_image_name = $name_mb.".".$ext_mb;
+
+                if(!in_array($ext_mb, $allowed_extensions)){
+                    return redirect()->back()->with('image_error', $extension_error);
+                }
+
+                $webp_mb = Webp::make($request->file('img_mb'));
+
+                if ($webp_mb->save(storage_path('/app/public/journals/'.$name_mb.'.webp'))) {
+                    $img_mb->move($destinationPath, $mb_image_name);
+                }
+                
+                DB::table('fumaco_blog')->where('id', $id)->update(['blogprimayimage-mob' => $mb_image_name, 'last_modified_by' => Auth::user()->username]);
+            }
+
+            if($request->hasFile('img_home')){
+                $img_home = $request->file('img_home');
+                
+                $name_home = pathinfo($img_home->getClientOriginalName(), PATHINFO_FILENAME);
+			    $ext_home = pathinfo($img_home->getClientOriginalName(), PATHINFO_EXTENSION);
+                
+                $name_home = Str::slug($name_home, '-');
+
+                $home_image_name = $name_home.".".$ext_home;
+
+                if(!in_array($ext_home, $allowed_extensions)){
+                    return redirect()->back()->with('image_error', $extension_error);
+                }
+
+                $webp_hm = Webp::make($request->file('img_home'));
+
+                if ($webp_hm->save(storage_path('/app/public/journals/'.$name_home.'.webp'))) {
+                    $img_home->move($destinationPath, $home_image_name);
+                }
+                
+                DB::table('fumaco_blog')->where('id', $id)->update(['blogprimayimage-home' => $home_image_name, 'last_modified_by' => Auth::user()->username]);
+            }
+
+            if($request->hasFile('img_journals')){
+                $img_journals = $request->file('img_journals');
+
+                $name_journals = pathinfo($img_journals->getClientOriginalName(), PATHINFO_FILENAME);
+			    $ext_journals = pathinfo($img_journals->getClientOriginalName(), PATHINFO_EXTENSION);
+
+                $name_journals = Str::slug($name_journals, '-');
+
+                $journals_image_name = $name_journals.".".$ext_journals;
+
+                if(!in_array($ext_journals, $allowed_extensions)){
+                    return redirect()->back()->with('image_error', $extension_error);
+                }
+
+                $webp_jr = Webp::make($request->file('img_journals'));
+
+                if ($webp_jr->save(storage_path('/app/public/journals/'.$name_journals.'.webp'))) {
+                    $img_journals->move($destinationPath, $journals_image_name);
+                }
+
+                DB::table('fumaco_blog')->where('id', $id)->update(['blogprimayimage-journal' => $journals_image_name, 'last_modified_by' => Auth::user()->username]);
+            }
+
+            // check if blog has images
+            $blog_check = DB::table('fumaco_blog')->where('id', $id)->where('blogprimaryimage', '!=', '')->where('blogprimayimage-mob', '!=', '')->where('blogprimayimage-home', '!=', '')->where('blogprimayimage-journal', '!=', '')->count();
+            if($blog_check > 0){
+                DB::table('fumaco_blog')->where('id', $id)->update(['blog_status' => 1]);
+            }
+
             DB::commit();
             return redirect()->back()->with('success', 'Blog Updated.');
         } catch (Exception $e) {
@@ -280,6 +329,18 @@ class BlogController extends Controller
             DB::table('fumaco_blog')->where('id', $id)->delete();
             DB::commit();
             return redirect()->back()->with('success', 'Blog Deleted.');
+        } catch (Exception $e) {
+            DB::rollback();
+            return redirect()->back()->with('error', 'An error occured. Please try again.');
+        }
+    }
+
+    public function deleteBlogImage($id, $image){
+        DB::beginTransaction();
+        try {
+            DB::table('fumaco_blog')->where('id', $id)->update([$image => null, 'blog_status' => 0, 'blog_enable' => 0, 'blog_featured' => 0]);
+            DB::commit();
+            return redirect()->back()->with('success', 'Image Deleted.');
         } catch (Exception $e) {
             DB::rollback();
             return redirect()->back()->with('error', 'An error occured. Please try again.');

@@ -36,7 +36,7 @@
                                         {{ session()->get('image_error') }}
                                     </div>
                                 @endif
-                                <form action="/admin/blog/edit/{{ $id }}" method="POST" enctype="multipart/form-data">
+                                <form action="/admin/blog/edit/{{ $id }}" method="POST">
                                     @csrf
                                 <div class="card-body">
                                     <div class="row">
@@ -63,40 +63,6 @@
                                     </div>
                                     <br/>
                                     <div class="row">
-                                        <div class="col-md-6">
-                                            <label>Primary Image:</label>
-                                            <div class="custom-file mb-3">
-                                                <input type="file" class="custom-file-input" id="customFile" name="img_primary" required>
-                                                <label class="custom-file-label" for="customFile">Choose File</label>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label>Mobile Image:</label>
-                                            <div class="custom-file mb-3">
-                                                <input type="file" class="custom-file-input" id="customFile" name="img_mb" required>
-                                                <label class="custom-file-label" for="customFile">Choose File</label>
-                                            </div>
-                                        </div> 
-                                    </div>
-                                    <br/>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <label>Homepage Image:</label>
-                                            <div class="custom-file mb-3">
-                                                <input type="file" class="custom-file-input" id="customFile" name="img_home" required>
-                                                <label class="custom-file-label" for="customFile">Choose File</label>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label>Journals Page Image:</label>
-                                            <div class="custom-file mb-3">
-                                                <input type="file" class="custom-file-input" id="customFile" name="img_journals" required>
-                                                <label class="custom-file-label" for="customFile">Choose File</label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <br/>
-                                    <div class="row">
                                         <div class="col-md-12">
                                             <label for="blog_caption">Caption</label>
                                             <textarea class="form-control" rows="8" name="blog_caption">{!! $blog->blog_caption !!}</textarea>
@@ -117,6 +83,149 @@
                                 <div class="card-footer">
                                     <center><button type="submit" class="btn btn-lg btn-primary">Save Changes</button></center>
                                 </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card card-primary">
+                                <form action="/admin/blog/images/edit/{{ $id }}" method="POST" enctype="multipart/form-data">
+                                    @csrf
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <label>Primary Image:</label>
+                                                <div class="custom-file mb-3">
+                                                    <input type="file" class="custom-file-input" id="customFile" name="img_primary" {{ $blog->blogprimaryimage ? '' : 'required' }}>
+                                                    <label class="custom-file-label" for="customFile">{{ $blog->blogprimaryimage ? $blog->blogprimaryimage : 'Choose File' }}</label>
+                                                </div>
+                                                @if($blog->blogprimaryimage)
+                                                    <p>Saved image: <b>{{ $blog->blogprimaryimage }}</b><button type="button" class="btn btn-sm btn-danger ml-3" data-toggle="modal" data-target="#deletePrimaryImageModal">Delete</button></p>
+                                                @else
+                                                    <p>No saved image</p>
+                                                @endif
+                                                <div class="modal fade" id="deletePrimaryImageModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                    <div class="modal-dialog" role="document">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title" id="exampleModalLabel">{{ $blog->blogprimaryimage }}</h5>
+                                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                    <span aria-hidden="true">&times;</span>
+                                                                </button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                Delete Primary Image?
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                                <a href="/admin/blog/images/img-delete/{{ $id }}/blogprimaryimage" type="button" class="btn btn-danger">Delete</a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label>Mobile Image:</label>
+                                                <div class="custom-file mb-3">
+                                                    <input type="file" class="custom-file-input" id="customFile" name="img_mb" {{ $blog->{'blogprimayimage-mob'} ? '' : 'required' }}>
+                                                    <label class="custom-file-label" for="customFile">{{ $blog->{'blogprimayimage-mob'} ? $blog->{'blogprimayimage-mob'} : 'Choose File' }}</label>
+                                                </div>
+                                                @if($blog->{'blogprimayimage-mob'})
+                                                    <p>Saved image: <b>{{ $blog->{'blogprimayimage-mob'} }}</b><button type="button" class="btn btn-sm btn-danger ml-3" data-toggle="modal" data-target="#deleteMobileImageModal">Delete</button></p>
+                                                @else
+                                                    <p>No saved image</p>
+                                                @endif
+                                                <div class="modal fade" id="deleteMobileImageModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                    <div class="modal-dialog" role="document">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title" id="exampleModalLabel">{{ $blog->{'blogprimayimage-mob'} }}</h5>
+                                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                    <span aria-hidden="true">&times;</span>
+                                                                </button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                Delete Mobile Image?
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                                <a href="/admin/blog/images/img-delete/{{ $id }}/blogprimayimage-mob" type="button" class="btn btn-danger">Delete</a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div> 
+                                        </div>
+                                        <br/>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <label>Homepage Image:</label>
+                                                <div class="custom-file mb-3">
+                                                    <input type="file" class="custom-file-input" id="customFile" name="img_home" {{ $blog->{'blogprimayimage-home'} ? '' : 'required' }}>
+                                                    <label class="custom-file-label" for="customFile">{{ $blog->{'blogprimayimage-home'} ? $blog->{'blogprimayimage-home'} : 'Choose File' }}</label>
+                                                </div>
+                                                @if($blog->{'blogprimayimage-home'})
+                                                    <p>Saved image: <b>{{ $blog->{'blogprimayimage-home'} }}</b><button type="button" class="btn btn-sm btn-danger ml-3" data-toggle="modal" data-target="#deleteHomeImageModal">Delete</button></p>
+                                                @else
+                                                    <p>No saved image</p>
+                                                @endif
+                                                <div class="modal fade" id="deleteHomeImageModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                    <div class="modal-dialog" role="document">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title" id="exampleModalLabel">{{ $blog->{'blogprimayimage-home'} }}</h5>
+                                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                    <span aria-hidden="true">&times;</span>
+                                                                </button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                Delete Homepage Image?
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                                <a href="/admin/blog/images/img-delete/{{ $id }}/blogprimayimage-home" type="button" class="btn btn-danger">Delete</a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label>Journals Page Image:</label>
+                                                <div class="custom-file mb-3">
+                                                    <input type="file" class="custom-file-input" id="customFile" name="img_journals" {{ $blog->{'blogprimayimage-journal'} ? '' : 'required' }}>
+                                                    <label class="custom-file-label" for="customFile">{{ $blog->{'blogprimayimage-journal'} ? $blog->{'blogprimayimage-journal'} : 'Choose File' }}</label>
+                                                </div>
+                                                @if($blog->{'blogprimayimage-journal'})
+                                                    <p>Saved image: <b>{{ $blog->{'blogprimayimage-journal'} }}</b><button type="button" class="btn btn-sm btn-danger ml-3" data-toggle="modal" data-target="#deleteJournalsImageModal">Delete</button></p>
+                                                @else
+                                                    <p>No saved image</p>
+                                                @endif
+                                                <div class="modal fade" id="deleteJournalsImageModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                    <div class="modal-dialog" role="document">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title" id="exampleModalLabel">{{ $blog->{'blogprimayimage-journal'} }}</h5>
+                                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                    <span aria-hidden="true">&times;</span>
+                                                                </button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                Delete Journals Page Image?
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                                <a href="/admin/blog/images/img-delete/{{ $id }}/blogprimayimage-journal" type="button" class="btn btn-danger">Delete</a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer">
+                                        <center><button type="submit" class="btn btn-lg btn-primary">Save Changes</button></center>
+                                    </div>
                                 </form>
                             </div>
                         </div>
