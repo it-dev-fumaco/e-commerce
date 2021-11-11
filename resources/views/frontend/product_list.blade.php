@@ -249,7 +249,7 @@
 								
 										<div class="card-body">
 											<div class="text ellipsis">
-												<p class="card-text fumacoFont_card_title text-concat prod-desc" style="color:#0062A5 !important; min-height: 80px; font-size: 16px !important; font-weight: 500 !important;">{{ $product['item_name'] }}</p>
+												<p class="card-text fumacoFont_card_title text-concat prod-desc" style="color:#0062A5 !important; min-height: 100px; font-size: 16px !important; font-weight: 500 !important;">{{ $product['item_name'] }}</p>
 											</div>
 											<p class="card-text fumacoFont_card_price" style="color:#000000 !important;">
 												@if($product['is_discounted'])
@@ -383,8 +383,8 @@
 		display: inline-block;
 		word-wrap: break-word;
 		overflow: hidden;
-		max-height: 5.7em;
-		line-height: 1.4em;
+		max-height: 4.5em;
+      	line-height: 1.6em;
 		text-align: left;
 		font-size: 16px !important;
 	}
