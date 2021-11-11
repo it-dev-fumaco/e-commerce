@@ -113,7 +113,7 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
 
                     <div class="card-body">
                       <div class="text ellipsis">
-                        <p class="card-text product-head fumacoFont_card_title text-concat prod_desc" style="color:#0062A5 !important;  min-height: 80px;">{{ $bs['item_name'] }}</p>
+                        <p class="card-text product-head fumacoFont_card_title text-concat prod_desc" style="color:#0062A5 !important;  min-height: 100px;">{{ $bs['item_name'] }}</p>
                       </div>
                       <p class="card-text fumacoFont_card_price" style="color:#000000 !important; ">
                         @if ($bs['is_discounted'])
@@ -175,7 +175,7 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
 
                     <div class="card-body">
                       <div class="text ellipsis">
-                        <p class="card-text product-head fumacoFont_card_title text-concat prod_desc" style="color:#0062A5 !important; min-height: 80px;">{{ $os['item_name'] }}</p>
+                        <p class="card-text product-head fumacoFont_card_title text-concat prod_desc" style="color:#0062A5 !important; min-height: 100px;">{{ $os['item_name'] }}</p>
                       </div>
                       <p class="card-text fumacoFont_card_price" style="color:#000000 !important; ">
                         @if ($os['is_discounted'])
@@ -223,9 +223,10 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
       display: inline-block;
       word-wrap: break-word;
       overflow: hidden;
-      max-height: 5.7em;
-      line-height: 1.4em;
+      max-height: 4.5em;
+      line-height: 1.6em;
       text-align: left;
+      font-size: 16px !important;
     }
 
     .carousel-text-concat {
