@@ -203,7 +203,7 @@
 									<tr>
 										<td class="col-md-2">
 											<center>
-												<img src="{{ asset('/storage/item_images/'.$cart['item_code'].'/gallery/preview/'.$cart['item_image']) }}" class="img-responsive" alt="" width="55" height="55">
+												<img src="{{ asset('/storage/item_images/'.$cart['item_code'].'/gallery/preview/'.$cart['item_image']) }}" class="img-responsive" alt="{{ Str::slug(explode(".", $cart['item_image'])[0], '-') }}" width="55" height="55">
 											</center>
 										</td>
 										<td>{{ $cart['item_description'] }}</td>

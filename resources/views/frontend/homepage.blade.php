@@ -37,7 +37,7 @@
             <picture>
               <source srcset="{{ asset('/assets/site-img/'. explode(".", $carousel->fumaco_image1)[0] .'.webp') }}" type="image/webp" style="object-fit: cover;opacity: 0.6;">
               <source srcset="{{ asset('/assets/site-img/'. $carousel->fumaco_image1) }}" type="image/jpeg" style="object-fit: cover;opacity: 0.6;">
-              <img src="{{ asset('/assets/site-img/'. $carousel->fumaco_image1) }}" alt="" style="object-fit: cover;opacity: 0.6;">
+              <img src="{{ asset('/assets/site-img/'. $carousel->fumaco_image1) }}" alt="{{ Str::slug(explode(".", $carousel->fumaco_image1)[0], '-') }}" style="object-fit: cover;opacity: 0.6;">
             </picture>
 
             <div class="container">
@@ -46,7 +46,6 @@
                 <div class="text ellipsis">
                   <p class="carousel-caption-font fumacoFont2 carousel-text-concat" style="text-align: left; text-justify: left; letter-spacing: 1px;">{{ $string }}</p>
                 </div>
-                {{-- <p class="carousel-caption-font fumacoFont2" style="text-align: left; text-justify: inter-word; letter-spacing: 1px;">{{ $string }}</p> --}}
                 <p><a class="btn btn-lg btn-primary btn-fumaco fumacoFont_btn" href="{{ $carousel->fumaco_url }}"role="button">{{ $carousel->fumaco_btn_name }}</a></p>
               </div>
             </div>
@@ -69,7 +68,7 @@
               <picture>
                 <source srcset="{!!  asset('/assets/site-img/'. explode(".", $b->{'blogprimayimage-home'})[0] .'.webp') !!}" type="image/webp" class="img-responsive" style="width: 100% !important;">
                 <source srcset="{!!  asset('/assets/site-img/'. $b->{'blogprimayimage-home'}) !!}" type="image/jpeg" class="img-responsive" style="width: 100% !important;">
-                <img src="{!!  asset('/assets/site-img/'. $b->{'blogprimayimage-home'}) !!}" alt="" class="img-responsive" style="width: 100% !important;">
+                <img src="{!!  asset('/assets/site-img/'. $b->{'blogprimayimage-home'}) !!}" alt="{{ Str::slug(explode(".", $b->{'blogprimayimage-home'})[0], '-') }}" class="img-responsive" style="width: 100% !important;">
               </picture>
               <br><br>
               <h5 class="font-style-thin fumacoFont_card_title article-title" style="font-family: 'poppins', sans-serif !important; color:#ffffff !important; line-height: 26px !important; font-size: 18px !important;">{{ $b->blogtitle }}</h5>
@@ -107,7 +106,7 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
                     <picture>
                       <source srcset="{{ asset($img_bs_webp) }}" type="image/webp" class="img-responsive" style="width: 100% !important;">
                       <source srcset="{{ asset($img_bs) }}" type="image/jpeg" class="img-responsive" style="width: 100% !important;">
-                      <img src="{{ asset($img_bs) }}" alt="{{ $bs['item_code'] }}" class="img-responsive" style="width: 100% !important;">
+                      <img src="{{ asset($img_bs) }}" alt="{{ Str::slug(explode(".", $bs['bs_img'])[0], '-') }}" class="img-responsive" style="width: 100% !important;">
                     </picture>
 
 
@@ -170,7 +169,7 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
                       <picture>
                         <source srcset="{{ asset($img_os_webp) }}" type="image/webp" class="img-responsive" style="width: 100% !important;">
                         <source srcset="{{ asset($img_os) }}" type="image/jpeg" class="img-responsive" style="width: 100% !important;">
-                        <img src="{{ asset($img_os) }}" alt="{{ $os['item_code'] }}" class="img-responsive" style="width: 100% !important;">
+                        <img src="{{ asset($img_os) }}" alt="{{ Str::slug(explode(".", $os['os_img'])[0], '-') }}" class="img-responsive" style="width: 100% !important;">
                       </picture>
 
                     <div class="card-body">

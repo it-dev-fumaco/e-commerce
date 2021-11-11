@@ -33,11 +33,11 @@
 									$src = (count($product_images) > 0) ? '/storage/item_images/'. $product_images[0]->idcode.'/gallery/preview/'. $product_images[0]->imgprimayx : '/storage/no-photo-available.png';
 									$xoriginal = (count($product_images) > 0)  ? '/storage/item_images/'. $product_images[0]->idcode.'/gallery/original/'. $product_images[0]->imgoriginalx : '/storage/no-photo-available.png';
 									@endphp
-									<img style="width: 100% !important;" class="xzoom4 imgx" id="xzoom-fancy" src="{{ asset($src) }}" xoriginal="{{ asset($xoriginal) }}" />
+									<img style="width: 100% !important;" alt="{{ Str::slug(explode(".", $product_images[0]->imgprimayx)[0], '-') }}" class="xzoom4 imgx" id="xzoom-fancy" src="{{ asset($src) }}" xoriginal="{{ asset($xoriginal) }}" />
 									<br><br>
 									<div class="xzoom-thumbs">
 										@foreach ($product_images as $image)
-										<a href="{{ asset('/storage/item_images/'. $image->idcode.'/gallery/original/'. $image->imgoriginalx) }}"><img class="xzoom-gallery4" width="60" src="{{ asset('/storage/item_images/'. $image->idcode.'/gallery/preview/'. $image->imgprimayx) }}" /></a>
+										<a href="{{ asset('/storage/item_images/'. $image->idcode.'/gallery/original/'. $image->imgoriginalx) }}"><img class="xzoom-gallery4" width="60" src="{{ asset('/storage/item_images/'. $image->idcode.'/gallery/preview/'. $image->imgprimayx) }}" alt="{{ Str::slug(explode(".", $image->imgprimayx)[0], '-') }}" /></a>
 										@endforeach
 									</div>
 								</div>
@@ -244,7 +244,7 @@
 <picture>
 	<source srcset="{{ asset($img_webp) }}" type="image/webp" class="img-responsive" style="width: 100% !important;">
 	<source srcset="{{ asset($img) }}" type="image/jpeg" class="img-responsive" style="width: 100% !important;">
-	<img src="{{ asset($img) }}" alt="{{ $rp['item_code'] }}" class="img-responsive" style="width: 100% !important;">
+	<img src="{{ asset($img) }}" alt="{{ Str::slug(explode(".", $rp['image'])[0], '-') }}" class="img-responsive" style="width: 100% !important;">
   </picture>
 
 

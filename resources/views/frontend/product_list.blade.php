@@ -244,7 +244,7 @@
 											<picture>
 												<source srcset="{{ asset($image_webp) }}" type="image/webp" class="card-img-top">
 												<source srcset="{{ asset($image) }}" type="image/jpeg" class="card-img-top">
-												<img src="{{ asset($image) }}" alt="{{ $product['item_code'] }}" class="card-img-top">
+												<img src="{{ asset($image) }}" alt="{{ Str::slug(explode(".", $product['image'])[0], '-') }}" class="card-img-top">
 											 </picture>
 								
 										<div class="card-body">
