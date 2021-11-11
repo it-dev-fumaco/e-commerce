@@ -28,13 +28,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
     <link href="{{ asset('/assets/fumaco.css') }}" rel="stylesheet">
-
-    {{-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    @if($activePage == 'contact')
-    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
-    @endif
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script> --}}
-    <!-- Global site tag (gtag.js) - Google Analytics -->
+    @if ($activePage != 'error_page')
+           <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id={{ Config::get('google_api.google_analytics_api') }}"></script>
     <script>
     window.dataLayer = window.dataLayer || [];
@@ -43,6 +38,8 @@
 
     gtag('config', '{{ Config::get('google_api.google_analytics_api') }}');
     </script>
+    @endif
+ 
     <style>
 	html,body{
 		width: 100% !important;
