@@ -53,7 +53,7 @@ class ErpStockReservationCommand extends Command
                 ->join('fumaco_items as b', 'a.item_code', 'b.f_idcode')
                 ->join('fumaco_order as c', 'a.order_number', 'c.order_number')
                 ->whereNotIn('c.order_status', ['Cancelled', 'Delivered', 'Delivered Order'])
-                ->where('c.erp_stock_reserved', 0)
+                ->where('c.stock_reserve_status', 0)
                 ->select('a.item_code', 'c.id', 'a.item_name', 'b.f_warehouse', 'a.item_qty', 'c.order_number')
                 ->get();
 
@@ -72,14 +72,14 @@ class ErpStockReservationCommand extends Command
                         ->post($erp_api->base_url . '/api/resource/Stock Reservation', ($new_stock_reservations));
 
                     if ($insert_response->successful()) {
-                        DB::table('fumaco_order')->where('id', $order->id)->update(['erp_stock_reserved' => 1]);
+                        DB::table('fumaco_order')->where('id', $order->id)->update(['stock_reserve_status' => 1]);
                         info('success');
                     }
                 }
             }
 
             // get cancelled orders
-            $cancelled_orders = DB::table('fumaco_order')->where('erp_stock_reserved', 1)
+            $cancelled_orders = DB::table('fumaco_order')->where('stock_reserve_status', 1)
                 ->where('order_status', 'Cancelled')->pluck('order_number')->toArray();
             // delete stock reservation in erp
             $fields = '?fields=["name","item_code","warehouse","reserve_qty", "reference_no"]';
