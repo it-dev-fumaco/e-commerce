@@ -286,14 +286,13 @@
                                     <img src="https://www.gravatar.com/avatar/205e460b479e2e5b48aec077210c08d50?s=100&d=https://secure.gravatar.com/avatar/56445b52ab352ef83cfff87e35d9929a?s=80&d=mm&r=g" width="100%"/>
                                 </div>
 
-                                <div class="col-lg-10">
+                                <div class="col-lg-10 mb-3">
                                     <span style="font-family: 'poppins', sans-serif !important;"><b>{{ $reply->blog_name }}</b></span><br/>
                                     <span style="font-size: 9pt !important">{{ $reply->blog_date }}</span>
                                     <br>
                                     <span style="font-family: 'poppins', sans-serif !important;"  class="fumacoFont_card_caption">{{ $reply->blog_comments }}</span>
                                     <br><br>
                                 </div>
-                                <br><br>&nbsp;
                             </div>
                         @endforeach
                         <br>
