@@ -35,6 +35,13 @@ class OrderController extends Controller
                     'item_total' => $i->item_total_price,
                 ];
             }
+
+            $store_address = null;
+			if($o->order_shipping == 'Store Pickup') {
+				$store = DB::table('fumaco_store')->where('store_name', $o->store_location)->first();
+				$store_address = ($store) ? $store->address : null;
+			}
+
             $orders_arr[] = [
                 'order_no' => $o->order_number,
                 'first_name' => $o->order_name,
@@ -76,7 +83,9 @@ class OrderController extends Controller
                 'user_email' => $o->user_email,
                 'billing_business_name' => $o->billing_business_name,
                 'shipping_business_name' => $o->shipping_business_name,
-                'pickup_date' => Carbon::parse($o->pickup_date)->format('M d, Y')
+                'pickup_date' => Carbon::parse($o->pickup_date)->format('M d, Y'),
+                'store_address' => $store_address,
+                'store' => $o->store_location
             ];
         }
 
