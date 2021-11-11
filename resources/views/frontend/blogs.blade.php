@@ -220,8 +220,8 @@
                     @php
                         $useravatar = md5( strtolower( trim( $comment['email'] ) ) );
                     @endphp
-                    <div class="col-md-2">
-                        <img src="https://www.gravatar.com/avatar/{{ $useravatar }}&d=https://secure.gravatar.com/avatar/56445b52ab352ef83cfff87e35d9929a?s=150&d=mm&r=g"/>
+                    <div class="col-md-1">
+                        <img src="https://www.gravatar.com/avatar/{{ $useravatar }}&d=https://secure.gravatar.com/avatar/56445b52ab352ef83cfff87e35d9929a?s=150&d=mm&r=g" width="100%"/>
                     </div>
                     <div class="col-md-10">
                         <span style="font-family: 'poppins', sans-serif !important;"><b>{{ $comment['name'] }}</b></span><br/>
@@ -282,8 +282,8 @@
                         <!-- reply comment -->
                         @foreach($comment['reply_comment'] as $reply)
                             <div class="row">
-                                <div class="col-lg-2">
-                                    <img src="https://www.gravatar.com/avatar/205e460b479e2e5b48aec077210c08d50?s=100&d=https://secure.gravatar.com/avatar/56445b52ab352ef83cfff87e35d9929a?s=80&d=mm&r=g" />
+                                <div class="col-lg-1">
+                                    <img src="https://www.gravatar.com/avatar/205e460b479e2e5b48aec077210c08d50?s=100&d=https://secure.gravatar.com/avatar/56445b52ab352ef83cfff87e35d9929a?s=80&d=mm&r=g" width="100%"/>
                                 </div>
 
                                 <div class="col-lg-10">
