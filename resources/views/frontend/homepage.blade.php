@@ -69,7 +69,7 @@
               <picture>
                 <source srcset="{!!  asset('/assets/site-img/'. explode(".", $b->{'blogprimayimage-home'})[0] .'.webp') !!}" type="image/webp" class="img-responsive" style="width: 100% !important;">
                 <source srcset="{!!  asset('/assets/site-img/'. $b->{'blogprimayimage-home'}) !!}" type="image/jpeg" class="img-responsive" style="width: 100% !important;">
-                <img src="{!!  asset('/assets/site-img/'. $b->{'blogprimayimage-home'}) !!}" alt="" class="img-responsive" style="width: 100% !important;">
+                <div class="hover-container"><img src="{!!  asset('/assets/site-img/'. $b->{'blogprimayimage-home'}) !!}" alt="" class="img-responsive hover" style="width: 100% !important;"></div>
               </picture>
               <br><br>
               <h5 class="font-style-thin fumacoFont_card_title article-title" style="font-family: 'poppins', sans-serif !important; color:#ffffff !important; line-height: 26px !important; font-size: 18px !important;">{{ $b->blogtitle }}</h5>
@@ -261,6 +261,17 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
       font-family: 'poppins', sans-serif !important;
       text-decoration: none !important;
     }
+
+    .hover{
+      transition: .5s;
+    }
+
+    .hover:hover {
+      -ms-transform: scale(0.95); /* IE 9 */
+      -webkit-transform: scale(0.95); /* Safari 3-8 */
+      transform: scale(0.95); 
+    }
+
     @media (max-width: 575.98px) {
       .article-title{
         min-height: auto !important
