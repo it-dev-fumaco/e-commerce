@@ -338,6 +338,12 @@ class BlogController extends Controller
     public function deleteBlogImage($id, $image){
         DB::beginTransaction();
         try {
+            $delete_img = DB::table('fumaco_blog')->where('id', $id)->select($image)->first();
+            $image_name = explode('.', $delete_img->$image);
+
+            unlink(storage_path('app/public/journals/'.$delete_img->$image));
+            unlink(storage_path('app/public/journals/'.$image_name[0].'.webp'));
+
             DB::table('fumaco_blog')->where('id', $id)->update([$image => null, 'blog_status' => 0, 'blog_enable' => 0, 'blog_featured' => 0]);
             DB::commit();
             return redirect()->back()->with('success', 'Image Deleted.');
