@@ -259,8 +259,8 @@
 								</div>
 								<div class="col-md-6 offset-md-3 bootstrap-timepicker">
 									<div class="form-group">
-										<label for="pickup-time">Pickup Date</label>
-										<input type="text" class="form-control" id="pickup-time" value="{{ date('Y-m-d') }}" style="text-align: center;">
+										<label for="pickup-time">Pickup by</label>
+										<input type="text" class="form-control" id="pickup-time" style="text-align: center;">
 									</div>
 								</div>
 							</div>
@@ -1353,7 +1353,7 @@
 		$("#pickup-time").datepicker({
 			showInputs: false,
 			startDate: new Date(),
-			format: 'yyyy-mm-dd',
+			format: 'D, M. dd, yyyy',
 			autoclose: true,
 			daysOfWeekDisabled: [0]
 		});

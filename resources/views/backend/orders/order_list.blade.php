@@ -116,7 +116,10 @@
 																		<h4 class="modal-title">ORDER NO. {{ $order['order_no'] }}</h4>
 																	</div>
 																	<div class="col-md-6">
-																		<div class="float-right font-italic m-1" style="font-size: 1.2rem;"><strong>Est. Delivery Date : </strong> {{ $order['estimated_delivery_date'] }}{{ $order['pickup_date'] }}</div>
+																		<div class="float-right font-italic m-1" style="font-size: 1.2rem;">
+																			<span class="badge badge-info d-inline-block mr-3" style="font-size: 1rem;">{{ $order['shipping_name'] }}</span>
+																			{!! ($order['shipping_name'] != 'Store Pickup') ? '<strong>Est. Delivery Date : </strong> ' . $order['estimated_delivery_date'] : '<strong>Pickup by : </strong> ' . \Carbon\Carbon::parse($order['pickup_date'])->format('D, F d, Y') !!}
+																		</div>
 																	</div>
 																</div>
 																<button type="button" class="close" data-dismiss="modal">&times;</button>

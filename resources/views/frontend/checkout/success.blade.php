@@ -64,16 +64,27 @@
 						<div style="color:#58595A !important;">
 							<h6 class="font-weight-bold mt-2">Order no.: <b>{{ $order_details->order_number }}</b></h6>
 							<p class="mt-3 mb-5">Your order has been placed, a confirmation will be sent to your email <b>{{ $loggedin }}</b> with the details of your order.</p>
+							@if ($order_details->order_shipping == 'Store Pickup')
+							<h6 class="font-weight-bold mt-2"><b>STORE PICKUP:</b></h6>
+							<span class="d-inline-block" style="width: 100px;"><strong>Store: </strong></span>
+							{{ $order_details->store_location }}
+							<br>
+							<span class="d-inline-block" style="width: 100px;"><strong>Address: </strong></span>
+							{!! $store_address !!}
+							<br>
+							<br>
+							<p><b>Pickup by:</b> {{ \Carbon\Carbon::parse($order_details->pickup_date)->format('D, F d, Y') }}</p>
+							@else
 							<h6 class="font-weight-bold mt-2"><b>SHIPPING TO:</b></h6>
 							<span class="d-inline-block" style="width: 100px;"><strong>Customer: </strong></span>
 							{{ $order_details->order_name .' ' . $order_details->order_lastname }}
 							<br>
 							<span class="d-inline-block" style="width: 100px;"><strong>Address: </strong></span>
 							{!! $order_details->order_ship_address1 . ' ' . $order_details->order_ship_address2 . ', ' . $order_details->order_ship_brgy . ', ' . $order_details->order_ship_city . ', ' . $order_details->order_ship_prov . ', ' . $order_details->order_ship_postal . ', ' . $order_details->order_ship_country !!}
-
 							<br>
 							<br>
 							<p><b>Estimated Delivery Date:</b> {{ $order_details->estimated_delivery_date }}</p>
+							@endif
 						</div>
 						<br><br>
 						<table class="table">

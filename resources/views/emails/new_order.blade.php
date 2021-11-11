@@ -28,7 +28,7 @@
 			@if ($order_details->order_shipping == 'Store Pickup')
 			<strong>Shipping Method :</strong> {{ $order_details->order_shipping }}<br><br>
 			<strong>Store Location :</strong> {!! $order_details->store_location . ' - ' . $store_address !!}<br><br>
-			<strong>Pickup Date :</strong> {{ $order_details->pickup_date }}<br>
+			<strong>Pickup by :</strong> {{ \Carbon\Carbon::parse($order_details->pickup_date)->format('D, F d, Y') }}<br>
 			@else
 			<strong>Shipping Address :</strong> {{ $order_details->order_ship_address1 . ' ' . $order_details->order_ship_address2 . ', ' . $order_details->order_ship_brgy . ', ' . $order_details->order_ship_city .', ' . $order_details->order_ship_prov . ', ' . $order_details->order_ship_country .', ' . $order_details->order_ship_postal }}<br><br>
 			<strong>Estimated Delivery Date :</strong> {{ $order_details->estimated_delivery_date }}<br>

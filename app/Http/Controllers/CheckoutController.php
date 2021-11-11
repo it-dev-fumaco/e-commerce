@@ -692,7 +692,7 @@ class CheckoutController extends Controller
 				});
 			}
 
-			return view('frontend.checkout.success', compact('order_details', 'items', 'loggedin'));
+			return view('frontend.checkout.success', compact('order_details', 'items', 'loggedin', 'store_address'));
 		} catch (Exception $e) {
 			DB::rollback();
 
