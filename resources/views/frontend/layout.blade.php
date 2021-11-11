@@ -51,6 +51,7 @@
 		padding: 0px !important;
 		overflow-x: hidden !important;
 			font-family: 'poppins', sans-serif !important;
+      scroll-behavior: smooth;
 	}
       .fumacoFont1 {
           font-family: 'poppins', sans-serif !important; font-weight:400 !important; font-size: 1.75rem!important;

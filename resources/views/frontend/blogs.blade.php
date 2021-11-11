@@ -103,7 +103,7 @@
                 <div class="fb-like" data-href="https://test.fumaco.com.ph/blog?id={{ $id }}" data-width="" data-layout="standard" data-action="like" data-size="small" data-share="true"></div>
             </div>
 
-            <div class="col-lg-6" style="text-align:right;">
+            <div class="col-lg-6" style="text-align:right;" id="comments">
                 <p style="font-family: 'poppins', sans-serif !important;"  class="blog-font-a font1color">
 
                 </p>

@@ -367,13 +367,13 @@ class BlogController extends Controller
     }
 
     public function viewComments(Request $request){
-        $comments = DB::table('fumaco_comments')->where('blog_type', 1)->where('blog_email', 'LIKE', '%'.$request->q.'%')->orderBy('blog_date', 'desc')->paginate(10);
+        $comments = DB::table('fumaco_comments')->where('blog_type', 1)->where('blog_email', 'LIKE', '%'.$request->q.'%')->orderBy('blog_status', 'asc')->orderBy('blog_reply_date', 'desc')->orderBy('blog_date', 'desc')->paginate(10);
 
         $comments_arr = [];
 
         foreach($comments as $comment){
             $replies_arr = [];
-            $replies = DB::table('fumaco_comments')->where('blog_type', 2)->where('reply_id', $comment->id)->get();
+            $replies = DB::table('fumaco_comments')->where('blog_type', 2)->where('reply_id', $comment->id)->orderBy('blog_status', 'asc')->get();
             foreach($replies as $r){
                 $replies_arr[] = [
                     'id' => $r->id,
@@ -447,8 +447,11 @@ class BlogController extends Controller
             ];
 
             $insert = DB::table('fumaco_comments')->insert($add_comment);
+            if($request->reply_replyId){
+                DB::table('fumaco_comments')->where('id', $request->reply_replyId)->update(['blog_reply_date' => Carbon::now()]);
+            }
             DB::commit();
-            return redirect()->back()->with('comment_message', 'Hello! Your comment has been received, please wait for approval.');
+            return redirect('/blog/'.$request->idcode.'#comments')->with('comment_message', 'Hello! Your comment has been received, please wait for approval.');
         }catch(Exception $e){
             DB::rollback();
         }
