@@ -144,12 +144,19 @@
                                 <p style="font-family: 'poppins', sans-serif !important;"  class="font2color animated animatedFadeInUp fadeInUp">LEAVE A COMMENT</p>
                             </div>
                         </div>
-
-                        <div class="row">
-                            <div class="col">
-                                <p style="font-family: 'poppins', sans-serif !important;"  class="animated animatedFadeInUp fadeInUp" style="color:#a9a9a9 !important;">Your email address will not be published. Required fields are marked *</p>
+                        @if (Auth::check())
+                            <div class="row">
+                                <div class="col mx-auto">
+                                    <p style="font-family: 'poppins', sans-serif !important;"  class="font2color animated animatedFadeInUp fadeInUp">Logged in as {{ Auth::user()->f_name." ".Auth::user()->f_lname }}</p>
+                                </div>
                             </div>
-                        </div>
+                        @else
+                            <div class="row">
+                                <div class="col">
+                                    <p style="font-family: 'poppins', sans-serif !important;"  class="animated animatedFadeInUp fadeInUp" style="color:#a9a9a9 !important;">Your email address will not be published. Required fields are marked *</p>
+                                </div>
+                            </div>
+                        @endif
 
                         <div class="row">
                             <div class="col">
@@ -164,17 +171,18 @@
                         </div>
 
                         <br>
+                        @if (!Auth::check())
+                            <div class="row">
+                                <div class="col">
+                                    <input type="text" class="form-control caption_1 animated animatedFadeInUp fadeInUp" placeholder="Name *" name="fullname" id="fullname" required>
+                                </div>
 
-                        <div class="row">
-                            <div class="col">
-                                <input type="text" class="form-control caption_1 animated animatedFadeInUp fadeInUp" placeholder="Name *" name="fullname" id="fullname" required>
+                                <div class="col">
+                                    <input type="email" class="form-control caption_1 animated animatedFadeInUp fadeInUp" placeholder="Email *" name="fullemail" id="fullemail" required>
+                                </div>
                             </div>
-
-                            <div class="col">
-                                <input type="email" class="form-control caption_1 animated animatedFadeInUp fadeInUp" placeholder="Email *" name="fullemail" id="fullemail" required>
-                                <input type="text" class="form-control caption_1 animated animatedFadeInUp fadeInUp" name="idcode" id="idcode" value="{{ $id }}" required hidden>
-                            </div>
-                        </div>
+                        @endif
+                        <input type="text" class="form-control caption_1 animated animatedFadeInUp fadeInUp" name="idcode" id="idcode" value="{{ $id }}" required hidden>
                         <input class="btn btn-primary mt-3 caption_1 animated animatedFadeInUp fadeInUp" type="submit" value="POST COMMENT">
                         <br>&nbsp;
                     </form>
@@ -196,7 +204,7 @@
 
             <div class="col-lg-12">
               <span style="font-family: 'poppins', sans-serif !important;"  style="font-size:24px; font-weight:300;">&nbsp;
-              &nbsp;Comments<span style="font-family: 'poppins', sans-serif !important;" >&nbsp;&nbsp;<span style="font-family: 'poppins', sans-serif !important;"  style="font-size:10px; font-weight:300;"> (Avatar powered by gravatar.com)</span>
+              &nbsp;Comments<span style="font-family: 'poppins', sans-serif !important;" >
             </div>
 
             <div class="col-lg-12">
@@ -212,11 +220,12 @@
                     @php
                         $useravatar = md5( strtolower( trim( $comment['email'] ) ) );
                     @endphp
-                    <div class="col-lg-2">
-                        <img src="https://www.gravatar.com/avatar/{{ $useravatar }}&d=https://secure.gravatar.com/avatar/56445b52ab352ef83cfff87e35d9929a?s=150&d=mm&r=g" />
+                    <div class="col-md-2">
+                        <img src="https://www.gravatar.com/avatar/{{ $useravatar }}&d=https://secure.gravatar.com/avatar/56445b52ab352ef83cfff87e35d9929a?s=150&d=mm&r=g"/>
                     </div>
-                    <div class="col-lg-10">
-                        <span style="font-family: 'poppins', sans-serif !important;"  class="font3color blog-font-b">{{ $comment['name'] }}</span> on {{ $date }}
+                    <div class="col-md-10">
+                        <span style="font-family: 'poppins', sans-serif !important;"><b>{{ $comment['name'] }}</b></span><br/>
+                        <span style="font-size: 9pt !important">{{ $date }}</span>
                         <br>
                         <span style="font-family: 'poppins', sans-serif !important;"  class="fumacoFont_card_caption">{{ $comment['comment'] }}</span>
                         <br>
@@ -224,7 +233,7 @@
                         <button type="button" class="btn btn-sm btn-outline-secondary reply {{ $key }}" id="x1{{ $comment['id'] }}">Reply</button>
                         <br>
                         <div class="row" id="reply-field-{{ $key }}" style="display:none;">
-                            <form action="/add_reply" method="post" name="form2">
+                            <form action="/add_comment" method="post" name="form2">
                                 @csrf
                                 <div class="row">
                                     <div class="col">
@@ -232,26 +241,35 @@
                                     </div>
                                 </div>
 
+                                @if (Auth::check())
+                                    <div class="row">
+                                        <div class="col mx-auto">
+                                            <p style="font-family: 'poppins', sans-serif !important;"  class="font2color">Logged in as {{ Auth::user()->f_name." ".Auth::user()->f_lname }}</p>
+                                        </div>
+                                    </div>
+                                @endif
+
                                 <div class="row">
                                     <div class="col">
-                                        <textarea class="form-control caption_1" rows="5" id="reply_comment" name="reply_comment" required></textarea>
+                                        <textarea class="form-control caption_1" rows="5" id="reply_comment" name="comment" required></textarea>
                                     </div>
                                 </div>
 
                                 <br>
+                                @if (!Auth::check())
+                                    <div class="row" >
+                                        <div class="col">
+                                            <input type="text" class="form-control caption_1" placeholder="Name *" name="fullname" required>
+                                        </div>
 
-                                <div class="row" >
-                                    <div class="col">
-                                        <input type="text" class="form-control caption_1" placeholder="Name *" name="reply_name" required>
+                                        <div class="col">
+                                            <input type="email" class="form-control caption_1" placeholder="Email *" name="fullemail" required>
+                                        </div>
                                     </div>
-
-                                    <div class="col">
-                                        <input type="email" class="form-control caption_1" placeholder="Email *" name="reply_email" required>
-                                        <input type="hidden" class="form-control caption_1"  name="reply_blogId" value="{{ $id }}">
-                                        <input type="hidden" class="form-control caption_1" name="reply_replyId" value="{{ $comment['id'] }}">
-                                    </div>
-                                </div>
-
+                                @endif
+                                {{-- <input type="hidden" class="form-control caption_1"  name="reply_blogId" value="{{ $id }}"> --}}
+                                <input type="hidden" class="form-control caption_1" name="reply_replyId" value="{{ $comment['id'] }}">
+                                <input type="text" class="form-control" name="idcode" id="idcode" value="{{ $id }}" required hidden>
                                 <button type="submit" class="btn btn-primary mt-3 caption_1">&nbsp;&nbsp;&nbsp;REPLY  COMMENT&nbsp;&nbsp;&nbsp;</button>
                                 <br>
                                 <br>
@@ -269,7 +287,8 @@
                                 </div>
 
                                 <div class="col-lg-10">
-                                    <span style="font-family: 'poppins', sans-serif !important;"  class="font3color blog-font-b">{{ $reply->blog_name }}</span> on {{ $reply->blog_date }}
+                                    <span style="font-family: 'poppins', sans-serif !important;"><b>{{ $reply->blog_name }}</b></span><br/>
+                                    <span style="font-size: 9pt !important">{{ $reply->blog_date }}</span>
                                     <br>
                                     <span style="font-family: 'poppins', sans-serif !important;"  class="fumacoFont_card_caption">{{ $reply->blog_comments }}</span>
                                     <br><br>

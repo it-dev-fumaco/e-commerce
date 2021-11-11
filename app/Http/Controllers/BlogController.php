@@ -367,9 +367,41 @@ class BlogController extends Controller
     }
 
     public function viewComments(Request $request){
-        $comments = DB::table('fumaco_comments')->where('blog_email', 'LIKE', '%'.$request->q.'%')->orderBy('blog_date', 'desc')->paginate(10);
+        $comments = DB::table('fumaco_comments')->where('blog_type', 1)->where('blog_email', 'LIKE', '%'.$request->q.'%')->orderBy('blog_date', 'desc')->paginate(10);
 
-        return view('backend.blog.comments', compact('comments'));
+        $comments_arr = [];
+
+        foreach($comments as $comment){
+            $replies_arr = [];
+            $replies = DB::table('fumaco_comments')->where('blog_type', 2)->where('reply_id', $comment->id)->get();
+            foreach($replies as $r){
+                $replies_arr[] = [
+                    'id' => $r->id,
+                    'blog_type' => $r->blog_type,
+                    'blog_id' => $r->blog_id,
+                    'blog_name' => $r->blog_name,
+                    'blog_email' => $r->blog_email,
+                    'blog_comments' => $r->blog_comments,
+                    'blog_ip' => $r->blog_ip,
+                    'blog_date' => $r->blog_date,
+                    'blog_status' => $r->blog_status,
+                ];
+            }
+            $comments_arr[] = [
+                'id' => $comment->id,
+                'blog_type' => $comment->blog_type,
+                'blog_id' => $comment->blog_id,
+                'blog_name' => $comment->blog_name,
+                'blog_email' => $comment->blog_email,
+                'blog_comments' => $comment->blog_comments,
+                'blog_ip' => $comment->blog_ip,
+                'blog_date' => $comment->blog_date,
+                'blog_status' => $comment->blog_status,
+                'replies' => $replies_arr
+            ];
+        }
+
+        return view('backend.blog.comments', compact('comments', 'comments_arr'));
     }
 
     public function commentStatus(Request $request){
@@ -398,12 +430,18 @@ class BlogController extends Controller
     public function addComment(Request $request){
         DB::beginTransaction();
         try{
+            $name = $request->fullname;
+            $email = $request->fullemail;
+            if(Auth::check()){
+                $name = Auth::user()->f_name." ".Auth::user()->f_lname;
+                $email = Auth::user()->username;
+            }
             $add_comment = [
-                'blog_type' => '1',
-                'reply_id' => '0',
+                'blog_type' => $request->reply_replyId ? 2 : 1,
+                'reply_id' => $request->reply_replyId ? $request->reply_replyId : 0,
                 'blog_id' => $request->idcode,
-                'blog_name' => $request->fullname,
-                'blog_email' => $request->fullemail,
+                'blog_name' => $name,
+                'blog_email' => $email,
                 'blog_ip' => $request->ip(),
                 'blog_comments' => $request->comment
             ];
@@ -411,27 +449,6 @@ class BlogController extends Controller
             $insert = DB::table('fumaco_comments')->insert($add_comment);
             DB::commit();
             return redirect()->back()->with('comment_message', 'Hello! Your comment has been received, please wait for approval.');
-        }catch(Exception $e){
-            DB::rollback();
-        }
-    }
-
-    public function addReply(Request $request){
-        DB::beginTransaction();
-        try{
-            $add_reply = [
-                'blog_type' => '2',
-                'reply_id' => $request->reply_replyId,
-                'blog_id' => $request->reply_blogId,
-                'blog_name' => $request->reply_name,
-                'blog_email' => $request->reply_email,
-                'blog_ip' => $request->ip(),
-                'blog_comments' => $request->reply_comment
-            ];
-
-            $insert = DB::table('fumaco_comments')->insert($add_reply);
-            DB::commit();
-            return redirect()->back()->with('reply_message', 'Hello! Your reply has been received, please wait for approval.');
         }catch(Exception $e){
             DB::rollback();
         }

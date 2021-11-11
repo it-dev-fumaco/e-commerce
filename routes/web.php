@@ -39,7 +39,6 @@ Route::get('/privacy_policy', 'FrontendController@viewPrivacyPage');
 Route::get('/terms_condition', 'FrontendController@viewTermsPage');
 Route::get('/blog/{slug}', 'FrontendController@viewBlogPage');
 Route::post('/add_comment', 'BlogController@addComment');
-Route::post('/add_reply', 'BlogController@addReply');
 Route::get('/contact', 'FrontendController@viewContactPage')->name('contact');
 Route::post('/add_contact', 'FrontendController@addContact');
 Route::get('/products/{slug}', 'FrontendController@viewProducts');
