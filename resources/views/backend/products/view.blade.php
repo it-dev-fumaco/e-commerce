@@ -181,11 +181,11 @@
                            <div class="col-md-4">
                               <div class="form-group mb-0">
                                  <label for="stock-qty">Stock Quantity (Actual Quantity)</label>
-                                 <input type="number" class="form-control" id="stock-qty" name="stock_qty" value="{{ $details->f_qty }}"  {{ ($details->is_manual_stock) ? '' : 'readonly' }} required>
+                                 <input type="number" class="form-control" id="stock-qty" name="stock_qty" value="{{ $details->f_qty }}"  {{ ($details->stock_source) ? 'readonly' : '' }} required>
                               </div>
                               <div class="form-check mt-1">
-                                 <input type="checkbox" class="form-check-input" id="is-manual" name="is_manual" value="1" {{ ($details->is_manual_stock) ? 'checked' : '' }}>
-                                 <label class="form-check-label" for="is-manual">Manual input stocks</label>
+                                 <input type="checkbox" class="form-check-input" id="is-manual" name="is_manual" value="1" {{ ($details->stock_source) ? '' : 'checked' }}>
+                                 <label class="form-check-label" for="is-manual">Manual input stocks (ERP stocks is not integrated)</label>
                               </div>
                            </div>
                            <div class="col-md-4">

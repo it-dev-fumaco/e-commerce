@@ -169,7 +169,7 @@
                     </div>
                     <div class="form-check mt-1">
                       <input type="checkbox" class="form-check-input" id="is-manual" name="is_manual" value="1">
-                      <label class="form-check-label" for="is-manual">Manual input stocks</label>
+                      <label class="form-check-label" for="is-manual">Manual input stocks (ERP stocks is not integrated)</label>
                    </div>
                   </div>
                   <div class="col-md-4">

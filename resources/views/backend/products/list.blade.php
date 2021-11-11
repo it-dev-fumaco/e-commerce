@@ -92,17 +92,6 @@
 								</div>
 							</form>
 							<table class="table table-bordered table-hover">
-								{{-- <col style="width: 5%;">
-								<col style="width: 30%;">
-								<col style="width: 7%;">
-								<col style="width: 7%;">
-								<col style="width: 7%;">
-								<col style="width: 8%;">
-								<col style="width: 12%;">
-								<col style="width: 8%;">
-								<col style="width: 5%;">
-								<col style="width: 5%;">
-								<col style="width: 6%;"> --}}
 								<thead>
 									<tr>
 										<th class="text-center align-middle" rowspan="2">Image</th>
