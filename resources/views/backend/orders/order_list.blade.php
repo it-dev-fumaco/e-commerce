@@ -170,6 +170,15 @@
 																		</p>
 																	</div>
 																	<div class="col-md-4">
+																		@if ($order['shipping_name'] == 'Store Pickup')
+																		<p>
+																			<strong>Pickup At : </strong><br>
+																			{{ ($order['store']) }}<br>
+																			{!! $order['store_address'] !!}<br/>
+																			<strong>Pickup Date : </strong>
+																			{{ \Carbon\Carbon::parse($order['pickup_date'])->format('D, F d, Y') }}
+																		</p>
+																		@else
 																		<p>
 																			<strong>Shipping Address : </strong><br>
 																			<strong>Ship to :</strong> {{ ($order['shipping_business_name']) ? $order['shipping_business_name'] : $order['ship_contact_person'] }}<br>
@@ -177,6 +186,7 @@
 																			{{ $order['email'] }}<br/>
 																			{{ $order['contact'] }}
 																		</p>
+																		@endif
 																	</div>
 																</div>
 																<div class="row">
