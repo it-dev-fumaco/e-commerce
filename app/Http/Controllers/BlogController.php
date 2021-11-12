@@ -492,7 +492,8 @@ class BlogController extends Controller
                 'id' => $sub->id,
                 'email' => $sub->email,
                 'status' => $sub->status,
-                'membership_status' => $membership_status
+                'membership_status' => $membership_status,
+                'subscribe_date' => $sub->subscribed_date
             ];
         }
 
