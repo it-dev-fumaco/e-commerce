@@ -421,21 +421,29 @@ class FrontendController extends Controller
 
         $comments_arr = [];
         foreach($blog_comment as $comment){
+            $replies_arr = [];
             $blog_reply = DB::table('fumaco_comments')->where('blog_id', $blog->id)->where('blog_type', 2)->where('reply_id', $comment->id)->where('blog_status', 1)->get();
-
+            foreach($blog_reply as $r){
+                $replies_arr[] = [
+                    'blog_name' => $r->blog_name,
+                    'blog_date' => Carbon::parse($r->blog_date)->format('M d, Y h:m A'),
+                    'blog_comments' => $r->blog_comments
+                ];
+            }
             $comments_arr[] = [
                 'id' => $comment->id,
                 'email' => $comment->blog_email,
                 'name' => $comment->blog_name,
                 'comment' => $comment->blog_comments,
-                'reply_comment' => $blog_reply
+                'reply_comment' => $replies_arr,
+                'date' => Carbon::parse($comment->blog_date)->format('M d, Y h:m A')
             ];
         }
 
         $id = $blog->id;
-        $date = Carbon::now();
+        // $date = Carbon::now();
 
-        return view('frontend.blogs', compact('blog', 'comments_arr', 'id', 'date', 'comment_count'));
+        return view('frontend.blogs', compact('blog', 'comments_arr', 'id', 'comment_count'));
     }
 
     public function viewContactPage() {

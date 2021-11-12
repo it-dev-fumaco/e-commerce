@@ -224,9 +224,8 @@
                         <img src="https://www.gravatar.com/avatar/{{ $useravatar }}&d=https://secure.gravatar.com/avatar/56445b52ab352ef83cfff87e35d9929a?s=150&d=mm&r=g" width="100%"/>
                     </div>
                     <div class="col-md-10">
-                        <span style="font-family: 'poppins', sans-serif !important;"><b>{{ $comment['name'] }}</b></span><br/>
-                        <span style="font-size: 9pt !important">{{ $date }}</span>
-                        <br>
+                        <p style="font-family: 'poppins', sans-serif !important; line-height: 5px !important"><b>{{ $comment['name'] }}</b></p>
+                        <p style="font-size: 9pt !important; line-height: 2px !important">{{ $comment['date'] }}</p>
                         <span style="font-family: 'poppins', sans-serif !important;"  class="fumacoFont_card_caption">{{ $comment['comment'] }}</span>
                         <br>
                         <br>
@@ -287,10 +286,9 @@
                                 </div>
 
                                 <div class="col-lg-10 mb-3">
-                                    <span style="font-family: 'poppins', sans-serif !important;"><b>{{ $reply->blog_name }}</b></span><br/>
-                                    <span style="font-size: 9pt !important">{{ $reply->blog_date }}</span>
-                                    <br>
-                                    <span style="font-family: 'poppins', sans-serif !important;"  class="fumacoFont_card_caption">{{ $reply->blog_comments }}</span>
+                                    <p style="font-family: 'poppins', sans-serif !important; line-height: 5px !important"><b>{{ $reply['blog_name'] }}</b></p>
+                                    <p style="font-size: 8pt !important; line-height: 2px !important">{{ $reply['blog_date'] }}</p>
+                                    <span style="font-family: 'poppins', sans-serif !important;"  class="fumacoFont_card_caption">{{ $reply['blog_comments'] }}</span>
                                     <br><br>
                                 </div>
                             </div>
