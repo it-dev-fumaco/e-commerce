@@ -16,7 +16,7 @@
     .label {
         display: inline-block;
         padding: .25em .4em;
-        font-size: 75%;
+        font-size: 16px;
         font-weight: 700;
         line-height: 1;
         text-align: center;
@@ -87,15 +87,8 @@
                                     <br/>
                                     <div class="row">
                                         <div class="col-md-12">
-                                            <label for="tags">Tags</label>
-                                            <input type="text" data-role="tagsinput" name="tags" class="form-control" value="{{ $tags }}">
-                                        </div>
-                                    </div>
-                                    <br/>
-                                    <div class="row">
-                                        <div class="col-md-12">
                                             <label for="blog_caption">Caption</label>
-                                            <textarea class="form-control" rows="8" name="blog_caption">{!! $blog->blog_caption !!}</textarea>
+                                            <textarea class="form-control page-content" rows="8" name="blog_caption">{!! $blog->blog_caption !!}</textarea>
                                         </div>
                                     </div>
                                     <br/>
@@ -103,6 +96,13 @@
                                         <div class="col-md-12">
                                             <label for="blogcontent">Content</label>
                                             <textarea class="form-control page-content" rows="10" name="blog_content">{!! $blog->blogcontent !!}</textarea>
+                                        </div>
+                                    </div>
+                                    <br/>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <label for="tags">Tags</label>
+                                            <input type="text" data-role="tagsinput" name="tags" class="form-control" value="{{ $tags }}">
                                         </div>
                                     </div>
                                     <div class="float-right font-italic">
