@@ -143,11 +143,11 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
         </div>
       </div>
       {{-- Scroll --}}
-      <button type="button" class="scroll-control bs-prev prev-btn d-sm-block d-md-none d-lg-block"><i class="fas fa-chevron-left" style="font-size: 24px"></i></button>
-      <button type="button" class="scroll-control bs-next next-btn d-sm-block d-md-none d-lg-block"><i class="fas fa-chevron-right" style="font-size: 24px"></i></button>
+      <button type="button" class="scroll-control bs-prev prev-btn d-sm-block d-md-none d-lg-block"><i class="fas fa-chevron-left scroll-btn"></i></button>
+      <button type="button" class="scroll-control bs-next next-btn d-sm-block d-md-none d-lg-block"><i class="fas fa-chevron-right scroll-btn"></i></button>
 
-      <button type="button" class="scroll-control bs-prev tab-prev-btn prev-btn d-none d-md-block d-lg-none"><i class="fas fa-chevron-left" style="font-size: 24px"></i></button>
-      <button type="button" class="scroll-control bs-next tab-next-btn next-btn d-none d-md-block d-lg-none"><i class="fas fa-chevron-right" style="font-size: 24px"></i></button>
+      <button type="button" class="scroll-control bs-prev tab-prev-btn prev-btn d-none d-md-block d-lg-none"><i class="fas fa-chevron-left scroll-btn"></i></button>
+      <button type="button" class="scroll-control bs-next tab-next-btn next-btn d-none d-md-block d-lg-none"><i class="fas fa-chevron-right scroll-btn"></i></button>
   </div>
   <div class="container marketing" style="position: relative">
     <section class="py-5 text-center container" style="padding-bottom: 0rem !important;">
@@ -211,8 +211,8 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
       </div>
     </div>
     {{-- Scroll --}}
-    <button id="os-prev" type="button" class="scroll-control prev-btn"><i class="fas fa-chevron-left" style="font-size: 24px"></i></button>
-    <button id="os-next" type="button" class="scroll-control next-btn"><i class="fas fa-chevron-right" style="font-size: 24px"></i></button>
+    <button id="os-prev" type="button" class="scroll-control prev-btn"><i class="fas fa-chevron-left scroll-btn"></i></button>
+    <button id="os-next" type="button" class="scroll-control next-btn"><i class="fas fa-chevron-right scroll-btn"></i></button>
   </div>
 
 @endsection
@@ -294,7 +294,7 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
       width: 80px;
       background-color: rgba(0,0,0,0);
       border-radius: 50%;
-      color: rgba(0,0,0,0.4);
+      color: rgba(0,0,0,0.2);
       border: none !important;
       text-transform: none !important;
       text-decoration: none !important;
@@ -320,12 +320,14 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
     }
 
     .prev-btn{
-      left: -30px !important;
+      left: -50px !important;
     }
     .next-btn{
-      right: -30px !important;
+      right: -50px !important;
     }
-
+    .scroll-btn{
+      font-size: 30px;
+    }
     
     @media (max-width: 575.98px) {
       .article-title{

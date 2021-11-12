@@ -279,8 +279,8 @@
 									</div>
 								</div>
 								{{-- Scroll --}}
-								<button type="button" class="scroll-control prev prev-btn"><i class="fas fa-chevron-left" style="font-size: 24px"></i></button>
-								<button type="button" class="scroll-control next next-btn"><i class="fas fa-chevron-right" style="font-size: 24px"></i></button>
+								<button type="button" class="scroll-control prev prev-btn"><i class="fas fa-chevron-left" style="font-size: 30px"></i></button>
+								<button type="button" class="scroll-control next next-btn"><i class="fas fa-chevron-right" style="font-size: 30px"></i></button>
 							</div>
 						@endif
 						</div>
@@ -866,7 +866,7 @@
       width: 80px;
       background-color: rgba(0,0,0,0);
       border-radius: 50%;
-      color: rgba(0,0,0,0.4);
+      color: rgba(0,0,0,0.2);
       border: none !important;
       text-transform: none !important;
       text-decoration: none !important;
@@ -892,10 +892,10 @@
     }
 
     .prev-btn{
-      left: -30px !important;
+      left: -50px !important;
     }
     .next-btn{
-      right: -30px !important;
+      right: -50px !important;
     }
 	@media (max-width: 575.98px) { /* Mobile */
         header{
