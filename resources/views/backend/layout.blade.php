@@ -452,12 +452,6 @@
               </li>
             </ul>
           </li>
-          <li class="nav-item">
-            <a href="/admin/api_setup/google" class="nav-link {{ $activePage == 'seo' ? 'active' : '' }}">
-              <i class="nav-icon fas fa-robot"></i>
-              <p>robots.txt</p>
-            </a>
-          </li>
           @php
               $user_mgt_pages = ['admin_list', 'change_password']
           @endphp
