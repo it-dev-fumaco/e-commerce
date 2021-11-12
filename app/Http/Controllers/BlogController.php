@@ -161,7 +161,14 @@ class BlogController extends Controller
 
     public function editBlogForm($id){
         $blog = DB::table('fumaco_blog')->where('id', $id)->first();
-        return view('backend.blog.edit', compact('blog', 'id'));
+
+        $blog_tags = DB::table('fumaco_blog_tag')->where('blog_id', $id)->first();
+
+        $tags = '';
+        if($blog_tags){
+            $tags = str_replace(array('"','"'), '',trim($blog_tags->tagname, '[]'));
+        }
+        return view('backend.blog.edit', compact('blog', 'id', 'tags'));
     }
 
     public function editBlog(Request $request, $id){
@@ -188,6 +195,19 @@ class BlogController extends Controller
                 'blogtags' => 0,
                 'last_modified_by' => Auth::user()->username
             ];
+
+            $blog_tags = [
+                'blog_id' => $id,
+                'tagname' => json_encode(explode(',',$request->tags))
+            ];
+
+            $tag_check = DB::table('fumaco_blog_tag')->where('blog_id', $id)->first();
+
+            if($tag_check){
+                DB::table('fumaco_blog_tag')->where('blog_id', $id)->update($blog_tags);
+            }else{
+                DB::table('fumaco_blog_tag')->insert($blog_tags);
+            }
 
             DB::table('fumaco_blog')->where('id', $id)->update($blogs_update);
             DB::commit();

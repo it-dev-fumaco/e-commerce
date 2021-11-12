@@ -4,6 +4,29 @@
 ])
 
 @section('content')
+<style>
+    .bootstrap-tagsinput{
+        width: 100%;
+    }
+
+    .label-info{
+        background-color: #007BFF;
+    }
+
+    .label {
+        display: inline-block;
+        padding: .25em .4em;
+        font-size: 75%;
+        font-weight: 700;
+        line-height: 1;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: baseline;
+        border-radius: .25rem;
+        transition: color .15s ease-in-out,background-color .15s ease-in-out,
+        border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+    }
+    </style>
     <div class="wrapper">
         <div class="content-wrapper">
             <section class="content-header">
@@ -59,6 +82,13 @@
                                                 <option value="Solutions" {{ $blog->blogtype == "Solutions" ? 'selected' : '' }}>Solutions</option>
                                                 <option value="Products" {{ $blog->blogtype == "Products" ? 'selected' : '' }}>Products</option>
                                             </select>
+                                        </div>
+                                    </div>
+                                    <br/>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <label for="tags">Tags</label>
+                                            <input type="text" data-role="tagsinput" name="tags" class="form-control" value="{{ $tags }}">
                                         </div>
                                     </div>
                                     <br/>
