@@ -550,6 +550,8 @@ class ComposerStaticInit0f1e38f3feaf9a00f758a56db0972401
     );
 
     public static $classMap = array (
+        'App\\Console\\Commands\\ErpStockReservationCommand' => __DIR__ . '/../..' . '/app/Console/Commands/ErpStockReservationCommand.php',
+        'App\\Console\\Commands\\SyncErpStockCommand' => __DIR__ . '/../..' . '/app/Console/Commands/SyncErpStockCommand.php',
         'App\\Console\\Kernel' => __DIR__ . '/../..' . '/app/Console/Kernel.php',
         'App\\Exceptions\\Handler' => __DIR__ . '/../..' . '/app/Exceptions/Handler.php',
         'App\\Http\\Controllers\\Admin\\Auth\\ForgotPasswordController' => __DIR__ . '/../..' . '/app/Http/Controllers/Admin/Auth/ForgotPasswordController.php',
@@ -572,6 +574,7 @@ class ComposerStaticInit0f1e38f3feaf9a00f758a56db0972401
         'App\\Http\\Controllers\\HomeCRUDController' => __DIR__ . '/../..' . '/app/Http/Controllers/HomeCRUDController.php',
         'App\\Http\\Controllers\\MediaController' => __DIR__ . '/../..' . '/app/Http/Controllers/MediaController.php',
         'App\\Http\\Controllers\\OrderController' => __DIR__ . '/../..' . '/app/Http/Controllers/OrderController.php',
+        'App\\Http\\Controllers\\PagesController' => __DIR__ . '/../..' . '/app/Http/Controllers/PagesController.php',
         'App\\Http\\Controllers\\ProductController' => __DIR__ . '/../..' . '/app/Http/Controllers/ProductController.php',
         'App\\Http\\Controllers\\SettingsController' => __DIR__ . '/../..' . '/app/Http/Controllers/SettingsController.php',
         'App\\Http\\Controllers\\ShippingController' => __DIR__ . '/../..' . '/app/Http/Controllers/ShippingController.php',
@@ -597,6 +600,7 @@ class ComposerStaticInit0f1e38f3feaf9a00f758a56db0972401
         'App\\Providers\\AuthServiceProvider' => __DIR__ . '/../..' . '/app/Providers/AuthServiceProvider.php',
         'App\\Providers\\BroadcastServiceProvider' => __DIR__ . '/../..' . '/app/Providers/BroadcastServiceProvider.php',
         'App\\Providers\\EventServiceProvider' => __DIR__ . '/../..' . '/app/Providers/EventServiceProvider.php',
+        'App\\Providers\\GoogleApiServiceProvider' => __DIR__ . '/../..' . '/app/Providers/GoogleApiServiceProvider.php',
         'App\\Providers\\MailConfigServiceProvider' => __DIR__ . '/../..' . '/app/Providers/MailConfigServiceProvider.php',
         'App\\Providers\\RouteServiceProvider' => __DIR__ . '/../..' . '/app/Providers/RouteServiceProvider.php',
         'Asm89\\Stack\\Cors' => __DIR__ . '/..' . '/asm89/stack-cors/src/Cors.php',

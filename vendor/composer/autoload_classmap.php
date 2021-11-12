@@ -6,6 +6,8 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
+    'App\\Console\\Commands\\ErpStockReservationCommand' => $baseDir . '/app/Console/Commands/ErpStockReservationCommand.php',
+    'App\\Console\\Commands\\SyncErpStockCommand' => $baseDir . '/app/Console/Commands/SyncErpStockCommand.php',
     'App\\Console\\Kernel' => $baseDir . '/app/Console/Kernel.php',
     'App\\Exceptions\\Handler' => $baseDir . '/app/Exceptions/Handler.php',
     'App\\Http\\Controllers\\Admin\\Auth\\ForgotPasswordController' => $baseDir . '/app/Http/Controllers/Admin/Auth/ForgotPasswordController.php',
@@ -28,6 +30,7 @@ return array(
     'App\\Http\\Controllers\\HomeCRUDController' => $baseDir . '/app/Http/Controllers/HomeCRUDController.php',
     'App\\Http\\Controllers\\MediaController' => $baseDir . '/app/Http/Controllers/MediaController.php',
     'App\\Http\\Controllers\\OrderController' => $baseDir . '/app/Http/Controllers/OrderController.php',
+    'App\\Http\\Controllers\\PagesController' => $baseDir . '/app/Http/Controllers/PagesController.php',
     'App\\Http\\Controllers\\ProductController' => $baseDir . '/app/Http/Controllers/ProductController.php',
     'App\\Http\\Controllers\\SettingsController' => $baseDir . '/app/Http/Controllers/SettingsController.php',
     'App\\Http\\Controllers\\ShippingController' => $baseDir . '/app/Http/Controllers/ShippingController.php',
@@ -53,6 +56,7 @@ return array(
     'App\\Providers\\AuthServiceProvider' => $baseDir . '/app/Providers/AuthServiceProvider.php',
     'App\\Providers\\BroadcastServiceProvider' => $baseDir . '/app/Providers/BroadcastServiceProvider.php',
     'App\\Providers\\EventServiceProvider' => $baseDir . '/app/Providers/EventServiceProvider.php',
+    'App\\Providers\\GoogleApiServiceProvider' => $baseDir . '/app/Providers/GoogleApiServiceProvider.php',
     'App\\Providers\\MailConfigServiceProvider' => $baseDir . '/app/Providers/MailConfigServiceProvider.php',
     'App\\Providers\\RouteServiceProvider' => $baseDir . '/app/Providers/RouteServiceProvider.php',
     'Asm89\\Stack\\Cors' => $vendorDir . '/asm89/stack-cors/src/Cors.php',

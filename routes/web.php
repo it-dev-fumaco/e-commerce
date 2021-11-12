@@ -99,7 +99,6 @@ Route::get('/checkout/failed', 'CheckoutController@orderFailed');
 Route::post('/checkout/failed', 'CheckoutController@orderFailed');
 Route::post('/checkout/callback', 'CheckoutController@paymentCallback');
 
-
 Auth::routes();
 
 // CMS Routes
@@ -125,6 +124,9 @@ Route::prefix('admin')->group(function () {
         Route::get('/api_setup/payment', 'SettingsController@paymentApiSetup');
         Route::get('/api_setup/google', 'SettingsController@googleApiSetup');
         Route::post('/api_setup/save', 'SettingsController@saveApiCredentials');
+
+        Route::get('/seo', 'SettingsController@seoSetup');
+        Route::post('/seo', 'SettingsController@seoSetup');
 
         Route::get('/email_setup', 'SettingsController@emailSetup');
         Route::post('/email_setup/save', 'SettingsController@saveEmailSetup');

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use DB;
 use Cache;
+use File;
 
 class SettingsController extends Controller
 {
@@ -184,5 +185,23 @@ class SettingsController extends Controller
 
             return redirect()->back()->with('error_1', 'An error occured. Please try again.');
         }
+    }
+
+    public function seoSetup(Request $request) {
+        if ($request->isMethod('post')) {
+            File::put(public_path('robots.txt'), $request->content);
+
+            return redirect()->back()->with('success', 'robots.txt has been updated.');
+        }
+
+        $path = public_path('robots.txt');
+        $isExists = File::exists($path);
+        if (!$isExists) {
+            File::put(public_path('robots.txt'), '');
+        }
+
+        $content = File::get($path);
+
+        return view('backend.settings.seo', compact('content'));
     }
 }
