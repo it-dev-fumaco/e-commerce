@@ -28,14 +28,12 @@ Route::namespace('Auth')->group(function(){
     //Reset Password Routes
     Route::get('/password/reset/{token}','ResetPasswordController@showResetForm')->name('password.reset');
     Route::post('/password/reset','ResetPasswordController@reset')->name('password.update');
-
 });
 
 Route::get('/signup', 'FrontendController@signupForm');
 Route::post('/user_register', 'FrontendController@userRegistration');
 Route::get('/about', 'FrontendController@viewAboutPage');
 Route::get('/journals', 'FrontendController@viewJournalsPage');
-Route::get('/privacy_policy', 'FrontendController@viewPrivacyPage');
 Route::get('/terms_condition', 'FrontendController@viewTermsPage');
 Route::get('/blog/{slug}', 'FrontendController@viewBlogPage');
 Route::post('/add_comment', 'BlogController@addComment');

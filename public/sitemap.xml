@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <sitemap>
+        <loc>http://localhost/sitemap/page-sitemap.xml</loc>
+    
+        <lastmod>2021-11-12T15:46:36+08:00</lastmod>
+    </sitemap>
+    <sitemap>
+        <loc>http://localhost/sitemap/troffer-luminaires.xml</loc>
+    
+        <lastmod>2021-11-09T13:53:49+08:00</lastmod>
+    </sitemap>
+    <sitemap>
+        <loc>http://localhost/sitemap/protected_luminaires.xml</loc>
+    
+        <lastmod>2021-11-09T13:03:47+08:00</lastmod>
+    </sitemap>
+    <sitemap>
+        <loc>http://localhost/sitemap/circuit_breakers.xml</loc>
+    
+        <lastmod>2021-11-09T13:03:47+08:00</lastmod>
+    </sitemap>
+    <sitemap>
+        <loc>http://localhost/sitemap/test.xml</loc>
+    
+        <lastmod>2021-11-09T13:03:47+08:00</lastmod>
+    </sitemap>
+    <sitemap>
+        <loc>http://localhost/sitemap/blog-sitemap.xml</loc>
+    
+        <lastmod>2021-11-12T15:46:36+08:00</lastmod>
+    </sitemap>
+</sitemapindex>
