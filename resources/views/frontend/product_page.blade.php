@@ -228,11 +228,11 @@
 								</div>
 							</section>
 
-							<div class="album py-5">
+							<div class="album py-5" style="position: relative">
 								<div class="container related-prod">
-									<div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4">
+									<div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4 overflow-auto flex-row flex-nowrap scroll-pane" id="related-products-container" style="min-height: 10px;">
 										@foreach($related_products as $rp)
-										<div class="col animated animatedFadeInUp fadeInUp equal-height-columns">
+										<div class="col animated animatedFadeInUp fadeInUp equal-height-columns mb-3 related-products-card">
 											<div class="card shadow-sm">
 												<div class="equal-column-content" style="border: 1px solid  #d5dbdb; position: relative;">
 													@php
@@ -278,6 +278,9 @@
 										@endforeach
 									</div>
 								</div>
+								{{-- Scroll --}}
+								<button type="button" class="scroll-control prev prev-btn"><i class="fas fa-chevron-left" style="font-size: 24px"></i></button>
+								<button type="button" class="scroll-control next next-btn"><i class="fas fa-chevron-right" style="font-size: 24px"></i></button>
 							</div>
 						@endif
 						</div>
@@ -851,6 +854,49 @@
 		font-family: 'poppins', sans-serif !important;
 		text-decoration: none !important;
 	}
+	#related-products-container{
+      overflow: auto;
+      outline: none;
+      overflow-y: hidden;
+      -ms-overflow-style: scroll;  /* IE 10+ */
+      scrollbar-width: none; /* Firefox */
+    }
+    .scroll-control{
+      height: 80px;
+      width: 80px;
+      background-color: rgba(0,0,0,0);
+      border-radius: 50%;
+      color: rgba(0,0,0,0.4);
+      border: none !important;
+      text-transform: none !important;
+      text-decoration: none !important;
+      transition: .4s
+    }
+
+    .scroll-control:hover{
+      color: #000;
+    }
+
+    .scroll-control:focus {
+      outline: none;
+      box-shadow: none;
+      text-transform: none !important;
+      text-decoration: none !important;
+      border: none !important;
+    }
+
+    .prev-btn, .next-btn{
+      position: absolute;
+      top: 50%;
+      bottom: 50%;
+    }
+
+    .prev-btn{
+      left: -30px !important;
+    }
+    .next-btn{
+      right: -30px !important;
+    }
 	@media (max-width: 575.98px) { /* Mobile */
         header{
           min-height: 50px;
@@ -882,6 +928,12 @@
 		.products-head{
 			padding-left: 20px !important;
 		}
+		.prev-btn{
+        left: 20px !important;
+      }
+      .next-btn{
+        right: 20px !important;
+      }
       }
 
       @media (max-width: 767.98px) { /* Mobile */
@@ -925,6 +977,12 @@
 			font-weight: 300 !important;
 			text-decoration: none !important;
 		}
+		.prev-btn{
+        left: 20px !important;
+      }
+      .next-btn{
+        right: 20px !important;
+      }
       }
 	  @media (max-width: 1199.98px) {/* tablet */
         .prod_desc{
@@ -964,5 +1022,19 @@
       	});
 		});
   	})();
+
+	$('.next').click(function() {
+      event.preventDefault();
+      $('#related-products-container').animate({
+        scrollLeft: "+="+$('.related-products-card').outerWidth()+"px"
+      }, "slow");
+    });
+
+    $('.prev').click(function() {
+      event.preventDefault();
+      $('#related-products-container').animate({
+        scrollLeft: "-="+$('.related-products-card').outerWidth()+"px"
+      }, "slow");
+    });
 </script>
 @endsection

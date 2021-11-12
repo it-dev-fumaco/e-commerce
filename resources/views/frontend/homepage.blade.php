@@ -82,7 +82,7 @@
       </div>
     </div>
   </main>
-  <div class="container marketing">
+  <div class="container marketing" style=" position: relative !important">
     <section class="py-5 text-center container" style="padding-bottom: 0rem !important;">
       <div class="row py-lg-5">
         <div class="col-lg-6 col-md-8 mx-auto">
@@ -92,9 +92,9 @@
     </section>
       <div class="album py-5">
         <div class="container">
-          <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4">
+          <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4 overflow-auto flex-row flex-nowrap scroll-pane" id="best-selling-container" style="min-height: 10px;">
             @foreach($best_selling_arr as $bs)
-              <div class="col animated animatedFadeInUp fadeInUp equal-height-columns">
+              <div class="col-md-3 animated animatedFadeInUp fadeInUp equal-height-columns mb-3 best-selling-card">
                 <div class="card shadow-sm">
                   <div class="equal-column-content">
 
@@ -116,7 +116,7 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
                       </div>
                       <p class="card-text fumacoFont_card_price" style="color:#000000 !important; ">
                         @if ($bs['is_discounted'])
-                        ₱ {{ number_format(str_replace(",","",$bs['new_price']), 2) }}&nbsp;&nbsp;<s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$bs['orig_price']), 2) }}</s>&nbsp;&nbsp;&nbsp;<span class="badge badge-danger" style="vertical-align: middle;background-color: red;">{{ $bs['discount'] }}% OFF</span>
+                        ₱ {{ number_format(str_replace(",","",$bs['new_price']), 2) }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$bs['orig_price']), 2) }}</s>&nbsp;&nbsp;&nbsp;<span class="badge badge-danger" style="vertical-align: middle;background-color: red;">{{ $bs['discount'] }}% OFF</span>
                         @else
                         ₱ {{ number_format(str_replace(",","",$bs['orig_price']), 2) }}
                         @endif
@@ -132,7 +132,6 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
                         <small class="text-muted stylecap" style="color:#c4cad0 !important; font-weight:100 !important;">( 0 Reviews )</small>
                       </div>
                       <br>
-                      {{-- <a href="/product/{{ $bs['item_code'] }}" class="btn btn-outline-primary fumacoFont_card_readmore" role="button" style="width:100% !important;">View</a> --}}
                     </div>
                   </div>
                   <a href="/product/{{ ($bs['slug']) ? $bs['slug'] : $bs['item_code'] }}" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto" role="button" style="width: 90% !important; margin-bottom: 20px">View</a>
@@ -143,8 +142,14 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
           </div>
         </div>
       </div>
+      {{-- Scroll --}}
+      <button type="button" class="scroll-control bs-prev prev-btn d-sm-block d-md-none d-lg-block"><i class="fas fa-chevron-left" style="font-size: 24px"></i></button>
+      <button type="button" class="scroll-control bs-next next-btn d-sm-block d-md-none d-lg-block"><i class="fas fa-chevron-right" style="font-size: 24px"></i></button>
+
+      <button type="button" class="scroll-control bs-prev tab-prev-btn prev-btn d-none d-md-block d-lg-none"><i class="fas fa-chevron-left" style="font-size: 24px"></i></button>
+      <button type="button" class="scroll-control bs-next tab-next-btn next-btn d-none d-md-block d-lg-none"><i class="fas fa-chevron-right" style="font-size: 24px"></i></button>
   </div>
-  <div class="container marketing">
+  <div class="container marketing" style="position: relative">
     <section class="py-5 text-center container" style="padding-bottom: 0rem !important;">
       <div class="row py-lg-5">
         <div class="col-lg-6 col-md-8 mx-auto">
@@ -155,13 +160,13 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
 
     <div class="album py-5">
       <div class="container">
-        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4">
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4 overflow-auto flex-row flex-nowrap scroll-pane" id="on-sale-container" style="min-height: 10px;">
           @foreach($on_sale_arr as $os)
            @php
             $img_os = ($os['os_img']) ? '/storage/item_images/'. $os['item_code'] .'/gallery/preview/'. $os['os_img'] : '/storage/no-photo-available.png';
             $img_os_webp = ($os['os_img']) ? '/storage/item_images/'. $os['item_code'] .'/gallery/preview/'. explode(".", $os['os_img'])[0] . '.webp' : '/storage/no-photo-available.png';
           @endphp
-              <div class="col animated animatedFadeInUp fadeInUp equal-height-columns">
+              <div class="col animated animatedFadeInUp fadeInUp equal-height-columns mb-3 on-sale-card">
                 <div class="card shadow-sm">
                   <div class="equal-column-content">
 
@@ -178,7 +183,7 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
                       </div>
                       <p class="card-text fumacoFont_card_price" style="color:#000000 !important; ">
                         @if ($os['is_discounted'])
-                        ₱ {{ number_format(str_replace(",","",$os['new_price']), 2) }}&nbsp;&nbsp;<s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$os['orig_price']), 2) }}</s>
+                        ₱ {{ number_format(str_replace(",","",$os['new_price']), 2) }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$os['orig_price']), 2) }}</s>
                         @else
                         ₱ {{ number_format(str_replace(",","",$os['orig_price']), 2) }}
                         @endif
@@ -195,7 +200,6 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
                         <small class="text-muted stylecap" style="color:#c4cad0 !important; font-weight:100 !important;">( 0 Reviews )</small>
                       </div>
                       <br>
-                      {{-- <a href="/product/{{ $os['item_code'] }}" class="btn btn-outline-primary fumacoFont_card_readmore" role="button" style="width:100% !important;">View</a> --}}
                     </div>
                   </div>
                   <a href="/product/{{ ($os['slug']) ? $os['slug'] : $os['item_code'] }}" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto" role="button" style="width: 90% !important; margin-bottom: 20px">View</a>
@@ -206,6 +210,9 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
         </div>
       </div>
     </div>
+    {{-- Scroll --}}
+    <button id="os-prev" type="button" class="scroll-control prev-btn"><i class="fas fa-chevron-left" style="font-size: 24px"></i></button>
+    <button id="os-next" type="button" class="scroll-control next-btn"><i class="fas fa-chevron-right" style="font-size: 24px"></i></button>
   </div>
 
 @endsection
@@ -272,6 +279,54 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
       transform: scale(0.95); 
     }
 
+    .scoll-pane::-webkit-scrollbar { 
+      display: none;  /* Safari and Chrome */
+    }
+    #best-selling-container, #on-sale-container{
+      overflow: auto;
+      outline: none;
+      overflow-y: hidden;
+      -ms-overflow-style: scroll;  /* IE 10+ */
+      scrollbar-width: none; /* Firefox */
+    }
+    .scroll-control{
+      height: 80px;
+      width: 80px;
+      background-color: rgba(0,0,0,0);
+      border-radius: 50%;
+      color: rgba(0,0,0,0.4);
+      border: none !important;
+      text-transform: none !important;
+      text-decoration: none !important;
+      transition: .4s
+    }
+
+    .scroll-control:hover{
+      color: #000;
+    }
+
+    .scroll-control:focus {
+      outline: none;
+      box-shadow: none;
+      text-transform: none !important;
+      text-decoration: none !important;
+      border: none !important;
+    }
+
+    .prev-btn, .next-btn{
+      position: absolute;
+      top: 50%;
+      bottom: 50%;
+    }
+
+    .prev-btn{
+      left: -30px !important;
+    }
+    .next-btn{
+      right: -30px !important;
+    }
+
+    
     @media (max-width: 575.98px) {
       .article-title{
         min-height: auto !important
@@ -279,7 +334,12 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
       .prod_desc{
         font-size: 12px !important;
       }
-
+      .prev-btn{
+        left: 20px !important;
+      }
+      .next-btn{
+        right: 20px !important;
+      }
     }
     @media (max-width: 767.98px) {
       .article-title{
@@ -288,11 +348,52 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
       .prod_desc{
         font-size: 12px !important;
       }
+      .prev-btn{
+        left: 20px !important;
+      }
+      .next-btn{
+        right: 20px !important;
+      }
     }
-    @media (max-width: 1199.98px) {/* tablet */
+    @media (max-width: 1199.98px) {
       .prod_desc{
         font-size: 16px !important;
       }
+      
     }
   </style>
+@endsection
+
+@section('script')
+  <script>
+    // Best Selling
+    $('.bs-next').click(function() {
+      event.preventDefault();
+      $('#best-selling-container').animate({
+        scrollLeft: "+="+$('.best-selling-card').outerWidth()+"px"
+      }, "slow");
+    });
+
+    $('.bs-prev').click(function() {
+      event.preventDefault();
+      $('#best-selling-container').animate({
+        scrollLeft: "-="+$('.best-selling-card').outerWidth()+"px"
+      }, "slow");
+    });
+
+    // On Sale
+    $('#os-next').click(function() {
+      event.preventDefault();
+      $('#on-sale-container').animate({
+        scrollLeft: "+="+$('.on-sale-card').outerWidth()+"px"
+      }, "slow");
+    });
+
+    $('#os-prev').click(function() {
+      event.preventDefault();
+      $('#on-sale-container').animate({
+        scrollLeft: "-="+$('.on-sale-card').outerWidth()+"px"
+      }, "slow");
+    });
+  </script>
 @endsection

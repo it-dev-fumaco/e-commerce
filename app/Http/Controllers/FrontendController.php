@@ -176,8 +176,8 @@ class FrontendController extends Controller
 
         $blogs = DB::table('fumaco_blog')->where('blog_featured', 1)
             ->where('blog_enable', 1)->take(3)->get();
-        $best_selling = DB::table('fumaco_items')->where('f_status', 1)->where('f_featured', 1)->limit(4)->get();
-        $on_sale = DB::table('fumaco_items')->where('f_status', 1)->where('f_onsale', 1)->limit(4)->get();
+        $best_selling = DB::table('fumaco_items')->where('f_status', 1)->where('f_featured', 1)->get();
+        $on_sale = DB::table('fumaco_items')->where('f_status', 1)->where('f_onsale', 1)->get();
         $best_selling_arr = [];
         $on_sale_arr = [];
 
