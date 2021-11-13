@@ -66,9 +66,9 @@
           <div class="col-lg-4 pr-md-1 animated animatedFadeInUp fadeInUp equal-height-columns" style="text-align: left !important; position: relative !important">
             <div class="equal-column-content">
               <picture>
-                <source srcset="{!!  asset('/assets/site-img/'. explode(".", $b->{'blogprimayimage-home'})[0] .'.webp') !!}" type="image/webp" class="img-responsive" style="width: 100% !important;">
-                <source srcset="{!!  asset('/assets/site-img/'. $b->{'blogprimayimage-home'}) !!}" type="image/jpeg" class="img-responsive" style="width: 100% !important;">
-                <div class="hover-container"><img src="{!!  asset('/assets/site-img/'. $b->{'blogprimayimage-home'}) !!}" alt="{{ Str::slug(explode(".", $b->{'blogprimayimage-home'})[0], '-') }}" class="img-responsive hover" style="width: 100% !important;"></div>
+                <source srcset="{!!  asset('/storage/journals/'. explode(".", $b->{'blogprimayimage-home'})[0] .'.webp') !!}" type="image/webp" class="img-responsive card-img-top" style="width: 100% !important;">
+                <source srcset="{!!  asset('/storage/journals/'. $b->{'blogprimayimage-home'}) !!}" type="image/jpeg" class="img-responsive card-img-top" style="width: 100% !important;">
+                <div class="hover-container"><img src="{!!  asset('/storage/journals/'. $b->{'blogprimayimage-home'}) !!}" alt="{{ Str::slug(explode(".", $b->{'blogprimayimage-home'})[0], '-') }}" class="img-responsive card-img-top hover" style="width: 100% !important;"></div>
               </picture>
               <br><br>
               <h5 class="font-style-thin fumacoFont_card_title article-title" style="font-family: 'poppins', sans-serif !important; color:#ffffff !important; line-height: 26px !important; font-size: 18px !important;">{{ $b->blogtitle }}</h5>
