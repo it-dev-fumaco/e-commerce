@@ -209,8 +209,11 @@ Route::prefix('admin')->group(function () {
         Route::post('/user_management/change_user_password/', 'UserManagementController@userChangePassword');
 
         Route::get('/pages/list', 'PagesController@viewPages');
+        Route::get('/pages/about', 'PagesController@viewAbout');
         Route::get('/pages/edit/{page_id}', 'PagesController@editForm');
         Route::post('/edit/{id}', 'PagesController@editPage');
+        Route::post('/edit/page/about_us', 'PagesController@editAbout');
+        Route::post('/edit/page/about_us/image', 'PagesController@aboutBackground');
 
         // SHIPPING SERVICES ROUTES CMS
         Route::get('/shipping/list', 'ShippingController@viewList');
