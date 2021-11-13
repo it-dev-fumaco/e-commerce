@@ -167,7 +167,17 @@ class FrontendController extends Controller
                     ];
                 }
             }
+            
+            if($request->s != ''){
+                $insert = [
+                    'search_term' => $request->s,
+                    'ip' => $request->ip(),
+                    'results_count' => $results->total()
+                ];
 
+                DB::table('fumaco_search_terms')->insert($insert);
+            }
+            
             return view('frontend.search_results', compact('results', 'blogs', 'products'));
         }
 
