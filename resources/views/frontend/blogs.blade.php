@@ -32,8 +32,19 @@
         <div class="row">
             <div class="col-lg-12 animated animatedFadeInUp fadeInUp">
                 <center>
-                    <img src="{{ asset('/storage/journals/'.$blog->blogprimaryimage) }}" alt="{{ Str::slug(explode(".", $blog->blogprimaryimage)[0], '-') }}"
-                        class="img-responsive" style="width: 100% !important;">
+                    
+                  @php
+                  $image = ($blog->blogprimaryimage) ? '/storage/journals/'.$blog->blogprimaryimage : '/storage/no-photo-available.png';
+                  $image_webp = ($blog->blogprimaryimage) ? '/storage/journals/'.explode(".", $blog->blogprimaryimage)[0] .'.webp' : '/storage/no-photo-available.png';
+                @endphp
+            
+                <picture>
+                  <source srcset="{{ asset($image_webp) }}" type="image/webp" class="img-responsive card-img-top" style="width: 100% !important;">
+                  <source srcset="{{ asset($image) }}" type="image/jpeg" class="img-responsive card-img-top" style="width: 100% !important;">
+                  <img src="{{ asset($image) }}" alt="{{ Str::slug(explode(".", $blog->blogprimaryimage)[0], '-') }}" class="img-responsive card-img-top" style="width: 100% !important;">
+                 </picture>
+                 
+
                 </center>
                 <br>
             </div>
