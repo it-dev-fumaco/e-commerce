@@ -421,6 +421,13 @@ class FrontendController extends Controller
 
         $blog_comment = DB::table('fumaco_comments')->where('blog_id', $blog->id)->where('blog_type', 1)->where('blog_status', 1)->get();
 
+        $blog_tags = DB::table('fumaco_blog_tag')->where('blog_id', $blog->id)->first();
+        
+        $tags = '';
+        if($blog_tags){
+            $tags = explode(',', str_replace(array('"','"'), '',trim($blog_tags->tagname, '[]')));
+        }
+
         $comment_count = DB::table('fumaco_comments')->where('blog_id', $blog->id)->where('blog_status', 1)->get();
 
         $comments_arr = [];
@@ -445,9 +452,8 @@ class FrontendController extends Controller
         }
 
         $id = $blog->id;
-        // $date = Carbon::now();
 
-        return view('frontend.blogs', compact('blog', 'comments_arr', 'id', 'comment_count'));
+        return view('frontend.blogs', compact('blog', 'comments_arr', 'id', 'comment_count', 'blog_tags', 'tags'));
     }
 
     public function viewContactPage() {

@@ -114,7 +114,6 @@
 											 </picture>
 
                         <div class="card-body align-items-stretch">
-                            {{-- <p style="color:#000 !important; font-size: 10pt !important; font-weight: 300;" class="abt_standard">{{ $blogs['publish_date'] }} | {{ $blogs['comment_count'] }} Comment(s)</p> --}}
                             <a href="blog/{{ $blogs['slug'] ? $blogs['slug'] : $blogs['id'] }}" style="text-decoration: none !important;">
                                 <p style="color:#373b3e !important;" class="abt_standard fumacoFont_card_title">{{ $blogs['title'] }}</p></a>
 
@@ -124,7 +123,6 @@
 
                           <a href="/blog/{{ $blogs['slug'] ? $blogs['slug'] : $blogs['id'] }}" class="text-concat mx-auto read-more">Read More</a>
                         </div>
-                        {{-- <p style="color:#000 !important; font-size: 10pt !important; font-weight: 300;" class="abt_standard">&nbsp;&nbsp;&nbsp;{{ $blogs['type'] }}</p> --}}
                       </div>
                 </div>
             @endforeach

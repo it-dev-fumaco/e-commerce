@@ -1,5 +1,5 @@
 @extends('frontend.layout', [
-'namePage' => 'Blog Content',
+'namePage' => $blog->blogtitle,
 'activePage' => 'blog'
 ])
 
@@ -28,7 +28,7 @@
     </div>
 </main>
 <main style="padding-left:7%; padding-right:7%;">
-    <div class="container-fluid">
+    <div class="container">
         <div class="row">
             <div class="col-lg-12 animated animatedFadeInUp fadeInUp">
                 <center>
@@ -69,23 +69,11 @@
             </div>
         </div>
 
-        {{-- <div class="row">
-            <div class="col-lg-12 animated animatedFadeInUp fadeInUp">
-                <p style="font-family: 'poppins', sans-serif !important;"  class="font1color">&nbsp;</p>
-            </div>
-        </div> --}}
-
         <div class="row">
             <div class="col-lg-12 animated animatedFadeInUp fadeInUp">
                 <p style="font-family: 'poppins', sans-serif !important;">{{ $blog->blog_caption }}</p>
             </div>
         </div>
-
-        {{-- <div class="row">
-            <div class="col-lg-12">
-                <p style="font-family: 'poppins', sans-serif !important;"  class="font1color">&nbsp;</p>
-            </div>
-        </div> --}}
 
         <div class="row">
             <div class="col-lg-12 animated animatedFadeInUp fadeInUp">
@@ -95,7 +83,14 @@
 
         <div class="row">
             <div class="col-lg-6 animated animatedFadeInUp fadeInUp">
-                <p style="font-family: 'poppins', sans-serif !important;">Tags : <button style=" color: #0F6DB7 !important" class="btn btn-outline-primary1 btn-sm">Products</button>&nbsp;<button style=" color: #0F6DB7 !important" class="btn btn-outline-primary1 btn-sm">Applications</button></p>
+                <p style="font-family: 'poppins', sans-serif !important;">
+                    Tags :
+                    @if ($blog_tags)
+                        @foreach ($tags as $tag)
+                            <button style=" color: #0F6DB7 !important; font-weight: 300 !important" class="btn btn-outline-primary1 btn-sm">{{ $tag }}</button>
+                        @endforeach
+                    @endif
+                </p>
 
                 <div id="fb-root"></div>
                 <script>
@@ -177,7 +172,7 @@
 
                         <div class="row">
                             <div class="col">
-                                <textarea class="form-control caption_1 animated animatedFadeInUp fadeInUp" rows="5" id="comment" name="comment" required></textarea>
+                                <textarea class="form-control caption_1 animated animatedFadeInUp fadeInUp" rows="5" id="comment" name="comment" placeholder="Message *" required></textarea>
                             </div>
                         </div>
 
@@ -226,7 +221,7 @@
 
             <div class="col-lg-12 animated animatedFadeInUp fadeInUp">
               <!-- comments -->
-                @foreach($comments_arr as $key => $comment)
+                @forelse($comments_arr as $key => $comment)
                 <div class="row">
                     @php
                         $useravatar = md5( strtolower( trim( $comment['email'] ) ) );
@@ -313,7 +308,13 @@
                 <hr>
                 <br>
                 <!-- row of comments -->
-                @endforeach
+                @empty
+                    <div class="row">
+                        <div class="col-md-12 mx-auto">
+                            <p>No Comments.</p>
+                        </div>
+                    </div>
+                @endforelse
             </div>
         </div>
     </div>
