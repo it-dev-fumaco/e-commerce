@@ -524,11 +524,20 @@
             <div class="col-md-12" style="text-align: left !important;">
               <h6 class="footer1st" style="color:#ffffff !important;">WE ACCEPT</h6>
               <div class="row" style="padding-left:1% !important">
-                <div class="d-inline m-2 payment-icons" style="position: relative !important"><img src="{{ asset('/assets/payment_method/mastercard2.webp') }}" alt="Master Card" style="max-height: 100%;max-width: 90%;width: auto;height: auto;position: absolute;top: 0;bottom: 0;left: 0;right: 0;margin: auto;"></div>
-                <div class="d-inline m-2 payment-icons" style="position: relative !important"><img src="{{ asset('/assets/payment_method/visa.webp') }}" alt="Visa" style="max-height: 100%;max-width: 90%;width: auto;height: auto;position: absolute;top: 0;bottom: 0;left: 0;right: 0;margin: auto;"></div>
-                <div class="d-inline m-2 payment-icons" style="position: relative !important"><img src="{{ asset('/assets/payment_method/gcash2.webp') }}" alt="GCash" style="max-height: 100%;max-width: 90%;width: auto;height: auto;position: absolute;top: 0;bottom: 0;left: 0;right: 0;margin: auto;"></div>
-                <div class="d-inline m-2 payment-icons" style="position: relative !important"><img src="{{ asset('/assets/payment_method/grabpay2.webp') }}" alt="GrabPay" style="max-height: 100%;max-width: 90%;width: auto;height: auto;position: absolute;top: 0;bottom: 0;left: 0;right: 0;margin: auto;"></div>
-                {{-- <div class="d-inline mx-auto payment-icons"><img src="{{ asset('/storage/payment_method/PayPal.svg') }}" alt="PayPal" style="width: 100%; height: 100% !important"></div> --}}
+                  @php
+                    $payment_method = array('mastercard2', 'visa', 'gcash2', 'grabpay2');
+                  @endphp
+                  @foreach($payment_method as $img)
+                    @php
+                      $image = '/storage/payment_method/'.$img.'.png';
+                      $image_webp = '/storage/payment_method/'.$img.'.webp';
+                    @endphp
+                    <div class="d-inline m-2 payment-icons" style="position: relative !important"><picture>
+                      <source srcset="{{ asset($image_webp) }}" type="image/webp" style="object-fit: cover;">
+                      <source srcset="{{ asset($image) }}" type="image/jpeg" style="object-fit: cover;">
+                      <img src="{{ asset($image) }}" style="object-fit: cover; max-height: 100%;max-width: 90%;width: auto;height: auto;position: absolute;top: 0;bottom: 0;left: 0;right: 0;margin: auto;">
+                    </picture></div>
+                  @endforeach
               </div>
             </div>
           </div>
