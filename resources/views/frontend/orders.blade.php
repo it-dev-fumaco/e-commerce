@@ -21,26 +21,20 @@
 
 	<main style="background-color:#ffffff; min-height: 500px;" class="products-head">
 		<div class="container-fluid">
+			
 			<div class="row">
-				<div class="col-lg-8 mx-auto">
-					<br><br>
+				<div class="col-md-8 mx-auto">
+					<br>
 					<center><h3>Order History</h3></center>
-					<br><br>
-				</div>
-				<div class="col-lg-8 mx-auto">
+					<br><br/>
 					<table class="table">
-						{{-- <col style="width: 20%;">
-						<col style="width: 15%;">
-						<col style="width: 15%;">
-						<col style="width: 35%;">
-						<col style="width: 15%;"> --}}
 						<thead>
 							<tr>
-								<th class="text-center d-none d-sm-table-cell">Order Number</th>
+								<th class="text-center d-none d-sm-table-cell">Order No.</th>
 								<th class="text-center">Date</th>
 								<th class="text-center">Details</th>
 								<th class="text-center d-none d-sm-table-cell">Shipping</th>
-								<th class="text-center d-none d-sm-table-cell">Est. Delivery Date</th>
+								<th class="text-center d-none d-sm-table-cell">Estimated Delivery Date</th>
 								<th class="text-center d-none d-sm-table-cell">Status</th>
 							</tr>
 						</thead>
@@ -184,6 +178,7 @@
 
 @section('style')
 <style>
+
 	.products-head {
 		margin-top: 10px !important;
 		padding-left: 40px !important;
