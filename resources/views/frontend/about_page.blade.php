@@ -282,7 +282,7 @@
         left:0;
         right:0;
         z-index:-1; /* needed to keep in the background */
-        background: url('{{ asset('/storage/about/'.$about_data->background_1) }}') center center;
+        background: url('{{ asset('/storage/about/'.$bg1[0].'.webp') }}') center center;
         -webkit-background-size: cover;
         -moz-background-size: cover;
         -o-background-size: cover;
@@ -296,7 +296,7 @@
         left:0;
         right:0;
         z-index:-1; /* needed to keep in the background */
-        background: url('{{ asset('/storage/about/'.$about_data->background_1) }}') center center;
+        background: url('{{ asset('/storage/about/'.$bg1[0].'.webp') }}') center center;
         -webkit-background-size: cover;
         -moz-background-size: cover;
         -o-background-size: cover;
@@ -310,14 +310,14 @@
         left:0;
         right:0;
         z-index:-1; /* needed to keep in the background */
-        background: url('{{ asset('/storage/about/'.$about_data->background_2) }}')   center center;
+        background: url('{{ asset('/storage/about/'.$bg2[0].'.webp') }}')   center center;
         -webkit-background-size: cover;
         -moz-background-size: cover;
         -o-background-size: cover;
         background-size: 100% 100%;
     }
     .bodybg2 {
-        background: url('{{ asset('/storage/about/'.$about_data->background_2) }}') no-repeat center center fixed;
+        background: url('{{ asset('/storage/about/'.$bg2[0].'.webp') }}') no-repeat center center fixed;
         -webkit-background-size: cover;
         -moz-background-size: cover;
         -o-background-size: cover;
@@ -328,7 +328,7 @@
         background: linear-gradient(90deg, rgba(0,13,43,1) 0%, rgba(5,67,210,1) 50%, rgba(0,13,43,1) 100%);
     }
     .bodybg4 {
-        background: url('{{ asset('/storage/about/'.$about_data->background_3) }}') no-repeat center center fixed;
+        background: url('{{ asset('/storage/about/'.$bg3[0].'.webp') }}') no-repeat center center fixed;
         -webkit-background-size: cover;
         -moz-background-size: cover;
         -o-background-size: cover;

@@ -369,7 +369,11 @@ class FrontendController extends Controller
         $partners = DB::table('fumaco_about_partners')->where('xstatus', 1)
             ->orderBy('partners_sort', 'asc')->get();
 
-        return view('frontend.about_page', compact('about_data', 'partners'));
+        $bg1 = explode('.',$about_data->background_1);
+        $bg2 = explode('.',$about_data->background_2);
+        $bg3 = explode('.',$about_data->background_3);
+
+        return view('frontend.about_page', compact('about_data', 'partners', 'bg1', 'bg2', 'bg3'));
     }
 
     public function viewJournalsPage(Request $request) {
