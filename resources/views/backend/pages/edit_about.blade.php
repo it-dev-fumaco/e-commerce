@@ -224,7 +224,7 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="card card-primary">
-                                <form action="" method="POST" enctype="multipart/form-data">
+                                <form action="/admin/edit/page/about_us/sponsor/add" method="POST" enctype="multipart/form-data">
                                     @csrf
                                     <div class="card-body">
                                         <h4>Add a sponsor</h4>
@@ -242,7 +242,7 @@
                                         </div>
                                         <div class="row">
                                             <div class="col-md-12">
-                                                <label>Sponsor Image</label>
+                                                <label>Sponsor Image *</label>
                                                 <div class="custom-file mb-3">
                                                     <input type="file" class="custom-file-input" id="customFile" name="sponsor_img" required>
                                                     <label class="custom-file-label" for="customFile">Choose File</label>
@@ -272,13 +272,10 @@
                                         @forelse ($sponsors as $sponsor)
                                             <tr>
                                                 <td style="width: 10%">{{ $sponsor->name_img }}</td>
-                                                <td style="width: 20%">{{ $sponsor->image }}</td>
-                                                <td style="width: 40%">{{ $sponsor->url }}</td>
-                                                <td style="width: 20%">
-                                                    @php
-                                                        $count = count($sponsors)
-                                                    @endphp
-                                                    <form action="" method="post">
+                                                <td style="width: 7%"><img src="{{ asset('/storage/sponsors/'.$sponsor->image) }}" alt="{{ $sponsor->name_img }}" width='100%'></td>
+                                                <td style="width: 40%"><a href="{{ $sponsor->url }}" target="_blank">{{ $sponsor->url }}</a></td>
+                                                <td style="width: 30%">
+                                                    <form action="/admin/edit/page/about_us/sponsor/sort/{{ $sponsor->id }}" method="post">
                                                         <div class="row">
                                                             <div class="col-md-12">
                                                                 <select class="form-control formslabelfnt" id="row_select" aria-label="Default select example" name="item_row" required>
