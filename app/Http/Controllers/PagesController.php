@@ -117,7 +117,6 @@ class PagesController extends Controller
     public function aboutBackground(Request $request){
         DB::beginTransaction();
         try {
-            // return $request->all();
             $image_error = '';
 
 			$rules = array(
