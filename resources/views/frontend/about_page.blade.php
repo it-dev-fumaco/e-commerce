@@ -215,7 +215,7 @@
         </div>
         <div class="row">
             <div class="col-lg-12">
-                <div class="row animated animatedFadeInUp fadeInUp">
+                <div class="row animated animatedFadeInUp fadeInUp display-flex">
                     @foreach ($partners as $partner)
                     <div class="col-md-2" style="padding-bottom: 20px;">
                         <img src="{{ asset('/storage/sponsors/'.$partner->image) }}" alt="{{ Str::slug(explode(".", $partner->image)[0], '-') }}" class="img-thumbnail">
@@ -428,6 +428,13 @@
     .abt_standard{
         font-family: 'poppins', sans-serif !important;
         text-decoration: none !important;
+    }
+    .row.display-flex {
+    display: flex;
+    flex-wrap: wrap;
+    }
+    .img-thumbnail {
+    height: 100%;
     }
 </style>
 @endsection

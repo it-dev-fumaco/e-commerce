@@ -63,7 +63,9 @@ class PagesController extends Controller
 
         $sponsors = DB::table('fumaco_about_partners')->orderBy('partners_sort', 'asc')->paginate(10);
 
-        return view('backend.pages.edit_about', compact('about', 'sponsors'));
+        $sponsors_count = DB::table('fumaco_about_partners')->count();
+
+        return view('backend.pages.edit_about', compact('about', 'sponsors', 'sponsors_count'));
     }
 
     public function editAbout(Request $request){
@@ -206,6 +208,82 @@ class PagesController extends Controller
 
             DB::commit();
             return redirect()->back()->with('success', 'About us updated.');
+        } catch (Exception $e) {
+            DB::rollback();
+            return redirect()->back()->with('error', 'An error occured. Please try again.');
+        }
+    }
+
+    public function addSponsor(Request $request){
+        DB::beginTransaction();
+        try {
+            $image_error = '';
+
+			$rules = array(
+				'uploadFile' => 'image|max:500000'
+			);
+
+            $validation = Validator::make($request->all(), $rules);
+
+            $allowed_extensions = array('jpg', 'png', 'jpeg', 'gif');
+            $extension_error = "Sorry, only JPG, JPEG, PNG and GIF files are allowed.";
+
+            if ($validation->fails()){
+				$image_error = "Sorry, your file is too large.";
+				return redirect()->back()->with('image_error', $image_error);
+			}
+
+            $destinationPath = storage_path('/app/public/sponsors/');
+
+            $sponsor_img = $request->file('sponsor_img');
+
+            $name_first = pathinfo($sponsor_img->getClientOriginalName(), PATHINFO_FILENAME);
+            $ext_first = pathinfo($sponsor_img->getClientOriginalName(), PATHINFO_EXTENSION);
+
+            $name_first = Str::slug($name_first, '-');
+
+            $sponsor_image_name = $name_first.".".$ext_first;
+
+            if(!in_array($ext_first, $allowed_extensions)){
+                return redirect()->back()->with('image_error', $extension_error);
+            }
+
+            $webp_first = Webp::make($request->file('sponsor_img'));
+
+            if ($webp_first->save(storage_path('/app/public/sponsors/'.$name_first.'.webp'))) {
+                $sponsor_img->move($destinationPath, $sponsor_image_name);
+            }
+
+            $insert = [
+                'name_img' => $request->sponsor_name,
+                'url' => $request->sponsor_url,
+                'image' => $name_first.".webp",
+                'xstatus' => 1
+            ];
+
+            DB::table('fumaco_about_partners')->insert($insert);
+
+            DB::commit();
+            return redirect()->back()->with('success', 'Sponsor Added.');
+        } catch (Exception $e) {
+            DB::rollback();
+            return redirect()->back()->with('error', 'An error occured. Please try again.');
+        }
+    }
+
+    public function deleteSponsor($id){
+        DB::beginTransaction();
+        try {
+            $delete_img = DB::table('fumaco_about_partners')->where('id', $id)->first();
+            $image_name = explode('.', $delete_img->image);
+
+            unlink(storage_path('app/public/sponsors/'.$delete_img->image));
+            unlink(storage_path('app/public/sponsors/'.$image_name[0].'.webp'));
+
+            DB::table('fumaco_about_partners')->where('id', $id)->delete();
+
+            DB::commit();
+            return redirect()->back()->with('success', 'Sponsor Removed.');
         } catch (Exception $e) {
             DB::rollback();
             return redirect()->back()->with('error', 'An error occured. Please try again.');
