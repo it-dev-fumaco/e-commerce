@@ -277,26 +277,23 @@
                                                 <td style="width: 30%">
                                                     <form action="/admin/edit/page/about_us/sponsor/sort/{{ $sponsor->id }}" method="post">
                                                         <div class="row">
-                                                            <div class="col-md-12">
+                                                            @csrf
+                                                            <div class="col-md-6">
                                                                 <select class="form-control formslabelfnt" id="row_select" aria-label="Default select example" name="item_row" required>
-                                                                    <option selected disabled value="">Select Order No.</option>
-                                                                    @for ($i = 0; $i < $count; $i++)
+                                                                    <option selected disabled value="">Order No.</option>
+                                                                    @for ($i = 0; $i < $sponsors_count; $i++)
                                                                         @php
                                                                             $option = $i + 1;
                                                                         @endphp
-                                                                        <option value="{{ $option }}" {{ ($sponsor->partners_sort == $option) ? 'disabled' : '' }}>{{ $option }}</option>
+                                                                        <option value="{{ $option }}" {{ ($sponsor->partners_sort == $option) ? 'selected disabled' : '' }}>{{ $option }}</option>
                                                                     @endfor
                                                                 </select>
                                                             </div>
-                                                        </div>
-                                                        <br/>
-                                                        <div class="row">
-                                                            <div class="col-md-6">
-                                                                <input type="text" name="item_code" id="item_code" value="{{ $sponsor->id }}" required hidden/>
-                                                                <button type="submit" class="btn btn-primary" style="width: 100%">Apply</button>
+                                                            <div class="col-md-3">
+                                                                <button type="submit" class="btn btn-sm btn-primary" style="width: 100%">Apply</button>
                                                             </div>
-                                                            <div class="col-md-6">
-                                                                <a href="#" class="btn btn-warning" style="width: 100%" role="button" data-toggle="modal" data-target="#resetModal{{ $sponsor->id }}">Reset</a>
+                                                            <div class="col-md-3">
+                                                                <a href="#" class="btn btn-sm btn-secondary" style="width: 100%" role="button" data-toggle="modal" data-target="#resetModal{{ $sponsor->id }}">Reset</a>
                                                                 <div class="modal fade" id="resetModal{{ $sponsor->id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                                                     <div class="modal-dialog" role="document">
                                                                         <div class="modal-content">
@@ -311,7 +308,7 @@
                                                                             </div>
                                                                             <div class="modal-footer">
                                                                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                                                                <a href="/admin/edit/page/about_us/sort/{{ $sponsor->id }}" class="btn btn-danger" role="button">Reset</a>
+                                                                                <a href="/admin/edit/page/about_us/sponsor/reset/{{ $sponsor->id }}" class="btn btn-danger" role="button">Reset</a>
                                                                             </div>
                                                                         </div>
                                                                     </div>
@@ -320,8 +317,8 @@
                                                         </div>
                                                     </form>
                                                 </td>
-                                                <td style="width: 10%">
-                                                    <a href="#" class="btn btn-danger" style="width: 100%" role="button" data-toggle="modal" data-target="#deleteModal{{ $sponsor->id }}">Delete</a>
+                                                <td style="width: 5%">
+                                                    <center><a href="#" class="btn btn-sm btn-danger" role="button" data-toggle="modal" data-target="#deleteModal{{ $sponsor->id }}"><i class="fas fa-trash-alt"></i></a></center>
 
                                                     <div class="modal fade" id="deleteModal{{ $sponsor->id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                                         <div class="modal-dialog" role="document">
@@ -337,7 +334,7 @@
                                                                 </div>
                                                                 <div class="modal-footer">
                                                                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                                                    <a href="/admin/edit/page/about_us/delete/{{ $sponsor->id }}" class="btn btn-danger" role="button">Reset</a>
+                                                                    <a href="/admin/edit/page/about_us/sponsor/delete/{{ $sponsor->id }}" class="btn btn-danger" role="button">Delete</a>
                                                                 </div>
                                                             </div>
                                                         </div>

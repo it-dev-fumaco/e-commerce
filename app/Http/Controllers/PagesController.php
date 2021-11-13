@@ -290,4 +290,28 @@ class PagesController extends Controller
             return redirect()->back()->with('error', 'An error occured. Please try again.');
         }
     }
+
+    public function updateSort(Request $request, $id){
+        DB::beginTransaction();
+        try {
+            DB::table('fumaco_about_partners')->where('id', $id)->update(['partners_sort' => $request->item_row, 'last_modified_by' => Auth::user()->username]);
+            DB::commit();
+            return redirect()->back()->with('success', 'Sort Updated.');
+        } catch (Exception $e) {
+            DB::rollback();
+            return redirect()->back()->with('error', 'An error occured. Please try again.');
+        }
+    }
+
+    public function resetSort($id){
+        DB::beginTransaction();
+        try {
+            DB::table('fumaco_about_partners')->where('id', $id)->update(['partners_sort' => 'P', 'last_modified_by' => Auth::user()->username]);
+            DB::commit();
+            return redirect()->back()->with('success', 'Sort Updated.');
+        } catch (Exception $e) {
+            DB::rollback();
+            return redirect()->back()->with('error', 'An error occured. Please try again.');
+        }
+    }
 }

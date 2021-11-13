@@ -216,6 +216,8 @@ Route::prefix('admin')->group(function () {
         Route::post('/edit/page/about_us/image', 'PagesController@aboutBackground');
         Route::post('/edit/page/about_us/sponsor/add', 'PagesController@addSponsor');
         Route::get('/edit/page/about_us/sponsor/delete/{id}', 'PagesController@deleteSponsor');
+        Route::post('/edit/page/about_us/sponsor/sort/{id}', 'PagesController@updateSort');
+        Route::get('/edit/page/about_us/sponsor/reset/{id}', 'PagesController@resetSort');
 
         // SHIPPING SERVICES ROUTES CMS
         Route::get('/shipping/list', 'ShippingController@viewList');
