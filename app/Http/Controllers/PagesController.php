@@ -257,7 +257,8 @@ class PagesController extends Controller
             $insert = [
                 'name_img' => $request->sponsor_name,
                 'url' => $request->sponsor_url,
-                'image' => $name_first.".webp",
+                'image' => $sponsor_image_name,
+                'created_by' => Auth::user()->username,
                 'xstatus' => 1
             ];
 

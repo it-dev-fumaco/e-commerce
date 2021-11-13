@@ -218,7 +218,7 @@
                 <div class="row animated animatedFadeInUp fadeInUp display-flex">
                     @foreach ($partners as $partner)
                     <div class="col-md-2" style="padding-bottom: 20px;">
-                        <img src="{{ asset('/storage/sponsors/'.$partner->image) }}" alt="{{ Str::slug(explode(".", $partner->image)[0], '-') }}" class="img-thumbnail">
+                        <img src="{{ asset('/storage/sponsors/'.explode(".", $partner->image)[0].'.webp') }}" alt="{{ Str::slug(explode(".", $partner->image)[0], '-') }}" class="img-thumbnail">
                     </div>
                     @endforeach
                 </div>
