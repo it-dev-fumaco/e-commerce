@@ -73,7 +73,6 @@ class LoginController extends Controller
     public function callbackFromFacebook() {
         try {
             $user = Socialite::driver('facebook')->user();
-            dd($user);
             $finduser = User::where('facebook_id', $user->id)->first();
             if($finduser){
                 Auth::login($finduser);
@@ -84,7 +83,7 @@ class LoginController extends Controller
                     'username' => trim($user->email),
                     'password' => password_hash($user->getName().'@'.$user->getId(), PASSWORD_DEFAULT),
                     'f_name' => $user->name,
-                    'f_lname' => $user->name,
+                    // 'f_lname' => $user->name,
                     'facebook_id'=> $user->id,
                     'f_email' => 'fumacoco_dev',
                     'f_temp_passcode' => 'fumaco12345'
@@ -106,7 +105,6 @@ class LoginController extends Controller
     public function callbackFromGoogle() {
         try {
             $user = Socialite::driver('google')->user();
-            dd($user);
             $finduser = User::where('google_id', $user->id)->first();
             if($finduser){
                 Auth::login($finduser);
@@ -117,7 +115,7 @@ class LoginController extends Controller
                     'username' => trim($user->email),
                     'password' => password_hash($user->getName().'@'.$user->getId(), PASSWORD_DEFAULT),
                     'f_name' => $user->name,
-                    'f_lname' => $user->name,
+                    // 'f_lname' => $user->name,
                     'google_id'=> $user->id,
                     'f_email' => 'fumacoco_dev',
                     'f_temp_passcode' => 'fumaco12345'
@@ -139,7 +137,6 @@ class LoginController extends Controller
     public function callbackFromLinkedin() {
         try {
             $user = Socialite::driver('linkedin')->user();
-            dd($user);
             $finduser = User::where('linkedin_id', $user->id)->first();
             if($finduser){
                 Auth::login($finduser);
@@ -150,7 +147,7 @@ class LoginController extends Controller
                     'username' => trim($user->email),
                     'password' => password_hash($user->getName().'@'.$user->getId(), PASSWORD_DEFAULT),
                     'f_name' => $user->name,
-                    'f_lname' => $user->name,
+                    // 'f_lname' => $user->name,
                     'linkedin_id'=> $user->id,
                     'f_email' => 'fumacoco_dev',
                     'f_temp_passcode' => 'fumaco12345'
