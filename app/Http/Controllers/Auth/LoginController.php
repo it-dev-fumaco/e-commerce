@@ -79,15 +79,14 @@ class LoginController extends Controller
 
                 return redirect('/');
             }else{
-                $newUser = User::create([
-                    'username' => trim($user->email),
-                    'password' => password_hash($user->getName().'@'.$user->getId(), PASSWORD_DEFAULT),
-                    'f_name' => $user->name,
-                    // 'f_lname' => $user->name,
-                    'facebook_id'=> $user->id,
-                    'f_email' => 'fumacoco_dev',
-                    'f_temp_passcode' => 'fumaco12345'
-                ]);
+                $newUser = new User;
+                $newUser->username = trim($user->email);
+                $newUser->password = password_hash($user->getName().'@'.$user->getId(), PASSWORD_DEFAULT);
+                $newUser->f_name = $user->name;
+                $newUser->facebook_id = $user->id;
+                $newUser->f_email = 'fumacoco_dev';
+                $newUser->f_temp_passcode = 'fumaco12345';
+                $newUser->save();
 
                 Auth::loginUsingId($newUser->id);
 
@@ -105,22 +104,22 @@ class LoginController extends Controller
     public function callbackFromGoogle() {
         try {
             $user = Socialite::driver('google')->user();
+
             $finduser = User::where('google_id', $user->id)->first();
             if($finduser){
                 Auth::loginUsingId($finduser->id);
-
+                
                 return redirect('/');
             }else{
-                $newUser = User::create([
-                    'username' => trim($user->email),
-                    'password' => password_hash($user->getName().'@'.$user->getId(), PASSWORD_DEFAULT),
-                    'f_name' => $user->name,
-                    // 'f_lname' => $user->name,
-                    'google_id'=> $user->id,
-                    'f_email' => 'fumacoco_dev',
-                    'f_temp_passcode' => 'fumaco12345'
-                ]);
-
+                $newUser = new User;
+                $newUser->username = trim($user->email);
+                $newUser->password = password_hash($user->getName().'@'.$user->getId(), PASSWORD_DEFAULT);
+                $newUser->f_name = $user->name;
+                $newUser->google_id = $user->id;
+                $newUser->f_email = 'fumacoco_dev';
+                $newUser->f_temp_passcode = 'fumaco12345';
+                $newUser->save();
+                
                 Auth::loginUsingId($newUser->id);
 
                 return redirect('/');
@@ -143,15 +142,14 @@ class LoginController extends Controller
 
                 return redirect('/');
             }else{
-                $newUser = User::create([
-                    'username' => trim($user->email),
-                    'password' => password_hash($user->getName().'@'.$user->getId(), PASSWORD_DEFAULT),
-                    'f_name' => $user->name,
-                    // 'f_lname' => $user->name,
-                    'linkedin_id'=> $user->id,
-                    'f_email' => 'fumacoco_dev',
-                    'f_temp_passcode' => 'fumaco12345'
-                ]);
+                $newUser = new User;
+                $newUser->username = trim($user->email);
+                $newUser->password = password_hash($user->getName().'@'.$user->getId(), PASSWORD_DEFAULT);
+                $newUser->f_name = $user->name;
+                $newUser->linkedin_id = $user->id;
+                $newUser->f_email = 'fumacoco_dev';
+                $newUser->f_temp_passcode = 'fumaco12345';
+                $newUser->save();
 
                 Auth::loginUsingId($newUser->id);
 
