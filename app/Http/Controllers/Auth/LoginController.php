@@ -94,7 +94,7 @@ class LoginController extends Controller
                 return redirect('/');
             }
         } catch (\Throwable $th) {
-            throw $th;
+            return redirect('/login')->with('error', 'Login failed, please try again!');
         }
     }
 
@@ -126,7 +126,7 @@ class LoginController extends Controller
                 return redirect('/');
             }
         } catch (\Throwable $th) {
-            throw $th;
+            return redirect('/login')->with('error', 'Login failed, please try again!');
         }
     }
 
@@ -158,7 +158,7 @@ class LoginController extends Controller
                 return redirect('/');
             }
         } catch (\Throwable $th) {
-            throw $th;
+            return redirect('/login')->with('error', 'Login failed, please try again!');
         }
     }
 }
