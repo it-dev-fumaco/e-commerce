@@ -66,13 +66,23 @@
                             <input type="password" id="password" name="password" class="form-control" required="">
 
                             <br>
-                            <input type="submit" class="btn btn-primary" value="&nbsp;&nbsp;LOGIN&nbsp;&nbsp;">
-
+                            <input type="submit" class="btn btn-primary" style="display: block; width: 100%;" value="LOGIN">
+                            
                             <a href="{{ route('password.request') }}" id="forgot_pswdx" class="forgot-1">Forgot password?</a>
                             <p style=" font-size: 1rem !important; margin-top: 12px;">
                                 <span style="display: inline-block; color:  #616a6b ">New member? </span> <a href="/signup" class="forgot-1" style="display: inline-block; font-size: 1rem !important;">Create new account.</a>
                             </p>
-                            <br>
+                            <hr>
+                            <a href="{{ route('facebook.login') }}" class="btn mt-2 text-white" style="display: block; width: 100%; background-color:  #115cf3;">
+                                <i class="fab fa-facebook mr-2"></i> Login with Facebook
+                            </a>
+                            <a href="{{ route('google.login') }}" class="btn text-white mt-2" style="display: block; width: 100%; background-color:  #d51b09;">
+                                <i class="fab fa-google mr-2"></i> Login with Google
+                            </a>
+                            <a href="{{ route('linkedin.login') }}" class="btn text-white mt-2" style="display: block; width: 100%; background-color: #0c6caf;">
+                                <i class="fab fa-linkedin mr-2"></i> Login with LinkedIn
+                            </a>
+
                             <label for="InputPassword" class="status-1"></label>
                         </div>
                         </center>
@@ -83,58 +93,6 @@
                         <button class="btn btn-primary btn-block" type="submit">Reset Password</button>
                         <a href="#" id="cancel_reset"><i class="fas fa-angle-left"></i> Back</a>
                     </form>
-
-                    {{-- <form action="user_register" class="form-signup" method="post" style="max-width: 600px !important; border-color: #efefef; border-style: solid; border-width: 1px; border-top: 8px solid #186eaa; ">
-                        @csrf
-                        <ul class="nav nav-tabs">
-                            <li class="nav-item" style="width: 50%;">
-                            <a class="nav-link" href="#" id="cancel_signup"><center><span class="login_2">Sign in</span></center></a>
-                            </li>
-
-                            <li class="nav-item" style="width: 50%;">
-                            <a class="nav-link" href="#" type="button" id="btn-signup" style="border-bottom: 3px solid #dc6f12;"><center><span class="login_2">Register</span></center></a>
-                            </li>
-                        </ul>
-
-                        <br>
-                        <center>
-                            <div class="col-lg-7" style="text-align: left;">
-                                <div class="row">
-                                    <label for="mobile_1" class="myprofile-font-form login_1">First Name : <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control caption_1" id="fname" name="first_name" required>
-                                </div>
-                                <br/>
-                                <div class="row">
-                                    <label for="mobile_1" class="myprofile-font-form login_1">Last Name : <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control caption_1" id="lname" name="last_name" required>
-                                </div>
-                                <br/>
-                                <div class="row">
-                                    <label class="login_1">Email address <span class="text-danger">*</span></label>
-                                    <input type="email" name="username" id="username" class="form-control caption_1" value="" required>
-                                    <span class="help-block"></span>
-                                </div>
-                                <br/>
-                                <div class="row">
-                                    <label class="login_1">Password <span class="text-danger">*</span></label>
-                                    <input type="password" name="password" id="password" class="form-control caption_1" value="" required>
-                                    <span class="help-block"></span>
-                                </div>
-                                <br/>
-                                <div class="row">
-                                    <label class="login_1">Confirm Password <span class="text-danger">*</span></label>
-                                    <input type="password" name="confirm_password" id="confirm_password"  class="form-control caption_1" value="" required>
-                                    <span class="help-block"></span>
-                                </div>
-                                <br>
-                                <div class="row">
-                                    <p class="reg_link" style="white-space: wrap;"><input type="checkbox" name="subscribe"> &nbsp;Yes, I want to receive email updates and notifications.</p>
-                                    <p class="reg_link" style=""><input type="checkbox" id="terms_checkbox"> I agree to <a href="/privacy_policy" style="display: inline-block !important;">Privacy Policy</a> and <a href="/terms_condition" style="display: inline-block !important;">Terms</a>.</p>
-                                    <input type="submit" id="reg_btn" class="btn btn-primary" value="REGISTER" disabled><br/>
-                                </div>
-                            </div>
-                        </center>
-                    </form> --}}
                     <br>
                 </div>
             </div>

@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Laravel\Socialite\Facades\Socialite;
+use App\Models\User;
 
 class LoginController extends Controller
 {
@@ -62,5 +64,104 @@ class LoginController extends Controller
         Auth::logout();
 
         return redirect('/');
+    }
+
+    public function loginUsingFacebook() {
+        return Socialite::driver('facebook')->redirect();
+    }
+
+    public function callbackFromFacebook() {
+        try {
+            $user = Socialite::driver('facebook')->user();
+            dd($user);
+            $finduser = User::where('facebook_id', $user->id)->first();
+            if($finduser){
+                Auth::login($finduser);
+
+                return redirect('/');
+            }else{
+                $newUser = User::create([
+                    'username' => trim($user->email),
+                    'password' => password_hash($user->getName().'@'.$user->getId(), PASSWORD_DEFAULT),
+                    'f_name' => $user->name,
+                    'f_lname' => $user->name,
+                    'facebook_id'=> $user->id,
+                    'f_email' => 'fumacoco_dev',
+                    'f_temp_passcode' => 'fumaco12345'
+                ]);
+
+                Auth::loginUsingId($newUser->id);
+
+                return redirect('/');
+            }
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+
+    public function loginUsingGoogle() {
+        return Socialite::driver('google')->redirect();
+    }
+
+    public function callbackFromGoogle() {
+        try {
+            $user = Socialite::driver('google')->user();
+            dd($user);
+            $finduser = User::where('google_id', $user->id)->first();
+            if($finduser){
+                Auth::login($finduser);
+
+                return redirect('/');
+            }else{
+                $newUser = User::create([
+                    'username' => trim($user->email),
+                    'password' => password_hash($user->getName().'@'.$user->getId(), PASSWORD_DEFAULT),
+                    'f_name' => $user->name,
+                    'f_lname' => $user->name,
+                    'google_id'=> $user->id,
+                    'f_email' => 'fumacoco_dev',
+                    'f_temp_passcode' => 'fumaco12345'
+                ]);
+
+                Auth::loginUsingId($newUser->id);
+
+                return redirect('/');
+            }
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+
+    public function loginUsingLinkedin() {
+        return Socialite::driver('linkedin')->redirect();
+    }
+
+    public function callbackFromLinkedin() {
+        try {
+            $user = Socialite::driver('linkedin')->user();
+            dd($user);
+            $finduser = User::where('linkedin_id', $user->id)->first();
+            if($finduser){
+                Auth::login($finduser);
+
+                return redirect('/');
+            }else{
+                $newUser = User::create([
+                    'username' => trim($user->email),
+                    'password' => password_hash($user->getName().'@'.$user->getId(), PASSWORD_DEFAULT),
+                    'f_name' => $user->name,
+                    'f_lname' => $user->name,
+                    'linkedin_id'=> $user->id,
+                    'f_email' => 'fumacoco_dev',
+                    'f_temp_passcode' => 'fumaco12345'
+                ]);
+
+                Auth::loginUsingId($newUser->id);
+
+                return redirect('/');
+            }
+        } catch (\Throwable $th) {
+            throw $th;
+        }
     }
 }

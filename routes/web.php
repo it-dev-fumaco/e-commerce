@@ -28,6 +28,18 @@ Route::namespace('Auth')->group(function(){
     //Reset Password Routes
     Route::get('/password/reset/{token}','ResetPasswordController@showResetForm')->name('password.reset');
     Route::post('/password/reset','ResetPasswordController@reset')->name('password.update');
+
+    // facebook login
+    Route::get('auth/facebook', 'LoginController@loginUsingFacebook')->name('facebook.login');
+    Route::get('auth/facebook/callback', 'LoginController@callbackFromFacebook')->name('facebook.callback');
+
+    // google login
+    Route::get('auth/google', 'LoginController@loginUsingGoogle')->name('google.login');
+    Route::get('auth/google/callback', 'LoginController@callbackFromGoogle')->name('google.callback');
+
+     // linkedin login
+     Route::get('auth/linkedin', 'LoginController@loginUsingLinkedin')->name('linkedin.login');
+     Route::get('auth/linkedin/callback', 'LoginController@callbackFromLinkedin')->name('linkedin.callback');
 });
 
 Route::get('/signup', 'FrontendController@signupForm');
