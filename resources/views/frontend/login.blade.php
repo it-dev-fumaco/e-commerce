@@ -79,9 +79,9 @@
                             <a href="{{ route('google.login') }}" class="btn text-white mt-2" style="display: block; width: 100%; background-color:  #d51b09;">
                                 <i class="fab fa-google mr-2"></i> Login with Google
                             </a>
-                            <a href="{{ route('linkedin.login') }}" class="btn text-white mt-2" style="display: block; width: 100%; background-color: #0c6caf;">
+                            {{-- <a href="{{ route('linkedin.login') }}" class="btn text-white mt-2" style="display: block; width: 100%; background-color: #0c6caf;">
                                 <i class="fab fa-linkedin mr-2"></i> Login with LinkedIn
-                            </a>
+                            </a> --}}
 
                             <label for="InputPassword" class="status-1"></label>
                         </div>
