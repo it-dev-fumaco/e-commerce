@@ -8,10 +8,10 @@
 		<div id="myCarousel" class="carousel slide" data-bs-ride="carousel">
 			<div class="carousel-inner">
 				<div class="carousel-item active" style="height: 13rem !important;">
-					<img src="{{ asset('/assets/site-img/header3-sm.png') }}" alt="" style="position: absolute; top: 0;left: 0;min-width: 100%; height: unset !important;">
+					<img src="{{ asset('/assets/site-img/header3-sm.png') }}" alt="" style="position: absolute; top: 0;left: 0;min-width: 100%; height: 100% !important;">
 					<div class="container">
 						<div class="carousel-caption text-start" style="bottom: 1rem !important; right: 25% !important; left: 25%; !important;">
-							<center><h3 class="carousel-header-font">ORDER STATUS</h3></center>
+							<center><h3 class="carousel-header-font">TRACK ORDER</h3></center>
 						</div>
 					</div>
 				</div>
@@ -22,10 +22,8 @@
 	<main style="background-color:#ffffff; min-height: 550px;" class="products-head">
 		<div class="container-fluid">
 			<div class="row">
-				<div class="col-lg-8 offset-lg-2 mx-auto" >
-					<br><br>
-					<center><h3>Order Tracking</h3></center>
-					<br>
+				<div class="col-lg-8 offset-lg-2 mx-auto {{ $track_order_details ? 'd-none' : '' }}">
+					<br/><br/>
 					<center><h4>Please enter your order reference number</h4></center>
 					<br>
 					<center>
@@ -46,48 +44,112 @@
 				@if($track_order_details and $order_details)
 				<div class="col-md-8 offset-md-2">
 					<div class="row mb-2">
-						<div class="col-md-6 mt-4">Order No. : <b>{{ request()->id }}</b>
+						<div class="col-md-6 mt-4"><span class="table-text">Order No. : <b>{{ request()->id }}</b></span>
 							@if($order_details->order_status == "Cancelled")
-								<span class="badge" style="background-color: #DC3545; font-size: 0.9rem;">{{ $order_details->order_status }}</span>
+								<span class="badge table-text" style="background-color: #DC3545; font-size: 0.9rem;">{{ $order_details->order_status }}</span>
 							@endif
 						</div>
-						<div class="col-md-6 mt-4 track-order-eta" style="text-align: right;">Estimated Delivery Date : <br class="d-lg-none d-xl-none"/><b>{{ $order_details->estimated_delivery_date ? $order_details->estimated_delivery_date : "-"}}</b></div>
+						<div class="col-md-6 mt-4 track-order-eta" style="text-align: right;"><span class="table-text">Estimated Delivery Date : <br class="d-lg-none d-xl-none"/><b>{{ $order_details->estimated_delivery_date ? $order_details->estimated_delivery_date : "-"}}</b></span></div>
 					</div>
 				</div>
 				@php
+					// $date_delivered = $order_details->date_delivered ? date('M d, Y H:m A', strtotime($order_details->date_delivered)) : '';
+					// $order_date = $order_details->order_date ? date('M d, Y H:m A', strtotime($order_details->order_date)) : '';
+					// $confirmed_date = $order_details->order_date_confirmed ? date('M d, Y H:m A', strtotime($order_details->order_date_confirmed)) : '';
+					// $ready_date = $order_details->order_date_ready ? date('M d, Y H:m A', strtotime($order_details->order_date_ready)) : '';
+
 					if($track_order_details->track_status == "Order Placed"){
 						$status = 1;
 					}else if($track_order_details->track_status == "Order Confirmed"){
 						$status = 2;
-					}else if($track_order_details->track_status == "Ready for Delivery"){
-						$status = 3;
 					}else if($track_order_details->track_status == "Out for Delivery" or $track_order_details->track_status == "Ready for Pickup" ){
-						$status = 4;
+						$status = 3;
 					}else if($track_order_details->track_status == "Delivered"){
-						$status = 5;
+						$status = 4;
 					}else{
 						$status = 0;
 					}
+					$status_name = array('Order Placed', "Order Confirmed", ($track_order_details->track_status == "Out for Delivery") ? "Out for Delivery" : "Ready for Pickup", "Delivered");
+
 				@endphp
 				<div class="row">
-					<div class="col-md-8 mx-auto" style="margin-bottom: 100px !important">
+					<div class="col-md-8 mx-auto" style="margin-bottom: 100px !important;">
 						<div class="card-body">
-							<div class="track">
-								<div class="step {{ $status >= 1 ? 'active' : '' }}"> <span class="icon"> <i class="fa fa-check"></i> </span> <span class="text">Order placed</span> </div>
-								<div class="step {{ $status >= 2 ? 'active' : '' }}"> <span class="icon"> <i class="fa fa-check"></i> </span> <span class="text">Order confirmed</span> </div>
-								@if($order_details->order_shipping == 'Store Pickup')
-									<div class="step {{ $status >= 4 ? 'active' : '' }}"> <span class="icon"> <i class="fa fa-user"></i> </span> <span class="text">Ready for Pickup</span> </div>
-								@else
-									<div class="step {{ $status >= 4 ? 'active' : '' }}"> <span class="icon"> <i class="fa fa-truck"></i> </span> <span class="text">Out for Delivery</span> </div>
-								@endif
-								
-								<div class="step {{ $status >= 5 ? 'active' : '' }}"> <span class="icon"> <i class="fa fa-box"></i> </span> <span class="text">Delivered</span> </div>
+							<div style="min-height: 120px;">
+								<div class="track">
+									@foreach ($status_name as $key => $name)
+										@php
+											$key = $key + 1;
+											if($name == "Order Placed"){
+												$date = $order_details->order_date ? date('M d, Y H:m A', strtotime($order_details->order_date)) : '';
+												$icon = 'check';
+											}else if($name == "Order Confirmed"){
+												$date = $order_details->order_date_confirmed ? date('M d, Y H:m A', strtotime($order_details->order_date_confirmed)) : '';
+												$icon = 'user';
+											}else if($name == "Out for Delivery" or $name == "Ready for Pickup" ){
+												$date = $order_details->order_date_ready ? date('M d, Y H:m A', strtotime($order_details->order_date_ready)) : ''; 
+												$icon = 'truck';
+											}else if($name == "Delivered"){
+												$date = $order_details->date_delivered ? date('M d, Y H:m A', strtotime($order_details->date_delivered)) : '';
+												$icon = 'shopping-bag';
+											}
+										@endphp
+										<div class="step {{ $status >= $key ? 'active' : '' }}">
+											<span class="icon {{ $status > $key ? 'inactive' : '' }}"><i class="fa fa-{{ $icon }} {{ $status > $key ? 'd-none' : '' }}"></i></span>
+											<span class="text status-text">{{ $name }}</span>
+											<span class="text status-text" style="font-size: 9pt; color: #a39f9f !important; font-style: italic !important">{{ $date }}</span>
+										</div>
+									@endforeach
+								</div>
 							</div>
-							<hr> <a href="#TrackItemsData" data-toggle="modal" class="btn btn-warning" data-abc="true">View Order Details</a>
+							{{-- <hr> <a href="#TrackItemsData" data-toggle="modal" class="btn btn-warning" data-abc="true">View Order Details</a> --}}
 						</div>
+						<table class="table" style="border-top: 1px solid #000">
+							<thead>
+								<tr style="font-size: 16px;">
+									<th></th>
+									<th class="text-center table-text">ORDERED ITEM(S)</th>
+									<th class="text-center d-none d-sm-table-cell">QTY</th>
+									<th class="text-center d-none d-sm-table-cell">PRICE</th>
+									<th class="text-center d-none d-sm-table-cell">TOTAL</th>
+								</tr>
+							</thead>
+							<tbody>
+								@forelse ($items as $item)
+								<tr style="font-size: 11pt;">
+									<td class="text-center">
+										<img src="{{ asset('/storage/item_images/'. $item['item_code'] .'/gallery/preview/'.$item['image']) }}" class="img-responsive" alt="" width="55" height="55">
+									</td>
+									<td>
+										<span class="table-text">{{ $item['item_name'] }}</span>
+										<table class="table d-sm-block d-md-none">
+											<tr>
+												<td class="table-text"><b>QTY</b></td>
+												<td class="table-text">{{ $item['quantity'] }}</td>
+											</tr>
+											<tr>
+												<td class="table-text"><b>PRICE</b></td>
+												<td class="table-text">{{ 'P ' . number_format($item['price'], 2) }}</td>
+											</tr>
+											<tr>
+												<td class="table-text"><b>Total</b></td>
+												<td class="table-text">{{ 'P ' . number_format($item['amount'], 2) }}</td>
+											</tr>
+										</table>
+									</td>
+									<td class="text-center d-none d-sm-table-cell">{{ $item['quantity'] }}</td>
+									<td class="text-center d-none d-sm-table-cell">{{ 'P ' . number_format($item['price'], 2) }}</td>
+									<td class="text-center d-none d-sm-table-cell">{{ 'P ' . number_format($item['amount'], 2) }}</td>
+								</tr>
+								@empty
+								<tr>
+									<td colspan="6" class="text-center">No items found.</td>
+								</tr>
+								@endforelse
+							</tbody>
+						</table>
 					</div>
 				</div>
-
 				{{-- <div class="col-lg-10 mx-auto">
 					<table class="table">
 						<thead>
@@ -137,7 +199,7 @@
 				@endif
 			</div>
 
-			<div id="TrackItemsData" class="modal fade" role="dialog">
+			{{-- <div id="TrackItemsData" class="modal fade" role="dialog">
 				<div class="modal-dialog modal-xl">
 					<div class="modal-content">
 						<div class="modal-header">
@@ -178,7 +240,7 @@
 						</div>
 					</div>
 				</div>
-			</div>
+			</div> --}}
 		</div>
 	</main>
 @endsection
@@ -187,8 +249,8 @@
 <style>
 	.products-head {
 		margin-top: 10px !important;
-		padding-left: 40px !important;
-		padding-right: 40px !important;
+		padding-left: 40px;
+		padding-right: 40px;
 	}
 	.he1 {
 		font-weight: 300 !important;
@@ -265,12 +327,13 @@
 .track {
     position: relative;
     background-color: #ddd;
-    height: 7px;
+    height: 4px;
     display: -webkit-box;
     display: -ms-flexbox;
     display: flex;
     margin-bottom: 60px;
-    margin-top: 50px
+    margin-top: 50px;
+
 }
 
 .track .step {
@@ -284,11 +347,11 @@
 }
 
 .track .step.active:before {
-    background: #FF5722
+    background: #008CFF
 }
 
 .track .step::before {
-    height: 7px;
+    height: 4px;
     position: absolute;
     content: "";
     width: 100%;
@@ -297,18 +360,30 @@
 }
 
 .track .step.active .icon {
-    background: #ee5435;
-    color: #fff
+    background: #008CFF;
+    color: #fff;
 }
 
 .track .icon {
     display: inline-block;
-    width: 40px;
-    height: 40px;
+    width: 50px;
+    height: 50px;
     line-height: 40px;
     position: relative;
     border-radius: 100%;
-    background: #ddd
+    background: #ddd;
+	margin-top: -5px;
+	padding: 10px !important;
+}
+
+.inactive{
+	height: 20px !important;
+	width: 20px !important;
+	margin-top: 10px !important;
+}
+
+.fa{
+	font-size: 24px !important;
 }
 
 .track .step.active .text {
@@ -376,5 +451,30 @@ p {
     border-color: #ff2b00;
     border-radius: 1px
 }
+	@media (max-width: 575.98px) {
+		.products-head{
+			padding-left: 0 !important;
+			padding-right: 0 !important;
+		}
+		.table-text{
+			font-size: 14px;
+		}
+		.status-text{
+			font-size: 12px;
+		}
+    }
+
+    @media (max-width: 767.98px) {
+		.products-head{
+			padding-left: 0 !important;
+			padding-right: 0 !important;
+		}
+		.table-text{
+			font-size: 14px;
+		}
+		.status-text{
+			font-size: 12px;
+		}
+    }
 </style>
 @endsection
