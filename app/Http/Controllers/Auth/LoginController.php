@@ -75,7 +75,7 @@ class LoginController extends Controller
             $user = Socialite::driver('facebook')->user();
             $finduser = User::where('facebook_id', $user->id)->first();
             if($finduser){
-                Auth::login($finduser);
+                Auth::loginUsingId($finduser->id);
 
                 return redirect('/');
             }else{
@@ -107,7 +107,7 @@ class LoginController extends Controller
             $user = Socialite::driver('google')->user();
             $finduser = User::where('google_id', $user->id)->first();
             if($finduser){
-                Auth::login($finduser);
+                Auth::loginUsingId($finduser->id);
 
                 return redirect('/');
             }else{
@@ -139,7 +139,7 @@ class LoginController extends Controller
             $user = Socialite::driver('linkedin')->user();
             $finduser = User::where('linkedin_id', $user->id)->first();
             if($finduser){
-                Auth::login($finduser);
+                Auth::loginUsingId($finduser->id);
 
                 return redirect('/');
             }else{
