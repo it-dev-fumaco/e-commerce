@@ -851,7 +851,7 @@ class FrontendController extends Controller
 
             $orders_arr[] = [
                 'order_number' => $order->order_number,
-                'date' => date('M d, Y - h:m: A', strtotime($order->order_date)),
+                'date' => date('M d, Y - h:i A', strtotime($order->order_date)),
                 'status' => $order->order_status,
                 'edd' => $order->estimated_delivery_date,
                 'items' => $items_arr,
@@ -882,7 +882,9 @@ class FrontendController extends Controller
 
             $new_orders_arr[] = [
                 'order_number' => $new_order->order_number,
-                'date' => date('M d, Y - h:m: A', strtotime($new_order->order_date)),
+                'date' => date('M d, Y - h:i A', strtotime($new_order->order_date)),
+                'order_date_confirmed' => $new_order->order_date_confirmed,
+                'order_date_ready' => $new_order->order_date_ready,
                 'status' => $new_order->order_status,
                 'edd' => $new_order->estimated_delivery_date,
                 'items' => $items_arr,
