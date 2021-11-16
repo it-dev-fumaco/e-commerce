@@ -178,7 +178,7 @@
           </li>
           <li class="nav-header">CONTENT MANAGEMENT</li>
           @php
-              $pages = ['pages_list', 'home_crud', 'privacy_policy', 'terms_condition', 'about_us', 'about_us_sponsors'];
+              $pages = ['pages_list', 'home_crud', 'privacy_policy', 'terms_condition', 'contact_us', 'about_us', 'about_us_sponsors'];
           @endphp
           <li class="nav-item {{ (in_array($activePage, $pages) ? 'menu-open' : '') }}">
             <a href="#" class="nav-link {{ (in_array($activePage, $pages) ? 'active' : '') }}">
@@ -205,7 +205,7 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a href="/admin/pages/contact" class="nav-link">
+                <a href="/admin/pages/contact" class="nav-link {{ $activePage == 'contact_us' ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Contact Us</p>
                 </a>

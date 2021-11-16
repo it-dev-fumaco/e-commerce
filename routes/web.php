@@ -221,7 +221,13 @@ Route::prefix('admin')->group(function () {
         Route::post('/user_management/change_user_password/', 'UserManagementController@userChangePassword');
 
         Route::get('/pages/list', 'PagesController@viewPages');
-        Route::get('/pages/about', 'PagesController@viewAbout');
+        Route::get('/pages/list', 'PagesController@viewPages');
+        Route::get('/pages/contact', 'PagesController@viewContact');
+        Route::get('/pages/contact/edit/{id}', 'PagesController@editContactForm');
+        Route::get('/pages/contact/add_form', 'PagesController@addContactForm');
+        Route::post('/pages/contact/add', 'PagesController@addContact');
+        Route::get('/pages/contact/delete/{id}', 'PagesController@deleteContact');
+        Route::post('/pages/contact/update/{id}', 'PagesController@editContact');
         Route::get('/pages/about/sponsor/list', 'PagesController@viewSponsors');
         Route::get('/pages/edit/{page_id}', 'PagesController@editForm');
         Route::post('/edit/{id}', 'PagesController@editPage');

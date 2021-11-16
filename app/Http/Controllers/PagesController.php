@@ -57,6 +57,93 @@ class PagesController extends Controller
             return redirect()->back()->with('error', 'An error occured. Please try again.');
         }
     }
+
+    public function viewContact(){
+        $address = DB::table('fumaco_contact')->paginate(10);
+
+        return view('backend.pages.list_contact', compact('address'));
+    }
+
+    public function editContactForm($id){
+        $address = DB::table('fumaco_contact')->where('id', $id)->first();
+
+        return view('backend.pages.edit_contact', compact('address'));
+    }
+
+    public function editContact(Request $request, $id){
+        DB::beginTransaction();
+        try {
+            $checker = DB::table('fumaco_contact')->where('id', '!=', $id)->where('office_title', $request->title)->first();
+            if($checker){
+                return redirect()->back()->with('error', 'Office title must be unique.');
+            }
+            $update = [
+                'office_title' => $request->title,
+                'office_address' => $request->address,
+                'office_phone' => $request->phone,
+                'office_mobile' => $request->mobile,
+                'office_email' => $request->email,
+                'last_modified_by' => Auth::user()->username
+            ];
+
+            DB::table('fumaco_contact')->where('id', $id)->update($update);
+
+            DB::commit();
+            return redirect()->back()->with('success', 'Address has been updated.');
+        } catch (Exception $e) {
+            DB::rollback();
+            
+            return redirect()->back()->with('error', 'An error occured. Please try again.');
+        }
+    }
+
+    public function addContactForm(){
+        return view('backend.pages.add_contact');
+    }
+
+    public function addContact(Request $request){
+        DB::beginTransaction();
+        try {
+            $checker = DB::table('fumaco_contact')->where('office_title', $request->title)->first();
+            if($checker){
+                return redirect()->back()->with('error', 'Office title must be unique.');
+            }
+
+            $insert = [
+                'office_title' => $request->title,
+                'office_address' => $request->address,
+                'office_phone' => $request->phone,
+                'office_mobile' => $request->mobile,
+                'office_email' => $request->email,
+                'created_by' => Auth::user()->username,
+                'created_at' => Carbon::now()->toDateTimeString()
+            ];
+
+            DB::table('fumaco_contact')->insert($insert);
+
+            DB::commit();
+            return redirect('/admin/pages/contact')->with('success', 'Address added.');
+        } catch (Exception $e) {
+            DB::rollback();
+            
+            return redirect()->back()->with('error', 'An error occured. Please try again.');
+        }
+    }
+
+    public function deleteContact($id){
+        DB::beginTransaction();
+        try {
+
+            DB::table('fumaco_contact')->where('id', $id)->delete();
+
+            DB::commit();
+            return redirect()->back()->with('success', 'Address added.');
+        } catch (Exception $e) {
+            DB::rollback();
+            
+            return redirect()->back()->with('error', 'An error occured. Please try again.');
+        }
+    }
     
     public function viewAbout(){
         $about = DB::table('fumaco_about')->first();
