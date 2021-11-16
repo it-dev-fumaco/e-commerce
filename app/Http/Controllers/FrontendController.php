@@ -816,12 +816,24 @@ class FrontendController extends Controller
     }
 
     public function viewOrders() {
-        $orders = DB::table('fumaco_order')->where('order_account', Auth::user()->id)->orderBy('id', 'desc')->paginate(10);
+        $orders = DB::table('fumaco_order')->where('order_account', Auth::user()->id)
+            ->where('order_status', '!=', 'Order Placed')
+            ->where('order_status', '!=', 'Order Confirmed')
+            ->where('order_status', '!=', 'Out for Delivery')
+            ->orderBy('id', 'desc')->paginate(10);
+
+        $new_orders = DB::table('fumaco_order')->where('order_account', Auth::user()->id)
+        ->where('order_status', '!=', 'Delivered')
+        ->where('order_status', '!=', 'Cancelled')
+        ->orderBy('id', 'desc')->paginate(10);
+
 
         $orders_arr = [];
-        $items_arr = [];
+        $new_orders_arr = [];
  
         foreach($orders as $order){
+            $items_arr = [];
+
             $order_items = DB::table('fumaco_order_items')->where('order_number', $order->order_number)->get();
             foreach($order_items as $item){
                 $item_image = DB::table('fumaco_items_image_v1')->where('idcode', $item->item_code)->first();
@@ -850,7 +862,38 @@ class FrontendController extends Controller
             ];
         }
 
-        return view('frontend.orders', compact('orders', 'orders_arr'));
+        foreach($new_orders as $new_order){
+            $items_arr = [];
+
+            $order_items = DB::table('fumaco_order_items')->where('order_number', $new_order->order_number)->get();
+            foreach($order_items as $item){
+                $item_image = DB::table('fumaco_items_image_v1')->where('idcode', $item->item_code)->first();
+
+                $items_arr[] = [
+                    'image' => ($item_image) ? $item_image->imgprimayx : null,
+                    'item_code' => $item->item_code,
+                    'item_name' => $item->item_name,
+                    'qty' => $item->item_qty,
+                    'discount' => $item->item_discount,
+                    'orig_price' => $item->item_original_price,
+                    'price' => $item->item_price,
+                ];
+            }
+
+            $new_orders_arr[] = [
+                'order_number' => $new_order->order_number,
+                'date' => date('M d, Y - h:m: A', strtotime($new_order->order_date)),
+                'status' => $new_order->order_status,
+                'edd' => $new_order->estimated_delivery_date,
+                'items' => $items_arr,
+                'subtotal' => $new_order->order_subtotal,
+                'shipping_name' => $new_order->order_shipping,
+                'shipping_fee' => $new_order->order_shipping_amount,
+                'grand_total' => ($new_order->order_shipping_amount + $new_order->order_subtotal),
+            ];
+        }
+
+        return view('frontend.orders', compact('orders', 'orders_arr', 'new_orders', 'new_orders_arr'));
     }
 
     public function viewOrder($order_id) {
