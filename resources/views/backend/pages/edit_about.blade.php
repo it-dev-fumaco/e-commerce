@@ -38,7 +38,15 @@
                             <div class="card card-primary">
                                 <form action="/admin/edit/page/about_us" method="POST">
                                     <div class="card-body">
-                                        <h4>Content</h4>
+                                        <div class="row">
+                                            <div class="col-md-9">
+                                                <h4>Content</h4>
+                                            </div>
+                                            <div class="col-md-3 text-right">
+                                                <a href="/admin/pages/about/sponsor/list#add_sponsor" class="btn btn-secondary">Add a Sponsor</a>
+                                                <button type="submit" class="btn btn-primary">Submit</button>
+                                            </div>
+                                        </div>
                                         @csrf
                                         <div class="row">
                                             <div class="form-group col-md-12">
@@ -176,9 +184,9 @@
                                             <small>Last modified by: {{ $about->last_modified_by }} - {{ $about->last_modified_at }}</small><br>
                                         </div>
                                     </div>
-                                    <div class="card-footer text-center">
+                                    {{-- <div class="card-footer text-center">
                                         <button type="submit" class="btn btn-primary btn-lg">SUBMIT</button>
-                                    </div>
+                                    </div> --}}
                                 </form>
                             </div>
                         </div>
@@ -189,7 +197,14 @@
                                 <form action="/admin/edit/page/about_us/image" method="POST" enctype="multipart/form-data">
                                     @csrf
                                     <div class="card-body">
-                                        <h4>Background Images</h4>
+                                        <div class="row">
+                                            <div class="col-md-9">
+                                                <h4>Background Images</h4>
+                                            </div>
+                                            <div class="col-md-3 text-right">
+                                                <button type="submit" class="btn btn-primary">Submit</button>
+                                            </div>
+                                        </div>
                                         <div class="row">
                                             <div class="col-md-4">
                                                 <label>1st Background Image</label>
@@ -214,14 +229,14 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="card-footer text-center">
+                                    {{-- <div class="card-footer text-center">
                                         <button type="submit" class="btn btn-primary btn-lg">SUBMIT</button>
-                                    </div>
+                                    </div> --}}
                                 </form>
                             </div>
                         </div>
                     </div>
-                    <div class="row">
+                    {{-- <div class="row">
                         <div class="col-md-12">
                             <div class="card card-primary">
                                 <form action="/admin/edit/page/about_us/sponsor/add" method="POST" enctype="multipart/form-data">
@@ -256,8 +271,8 @@
                                 </form>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
+                    </div> --}}
+                    {{-- <div class="row">
                         <div class="col-md-12">
                             <div class="card card-primary">
                                 <div class="card-body">
@@ -353,7 +368,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> --}}
                 </div>
             </section>
         </div>

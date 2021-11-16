@@ -178,7 +178,7 @@
           </li>
           <li class="nav-header">CONTENT MANAGEMENT</li>
           @php
-              $pages = ['pages_list', 'home_crud', 'privacy_policy', 'terms_condition', 'about_us'];
+              $pages = ['pages_list', 'home_crud', 'privacy_policy', 'terms_condition', 'about_us', 'about_us_sponsors'];
           @endphp
           <li class="nav-item {{ (in_array($activePage, $pages) ? 'menu-open' : '') }}">
             <a href="#" class="nav-link {{ (in_array($activePage, $pages) ? 'active' : '') }}">
@@ -196,6 +196,12 @@
                 <a href="/admin/pages/about" class="nav-link {{ $activePage == 'about_us' ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>About Us</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="/admin/pages/about/sponsor/list" class="nav-link {{ $activePage == 'about_us_sponsors' ? 'active' : '' }}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>About Us - Sponsors</p>
                 </a>
               </li>
               <li class="nav-item">

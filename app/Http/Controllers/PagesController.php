@@ -61,11 +61,7 @@ class PagesController extends Controller
     public function viewAbout(){
         $about = DB::table('fumaco_about')->first();
 
-        $sponsors = DB::table('fumaco_about_partners')->orderBy('partners_sort', 'asc')->paginate(10);
-
-        $sponsors_count = DB::table('fumaco_about_partners')->count();
-
-        return view('backend.pages.edit_about', compact('about', 'sponsors', 'sponsors_count'));
+        return view('backend.pages.edit_about', compact('about'));
     }
 
     public function editAbout(Request $request){
@@ -270,6 +266,16 @@ class PagesController extends Controller
             DB::rollback();
             return redirect()->back()->with('error', 'An error occured. Please try again.');
         }
+    }
+
+    public function viewSponsors(){
+        $sponsors = DB::table('fumaco_about_partners')->orderBy('partners_sort', 'asc')->paginate(10);
+
+        $sponsors_count = DB::table('fumaco_about_partners')->count();
+
+        $last_mod = DB::table('fumaco_about_partners')->orderBy('last_modified_at', 'desc')->first();
+
+        return view('backend.pages.list_sponsors', compact('sponsors', 'sponsors_count', 'last_mod'));
     }
 
     public function deleteSponsor($id){
