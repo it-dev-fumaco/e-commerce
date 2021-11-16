@@ -168,7 +168,7 @@ class FrontendController extends Controller
                     ];
                 }
             }
-            
+
             if($request->s != ''){// Save search terms
                 $search_check = DB::table('fumaco_search_terms')->where('search_term', $request->s)->first();
 
@@ -178,25 +178,25 @@ class FrontendController extends Controller
                     'frequency' => $search_check ? $search_check->frequency + 1 : 1
                 ];
 
-                if($results['item_code'] != null){
-                    $item_code_array = $results->map(function($result){
+                if($products){
+                    $item_code_array = collect($products)->map(function($result){
                         return $result['item_code'];
                     });
 
                     $item_codes = collect($item_code_array);
 
-                    $search_data['prod_results_count'] = $results->total();
+                    $search_data['prod_results_count'] = count($products);
                     $search_data['prod_results'] = $item_codes->implode(',');
                 }
                 
-                if($results['title'] != null){
-                    $blog_id_array = $results->map(function($result){
+                if($blogs){
+                    $blog_id_array = collect($blogs)->map(function($result){
                         return $result['id'];
                     });
 
                     $blog_ids = collect($blog_id_array);
 
-                    $search_data['blog_results_count'] = $results->total();
+                    $search_data['blog_results_count'] = count($blogs);
                     $search_data['blog_results'] = $blog_ids->implode(',');
                 }
 
