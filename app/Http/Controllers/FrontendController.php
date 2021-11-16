@@ -141,6 +141,7 @@ class FrontendController extends Controller
 
             $products = [];
             $blogs = [];
+            
             foreach ($results as $result) {
                 if($result['item_code'] != null) {
                     $products[] = [
@@ -168,14 +169,42 @@ class FrontendController extends Controller
                 }
             }
             
-            if($request->s != ''){
-                $insert = [
+            if($request->s != ''){// Save search terms
+                $search_check = DB::table('fumaco_search_terms')->where('search_term', $request->s)->first();
+
+                $search_data = [
                     'search_term' => $request->s,
                     'ip' => $request->ip(),
-                    'results_count' => $results->total()
+                    'frequency' => $search_check ? $search_check->frequency + 1 : 1
                 ];
 
-                DB::table('fumaco_search_terms')->insert($insert);
+                if($results['item_code'] != null){
+                    $item_code_array = $results->map(function($result){
+                        return $result['item_code'];
+                    });
+
+                    $item_codes = collect($item_code_array);
+
+                    $search_data['prod_results_count'] = $results->total();
+                    $search_data['prod_results'] = $item_codes->implode(',');
+                }
+                
+                if($results['title'] != null){
+                    $blog_id_array = $results->map(function($result){
+                        return $result['id'];
+                    });
+
+                    $blog_ids = collect($blog_id_array);
+
+                    $search_data['blog_results_count'] = $results->total();
+                    $search_data['blog_results'] = $blog_ids->implode(',');
+                }
+
+                if($search_check){
+                    DB::table('fumaco_search_terms')->where('id', $search_check->id)->update($search_data);
+                }else{
+                    DB::table('fumaco_search_terms')->insert($search_data);
+                }
             }
             
             return view('frontend.search_results', compact('results', 'blogs', 'products'));
