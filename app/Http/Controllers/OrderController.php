@@ -248,13 +248,22 @@ class OrderController extends Controller
                     'date_cancelled' => $date_cancelled
                 ];
 
+                $track_update = [
+                    'track_status' => $status,
+                    'track_date_update' => $now
+                ];
+
                 if($status == 'Order Confirmed'){
-                    $orders_arr['order_date_confirmed'] = Carbon::now()->toDateTimeString();
-                    $orders_arr['order_date_ready'] = '';
+                    $track_update['track_order_confirmed'] = $now;
+                    $track_update['track_order_ready'] = '';
                 }
                 
                 if($status == 'Out for Delivery'){
-                    $orders_arr['order_date_ready'] = Carbon::now()->toDateTimeString();
+                    $track_update['track_order_ready'] = $now;
+                }
+
+                if($status == 'Delivered'){
+                    $track_update['track_order_complete'] = $now;
                 }
 
                 $items = [];
@@ -291,7 +300,7 @@ class OrderController extends Controller
 
                 DB::table('fumaco_order')->where('order_number', $request->order_number)->update($orders_arr);
 
-                DB::table('track_order')->where('track_code', $request->order_number)->update(['track_status' => $status, 'track_date_update' => $now]);
+                DB::table('track_order')->where('track_code', $request->order_number)->update($track_update);
 
                 DB::commit();
             }
