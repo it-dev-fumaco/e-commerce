@@ -231,6 +231,7 @@ Route::prefix('admin')->group(function () {
         Route::get('/pages/about/sponsor/list', 'PagesController@viewSponsors');
         Route::get('/pages/edit/{page_id}', 'PagesController@editForm');
         Route::post('/edit/{id}', 'PagesController@editPage');
+        Route::get('/pages/about', 'PagesController@viewAbout');
         Route::post('/edit/page/about_us', 'PagesController@editAbout');
         Route::post('/edit/page/about_us/image', 'PagesController@aboutBackground');
         Route::post('/edit/page/about_us/sponsor/add', 'PagesController@addSponsor');
