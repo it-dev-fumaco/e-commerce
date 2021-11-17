@@ -49,14 +49,15 @@
 								<span class="badge table-text" style="background-color: #DC3545; font-size: 0.9rem;">{{ $order_details->order_status }}</span>
 							@endif
 						</div>
-						@if($order_details->order_shipping != "Store Pickup")
-							<div class="col-md-6 mt-4 track-order-eta" style="text-align: right;"><span class="table-text">Estimated Delivery Date : <br class="d-lg-none d-xl-none"/><b>{{ $order_details->estimated_delivery_date }}</b></span></div>
-						@else
-							<div class="col-md-6 mt-4 track-order-eta" style="text-align: right;"><span class="table-text">Pickup Date: <br class="d-lg-none d-xl-none"/><b>{{ date('M d, Y', strtotime($order_details->pickup_date)) }}</b></span></div>
-						@endif
+						<div class="col-md-6 mt-4 track-order-eta" style="text-align: right;"><span class="table-text">Estimated Delivery Date : <br class="d-lg-none d-xl-none"/><b>{{ $order_details->estimated_delivery_date ? $order_details->estimated_delivery_date : "-"}}</b></span></div>
 					</div>
 				</div>
 				@php
+					// $date_delivered = $order_details->date_delivered ? date('M d, Y H:m A', strtotime($order_details->date_delivered)) : '';
+					// $order_date = $order_details->order_date ? date('M d, Y H:m A', strtotime($order_details->order_date)) : '';
+					// $confirmed_date = $order_details->order_date_confirmed ? date('M d, Y H:m A', strtotime($order_details->order_date_confirmed)) : '';
+					// $ready_date = $order_details->order_date_ready ? date('M d, Y H:m A', strtotime($order_details->order_date_ready)) : '';
+
 					if($track_order_details->track_status == "Order Placed"){
 						$status = 1;
 					}else if($track_order_details->track_status == "Order Confirmed"){
@@ -68,7 +69,7 @@
 					}else{
 						$status = 0;
 					}
-					$status_name = array('Order Placed', "Order Confirmed", ($order_details->order_shipping != "Store Pickup") ? "Out for Delivery" : "Ready for Pickup", ($order_details->order_shipping != "Store Pickup") ? "Delivered" : "Order Complete");
+					$status_name = array('Order Placed', "Order Confirmed", ($track_order_details->track_status == "Out for Delivery") ? "Out for Delivery" : "Ready for Pickup", "Delivered");
 
 				@endphp
 				<div class="row">
@@ -80,16 +81,16 @@
 										@php
 											$key = $key + 1;
 											if($name == "Order Placed"){
-												$date = $track_order_details->track_order_placed ? date('M d, Y H:i A', strtotime($track_order_details->track_order_placed)) : '';
+												$date = $order_details->order_date ? date('M d, Y H:m A', strtotime($order_details->order_date)) : '';
 												$icon = 'check';
 											}else if($name == "Order Confirmed"){
-												$date = $track_order_details->track_order_confirmed ? date('M d, Y H:i A', strtotime($track_order_details->track_order_confirmed)) : '';
+												$date = $order_details->order_date_confirmed ? date('M d, Y H:m A', strtotime($order_details->order_date_confirmed)) : '';
 												$icon = 'user';
 											}else if($name == "Out for Delivery" or $name == "Ready for Pickup" ){
-												$date = $track_order_details->track_order_ready ? date('M d, Y H:i A', strtotime($track_order_details->track_order_ready)) : ''; 
+												$date = $order_details->order_date_ready ? date('M d, Y H:m A', strtotime($order_details->order_date_ready)) : ''; 
 												$icon = 'truck';
-											}else if($name == "Delivered" or $name == "Order Complete"){
-												$date = $track_order_details->track_order_complete ? date('M d, Y H:i A', strtotime($order_details->track_order_complete)) : '';
+											}else if($name == "Delivered"){
+												$date = $order_details->date_delivered ? date('M d, Y H:m A', strtotime($order_details->date_delivered)) : '';
 												$icon = 'shopping-bag';
 											}
 										@endphp
