@@ -48,7 +48,7 @@ class LoginController extends Controller
             'username' => 'required',
             'password' => 'required'
         ]);
-        
+
         if (Auth::attempt(['username' => $request->username,'password' => $request->password], $request->remember)) {
             if ($request->has('summary')){
                 return redirect('/checkout/summary');
@@ -57,7 +57,7 @@ class LoginController extends Controller
         }
 
         return redirect()->back()->withInput()
-            ->with('error', 'Login failed, please try again!');
+            ->with('error', 'Your Email address or password is incorrect, please try again');
     }
 
     public function logout(){
@@ -93,7 +93,7 @@ class LoginController extends Controller
                 return redirect('/');
             }
         } catch (\Throwable $th) {
-            return redirect('/login')->with('error', 'Login failed, please try again!');
+            return redirect('/login')->with('error', 'Your Email address or password is incorrect, please try again');
         }
     }
 
@@ -108,7 +108,7 @@ class LoginController extends Controller
             $finduser = User::where('google_id', $user->id)->first();
             if($finduser){
                 Auth::loginUsingId($finduser->id);
-                
+
                 return redirect('/');
             }else{
                 $newUser = new User;
@@ -119,13 +119,13 @@ class LoginController extends Controller
                 $newUser->f_email = 'fumacoco_dev';
                 $newUser->f_temp_passcode = 'fumaco12345';
                 $newUser->save();
-                
+
                 Auth::loginUsingId($newUser->id);
 
                 return redirect('/');
             }
         } catch (\Throwable $th) {
-            return redirect('/login')->with('error', 'Login failed, please try again!');
+            return redirect('/login')->with('error', 'Your Email address or password is incorrect, please try again');
         }
     }
 
@@ -156,7 +156,7 @@ class LoginController extends Controller
                 return redirect('/');
             }
         } catch (\Throwable $th) {
-            return redirect('/login')->with('error', 'Login failed, please try again!');
+            return redirect('/login')->with('error', 'Your Email address or password is incorrect, please try again');
         }
     }
 }
