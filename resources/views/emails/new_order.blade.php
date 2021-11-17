@@ -15,11 +15,11 @@
 
 <table border="0" width="50%" bgcolor="#ffffff" cellpadding="0" cellspacing="0" style="margin: 0 auto 0 auto;">
     <tr>
-        <td class="h2" style="padding: 5% 0 0 5%;">New Order</td>
+        <td class="h2" style="padding: 5% 0 0 5%;">New Order Notification</td>
      </tr>
      <tr>
         <td class="bodycopy borderbottom" style="padding: 5%;">
-			A new order has been placed.<br><br>
+			A new order has been placed. Please update the order status to "Order Confirmed" in Admin Page<br><br>
 			Order Summary : {{ date("Y-m-d h:i a") }}
 			<br>
 			<br>

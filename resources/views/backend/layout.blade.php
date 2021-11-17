@@ -159,7 +159,7 @@
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
     <a href="/admin" class="brand-link text-center">
-      <span class="brand-text font-weight-light">FUMACO Admin v1.0</span>
+      <span class="brand-text font-weight-light">FUMACO Admin v2.0</span>
     </a>
 
     <!-- Sidebar -->
