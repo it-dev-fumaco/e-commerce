@@ -201,19 +201,13 @@
               <li class="nav-item">
                 <a href="/admin/pages/about/sponsor/list" class="nav-link {{ $activePage == 'about_us_sponsors' ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>About Us - Sponsors</p>
+                  <p>Sponsors/Partners</p>
                 </a>
               </li>
               <li class="nav-item">
                 <a href="/admin/pages/contact" class="nav-link {{ $activePage == 'contact_us' ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Contact Us</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="/admin/pages/messages" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Contact List</p>
                 </a>
               </li>
               <li class="nav-item" id="policy-pages"></li>{{-- Policy Pages --}}
@@ -542,7 +536,7 @@
           var active = '';
           var f = '';
           var activePage = {!! str_replace("'", "\'", json_encode($activePage)) !!};
-          
+
           $(response).each(function(i, d){
             var link = '/admin/pages/edit/' + d.page_id;
             if(activePage == d.slug){
@@ -550,8 +544,8 @@
             }else{
               active = '';
             }
-            f += '<a href="' + link + '" class="nav-link ' + active + '">' + 
-                    '<i class="far fa-circle nav-icon"></i>' + 
+            f += '<a href="' + link + '" class="nav-link ' + active + '">' +
+                    '<i class="far fa-circle nav-icon"></i>' +
                     '<p>' + d.page_title + '</p>' +
                   '</a>'
           });
