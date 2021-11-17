@@ -57,7 +57,7 @@ class LoginController extends Controller
         }
 
         return redirect()->back()->withInput()
-            ->with('error', 'Your Email address or password is incorrect, please try again');
+            ->with('error', 'Your email address or password is incorrect, please try again');
     }
 
     public function logout(){
@@ -93,7 +93,7 @@ class LoginController extends Controller
                 return redirect('/');
             }
         } catch (\Throwable $th) {
-            return redirect('/login')->with('error', 'Your Email address or password is incorrect, please try again');
+            return redirect('/login')->with('error', 'Your email address or password is incorrect, please try again');
         }
     }
 
@@ -125,7 +125,7 @@ class LoginController extends Controller
                 return redirect('/');
             }
         } catch (\Throwable $th) {
-            return redirect('/login')->with('error', 'Your Email address or password is incorrect, please try again');
+            return redirect('/login')->with('error', 'Your email address or password is incorrect, please try again');
         }
     }
 
@@ -156,7 +156,7 @@ class LoginController extends Controller
                 return redirect('/');
             }
         } catch (\Throwable $th) {
-            return redirect('/login')->with('error', 'Your Email address or password is incorrect, please try again');
+            return redirect('/login')->with('error', 'Your email address or password is incorrect, please try again');
         }
     }
 }
