@@ -873,12 +873,24 @@ class CheckoutController extends Controller
         
         $shipping_offer_rates = [];
         foreach($shipping_services_without_conditions as $row){
-            $expected_delivery_date = $this->delivery_leadtime($row->min_leadtime, $row->max_leadtime);
+			$max_leadtime = DB::table('fumaco_shipping_product_category as a')
+				->join('fumaco_shipping_service as b', 'a.shipping_service_id', 'b.shipping_service_id')->whereIn('a.category_id', array_column($order_items->toArray(), 'f_cat_id'))
+				->where('b.shipping_service_id', $row->shipping_service_id)->max('a.max_leadtime');
+
+			$min_leadtime = DB::table('fumaco_shipping_product_category as a')
+				->join('fumaco_shipping_service as b', 'a.shipping_service_id', 'b.shipping_service_id')->whereIn('a.category_id', array_column($order_items->toArray(), 'f_cat_id'))
+				->where('b.shipping_service_id', $row->shipping_service_id)->max('a.min_leadtime');
+
+			$min = ($min_leadtime > 0) ? $min_leadtime : $row->min_leadtime;
+			$max = ($max_leadtime > 0) ? $max_leadtime : $row->max_leadtime;
+
+			$expected_delivery_date = $this->delivery_leadtime($min, $max);
+
             $shipping_offer_rates[] = [
                 'shipping_service_name' => $row->shipping_service_name,
                 'expected_delivery_date' => $expected_delivery_date,
-				'min_lead_time' => $row->min_leadtime,
-				'max_lead_time' => $row->max_leadtime,
+				'min_lead_time' => $min,
+				'max_lead_time' => $max,
                 'shipping_cost' => (float)$row->amount,
                 'external_carrier' => false,
                 'allow_delivery_after' => 0,
@@ -891,8 +903,6 @@ class CheckoutController extends Controller
             ->whereIn('a.shipping_service_id', $shipping_services_arr)->get();
 
         foreach($shipping_services as $row){
-            $expected_delivery_date = $this->delivery_leadtime($row->min_leadtime, $row->max_leadtime);
-
             if($row->shipping_calculation == 'Per Cubic cm') {
                 $shipping_cost = $row->shipping_amount * $total_cubic_cm;
             }
@@ -920,11 +930,24 @@ class CheckoutController extends Controller
             }
 
             if($shipping_cost !== false) {
+				$max_leadtime = DB::table('fumaco_shipping_product_category as a')
+					->join('fumaco_shipping_service as b', 'a.shipping_service_id', 'b.shipping_service_id')->whereIn('a.category_id', array_column($order_items->toArray(), 'f_cat_id'))
+					->where('b.shipping_service_id', $row->shipping_service_id)->max('a.max_leadtime');
+
+				$min_leadtime = DB::table('fumaco_shipping_product_category as a')
+					->join('fumaco_shipping_service as b', 'a.shipping_service_id', 'b.shipping_service_id')->whereIn('a.category_id', array_column($order_items->toArray(), 'f_cat_id'))
+					->where('b.shipping_service_id', $row->shipping_service_id)->max('a.min_leadtime');
+
+				$min = ($min_leadtime > 0) ? $min_leadtime : $row->min_leadtime;
+				$max = ($max_leadtime > 0) ? $max_leadtime : $row->max_leadtime;
+
+				$expected_delivery_date = $this->delivery_leadtime($min, $max);
+
                 $shipping_offer_rates[] = [
                     'shipping_service_name' => $row->shipping_service_name,
                     'expected_delivery_date' => $expected_delivery_date,
-					'min_lead_time' => $row->min_leadtime, //
-					'max_lead_time' => $row->max_leadtime, //
+					'min_lead_time' => $min, //
+					'max_lead_time' => $max, //
                     'shipping_cost' => $shipping_cost,
                     'external_carrier' => false,
                     'allow_delivery_after' => 0,
@@ -940,11 +963,15 @@ class CheckoutController extends Controller
 				->join('fumaco_shipping_service_store', 'fumaco_shipping_service_store.store_location_id', 'fumaco_store.store_id')
 				->where('shipping_service_id', $row->shipping_service_id)->select('store_name', 'available_from', 'available_to', 'address')->get();
 
+			$max_leadtime = DB::table('fumaco_shipping_product_category as a')
+				->join('fumaco_shipping_service as b', 'a.shipping_service_id', 'b.shipping_service_id')->whereIn('a.category_id', array_column($order_items->toArray(), 'f_cat_id'))
+				->where('b.shipping_service_id', $row->shipping_service_id)->max('a.max_leadtime');
+
 			$shipping_offer_rates[] = [
 				'shipping_service_name' => $row->shipping_service_name,
 				'expected_delivery_date' => null,
 				'min_lead_time' => null, //
-				'max_lead_time' => null, //
+				'max_lead_time' => ($max_leadtime > 0) ? $max_leadtime : $row->max_leadtime, //
 				'shipping_cost' => 0,
 				'external_carrier' => false,
 				'allow_delivery_after' => 0,
@@ -953,7 +980,6 @@ class CheckoutController extends Controller
 			];
 		}
 	
-
 		return $shipping_offer_rates;
 	}
 

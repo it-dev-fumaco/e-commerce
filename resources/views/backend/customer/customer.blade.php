@@ -42,12 +42,12 @@
                                             </form>
                                         </div>
                                     </div>
-                                    <table class="table">
+                                    <table class="table table-hover table-bordered">
                                         <tr>
                                             <th>First name</th>
                                             <th>Last Name</th>
                                             <th>Email</th>
-                                            <th>Contact</th>
+                                            <th>Date Registered</th>
                                             <th>Total No. of Visits</th>
                                             <th>Last login</th>
                                             <th>Action</th>
@@ -57,9 +57,9 @@
                                                 <td>{{ $user['first_name'] }}</td>
                                                 <td>{{ $user['last_name'] }}</td>
                                                 <td>{{ $user['email'] }}</td>
-                                                <td>{{ $user['contact'] }}</td>
-                                                <td></td>
-                                                <td></td>
+                                                <td>{{ $user['created_at'] }}</td>
+                                                <td>{{ $user['no_of_visits'] }}</td>
+                                                <td>{{ $user['last_login'] }}</td>
                                                 <td class="col-sm-3">
                                                     <button type="button" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#ship-{{ $user['id'] }}">
                                                         Shipping Address

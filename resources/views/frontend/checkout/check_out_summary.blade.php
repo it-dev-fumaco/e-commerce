@@ -236,7 +236,7 @@
 							@forelse ($shipping_rates as $l => $srate)
 							<div class="d-flex justify-content-between align-items-center">
 								<div class="form-check">
-									<input class="form-check-input" type="radio" name="shipping_fee" id="{{ 'sr' . $l }}" value="{{ $srate['shipping_cost'] }}" data-sname="{{ $srate['shipping_service_name'] }}" data-est="{{ $srate['expected_delivery_date'] }}" data-pickup="{{ $srate['pickup'] }}" required {{ $loop->first ? 'checked' : '' }}>
+									<input class="form-check-input" type="radio" name="shipping_fee" id="{{ 'sr' . $l }}" value="{{ $srate['shipping_cost'] }}" data-sname="{{ $srate['shipping_service_name'] }}" data-est="{{ $srate['expected_delivery_date'] }}" data-pickup="{{ $srate['pickup'] }}" required {{ $loop->first ? 'checked' : '' }} data-lead="{{ $srate['max_lead_time'] }}">
 									<label class="form-check-label" for="{{ 'sr' . $l }}">{{ $srate['shipping_service_name'] }} <br class="d-xl-none"/>
 										@if (count($srate['stores']) <= 0)<small class="fst-italic">({{ $srate['min_lead_time'] . " - ". $srate['max_lead_time'] . " Days" }})</small>@endif</label>
 								</div>
@@ -1147,6 +1147,16 @@
 				$('#for-store-pickup').removeClass('d-none');
 				$('#store-selection').val('');
 				$('#store-selection').attr('required', true);
+
+				var l = $("input[name='shipping_fee']:checked").data('lead');
+
+				$("#pickup-time").datepicker({
+					showInputs: false,
+					startDate: '+'+ l +'d',
+					format: 'D, M. dd, yyyy',
+					autoclose: true,
+					daysOfWeekDisabled: [0]
+				});
 			}else{
 				$('#for-store-pickup').addClass('d-none');
 				$('#store-selection').removeAttr('required');
@@ -1348,14 +1358,6 @@
 					data: brgy_bill
 				});
 			});
-		});
-
-		$("#pickup-time").datepicker({
-			showInputs: false,
-			startDate: new Date(),
-			format: 'D, M. dd, yyyy',
-			autoclose: true,
-			daysOfWeekDisabled: [0]
 		});
 
 		$('#store-selection').on('change', function(e){

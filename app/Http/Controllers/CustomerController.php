@@ -87,7 +87,10 @@ class CustomerController extends Controller
                 'bill_brgy' => $bill_brgy,
                 'bill_postal' => $bill_postal,
                 'bill_country' => $bill_country,
-                'bill_type' => $bill_type
+                'bill_type' => $bill_type,
+                'created_at' => $user->created_at,
+                'no_of_visits' => number_format($user->no_of_visits),
+                'last_login' => $user->last_login
             ];
         }
         // dd($user_arr);
