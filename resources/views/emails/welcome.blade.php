@@ -19,8 +19,7 @@
 
      <tr>
         <td class="bodycopy" style="padding: 5% 0 0 5%;">
-          Username : {{ $details['username'] }}<br>
-          Password : {{ str_repeat("*", strlen($details['password'])) }}
+          Username : {{ $username }}<br>
         </td>
      </tr>
      <tr>

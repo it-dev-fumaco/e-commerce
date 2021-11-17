@@ -10,6 +10,9 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\WelcomeEmail;
 use DB;
 use Auth;
+use App\Models\User;
+use App\Models\UserVerify;
+use Illuminate\Support\Str;
 
 use Illuminate\Pagination\LengthAwarePaginator;
 
@@ -353,24 +356,30 @@ class FrontendController extends Controller
     public function userRegistration(Request $request){
         DB::beginTransaction();
         try{
-            $user_check = DB::table('fumaco_users')->where('username', $request->username)->get();
-            
-            if(count($user_check) > 0){
-                return redirect()->back()->with('error', 'Record not created, username already exists.');
-            }
+            $request->validate([
+                'first_name' => 'required',
+                'last_name' => 'required',
+                'username' => 'required|email|unique:fumaco_users,username',
+                'password' => 'required|confirmed|min:6',
+            ],
+            [
+                'password.confirmed' => 'Password does not match.'
+            ]);
 
-            if($request->password != $request->confirm_password){
-                return redirect()->back()->with('error', 'Record not created, password/s do not match.');
-            }
+            $user = new User;
+            $user->username = trim($request->username);
+            $user->password = Hash::make($request->password);
+            $user->f_name = $request->first_name;
+            $user->f_lname = $request->last_name;
+            $user->f_email = 'fumacoco_dev';
+            $user->f_temp_passcode = 'fumaco12345';
+            $user->save();
 
-            $new_user = [
-                'username' => trim($request->username),
-                'password' => password_hash($request->password, PASSWORD_DEFAULT),
-                'f_name' => $request->first_name,
-                'f_lname' => $request->last_name,
-                'f_email' => 'fumacoco_dev',
-                'f_temp_passcode' => 'fumaco12345'
-            ];
+            $token = Str::random(64);
+            UserVerify::create([
+                'user_id' => $user->id, 
+                'token' => $token
+            ]);
 
             if(isset($request->subscribe)){
                 $checker = DB::table('fumaco_subscribe')->where('email', $request->username)->count();
@@ -385,21 +394,67 @@ class FrontendController extends Controller
                 }
             }
 
-            DB::table('fumaco_users')->insert($new_user);
-
-            Mail::to(trim($request->username))
-                ->queue(new WelcomeEmail(['username' => trim($request->username), 'password' => $request->password]));
-            // check for failures
-            if (Mail::failures()) {
-                return redirect()->back()->with('error', 'There was a problem in user registration. Please try again.');
-            }
+            Mail::send('emails.verify_email', ['token' => $token], function($message) use($request){
+                $message->to($request->username);
+                $message->subject('Verify email from Fumaco.com');
+            });
 
             DB::commit();
 
-            return redirect('/login')->with('success', 'Account successfully created. You can login now!');
+            return redirect('/myprofile/verify/email')->with('email', $request->username);
         }catch(Exception $e){
             DB::rollback();
         }
+    }
+
+    public function resendVerification($email) {
+        $existing = User::where('username', $email)->first();
+        if ($existing) {
+            $token = Str::random(64);
+            UserVerify::create([
+                'user_id' => $existing->id, 
+                'token' => $token
+            ]);
+
+            Mail::send('emails.verify_email', ['token' => $token], function($message) use($email){
+                $message->to($email);
+                $message->subject('Verify email from Fumaco.com');
+            });
+        }
+
+        return redirect()->back()->with(['email' => $email, 'resend' => true]);
+    }
+
+    public function verifyAccount($token) {
+        $verifyUser = UserVerify::where('token', $token)->first();
+
+        $message = 'Sorry your email cannot be identified.';
+        if(!is_null($verifyUser) ){
+            $user = User::find($verifyUser->user_id);
+
+            if(!$user->is_email_verified) {
+                $verifyUser->user->is_email_verified = 1;
+                $verifyUser->user->save();
+                $message = "Your email is verified. You can now login.";
+
+                Mail::send('emails.welcome', ['username' => trim($user->username), 'password' => $user->password], function($message) use($user){
+                    $message->to($user->username);
+                    $message->subject('Welcome Email from Fumaco.com');
+                });
+            } else {
+                $message = "Your email is already verified. You can now login.";
+            }
+        }
+     
+        return redirect('/login')->with('success', $message);
+    }
+
+    public function emailVerify() {
+        if (!session('email')) {
+            return redirect('/');
+        }
+
+        return view('frontend.email_verify');
     }
 
     public function viewAboutPage() {

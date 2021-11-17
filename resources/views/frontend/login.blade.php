@@ -36,8 +36,13 @@
 
                     @if(session()->has('error'))
                         <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            {{ session()->get('error') }}
+                            {!! session()->get('error') !!}
                         </div>
+                    @endif
+                    @if (session()->has('resend'))
+                    <div class="alert alert-success alert-dismissible fade show text-center" role="alert">
+                        Email has been resent
+                    </div>
                     @endif
                         @csrf
                         <h4 style="color: #404040; border-bottom: 2px solid  #e59866 ; padding-bottom: 8px; text-align: center;">Sign In</h4>
@@ -154,39 +159,6 @@
   }
  </style>
 
-<script>
-
-    function toggleResetPswd(e){
-        e.preventDefault();
-        $('#logreg-forms .form-signin').toggle() // display:block or none
-        $('#logreg-forms .form-reset').toggle() // display:block or none
-    }
-
-    function toggleSignUp(e){
-        e.preventDefault();
-        $('#logreg-forms .form-signin').toggle(); // display:block or none
-        $('#logreg-forms .form-signup').toggle(); // display:block or none
-    }
-
-    $(()=>{
-        // Login Register Form
-        $('#logreg-forms #forgot_pswd').click(toggleResetPswd);
-        $('#logreg-forms #cancel_reset').click(toggleResetPswd);
-        $('#logreg-forms #btn-signup').click(toggleSignUp);
-        $('#logreg-forms #cancel_signup').click(toggleSignUp);
-    })
-
-    $(document).ready(function() {
-        $('#terms_checkbox').click(function() {
-            if($(this).prop("checked") == false) {
-                $("#reg_btn").prop('disabled',true);
-            }else{
-                $("#reg_btn").prop('disabled',false);
-            }
-        });
-    });
-
-	</script>
 @endsection
 
 @section('style')

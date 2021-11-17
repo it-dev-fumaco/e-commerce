@@ -50,9 +50,17 @@ class LoginController extends Controller
         ]);
 
         if (Auth::attempt(['username' => $request->username,'password' => $request->password], $request->remember)) {
+            if (!Auth::user()->is_email_verified) {
+                auth()->logout();
+    
+                return redirect()->back()->withInput()
+                    ->with('error', '<p class="p-1 text-center">Please verify your email for a verification link. If you did not receive the email then <a href="/resend_verification/'.$request->username.'"  class="d-inline-block m-0">resend the verification email</a>.</p>');
+            }
+
             if ($request->has('summary')){
                 return redirect('/checkout/summary');
             }
+            
             return redirect('/');
         }
 
@@ -86,6 +94,7 @@ class LoginController extends Controller
                 $newUser->facebook_id = $user->id;
                 $newUser->f_email = 'fumacoco_dev';
                 $newUser->f_temp_passcode = 'fumaco12345';
+                $newUser->is_email_verified = 1;
                 $newUser->save();
 
                 Auth::loginUsingId($newUser->id);
@@ -118,6 +127,7 @@ class LoginController extends Controller
                 $newUser->google_id = $user->id;
                 $newUser->f_email = 'fumacoco_dev';
                 $newUser->f_temp_passcode = 'fumaco12345';
+                $newUser->is_email_verified = 1;
                 $newUser->save();
 
                 Auth::loginUsingId($newUser->id);
@@ -149,6 +159,7 @@ class LoginController extends Controller
                 $newUser->linkedin_id = $user->id;
                 $newUser->f_email = 'fumacoco_dev';
                 $newUser->f_temp_passcode = 'fumaco12345';
+                $newUser->is_email_verified = 1;
                 $newUser->save();
 
                 Auth::loginUsingId($newUser->id);

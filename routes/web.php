@@ -64,6 +64,8 @@ Route::get('/thankyou', 'FrontendController@subscribeThankyou');
 Route::get('/policy_pages', 'FrontendController@pagesList');
 Route::get('/pages/{slug}', 'FrontendController@viewPage')->name('pages');
 
+Route::get('/myprofile/verify/email', 'FrontendController@emailVerify');
+
 Route::group(['middleware' => 'auth'], function(){
     Route::get('/mywishlist', 'FrontendController@viewWishlist');
     Route::delete('/mywishlist/{id}/delete', 'FrontendController@deleteWishlist');
@@ -108,6 +110,9 @@ Route::post('/checkout/success/{id}', 'CheckoutController@orderSuccess');
 Route::get('/checkout/failed', 'CheckoutController@orderFailed');
 Route::post('/checkout/failed', 'CheckoutController@orderFailed');
 Route::post('/checkout/callback', 'CheckoutController@paymentCallback');
+
+Route::get('/verify_email/{token}', 'FrontendController@verifyAccount')->name('account.verify');
+Route::get('/resend_verification/{email}', 'FrontendController@resendVerification');
 
 Auth::routes();
 
