@@ -43,12 +43,15 @@ class SettingsController extends Controller
                         'api_secret_key' => null,
                         'merchant_type' => null,
                         'service_id' => null,
-                        'password' => null
+                        'password' => null,
+                        'last_modified_by' => Auth::user()->username,
                     ]);
                 } else {
                     DB::table('api_setup')->insert([
                         'type' => 'google_maps_api',
                         'api_key' => $request->google_maps_api,
+                        'created_by' => Auth::user()->username,
+                        'last_modified_by' => Auth::user()->username,
                     ]);
                 }
                 // insert api for google analytics
@@ -60,12 +63,15 @@ class SettingsController extends Controller
                         'api_secret_key' => null,
                         'merchant_type' => null,
                         'service_id' => null,
-                        'password' => null
+                        'password' => null,
+                        'last_modified_by' => Auth::user()->username,
                     ]);
                 } else {
                     DB::table('api_setup')->insert([
                         'type' => 'google_analytics_api',
                         'api_key' => $request->google_analytics_api,
+                        'created_by' => Auth::user()->username,
+                        'last_modified_by' => Auth::user()->username,
                     ]);
                 }
 
@@ -83,7 +89,8 @@ class SettingsController extends Controller
                         'api_secret_key' => $request->api_secret_key,
                         'merchant_type' => $request->merchant_type,
                         'service_id' => $request->service_id,
-                        'password' => $request->password
+                        'password' => $request->password,
+                        'last_modified_by' => Auth::user()->username,
                     ]);
                 } else {
                     DB::table('api_setup')->insert([
@@ -93,7 +100,9 @@ class SettingsController extends Controller
                         'api_secret_key' => $request->api_secret_key,
                         'merchant_type' => $request->merchant_type,
                         'service_id' => $request->service_id,
-                        'password' => $request->password
+                        'password' => $request->password,
+                        'created_by' => Auth::user()->username,
+                        'last_modified_by' => Auth::user()->username,
                     ]);
                 }
             }

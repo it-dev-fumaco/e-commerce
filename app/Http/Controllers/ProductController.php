@@ -278,7 +278,8 @@ class ProductController extends Controller
                 'url_title' => $request->url_title,
                 'meta_description' => $request->meta_description,
                 'slug' => $request->slug,
-                'created_by' => Auth::user()->username
+                'created_by' => Auth::user()->username,
+                'last_modified_by' => Auth::user()->username,
             ]);
 
             // insert item attributes
@@ -310,7 +311,8 @@ class ProductController extends Controller
                     'idcode' => $attr['parent'],
                     'attribute_name_id' => $attr_name_id,
                     'attribute_value' => $attribute_value,
-                    'created_by' => Auth::user()->username
+                    'created_by' => Auth::user()->username,
+                    'last_modified_by' => Auth::user()->username,
                 ];
             }
 
@@ -371,7 +373,8 @@ class ProductController extends Controller
                 'keywords' => $request->keywords,
                 'url_title' => $request->url_title,
                 'meta_description' => $request->meta_description,
-                'slug' => $request->slug
+                'slug' => $request->slug,
+                'last_modified_by' => Auth::user()->username,
             ]);
 
             if($detail->f_cat_id != $request->product_category) {
@@ -390,7 +393,9 @@ class ProductController extends Controller
                         $attr_id = DB::table('fumaco_attributes_per_category')->insertGetId([
                             'category_id' => $request->product_category,
                             'attribute_name' => $attr->attribute_name,
-                            'slug' => Str::slug($attr->attribute_name, '-')
+                            'slug' => Str::slug($attr->attribute_name, '-'),
+                            'created_by' => Auth::user()->username,
+                            'last_modified_by' => Auth::user()->username,
                         ]);
                     }
                     // get attribute name id
@@ -398,6 +403,7 @@ class ProductController extends Controller
                     DB::table('fumaco_items_attributes')->where('id', $attr->id)->update(
                         [
                             'attribute_name_id' => $attr_name_id,
+                            'last_modified_by' => Auth::user()->username,
                         ]
                     );
                 }
@@ -440,7 +446,7 @@ class ProductController extends Controller
     public function disableItem($item_code) {
         DB::beginTransaction();
         try {
-            DB::table('fumaco_items')->where('f_idcode', $item_code)->update(['f_status' => 0]);
+            DB::table('fumaco_items')->where('f_idcode', $item_code)->update(['f_status' => 0, 'last_modified_by' => Auth::user()->username]);
 
             DB::commit();
 
@@ -455,7 +461,7 @@ class ProductController extends Controller
     public function enableItem($item_code) {
         DB::beginTransaction();
         try {
-            DB::table('fumaco_items')->where('f_idcode', $item_code)->update(['f_status' => 1]);
+            DB::table('fumaco_items')->where('f_idcode', $item_code)->update(['f_status' => 1, 'last_modified_by' => Auth::user()->username]);
 
             DB::commit();
 
@@ -474,7 +480,7 @@ class ProductController extends Controller
             $details = DB::table('fumaco_items')->where('id', $id)->first();
             if ($details) {
                 $featured = ($details->f_featured) ? 0 : 1;
-                DB::table('fumaco_items')->where('id', $id)->update(['f_featured' => $featured]);
+                DB::table('fumaco_items')->where('id', $id)->update(['f_featured' => $featured, 'last_modified_by' => Auth::user()->username]);
             }
 
             DB::commit();
@@ -604,7 +610,7 @@ class ProductController extends Controller
             foreach($attr_names as $i => $attr_name) {
                 DB::table('fumaco_attributes_per_category')
                     ->where('category_id', $cat_id)->where('attribute_name', $attr_name)
-                    ->update(['status' => $status[$i]]);
+                    ->update(['status' => $status[$i], 'last_modified_by' => Auth::user()->username]);
             }
 
             DB::commit();
@@ -624,8 +630,8 @@ class ProductController extends Controller
 
         $img_arr = [];
         foreach($item_image as $img){
-            $img_zoom = ($img->imgoriginalx) ? $img->imgoriginalx : 'test.jpg';
-            $img_primary = ($img->imgprimayx) ? $img->imgprimayx : 'test.jpg';
+            $img_zoom = ($img->imgoriginalx) ? $img->imgoriginalx : null;
+            $img_primary = ($img->imgprimayx) ? $img->imgprimayx : null;
 
             $img_arr[] = [
                 'img_id' => $img->id,
@@ -742,7 +748,8 @@ class ProductController extends Controller
                 'img_name' => " ",
                 'imgprimayx' => $p_name,
                 'imgoriginalx' => $z_name,
-                'img_status' => 1
+                'img_status' => 1,
+                'created_by' => Auth::user()->username,
 			];
 
             DB::table('fumaco_items_image_v1')->insert($images_arr);
@@ -796,7 +803,8 @@ class ProductController extends Controller
                 if (!$existing) {
                     $values[] = [
                         'item_code' => $parent_code,
-                        'related_item_code' => $item
+                        'related_item_code' => $item,
+                        'created_by' => Auth::user()->username,
                     ];
                 }
             }
@@ -847,7 +855,8 @@ class ProductController extends Controller
                 'f_price' => $discounted_price,
                 'f_onsale' => 1,
                 'f_discount_percent' => $discount_percentage,
-                'f_discount_trigger' => 1
+                'f_discount_trigger' => 1,
+                'last_modified_by' => Auth::user()->username,
             ]);
 
             DB::commit();
@@ -863,7 +872,7 @@ class ProductController extends Controller
     public function disableProductOnSale($item_code) {
         DB::beginTransaction();
         try {
-            DB::table('fumaco_items')->where('f_idcode', $item_code)->update(['f_onsale' => 0, 'f_discount_trigger' => 0]);
+            DB::table('fumaco_items')->where('f_idcode', $item_code)->update(['f_onsale' => 0, 'f_discount_trigger' => 0, 'last_modified_by' => Auth::user()->username]);
 
             DB::commit();
 

@@ -2,13 +2,12 @@
 	'namePage' => 'Track Order',
 	'activePage' => 'track_order'
 ])
-
 @section('content')
 	<main style="background-color:#0062A5;">
 		<div id="myCarousel" class="carousel slide" data-bs-ride="carousel">
 			<div class="carousel-inner">
 				<div class="carousel-item active" style="height: 13rem !important;">
-					<img src="{{ asset('/assets/site-img/header3-sm.png') }}" alt="" style="position: absolute; top: 0;left: 0;min-width: 100%; height: 100% !important;">
+					<img src="{{ asset('/assets/site-img/header3-sm.png') }}" alt="" style="position: absolute; bottom: 0 !important;left: 0;min-width: 100%; height: 100% !important;">
 					<div class="container">
 						<div class="carousel-caption text-start" style="bottom: 1rem !important; right: 25% !important; left: 25%; !important;">
 							<center><h3 class="carousel-header-font">ORDER STATUS</h3></center>

@@ -23,7 +23,7 @@ class UserManagementController extends Controller
         DB::beginTransaction();
         try {
             $acc_name = ($request->account_name) ? $request->account_name : ' ';
-            DB::table('fumaco_admin_user')->where('username', $request->username)->update(['account_name' => $acc_name, 'user_type' => $request->user_type]); 
+            DB::table('fumaco_admin_user')->where('username', $request->username)->update(['account_name' => $acc_name, 'user_type' => $request->user_type, 'last_modified_by' => Auth::user()->username]); 
             DB::commit();
             return redirect()->back()->with('success', 'Admin Information Edited.');
         } catch (Exception $e) {
@@ -59,7 +59,9 @@ class UserManagementController extends Controller
                 'account_name' => $request->account_name,
                 'username' => $request->username,
                 'password' => password_hash($request->password, PASSWORD_DEFAULT),
-                'user_type' => $request->user_type
+                'user_type' => $request->user_type,
+                'created_by' => Auth::user()->username,
+                'last_modified_by' => Auth::user()->username,
             ];
 
             if($request->password != $request->confirm){
@@ -78,7 +80,7 @@ class UserManagementController extends Controller
     public function adminChangeStatus(Request $request){
         DB::beginTransaction();
         try {
-            DB::table('fumaco_admin_user')->where('id', $request->admin_id)->update(['xstatus' => $request->status]);
+            DB::table('fumaco_admin_user')->where('id', $request->admin_id)->update(['xstatus' => $request->status, 'last_modified_by' => Auth::user()->username]);
             DB::commit();
             return response()->json(['status' => 1, 'message' => 'Status Changed']);
         } catch (Exception $e) {
@@ -100,18 +102,8 @@ class UserManagementController extends Controller
             }
 
             $user = DB::table('fumaco_admin_user')->where('id', $id)->first();
-
-            if (!(Hash::check($request->get('current'), $user->password))) {
-                return redirect()->back()->with("error","Your current password does not match with the password you provided. Please try again.");
-            }
-    
-            if(strcmp($request->get('current'), $request->get('password')) == 0){
-                //Current password and new password are same
-                return redirect()->back()->with("error","New password cannot be same as your current password. Please choose a different password.");
-            }
     
             $rules = array(
-                'current' => 'required',
                 'password' => 'required|string|min:4|max:255',
                 'confirm' => 'required|string'
             );
@@ -122,7 +114,7 @@ class UserManagementController extends Controller
 				return redirect()->back()->with('error', 'Password should be at least 4 characters');
 			}
 
-            DB::table('fumaco_admin_user')->where('id', $id)->update(['password' => password_hash($request->password, PASSWORD_DEFAULT)]);
+            DB::table('fumaco_admin_user')->where('id', $id)->update(['password' => password_hash($request->password, PASSWORD_DEFAULT), 'last_modified_by' => Auth::user()->username]);
             DB::commit();
 
             return redirect()->back()->with('success', 'Password Changed.');
@@ -160,7 +152,7 @@ class UserManagementController extends Controller
 				return redirect()->back()->with('error', 'Password should be at least 4 characters');
 			}
 
-            DB::table('fumaco_admin_user')->where('id', Auth::user()->id)->update(['password' => password_hash($request->password, PASSWORD_DEFAULT)]);
+            DB::table('fumaco_admin_user')->where('id', Auth::user()->id)->update(['password' => password_hash($request->password, PASSWORD_DEFAULT), 'last_modified_by' => Auth::user()->username]);
             DB::commit();
 
             return redirect()->back()->with('success', 'Password Changed.');

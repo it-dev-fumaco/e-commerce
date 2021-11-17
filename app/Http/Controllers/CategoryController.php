@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use DB;
-
+use Auth;
 
 class CategoryController extends Controller
 {
@@ -32,7 +32,8 @@ class CategoryController extends Controller
                 'hide_none' => (isset($request->hide_na)) ? 1 : 0,
                 'external_link' => ($request->edit_is_external_link) ? $request->external_link : null,
                 'meta_keywords' => $request->cat_meta_keywords,
-                'meta_description' => $request->cat_meta_desc
+                'meta_description' => $request->cat_meta_desc,
+                'last_modified_by' => Auth::user()->username,
             ];
 
             DB::table('fumaco_categories')->where('id', $id)->update($cat_edit);
@@ -53,7 +54,9 @@ class CategoryController extends Controller
                 'image' => $request->add_cat_icon,
                 'slug' => $request->add_cat_slug,
                 'code' => " ",
-                'external_link' => ($request->is_external_link) ? $request->external_link : null
+                'external_link' => ($request->is_external_link) ? $request->external_link : null,
+                'created_by' => Auth::user()->username,
+                'last_modified_by' => Auth::user()->username,
             ];
             if($request->add_cat_slug){
                 $rules = array(
@@ -115,7 +118,7 @@ class CategoryController extends Controller
     public function resetOrder($id){
         DB::beginTransaction();
         try {
-            DB::table('fumaco_items')->where('f_idcode', $id)->update(['f_order_by' => 'P']);
+            DB::table('fumaco_items')->where('f_idcode', $id)->update(['f_order_by' => 'P', 'last_modified_by' => Auth::user()->username]);
             DB::commit();
             return redirect()->back()->with('success', 'Order No. Changed.');
         } catch (Exception $e) {
@@ -132,7 +135,7 @@ class CategoryController extends Controller
             if(count($checker) > 0){
                 return redirect()->back()->with('error', 'Sorry, order number '.$request->item_row.' is taken.');
             }
-            DB::table('fumaco_items')->where('f_idcode', $request->item_code)->update(['f_order_by' => $request->item_row]);
+            DB::table('fumaco_items')->where('f_idcode', $request->item_code)->update(['f_order_by' => $request->item_row, 'last_modified_by' => Auth::user()->username]);
             DB::commit();
             return redirect()->back()->with('success', 'Order No. Changed.');
         } catch (Exception $e) {
@@ -144,7 +147,7 @@ class CategoryController extends Controller
     public function publishCategory(Request $request){
         DB::beginTransaction();
         try {
-            DB::table('fumaco_categories')->where('id', $request->cat_id)->update(['publish' => $request->publish]);
+            DB::table('fumaco_categories')->where('id', $request->cat_id)->update(['publish' => $request->publish, 'last_modified_by' => Auth::user()->username]);
             DB::commit();
             return response()->json(['status' => 1, 'message' => 'Test']);
         } catch (Exception $e) {

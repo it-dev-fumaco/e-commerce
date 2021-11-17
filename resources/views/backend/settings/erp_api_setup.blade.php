@@ -69,6 +69,9 @@
 									<label for="api-secret-key">API Secret Key</label>
 									<input type="text" class="form-control" id="api-secret-key" name="api_secret_key" value="{{ ($api_details) ? $api_details->api_secret_key : old('api_secret_key') }}" required>
 								</div>
+								<div class="float-right font-italic">
+									<small>Last modified by: {{ ($api_details) ? $api_details->last_modified_by . ' - ' . $api_details->last_modified_at : '' }}</small>
+								</div>
 							</div>
 							<!-- /.card-body -->
 							<div class="card-footer">

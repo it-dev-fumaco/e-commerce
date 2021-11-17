@@ -77,6 +77,7 @@ Route::group(['middleware' => 'auth'], function(){
     Route::post('/myprofile/change_password/{id}/update', 'FrontendController@updatePassword');
     Route::get('/myprofile/address', 'FrontendController@viewAddresses');
     Route::delete('/myprofile/address/{id}/{type}/delete', 'FrontendController@deleteAddress');
+    Route::post('/myprofile/address/{id}/{type}/update', 'FrontendController@updateAddress');
     Route::get('/myprofile/address/{id}/{type}/change_default/{summary?}', 'FrontendController@setDefaultAddress');
     Route::get('/myprofile/address/{type}/new', 'FrontendController@addAddressForm');
     Route::post('/myprofile/address/{type}/save', 'FrontendController@saveAddress');

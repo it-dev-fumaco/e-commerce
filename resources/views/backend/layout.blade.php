@@ -53,6 +53,9 @@
       <li class="nav-item">
         <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
       </li>
+      <li class="nav-item">
+        <p class="mt-2 mb-0">You are logged in as <b>{{ Auth::user()->account_name }}</b></p>
+      </li>
     </ul>
 
     <!-- Right navbar links -->
@@ -176,11 +179,11 @@
               <p>Dashboard</p>
             </a>
           </li>
-          <li class="nav-header">CONTENT MANAGEMENT</li>
+          <li class="nav-header {{ Auth::user()->user_type == 'Sales Admin' ? 'd-none' : ''  }}">CONTENT MANAGEMENT</li>
           @php
               $pages = ['pages_list', 'home_crud', 'privacy_policy', 'terms_condition', 'contact_us', 'about_us', 'about_us_sponsors'];
           @endphp
-          <li class="nav-item {{ (in_array($activePage, $pages) ? 'menu-open' : '') }}">
+          <li class="nav-item {{ (in_array($activePage, $pages) ? 'menu-open' : '') }} {{ Auth::user()->user_type == 'Sales Admin' ? 'd-none' : ''  }}">
             <a href="#" class="nav-link {{ (in_array($activePage, $pages) ? 'active' : '') }}">
               <i class="nav-icon fas fa-book"></i>
               <p>Pages <i class="fas fa-angle-left right"></i></p>
@@ -216,7 +219,7 @@
           @php
               $blog_pages = ['subscribers_list', 'blog_list', 'blog_comments_list'];
           @endphp
-          <li class="nav-item {{ (in_array($activePage, $blog_pages) ? 'menu-open' : '') }}">
+          <li class="nav-item {{ (in_array($activePage, $blog_pages) ? 'menu-open' : '') }} {{ Auth::user()->user_type == 'Sales Admin' ? 'd-none' : ''  }}">
             <a href="#" class="nav-link {{ (in_array($activePage, $blog_pages) ? 'active' : '') }}">
               <i class="nav-icon fab fa-blogger"></i>
               <p>Blog Content<i class="fas fa-angle-left right"></i></p>

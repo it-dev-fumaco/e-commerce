@@ -309,6 +309,10 @@
                            <label for="product-meta-description">Meta Description</label>
                            <textarea class="form-control" rows="3" id="product-meta-description" name="meta_description">{{ old('meta_description') }}{{ $details->meta_description }}</textarea>
                          </div>
+                         <div class="float-right font-italic">
+                           <small>Last modified by: {{ $details->last_modified_by }} - {{ $details->last_modified_at }}</small><br>
+                           <small>Created by: {{ $details->created_by }} - {{ $details->created_at }}</small>
+                       </div>
                      </div>
 
                      <!-- /.card-body -->

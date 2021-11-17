@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Http;
 use DB;
 use Mail;
 use Carbon\Carbon;
+use Auth;
 
 class OrderController extends Controller
 {
@@ -226,7 +227,7 @@ class OrderController extends Controller
                         $items = DB::table('fumaco_items')->select('f_reserved_qty')->where('f_idcode', $orders->item_code)->first();
                         $qty_left = $items->f_reserved_qty - $orders->item_qty;
 
-                        DB::table('fumaco_items')->where('f_idcode', $orders->item_code)->update(['f_reserved_qty' => $qty_left]);
+                        DB::table('fumaco_items')->where('f_idcode', $orders->item_code)->update(['f_reserved_qty' => $qty_left, 'last_modified_by' => Auth::user()->username]);
                     }
                 }
 
@@ -237,7 +238,7 @@ class OrderController extends Controller
                         $r_qty = $items->f_reserved_qty - $orders->item_qty;
                         $f_qty = $items->f_qty + $orders->item_qty;
 
-                        DB::table('fumaco_items')->where('f_idcode', $orders->item_code)->update(['f_reserved_qty' => $r_qty]);
+                        DB::table('fumaco_items')->where('f_idcode', $orders->item_code)->update(['f_reserved_qty' => $r_qty, 'last_modified_by' => Auth::user()->username]);
                     }
                 }
 
@@ -245,7 +246,8 @@ class OrderController extends Controller
                     'order_status' => $status,
                     'order_update' => $now,
                     'date_delivered' => $delivery_date,
-                    'date_cancelled' => $date_cancelled
+                    'date_cancelled' => $date_cancelled,
+                    'last_modified_by' => Auth::user()->username,
                 ];
 
                 if($status == 'Order Confirmed'){

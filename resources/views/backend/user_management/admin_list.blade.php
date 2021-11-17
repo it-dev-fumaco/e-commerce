@@ -117,8 +117,12 @@
                                                                                     <option {{ ($a->user_type == "" ) ? 'selected' : '' }} disabled value="">Select User Type</option>
                                                                                     <option value="System Admin" {{ ($a->user_type == "System Admin" ) ? 'selected' : '' }}>System Admin</option>
                                                                                     <option value="Sales Admin" {{ ($a->user_type == "Sales Admin" ) ? 'selected' : '' }}>Sales Admin</option>
+                                                                                    <option value="Marketing Admin" {{ ($a->user_type == "Marketing Admin" ) ? 'selected' : '' }}>Marketing Admin</option>
                                                                                 </select>
-                                                                            </div>                                                                    
+                                                                            </div>  
+                                                                            <div class="float-right font-italic">
+                                                                                <small>Last modified by: {{ ($a) ? $a->last_modified_by . ' - ' . $a->last_modified_at : '' }}</small>
+                                                                            </div>                                                                  
                                                                         </div>
                                                                         <div class="modal-footer">
                                                                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -142,10 +146,6 @@
                                                                         <div class="modal-body">
                                                                             @csrf
                                                                             <label>Username:</label> {{ $a->username }}
-                                                                            <div class="form-group">
-                                                                                <label for="current">Current Password</label>
-                                                                                <input type="password" class="form-control" name="current" placeholder="Current Password" required>
-                                                                            </div>
                                                                             <div class="form-group">
                                                                                 <label for="password">New Password</label>
                                                                                 <input type="password" class="form-control" name="password" placeholder="Password" required>

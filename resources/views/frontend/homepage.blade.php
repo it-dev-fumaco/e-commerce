@@ -112,15 +112,24 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
 
                     <div class="card-body">
                       <div class="text ellipsis">
-                        <p class="card-text product-head fumacoFont_card_title text-concat prod_desc" style="color:#0062A5 !important;  min-height: 80px;">{{ $bs['item_name'] }}</p>
+                        <p class="card-text product-head fumacoFont_card_title text-concat prod_desc" style="color:#0062A5 !important;  min-height: 100px;">{{ $bs['item_name'] }}</p>
                       </div>
-                      <p class="card-text fumacoFont_card_price" style="color:#000000 !important; ">
+                      <p class="card-text fumacoFont_card_price price-card d-none d-md-block d-lg-none" style="color:#000000 !important; ">
                         @if ($bs['is_discounted'])
                         ₱ {{ number_format(str_replace(",","",$bs['new_price']), 2) }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$bs['orig_price']), 2) }}</s>&nbsp;&nbsp;&nbsp;<span class="badge badge-danger" style="vertical-align: middle;background-color: red;">{{ $bs['discount'] }}% OFF</span>
                         @else
                         ₱ {{ number_format(str_replace(",","",$bs['orig_price']), 2) }}
                         @endif
-                        </p>
+                      </p>
+                      <p class="card-text fumacoFont_card_price d-sm-block d-md-none d-lg-block" style="color:#000000 !important; ">
+                        @if ($bs['is_discounted'])
+                        ₱ {{ number_format(str_replace(",","",$bs['new_price']), 2) }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$bs['orig_price']), 2) }}</s>&nbsp;&nbsp;&nbsp;<span class="badge badge-danger" style="vertical-align: middle;background-color: red;">{{ $bs['discount'] }}% OFF</span>
+                        @else
+                        ₱ {{ number_format(str_replace(",","",$bs['orig_price']), 2) }}
+                        @endif
+                      </p>
+                    </div>
+                    <div class="mx-auto" style="width: 90%;">
                       <div class="d-flex justify-content-between align-items-center">
                         <div class="btn-group stylecap">
                           <span class="fa fa-star starcolorgrey"></span>
@@ -179,9 +188,9 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
 
                     <div class="card-body">
                       <div class="text ellipsis">
-                        <p class="card-text product-head fumacoFont_card_title text-concat prod_desc" style="color:#0062A5 !important; min-height: 80px;">{{ $os['item_name'] }}</p>
+                        <p class="card-text product-head fumacoFont_card_title text-concat prod_desc" style="color:#0062A5 !important; min-height: 100px;">{{ $os['item_name'] }}</p>
                       </div>
-                      <p class="card-text fumacoFont_card_price" style="color:#000000 !important; ">
+                      <p class="card-text fumacoFont_card_price price-card d-none d-md-block d-lg-none" style="color:#000000 !important; min-height: 30px">
                         @if ($os['is_discounted'])
                         ₱ {{ number_format(str_replace(",","",$os['new_price']), 2) }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$os['orig_price']), 2) }}</s>
                         @else
@@ -189,6 +198,16 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
                         @endif
                         &nbsp;&nbsp;<span class="badge badge-danger" style="vertical-align: middle;background-color: red;">{{ $os['discount_percent'] }}% OFF</span>
                       </p>
+                      <p class="card-text fumacoFont_card_price d-sm-block d-md-none d-lg-block" style="color:#000000 !important; min-height: 30px">
+                        @if ($os['is_discounted'])
+                        ₱ {{ number_format(str_replace(",","",$os['new_price']), 2) }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$os['orig_price']), 2) }}</s>
+                        @else
+                        ₱ {{ number_format(str_replace(",","",$os['orig_price']), 2) }}
+                        @endif
+                        &nbsp;&nbsp;<span class="badge badge-danger" style="vertical-align: middle;background-color: red;">{{ $os['discount_percent'] }}% OFF</span>
+                      </p>
+                    </div>
+                    <div class="mx-auto" style="width: 90%;">
                       <div class="d-flex justify-content-between align-items-center">
                         <div class="btn-group stylecap">
                           <span class="fa fa-star starcolorgrey"></span>
@@ -199,9 +218,10 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
                         </div>
                         <small class="text-muted stylecap" style="color:#c4cad0 !important; font-weight:100 !important;">( 0 Reviews )</small>
                       </div>
-                      <br>
+                      <br/>
                     </div>
                   </div>
+                  
                   <a href="/product/{{ ($os['slug']) ? $os['slug'] : $os['item_code'] }}" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto" role="button" style="width: 90% !important; margin-bottom: 20px">View</a>
 
                 </div>
@@ -229,8 +249,8 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
       display: inline-block;
       word-wrap: break-word;
       overflow: hidden;
-      max-height: 5.5em;
-      line-height: 1.4em;
+      max-height: 4.5em;
+      line-height: 1.6em;
       text-align: left;
       font-size: 16px !important;
     }

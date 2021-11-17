@@ -91,6 +91,9 @@
                                             <label for="product-meta-description">Meta Description</label>
                                             <textarea class="form-control" rows="3" name="meta_description">{{ $policy->meta_description }}</textarea>
                                         </div>
+                                        <div class="float-right font-italic">
+                                            <small>Last modified by: {{ $policy->last_modified_by }} - {{ $policy->date_updated }}</small>
+                                        </div>
                                     </div>
                                     <div class="card-footer text-center">
                                         <button type="submit" class="btn btn-primary btn-lg">SUBMIT</button>

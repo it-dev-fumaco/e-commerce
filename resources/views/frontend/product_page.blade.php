@@ -250,15 +250,22 @@
 
 													<div class="card-body">
 														<div class="text ellipsis">
-															<p class="card-text product-head fumacoFont_card_title text-concat prod_desc" style="color:#0062A5 !important;  min-height: 80px;">{{ $rp['item_name'] }}</p>
+															<p class="card-text product-head fumacoFont_card_title text-concat prod_desc" style="color:#0062A5 !important;  min-height: 100px;">{{ $rp['item_name'] }}</p>
 														</div>
-														<p class="card-text fumacoFont_card_price" style="color:#000000 !important; ">
+														<p class="card-text fumacoFont_card_price price-card d-none d-md-block d-lg-none" style="color:#000000 !important; ">
 															@if ($rp['is_discounted'])
 															<span style="white-space: nowrap !important">₱ {{ number_format(str_replace(",","",$rp['new_price']), 2) }}</span>&nbsp;<br class="d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$rp['orig_price']), 2) }}</s>
 															@else
 															₱ {{ number_format(str_replace(",","",$rp['orig_price']), 2) }}
 															@endif
-															</p>
+														</p>
+														<p class="card-text fumacoFont_card_price d-sm-block d-md-none d-lg-block" style="color:#000000 !important; ">
+															@if ($rp['is_discounted'])
+															<span style="white-space: nowrap !important">₱ {{ number_format(str_replace(",","",$rp['new_price']), 2) }}</span>&nbsp;<br class="d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$rp['orig_price']), 2) }}</s>
+															@else
+															₱ {{ number_format(str_replace(",","",$rp['orig_price']), 2) }}
+															@endif
+														</p>
 														<div class="d-flex justify-content-between align-items-center">
 															<div class="btn-group stylecap">
 															<span class="fa fa-star starcolorgrey"></span>
@@ -834,15 +841,16 @@
 			width: 100%;
 			}
 
-    .text-concat {
+	.text-concat {
 		position: relative;
 		display: inline-block;
 		word-wrap: break-word;
 		overflow: hidden;
-		max-height: 5.7em;
-		line-height: 1.4em;
+		max-height: 4.5em;
+		line-height: 1.6em;
 		text-align: left;
-    }
+		font-size: 16px !important;
+	}
 
     .text.ellipsis::after {
       position: absolute;
@@ -984,11 +992,25 @@
         right: 20px !important;
       }
       }
-	  @media (max-width: 1199.98px) {/* tablet */
-        .prod_desc{
-			font-size: 16px !important;
+	  	@media (max-width: 575.98px) {
+			.price-card{
+				min-height: 20px;
+			}
 		}
-      }
+    	@media (max-width: 767.98px) {
+			.price-card{
+				min-height: 20px;
+			}
+		}
+
+	 	 @media (max-width: 1199.98px) {/* tablet */
+			.prod_desc{
+				font-size: 16px !important;
+			}
+			.price-card{
+				min-height: 80px;
+			}
+		}
 	</style>
 @endsection
 

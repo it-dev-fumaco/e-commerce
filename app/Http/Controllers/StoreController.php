@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use DB;
 use Carbon\Carbon;
+use Auth;
 
 class StoreController extends Controller
 {
@@ -38,6 +39,8 @@ class StoreController extends Controller
                 'address' => $request->address,
                 'available_from' => Carbon::parse($request->available_from)->format('H:i'),
                 'available_to' => Carbon::parse($request->available_to)->format('H:i'),
+                'created_by' => Auth::user()->username,
+                'last_modified_by' => Auth::user()->username,
             ]);
 
             DB::commit();
@@ -73,6 +76,7 @@ class StoreController extends Controller
                 'address' => $request->address,
                 'available_from' => Carbon::parse($request->available_from)->format('H:i'),
                 'available_to' => Carbon::parse($request->available_to)->format('H:i'),
+                'last_modified_by' => Auth::user()->username,
             ]);
 
             DB::commit();
