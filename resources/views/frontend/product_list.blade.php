@@ -244,7 +244,7 @@
 											<picture>
 												<source srcset="{{ asset($image_webp) }}" type="image/webp" class="card-img-top">
 												<source srcset="{{ asset($image) }}" type="image/jpeg" class="card-img-top">
-												<img src="{{ asset($image) }}" alt="{{ $product['item_code'] }}" class="card-img-top">
+												<img src="{{ asset($image) }}" alt="{{ Str::slug(explode(".", $product['image'])[0], '-') }}" class="card-img-top hover">
 											 </picture>
 								
 										<div class="card-body">
@@ -405,6 +405,16 @@
 	.prod-sort{
 		margin-right: 5%;
 	}
+
+	.hover{
+      transition: .5s;
+    }
+
+    .hover:hover {
+      -ms-transform: scale(0.95); /* IE 9 */
+      -webkit-transform: scale(0.95); /* Safari 3-8 */
+      transform: scale(0.95); 
+    }
 	/*Required*/
 @media (max-width: 576px){.modal-dialog.modal-dialog-slideout {width: 80%}}
 .modal-dialog-slideout {min-height: 100%; margin: 0 0 0 auto ;background: #fff;}

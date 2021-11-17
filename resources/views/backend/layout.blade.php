@@ -26,12 +26,17 @@
   <link rel="stylesheet" href="{{ asset('/assets/admin/plugins/daterangepicker/daterangepicker.css') }}">
   <!-- summernote -->
   <link rel="stylesheet" href="{{ asset('/assets/admin/plugins/summernote/summernote-bs4.min.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tagsinput/0.8.0/bootstrap-tagsinput.css" integrity="sha512-xmGTNt20S0t62wHLmQec2DauG9T+owP9e6VU8GigI0anN7OXLip9i7IwEhelasml2osdxX71XcYm6BQunTQeQg==" crossorigin="anonymous" />
 
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
 
   <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
   <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tagsinput/0.8.0/bootstrap-tagsinput.js" integrity="sha512-VvWznBcyBJK71YKEKDMpZ0pCVxjNuKwApp4zLF3ul+CiflQi6aIJR+aZCP/qWsoFBA28avL5T5HA+RE+zrGQYg==" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tagsinput/0.8.0/bootstrap-tagsinput-angular.min.js" integrity="sha512-KT0oYlhnDf0XQfjuCS/QIw4sjTHdkefv8rOJY5HHdNEZ6AmOh1DW/ZdSqpipe+2AEXym5D0khNu95Mtmw9VNKg==" crossorigin="anonymous"></script>
+
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
 <div class="wrapper">
@@ -157,7 +162,7 @@
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
     <a href="/admin" class="brand-link text-center">
-      <span class="brand-text font-weight-light">FUMACO Admin v1.0</span>
+      <span class="brand-text font-weight-light">FUMACO Admin v2.0</span>
     </a>
 
     <!-- Sidebar -->
@@ -176,7 +181,7 @@
           </li>
           <li class="nav-header {{ Auth::user()->user_type == 'Sales Admin' ? 'd-none' : ''  }}">CONTENT MANAGEMENT</li>
           @php
-              $pages = ['pages_list', 'home_crud', 'privacy_policy', 'terms_condition'];
+              $pages = ['pages_list', 'home_crud', 'privacy_policy', 'terms_condition', 'contact_us', 'about_us', 'about_us_sponsors'];
           @endphp
           <li class="nav-item {{ (in_array($activePage, $pages) ? 'menu-open' : '') }} {{ Auth::user()->user_type == 'Sales Admin' ? 'd-none' : ''  }}">
             <a href="#" class="nav-link {{ (in_array($activePage, $pages) ? 'active' : '') }}">
@@ -191,28 +196,28 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a href="/admin/pages/about" class="nav-link">
+                <a href="/admin/pages/about" class="nav-link {{ $activePage == 'about_us' ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>About Us</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="/admin/pages/contact" class="nav-link">
+                <a href="/admin/pages/about/sponsor/list" class="nav-link {{ $activePage == 'about_us_sponsors' ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Contact Us</p>
+                  <p>Sponsors/Partners</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="/admin/pages/messages" class="nav-link">
+                <a href="/admin/pages/contact" class="nav-link {{ $activePage == 'contact_us' ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Contact List</p>
+                  <p>Contact Us</p>
                 </a>
               </li>
               <li class="nav-item" id="policy-pages"></li>{{-- Policy Pages --}}
             </ul>
           </li>
           @php
-              $blog_pages = ['subscribers_list'];
+              $blog_pages = ['subscribers_list', 'blog_list', 'blog_comments_list'];
           @endphp
           <li class="nav-item {{ (in_array($activePage, $blog_pages) ? 'menu-open' : '') }} {{ Auth::user()->user_type == 'Sales Admin' ? 'd-none' : ''  }}">
             <a href="#" class="nav-link {{ (in_array($activePage, $blog_pages) ? 'active' : '') }}">
@@ -221,13 +226,13 @@
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="/admin/blog/list" class="nav-link">
+                <a href="/admin/blog/list" class="nav-link {{ $activePage == 'blog_list' ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Blog List</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="/admin/blog/comments" class="nav-link">
+                <a href="/admin/blog/comments" class="nav-link {{ $activePage == 'blog_comments_list' ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Blog Comments</p>
                 </a>
@@ -534,7 +539,7 @@
           var active = '';
           var f = '';
           var activePage = {!! str_replace("'", "\'", json_encode($activePage)) !!};
-          
+
           $(response).each(function(i, d){
             var link = '/admin/pages/edit/' + d.page_id;
             if(activePage == d.slug){
@@ -542,8 +547,8 @@
             }else{
               active = '';
             }
-            f += '<a href="' + link + '" class="nav-link ' + active + '">' + 
-                    '<i class="far fa-circle nav-icon"></i>' + 
+            f += '<a href="' + link + '" class="nav-link ' + active + '">' +
+                    '<i class="far fa-circle nav-icon"></i>' +
                     '<p>' + d.page_title + '</p>' +
                   '</a>'
           });

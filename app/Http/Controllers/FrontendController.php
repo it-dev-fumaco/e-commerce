@@ -11,6 +11,9 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\WelcomeEmail;
 use DB;
 use Auth;
+use App\Models\User;
+use App\Models\UserVerify;
+use Illuminate\Support\Str;
 
 use Illuminate\Pagination\LengthAwarePaginator;
 
@@ -142,6 +145,7 @@ class FrontendController extends Controller
 
             $products = [];
             $blogs = [];
+            
             foreach ($results as $result) {
                 if($result['item_code'] != null) {
                     $products[] = [
@@ -169,6 +173,44 @@ class FrontendController extends Controller
                 }
             }
 
+            if($request->s != ''){// Save search terms
+                $search_check = DB::table('fumaco_search_terms')->where('search_term', $request->s)->first();
+
+                $search_data = [
+                    'search_term' => $request->s,
+                    'ip' => $request->ip(),
+                    'frequency' => $search_check ? $search_check->frequency + 1 : 1
+                ];
+
+                if($products){
+                    $item_code_array = collect($products)->map(function($result){
+                        return $result['item_code'];
+                    });
+
+                    $item_codes = collect($item_code_array);
+
+                    $search_data['prod_results_count'] = count($products);
+                    $search_data['prod_results'] = $item_codes->implode(',');
+                }
+                
+                if($blogs){
+                    $blog_id_array = collect($blogs)->map(function($result){
+                        return $result['id'];
+                    });
+
+                    $blog_ids = collect($blog_id_array);
+
+                    $search_data['blog_results_count'] = count($blogs);
+                    $search_data['blog_results'] = $blog_ids->implode(',');
+                }
+
+                if($search_check){
+                    DB::table('fumaco_search_terms')->where('id', $search_check->id)->update($search_data);
+                }else{
+                    DB::table('fumaco_search_terms')->insert($search_data);
+                }
+            }
+            
             return view('frontend.search_results', compact('results', 'blogs', 'products'));
         }
 
@@ -177,8 +219,8 @@ class FrontendController extends Controller
 
         $blogs = DB::table('fumaco_blog')->where('blog_featured', 1)
             ->where('blog_enable', 1)->take(3)->get();
-        $best_selling = DB::table('fumaco_items')->where('f_status', 1)->where('f_featured', 1)->limit(4)->get();
-        $on_sale = DB::table('fumaco_items')->where('f_status', 1)->where('f_onsale', 1)->limit(4)->get();
+        $best_selling = DB::table('fumaco_items')->where('f_status', 1)->where('f_featured', 1)->get();
+        $on_sale = DB::table('fumaco_items')->where('f_status', 1)->where('f_onsale', 1)->get();
         $best_selling_arr = [];
         $on_sale_arr = [];
 
@@ -315,24 +357,30 @@ class FrontendController extends Controller
     public function userRegistration(Request $request){
         DB::beginTransaction();
         try{
-            $user_check = DB::table('fumaco_users')->where('username', $request->username)->get();
-            
-            if(count($user_check) > 0){
-                return redirect()->back()->with('error', 'Record not created, username already exists.');
-            }
+            $request->validate([
+                'first_name' => 'required',
+                'last_name' => 'required',
+                'username' => 'required|email|unique:fumaco_users,username',
+                'password' => 'required|confirmed|min:6',
+            ],
+            [
+                'password.confirmed' => 'Password does not match.'
+            ]);
 
-            if($request->password != $request->confirm_password){
-                return redirect()->back()->with('error', 'Record not created, password/s do not match.');
-            }
+            $user = new User;
+            $user->username = trim($request->username);
+            $user->password = Hash::make($request->password);
+            $user->f_name = $request->first_name;
+            $user->f_lname = $request->last_name;
+            $user->f_email = 'fumacoco_dev';
+            $user->f_temp_passcode = 'fumaco12345';
+            $user->save();
 
-            $new_user = [
-                'username' => trim($request->username),
-                'password' => password_hash($request->password, PASSWORD_DEFAULT),
-                'f_name' => $request->first_name,
-                'f_lname' => $request->last_name,
-                'f_email' => 'fumacoco_dev',
-                'f_temp_passcode' => 'fumaco12345'
-            ];
+            $token = Str::random(64);
+            UserVerify::create([
+                'user_id' => $user->id, 
+                'token' => $token
+            ]);
 
             if(isset($request->subscribe)){
                 $checker = DB::table('fumaco_subscribe')->where('email', $request->username)->count();
@@ -347,21 +395,67 @@ class FrontendController extends Controller
                 }
             }
 
-            DB::table('fumaco_users')->insert($new_user);
-
-            Mail::to(trim($request->username))
-                ->queue(new WelcomeEmail(['username' => trim($request->username), 'password' => $request->password]));
-            // check for failures
-            if (Mail::failures()) {
-                return redirect()->back()->with('error', 'There was a problem in user registration. Please try again.');
-            }
+            Mail::send('emails.verify_email', ['token' => $token], function($message) use($request){
+                $message->to($request->username);
+                $message->subject('Verify email from Fumaco.com');
+            });
 
             DB::commit();
 
-            return redirect('/login')->with('success', 'Account successfully created. You can login now!');
+            return redirect('/myprofile/verify/email')->with('email', $request->username);
         }catch(Exception $e){
             DB::rollback();
         }
+    }
+
+    public function resendVerification($email) {
+        $existing = User::where('username', $email)->first();
+        if ($existing) {
+            $token = Str::random(64);
+            UserVerify::create([
+                'user_id' => $existing->id, 
+                'token' => $token
+            ]);
+
+            Mail::send('emails.verify_email', ['token' => $token], function($message) use($email){
+                $message->to($email);
+                $message->subject('Verify email from Fumaco.com');
+            });
+        }
+
+        return redirect()->back()->with(['email' => $email, 'resend' => true]);
+    }
+
+    public function verifyAccount($token) {
+        $verifyUser = UserVerify::where('token', $token)->first();
+
+        $message = 'Sorry your email cannot be identified.';
+        if(!is_null($verifyUser) ){
+            $user = User::find($verifyUser->user_id);
+
+            if(!$user->is_email_verified) {
+                $verifyUser->user->is_email_verified = 1;
+                $verifyUser->user->save();
+                $message = "Your email is verified. You can now login.";
+
+                Mail::send('emails.welcome', ['username' => trim($user->username), 'password' => $user->password], function($message) use($user){
+                    $message->to($user->username);
+                    $message->subject('Welcome Email from Fumaco.com');
+                });
+            } else {
+                $message = "Your email is already verified. You can now login.";
+            }
+        }
+     
+        return redirect('/login')->with('success', $message);
+    }
+
+    public function emailVerify() {
+        if (!session('email')) {
+            return redirect('/');
+        }
+
+        return view('frontend.email_verify');
     }
 
     public function viewAboutPage() {
@@ -370,7 +464,11 @@ class FrontendController extends Controller
         $partners = DB::table('fumaco_about_partners')->where('xstatus', 1)
             ->orderBy('partners_sort', 'asc')->get();
 
-        return view('frontend.about_page', compact('about_data', 'partners'));
+        $bg1 = explode('.',$about_data->background_1);
+        $bg2 = explode('.',$about_data->background_2);
+        $bg3 = explode('.',$about_data->background_3);
+
+        return view('frontend.about_page', compact('about_data', 'partners', 'bg1', 'bg2', 'bg3'));
     }
 
     public function viewJournalsPage(Request $request) {
@@ -405,79 +503,52 @@ class FrontendController extends Controller
                 'publish_date' => $blogs->datepublish,
                 'title' => $blogs->blogtitle,
                 'caption' => $blogs->blog_caption,
-                'type' => $blogs->blogtype
+                'type' => $blogs->blogtype,
+                'slug' => $blogs->slug
             ];
         }
 
         return view('frontend.journals', compact('blog_carousel', 'blog_count', 'app_count', 'soln_count', 'prod_count', 'blog_list', 'blogs_arr'));
     }
 
-    public function viewBlogPage(Request $request) {
-        $blog = DB::table('fumaco_blog')->where('id', $request->id)->first();
+    public function viewBlogPage($slug) {
+        $blog = DB::table('fumaco_blog')->where('slug', $slug)->orWhere('id', $slug)->first();
 
-        $blog_comment = DB::table('fumaco_comments')->where('blog_id', $request->id)->where('blog_type', 1)->where('blog_status', 1)->get();
+        $blog_comment = DB::table('fumaco_comments')->where('blog_id', $blog->id)->where('blog_type', 1)->where('blog_status', 1)->get();
 
-        $comment_count = DB::table('fumaco_comments')->where('blog_id', $request->id)->where('blog_status', 1)->get();
+        $blog_tags = DB::table('fumaco_blog_tag')->where('blog_id', $blog->id)->first();
+        
+        $tags = '';
+        if($blog_tags){
+            $tags = explode(',', str_replace(array('"','"'), '',trim($blog_tags->tagname, '[]')));
+        }
+
+        $comment_count = DB::table('fumaco_comments')->where('blog_id', $blog->id)->where('blog_status', 1)->get();
 
         $comments_arr = [];
         foreach($blog_comment as $comment){
-            $blog_reply = DB::table('fumaco_comments')->where('blog_id', $request->id)->where('blog_type', 2)->where('reply_id', $comment->id)->where('blog_status', 1)->get();
-
+            $replies_arr = [];
+            $blog_reply = DB::table('fumaco_comments')->where('blog_id', $blog->id)->where('blog_type', 2)->where('reply_id', $comment->id)->where('blog_status', 1)->get();
+            foreach($blog_reply as $r){
+                $replies_arr[] = [
+                    'blog_name' => $r->blog_name,
+                    'blog_date' => Carbon::parse($r->blog_date)->format('M d, Y h:m A'),
+                    'blog_comments' => $r->blog_comments
+                ];
+            }
             $comments_arr[] = [
                 'id' => $comment->id,
                 'email' => $comment->blog_email,
                 'name' => $comment->blog_name,
                 'comment' => $comment->blog_comments,
-                'reply_comment' => $blog_reply
+                'reply_comment' => $replies_arr,
+                'date' => Carbon::parse($comment->blog_date)->format('M d, Y h:m A')
             ];
         }
 
-        $id = $request->id;
-        $date = Carbon::now();
+        $id = $blog->id;
 
-        return view('frontend.blogs', compact('blog', 'comments_arr', 'id', 'date', 'comment_count'));
-    }
-
-    public function addComment(Request $request){
-        DB::beginTransaction();
-        try{
-            $add_comment = [
-                'blog_type' => '1',
-                'reply_id' => '0',
-                'blog_id' => $request->idcode,
-                'blog_name' => $request->fullname,
-                'blog_email' => $request->fullemail,
-                'blog_ip' => $request->ip(),
-                'blog_comments' => $request->comment
-            ];
-
-            $insert = DB::table('fumaco_comments')->insert($add_comment);
-            DB::commit();
-            return redirect()->back()->with('comment_message', 'Hello! Your comment has been received, please wait for approval.');
-        }catch(Exception $e){
-            DB::rollback();
-        }
-    }
-
-    public function addReply(Request $request){
-        DB::beginTransaction();
-        try{
-            $add_reply = [
-                'blog_type' => '2',
-                'reply_id' => $request->reply_replyId,
-                'blog_id' => $request->reply_blogId,
-                'blog_name' => $request->reply_name,
-                'blog_email' => $request->reply_email,
-                'blog_ip' => $request->ip(),
-                'blog_comments' => $request->reply_comment
-            ];
-
-            $insert = DB::table('fumaco_comments')->insert($add_reply);
-            DB::commit();
-            return redirect()->back()->with('reply_message', 'Hello! Your reply has been received, please wait for approval.');
-        }catch(Exception $e){
-            DB::rollback();
-        }
+        return view('frontend.blogs', compact('blog', 'comments_arr', 'id', 'comment_count', 'blog_tags', 'tags'));
     }
 
     public function viewContactPage() {
@@ -801,12 +872,24 @@ class FrontendController extends Controller
     }
 
     public function viewOrders() {
-        $orders = DB::table('fumaco_order')->where('order_account', Auth::user()->id)->orderBy('id', 'desc')->paginate(10);
+        $orders = DB::table('fumaco_order')->where('order_account', Auth::user()->id)
+            ->where('order_status', '!=', 'Order Placed')
+            ->where('order_status', '!=', 'Order Confirmed')
+            ->where('order_status', '!=', 'Out for Delivery')
+            ->orderBy('id', 'desc')->paginate(10);
+
+        $new_orders = DB::table('fumaco_order')->where('order_account', Auth::user()->id)
+        ->where('order_status', '!=', 'Delivered')
+        ->where('order_status', '!=', 'Cancelled')
+        ->orderBy('id', 'desc')->paginate(10);
+
 
         $orders_arr = [];
-        $items_arr = [];
+        $new_orders_arr = [];
  
         foreach($orders as $order){
+            $items_arr = [];
+
             $order_items = DB::table('fumaco_order_items')->where('order_number', $order->order_number)->get();
             foreach($order_items as $item){
                 $item_image = DB::table('fumaco_items_image_v1')->where('idcode', $item->item_code)->first();
@@ -835,7 +918,38 @@ class FrontendController extends Controller
             ];
         }
 
-        return view('frontend.orders', compact('orders', 'orders_arr'));
+        foreach($new_orders as $new_order){
+            $items_arr = [];
+
+            $order_items = DB::table('fumaco_order_items')->where('order_number', $new_order->order_number)->get();
+            foreach($order_items as $item){
+                $item_image = DB::table('fumaco_items_image_v1')->where('idcode', $item->item_code)->first();
+
+                $items_arr[] = [
+                    'image' => ($item_image) ? $item_image->imgprimayx : null,
+                    'item_code' => $item->item_code,
+                    'item_name' => $item->item_name,
+                    'qty' => $item->item_qty,
+                    'discount' => $item->item_discount,
+                    'orig_price' => $item->item_original_price,
+                    'price' => $item->item_price,
+                ];
+            }
+
+            $new_orders_arr[] = [
+                'order_number' => $new_order->order_number,
+                'date' => date('M d, Y - h:m: A', strtotime($new_order->order_date)),
+                'status' => $new_order->order_status,
+                'edd' => $new_order->estimated_delivery_date,
+                'items' => $items_arr,
+                'subtotal' => $new_order->order_subtotal,
+                'shipping_name' => $new_order->order_shipping,
+                'shipping_fee' => $new_order->order_shipping_amount,
+                'grand_total' => ($new_order->order_shipping_amount + $new_order->order_subtotal),
+            ];
+        }
+
+        return view('frontend.orders', compact('orders', 'orders_arr', 'new_orders', 'new_orders_arr'));
     }
 
     public function viewOrder($order_id) {
@@ -1200,7 +1314,7 @@ class FrontendController extends Controller
     public function viewOrderTracking(Request $request) {
         $order_details = DB::table('fumaco_order')->where('order_number', $request->id)->first();
 
-        $track_order_details = DB::table('track_order')->where('track_code', $request->id)->get();
+        $track_order_details = DB::table('track_order')->where('track_code', $request->id)->first();
 
         $ordered_items = DB::table('fumaco_order_items')->where('order_number', $request->id)->get();
         $items = [];

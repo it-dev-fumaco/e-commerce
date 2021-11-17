@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use DB;
 use Cache;
+use File;
 
 class SettingsController extends Controller
 {

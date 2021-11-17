@@ -42,15 +42,52 @@
 						</form>
 					</center>
 				</div>
-				@if(count($track_order_details) > 0)
+				@if($track_order_details and $order_details)
 				<div class="col-md-8 offset-md-2">
 					<div class="row mb-2">
-						<div class="col-md-6 mt-4">Order No. : <b>{{ request()->id }}</b></div>
-						<div class="col-md-6 mt-4 track-order-eta" style="text-align: right;">Estimated Delivery Date : <br class="d-lg-none d-xl-none"/><b>{{ $order_details->estimated_delivery_date }}</b></div>
+						<div class="col-md-6 mt-4">Order No. : <b>{{ request()->id }}</b>
+							@if($order_details->order_status == "Cancelled")
+								<span class="badge" style="background-color: #DC3545; font-size: 0.9rem;">{{ $order_details->order_status }}</span>
+							@endif
+						</div>
+						<div class="col-md-6 mt-4 track-order-eta" style="text-align: right;">Estimated Delivery Date : <br class="d-lg-none d-xl-none"/><b>{{ $order_details->estimated_delivery_date ? $order_details->estimated_delivery_date : "-"}}</b></div>
+					</div>
+				</div>
+				@php
+					if($track_order_details->track_status == "Order Placed"){
+						$status = 1;
+					}else if($track_order_details->track_status == "Order Confirmed"){
+						$status = 2;
+					}else if($track_order_details->track_status == "Ready for Delivery"){
+						$status = 3;
+					}else if($track_order_details->track_status == "Out for Delivery" or $track_order_details->track_status == "Ready for Pickup" ){
+						$status = 4;
+					}else if($track_order_details->track_status == "Delivered"){
+						$status = 5;
+					}else{
+						$status = 0;
+					}
+				@endphp
+				<div class="row">
+					<div class="col-md-8 mx-auto" style="margin-bottom: 100px !important">
+						<div class="card-body">
+							<div class="track">
+								<div class="step {{ $status >= 1 ? 'active' : '' }}"> <span class="icon"> <i class="fa fa-check"></i> </span> <span class="text">Order placed</span> </div>
+								<div class="step {{ $status >= 2 ? 'active' : '' }}"> <span class="icon"> <i class="fa fa-check"></i> </span> <span class="text">Order confirmed</span> </div>
+								@if($order_details->order_shipping == 'Store Pickup')
+									<div class="step {{ $status >= 4 ? 'active' : '' }}"> <span class="icon"> <i class="fa fa-user"></i> </span> <span class="text">Ready for Pickup</span> </div>
+								@else
+									<div class="step {{ $status >= 4 ? 'active' : '' }}"> <span class="icon"> <i class="fa fa-truck"></i> </span> <span class="text">Out for Delivery</span> </div>
+								@endif
+								
+								<div class="step {{ $status >= 5 ? 'active' : '' }}"> <span class="icon"> <i class="fa fa-box"></i> </span> <span class="text">Delivered</span> </div>
+							</div>
+							<hr> <a href="#TrackItemsData" data-toggle="modal" class="btn btn-warning" data-abc="true">View Order Details</a>
+						</div>
 					</div>
 				</div>
 
-				<div class="col-lg-10 mx-auto">
+				{{-- <div class="col-lg-10 mx-auto">
 					<table class="table">
 						<thead>
 							<tr>
@@ -87,15 +124,15 @@
 						@endforeach
 						</tbody>
 					</table>
-				</div>
+				</div> --}}
 				@else
-				@if(request()->get('id'))
-				<div class="col-md-6 offset-md-3">
-					<div class="alert alert-warning fade show text-center mt-5 p-2" role="alert">
-						<h5 class="p-2 m-0">Sorry, transaction code "<b>{{ request()->get('id') }}</b>" not found.</h5>
+					@if(request()->get('id'))
+					<div class="col-md-6 offset-md-3">
+						<div class="alert alert-warning fade show text-center mt-5 p-2" role="alert">
+							<h5 class="p-2 m-0">Sorry, transaction code "<b>{{ request()->get('id') }}</b>" not found.</h5>
+						</div>
 					</div>
-				</div>
-				@endif
+					@endif
 				@endif
 			</div>
 
@@ -103,7 +140,7 @@
 				<div class="modal-dialog modal-xl">
 					<div class="modal-content">
 						<div class="modal-header">
-							<h4 class="modal-title">List of Orders</h4>
+							<h4 class="modal-title">Order Details</h4>
 						</div>
 						<div class="modal-body">
 							<table class="table">
@@ -193,5 +230,150 @@
 			text-align: left !important;
 		}
 	}
+
+	@import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');
+
+.card {
+    position: relative;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    min-width: 0;
+    word-wrap: break-word;
+    background-color: #fff;
+    background-clip: border-box;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 0.10rem
+}
+
+.card-header:first-child {
+    border-radius: calc(0.37rem - 1px) calc(0.37rem - 1px) 0 0
+}
+
+.card-header {
+    padding: 0.75rem 1.25rem;
+    margin-bottom: 0;
+    background-color: #fff;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1)
+}
+
+.track {
+    position: relative;
+    background-color: #ddd;
+    height: 7px;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    margin-bottom: 60px;
+    margin-top: 50px
+}
+
+.track .step {
+    -webkit-box-flex: 1;
+    -ms-flex-positive: 1;
+    flex-grow: 1;
+    width: 25%;
+    margin-top: -18px;
+    text-align: center;
+    position: relative
+}
+
+.track .step.active:before {
+    background: #FF5722
+}
+
+.track .step::before {
+    height: 7px;
+    position: absolute;
+    content: "";
+    width: 100%;
+    left: 0;
+    top: 18px
+}
+
+.track .step.active .icon {
+    background: #ee5435;
+    color: #fff
+}
+
+.track .icon {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    position: relative;
+    border-radius: 100%;
+    background: #ddd
+}
+
+.track .step.active .text {
+    font-weight: 400;
+    color: #000
+}
+
+.track .text {
+    display: block;
+    margin-top: 7px
+}
+
+.itemside {
+    position: relative;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    width: 100%
+}
+
+.itemside .aside {
+    position: relative;
+    -ms-flex-negative: 0;
+    flex-shrink: 0
+}
+
+.img-sm {
+    width: 80px;
+    height: 80px;
+    padding: 7px
+}
+
+ul.row,
+ul.row-sm {
+    list-style: none;
+    padding: 0
+}
+
+.itemside .info {
+    padding-left: 15px;
+    padding-right: 7px
+}
+
+.itemside .title {
+    display: block;
+    margin-bottom: 5px;
+    color: #212529
+}
+
+p {
+    margin-top: 0;
+    margin-bottom: 1rem
+}
+
+.btn-warning {
+    color: #ffffff;
+    background-color: #ee5435;
+    border-color: #ee5435;
+    border-radius: 1px
+}
+
+.btn-warning:hover {
+    color: #ffffff;
+    background-color: #ff2b00;
+    border-color: #ff2b00;
+    border-radius: 1px
+}
 </style>
 @endsection

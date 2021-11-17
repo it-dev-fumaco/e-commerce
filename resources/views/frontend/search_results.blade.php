@@ -60,18 +60,6 @@
 						@endif
 					</div>
 				  </div>
-				{{-- <div class="row mb-2">
-					<div class="col-md-9 pr-1" style="text-align: right;">
-						<label class="mt-1 mb-1 mr-0" style="font-size: 0.75rem;">Sort By</label>
-					</div>
-					<div class="col-md-3" style="padding-left: 0;">
-						<select name="sortby" class="form-control form-control-sm">
-							<option value="Position" data-loc="{{ request()->fullUrlWithQuery(['sortby' => 'Position']) }}" {{ (request()->sortby == 'Position') ? 'selected' : '' }}>Recommended</option>
-							<option value="Product Name" data-loc="{{ request()->fullUrlWithQuery(['sortby' => 'Product Name']) }}" {{ (request()->sortby == 'Product Name') ? 'selected' : '' }}>Product Name</option>
-							<option value="Price" data-loc="{{ request()->fullUrlWithQuery(['sortby' => 'Price']) }}" {{ (request()->sortby == 'Price') ? 'selected' : '' }}>Price</option>
-						</select>
-					</div>
-				</div> --}}
 			</div>		
 		</div>
 		@endif
@@ -142,9 +130,17 @@
 			@foreach($blogs as $blog)
 			<div class="col-lg-4 d-flex align-items-stretch animated animatedFadeInUp fadeInUp">
 				<div class="card mb-4" style="border: 0px solid rgba(0, 0, 0, 0.125) !important;">
-					<img class="card-img-top" src="{{ asset('/assets/journal/'. $blog['image']) }}" alt="">
+					@php
+						$image = ($blog['image']) ? '/storage/journals/'.$blog['image'] : '/storage/no-photo-available.png';
+						$image_webp = ($blog['image']) ? '/storage/journals/'.explode(".", $blog['image'])[0] .'.webp' : '/storage/no-photo-available.png';
+					@endphp
+				
+					<picture>
+						<source srcset="{{ asset($image_webp) }}" type="image/webp" class="card-img-top">
+						<source srcset="{{ asset($image) }}" type="image/jpeg" class="card-img-top">
+						<img src="{{ asset($image) }}" alt="{{ Str::slug(explode(".", $blog['image'])[0], '-') }}" class="card-img-top">
+					</picture>
 					<div class="card-body align-items-stretch p-2">
-						{{-- <p style="color:#000 !important; font-size: 10pt !important; font-weight: 300;" class="abt_standard m-0">{{ $blog['publish_date'] }} | {{ $blog['comment_count'] }} Comment(s)</p> --}}
 						<a href="blog?id={{ $blog['id'] }}" style="text-decoration: none !important;">
 							<p style="color:#373b3e !important;" class="abt_standard fumacoFont_card_title">{{ $blog['title'] }}</p>
 						</a>

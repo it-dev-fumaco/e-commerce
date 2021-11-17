@@ -1,2 +1,33 @@
 User-agent: *
-Disallow:
+
+Disallow: /admin/
+Disallow: /checkout/
+Disallow: /password/
+Disallow: /logout/
+Disallow: /order/
+Disallow: /eghlform/
+Disallow: /setdetails/
+Disallow: /cart/
+Disallow: /product_actions/
+Disallow: /updatecart/
+Disallow: /removefromcart/
+Disallow: /addtowishlist/
+Disallow: /countcartitems/
+Disallow: /countwishlist/
+Disallow: /user_register/
+Disallow: /privacy_policy/
+Disallow: /terms_condition/
+Disallow: /add_comment/
+Disallow: /add_contact/
+Disallow: /track_order/
+Disallow: /categories/
+Disallow: /website_settings/
+Disallow: /getvariantcode/
+Disallow: /subscribe/
+Disallow: /thankyou/
+Disallow: /policy_pages/
+Disallow: /pages/
+Disallow: /mywishlist/
+Disallow: /myorders/
+Disallow: /myorder/
+Disallow: /myprofile/

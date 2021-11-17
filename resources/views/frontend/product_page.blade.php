@@ -33,11 +33,11 @@
 									$src = (count($product_images) > 0) ? '/storage/item_images/'. $product_images[0]->idcode.'/gallery/preview/'. $product_images[0]->imgprimayx : '/storage/no-photo-available.png';
 									$xoriginal = (count($product_images) > 0)  ? '/storage/item_images/'. $product_images[0]->idcode.'/gallery/original/'. $product_images[0]->imgoriginalx : '/storage/no-photo-available.png';
 									@endphp
-									<img style="width: 100% !important;" class="xzoom4 imgx" id="xzoom-fancy" src="{{ asset($src) }}" xoriginal="{{ asset($xoriginal) }}" />
+									<img style="width: 100% !important;" alt="{{ Str::slug(explode(".", $product_images[0]->imgprimayx)[0], '-') }}" class="xzoom4 imgx" id="xzoom-fancy" src="{{ asset($src) }}" xoriginal="{{ asset($xoriginal) }}" />
 									<br><br>
 									<div class="xzoom-thumbs">
 										@foreach ($product_images as $image)
-										<a href="{{ asset('/storage/item_images/'. $image->idcode.'/gallery/original/'. $image->imgoriginalx) }}"><img class="xzoom-gallery4" width="60" src="{{ asset('/storage/item_images/'. $image->idcode.'/gallery/preview/'. $image->imgprimayx) }}" /></a>
+										<a href="{{ asset('/storage/item_images/'. $image->idcode.'/gallery/original/'. $image->imgoriginalx) }}"><img class="xzoom-gallery4" width="60" src="{{ asset('/storage/item_images/'. $image->idcode.'/gallery/preview/'. $image->imgprimayx) }}" alt="{{ Str::slug(explode(".", $image->imgprimayx)[0], '-') }}" /></a>
 										@endforeach
 									</div>
 								</div>
@@ -228,11 +228,11 @@
 								</div>
 							</section>
 
-							<div class="album py-5">
+							<div class="album py-5" style="position: relative">
 								<div class="container related-prod">
-									<div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4">
+									<div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4 overflow-auto flex-row flex-nowrap scroll-pane" id="related-products-container" style="min-height: 10px;">
 										@foreach($related_products as $rp)
-										<div class="col animated animatedFadeInUp fadeInUp equal-height-columns">
+										<div class="col animated animatedFadeInUp fadeInUp equal-height-columns mb-3 related-products-card">
 											<div class="card shadow-sm">
 												<div class="equal-column-content" style="border: 1px solid  #d5dbdb; position: relative;">
 													@php
@@ -244,7 +244,7 @@
 <picture>
 	<source srcset="{{ asset($img_webp) }}" type="image/webp" class="img-responsive" style="width: 100% !important;">
 	<source srcset="{{ asset($img) }}" type="image/jpeg" class="img-responsive" style="width: 100% !important;">
-	<img src="{{ asset($img) }}" alt="{{ $rp['item_code'] }}" class="img-responsive" style="width: 100% !important;">
+	<img src="{{ asset($img) }}" alt="{{ Str::slug(explode(".", $rp['image'])[0], '-') }}" class="img-responsive" style="width: 100% !important;">
   </picture>
 
 
@@ -285,6 +285,9 @@
 										@endforeach
 									</div>
 								</div>
+								{{-- Scroll --}}
+								<button type="button" class="scroll-control prev prev-btn"><i class="fas fa-chevron-left" style="font-size: 30px"></i></button>
+								<button type="button" class="scroll-control next next-btn"><i class="fas fa-chevron-right" style="font-size: 30px"></i></button>
 							</div>
 						@endif
 						</div>
@@ -859,6 +862,49 @@
 		font-family: 'poppins', sans-serif !important;
 		text-decoration: none !important;
 	}
+	#related-products-container{
+      overflow: auto;
+      outline: none;
+      overflow-y: hidden;
+      -ms-overflow-style: scroll;  /* IE 10+ */
+      scrollbar-width: none; /* Firefox */
+    }
+    .scroll-control{
+      height: 80px;
+      width: 80px;
+      background-color: rgba(0,0,0,0);
+      border-radius: 50%;
+      color: rgba(0,0,0,0.2);
+      border: none !important;
+      text-transform: none !important;
+      text-decoration: none !important;
+      transition: .4s
+    }
+
+    .scroll-control:hover{
+      color: #000;
+    }
+
+    .scroll-control:focus {
+      outline: none;
+      box-shadow: none;
+      text-transform: none !important;
+      text-decoration: none !important;
+      border: none !important;
+    }
+
+    .prev-btn, .next-btn{
+      position: absolute;
+      top: 50%;
+      bottom: 50%;
+    }
+
+    .prev-btn{
+      left: -50px !important;
+    }
+    .next-btn{
+      right: -50px !important;
+    }
 	@media (max-width: 575.98px) { /* Mobile */
         header{
           min-height: 50px;
@@ -890,6 +936,12 @@
 		.products-head{
 			padding-left: 20px !important;
 		}
+		.prev-btn{
+        left: 20px !important;
+      }
+      .next-btn{
+        right: 20px !important;
+      }
       }
 
       @media (max-width: 767.98px) { /* Mobile */
@@ -933,6 +985,12 @@
 			font-weight: 300 !important;
 			text-decoration: none !important;
 		}
+		.prev-btn{
+        left: 20px !important;
+      }
+      .next-btn{
+        right: 20px !important;
+      }
       }
 	  	@media (max-width: 575.98px) {
 			.price-card{
@@ -986,5 +1044,19 @@
       	});
 		});
   	})();
+
+	$('.next').click(function() {
+      event.preventDefault();
+      $('#related-products-container').animate({
+        scrollLeft: "+="+$('.related-products-card').outerWidth()+"px"
+      }, "slow");
+    });
+
+    $('.prev').click(function() {
+      event.preventDefault();
+      $('#related-products-container').animate({
+        scrollLeft: "-="+$('.related-products-card').outerWidth()+"px"
+      }, "slow");
+    });
 </script>
 @endsection

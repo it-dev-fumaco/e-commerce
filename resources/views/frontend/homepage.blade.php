@@ -37,7 +37,7 @@
             <picture>
               <source srcset="{{ asset('/assets/site-img/'. explode(".", $carousel->fumaco_image1)[0] .'.webp') }}" type="image/webp" style="object-fit: cover;opacity: 0.6;">
               <source srcset="{{ asset('/assets/site-img/'. $carousel->fumaco_image1) }}" type="image/jpeg" style="object-fit: cover;opacity: 0.6;">
-              <img src="{{ asset('/assets/site-img/'. $carousel->fumaco_image1) }}" alt="" style="object-fit: cover;opacity: 0.6;">
+              <img src="{{ asset('/assets/site-img/'. $carousel->fumaco_image1) }}" alt="{{ Str::slug(explode(".", $carousel->fumaco_image1)[0], '-') }}" style="object-fit: cover;opacity: 0.6;">
             </picture>
 
             <div class="container">
@@ -46,7 +46,6 @@
                 <div class="text ellipsis">
                   <p class="carousel-caption-font fumacoFont2 carousel-text-concat" style="text-align: left; text-justify: left; letter-spacing: 1px;">{{ $string }}</p>
                 </div>
-                {{-- <p class="carousel-caption-font fumacoFont2" style="text-align: left; text-justify: inter-word; letter-spacing: 1px;">{{ $string }}</p> --}}
                 <p><a class="btn btn-lg btn-primary btn-fumaco fumacoFont_btn" href="{{ $carousel->fumaco_url }}"role="button">{{ $carousel->fumaco_btn_name }}</a></p>
               </div>
             </div>
@@ -67,23 +66,23 @@
           <div class="col-lg-4 pr-md-1 animated animatedFadeInUp fadeInUp equal-height-columns" style="text-align: left !important; position: relative !important">
             <div class="equal-column-content">
               <picture>
-                <source srcset="{!!  asset('/assets/site-img/'. explode(".", $b->{'blogprimayimage-home'})[0] .'.webp') !!}" type="image/webp" class="img-responsive" style="width: 100% !important;">
-                <source srcset="{!!  asset('/assets/site-img/'. $b->{'blogprimayimage-home'}) !!}" type="image/jpeg" class="img-responsive" style="width: 100% !important;">
-                <img src="{!!  asset('/assets/site-img/'. $b->{'blogprimayimage-home'}) !!}" alt="" class="img-responsive" style="width: 100% !important;">
+                <source srcset="{!!  asset('/storage/journals/'. explode(".", $b->{'blogprimayimage-home'})[0] .'.webp') !!}" type="image/webp" class="img-responsive card-img-top" style="width: 100% !important;">
+                <source srcset="{!!  asset('/storage/journals/'. $b->{'blogprimayimage-home'}) !!}" type="image/jpeg" class="img-responsive card-img-top" style="width: 100% !important;">
+                <div class="hover-container"><img src="{!!  asset('/storage/journals/'. $b->{'blogprimayimage-home'}) !!}" alt="{{ Str::slug(explode(".", $b->{'blogprimayimage-home'})[0], '-') }}" class="img-responsive card-img-top hover" style="width: 100% !important;"></div>
               </picture>
               <br><br>
               <h5 class="font-style-thin fumacoFont_card_title article-title" style="font-family: 'poppins', sans-serif !important; color:#ffffff !important; line-height: 26px !important; font-size: 18px !important;">{{ $b->blogtitle }}</h5>
               <p class="abt_standard align-bottom" style="font-size: 14px; margin-left: 0rem !important; color:#ffffff !important; font-weight: 300">
-                <a href="blog?id={{ $b->id }}" style="color:#ffffff !important; text-decoration: none !important; text-transform: none !important">{{ substr($b->blog_caption, 0, 100) }}...</a>
+                <a href="/blog/{{ $b->slug ? $b->slug : $b->id }}" style="color:#ffffff !important; text-decoration: none !important; text-transform: none !important">{{ substr($b->blog_caption, 0, 100) }}...</a>
               </p>
             </div>
-            <p class="abt_standard font-style-thin" style="margin-left: 0rem !important; color:#ffffff !important;"><a href="blog?id={{ $b->id }}" class="fumacoFont_card_readmore"><span style="color:#ffffff !important;font-size: 14px; position: absolute; bottom: 0 !important;">Read More &#x2192;</span></a></p>
+            <p class="abt_standard font-style-thin" style="margin-left: 0rem !important; color:#ffffff !important;"><a href="/blog/{{ $b->slug ? $b->slug : $b->id }}" class="fumacoFont_card_readmore"><span style="color:#ffffff !important;font-size: 14px; position: absolute; bottom: 0 !important;">Read More &#x2192;</span></a></p>
           </div>
         @endforeach
       </div>
     </div>
   </main>
-  <div class="container marketing">
+  <div class="container marketing" style=" position: relative !important">
     <section class="py-5 text-center container" style="padding-bottom: 0rem !important;">
       <div class="row py-lg-5">
         <div class="col-lg-6 col-md-8 mx-auto">
@@ -93,9 +92,9 @@
     </section>
       <div class="album py-5">
         <div class="container">
-          <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4">
+          <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4 overflow-auto flex-row flex-nowrap scroll-pane" id="best-selling-container" style="min-height: 10px;">
             @foreach($best_selling_arr as $bs)
-              <div class="col animated animatedFadeInUp fadeInUp equal-height-columns">
+              <div class="col-md-3 animated animatedFadeInUp fadeInUp equal-height-columns mb-3 best-selling-card">
                 <div class="card shadow-sm">
                   <div class="equal-column-content">
 
@@ -107,7 +106,7 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
                     <picture>
                       <source srcset="{{ asset($img_bs_webp) }}" type="image/webp" class="img-responsive" style="width: 100% !important;">
                       <source srcset="{{ asset($img_bs) }}" type="image/jpeg" class="img-responsive" style="width: 100% !important;">
-                      <img src="{{ asset($img_bs) }}" alt="{{ $bs['item_code'] }}" class="img-responsive" style="width: 100% !important;">
+                      <img src="{{ asset($img_bs) }}" alt="{{ Str::slug(explode(".", $bs['bs_img'])[0], '-') }}" class="img-responsive hover" style="width: 100% !important;">
                     </picture>
 
 
@@ -152,8 +151,14 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
           </div>
         </div>
       </div>
+      {{-- Scroll --}}
+      <button type="button" class="scroll-control bs-prev prev-btn d-sm-block d-md-none d-lg-block"><i class="fas fa-chevron-left scroll-btn"></i></button>
+      <button type="button" class="scroll-control bs-next next-btn d-sm-block d-md-none d-lg-block"><i class="fas fa-chevron-right scroll-btn"></i></button>
+
+      <button type="button" class="scroll-control bs-prev tab-prev-btn prev-btn d-none d-md-block d-lg-none"><i class="fas fa-chevron-left scroll-btn"></i></button>
+      <button type="button" class="scroll-control bs-next tab-next-btn next-btn d-none d-md-block d-lg-none"><i class="fas fa-chevron-right scroll-btn"></i></button>
   </div>
-  <div class="container marketing">
+  <div class="container marketing" style="position: relative">
     <section class="py-5 text-center container" style="padding-bottom: 0rem !important;">
       <div class="row py-lg-5">
         <div class="col-lg-6 col-md-8 mx-auto">
@@ -164,13 +169,13 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
 
     <div class="album py-5">
       <div class="container">
-        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4">
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4 overflow-auto flex-row flex-nowrap scroll-pane" id="on-sale-container" style="min-height: 10px;">
           @foreach($on_sale_arr as $os)
            @php
             $img_os = ($os['os_img']) ? '/storage/item_images/'. $os['item_code'] .'/gallery/preview/'. $os['os_img'] : '/storage/no-photo-available.png';
             $img_os_webp = ($os['os_img']) ? '/storage/item_images/'. $os['item_code'] .'/gallery/preview/'. explode(".", $os['os_img'])[0] . '.webp' : '/storage/no-photo-available.png';
           @endphp
-              <div class="col animated animatedFadeInUp fadeInUp equal-height-columns">
+              <div class="col animated animatedFadeInUp fadeInUp equal-height-columns mb-3 on-sale-card">
                 <div class="card shadow-sm">
                   <div class="equal-column-content">
 
@@ -178,7 +183,7 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
                       <picture>
                         <source srcset="{{ asset($img_os_webp) }}" type="image/webp" class="img-responsive" style="width: 100% !important;">
                         <source srcset="{{ asset($img_os) }}" type="image/jpeg" class="img-responsive" style="width: 100% !important;">
-                        <img src="{{ asset($img_os) }}" alt="{{ $os['item_code'] }}" class="img-responsive" style="width: 100% !important;">
+                        <img src="{{ asset($img_os) }}" alt="{{ Str::slug(explode(".", $os['os_img'])[0], '-') }}" class="img-responsive hover" style="width: 100% !important;">
                       </picture>
 
                     <div class="card-body">
@@ -225,6 +230,9 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
         </div>
       </div>
     </div>
+    {{-- Scroll --}}
+    <button id="os-prev" type="button" class="scroll-control prev-btn"><i class="fas fa-chevron-left scroll-btn"></i></button>
+    <button id="os-next" type="button" class="scroll-control next-btn"><i class="fas fa-chevron-right scroll-btn"></i></button>
   </div>
 
 @endsection
@@ -281,12 +289,78 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
       text-decoration: none !important;
     }
 
+    .hover{
+      transition: .5s;
+    }
+
+    .hover:hover {
+      -ms-transform: scale(0.95); /* IE 9 */
+      -webkit-transform: scale(0.95); /* Safari 3-8 */
+      transform: scale(0.95); 
+    }
+
+    .scoll-pane::-webkit-scrollbar { 
+      display: none;  /* Safari and Chrome */
+    }
+    #best-selling-container, #on-sale-container{
+      overflow: auto;
+      outline: none;
+      overflow-y: hidden;
+      -ms-overflow-style: scroll;  /* IE 10+ */
+      scrollbar-width: none; /* Firefox */
+    }
+    .scroll-control{
+      height: 80px;
+      width: 80px;
+      background-color: rgba(0,0,0,0);
+      border-radius: 50%;
+      color: rgba(0,0,0,0.2);
+      border: none !important;
+      text-transform: none !important;
+      text-decoration: none !important;
+      transition: .4s
+    }
+
+    .scroll-control:hover{
+      color: #000;
+    }
+
+    .scroll-control:focus {
+      outline: none;
+      box-shadow: none;
+      text-transform: none !important;
+      text-decoration: none !important;
+      border: none !important;
+    }
+
+    .prev-btn, .next-btn{
+      position: absolute;
+      top: 50%;
+      bottom: 50%;
+    }
+
+    .prev-btn{
+      left: -50px !important;
+    }
+    .next-btn{
+      right: -50px !important;
+    }
+    .scroll-btn{
+      font-size: 30px;
+    }
+    
     @media (max-width: 575.98px) {
       .article-title{
         min-height: auto !important
       }
       .prod_desc{
         font-size: 12px !important;
+      }
+      .prev-btn{
+        left: 20px !important;
+      }
+      .next-btn{
+        right: 20px !important;
       }
     }
     @media (max-width: 767.98px) {
@@ -296,14 +370,52 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
       .prod_desc{
         font-size: 12px !important;
       }
+      .prev-btn{
+        left: 20px !important;
+      }
+      .next-btn{
+        right: 20px !important;
+      }
     }
-    @media (max-width: 1199.98px) {/* tablet */
+    @media (max-width: 1199.98px) {
       .prod_desc{
         font-size: 16px !important;
       }
-      .price-card{
-        min-height: 70px !important;
-      }
+      
     }
   </style>
+@endsection
+
+@section('script')
+  <script>
+    // Best Selling
+    $('.bs-next').click(function() {
+      event.preventDefault();
+      $('#best-selling-container').animate({
+        scrollLeft: "+="+$('.best-selling-card').outerWidth()+"px"
+      }, "slow");
+    });
+
+    $('.bs-prev').click(function() {
+      event.preventDefault();
+      $('#best-selling-container').animate({
+        scrollLeft: "-="+$('.best-selling-card').outerWidth()+"px"
+      }, "slow");
+    });
+
+    // On Sale
+    $('#os-next').click(function() {
+      event.preventDefault();
+      $('#on-sale-container').animate({
+        scrollLeft: "+="+$('.on-sale-card').outerWidth()+"px"
+      }, "slow");
+    });
+
+    $('#os-prev').click(function() {
+      event.preventDefault();
+      $('#on-sale-container').animate({
+        scrollLeft: "-="+$('.on-sale-card').outerWidth()+"px"
+      }, "slow");
+    });
+  </script>
 @endsection

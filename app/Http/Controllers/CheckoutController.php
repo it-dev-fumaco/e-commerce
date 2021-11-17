@@ -388,7 +388,7 @@ class CheckoutController extends Controller
 			}
 
 			$shipping_rates = $this->getShippingRates();
-			
+
 			$shipping_add = $billing_add = [];
 			if (Auth::check()) {
 				$shipping_add = DB::table('fumaco_user_add')->where('user_idx', Auth::user()->id)->where('address_class','Delivery')->get();
@@ -453,6 +453,8 @@ class CheckoutController extends Controller
 				'shipping_name' => $request->s_name,
 				'shipping_amount' => $request->s_amount,
 				'estimated_delivery_date' => $request->estimated_del,
+				'xstore_location' => ($request->s_name == 'Store Pickup') ? $request->storeloc : null,
+				'xpickup_date' => ($request->s_name == 'Store Pickup') ? Carbon::parse($request->picktime)->format('Y-m-d') : null,
 			];
 
 			$existing_order_temp = DB::table('fumaco_temp')->where('order_tracker_code', $order_no)->exists();
@@ -614,7 +616,9 @@ class CheckoutController extends Controller
 					'shipping_business_name' => $temp->xship_business_name,
 					'shipping_tin' => $temp->xship_tin,
 					'billing_business_name' => $temp->xbusiness_name,
-					'billing_tin' => $temp->xtin_no
+					'billing_tin' => $temp->xtin_no,
+					'store_location' => $temp->xstore_location,
+					'pickup_date' => $temp->xpickup_date
 				]);
 
 				// insert order in tracking order table
@@ -662,16 +666,33 @@ class CheckoutController extends Controller
 			
 			DB::commit();
 
+			$store_address = null;
+			if($order_details->order_shipping == 'Store Pickup') {
+				$store = DB::table('fumaco_store')->where('store_name', $order_details->store_location)->first();
+				$store_address = ($store) ? $store->address : null;
+			}
+
 			$order = [
 				'order_details' => $order_details,
-				'items' => $items
+				'items' => $items,
+				'store_address' => $store_address
 			];
 
 			$emails = array_filter(array_unique([trim($order_details->order_bill_email), trim($order_details->order_email), trim($temp->xusernamex)]));
 			Mail::to($emails)
 				->queue(new OrderSuccess($order));
 
-			return view('frontend.checkout.success', compact('order_details', 'items', 'loggedin'));
+			// send email to fumaco staff
+			$email_recipient = DB::table('email_config')->first();
+			$email_recipient = ($email_recipient) ? explode(",", $email_recipient->email_recipients) : [];
+			if (count(array_filter($email_recipient)) > 0) {
+				Mail::send('emails.new_order', $order, function($message) use ($email_recipient) {
+					$message->to($email_recipient);
+					$message->subject('New Order - FUMACO');
+				});
+			}
+
+			return view('frontend.checkout.success', compact('order_details', 'items', 'loggedin', 'store_address'));
 		} catch (Exception $e) {
 			DB::rollback();
 
@@ -852,12 +873,24 @@ class CheckoutController extends Controller
         
         $shipping_offer_rates = [];
         foreach($shipping_services_without_conditions as $row){
-            $expected_delivery_date = $this->delivery_leadtime($row->min_leadtime, $row->max_leadtime);
+			$max_leadtime = DB::table('fumaco_shipping_product_category as a')
+				->join('fumaco_shipping_service as b', 'a.shipping_service_id', 'b.shipping_service_id')->whereIn('a.category_id', array_column($order_items->toArray(), 'f_cat_id'))
+				->where('b.shipping_service_id', $row->shipping_service_id)->max('a.max_leadtime');
+
+			$min_leadtime = DB::table('fumaco_shipping_product_category as a')
+				->join('fumaco_shipping_service as b', 'a.shipping_service_id', 'b.shipping_service_id')->whereIn('a.category_id', array_column($order_items->toArray(), 'f_cat_id'))
+				->where('b.shipping_service_id', $row->shipping_service_id)->max('a.min_leadtime');
+
+			$min = ($min_leadtime > 0) ? $min_leadtime : $row->min_leadtime;
+			$max = ($max_leadtime > 0) ? $max_leadtime : $row->max_leadtime;
+
+			$expected_delivery_date = $this->delivery_leadtime($min, $max);
+
             $shipping_offer_rates[] = [
                 'shipping_service_name' => $row->shipping_service_name,
                 'expected_delivery_date' => $expected_delivery_date,
-				'min_lead_time' => $row->min_leadtime,
-				'max_lead_time' => $row->max_leadtime,
+				'min_lead_time' => $min,
+				'max_lead_time' => $max,
                 'shipping_cost' => (float)$row->amount,
                 'external_carrier' => false,
                 'allow_delivery_after' => 0,
@@ -870,8 +903,6 @@ class CheckoutController extends Controller
             ->whereIn('a.shipping_service_id', $shipping_services_arr)->get();
 
         foreach($shipping_services as $row){
-            $expected_delivery_date = $this->delivery_leadtime($row->min_leadtime, $row->max_leadtime);
-
             if($row->shipping_calculation == 'Per Cubic cm') {
                 $shipping_cost = $row->shipping_amount * $total_cubic_cm;
             }
@@ -899,11 +930,24 @@ class CheckoutController extends Controller
             }
 
             if($shipping_cost !== false) {
+				$max_leadtime = DB::table('fumaco_shipping_product_category as a')
+					->join('fumaco_shipping_service as b', 'a.shipping_service_id', 'b.shipping_service_id')->whereIn('a.category_id', array_column($order_items->toArray(), 'f_cat_id'))
+					->where('b.shipping_service_id', $row->shipping_service_id)->max('a.max_leadtime');
+
+				$min_leadtime = DB::table('fumaco_shipping_product_category as a')
+					->join('fumaco_shipping_service as b', 'a.shipping_service_id', 'b.shipping_service_id')->whereIn('a.category_id', array_column($order_items->toArray(), 'f_cat_id'))
+					->where('b.shipping_service_id', $row->shipping_service_id)->max('a.min_leadtime');
+
+				$min = ($min_leadtime > 0) ? $min_leadtime : $row->min_leadtime;
+				$max = ($max_leadtime > 0) ? $max_leadtime : $row->max_leadtime;
+
+				$expected_delivery_date = $this->delivery_leadtime($min, $max);
+
                 $shipping_offer_rates[] = [
                     'shipping_service_name' => $row->shipping_service_name,
                     'expected_delivery_date' => $expected_delivery_date,
-					'min_lead_time' => $row->min_leadtime, //
-					'max_lead_time' => $row->max_leadtime, //
+					'min_lead_time' => $min, //
+					'max_lead_time' => $max, //
                     'shipping_cost' => $shipping_cost,
                     'external_carrier' => false,
                     'allow_delivery_after' => 0,
@@ -913,6 +957,29 @@ class CheckoutController extends Controller
             }
         }
 
+		$store_pickup_query = ShippingService::where('shipping_service_name', 'Store Pickup')->get();
+		foreach($store_pickup_query as $row){
+			$stores = DB::table('fumaco_store')
+				->join('fumaco_shipping_service_store', 'fumaco_shipping_service_store.store_location_id', 'fumaco_store.store_id')
+				->where('shipping_service_id', $row->shipping_service_id)->select('store_name', 'available_from', 'available_to', 'address')->get();
+
+			$max_leadtime = DB::table('fumaco_shipping_product_category as a')
+				->join('fumaco_shipping_service as b', 'a.shipping_service_id', 'b.shipping_service_id')->whereIn('a.category_id', array_column($order_items->toArray(), 'f_cat_id'))
+				->where('b.shipping_service_id', $row->shipping_service_id)->max('a.max_leadtime');
+
+			$shipping_offer_rates[] = [
+				'shipping_service_name' => $row->shipping_service_name,
+				'expected_delivery_date' => null,
+				'min_lead_time' => null, //
+				'max_lead_time' => ($max_leadtime > 0) ? $max_leadtime : $row->max_leadtime, //
+				'shipping_cost' => 0,
+				'external_carrier' => false,
+				'allow_delivery_after' => 0,
+				'pickup' => true,
+				'stores' => $stores,
+			];
+		}
+	
 		return $shipping_offer_rates;
 	}
 

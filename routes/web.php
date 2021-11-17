@@ -29,17 +29,26 @@ Route::namespace('Auth')->group(function(){
     Route::get('/password/reset/{token}','ResetPasswordController@showResetForm')->name('password.reset');
     Route::post('/password/reset','ResetPasswordController@reset')->name('password.update');
 
+    // facebook login
+    Route::get('auth/facebook', 'LoginController@loginUsingFacebook')->name('facebook.login');
+    Route::get('auth/facebook/callback', 'LoginController@callbackFromFacebook')->name('facebook.callback');
+
+    // google login
+    Route::get('auth/google', 'LoginController@loginUsingGoogle')->name('google.login');
+    Route::get('auth/google/callback', 'LoginController@callbackFromGoogle')->name('google.callback');
+
+     // linkedin login
+     Route::get('auth/linkedin', 'LoginController@loginUsingLinkedin')->name('linkedin.login');
+     Route::get('auth/linkedin/callback', 'LoginController@callbackFromLinkedin')->name('linkedin.callback');
 });
 
 Route::get('/signup', 'FrontendController@signupForm');
 Route::post('/user_register', 'FrontendController@userRegistration');
 Route::get('/about', 'FrontendController@viewAboutPage');
 Route::get('/journals', 'FrontendController@viewJournalsPage');
-Route::get('/privacy_policy', 'FrontendController@viewPrivacyPage');
 Route::get('/terms_condition', 'FrontendController@viewTermsPage');
-Route::get('/blog', 'FrontendController@viewBlogPage');
-Route::post('/add_comment', 'FrontendController@addComment');
-Route::post('/add_reply', 'FrontendController@addReply');
+Route::get('/blog/{slug}', 'FrontendController@viewBlogPage');
+Route::post('/add_comment', 'BlogController@addComment');
 Route::get('/contact', 'FrontendController@viewContactPage')->name('contact');
 Route::post('/add_contact', 'FrontendController@addContact');
 Route::get('/products/{slug}', 'FrontendController@viewProducts');
@@ -54,6 +63,8 @@ Route::get('/thankyou', 'FrontendController@subscribeThankyou');
 
 Route::get('/policy_pages', 'FrontendController@pagesList');
 Route::get('/pages/{slug}', 'FrontendController@viewPage')->name('pages');
+
+Route::get('/myprofile/verify/email', 'FrontendController@emailVerify');
 
 Route::group(['middleware' => 'auth'], function(){
     Route::get('/mywishlist', 'FrontendController@viewWishlist');
@@ -101,6 +112,8 @@ Route::get('/checkout/failed', 'CheckoutController@orderFailed');
 Route::post('/checkout/failed', 'CheckoutController@orderFailed');
 Route::post('/checkout/callback', 'CheckoutController@paymentCallback');
 
+Route::get('/verify_email/{token}', 'FrontendController@verifyAccount')->name('account.verify');
+Route::get('/resend_verification/{email}', 'FrontendController@resendVerification');
 
 Auth::routes();
 
@@ -185,6 +198,22 @@ Route::prefix('admin')->group(function () {
         
         Route::get('/customer/list', 'CustomerController@viewCustomers');
 
+        Route::get('/blog/list', 'BlogController@viewBlogs');
+        Route::get('/blog/new', 'BlogController@newBlog');
+        Route::post('/blog/add', 'BlogController@addBlog');
+        Route::post('/blog/publish', 'BlogController@publishBlog');
+        Route::post('/blog/feature', 'BlogController@featuredBlog');
+        Route::get('/blog/edit/form/{id}', 'BlogController@editBlogForm');
+        Route::post('/blog/edit/{id}', 'BlogController@editBlog');
+        Route::post('/blog/images/edit/{id}', 'BlogController@editBlogImages');
+        Route::get('/blog/delete/{id}', 'BlogController@deleteBlog');
+        Route::get('/blog/delete/{id}', 'BlogController@deleteBlog');
+        Route::get('/blog/images/img-delete/{id}/{image}', 'BlogController@deleteBlogImage');
+
+        Route::get('/blog/comments', 'BlogController@viewComments');
+        Route::post('/blog/comment/approve', 'BlogController@commentStatus');
+        Route::get('/blog/comment/delete/{id}', 'BlogController@deleteComment');
+
         Route::get('/blog/subscribers', 'BlogController@viewSubscribers');
         Route::post('/subscribe/change_status', 'BlogController@subscriberChangeStatus');
 
@@ -198,8 +227,23 @@ Route::prefix('admin')->group(function () {
         Route::post('/user_management/change_user_password/', 'UserManagementController@userChangePassword');
 
         Route::get('/pages/list', 'PagesController@viewPages');
+        Route::get('/pages/list', 'PagesController@viewPages');
+        Route::get('/pages/contact', 'PagesController@viewContact');
+        Route::get('/pages/contact/edit/{id}', 'PagesController@editContactForm');
+        Route::get('/pages/contact/add_form', 'PagesController@addContactForm');
+        Route::post('/pages/contact/add', 'PagesController@addContact');
+        Route::get('/pages/contact/delete/{id}', 'PagesController@deleteContact');
+        Route::post('/pages/contact/update/{id}', 'PagesController@editContact');
+        Route::get('/pages/about/sponsor/list', 'PagesController@viewSponsors');
         Route::get('/pages/edit/{page_id}', 'PagesController@editForm');
         Route::post('/edit/{id}', 'PagesController@editPage');
+        Route::get('/pages/about', 'PagesController@viewAbout');
+        Route::post('/edit/page/about_us', 'PagesController@editAbout');
+        Route::post('/edit/page/about_us/image', 'PagesController@aboutBackground');
+        Route::post('/edit/page/about_us/sponsor/add', 'PagesController@addSponsor');
+        Route::get('/edit/page/about_us/sponsor/delete/{id}', 'PagesController@deleteSponsor');
+        Route::post('/edit/page/about_us/sponsor/sort/{id}', 'PagesController@updateSort');
+        Route::get('/edit/page/about_us/sponsor/reset/{id}', 'PagesController@resetSort');
 
         // SHIPPING SERVICES ROUTES CMS
         Route::get('/shipping/list', 'ShippingController@viewList');

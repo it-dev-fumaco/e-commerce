@@ -128,6 +128,14 @@
 								<option value="{{ $store->store_id }}">{{ $store->store_name }}</option>
 								@endforeach
 							</select>
+							<select class="d-none" id="product-categories">
+								<option value="">-</option>
+								@foreach ($categories as $id => $name)
+								<option value="{{ $id }}">{{ $name }}</option>
+								@endforeach
+							</select>
+
+							
 							<h5 class="shipping-conditions d-none mt-3">Shipping Condition(s)</h5>
 							<hr class="shipping-conditions d-none">
 							<div class="row shipping-conditions d-none">
@@ -164,6 +172,27 @@
 													<th style="width: 23%;" scope="col" class="text-center">Town / City</th>
 													<th style="width: 10%;"></th>
 											  </tr>
+										 </thead>
+										 <tbody></tbody>
+									</table>
+							  </div>
+							</div>
+							<h5 class="shipping-category d-none mt-3">Product Category</h5>
+							<hr class="shipping-category d-none">
+							<div class="row shipping-category d-none">
+								<div class="col-md-6 offset-md-3">
+									<label id="label-cat">Allowed product categories</label>
+									<div class="float-right">
+										 <button class="btn btn-outline-primary btn-sm mb-2" id="add-product-category-btn">Add Product Category</button>
+									</div>
+									<table class="table table-bordered" id="product-category-table">
+										 <thead>
+											<tr>
+												<th style="width: 40%;" scope="col" class="text-center">Product Category Name</th>
+												<th style="width: 25%;" scope="col" class="text-center">Min. Leadtime</th>
+												<th style="width: 25%;" scope="col" class="text-center">Max. Leadtime</th>
+												<th style="width: 10%;"></th>
+										  </tr>
 										 </thead>
 										 <tbody></tbody>
 									</table>
@@ -237,23 +266,31 @@
 			$('#flat-rate-amount').closest('.col-md-6').addClass('d-none');
 			$('.shipping-conditions').addClass('d-none');
 			$('.shipping-zone-rates').addClass('d-none');
+			$('.shipping-category').addClass('d-none');
 
 			$('#shipping-method').val("");
 
 			$('#shipping-zone-table tbody').empty();
 			$('#shipping-condition-table tbody').empty();
 			$('#stores-table tbody').empty();
+			$('#product-category-table tbody').empty();
 
 			if (shipping_service_type == '') {
 				$('#shipping-method').closest('.form-group').addClass('d-none');
 			} else  if (shipping_service_type == 'Store Pickup'){
 				add_store_row('#stores-table tbody');
+				add_shipping_category();
 				$('#shipping-method').closest('.form-group').addClass('d-none');
 				$('.store-locations').removeClass('d-none');
+				$('.shipping-category').removeClass('d-none');
+				$('#label-cat').text('Allowed product categories');
 			} else {
 				add_shipping_zone_rate_row('#shipping-zone-table tbody');
 				$('#shipping-method').closest('.form-group').removeClass('d-none');
 				$('.store-locations').addClass('d-none');
+				$('.shipping-category').removeClass('d-none');
+				add_shipping_category();
+				$('#label-cat').text('Not applicable for the following product categories');
 			}
 		});
 
@@ -447,6 +484,31 @@
 				}
 			});
 		});
+
+		$('#add-product-category-btn').click(function(e){
+			e.preventDefault();
+			add_shipping_category();
+		});
+
+		function add_shipping_category() {
+			var clone_select = $('#product-categories').html();
+			var row = '<tr>' +
+				'<td class="p-2">' +
+					'<select name="product_category[]" class="form-control w-100" style="width: 100%;" required>' + clone_select + '</select>' +
+				'</td>' +
+				'<td class="p-2">' +
+					'<input type="text" name="c_min_leadtime[]" class="form-control" placeholder="0 Day(s)" required>' +
+				'</td>' +
+				'<td class="p-2">' +
+					'<input type="text" name="c_max_leadtime[]" class="form-control" placeholder="0 Day(s)" required>' +
+				'</td>' +
+				'<td class="text-center">' +
+					'<button class="btn btn-outline-danger btn-sm remove-td-row">Remove</button>' +
+				'</td>' +
+			'</tr>';
+
+			$('#product-category-table tbody').append(row);
+		}
 	})();
 
 </script>

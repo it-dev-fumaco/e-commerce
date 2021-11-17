@@ -12,6 +12,12 @@
 
     <title>{{ $namePage }}</title>
 
+    @if (Str::startsWith($current = url()->current(), 'https://www'))
+      <link rel="canonical" href="{{ str_replace('https://www.', 'https://', $current) }}">
+    @else
+      <link rel="canonical" href="{{ str_replace('https://', 'https://www.', $current) }}">
+    @endif
+
     <link rel="shortcut icon" type="image/x-icon" href="{{ asset('/assets/icon/favicon.ico') }}">
     <link rel="icon" type="image/png" href="{{ asset('/assets/icon/favicon-16x16.png') }}" sizes="16x16">
     <link rel="icon" type="image/png" href="{{ asset('/assets/icon/favicon-32x32.png') }}" sizes="32x32">
@@ -28,13 +34,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
     <link href="{{ asset('/assets/fumaco.css') }}" rel="stylesheet">
-
-    {{-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    @if($activePage == 'contact')
-    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
-    @endif
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script> --}}
-    <!-- Global site tag (gtag.js) - Google Analytics -->
+    @if ($activePage != 'error_page')
+           <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id={{ Config::get('google_api.google_analytics_api') }}"></script>
     <script>
     window.dataLayer = window.dataLayer || [];
@@ -43,6 +44,8 @@
 
     gtag('config', '{{ Config::get('google_api.google_analytics_api') }}');
     </script>
+    @endif
+ 
     <style>
 	html,body{
 		width: 100% !important;
@@ -51,6 +54,7 @@
 		padding: 0px !important;
 		overflow-x: hidden !important;
 			font-family: 'poppins', sans-serif !important;
+      scroll-behavior: smooth;
 	}
       .fumacoFont1 {
           font-family: 'poppins', sans-serif !important; font-weight:400 !important; font-size: 1.75rem!important;
@@ -520,11 +524,20 @@
             <div class="col-md-12" style="text-align: left !important;">
               <h6 class="footer1st" style="color:#ffffff !important;">WE ACCEPT</h6>
               <div class="row" style="padding-left:1% !important">
-                <div class="d-inline m-2 payment-icons" style="position: relative !important"><img src="{{ asset('/assets/payment_method/mastercard2.webp') }}" alt="Master Card" style="max-height: 100%;max-width: 90%;width: auto;height: auto;position: absolute;top: 0;bottom: 0;left: 0;right: 0;margin: auto;"></div>
-                <div class="d-inline m-2 payment-icons" style="position: relative !important"><img src="{{ asset('/assets/payment_method/visa.webp') }}" alt="Visa" style="max-height: 100%;max-width: 90%;width: auto;height: auto;position: absolute;top: 0;bottom: 0;left: 0;right: 0;margin: auto;"></div>
-                <div class="d-inline m-2 payment-icons" style="position: relative !important"><img src="{{ asset('/assets/payment_method/gcash2.webp') }}" alt="GCash" style="max-height: 100%;max-width: 90%;width: auto;height: auto;position: absolute;top: 0;bottom: 0;left: 0;right: 0;margin: auto;"></div>
-                <div class="d-inline m-2 payment-icons" style="position: relative !important"><img src="{{ asset('/assets/payment_method/grabpay2.webp') }}" alt="GrabPay" style="max-height: 100%;max-width: 90%;width: auto;height: auto;position: absolute;top: 0;bottom: 0;left: 0;right: 0;margin: auto;"></div>
-                {{-- <div class="d-inline mx-auto payment-icons"><img src="{{ asset('/storage/payment_method/PayPal.svg') }}" alt="PayPal" style="width: 100%; height: 100% !important"></div> --}}
+                  @php
+                    $payment_method = array('mastercard2', 'visa', 'gcash2', 'grabpay2');
+                  @endphp
+                  @foreach($payment_method as $img)
+                    @php
+                      $image = '/storage/payment_method/'.$img.'.png';
+                      $image_webp = '/storage/payment_method/'.$img.'.webp';
+                    @endphp
+                    <div class="d-inline m-2 payment-icons" style="position: relative !important"><picture>
+                      <source srcset="{{ asset($image_webp) }}" type="image/webp" style="object-fit: cover;">
+                      <source srcset="{{ asset($image) }}" type="image/jpeg" style="object-fit: cover;">
+                      <img src="{{ asset($image) }}" style="object-fit: cover; max-height: 100%;max-width: 90%;width: auto;height: auto;position: absolute;top: 0;bottom: 0;left: 0;right: 0;margin: auto;">
+                    </picture></div>
+                  @endforeach
               </div>
             </div>
           </div>

@@ -29,4 +29,24 @@ return [
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
+
+    'facebook' => [
+        'client_id' => '435536724607670',
+        'client_secret' => '983cd95dca020ece7f82b82c2f97c826',
+        'redirect' => 'https://test301.fumaco.com/auth/facebook/callback',
+    ],
+
+    'google' => [
+        'client_id' => '794522382369-0pdu3n5j2ofohbae2hcbtgtfqiu898a2.apps.googleusercontent.com',
+        'client_secret' => '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',
+        'redirect' => 'https://test301.fumaco.com/auth/google/callback',
+    ],
+
+    'linkedin' => [
+        'client_id' => 'id',
+        'client_secret' => 'secret',
+        'redirect' => 'https://test301.fumaco.com/auth/linkedin/callback'
+
+    ],
+
 ];

@@ -64,7 +64,7 @@
                         @forelse ($cart_arr as $cart)
                         <tr class="he2x2">
                             <td class="tbl-qtr">
-                                <img src="{{ asset('/storage/item_images/'.$cart['item_code'].'/gallery/preview/'.$cart['item_image']) }}" class="img-responsive" alt="" width="55" height="55">
+                                <img src="{{ asset('/storage/item_images/'.$cart['item_code'].'/gallery/preview/'.$cart['item_image']) }}" class="img-responsive" alt="{{ Str::slug(explode(".", $cart['item_image'])[0], '-') }}" width="55" height="55">
                             </td>
                             <td class="tbls tbl-half" style="width:40% !important;"><a href="/product/{{ $cart['item_code'] }}" style="text-decoration: none !important; color: #000;">{{ $cart['item_description'] }}</a>
                                 <br/>{{-- for mobile --}}

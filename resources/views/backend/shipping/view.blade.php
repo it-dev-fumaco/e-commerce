@@ -149,6 +149,12 @@
 								<option value="{{ $store->store_id }}">{{ $store->store_name }}</option>
 								@endforeach
 							</select>
+							<select class="d-none" id="product-categories">
+								<option value="">-</option>
+								@foreach ($product_categories as $id => $name)
+								<option value="{{ $id }}">{{ $name }}</option>
+								@endforeach
+							</select>
 							<h5 class="shipping-conditions {{ ($details->shipping_calculation == 'Flat Rate' || !$details->shipping_calculation) ? 'd-none' : ''  }} mt-3">Shipping Condition(s)</h5>
 							<hr class="shipping-conditions {{ ($details->shipping_calculation == 'Flat Rate' || !$details->shipping_calculation) ? 'd-none' : ''  }}">
 							<div class="row shipping-conditions {{ ($details->shipping_calculation == 'Flat Rate' || !$details->shipping_calculation) ? 'd-none' : ''  }}">
@@ -237,6 +243,48 @@
 									</table>
 							  </div>
 							</div>
+							<h5 class="shipping-category mt-3">Product Category</h5>
+							<hr class="shipping-category">
+							<div class="row shipping-category">
+								<div class="col-md-6 offset-md-3">
+									<label id="label-cat">{{ $details->shipping_service_name == 'Store Pickup' ? 'Allowed product categories' : 'Not applicable for the following product categories' }}</label>
+									<div class="float-right">
+										 <button class="btn btn-outline-primary btn-sm mb-2" id="add-product-category-btn">Add Product Category</button>
+									</div>
+									<table class="table table-bordered" id="product-category-table">
+										 <thead>
+											  <tr>
+													<th style="width: 40%;" scope="col" class="text-center">Product Category Name</th>
+													<th style="width: 25%;" scope="col" class="text-center">Min. Leadtime</th>
+													<th style="width: 25%;" scope="col" class="text-center">Max. Leadtime</th>
+													<th style="width: 10%;"></th>
+											  </tr>
+										 </thead>
+										 <tbody>
+											 @foreach($categories as $row) 
+											 <tr>
+												<td class="p-2">
+													<select name="product_category[]" class="form-control w-100" style="width: 100%;" required>
+														<option value="">-</option>
+														@foreach ($product_categories as $id => $name)
+														<option value="{{ $id }}" {{ $row->category_id == $id ? 'selected' : '' }}>{{ $name }}</option>
+														@endforeach
+													</select>
+												</td>
+												<td class="p-2">
+													<input type="text" name="c_min_leadtime[]" class="form-control" value="{{ $row->min_leadtime }}" placeholder="0.00" required>
+												</td>
+												<td class="p-2">
+													<input type="text" name="c_max_leadtime[]" class="form-control" value="{{ $row->max_leadtime }}" placeholder="0.00" required>
+												</td>
+												<td class="text-center">
+													<button class="btn btn-outline-danger btn-sm remove-td-row">Remove</button>
+												</td>
+											</tr>
+											 @endforeach
+										 </tbody>
+									</table>
+							  </div>
 							<div class="float-right font-italic">
 								<small>Last modified by: {{ $details->last_modified_by }} - {{ $details->last_modified_at }}</small><br>
 								<small>Created by: {{ $details->created_by }} - {{ $details->created_at }}</small>
@@ -571,6 +619,28 @@
 					$('#alert-div').removeClass('d-none alert-success').addClass('alert-danger').text(data.responseText);
 				}
 			});
+		});
+
+		$('#add-product-category-btn').click(function(e){
+			e.preventDefault();
+
+			var clone_select = $('#product-categories').html();
+			var row = '<tr>' +
+				'<td class="p-2">' +
+					'<select name="product_category[]" class="form-control w-100" style="width: 100%;" required>' + clone_select + '</select>' +
+				'</td>' +
+				'<td class="p-2">' +
+					'<input type="text" name="c_min_leadtime[]" class="form-control" placeholder="0 Day(s)" required>' +
+				'</td>' +
+				'<td class="p-2">' +
+					'<input type="text" name="c_max_leadtime[]" class="form-control" placeholder="0 Day(s)" required>' +
+				'</td>' +
+				'<td class="text-center">' +
+					'<button class="btn btn-outline-danger btn-sm remove-td-row">Remove</button>' +
+				'</td>' +
+			'</tr>';
+
+			$('#product-category-table tbody').append(row);
 		});
 	})();
 

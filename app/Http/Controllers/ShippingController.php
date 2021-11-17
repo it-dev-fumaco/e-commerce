@@ -15,7 +15,9 @@ class ShippingController extends Controller
     public function viewAddForm() {
         $stores = DB::table('fumaco_store')->get();
 
-        return view('backend.shipping.add', compact('stores'));
+        $categories = DB::table('fumaco_categories')->pluck('name', 'id');
+
+        return view('backend.shipping.add', compact('stores', 'categories'));
     }
 
     public function viewList() {
@@ -257,7 +259,22 @@ class ShippingController extends Controller
                 ShippingCondition::insert($shipping_conditions);
                 ShippingZoneRate::insert($shipping_zone_rates);
             }
-                        
+
+            if(isset($request->product_category)) {
+                $category_arr = [];
+                foreach($request->product_category as $i => $category) {
+                    $category_arr[] = [
+                        'shipping_service_id' => $shipping_service->shipping_service_id,
+                        'category_id' => $category,
+                        'min_leadtime' => $request->c_min_leadtime[$i],
+                        'max_leadtime' => $request->c_max_leadtime[$i],
+                        'created_by' => Auth::user()->username
+                    ];
+                }
+    
+                DB::table('fumaco_shipping_product_category')->insert($category_arr);
+            }
+
             DB::commit();
 
             return response()->json([
@@ -287,7 +304,11 @@ class ShippingController extends Controller
             ->where('shipping_service_id', $id)->get();
         $stores = DB::table('fumaco_store')->get();
 
-        return view('backend.shipping.view', compact('details', 'shipping_zone_rates', 'shipping_conditions', 'stores', 'shipping_service_stores'));
+        $categories = DB::table('fumaco_categories as a')->join('fumaco_shipping_product_category as b', 'a.id', 'b.category_id')->where('b.shipping_service_id', $id)->get();
+
+        $product_categories = DB::table('fumaco_categories')->pluck('name', 'id');
+
+        return view('backend.shipping.view', compact('details', 'shipping_zone_rates', 'shipping_conditions', 'stores', 'shipping_service_stores', 'categories', 'product_categories'));
     }
 
     public function updateShipping($id, Request $request){
@@ -455,6 +476,23 @@ class ShippingController extends Controller
                 }
 
                 ShippingCondition::insert($shipping_conditions);
+            }
+
+            DB::table('fumaco_shipping_product_category')->where('shipping_service_id', $id)->delete();
+            if(isset($request->product_category)) {
+                $category_arr = [];
+
+                foreach($request->product_category as $i => $category) {
+                    $category_arr[] = [
+                        'shipping_service_id' => $id,
+                        'category_id' => $category,
+                        'min_leadtime' => $request->c_min_leadtime[$i],
+                        'max_leadtime' => $request->c_max_leadtime[$i],
+                        'created_by' => Auth::user()->username
+                    ];
+                }
+    
+                DB::table('fumaco_shipping_product_category')->insert($category_arr);
             }
                         
             DB::commit();

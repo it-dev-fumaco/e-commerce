@@ -39,6 +39,13 @@
                             {{ session()->get('error') }}
                         </div>
                     @endif
+                    @if(count($errors->all()) > 0)
+						<div class="alert alert-warning alert-dismissible fade show text-center" role="alert">
+							@foreach ($errors->all() as $error)
+								{{ $error }}
+							@endforeach 
+						</div>
+					@endif
                         @csrf
                         <h4 style="color: #404040; border-bottom: 2px solid  #e59866 ; padding-bottom: 8px; text-align: center;">Sign Up</h4>
                         <br>
@@ -46,17 +53,17 @@
                             <div class="col-lg-7" style="text-align: left;">
                                 <div class="row">
                                     <label for="mobile_1" class="myprofile-font-form login_1">First Name : <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control caption_1" id="fname" name="first_name" required>
+                                    <input type="text" class="form-control caption_1" id="fname" name="first_name" value="{{ old('first_name') }}" required>
                                 </div>
                                 <br/>
                                 <div class="row">
                                     <label for="mobile_1" class="myprofile-font-form login_1">Last Name : <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control caption_1" id="lname" name="last_name" required>
+                                    <input type="text" class="form-control caption_1" id="lname" name="last_name" value="{{ old('last_name') }}" required>
                                 </div>
                                 <br/>
                                 <div class="row">
                                     <label class="login_1">Email address <span class="text-danger">*</span></label>
-                                    <input type="email" name="username" id="username" class="form-control caption_1" value="" required>
+                                    <input type="email" name="username" id="username" class="form-control caption_1" value="{{ old('username') }}" required>
                                     <span class="help-block"></span>
                                 </div>
                                 <br/>
@@ -68,7 +75,7 @@
                                 <br/>
                                 <div class="row">
                                     <label class="login_1">Confirm Password <span class="text-danger">*</span></label>
-                                    <input type="password" name="confirm_password" id="confirm_password"  class="form-control caption_1" value="" required>
+                                    <input type="password" name="password_confirmation" id="confirm_password"  class="form-control caption_1" value="" required>
                                     <span class="help-block"></span>
                                 </div>
                                 <br>
@@ -110,6 +117,10 @@
     <br>
     <br>
 </main>
+
+@endsection
+
+@section('script')
 
 <script>
 

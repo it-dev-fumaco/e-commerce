@@ -11,6 +11,39 @@ class CartController extends Controller
     public function productActions(Request $request) {
         $data = $request->all();
         $order_no = 'FUM-' . date('yd') . random_int(0, 9999);
+
+        if(isset($data['reorder'])){
+            session()->forget('fumCart');
+            $items = DB::table('fumaco_order_items')->where('order_number', $request->order_number)->get();
+            $cart = [];
+            foreach($items as $item){
+                $cart[$item->item_code] = [
+                    "item_code" => $item->item_code,
+                    "quantity" => $item->item_qty,
+                    "price" => $item->item_price
+                ];
+                session()->put('fumCart', $cart);
+            }
+
+            // return session()->get('fumCart');
+            $user_id = DB::table('fumaco_users')->where('username', Auth::user()->username)->first();
+            $bill_address = DB::table('fumaco_user_add')->where('xdefault', 1)->where('user_idx', $user_id->id)->where('address_class', 'Billing')->count();
+            $ship_address = DB::table('fumaco_user_add')->where('xdefault', 1)->where('user_idx', $user_id->id)->where('address_class', 'Delivery')->count();
+
+            if($bill_address > 0 and $ship_address > 0){
+                $action = '/setdetails';
+            }else if($ship_address < 1){
+                $action = '/checkout/billing';
+            }else if($bill_address < 1){
+                $action = '/checkout/set_billing_form';
+            }else{
+                $action = '/checkout/billing';
+            }
+
+            return redirect($action);
+
+        }
+        
         if (isset($data['addtocart']) && $data['addtocart']) {
             if (!session()->get('fumOrderNo')) {
                 session()->put('fumOrderNo', $order_no);

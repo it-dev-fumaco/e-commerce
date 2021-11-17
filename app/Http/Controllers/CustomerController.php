@@ -11,7 +11,11 @@ use DB;
 class CustomerController extends Controller
 {
     public function viewCustomers(Request $request){
-        $user_info = DB::table('fumaco_users')->where('f_name', 'LIKE', '%'.$request->q.'%')->orWhere('f_lname', 'LIKE', '%'.$request->q.'%')->orWhere('username', 'LIKE', '%'.$request->q.'%')->paginate(10);
+        $user_info = DB::table('fumaco_users')->where('is_email_verified', 1)
+        ->when($request->q, function($c) use ($request) {
+            $c->where('f_name', 'LIKE', '%'.$request->q.'%')->orWhere('f_lname', 'LIKE', '%'.$request->q.'%')->orWhere('username', 'LIKE', '%'.$request->q.'%');
+        })
+            ->paginate(10);
 
         $user_arr = [];
         $ship_arr = [];
@@ -87,7 +91,10 @@ class CustomerController extends Controller
                 'bill_brgy' => $bill_brgy,
                 'bill_postal' => $bill_postal,
                 'bill_country' => $bill_country,
-                'bill_type' => $bill_type
+                'bill_type' => $bill_type,
+                'created_at' => $user->created_at,
+                'no_of_visits' => number_format($user->no_of_visits),
+                'last_login' => $user->last_login
             ];
         }
         // dd($user_arr);

@@ -116,7 +116,10 @@
 																		<h4 class="modal-title">ORDER NO. {{ $order['order_no'] }}</h4>
 																	</div>
 																	<div class="col-md-6">
-																		<div class="float-right font-italic m-1" style="font-size: 1.2rem;"><strong>Est. Delivery Date : </strong> {{ $order['estimated_delivery_date'] }}</div>
+																		<div class="float-right font-italic m-1" style="font-size: 1.2rem;">
+																			<span class="badge badge-info d-inline-block mr-3" style="font-size: 1rem;">{{ $order['shipping_name'] }}</span>
+																			{!! ($order['shipping_name'] != 'Store Pickup') ? '<strong>Est. Delivery Date : </strong> ' . $order['estimated_delivery_date'] : '<strong>Pickup by : </strong> ' . \Carbon\Carbon::parse($order['pickup_date'])->format('D, F d, Y') !!}
+																		</div>
 																	</div>
 																</div>
 																<button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -167,6 +170,15 @@
 																		</p>
 																	</div>
 																	<div class="col-md-4">
+																		@if ($order['shipping_name'] == 'Store Pickup')
+																		<p>
+																			<strong>Pickup At : </strong><br>
+																			{{ ($order['store']) }}<br>
+																			{!! $order['store_address'] !!}<br/>
+																			<strong>Pickup Date : </strong>
+																			{{ \Carbon\Carbon::parse($order['pickup_date'])->format('D, F d, Y') }}
+																		</p>
+																		@else
 																		<p>
 																			<strong>Shipping Address : </strong><br>
 																			<strong>Ship to :</strong> {{ ($order['shipping_business_name']) ? $order['shipping_business_name'] : $order['ship_contact_person'] }}<br>
@@ -174,6 +186,7 @@
 																			{{ $order['email'] }}<br/>
 																			{{ $order['contact'] }}
 																		</p>
+																		@endif
 																	</div>
 																</div>
 																<div class="row">
@@ -215,7 +228,13 @@
 																		<dl class="row">
 																			<dt class="col-sm-10 text-right">Subtotal</dt>
 																			<dd class="col-sm-2 text-right">₱ {{ number_format(str_replace(",","",$order['subtotal']), 2) }}</dd>
-																			<dt class="col-sm-10 text-right">{{ $order['shipping_name'] }}</dt>
+																			<dt class="col-sm-10 text-right">
+																				@if ($order['shipping_name'])
+																				<span class="badge badge-info" style="font-size: 11pt;">{{ $order['shipping_name'] }}</span>
+																				@else
+																				{{ $order['shipping_name'] }}
+																				@endif
+																			</dt>
 																			<dd class="col-sm-2 text-right">₱ {{ number_format(str_replace(",","",$order['shipping_amount']), 2) }}</dd>
 																			<dt class="col-sm-10 text-right">Grand Total</dt>
 																			<dd class="col-sm-2 text-right">₱ {{ number_format(str_replace(",","",$order['grand_total']), 2) }}</dd>

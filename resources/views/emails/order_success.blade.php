@@ -27,8 +27,14 @@
 			<strong>Order No. :</strong> {{ $order['order_details']->order_number }}<br><br>
 			<strong>Payment Method :</strong> {{ $order['order_details']->order_payment_method }}<br><br>
 			<strong>Customer :</strong> {{ $order['order_details']->order_name . ' ' . $order['order_details']->order_lastname }}<br><br>
+			@if ($order['order_details']->order_shipping == 'Store Pickup')
+			<strong>Shipping Method :</strong> {{ $order['order_details']->order_shipping }}<br><br>
+			<strong>Store Location :</strong> {!! $order['order_details']->store_location . ' - ' . $order['store_address'] !!}<br><br>
+			<strong>Pickup by :</strong> {{ \Carbon\Carbon::parse($order['order_details']->pickup_date)->format('D, F d, Y') }}<br>
+			@else
 			<strong>Shipping Address :</strong> {{ $order['order_details']->order_ship_address1 . ' ' . $order['order_details']->order_ship_address2 . ', ' . $order['order_details']->order_ship_brgy . ', ' . $order['order_details']->order_ship_city .', ' . $order['order_details']->order_ship_prov . ', ' . $order['order_details']->order_ship_country .', ' . $order['order_details']->order_ship_postal }}<br><br>
 			<strong>Estimated Delivery Date :</strong> {{ $order['order_details']->estimated_delivery_date }}<br>
+			@endif
         </td>
      </tr>
      <tr>

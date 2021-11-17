@@ -42,7 +42,8 @@
                                         <thead>
                                             <tr>
                                                 <th>Email</th>
-                                                <th>Membership Status
+                                                <th>Membership Status</th>
+                                                <th>Date Subscribed</th>
                                                 <th>Status</th>
                                             </tr>
                                         </thead>
@@ -52,6 +53,7 @@
                                                 <tr>
                                                     <td>{{ $subs['email'] }}</td>
                                                     <td>{{ $subs['membership_status'] }}</td>
+                                                    <td>{{ $subs['subscribe_date'] }}</td>
                                                     <td>
                                                         <center>
                                                             <label class="switch">
