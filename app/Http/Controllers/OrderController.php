@@ -224,10 +224,15 @@ class OrderController extends Controller
                 if($status == 'Delivered'){
                     $delivery_date = Carbon::now()->toDateTimeString();
                     foreach($ordered_items as $orders){
-                        $items = DB::table('fumaco_items')->select('f_reserved_qty')->where('f_idcode', $orders->item_code)->first();
+                        $items = DB::table('fumaco_items')->select('f_reserved_qty', 'f_qty', 'stock_source')->where('f_idcode', $orders->item_code)->first();
                         $qty_left = $items->f_reserved_qty - $orders->item_qty;
 
-                        DB::table('fumaco_items')->where('f_idcode', $orders->item_code)->update(['f_reserved_qty' => $qty_left, 'last_modified_by' => Auth::user()->username]);
+                        $data = ['f_reserved_qty' => $qty_left, 'last_modified_by' => Auth::user()->username];
+                        if (!$items->stock_source) {
+                            $data['f_qty'] = ($items->f_qty - $orders->item_qty);
+                        }
+
+                        DB::table('fumaco_items')->where('f_idcode', $orders->item_code)->update($data);
                     }
                 }
 
