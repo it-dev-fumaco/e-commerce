@@ -8,8 +8,8 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Http;
 use DB;
 use Mail;
-use Auth;
 use Carbon\Carbon;
+use Auth;
 
 class OrderController extends Controller
 {
@@ -18,7 +18,7 @@ class OrderController extends Controller
         $search_id = ($request->search) ? $request->search : '';
         $order_status = ($request->order_status) ? $request->order_status : '';
 
-        $orders = DB::table('fumaco_order')->where('order_number', 'LIKE', '%'.$search_id.'%')->where('order_status', 'LIKE', '%'.$order_status.'%')->where('order_status', '!=', 'Cancelled')->where('order_status', '!=', 'Delivered')->where('order_status', '!=', 'Order Completed')->where('order_status', '!=', 'Order Delivered')->orderBy('id', 'desc')->paginate(10);
+        $orders = DB::table('fumaco_order')->where('order_number', 'LIKE', '%'.$search_id.'%')->where('order_status', 'LIKE', '%'.$order_status.'%')->where('order_status', '!=', 'Cancelled')->where('order_status', '!=', 'Delivered')->orderBy('id', 'desc')->paginate(10);
 
         $orders_arr = [];
 
@@ -42,12 +42,6 @@ class OrderController extends Controller
 				$store = DB::table('fumaco_store')->where('store_name', $o->store_location)->first();
 				$store_address = ($store) ? $store->address : null;
 			}
-
-            $order_status = DB::table('order_status as s')
-            ->join('order_status_process as p', 's.order_status_id', 'p.order_status_id')
-            ->where('shipping_method', $o->order_shipping)
-            ->orderBy('order_sequence', 'asc')
-            ->get();
 
             $orders_arr[] = [
                 'order_no' => $o->order_number,
@@ -92,12 +86,9 @@ class OrderController extends Controller
                 'shipping_business_name' => $o->shipping_business_name,
                 'pickup_date' => Carbon::parse($o->pickup_date)->format('M d, Y'),
                 'store_address' => $store_address,
-                'store' => $o->store_location,
-                'order_status' => $order_status
+                'store' => $o->store_location
             ];
         }
-
-        // return $orders_arr;
 
         return view('backend.orders.order_list', compact('orders_arr', 'orders'));
     }
@@ -163,13 +154,7 @@ class OrderController extends Controller
 
     public function deliveredOrders(Request $request){
         $search_id = ($request->search) ? $request->search : '';
-        $orders = DB::table('fumaco_order')->where('order_number', 'LIKE', '%'.$search_id.'%')
-        ->where('order_status', '!=', 'Order Placed')
-        ->where('order_status', '!=', 'Order Confirmed')
-        ->where('order_status', '!=', 'Out for Delivery')
-        ->where('order_status', '!=', 'Ready for Pickup')
-        ->where('order_status', '!=', 'Cancelled')
-        ->orderBy('id', 'desc')->paginate(10);
+        $orders = DB::table('fumaco_order')->where('order_number', 'LIKE', '%'.$search_id.'%')->where('order_status', 'Delivered')->orderBy('id', 'desc')->paginate(10);
 
         $orders_arr = [];
 
@@ -235,31 +220,15 @@ class OrderController extends Controller
             $date_cancelled = "";
 
             if($status) {
-                $order_status_check = DB::table('order_status')->where('status', $status)->first();
-                
                 $ordered_items = DB::table('fumaco_order_items')->where('order_number', $request->order_number)->get();
-                
-                if($order_status_check){
-                    if($order_status_check->update_stocks == 1){ // check if stocks needs to update
-                        foreach($ordered_items as $orders){
-                            $items = DB::table('fumaco_items')->select('f_reserved_qty', 'stock_source', 'f_qty')->where('f_idcode', $orders->item_code)->first();
-                            $qty_left = $items->f_reserved_qty - $orders->item_qty;
-    
-                            $quantity_update = [
-                                'f_reserved_qty' => $qty_left
-                            ];
-    
-                            if($items->stock_source == 0){
-                                $quantity_update['f_qty'] = $items->f_qty - $orders->item_qty;
-                            }
-        
-                            DB::table('fumaco_items')->where('f_idcode', $orders->item_code)->update($quantity_update);
-                        }
-                    }
-                }
-
-                if($status == 'Order Delivered' or $status == 'Order Completed'){
+                if($status == 'Delivered'){
                     $delivery_date = Carbon::now()->toDateTimeString();
+                    foreach($ordered_items as $orders){
+                        $items = DB::table('fumaco_items')->select('f_reserved_qty')->where('f_idcode', $orders->item_code)->first();
+                        $qty_left = $items->f_reserved_qty - $orders->item_qty;
+
+                        DB::table('fumaco_items')->where('f_idcode', $orders->item_code)->update(['f_reserved_qty' => $qty_left, 'last_modified_by' => Auth::user()->username]);
+                    }
                 }
 
                 if($status == 'Cancelled'){
@@ -267,6 +236,7 @@ class OrderController extends Controller
                     foreach($ordered_items as $orders){
                         $items = DB::table('fumaco_items')->select('f_reserved_qty', 'f_qty')->where('f_idcode', $orders->item_code)->first();
                         $r_qty = $items->f_reserved_qty - $orders->item_qty;
+                        $f_qty = $items->f_qty + $orders->item_qty;
 
                         DB::table('fumaco_items')->where('f_idcode', $orders->item_code)->update(['f_reserved_qty' => $r_qty, 'last_modified_by' => Auth::user()->username]);
                     }
@@ -280,25 +250,13 @@ class OrderController extends Controller
                     'last_modified_by' => Auth::user()->username,
                 ];
 
-                $track_order = [
-                    'track_code' => $request->order_number,
-                    'track_item' => 'Item Purchase',
-                    'track_description' => $status == 'Cancelled' ? 'Cancelled' : $order_status_check->status_description,
-                    'track_date' => Carbon::now()->toDateTimeString(),
-                    'track_status' => $status,
-                    'track_ip' => $request->ip(),
-                    'transaction_member' => isset($request->member) ? 'Member' : 'Guest',
-                    'track_active' => 1,
-                    'last_modified_by' => Auth::user()->username
-                ];
-
                 if($status == 'Order Confirmed'){
-                    $checker = DB::table('track_order')->where('track_code', $request->order_number)->where('track_status', 'Out for Delivery')->count();
-
-                    if($checker > 1){
-                        DB::table('track_order')->where('track_code', $request->order_number)->where('track_status', 'Out for Delivery')->update(['track_active' => 0]);
-                        DB::table('track_order')->where('track_code', $request->order_number)->where('track_status', 'Order Confirmed')->update(['track_active' => 0]);
-                    }
+                    $orders_arr['order_date_confirmed'] = Carbon::now()->toDateTimeString();
+                    $orders_arr['order_date_ready'] = '';
+                }
+                
+                if($status == 'Out for Delivery'){
+                    $orders_arr['order_date_ready'] = Carbon::now()->toDateTimeString();
                 }
 
                 $items = [];
@@ -335,7 +293,7 @@ class OrderController extends Controller
 
                 DB::table('fumaco_order')->where('order_number', $request->order_number)->update($orders_arr);
 
-                DB::table('track_order')->insert($track_order);
+                DB::table('track_order')->where('track_code', $request->order_number)->update(['track_status' => $status, 'track_date_update' => $now]);
 
                 DB::commit();
             }
