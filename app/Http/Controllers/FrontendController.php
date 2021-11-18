@@ -772,7 +772,7 @@ class FrontendController extends Controller
     public function viewProduct($slug) { // Product Page
         $product_details = DB::table('fumaco_items')->where('slug', $slug)->orWhere('f_idcode', $slug)->first();
         if (!$product_details) {
-            return view('error');
+            return redirect('/');
         }
 
         // get items with the same parent item code
