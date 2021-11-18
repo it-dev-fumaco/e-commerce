@@ -51,8 +51,15 @@ class GenerateSitemap extends Command
         $sitemap_indexes = SitemapIndex::create()->add('/sitemap/page-sitemap.xml');
             // add index per category
             foreach ($categories as $category) {
-                $sitemap_indexes->add(SitemapTag::create('/sitemap/'.$category->slug.'.xml')
-                    ->setLastModificationDate(Carbon::parse($category->last_modified_at)));
+                // get active products
+                $products = DB::table('fumaco_items')->where('f_status', 1)
+                    ->whereNotNull('slug')->where('slug', '!=', '')
+                    ->where('f_cat_id', $category->id)->orderBy('last_modified_at', 'desc')
+                    ->select('slug', 'last_modified_at')->get();
+                if (count($products) > 0) {
+                    $sitemap_indexes->add(SitemapTag::create('/sitemap/'.$category->slug.'.xml')
+                        ->setLastModificationDate(Carbon::parse($category->last_modified_at)));
+                }
             }
 
         $sitemap_indexes->add('/sitemap/blog-sitemap.xml')->writeToFile(public_path('sitemap.xml'));
