@@ -99,17 +99,19 @@ class GenerateSitemap extends Command
             }
         }
 
-        // sitemap for blogs
-        $blog_sitemap = Sitemap::create();
+       
         // get blogs
         $blogs = DB::table('fumaco_blog')->where('blog_enable', 1)
             ->whereNotNull('slug')->where('slug', '!=', '')->orderBy('last_modified_at', 'desc')
             ->select('slug', 'last_modified_at')->get();
-
-        foreach ($blogs as $blog) {
-            $blog_sitemap->add(Url::create('/blog/'.$blog->slug)->setLastModificationDate(Carbon::parse($blog->last_modified_at)));
+        if (count($blogs) > 0) {
+             // sitemap for blogs
+            $blog_sitemap = Sitemap::create();
+            foreach ($blogs as $blog) {
+                $blog_sitemap->add(Url::create('/blog/'.$blog->slug)->setLastModificationDate(Carbon::parse($blog->last_modified_at)));
+            }
+            
+            $blog_sitemap->writeToFile(public_path('sitemap/blog-sitemap.xml'));
         }
-        
-        $blog_sitemap->writeToFile(public_path('sitemap/blog-sitemap.xml'));
     }
 }
