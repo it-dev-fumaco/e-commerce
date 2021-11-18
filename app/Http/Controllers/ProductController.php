@@ -547,7 +547,8 @@ class ProductController extends Controller
                 'brand' => $product->f_brand,
                 'on_sale' => $product->f_onsale,
                 'status' => $product->f_status,
-                'featured' => $product->f_featured
+                'featured' => $product->f_featured,
+                'erp_stock' => $product->stock_source,
             ];
         }
 
