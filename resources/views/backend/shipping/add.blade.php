@@ -283,14 +283,18 @@
 				$('#shipping-method').closest('.form-group').addClass('d-none');
 				$('.store-locations').removeClass('d-none');
 				$('.shipping-category').removeClass('d-none');
-				$('#label-cat').text('Allowed product categories');
+				$('#label-cat').text('Override leadtime for the following product categories');
 			} else {
+				if (shipping_service_type != 'Express Delivery'){
+					$('#label-cat').text('Override leadtime for the following product categories');
+				} else {
+					$('#label-cat').text('Not applicable for the following product categories');
+				}
 				add_shipping_zone_rate_row('#shipping-zone-table tbody');
 				$('#shipping-method').closest('.form-group').removeClass('d-none');
 				$('.store-locations').addClass('d-none');
 				$('.shipping-category').removeClass('d-none');
 				add_shipping_category();
-				$('#label-cat').text('Not applicable for the following product categories');
 			}
 		});
 

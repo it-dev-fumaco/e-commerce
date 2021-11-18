@@ -247,7 +247,7 @@
 							<hr class="shipping-category">
 							<div class="row shipping-category">
 								<div class="col-md-6 offset-md-3">
-									<label id="label-cat">{{ $details->shipping_service_name == 'Store Pickup' ? 'Allowed product categories' : 'Not applicable for the following product categories' }}</label>
+									<label id="label-cat">{{ $details->shipping_service_name == 'Store Pickup' ? 'Override leadtime for the following product categories' : 'Not applicable for the following product categories' }}</label>
 									<div class="float-right">
 										 <button class="btn btn-outline-primary btn-sm mb-2" id="add-product-category-btn">Add Product Category</button>
 									</div>
@@ -285,10 +285,11 @@
 										 </tbody>
 									</table>
 							  </div>
-							<div class="float-right font-italic">
-								<small>Last modified by: {{ $details->last_modified_by }} - {{ $details->last_modified_at }}</small><br>
-								<small>Created by: {{ $details->created_by }} - {{ $details->created_at }}</small>
-							</div>
+						
+						</div>
+						<div class="float-right font-italic">
+							<small>Last modified by: {{ $details->last_modified_by }} - {{ $details->last_modified_at }}</small><br>
+							<small>Created by: {{ $details->created_by }} - {{ $details->created_at }}</small>
 						</div>
 						<!-- /.card-body -->
 					</div>
@@ -367,7 +368,13 @@
 				add_store_row('#stores-table tbody');
 				$('#shipping-method').closest('.form-group').addClass('d-none');
 				$('.store-locations').removeClass('d-none');
+				$('#label-cat').text('Override leadtime for the following product categories');
 			} else {
+				if (shipping_service_type != 'Express Delivery'){
+					$('#label-cat').text('Override leadtime for the following product categories');
+				} else {
+					$('#label-cat').text('Not applicable for the following product categories');
+				}
 				add_shipping_zone_rate_row('#shipping-zone-table tbody');
 				$('#shipping-method').closest('.form-group').removeClass('d-none');
 				$('.store-locations').addClass('d-none');
