@@ -14,6 +14,9 @@ class CartController extends Controller
 
         if(isset($data['reorder'])){
             session()->forget('fumCart');
+            session()->forget('fumOrderNo');
+            session()->put('fumOrderNo', $order_no);
+            
             $items = DB::table('fumaco_order_items')->where('order_number', $request->order_number)->get();
             $cart = [];
             foreach($items as $item){
