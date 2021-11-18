@@ -55,7 +55,7 @@ return [
     // 'url' => env('APP_URL', 'http://localhost'),
     'url' => 'https://www.fumaco.com',
 
-    'asset_url' => env('ASSET_URL', null),
+    'asset_url' => env('ASSET_URL', 'https://www.fumaco.com'),
 
     /*
     |--------------------------------------------------------------------------
