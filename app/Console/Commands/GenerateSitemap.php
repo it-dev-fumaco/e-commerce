@@ -78,9 +78,9 @@ class GenerateSitemap extends Command
         
         // sitemap for pages
         Sitemap::create()
-            ->add(Url::create('/')->setLastModificationDate($homepage_last_modified_at))
-            ->add(Url::create('/about')->setLastModificationDate($about_last_modified_at))
-            ->add(Url::create('/contact')->setLastModificationDate($contact_last_modified_at))
+            ->add(Url::create('/')->setLastModificationDate($homepage_last_modified_at)->setPriority(1.0))
+            ->add(Url::create('/about')->setLastModificationDate($about_last_modified_at)->setPriority(1.0))
+            ->add(Url::create('/contact')->setLastModificationDate($contact_last_modified_at)->setPriority(1.0))
             ->writeToFile(public_path('sitemap/page-sitemap.xml'));
 
         // sitemap for products per category
@@ -93,7 +93,7 @@ class GenerateSitemap extends Command
             if (count($products) > 0) {
                 $product_sitemap = Sitemap::create();
                 foreach ($products as $product) {
-                    $product_sitemap->add(Url::create('/product/'.$product->slug)->setLastModificationDate(Carbon::parse($product->last_modified_at)));
+                    $product_sitemap->add(Url::create('/product/'.$product->slug)->setLastModificationDate(Carbon::parse($product->last_modified_at))->setPriority(1.0));
                 }
                 $product_sitemap->writeToFile(public_path('sitemap/'.$category->slug.'.xml'));
             }
