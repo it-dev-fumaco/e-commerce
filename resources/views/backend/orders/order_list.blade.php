@@ -94,7 +94,7 @@
 											@php
 												if($order['status'] == 'Order Placed'){
 													$badge = 'warning';
-												}else if($order['status'] == 'Out for Delivery'){
+												}else if($order['status'] == 'Out for Delivery' or $order['status'] == 'Ready for Pickup'){
 													$badge = 'success';
 												}else if($order['status'] == 'Cancelled'){
 													$badge = 'secondary';
@@ -139,12 +139,13 @@
 																			<label class="stat-label" for="status">Order Status</label>
 																			<select name="status" class="form-control col-md-6" name="order_status" required> 
 																				<option value="" {{ ($order['status'] == 'Order Placed') ? 'selected' : '' }} disabled>Order Placed</option>
-																				<option value="Order Confirmed" {{ ($order['status'] == 'Order Confirmed') ? 'selected disabled' : '' }}>Order Confirmed</option>
-																				<option value="Out for Delivery" {{ ($order['status'] == 'Out for Delivery') ? 'selected disabled' : '' }}>Out for Delivery</option>
-																				<option value="Delivered">Delivered Order</option>
+																				@foreach($order['order_status'] as $status)
+																					<option value="{{ $status->status }}" {{ $order['status'] == $status->status ? 'selected disabled' : '' }}>{{ $status->status }}</option>
+																				@endforeach
 																				<option value="Cancelled">Cancel Order</option>
 																			</select>
 																			<input type="text" value="{{ $order['order_no'] }}" name="order_number" hidden readonly/>
+																			<input type="checkbox" name="member" {{ $order['order_type'] == 'Member' ? 'checked' : '' }} readonly hidden/>
 																			<button type="submit" class="form-control col-md-3" style="margin-left: 2%">Update</button>
 																		</form>
 																	</div>

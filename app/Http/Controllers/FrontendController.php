@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -880,6 +879,8 @@ class FrontendController extends Controller
 
         $new_orders = DB::table('fumaco_order')->where('order_account', Auth::user()->id)
         ->where('order_status', '!=', 'Delivered')
+        ->where('order_status', '!=', 'Order Delivered')
+        ->where('order_status', '!=', 'Order Completed')
         ->where('order_status', '!=', 'Cancelled')
         ->orderBy('id', 'desc')->paginate(10);
 
@@ -907,7 +908,7 @@ class FrontendController extends Controller
 
             $orders_arr[] = [
                 'order_number' => $order->order_number,
-                'date' => date('M d, Y - h:m: A', strtotime($order->order_date)),
+                'date' => date('M d, Y - h:i A', strtotime($order->order_date)),
                 'status' => $order->order_status,
                 'edd' => $order->estimated_delivery_date,
                 'items' => $items_arr,
@@ -918,10 +919,13 @@ class FrontendController extends Controller
             ];
         }
 
-        foreach($new_orders as $new_order){
+        foreach($new_orders as $key => $new_order){
             $items_arr = [];
 
             $order_items = DB::table('fumaco_order_items')->where('order_number', $new_order->order_number)->get();
+
+            $track_order_details = DB::table('track_order')->where('track_code', $new_order->order_number)->where('track_active', 1)->select('track_status', 'track_date_update')->get();
+
             foreach($order_items as $item){
                 $item_image = DB::table('fumaco_items_image_v1')->where('idcode', $item->item_code)->first();
 
@@ -936,9 +940,16 @@ class FrontendController extends Controller
                 ];
             }
 
+            $order_status = DB::table('order_status as s')
+                ->join('order_status_process as p', 's.order_status_id', 'p.order_status_id')
+                ->where('shipping_method', $new_order->order_shipping)
+                ->select('s.status', 'p.order_sequence')
+                ->orderBy('order_sequence', 'asc')
+                ->get();
+
             $new_orders_arr[] = [
                 'order_number' => $new_order->order_number,
-                'date' => date('M d, Y - h:m: A', strtotime($new_order->order_date)),
+                'date' => date('M d, Y - h:i A', strtotime($new_order->order_date)),
                 'status' => $new_order->order_status,
                 'edd' => $new_order->estimated_delivery_date,
                 'items' => $items_arr,
@@ -946,8 +957,13 @@ class FrontendController extends Controller
                 'shipping_name' => $new_order->order_shipping,
                 'shipping_fee' => $new_order->order_shipping_amount,
                 'grand_total' => ($new_order->order_shipping_amount + $new_order->order_subtotal),
+                'pickup_date' => $new_order->pickup_date,
+                'order_tracker' => $track_order_details,
+                'ship_status' => $order_status,
+                // 'seq_lvl' => $order_status->where('status', $new_order->order_status)
             ];
         }
+        // return $new_orders_arr;
 
         return view('frontend.orders', compact('orders', 'orders_arr', 'new_orders', 'new_orders_arr'));
     }
