@@ -250,15 +250,6 @@ class OrderController extends Controller
                     'last_modified_by' => Auth::user()->username,
                 ];
 
-                if($status == 'Order Confirmed'){
-                    $orders_arr['order_date_confirmed'] = Carbon::now()->toDateTimeString();
-                    $orders_arr['order_date_ready'] = '';
-                }
-                
-                if($status == 'Out for Delivery'){
-                    $orders_arr['order_date_ready'] = Carbon::now()->toDateTimeString();
-                }
-
                 $items = [];
                 foreach($ordered_items as $row) {
                     $image = DB::table('fumaco_items_image_v1')->where('idcode', $row->item_code)->first();
