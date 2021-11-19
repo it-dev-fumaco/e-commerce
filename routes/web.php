@@ -245,6 +245,8 @@ Route::prefix('admin')->group(function () {
         Route::post('/edit/page/about_us/sponsor/sort/{id}', 'PagesController@updateSort');
         Route::get('/edit/page/about_us/sponsor/reset/{id}', 'PagesController@resetSort');
 
+        Route::get('/marketing/search/list', 'PagesController@searchList');
+
         // SHIPPING SERVICES ROUTES CMS
         Route::get('/shipping/list', 'ShippingController@viewList');
         Route::get('/shipping/add', 'ShippingController@viewAddForm');

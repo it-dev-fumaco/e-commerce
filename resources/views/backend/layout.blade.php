@@ -382,9 +382,12 @@
               </li>
             </ul>
           </li>
+          @php
+              $marketing_pages = ['Price Rule/Discounts', 'search_terms_list'];
+          @endphp
           <li class="nav-header">MARKETING</li>
-          <li class="nav-item {{ (in_array($activePage, $media_pages) ? 'menu-open' : '') }}">
-            <a href="#" class="nav-link {{ (in_array($activePage, $media_pages) ? 'active' : '') }}">
+          <li class="nav-item {{ (in_array($activePage, $marketing_pages) ? 'menu-open' : '') }}">
+            <a href="#" class="nav-link {{ (in_array($activePage, $marketing_pages) ? 'active' : '') }}">
               <i class="nav-icon fas fa-photo-video"></i>
               <p>Promotions <i class="fas fa-angle-left right"></i></p>
             </a>
@@ -393,6 +396,12 @@
                 <a href="#" class="nav-link {{ $activePage == 'Price Rule/Discounts' ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Price Rule/Discounts</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="/admin/marketing/search/list" class="nav-link {{ $activePage == 'search_terms_list' ? 'active' : '' }}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Search Terms</p>
                 </a>
               </li>
             </ul>
