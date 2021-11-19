@@ -48,7 +48,7 @@ class GenerateSitemap extends Command
             ->whereNull('external_link')->orderBy('last_modified_at', 'desc')
             ->select('slug', 'id', 'last_modified_at')->get();
             
-        $sitemap_indexes = SitemapIndex::create()->add('/sitemap/page-sitemap.xml');
+        $sitemap_indexes = SitemapIndex::create()->add('/')->add('/sitemap/page-sitemap.xml');
         // add index per category
         foreach ($categories as $category) {
             // get active products
@@ -76,7 +76,7 @@ class GenerateSitemap extends Command
             
             $blog_sitemap->writeToFile(public_path('sitemap/blog-sitemap.xml'));
         }
-
+       
         $sitemap_indexes->writeToFile(public_path('sitemap.xml'));
 
         // get about us page last modified date
@@ -86,14 +86,10 @@ class GenerateSitemap extends Command
         // get contact us page last modified date
         $contact_last_modified_at = DB::table('fumaco_contact')->max('update_date');
         $contact_last_modified_at = ($contact_last_modified_at) ? Carbon::parse($contact_last_modified_at) : Carbon::now();
-
-        // get contact us page last modified date
-        $homepage = DB::table('fumaco_pages')->where('is_homepage', 1)->first();
-        $homepage_last_modified_at = ($homepage) ? Carbon::parse($homepage->date_updated) : Carbon::now();
         
         // sitemap for pages
         Sitemap::create()
-            ->add(Url::create('/')->setLastModificationDate($homepage_last_modified_at)->setPriority(1.0))
+            // ->add(Url::create('/')->setLastModificationDate($homepage_last_modified_at)->setPriority(1.0))
             ->add(Url::create('/about')->setLastModificationDate($about_last_modified_at)->setPriority(1.0))
             ->add(Url::create('/contact')->setLastModificationDate($contact_last_modified_at)->setPriority(1.0))
             ->writeToFile(public_path('sitemap/page-sitemap.xml'));
