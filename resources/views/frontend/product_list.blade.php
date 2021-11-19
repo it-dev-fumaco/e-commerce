@@ -230,12 +230,15 @@
 
 						<div class="row animated animatedFade1InUp fadeInUp mx-auto">
 							@forelse ($products_arr as $product)
-							<div class="col-md-4 mb-3 btmp mb-pad">
+							<div class="col-md-4 mb-3 btmp mb-pad" 	>
+								
 								{{-- <div class="col-md-4 btmp animated animatedFadeInUp fadeInUp equal-height-columns"> --}}
-							<a href="/product/{{ ($product['slug']) ? $product['slug'] : $product['item_code'] }}" style="text-decoration: none !important; text-transform: none !important;">
-	
+							{{-- <a class="product-card" href="/product/{{ ($product['slug']) ? $product['slug'] : $product['item_code'] }}" style="text-decoration: none !important; text-transform: none !important; position: relative"> --}}
 								<div class="card">
-									<div class="equal-column-content">
+									<div class="equal-column-content product-card hover-container">
+										<div class="overlay-bg"></div>
+										<a href="/product/{{ ($product['slug']) ? $product['slug'] : $product['item_code'] }}" class="view-products-btn btn">View</a>
+
 										@php
 											$image = ($product['image']) ? '/storage/item_images/'.$product['item_code'].'/gallery/preview/'.$product['image'] : '/storage/no-photo-available.png';
 											$image_webp = ($product['image']) ? '/storage/item_images/'.$product['item_code'].'/gallery/preview/'.explode(".", $product['image'])[0] .'.webp' : '/storage/no-photo-available.png';
@@ -281,17 +284,15 @@
 										<div class="card-body">
 											{{-- <a href="/product/{{ $product['item_code'] }}" class="btn btn-outline-primary fumacoFont_card_readmore" role="button" style="width:100% !important;">View</a> --}}
 										</div>
-									</div>
+									</div><br/>&nbsp;
 									<a href="/product/{{ ($product['slug']) ? $product['slug'] : $product['item_code'] }}" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto" role="button" style="width: 90% !important; margin-bottom: 20px">View</a>
-	
 								</div>
-							</a>
+							{{-- </a> --}}
 							</div>
 							@empty
 							<h4 class="text-center text-muted p-5 text-uppercase">No products found</h4>
 							@endforelse
 						</div>
-					
 					</div>
 				</div>
 				<!--products-->
@@ -304,6 +305,7 @@
 			</div>
 		</div>
 	</main>
+
 @endsection
 
 @section('style')
@@ -415,6 +417,7 @@
       -webkit-transform: scale(0.95); /* Safari 3-8 */
       transform: scale(0.95); 
     }
+
 	/*Required*/
 @media (max-width: 576px){.modal-dialog.modal-dialog-slideout {width: 80%}}
 .modal-dialog-slideout {min-height: 100%; margin: 0 0 0 auto ;background: #fff;}
@@ -487,6 +490,65 @@
 	  display: inline-block !important;
 	}
   }
+</style>
+<style>
+
+	.overlay-bg{
+		position: absolute !important;
+		background-color: rgba(0,0,0,0.2) !important;
+		width: 100%;
+		height: 100%;
+		top: 0;
+		z-index: 1;
+		transition:all .15s ease-in;
+		opacity: 0;
+	}
+	.product-card{
+		position:relative;
+		margin: 0 auto;
+		transition:all .15s ease-in !important;
+	}
+	.view-products-btn{
+		position: absolute;
+		z-index: 2;
+		margin-left: auto;
+		margin-right: auto;
+		left: 0;
+		right: 0;
+		top: 50%;
+		width: 50%;
+		text-align: center;
+		background-color: #0062A5;
+		display: none;
+		color:#fff;
+		font-size:13px;
+		letter-spacing:2px;
+		text-transform:uppercase;
+		padding:8px 20px;
+		font-weight:400;
+		transition:all .15s ease-in;
+		
+	}
+
+	.view-products-btn:hover{
+		color: #fff;
+		background-color: #000;
+	}
+
+	.product-card:hover .view-products-btn{ 
+		display:block;
+	}
+	.product-card:hover .overlay-bg{ 
+		/* display:block !important; */
+		transition:all .15s ease-in !important;
+		opacity: 1 !important;
+	}
+
+	.hover-container:hover img{
+		-ms-transform: scale(0.95); /* IE 9 */
+      	-webkit-transform: scale(0.95); /* Safari 3-8 */
+      	transform: scale(0.95); 
+	}
 </style>
 @endsection
 

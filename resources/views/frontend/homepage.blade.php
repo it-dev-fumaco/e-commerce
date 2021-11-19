@@ -96,8 +96,9 @@
             @foreach($best_selling_arr as $bs)
               <div class="col-md-3 animated animatedFadeInUp fadeInUp equal-height-columns mb-3 best-selling-card">
                 <div class="card shadow-sm">
-                  <div class="equal-column-content">
-
+                  <div class="equal-column-content product-card hover-container">
+                    <div class="overlay-bg"></div>
+                    <a href="/product/{{ ($bs['slug']) ? $bs['slug'] : $bs['item_code'] }}" class="view-products-btn btn" role="button">View</a>
 @php
 $img_bs = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/gallery/preview/'. $bs['bs_img'] : '/storage/no-photo-available.png';
 $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/gallery/preview/'. explode(".", $bs['bs_img'])[0] . '.webp' : '/storage/no-photo-available.png';
@@ -142,7 +143,7 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
                       </div>
                       <br>
                     </div>
-                  </div>
+                  </div><br/>&nbsp;
                   <a href="/product/{{ ($bs['slug']) ? $bs['slug'] : $bs['item_code'] }}" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto" role="button" style="width: 90% !important; margin-bottom: 20px">View</a>
 
                 </div>
@@ -178,9 +179,9 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
           @endphp
               <div class="col animated animatedFadeInUp fadeInUp equal-height-columns mb-3 on-sale-card">
                 <div class="card shadow-sm">
-                  <div class="equal-column-content">
-
-
+                  <div class="equal-column-content product-card hover-container">
+                    <div class="overlay-bg"></div>
+                    <a href="/product/{{ ($os['slug']) ? $os['slug'] : $os['item_code'] }}" class="view-products-btn btn" role="button">View</a>
                       <picture>
                         <source srcset="{{ asset($img_os_webp) }}" type="image/webp" class="img-responsive" style="width: 100% !important;">
                         <source srcset="{{ asset($img_os) }}" type="image/jpeg" class="img-responsive" style="width: 100% !important;">
@@ -222,7 +223,7 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
                       <br/>
                     </div>
                   </div>
-                  
+                  <br/>&nbsp;
                   <a href="/product/{{ ($os['slug']) ? $os['slug'] : $os['item_code'] }}" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto" role="button" style="width: 90% !important; margin-bottom: 20px">View</a>
 
                 </div>
@@ -350,6 +351,63 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
     .scroll-btn{
       font-size: 30px;
     }
+
+    .overlay-bg{
+		position: absolute !important;
+		background-color: rgba(0,0,0,0.2) !important;
+		width: 100%;
+		height: 100%;
+		top: 0;
+		z-index: 1;
+		transition:all .15s ease-in;
+		opacity: 0;
+	}
+	.product-card{
+		position:relative;
+		margin: 0 auto;
+		transition:all .15s ease-in !important;
+	}
+	.view-products-btn{
+		position: absolute;
+		z-index: 2;
+		margin-left: auto;
+		margin-right: auto;
+		left: 0;
+		right: 0;
+		top: 50%;
+		width: 50%;
+		text-align: center;
+		background-color: #0062A5;
+		display: none;
+		color:#fff;
+		font-size:13px;
+		letter-spacing:2px;
+		text-transform:uppercase;
+		padding:8px 20px;
+		font-weight:400;
+		transition:all .15s ease-in;
+		
+	}
+
+	.view-products-btn:hover{
+		color: #fff;
+		background-color: #000;
+	}
+
+	.product-card:hover .view-products-btn{ 
+		display:block;
+	}
+	.product-card:hover .overlay-bg{ 
+		/* display:block !important; */
+		transition:all .15s ease-in !important;
+		opacity: 1 !important;
+	}
+
+	.hover-container:hover img{
+		-ms-transform: scale(0.95); /* IE 9 */
+      	-webkit-transform: scale(0.95); /* Safari 3-8 */
+      	transform: scale(0.95); 
+	}
     
     @media (max-width: 575.98px) {
       .article-title{

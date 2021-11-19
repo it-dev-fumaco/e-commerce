@@ -74,7 +74,9 @@
 			@foreach ($products as $product)
 			<div class="col-md-3 animated animatedFadeInUp fadeInUp equal-height-columns">
 				<div class="card mb-4">
-					<div class="equal-column-content">
+					<div class="equal-column-content product-card hover-container">
+						<div class="overlay-bg"></div>
+						<a href="/product/{{ $product['slug'] ? $product['slug'] : $product['item_code'] }}" class="view-products-btn btn" role="button">View</a>
 						@php
 						$image = ($product['image']) ? '/storage/item_images/'.$product['item_code'].'/gallery/preview/'.$product['image'] : '/storage/no-photo-available.png';
 						$image_webp = ($product['image']) ? '/storage/item_images/'.$product['item_code'].'/gallery/preview/'.explode(".", $product['image'])[0] .'.webp' : '/storage/no-photo-available.png';
@@ -82,7 +84,7 @@
 						<picture>
 							<source srcset="{{ asset($image_webp) }}" type="image/webp" class="card-img-top">
 							<source srcset="{{ asset($image) }}" type="image/jpeg" class="card-img-top"> 
-							<img src="{{ asset($image) }}" alt="{{ $product['item_code'] }}" class="card-img-top">
+							<img src="{{ asset($image) }}" alt="{{ $product['item_code'] }}" class="card-img-top hover">
 						</picture>
 						<div class="card-body">
 							<div class="text ellipsis">
@@ -113,10 +115,13 @@
 								<small class="text-muted stylecap" style="color:#c4cad0 !important; font-weight:100 !important;">( 0 Reviews )</small>
 							</div>
 						</div>
-						<div class="card-body">
+						{{-- <div class="card-body">
 							<a href="/product/{{ $product['slug'] ? $product['slug'] : $product['item_code'] }}" class="btn btn-outline-primary fumacoFont_card_readmore" role="button" style="width:100% !important;">View</a>
-						</div>
+						</div> --}}
 					</div>
+					<br/>&nbsp;
+					<a href="/product/{{ $product['slug'] ? $product['slug'] : $product['item_code'] }}" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto" role="button" style="width:90% !important;">View</a>
+					<br/>&nbsp;
 				</div>
 			</div>
 			@endforeach
@@ -225,6 +230,71 @@
         font-size: 16px !important;
         font-weight: 500 !important;
         text-align: left !important;
+    }
+	.overlay-bg{
+		position: absolute !important;
+		background-color: rgba(0,0,0,0.2) !important;
+		width: 100%;
+		height: 100%;
+		top: 0;
+		z-index: 1;
+		transition:all .15s ease-in;
+		opacity: 0;
+	}
+	.product-card{
+		position:relative;
+		margin: 0 auto;
+		transition:all .15s ease-in !important;
+	}
+	.view-products-btn{
+		position: absolute;
+		z-index: 2;
+		margin-left: auto;
+		margin-right: auto;
+		left: 0;
+		right: 0;
+		top: 50%;
+		width: 50%;
+		text-align: center;
+		background-color: #0062A5;
+		display: none;
+		color:#fff;
+		font-size:13px;
+		letter-spacing:2px;
+		text-transform:uppercase;
+		padding:8px 20px;
+		font-weight:400;
+		transition:all .15s ease-in;
+		
+	}
+
+	.view-products-btn:hover{
+		color: #fff;
+		background-color: #000;
+	}
+
+	.product-card:hover .view-products-btn{ 
+		display:block;
+	}
+	.product-card:hover .overlay-bg{ 
+		/* display:block !important; */
+		transition:all .15s ease-in !important;
+		opacity: 1 !important;
+	}
+
+	.hover-container:hover img{
+		-ms-transform: scale(0.95); /* IE 9 */
+      	-webkit-transform: scale(0.95); /* Safari 3-8 */
+      	transform: scale(0.95); 
+	}
+	.hover{
+      transition: .5s;
+    }
+
+    .hover:hover {
+      -ms-transform: scale(0.95); /* IE 9 */
+      -webkit-transform: scale(0.95); /* Safari 3-8 */
+      transform: scale(0.95); 
     }
 	@media (max-width: 1199.98px) {/* tablet */
       .price-card{

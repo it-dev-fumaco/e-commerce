@@ -232,9 +232,11 @@
 								<div class="container related-prod">
 									<div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4 overflow-auto flex-row flex-nowrap scroll-pane" id="related-products-container" style="min-height: 10px;">
 										@foreach($related_products as $rp)
-										<div class="col animated animatedFadeInUp fadeInUp equal-height-columns mb-3 related-products-card">
-											<div class="card shadow-sm">
-												<div class="equal-column-content" style="border: 1px solid  #d5dbdb; position: relative;">
+										<div class="col-md-3 animated animatedFadeInUp fadeInUp equal-height-columns mb-3 related-products-card">
+											<div class="card shadow-sm" style="border: 1px solid  #d5dbdb; background-color: #fff;">
+												<div class="equal-column-content product-card hover-container">
+													<div class="overlay-bg"></div>
+													<a href="/product/{{ ($rp['slug']) ? $rp['slug'] : $rp['item_code'] }}" class="view-products-btn btn" role="button">View</a>
 													@php
 														$img = ($rp['image']) ? '/storage/item_images/'. $rp['item_code'] .'/gallery/preview/'. $rp['image'] : '/storage/no-photo-available.png';
 														$img_webp = ($rp['image']) ? '/storage/item_images/'. $rp['item_code'] .'/gallery/preview/'. explode(".", $rp['image'])[0] .'.webp' : '/storage/no-photo-available.png';
@@ -244,7 +246,7 @@
 <picture>
 	<source srcset="{{ asset($img_webp) }}" type="image/webp" class="img-responsive" style="width: 100% !important;">
 	<source srcset="{{ asset($img) }}" type="image/jpeg" class="img-responsive" style="width: 100% !important;">
-	<img src="{{ asset($img) }}" alt="{{ Str::slug(explode(".", $rp['image'])[0], '-') }}" class="img-responsive" style="width: 100% !important;">
+	<img src="{{ asset($img) }}" alt="{{ Str::slug(explode(".", $rp['image'])[0], '-') }}" class="img-responsive hover" style="width: 100% !important;">
   </picture>
 
 
@@ -277,9 +279,10 @@
 															<small class="text-muted stylecap" style="color:#c4cad0 !important; font-weight:100 !important;">( 0 Reviews )</small>
 														</div>
 														<br>
-														<a href="/product/{{ ($rp['slug']) ? $rp['slug'] : $rp['item_code'] }}" class="btn btn-outline-primary fumacoFont_card_readmore" role="button" style="width:100% !important;">View</a>
+														{{-- <a href="/product/{{ ($rp['slug']) ? $rp['slug'] : $rp['item_code'] }}" class="btn btn-outline-primary fumacoFont_card_readmore" role="button" style="width:100% !important;">View</a> --}}
 													</div>
-												</div>
+												</div><br/>&nbsp;
+												<a href="/product/{{ ($rp['slug']) ? $rp['slug'] : $rp['item_code'] }}" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto" role="button" style="width:90% !important;">View</a><br/>&nbsp;
 											</div>
 										</div>
 										@endforeach
@@ -904,6 +907,72 @@
     }
     .next-btn{
       right: -50px !important;
+    }
+
+	.overlay-bg{
+		position: absolute !important;
+		background-color: rgba(0,0,0,0.2) !important;
+		width: 100%;
+		height: 100%;
+		top: 0;
+		z-index: 1;
+		transition:all .15s ease-in;
+		opacity: 0;
+	}
+	.product-card{
+		position:relative;
+		margin: 0 auto;
+		transition:all .15s ease-in !important;
+	}
+	.view-products-btn{
+		position: absolute;
+		z-index: 2;
+		margin-left: auto;
+		margin-right: auto;
+		left: 0;
+		right: 0;
+		top: 50%;
+		width: 50%;
+		text-align: center;
+		background-color: #0062A5;
+		display: none;
+		color:#fff;
+		font-size:13px;
+		letter-spacing:2px;
+		text-transform:uppercase;
+		padding:8px 20px;
+		font-weight:400;
+		transition:all .15s ease-in;
+		
+	}
+
+	.view-products-btn:hover{
+		color: #fff;
+		background-color: #000;
+	}
+
+	.product-card:hover .view-products-btn{ 
+		display:block;
+	}
+	.product-card:hover .overlay-bg{ 
+		/* display:block !important; */
+		transition:all .15s ease-in !important;
+		opacity: 1 !important;
+	}
+
+	.hover-container:hover img{
+		-ms-transform: scale(0.95); /* IE 9 */
+      	-webkit-transform: scale(0.95); /* Safari 3-8 */
+      	transform: scale(0.95); 
+	}
+	.hover{
+      transition: .5s;
+    }
+
+    .hover:hover {
+      -ms-transform: scale(0.95); /* IE 9 */
+      -webkit-transform: scale(0.95); /* Safari 3-8 */
+      transform: scale(0.95); 
     }
 	@media (max-width: 575.98px) { /* Mobile */
         header{
