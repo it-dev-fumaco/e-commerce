@@ -54,11 +54,11 @@
 							<div class="col-md-6">
 								<label for="fname" class="formslabelfnt">First Name : *</label>
 								<input type="hidden" class="form-control formslabelfnt" id="logtype" name="logtype" value="1" required>
-								<input type="text" class="form-control formslabelfnt" id="fname" name="fname" required>
+								<input type="text" class="form-control formslabelfnt" id="fname" name="fname" value="{{ (old('fname')) ? old('fname') : (Auth::check() ? Auth::user()->f_name : '') }}" required>
 							</div>
 							<div class="col-md-6">
 								<label for="lname" class="formslabelfnt">Last Name : *</label>
-								<input type="text" class="form-control formslabelfnt" id="lname" name="lname" required>
+								<input type="text" class="form-control formslabelfnt" id="lname" value="{{ (old('lname')) ? old('lname') : (Auth::check() ? Auth::user()->f_lname : '') }}" name="lname" required>
 							</div>
 						</div>
 						<br>
@@ -124,7 +124,7 @@
 						<div class="row">
 							<div class="col-md-6">
 								<label for="email1_1" class="formslabelfnt">Email Address : *</label>
-								<input type="email" class="form-control formslabelfnt" id="email" name="email" required>
+								<input type="email" class="form-control formslabelfnt" id="email" name="email" value="{{ (old('email')) ? old('email') : (Auth::check() ? Auth::user()->username : '') }}" required>
 							</div>
 							<div class="col-md-6">
 								<label for="mobilenumber1_1" class="formslabelfnt">Mobile Number : *</label>
@@ -134,20 +134,6 @@
 					</div>					
 				</div>
 				<br/>&nbsp;
-				{{-- <div class="row">
-					<br/>&nbsp;
-					<div class="col-md-8 mx-auto">
-						<a href="/cart" class="btn btn-lg btn-outline-primary col-md-5 mx-auto" role="button" style="background-color: #777575 !important; border-color: #777575 !important;">BACK</a>
-						<div class="d-none">
-							<input type="text" value="{{ $item_code_buy }}" name="buy_now_item_code">
-							<input type="text" value="{{ $qty_buy }}" name="buy_now_qty">
-							<input type="checkbox" value="buy_now" name="buy_now" {{ ($item_code_buy) ? "checked" : '' }} readonly>
-						</div>
-						<input type="submit" class="btn btn-lg btn-outline-primary col-md-5 mx-auto" role="button" style="float: right;" value="PROCEED">
-						
-					</div>
-
-				</div> --}}
 				<div class="row mb-4">
 					<div class="col-md-9 mx-auto">
 						<div class="col-md-4 d-none d-xl-block">
@@ -191,6 +177,34 @@
 
 <script>
 	$(document).ready(function() {
+		$('#province1_1').val('METRO MANILA');
+		$('#province1_1').select2().trigger('change');
+		loadcities("1339");
+		function loadcities(code) {
+			var select_el = $('#City_Municipality1_1');
+			var cities = [];
+
+			select_el.empty();
+			$.getJSON("{{ asset('/json/cities.json') }}", function(obj){
+				var filtered_cities = $.grep(obj.results, function(v) {
+					return v.provCode === code;
+				});
+
+				$.each(filtered_cities, function(e, i) {
+					cities.push({
+						id: i.text,
+						code: i.citymunCode,
+						text: i.text,
+					});
+				});
+
+				select_el.select2({
+					placeholder: 'Select City',
+					data: cities
+				});
+			});
+		}
+
 		var str = "{{ implode(',', $shipping_zones) }}";
 		var res = str.split(",");
 		var provinces = [];
@@ -212,39 +226,15 @@
 			data: provinces
 		});
 
-		$('#City_Municipality1_1').select2({
-			placeholder: 'Select City',
-		});
-
 		$('#Barangay1_1').select2({
 			placeholder: 'Select Barangay',
 		});
 	});
 
+
 	$(document).on('select2:select', '#province1_1', function(e){
 		var data = e.params.data;
-		var select_el = $('#City_Municipality1_1');
-		var cities = [];
-
-		select_el.empty();
-		$.getJSON("{{ asset('/json/cities.json') }}", function(obj){
-			var filtered_cities = $.grep(obj.results, function(v) {
-				return v.provCode === data.code;
-			});
-
-			$.each(filtered_cities, function(e, i) {
-				cities.push({
-					id: i.text,
-					code: i.citymunCode,
-					text: i.text,
-				});
-			});
-
-			select_el.select2({
-				placeholder: 'Select City',
-				data: cities
-			});
-		});
+		loadcities(data.code);
 	});
 
 	$(document).on('select2:select', '#City_Municipality1_1', function(e){

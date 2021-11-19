@@ -64,11 +64,11 @@
 							<div class="col-md-6">
 								<label for="fname" class="formslabelfnt">First Name : <span class="text-danger">*</span></label>
 								<input type="hidden" class="form-control formslabelfnt" id="logtype" name="logtype" value="1" required>
-								<input type="text" class="form-control formslabelfnt" id="fname" name="fname" required value="{{ old('fname') }}"><br class="d-lg-none d-xl-none"/>
+								<input type="text" class="form-control formslabelfnt" id="fname" name="fname" required value="{{ (old('fname')) ? old('fname') : (Auth::check() ? Auth::user()->f_name : '') }}"><br class="d-lg-none d-xl-none"/>
 							</div>
 							<div class="col-md-6">
 								<label for="lname" class="formslabelfnt">Last Name : <span class="text-danger">*</span></label>
-								<input type="text" class="form-control formslabelfnt" id="lname" name="lname" required value="{{ old('lname') }}"><br class="d-lg-none d-xl-none"/>
+								<input type="text" class="form-control formslabelfnt" id="lname" name="lname" required value="{{ (old('lname')) ? old('lname') : (Auth::check() ? Auth::user()->f_lname : '') }}"><br class="d-lg-none d-xl-none"/>
 							</div>
 						</div>
 						<br>
@@ -153,7 +153,7 @@
 						<div class="row">
 							<div class="col-md-4">
 								<label for="email1_1" class="formslabelfnt">Email Address : <span class="text-danger">*</span></label>
-								<input type="email" class="form-control formslabelfnt" id="ship_email" name="ship_email" required value="{{ old('ship_email') }}"><br class="d-lg-none d-xl-none"/>
+								<input type="email" class="form-control formslabelfnt" id="ship_email" name="ship_email" required value="{{ (old('ship_email')) ? old('ship_email') : (Auth::check() ? Auth::user()->username : '') }}"><br class="d-lg-none d-xl-none"/>
 							</div>
 							<div class="col-md-4">
 								<label for="contactnumber1_1" class="formslabelfnt">Mobile Number : <span class="text-danger">*</span></label>
@@ -177,11 +177,11 @@
 							<div class="row">
 								<div class="col-md-6">
 									<label for="fname" class="formslabelfnt">First Name : <span class="text-danger">*</span></label>
-									<input type="text" class="form-control formslabelfnt" id="bill_fname" name="bill_fname" value="{{ old('bill_fname') }}">
+									<input type="text" class="form-control formslabelfnt" id="bill_fname" name="bill_fname" value="{{ (old('bill_fname')) ? old('bill_fname') : (Auth::check() ? Auth::user()->f_name : '') }}">
 								</div>
 								<div class="col-md-6">
 									<label for="lname" class="formslabelfnt">Last Name : <span class="text-danger">*</span></label>
-									<input type="text" class="form-control formslabelfnt" id="bill_lname" name="bill_lname" value="{{ old('bill_lname') }}">
+									<input type="text" class="form-control formslabelfnt" id="bill_lname" name="bill_lname" value="{{ (old('bill_lname')) ? old('bill_lname') : (Auth::check() ? Auth::user()->f_lname : '') }}">
 								</div>
 							</div>
 							<br/>
@@ -262,7 +262,7 @@
 							<div class="row">
 								<div class="col-md-6">
 									<label for="email1_1" class="formslabelfnt">Email Address : <span class="text-danger">*</span></label>
-									<input type="email" class="form-control formslabelfnt" id="email" name="email" value="{{ old('email') }}">
+									<input type="email" class="form-control formslabelfnt" id="email" name="email" value="{{ (old('email')) ? old('email') : (Auth::check() ? Auth::user()->username : '') }}">
 								</div>
 								<div class="col-md-6">
 									<label for="mobilenumber1_1" class="formslabelfnt">Mobile Number : <span class="text-danger">*</span></label>
@@ -446,6 +446,7 @@
 	$(document).ready(function() {
 		$('input[type="checkbox"]').prop("checked", true);
 		$('#ship_province1_1').empty();
+
 		var str = "{{ implode(',', $shipping_zones) }}";
 		var res = str.split(",");
 		var provinces = [];
@@ -475,16 +476,19 @@
 				placeholder: 'Select Barangay',
 			});
 		});
+		
+		$('#ship_province1_1').val('METRO MANILA');
+		$('#ship_province1_1').select2().trigger('change');
+		loadcities("1339");
 
-		$(document).on('select2:select', '#ship_province1_1', function(e){
-			var data = e.params.data;
+		function loadcities(code) {
 			var select_el = $('#ship_City_Municipality1_1');
 			var cities = [];
 
 			select_el.empty();
 			$.getJSON("{{ asset('/json/cities.json') }}", function(obj){
 				var filtered_cities = $.grep(obj.results, function(v) {
-					return v.provCode === data.code;
+					return v.provCode === code;
 				});
 
 				$.each(filtered_cities, function(e, i) {
@@ -500,6 +504,11 @@
 					data: cities
 				});
 			});
+		}
+
+		$(document).on('select2:select', '#ship_province1_1', function(e){
+			var data = e.params.data;
+			loadcities(data.code);
 		});
 
 		$(document).on('select2:select', '#ship_City_Municipality1_1', function(e){
@@ -527,7 +536,7 @@
 			});
 		});
 
-		$('#ship_province1_1').val(null).trigger('change');
+		// $('#ship_province1_1').val(null).trigger('change');
 		$('#ship_City_Municipality1_1').val(null).trigger('change');
 		$('#ship_Barangay1_1').val(null).trigger('change');
 
@@ -603,14 +612,6 @@
 			});
 
 			$.each(filtered_province_bill, function(e, i) {
-				provinces.push({
-					id: i.text,
-					code: i.provCode,
-					text: i.text
-				});
-			});
-			
-			$.each(filtered_province_bill, function(e, i) {
 				provinces_bill.push({
 					id: i.text,
 					code: i.provCode,
@@ -632,31 +633,38 @@
 			});
 		});
 
-		$(document).on('select2:select', '#province1_1', function(e){
-			var data = e.params.data;
+		$('#province1_1').val('METRO MANILA');
+		$('#province1_1').select2().trigger('change');
+		loadcities_bill("1339");
+
+		function loadcities_bill(code) {
 			var select_el = $('#City_Municipality1_1');
-			var cities_bill = [];
+			var cities = [];
 
 			select_el.empty();
 			$.getJSON("{{ asset('/json/cities.json') }}", function(obj){
 				var filtered_cities = $.grep(obj.results, function(v) {
-					return v.provCode === data.code;
+					return v.provCode === code;
 				});
 
 				$.each(filtered_cities, function(e, i) {
-					cities_bill.push({
+					cities.push({
 						id: i.text,
 						code: i.citymunCode,
 						text: i.text,
-						
 					});
 				});
 
 				select_el.select2({
 					placeholder: 'Select City',
-					data: cities_bill
+					data: cities
 				});
 			});
+		}
+
+		$(document).on('select2:select', '#province1_1', function(e){
+			var data = e.params.data;
+			loadcities_bill(data.code)
 		});
 
 		$(document).on('select2:select', '#City_Municipality1_1', function(e){
@@ -684,7 +692,7 @@
 			});
 		});
 
-		$('#province1_1').val(null).trigger('change');
+		// $('#province1_1').val(null).trigger('change');
 		$('#City_Municipality1_1').val(null).trigger('change');
 		$('#Barangay1_1').val(null).trigger('change');
 
