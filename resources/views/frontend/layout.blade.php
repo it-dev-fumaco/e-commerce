@@ -411,6 +411,11 @@
               </div>
             </form>
             <ul class="navbar-nav d-lg-inline-block">
+              @if (!Auth::check())
+              <li class="nav-item">
+                <a class="nav-link" href="/login"><i class="fas fa-user" style="font-size:24px; color: #404040;"></i></a>
+              </li>
+              @else
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle navbar-header welcome-msg" href="#" id="navbarDarkDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">Welcome, {{ (Auth::check()) ? Auth::user()->f_name : 'Guest' }}</a>
                 <a class="nav-link dropdown-toggle navbar-header mbl-welcome" href="#" id="navbarDarkDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="far fa-user" style="font-size: 20px"></i></a>
@@ -450,9 +455,12 @@
                   @endif
                 </ul>
               </li>
+              @endif
+          
             </ul>
 
           </div>
+          
           {{-- Cart Icon --}}
           <a class="d-none d-lg-block pc-cart" style="text-decoration: none !important" href="/cart">
             <div class="" style="width: 50px !important; padding: 0 !important; margin-right: -20px !important">
