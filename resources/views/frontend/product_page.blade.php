@@ -1045,6 +1045,14 @@
 		});
   	})();
 
+	$(document).ready(function() {
+		if ($(".scroll-pane").prop('scrollWidth') > $(".scroll-pane").width() ) {
+			$('.scroll-control').addClass('d-block');
+		}else{
+			$('.scroll-control').addClass('d-none');
+		}
+	});
+
 	$('.next').click(function() {
       event.preventDefault();
       $('#related-products-container').animate({

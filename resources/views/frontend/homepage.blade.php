@@ -152,11 +152,12 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
         </div>
       </div>
       {{-- Scroll --}}
-      <button type="button" class="scroll-control bs-prev prev-btn d-sm-block d-md-none d-lg-block"><i class="fas fa-chevron-left scroll-btn"></i></button>
-      <button type="button" class="scroll-control bs-next next-btn d-sm-block d-md-none d-lg-block"><i class="fas fa-chevron-right scroll-btn"></i></button>
+      <button type="button" class="scroll-control bs-control bs-prev prev-btn d-sm-block d-md-none d-lg-block"><i class="fas fa-chevron-left scroll-btn"></i></button>
+      <button type="button" class="scroll-control bs-control bs-next next-btn d-sm-block d-md-none d-lg-block"><i class="fas fa-chevron-right scroll-btn"></i></button>
 
-      <button type="button" class="scroll-control bs-prev tab-prev-btn prev-btn d-none d-md-block d-lg-none"><i class="fas fa-chevron-left scroll-btn"></i></button>
-      <button type="button" class="scroll-control bs-next tab-next-btn next-btn d-none d-md-block d-lg-none"><i class="fas fa-chevron-right scroll-btn"></i></button>
+      <button type="button" class="scroll-control bs-control bs-prev tab-prev-btn prev-btn d-none d-md-block d-lg-none"><i class="fas fa-chevron-left scroll-btn"></i></button>
+      <button type="button" class="scroll-control bs-control bs-next tab-next-btn next-btn d-none d-md-block d-lg-none"><i class="fas fa-chevron-right scroll-btn"></i></button>
+      
   </div>
   <div class="container marketing" style="position: relative">
     <section class="py-5 text-center container" style="padding-bottom: 0rem !important;">
@@ -231,8 +232,9 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
       </div>
     </div>
     {{-- Scroll --}}
-    <button id="os-prev" type="button" class="scroll-control prev-btn"><i class="fas fa-chevron-left scroll-btn"></i></button>
-    <button id="os-next" type="button" class="scroll-control next-btn"><i class="fas fa-chevron-right scroll-btn"></i></button>
+    <button id="os-prev" type="button" class="scroll-control os-control prev-btn"><i class="fas fa-chevron-left scroll-btn"></i></button>
+    <button id="os-next" type="button" class="scroll-control os-control next-btn"><i class="fas fa-chevron-right scroll-btn"></i></button>
+    
   </div>
 
 @endsection
@@ -416,6 +418,20 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
       $('#on-sale-container').animate({
         scrollLeft: "-="+$('.on-sale-card').outerWidth()+"px"
       }, "slow");
+    });
+
+    $(document).ready(function() {
+      if ($("#best-selling-container").prop('scrollWidth') > $("#best-selling-container").width() ) {
+        $('.bs-control').addClass('d-block');
+      }else{
+        $('.bs-control').addClass('d-none');
+      }
+
+      if ($("#on-sale-container").prop('scrollWidth') > $("#on-sale-container").width() ) {
+        $('.os-control').addClass('d-block');
+      }else{
+        $('.os-control').addClass('d-none');
+      }
     });
   </script>
 @endsection
