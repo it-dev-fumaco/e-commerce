@@ -960,7 +960,6 @@ class FrontendController extends Controller
                 'pickup_date' => $new_order->pickup_date,
                 'order_tracker' => $track_order_details,
                 'ship_status' => $order_status,
-                // 'seq_lvl' => $order_status->where('status', $new_order->order_status)
             ];
         }
         // return $new_orders_arr;
@@ -1330,9 +1329,20 @@ class FrontendController extends Controller
     public function viewOrderTracking(Request $request) {
         $order_details = DB::table('fumaco_order')->where('order_number', $request->id)->first();
 
-        $track_order_details = DB::table('track_order')->where('track_code', $request->id)->first();
+        $track_order_details = DB::table('track_order')->where('track_code', $request->id)->where('track_active', 1)->select('track_status', 'track_date_update')->get();
 
         $ordered_items = DB::table('fumaco_order_items')->where('order_number', $request->id)->get();
+        $order_status = '';
+        if($order_details){
+            $order_status = DB::table('order_status as s')
+                ->join('order_status_process as p', 's.order_status_id', 'p.order_status_id')
+                ->where('shipping_method', $order_details->order_shipping)
+                ->select('s.status', 'p.order_sequence')
+                ->orderBy('order_sequence', 'asc')
+                ->get();
+        }
+        
+
         $items = [];
         foreach ($ordered_items as $item) {
             $item_image = DB::table('fumaco_items_image_v1')
@@ -1349,7 +1359,9 @@ class FrontendController extends Controller
             ];
         }
 
-        return view('frontend.track_order', compact('order_details', 'items', 'track_order_details'));
+        // return $track_order_details;
+
+        return view('frontend.track_order', compact('order_details', 'items', 'track_order_details', 'order_status'));
     }
 
     // get item code based on variants selected in product page
