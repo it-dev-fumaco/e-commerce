@@ -10,6 +10,8 @@ class CartController extends Controller
 {
     public function productActions(Request $request) {
         $data = $request->all();
+        $data['is_ajax'] = ($request->ajax());
+
         $order_no = 'FUM-' . date('yd') . random_int(0, 9999);
 
         if(isset($data['reorder'])){
@@ -120,23 +122,31 @@ class CartController extends Controller
  
             session()->put('fumCart', $cart);
 
-            if (isset($data['buynow']) && $data['buynow']) {
-                return redirect('/checkout/summary');
+            if(!$data['is_ajax']) {
+                if (isset($data['buynow']) && $data['buynow']) {
+                    return redirect('/checkout/summary');
+                }
+    
+                return redirect()->back()->with('success', 'Product added to your cart!');
+            } else {
+                return response()->json(['message' => 'Product added to your cart!']);
             }
-
-            return redirect()->back()->with('success', 'Product added to your cart!');
         }
         // if cart not empty then check if this product exist then increment quantity
         if(isset($cart[$id])) {
             $cart[$id]['quantity'] = $cart[$id]['quantity'] + $data['quantity'];
-
+            
             session()->put('fumCart', $cart);
 
-            if (isset($data['buynow']) && $data['buynow']) {
-                return redirect('/cart');
+            if(!$data['is_ajax']) {
+                if (isset($data['buynow']) && $data['buynow']) {
+                    return redirect('/cart');
+                }
+    
+                return redirect()->back()->with('success', 'Product added to your cart!');
+            } else {
+                return response()->json(['message' => 'Product added to your cart!']);
             }
-
-            return redirect()->back()->with('success', 'Product added to your cart!');
         }
         // if item not exist in cart then add to cart with quantity = 1
         $cart[$id] = [
@@ -147,11 +157,15 @@ class CartController extends Controller
 
         session()->put('fumCart', $cart);
 
-        if (isset($data['buynow']) && $data['buynow']) {
-            return redirect('/cart');
+        if(!$data['is_ajax']) {
+            if (isset($data['buynow']) && $data['buynow']) {
+                return redirect('/cart');
+            }
+    
+            return redirect()->back()->with('success', 'Product added to your cart!');
+        } else {
+            return response()->json(['message' => 'Product added to your cart!']);
         }
-
-        return redirect()->back()->with('success', 'Product added to your cart!');
     }
 
     public function viewCart() {

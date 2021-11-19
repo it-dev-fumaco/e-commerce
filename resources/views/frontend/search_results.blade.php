@@ -115,13 +115,11 @@
 								<small class="text-muted stylecap" style="color:#c4cad0 !important; font-weight:100 !important;">( 0 Reviews )</small>
 							</div>
 						</div>
-						{{-- <div class="card-body">
-							<a href="/product/{{ $product['slug'] ? $product['slug'] : $product['item_code'] }}" class="btn btn-outline-primary fumacoFont_card_readmore" role="button" style="width:100% !important;">View</a>
-						</div> --}}
 					</div>
-					<br/>&nbsp;
-					<a href="/product/{{ $product['slug'] ? $product['slug'] : $product['item_code'] }}" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto" role="button" style="width:90% !important;">View</a>
-					<br/>&nbsp;
+					<br/>
+					<a href="#" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto add-to-cart mb-3" role="button" style="width:90% !important;" data-item-code="{{ $product['item_code'] }}">
+						<i class="fas fa-shopping-cart"></i> Add to Cart
+					</a>
 				</div>
 			</div>
 			@endforeach

@@ -284,8 +284,8 @@
 										<div class="card-body">
 											{{-- <a href="/product/{{ $product['item_code'] }}" class="btn btn-outline-primary fumacoFont_card_readmore" role="button" style="width:100% !important;">View</a> --}}
 										</div>
-									</div><br/>&nbsp;
-									<a href="/product/{{ ($product['slug']) ? $product['slug'] : $product['item_code'] }}" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto" role="button" style="width: 90% !important; margin-bottom: 20px">View</a>
+									</div>
+									<a href="#" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto mt-3 add-to-cart" role="button" style="width: 90% !important; margin-bottom: 20px" data-item-code="{{ $product['item_code'] }}"><i class="fas fa-shopping-cart"></i> Add to Cart</a>
 								</div>
 							{{-- </a> --}}
 							</div>

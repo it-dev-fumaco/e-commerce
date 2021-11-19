@@ -280,9 +280,10 @@
 														</div>
 														<br>
 														{{-- <a href="/product/{{ ($rp['slug']) ? $rp['slug'] : $rp['item_code'] }}" class="btn btn-outline-primary fumacoFont_card_readmore" role="button" style="width:100% !important;">View</a> --}}
+														{{-- <a href="#" class="btn btn-outline-primary fumacoFont_card_readmore add-to-cart" role="button" style="width: 100% !important; margin-bottom: 20px" data-item-code="{{ $rp['item_code'] }}"><i class="fas fa-shopping-cart"></i> Add to Cart</a> --}}
 													</div>
 												</div><br/>&nbsp;
-												<a href="/product/{{ ($rp['slug']) ? $rp['slug'] : $rp['item_code'] }}" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto" role="button" style="width:90% !important;">View</a><br/>&nbsp;
+												<a href="#" class="btn btn-outline-primary fumacoFont_card_readmore add-to-cart" role="button" style="width: 100% !important; margin-bottom: 20px" data-item-code="{{ $rp['item_code'] }}"><i class="fas fa-shopping-cart"></i> Add to Cart</a>
 											</div>
 										</div>
 										@endforeach

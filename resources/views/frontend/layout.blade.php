@@ -558,6 +558,32 @@
   <script src="{{ asset('/assets/dist/js/bootstrap.bundle.min.js') }}"></script>
   <script>
     $(document).ready(function() {
+      @if (in_array($activePage, ['homepage', 'product_page', 'search_result', 'product_list']))
+        $(document).on('click', '.add-to-cart', function(e){
+          e.preventDefault();
+          var btn = $(this);
+          btn.removeClass('add-to-cart').text('Adding . . .');
+          var data = {
+            'item_code': $(this).data('item-code'),
+            'quantity': 1,
+            '_token': '{{ csrf_token() }}',
+            'addtocart': 1
+          }
+
+          $.ajax({
+            type:"POST",
+            url:"/product_actions",
+            data: data,
+            success:function(response){
+              setTimeout(function() { 
+                btn.addClass('add-to-cart').html('<i class="fas fa-shopping-cart"></i> Add to Cart');
+              }, 1800);
+            
+              countCartItems();
+            }
+          });
+        });
+      @endif
       websiteSettings();
       productCategories();
       countCartItems();

@@ -144,7 +144,7 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
                       <br>
                     </div>
                   </div><br/>&nbsp;
-                  <a href="/product/{{ ($bs['slug']) ? $bs['slug'] : $bs['item_code'] }}" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto" role="button" style="width: 90% !important; margin-bottom: 20px">View</a>
+                  <a href="#" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto add-to-cart" role="button" style="width: 90% !important; margin-bottom: 20px" data-item-code="{{ $bs['item_code'] }}"><i class="fas fa-shopping-cart"></i> Add to Cart</a>
 
                 </div>
               </div>
@@ -224,7 +224,7 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
                     </div>
                   </div>
                   <br/>&nbsp;
-                  <a href="/product/{{ ($os['slug']) ? $os['slug'] : $os['item_code'] }}" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto" role="button" style="width: 90% !important; margin-bottom: 20px">View</a>
+                  <a href="#" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto add-to-cart" role="button" style="width: 90% !important; margin-bottom: 20px" data-item-code="{{ $os['item_code'] }}"><i class="fas fa-shopping-cart"></i> Add to Cart</a>
 
                 </div>
               </div>
