@@ -46,7 +46,7 @@
 			<form action="{{ $form_action }}" method="post" id="checkout-form">
 				@csrf
 				<div class="row">
-					<div class="col-md-8 mx-auto">
+					<div class="col-md-12 col-lg-8 mx-auto">
 						<div class="alert alert-warning alert-dismissible fade show text-center d-none" id="alert-message" role="alert"></div>
 						<table class="table">
 							<tr>
@@ -55,7 +55,7 @@
 								</td>
 								@if(!Auth::check())
 									<td style="text-align: right; font-size: 10pt;">
-										Already a member? <a href="#" data-toggle="modal" data-target="#loginModal">Log in</a>
+										Already a member? <br class="d-lg-none"/><a href="#" data-toggle="modal" data-target="#loginModal">Log in</a>
 									</td>
 								@endif
 							</tr>

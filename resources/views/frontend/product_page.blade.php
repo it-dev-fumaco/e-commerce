@@ -232,7 +232,7 @@
 								<div class="container related-prod">
 									<div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4 overflow-auto flex-row flex-nowrap scroll-pane" id="related-products-container" style="min-height: 10px;">
 										@foreach($related_products as $rp)
-										<div class="col-md-3 animated animatedFadeInUp fadeInUp equal-height-columns mb-3 related-products-card">
+										<div class="col-md-4 col-lg-3 animated animatedFadeInUp fadeInUp equal-height-columns mb-3 related-products-card">
 											<div class="card shadow-sm" style="border: 1px solid  #d5dbdb; background-color: #fff;">
 												<div class="equal-column-content product-card hover-container">
 													<div class="overlay-bg"></div>
@@ -283,7 +283,7 @@
 														{{-- <a href="#" class="btn btn-outline-primary fumacoFont_card_readmore add-to-cart" role="button" style="width: 100% !important; margin-bottom: 20px" data-item-code="{{ $rp['item_code'] }}"><i class="fas fa-shopping-cart"></i> Add to Cart</a> --}}
 													</div>
 												</div><br/>&nbsp;
-												<a href="#" class="btn btn-outline-primary fumacoFont_card_readmore add-to-cart" role="button" style="width: 100% !important; margin-bottom: 20px" data-item-code="{{ $rp['item_code'] }}"><i class="fas fa-shopping-cart"></i> Add to Cart</a>
+												<a href="#" class="btn btn-outline-primary fumacoFont_card_readmore add-to-cart mx-auto" role="button" style="width: 90%; margin-bottom: 20px" data-item-code="{{ $rp['item_code'] }}"><i class="fas fa-shopping-cart"></i> Add to Cart</a>
 											</div>
 										</div>
 										@endforeach
@@ -873,6 +873,9 @@
       -ms-overflow-style: scroll;  /* IE 10+ */
       scrollbar-width: none; /* Firefox */
     }
+	#related-products-container::-webkit-scrollbar{ /* Chrome */
+      display: none;
+    }
     .scroll-control{
       height: 80px;
       width: 80px;
@@ -1007,11 +1010,11 @@
 			padding-left: 20px !important;
 		}
 		.prev-btn{
-        left: 20px !important;
-      }
-      .next-btn{
-        right: 20px !important;
-      }
+        	left: 10px !important;
+		}
+		.next-btn{
+			right: 10px !important;
+		}
       }
 
       @media (max-width: 767.98px) { /* Mobile */
@@ -1056,11 +1059,11 @@
 			text-decoration: none !important;
 		}
 		.prev-btn{
-        left: 20px !important;
-      }
-      .next-btn{
-        right: 20px !important;
-      }
+			left: 10px !important;
+		}
+		.next-btn{
+			right: 10px !important;
+		}
       }
 	  	@media (max-width: 575.98px) {
 			.price-card{

@@ -94,7 +94,7 @@
         <div class="container">
           <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4 overflow-auto flex-row flex-nowrap scroll-pane" id="best-selling-container" style="min-height: 10px;">
             @foreach($best_selling_arr as $bs)
-              <div class="col-md-3 animated animatedFadeInUp fadeInUp equal-height-columns mb-3 best-selling-card">
+              <div class="col-md-4 col-lg-3 animated animatedFadeInUp fadeInUp equal-height-columns mb-3 best-selling-card">
                 <div class="card shadow-sm">
                   <div class="equal-column-content product-card hover-container">
                     <div class="overlay-bg"></div>
@@ -177,7 +177,7 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
             $img_os = ($os['os_img']) ? '/storage/item_images/'. $os['item_code'] .'/gallery/preview/'. $os['os_img'] : '/storage/no-photo-available.png';
             $img_os_webp = ($os['os_img']) ? '/storage/item_images/'. $os['item_code'] .'/gallery/preview/'. explode(".", $os['os_img'])[0] . '.webp' : '/storage/no-photo-available.png';
           @endphp
-              <div class="col animated animatedFadeInUp fadeInUp equal-height-columns mb-3 on-sale-card">
+              <div class="col-md-4 col-lg-3 animated animatedFadeInUp fadeInUp equal-height-columns mb-3 on-sale-card">
                 <div class="card shadow-sm">
                   <div class="equal-column-content product-card hover-container">
                     <div class="overlay-bg"></div>
@@ -311,6 +311,10 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
       overflow-y: hidden;
       -ms-overflow-style: scroll;  /* IE 10+ */
       scrollbar-width: none; /* Firefox */
+    }
+
+    #best-selling-container::-webkit-scrollbar, #on-sale-container::-webkit-scrollbar{ /* Chrome */
+      display: none;
     }
     .scroll-control{
       height: 80px;

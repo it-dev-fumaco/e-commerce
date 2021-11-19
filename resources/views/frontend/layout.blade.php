@@ -376,15 +376,18 @@
             <i class="far fa-user user-icon" style=""></i>
           </a> --}}
           <div class="d-flex justify-content-end">
-          <a class="d-md-block d-lg-none d-xl-none mb-cart" href="/cart" style="text-decoration: none !important; margin-left:33px !important; padding-top: 8px">
-            <div class="" style="width: 50px !important; padding: 0 !important;">
-              <i class="fa" style="font-size:24px; color:#126cb6;">&#xf07a;</i><span class="badge badge-warning count-cart-items" id="lblCartCount" style="font-size: 12px; background: #ff0000; color: #fff; padding: 4px 7px; vertical-align: top; margin-left: -10px;display: unset !important; font-weight: 500 !important; border-radius: 1rem !important; margin-top: -15px;">0</span>
-            </div>
-          </a>
+            @if (!Auth::check())
+              <a class="nav-link d-md-block d-lg-none" href="/login"><i class="fas fa-user" style="font-size:24px; color: #404040;"></i></a>
+            @endif
+            <a class="d-md-block d-lg-none mb-cart" href="/cart" style="text-decoration: none !important; !important; padding-top: 8px">
+              <div class="" style="width: 50px !important; padding: 0 !important;">
+                <i class="fa" style="font-size:24px; color:#126cb6;">&#xf07a;</i><span class="badge badge-warning count-cart-items" id="lblCartCount" style="font-size: 12px; background: #ff0000; color: #fff; padding: 4px 7px; vertical-align: top; margin-left: -10px;display: unset !important; font-weight: 500 !important; border-radius: 1rem !important; margin-top: -15px;">0</span>
+              </div>
+            </a>
 
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" style="float: right !important">
-            <span class="navbar-toggler-icon"></span>
-          </button>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" style="float: right !important">
+              <span class="navbar-toggler-icon"></span>
+            </button>
           </div>
           {{-- Mobile Icons --}}
           <div class="collapse navbar-collapse nav_fumaco_res nav-a" id="navbarCollapse">
@@ -412,7 +415,7 @@
             </form>
             <ul class="navbar-nav d-lg-inline-block">
               @if (!Auth::check())
-              <li class="nav-item">
+              <li class="nav-item d-none d-lg-block">
                 <a class="nav-link" href="/login"><i class="fas fa-user" style="font-size:24px; color: #404040;"></i></a>
               </li>
               @else
@@ -462,11 +465,13 @@
           </div>
           
           {{-- Cart Icon --}}
-          <a class="d-none d-lg-block pc-cart" style="text-decoration: none !important" href="/cart">
-            <div class="" style="width: 50px !important; padding: 0 !important; margin-right: -20px !important">
-              <i class="fa" style="font-size:24px; color:#126cb6;">&#xf07a;</i><span class="badge badge-warning count-cart-items" id="lblCartCount" style="font-size: 12px; background: #ff0000; color: #fff; padding: 4px 7px; vertical-align: top; margin-left: -10px;display: unset !important; font-weight: 500 !important; border-radius: 1rem !important; margin-top: -15px;">0</span>
-            </div>
-          </a>
+            <a class="d-none d-lg-block pc-cart" style="text-decoration: none !important" href="/cart">
+              <div  style="width: 50px !important; padding: 0 !important; margin-right: -20px !important">
+                <i class="fa" style="font-size:24px; color:#126cb6;">&#xf07a;</i><span class="badge badge-warning count-cart-items" id="lblCartCount" style="font-size: 12px; background: #ff0000; color: #fff; padding: 4px 7px; vertical-align: top; margin-left: -10px;display: unset !important; font-weight: 500 !important; border-radius: 1rem !important; margin-top: -15px;">0</span>
+              </div>
+  
+            </a>
+          
           {{-- Cart Icon --}}
           <div class="d-md-block d-lg-none mob-srch" style="width: 100% !important">
             <div class="col-md-12">
@@ -554,7 +559,6 @@
       <br>
       <br>
     </main>
-
   </footer>
   <script src="https://kit.fontawesome.com/ec0415ab92.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>

@@ -42,7 +42,7 @@
 			<form action="/checkout/set_billing" method="post">
 				@csrf
 				<div class="row">
-					<div class="col-md-8 mx-auto">
+					<div class="col-md-12 col-lg-8 mx-auto">
 						<table class="table">
 							<tr>
 								<td class='col-md-9'>

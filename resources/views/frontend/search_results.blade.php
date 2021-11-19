@@ -72,7 +72,7 @@
 				<h4 class="mt-4 mb-3 fw-light bestsellinghead fumacoFont1 animated animatedFadeInUp fadeInUp" style="color:#000000 !important;">{{ request()->s == null ? 'FEATURED PRODUCT(S)' : 'PRODUCT(S)' }}</h4>
 			</div>
 			@foreach ($products as $product)
-			<div class="col-md-3 animated animatedFadeInUp fadeInUp equal-height-columns">
+			<div class="col-md-4 col-lg-3 animated animatedFadeInUp fadeInUp equal-height-columns">
 				<div class="card mb-4">
 					<div class="equal-column-content product-card hover-container">
 						<div class="overlay-bg"></div>
