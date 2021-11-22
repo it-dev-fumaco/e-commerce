@@ -132,7 +132,11 @@
 										</td>
 										<td class="text-center">{{ $item['product_code'] }}</td>
 										<td class="text-center">{{ 'P ' . number_format((float)$item['price'], 2, '.', ',') }}</td>
-										<td class="text-center">{{ number_format($item['qty']) }}<br><span class="badge badge-info">ERP Stock</span></td>
+										<td class="text-center">{{ number_format($item['qty']) }}<br>
+											@if($item['erp_stock'])
+											<span class="badge badge-info">ERP Stock</span>
+											@endif
+										</td>
 										<td class="text-center">{{ number_format($item['reserved_qty']) }}</td>
 										<td class="text-center font-weight-bold" style="font-size: 1.2rem;">{{ number_format($item['qty'] - $item['reserved_qty']) }}</td>
 										<td class="text-center">{{ $item['product_category'] }}</td>

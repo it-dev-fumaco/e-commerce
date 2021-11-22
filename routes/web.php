@@ -15,6 +15,24 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', 'FrontendController@index')->name('website');
 
+// https://www.fumaco.com/products/category/luminaires/1469 - Troofers and Luminaires
+Route::get('/products/category/luminaires/1469', function() {
+    return redirect('/products/troffer-and-luminaires');
+});
+// https://www.fumaco.com/products/category/emergency-exit-lighting/1621 - Emergeny Light
+Route::get('/products/category/emergency-exit-lighting/1621', function() {
+    return redirect('/products/emergency-light-and-exit-light');
+});
+// https://www.fumaco.com/products/category/downlights-and-uplights/5527 - Downlinghts
+Route::get('/products/category/downlights-and-uplights/5527', function() {
+    return redirect('/products/downlights');
+});
+// https://www.fumaco.com/products/category/lighting-components/208 - Led Bulb
+Route::get('/products/category/lighting-components/208', function() {
+    return redirect('/products/led-lamps-and-bulbs');
+});
+
+
 Route::namespace('Auth')->group(function(){
     //Login Routes
     Route::get('/login','LoginController@viewLoginPage')->name('login');

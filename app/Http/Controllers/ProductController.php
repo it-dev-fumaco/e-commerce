@@ -277,7 +277,7 @@ class ProductController extends Controller
                 'keywords' => $request->keywords,
                 'url_title' => $request->url_title,
                 'meta_description' => $request->meta_description,
-                'slug' => $request->slug,
+                'slug' => strtolower($request->slug),
                 'created_by' => Auth::user()->username,
                 'last_modified_by' => Auth::user()->username,
             ]);
@@ -373,7 +373,7 @@ class ProductController extends Controller
                 'keywords' => $request->keywords,
                 'url_title' => $request->url_title,
                 'meta_description' => $request->meta_description,
-                'slug' => $request->slug,
+                'slug' => strtolower($request->slug),
                 'last_modified_by' => Auth::user()->username,
             ]);
 
@@ -547,7 +547,8 @@ class ProductController extends Controller
                 'brand' => $product->f_brand,
                 'on_sale' => $product->f_onsale,
                 'status' => $product->f_status,
-                'featured' => $product->f_featured
+                'featured' => $product->f_featured,
+                'erp_stock' => $product->stock_source,
             ];
         }
 

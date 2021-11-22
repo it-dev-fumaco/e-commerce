@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Http;
 use DB;
 use Cache;
 use File;
+use Auth;
 
 class SettingsController extends Controller
 {
