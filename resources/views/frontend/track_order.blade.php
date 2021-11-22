@@ -53,7 +53,7 @@
 						@if($order_details->order_shipping != 'Store Pickup')
 							<div class="col-md-6 mt-4 track-order-eta" style="text-align: right;">Estimated Delivery Date : <br class="d-lg-none d-xl-none"/><b>{{ $order_details->estimated_delivery_date }}</b></div>
 						@else
-							<div class="col-md-6 mt-4 track-order-eta" style="text-align: right;">Pickup Date : <br class="d-lg-none d-xl-none"/><b>{{ $order_details->pickup }}</b></div>
+							<div class="col-md-6 mt-4 track-order-eta" style="text-align: right;">Pickup Date : <br class="d-lg-none d-xl-none"/><b>{{ $order_details->pickup_date }}</b></div>
 						@endif
 					</div>
 				</div>
