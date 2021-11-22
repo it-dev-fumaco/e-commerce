@@ -2,7 +2,10 @@
     'namePage' => $product_category->name,
     'activePage' => 'product_list'
 ])
-
+@section('meta')
+<meta name="description" content="{{ $product_category->meta_description }}">
+	<meta name="keywords" content="{{ $product_category->meta_keywords }}" />
+@endsection
 @section('content')
 	<main style="background-color:#0062A5;">
 		<div id="myCarousel" class="carousel slide" data-bs-ride="carousel">
