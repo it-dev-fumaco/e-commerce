@@ -1337,7 +1337,7 @@ class FrontendController extends Controller
             $order_status = DB::table('order_status as s')
                 ->join('order_status_process as p', 's.order_status_id', 'p.order_status_id')
                 ->where('shipping_method', $order_details->order_shipping)
-                ->select('s.status', 'p.order_sequence')
+                ->select('s.status', 's.status_description', 'p.order_sequence')
                 ->orderBy('order_sequence', 'asc')
                 ->get();
         }

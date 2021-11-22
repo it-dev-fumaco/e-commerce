@@ -60,38 +60,42 @@
 				<div class="row">
 					<div class="col-md-8 mx-auto" style="margin-bottom: 100px !important">
 						<div class="card-body">
-							<div class="track">
-								@php
-									$step = trim(collect($order_status)->where('status', $order_details->order_status)->pluck('order_sequence'), '[""]');
-								@endphp
-								<div class="step active">
-									<span class="icon {{ $step > 0 ? 'inactive' : '' }}"><i class="fa fa-check {{ $step > 0 ? 'd-none' : '' }}"></i></span>
-									<span class="text status-text">Order Placed</span>
-									<span class="text status-text" style="font-size: 9pt; color: #a39f9f !important; font-style: italic !important">{{ date('M d, Y H:i A', strtotime(trim(collect($track_order_details)->where('track_status', 'Order Placed')->pluck('track_date_update'), '[""]'))) }}</span>
-								</div>
-								@foreach ($order_status as $key => $name)
+							<div class="track-container">
+								<div class="track">
 									@php
-										$date = '';
-										if(trim(collect($track_order_details)->where('track_status', $name->status)->pluck('track_date_update'), '[""]') != null){
-											$date = date('M d, Y H:i A', strtotime(trim(collect($track_order_details)->where('track_status', $name->status)->pluck('track_date_update'), '[""]')));
-										}
-										
-										$icon = '';
-										if($name->status == "Order Confirmed"){
-											$icon = 'user';
-										}else if($name->status == "Out for Delivery" or $name->status == "Ready for Pickup" ){
-											$icon = 'truck';
-										}else if($name->status == "Order Delivered" or $name->status == "Order Completed"){
-											$icon = 'shopping-bag';
-										}
+										$step = trim(collect($order_status)->where('status', $order_details->order_status)->pluck('order_sequence'), '[""]');
 									@endphp
-									<div class="step {{ collect($track_order_details)->contains('track_status', $name->status) ? 'active' : '' }}">
-										<span class="icon {{ $step > $key + 1 ? 'inactive' : '' }}"><i class="fa fa-{{ $icon }} {{ $step > $key + 1 ? 'd-none' : '' }}"></i></span>
-										<span class="text status-text">{{ $name->status }}</span>
-										<span class="text status-text" style="font-size: 9pt; color: #a39f9f !important; font-style: italic !important">{{ $date }}</span>
+									<div class="step active">
+										<span class="icon {{ $step > 0 ? 'inactive' : '' }}"><i class="fa fa-check {{ $step > 0 ? 'd-none' : '' }}"></i></span>
+										<span class="text status-text">Order Placed</span>
+										<span class="text status-text" style="font-size: 9pt; color: #a39f9f !important; font-style: italic !important">{{ date('M d, Y H:i A', strtotime(trim(collect($track_order_details)->where('track_status', 'Order Placed')->pluck('track_date_update'), '[""]'))) }}</span>
 									</div>
-								@endforeach
+									@foreach ($order_status as $key => $name)
+										@php
+											$date = '';
+											if(trim(collect($track_order_details)->where('track_status', $name->status)->pluck('track_date_update'), '[""]') != null){
+												$date = date('M d, Y H:i A', strtotime(trim(collect($track_order_details)->where('track_status', $name->status)->pluck('track_date_update'), '[""]')));
+											}
+											
+											$icon = '';
+											if($name->status == "Order Confirmed"){
+												$icon = 'user';
+											}else if($name->status == "Out for Delivery" or $name->status == "Ready for Pickup" ){
+												$icon = 'truck';
+											}else if($name->status == "Order Delivered" or $name->status == "Order Completed"){
+												$icon = 'shopping-bag';
+											}
+										@endphp
+										<div class="step {{ collect($track_order_details)->contains('track_status', $name->status) ? 'active' : '' }}">
+											<span class="icon {{ $step != $key + 1 ? 'inactive' : '' }}"><i class="fa fa-{{ $icon }} {{ $step != $key + 1 ? 'd-none' : '' }}"></i></span>
+											<span class="text status-text">{{ $name->status }}</span>
+											<span class="text status-text" style="font-size: 9pt; color: #a39f9f !important; font-style: italic !important">{{ $date }}</span>
+											<span class="text status-text {{ $step != $key + 1 ? 'd-none' : '' }}" style="font-size: 9pt; color: #a39f9f !important; font-style: italic !important">{{ $name->status_description }}</span>
+										</div>
+									@endforeach
+								</div>
 							</div>
+							
 							{{-- <div class="track">
 								<div class="step {{ $status >= 1 ? 'active' : '' }}"> <span class="icon"> <i class="fa fa-check"></i> </span> <span class="text">Order placed</span> </div>
 								<div class="step {{ $status >= 2 ? 'active' : '' }}"> <span class="icon"> <i class="fa fa-check"></i> </span> <span class="text">Order confirmed</span> </div>
@@ -105,9 +109,8 @@
 							</div> --}}
 							{{-- <hr> <a href="#TrackItemsData" data-toggle="modal" class="btn btn-warning" data-abc="true">View Order Details</a> --}}
 						</div>
-						<hr>
 						<div class="card-body">
-							<table class="table">
+							<table class="table" style="border-top: 1px solid #000">
 								<thead>
 									<tr style="font-size: 16px;">
 										<th></th>
@@ -449,6 +452,9 @@ p {
 	.active-btn {
 		border-bottom: 3px solid #dc6f12;
 	}
+	.track-container{
+		min-height: 120px;
+	}
 @media (max-width: 575.98px) {
 		.products-head{
 			padding-left: 0 !important;
@@ -459,6 +465,9 @@ p {
 		}
 		.status-text{
 			font-size: 12px;
+		}
+		.track-container{
+			min-height: 200px
 		}
     }
 
@@ -473,6 +482,14 @@ p {
 		.status-text{
 			font-size: 12px;
 		}
+		.track-container{
+			min-height: 200px
+		}
     }
+	@media (max-width: 1199.98px) {
+		.track-container{
+			min-height: 200px
+		}
+	}
 </style>
 @endsection
