@@ -65,14 +65,14 @@
 </div>
 @if (Auth::check())
 <div class="d-flex flex-row justify-content-between">
-    <div class="p-1 col">
-        <a href="/myorders" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto" role="button" style="width: 100% !important;"><i class="fas fa-box"></i> My Orders</a>
+    <div class="p-1 col text-center">
+        <a href="/myorders" class="fumacoFont_card_readmore mx-auto" role="button" style="width: 100% !important;"><i class="fas fa-box" style="margin-right: 2%;"></i> My Orders</a>
     </div>
 </div>
 @else
 <div class="d-flex flex-row justify-content-between">
     <div class="p-1 col text-center">
-       <a href="/track_order" class=" fumacoFont_card_readmore mx-auto" role="button" style="width: 100% !important; font-size: 10pt !important;"><i class="fas fa-box" style="margin-right: 2%;"></i> Track Order</a>
+       <a href="/track_order" class="fumacoFont_card_readmore mx-auto" role="button" style="width: 100% !important; font-size: 10pt !important;"><i class="fas fa-box" style="margin-right: 2%;"></i> Track Order</a>
     </div>
 </div>
 @endif
