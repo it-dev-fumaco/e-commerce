@@ -123,7 +123,7 @@
 					</div>
 					<br/>
 					<a href="#" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto add-to-cart mb-3" role="button" style="width:90% !important;" data-item-code="{{ $product['item_code'] }}">
-						<i class="fas fa-shopping-cart"></i> Add to Cart
+						<i class="fas fa-shopping-cart d-inline-block" style="margin-right: 3%;"></i> Add to Cart
 					</a>
 				</div>
 			</div>
