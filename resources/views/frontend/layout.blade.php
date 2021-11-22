@@ -323,7 +323,7 @@
   }
   #shopping-cart .shopping-cart-items .item-name {
     display: block;
-    font-size: 12px;
+    font-size: 14px;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
