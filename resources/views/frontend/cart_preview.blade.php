@@ -1,6 +1,6 @@
 <div class="shopping-cart-header">
     <div class="shopping-cart-total" style="font-size: 14pt; text-align: left !important; margin-left: 10px;">
-        <span class="lighter-text">Your Cart</span>
+        <span class="lighter-text">My Cart</span>
     </div>
 </div> <!--end shopping-cart-header -->
 <ul class="shopping-cart-items">
