@@ -160,7 +160,7 @@
 													</button>
 												</div>
 												<div class="modal-body">
-													<div style="min-height: 120px !important">
+													<div class="track-container">
 														<div class="track">
 															@php
 																$step = trim(collect($order['ship_status'])->where('status', $order['status'] )->pluck('order_sequence'), '[""]');
@@ -187,9 +187,10 @@
 																	}
 																@endphp
 																<div class="step {{ collect($order['order_tracker'])->contains('track_status', $name->status) ? 'active' : '' }}">
-																	<span class="icon {{ $step > $key + 1 ? 'inactive' : '' }}"><i class="fa fa-{{ $icon }} {{ $step > $key + 1 ? 'd-none' : '' }}"></i></span>
+																	<span class="icon {{ $step != $key + 1 ? 'inactive' : '' }}"><i class="fa fa-{{ $icon }} {{ $step != $key + 1 ? 'd-none' : '' }}"></i></span>
 																	<span class="text status-text">{{ $name->status }}</span>
 																	<span class="text status-text" style="font-size: 9pt; color: #a39f9f !important; font-style: italic !important">{{ $date }}</span>
+																	<span class="text status-text {{ $step != $key + 1 ? 'd-none' : '' }}" style="font-size: 9pt; color: #a39f9f !important; font-style: italic !important">{{ $name->status_description }}</span>
 																</div>
 															@endforeach
 														</div>
@@ -351,13 +352,13 @@
 							<table class="table">
 								<thead>
 									<tr>
-										<th class="text-center d-none d-sm-table-cell">Order No.</th>
+										<th class="text-center d-none d-lg-table-cell">Order No.</th>
 										<th class="text-center table-text">Date</th>
 										<th class="text-center table-text">Details</th>
-										<th class="text-center d-none d-sm-table-cell">Shipping</th>
-										<th class="text-center d-none d-sm-table-cell">Estimated Delivery Date</th>
-										<th class="text-center d-none d-sm-table-cell">Status</th>
-										<th class="text-center d-none d-sm-table-cell">Action</th>
+										<th class="text-center d-none d-lg-table-cell">Shipping</th>
+										<th class="text-center d-none d-lg-table-cell">Delivery Date</th>
+										<th class="text-center d-none d-lg-table-cell">Status</th>
+										<th class="text-center d-none d-lg-table-cell">Action</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -376,7 +377,7 @@
 										}
 									@endphp
 									<tr>
-										<td class="text-center align-middle d-none d-sm-table-cell">{{ $order['order_number'] }}</td>
+										<td class="text-center align-middle d-none d-lg-table-cell">{{ $order['order_number'] }}</td>
 										<td class="text-center align-middle table-text">{{ $order['date'] }}</td>
 										<td class="text-center align-middle">
 											<a href="#" class="table-text" data-toggle="modal" data-target="#{{ $order['order_number'] }}-Modal">Item Purchase</a>
@@ -468,19 +469,19 @@
 													</div>
 												</div>
 											</div>
-											<div class="d-md-none table-text" style="text-align: left;">
+											<div class="d-lg-none table-text" style="text-align: left;">
 												<br/>
 												<b>Order Number:</b><br/>{{ $order['order_number'] }}<br/><br/>
 												<b>Shipping Name:</b> {{ $order['shipping_name'] }}<br/><br/>
-												<b>Est. Delivery Date:</b> {{ $order['edd'] }}<br/>
+												<b>Delivery Date:</b> {{ $order['date_delivered'] ? date('M d, Y', strtotime($order['date_delivered'])) : '' }}<br/>
 												<p><span class="badge text-dark" style="background-color: {{ $badge }}; font-size: 0.9rem; color: #fff !important;">{{ $order['status'] }}</span></p>
 												<button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#reorder{{ $order['order_number'] }}Modal"  {{ $order['status'] == 'Cancelled' ? 'disabled' : '' }}>Re-Order</button>
 											</div>
 										</td>
-										<td class="text-center align-middle d-none d-sm-table-cell">{{ $order['shipping_name'] }}</td>
-										<td class="text-center align-middle d-none d-sm-table-cell">{{ $order['edd'] }}</td>
-										<td class="text-center align-middle d-none d-sm-table-cell"><span class="badge text-dark" style="background-color: {{ $badge }}; font-size: 0.9rem; color: #fff !important;">{{ $order['status'] }}</span></td>
-										<td class="text-center align-middle d-none d-sm-table-cell"><button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#reorder{{ $order['order_number'] }}Modal" {{ $order['status'] == 'Cancelled' ? 'disabled' : '' }}>Re-Order</button></td>
+										<td class="text-center align-middle d-none d-lg-table-cell">{{ $order['shipping_name'] }}</td>
+										<td class="text-center align-middle d-none d-lg-table-cell">{{ $order['date_delivered'] ? date('M d, Y', strtotime($order['date_delivered'])) : '' }}</td>
+										<td class="text-center align-middle d-none d-lg-table-cell"><span class="badge text-dark" style="background-color: {{ $badge }}; font-size: 0.9rem; color: #fff !important;">{{ $order['status'] }}</span></td>
+										<td class="text-center align-middle d-none d-lg-table-cell"><button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#reorder{{ $order['order_number'] }}Modal" {{ $order['status'] == 'Cancelled' ? 'disabled' : '' }}>Re-Order</button></td>
 
 										<!-- Re-Order Modal -->
 										<div class="modal fade" id="reorder{{ $order['order_number'] }}Modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -1044,6 +1045,9 @@ p {
 	.active-btn {
 		border-bottom: 3px solid #dc6f12;
 	}
+	.track-container{
+			min-height: 120px
+		}
 @media (max-width: 575.98px) {
 		.products-head{
 			padding-left: 0 !important;
@@ -1054,6 +1058,9 @@ p {
 		}
 		.status-text{
 			font-size: 12px;
+		}
+		.track-container{
+			min-height: 200px
 		}
     }
 
@@ -1068,6 +1075,14 @@ p {
 		.status-text{
 			font-size: 12px;
 		}
+		.track-container{
+			min-height: 200px
+		}
     }
+	@media (max-width: 1199.98px) {
+		.track-container{
+			min-height: 200px
+		}
+	}
 </style>
 @endsection
