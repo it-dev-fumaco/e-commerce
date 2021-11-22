@@ -168,7 +168,7 @@ class CartController extends Controller
         }
     }
 
-    public function viewCart() {
+    public function viewCart(Request $request) {
         $cart = session()->get('fumCart');
         $cart = (!$cart) ? [] : $cart;
 
@@ -204,6 +204,10 @@ class CartController extends Controller
 
 			$ship_address = DB::table('fumaco_user_add')->where('xdefault', 1)->where('user_idx', $user_id->id)->where('address_class', 'Delivery')->count();
 		}
+
+        if ($request->ajax()) {
+            return view('frontend.cart_preview', compact('cart_arr', 'bill_address', 'ship_address'));
+        }
 
         return view('frontend.cart', compact('cart_arr', 'bill_address', 'ship_address'));
     }
