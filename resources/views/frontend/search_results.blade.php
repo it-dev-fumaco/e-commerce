@@ -311,7 +311,7 @@
 
   // Product Image Hover
   $('.hover-container').hover(function(){
-      $(this).children('.btn-container').slideToggle();
+      $(this).children('.btn-container').slideToggle('fast');
     });
 
 </script>
