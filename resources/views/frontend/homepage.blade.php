@@ -106,14 +106,14 @@
                       <div class="btn-container">
                         <a href="/product/{{ ($bs['slug']) ? $bs['slug'] : $bs['item_code'] }}" class="view-products-btn btn" role="button"><i class="fas fa-search"></i>&nbsp;View Product</a>
                       </div>
-  
+
                       <picture>
                         <source srcset="{{ asset($img_bs_webp) }}" type="image/webp" class="img-responsive" style="width: 100% !important;">
                         <source srcset="{{ asset($img_bs) }}" type="image/jpeg" class="img-responsive" style="width: 100% !important;">
                         <img src="{{ asset($img_bs) }}" alt="{{ Str::slug(explode(".", $bs['bs_img'])[0], '-') }}" class="img-responsive hover" style="width: 100% !important;">
                       </picture>
                     </div>
-                    
+
 
 
                     <div class="card-body">
@@ -166,7 +166,7 @@
 
       <button type="button" class="scroll-control bs-control bs-prev tab-prev-btn prev-btn d-none d-md-block d-lg-none"><i class="fas fa-chevron-left scroll-btn"></i></button>
       <button type="button" class="scroll-control bs-control bs-next tab-next-btn next-btn d-none d-md-block d-lg-none"><i class="fas fa-chevron-right scroll-btn"></i></button>
-      
+
   </div>
   <div class="container marketing" style="position: relative">
     <section class="py-5 text-center container" style="padding-bottom: 0rem !important;">
@@ -188,10 +188,10 @@
               <div class="col-md-4 col-lg-3 animated animatedFadeInUp fadeInUp equal-height-columns mb-3 on-sale-card">
                 <div class="card shadow-sm">
                   <div class="equal-column-content">
-                    
+
                     <div class="hover-container product-card" style="position: relative !important">
                       <div class="btn-container">
-                        <a href="/product/{{ ($os['slug']) ? $os['slug'] : $os['item_code'] }}" class="view-products-btn btn" role="button"><i class="fas fa-search"></i>&nbsp;View Product</a>
+                        <a href="/product/{{ ($os['slug']) ? $os['slug'] : $os['item_code'] }}" class="view-products-btn btn" role="button"><i class="fas fa-search"></i>&nbsp;View 1Product</a>
                       </div>
                       <div class="overlay-bg"></div>
                       <picture>
@@ -200,7 +200,7 @@
                         <img src="{{ asset($img_os) }}" alt="{{ Str::slug(explode(".", $os['os_img'])[0], '-') }}" class="img-responsive hover" style="width: 100% !important;">
                       </picture>
                     </div>
-                      
+
 
                     <div class="card-body">
                       <div class="text ellipsis">
@@ -252,7 +252,7 @@
     {{-- Scroll --}}
     <button id="os-prev" type="button" class="scroll-control os-control prev-btn"><i class="fas fa-chevron-left scroll-btn"></i></button>
     <button id="os-next" type="button" class="scroll-control os-control next-btn"><i class="fas fa-chevron-right scroll-btn"></i></button>
-    
+
   </div>
 
 @endsection
@@ -316,10 +316,10 @@
     .hover:hover {
       -ms-transform: scale(0.95); /* IE 9 */
       -webkit-transform: scale(0.95); /* Safari 3-8 */
-      transform: scale(0.95); 
+      transform: scale(0.95);
     }
 
-    .scoll-pane::-webkit-scrollbar { 
+    .scoll-pane::-webkit-scrollbar {
       display: none;  /* Safari and Chrome */
     }
     #best-selling-container, #on-sale-container{
@@ -391,11 +391,11 @@
 
   .btn-container{
     width: 100%;
-    position: absolute; 
-    top: 50%; 
-    left: 0; 
-    z-index: 9; 
-    display: none; 
+    position: absolute;
+    top: 50%;
+    left: 0;
+    z-index: 9;
+    display: none;
     text-align: center;
   }
 
@@ -415,11 +415,11 @@
 	.view-products-btn:hover{
 		/* color: #fff;
 		background-color: #000; */
-    background-color: #f8b878; 
+    background-color: #f8b878;
     color: black;
 	}
 
-	.product-card:hover .overlay-bg{ 
+	.product-card:hover .overlay-bg{
 		transition:all .15s ease-in !important;
 		opacity: 1 !important;
 	}
@@ -427,9 +427,9 @@
 	.hover-container:hover img{
 		-ms-transform: scale(0.95); /* IE 9 */
       	-webkit-transform: scale(0.95); /* Safari 3-8 */
-      	transform: scale(0.95); 
+      	transform: scale(0.95);
 	}
-    
+
     @media (max-width: 575.98px) {
       .article-title{
         min-height: auto !important
@@ -462,7 +462,7 @@
       .prod_desc{
         font-size: 16px !important;
       }
-      
+
     }
   </style>
   <style>
