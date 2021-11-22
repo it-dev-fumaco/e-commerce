@@ -290,7 +290,11 @@
 														{{-- <a href="#" class="btn btn-outline-primary fumacoFont_card_readmore add-to-cart" role="button" style="width: 100% !important; margin-bottom: 20px" data-item-code="{{ $rp['item_code'] }}"><i class="fas fa-shopping-cart"></i> Add to Cart</a> --}}
 													</div>
 												</div><br/>&nbsp;
-												<a href="#" class="btn btn-outline-primary fumacoFont_card_readmore add-to-cart mx-auto" role="button" style="width: 90%; margin-bottom: 20px" data-item-code="{{ $rp['item_code'] }}"><i class="fas fa-shopping-cart d-inline-block" style="margin-right: 3%;"></i> Add to Cart</a>
+												@if ($rp['on_stock'] == 1)
+												<a href="#" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto add-to-cart" role="button" style="width: 90% !important; margin-bottom: 20px" data-item-code="{{ $rp['item_code'] }}"><i class="fas fa-shopping-cart d-inline-block" style="margin-right: 3%;"></i> Add to Cart</a>
+												@else
+												<a href="#" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto add-to-wishlist" role="button" style="width: 90% !important; margin-bottom: 20px" data-item-code="{{ $rp['item_code'] }}"><i class="far fa-heart d-inline-block" style="margin-right: 3%;"></i> Add to Wishlist</a>
+												@endif
 											</div>
 										</div>
 										@endforeach

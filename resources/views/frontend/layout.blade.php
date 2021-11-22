@@ -628,6 +628,29 @@
             }
           });
         });
+
+        $(document).on('click', '.add-to-wishlist', function(e){
+          e.preventDefault();
+          var btn = $(this);
+          btn.removeClass('add-to-wishlist').text('Adding . . .');
+          var data = {
+            'item_code': $(this).data('item-code'),
+            'quantity': 1,
+            '_token': '{{ csrf_token() }}',
+            'addtowishlist': 1
+          }
+
+          $.ajax({
+            type:"POST",
+            url:"/product_actions",
+            data: data,
+            success:function(response){
+              setTimeout(function() { 
+                btn.addClass('add-to-wishlist').html('<i class="far fa-heart"></i> Add to Wishlist');
+              }, 1800);
+            }
+          });
+        });
       @endif
       websiteSettings();
       productCategories();

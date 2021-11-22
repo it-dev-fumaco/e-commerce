@@ -18,11 +18,9 @@
         <span class="item-name">{{ $cart['item_description'] }}</span>
         <span class="item-price">₱ {{ number_format($cart['price'], 2, '.', ',') }}</span>
         <span class="item-quantity">Qty: {{ $cart['quantity'] }} {{ $cart['stock_uom'] }}</span>
-        {{-- @if ($cart['insufficient_stock'])
+        @if ($cart['insufficient_stock'])
         <small class="item-detail text-danger">Insufficient Stock</small>
-        @else
-        <small class="item-detail text-success">Available :  {{ $cart['stock_qty'] }}</small>
-        @endif --}}
+        @endif
     </li>
     @empty
     <li class="clearfix text-center">

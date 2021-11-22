@@ -292,7 +292,11 @@
 											{{-- <a href="/product/{{ $product['item_code'] }}" class="btn btn-outline-primary fumacoFont_card_readmore" role="button" style="width:100% !important;">View</a> --}}
 										</div>
 									</div>
-									<a href="#" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto mt-3 add-to-cart" role="button" style="width: 90% !important; margin-bottom: 20px" data-item-code="{{ $product['item_code'] }}"><i class="fas fa-shopping-cart d-inline-block" style="margin-right: 2%;"></i> Add to Cart</a>
+									@if ($product['on_stock'] == 1)
+									<a href="#" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto add-to-cart" role="button" style="width: 90% !important; margin-bottom: 20px" data-item-code="{{ $product['item_code'] }}"><i class="fas fa-shopping-cart d-inline-block" style="margin-right: 2%;"></i> Add to Cart</a>
+									@else
+									<a href="#" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto add-to-wishlist" role="button" style="width: 90% !important; margin-bottom: 20px" data-item-code="{{ $product['item_code'] }}"><i class="far fa-heart d-inline-block" style="margin-right: 2%;"></i> Add to Wishlist</a>
+									@endif
 								</div>
 							{{-- </a> --}}
 							</div>
