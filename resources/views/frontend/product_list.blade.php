@@ -233,29 +233,33 @@
 
 						<div class="row animated animatedFade1InUp fadeInUp mx-auto">
 							@forelse ($products_arr as $product)
-							<div class="col-md-4 mb-3 btmp mb-pad" 	>
+							<div class="col-md-4 mb-3 btmp mb-pad">
 								
 								{{-- <div class="col-md-4 btmp animated animatedFadeInUp fadeInUp equal-height-columns"> --}}
 							{{-- <a class="product-card" href="/product/{{ ($product['slug']) ? $product['slug'] : $product['item_code'] }}" style="text-decoration: none !important; text-transform: none !important; position: relative"> --}}
 								<div class="card">
-									<div class="equal-column-content product-card hover-container">
-										<div class="overlay-bg"></div>
-										<a href="/product/{{ ($product['slug']) ? $product['slug'] : $product['item_code'] }}" class="view-products-btn btn">View</a>
-
+									<div class="equal-column-content">
 										@php
 											$image = ($product['image']) ? '/storage/item_images/'.$product['item_code'].'/gallery/preview/'.$product['image'] : '/storage/no-photo-available.png';
 											$image_webp = ($product['image']) ? '/storage/item_images/'.$product['item_code'].'/gallery/preview/'.explode(".", $product['image'])[0] .'.webp' : '/storage/no-photo-available.png';
 										@endphp
-									
+
+										<div class="hover-container product-card" style="position: relative">
+											<div class="btn-container">
+												<a href="/product/{{ ($product['slug']) ? $product['slug'] : $product['item_code'] }}" class="view-products-btn btn"><i class="fas fa-search"></i>&nbsp;View Product</a>
+											</div>
+											<div class="overlay-bg"></div>
 											<picture>
 												<source srcset="{{ asset($image_webp) }}" type="image/webp" class="card-img-top">
 												<source srcset="{{ asset($image) }}" type="image/jpeg" class="card-img-top">
 												<img src="{{ asset($image) }}" alt="{{ Str::slug(explode(".", $product['image'])[0], '-') }}" class="card-img-top hover">
-											 </picture>
+											</picture>
+										</div>
+										
 								
 										<div class="card-body">
 											<div class="text ellipsis">
-												<p class="card-text fumacoFont_card_title text-concat prod-desc" style="color:#0062A5 !important; min-height: 100px; font-size: 16px !important; font-weight: 500 !important;">{{ $product['item_name'] }}</p>
+												<a href="/product/{{ ($product['slug']) ? $product['slug'] : $product['item_code'] }}" class="card-text fumacoFont_card_title text-concat prod-desc" style="text-transform: none !important; text-decoration: none !important; color:#0062A5 !important; min-height: 100px; font-size: 16px !important; font-weight: 500 !important;">{{ $product['item_name'] }}</a>
 											</div>
 											<p class="card-text fumacoFont_card_price price-card d-none d-md-block d-lg-none" style="color:#000000 !important;">
 												@if($product['is_discounted'])
@@ -498,7 +502,7 @@
 
 	.overlay-bg{
 		position: absolute !important;
-		background-color: rgba(0,0,0,0.2) !important;
+		background-color: rgba(255,255,255,0.3) !important;
 		width: 100%;
 		height: 100%;
 		top: 0;
@@ -511,18 +515,21 @@
 		margin: 0 auto;
 		transition:all .15s ease-in !important;
 	}
+
+	.btn-container{
+		width: 100%;
+		position: absolute; 
+		top: 50%; 
+		left: 0; 
+		z-index: 9; 
+		display: none; 
+		text-align: center;
+	}
+
 	.view-products-btn{
-		position: absolute;
 		z-index: 2;
-		margin-left: auto;
-		margin-right: auto;
-		left: 0;
-		right: 0;
-		top: 50%;
-		width: 50%;
 		text-align: center;
 		background-color: #0062A5;
-		display: none;
 		color:#fff;
 		font-size:13px;
 		letter-spacing:2px;
@@ -530,7 +537,6 @@
 		padding:8px 20px;
 		font-weight:400;
 		transition:all .15s ease-in;
-		
 	}
 
 	.view-products-btn:hover{
@@ -538,11 +544,7 @@
 		background-color: #000;
 	}
 
-	.product-card:hover .view-products-btn{ 
-		display:block;
-	}
 	.product-card:hover .overlay-bg{ 
-		/* display:block !important; */
 		transition:all .15s ease-in !important;
 		opacity: 1 !important;
 	}
@@ -571,6 +573,11 @@
 		$('#filter-form').submit();
 	});
   })();
+
+  // Product Image Hover
+  $('.hover-container').hover(function(){
+      $(this).children('.btn-container').slideToggle();
+    });
 
 </script>
 @endsection
