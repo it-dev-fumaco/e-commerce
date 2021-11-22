@@ -305,9 +305,9 @@
     border-bottom: 1px solid #E8E8E8;
     padding-bottom: 15px;
   }
-  #shopping-cart .shopping-cart-header .shopping-cart-total {
+  /* #shopping-cart .shopping-cart-header .shopping-cart-total {
     float: right;
-  }
+  } */
   #shopping-cart .shopping-cart-items {
     padding: 5px;
     list-style: none;
@@ -346,7 +346,7 @@
 
   #shopping-cart .shopping-cart-items .item-detail {
   display: block;
-  font-size: 12px;
+  font-size: 11px !important;
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;

@@ -1,8 +1,6 @@
 <div class="shopping-cart-header">
-    <i class="fa fa-shopping-cart cart-icon"></i><span class="badge badge-danger">{{ collect($cart_arr)->sum('quantity') }}</span>
-    <div class="shopping-cart-total">
-        <span class="lighter-text">Cart Total:</span>
-        <span class="main-color-text total">₱ {{ number_format(collect($cart_arr)->sum('amount'), 2, '.', ',') }}</span>
+    <div class="shopping-cart-total" style="font-size: 14pt; text-align: left !important; margin-left: 10px;">
+        <span class="lighter-text">Your Cart</span>
     </div>
 </div> <!--end shopping-cart-header -->
 <ul class="shopping-cart-items">
@@ -32,6 +30,9 @@
     </li>
     @endforelse
 </ul>
+<div style="text-align: right; margin: 10px; font-size: 10pt;">
+    Total: ₱ {{ number_format(collect($cart_arr)->sum('amount'), 2, '.', ',') }}
+</div>
   @php
   $action = '';
   if(Auth::check()){//member
@@ -56,10 +57,10 @@
 @endphp
 <div class="d-flex flex-row justify-content-between">
     <div class="p-1 col">
-        <a href="/cart" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto" role="button" style="width: 100% !important;"><i class="fas fa-shopping-cart"></i> View Cart</a>
+        <a href="/cart" class="btn btn-outline-primary fumacoFont_card_readmore btn-sm mx-auto" role="button" style="width: 100% !important;"><i class="fas fa-shopping-cart"></i> View Cart</a>
     </div>
     <div class="p-1 col">
-        <a href="{{ $action }}" class="co-btn btn btn-outline-primary fumacoFont_card_readmore mx-auto" role="button" style="width: 100% !important;" {{ (count($cart_arr) > 0) ? '' : 'disabled' }} {{ $disabled_co }}>Checkout <i class="fa fa-chevron-right"></i></a>
+        <a href="{{ $action }}" class="co-btn btn btn-outline-primary btn-sm fumacoFont_card_readmore mx-auto" role="button" style="width: 100% !important;" {{ (count($cart_arr) > 0) ? '' : 'disabled' }} {{ $disabled_co }}>Checkout <i class="fa fa-chevron-right"></i></a>
     </div>
 </div>
 @if (Auth::check())
@@ -70,8 +71,8 @@
 </div>
 @else
 <div class="d-flex flex-row justify-content-between">
-    <div class="p-1 col">
-        <a href="/track_order" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto" role="button" style="width: 100% !important;"><i class="fas fa-box"></i> Track Order</a>
+    <div class="p-1 col text-center">
+       <a href="/track_order" class=" fumacoFont_card_readmore mx-auto" role="button" style="width: 100% !important; font-size: 10pt !important;"><i class="fas fa-box" style="margin-right: 2%;"></i> Track Order</a>
     </div>
 </div>
 @endif
