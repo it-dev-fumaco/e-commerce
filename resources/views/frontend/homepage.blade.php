@@ -407,8 +407,10 @@
 	}
 
 	.view-products-btn:hover{
-		color: #fff;
-		background-color: #000;
+		/* color: #fff;
+		background-color: #000; */
+    background-color: #f8b878; 
+    color: black;
 	}
 
 	.product-card:hover .overlay-bg{ 
