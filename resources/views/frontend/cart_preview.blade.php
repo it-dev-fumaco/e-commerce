@@ -17,12 +17,12 @@
         </picture>
         <span class="item-name">{{ $cart['item_description'] }}</span>
         <span class="item-price">₱ {{ number_format($cart['price'], 2, '.', ',') }}</span>
-        <span class="item-quantity">Quantity: {{ $cart['quantity'] }}</span>
-        @if ($cart['insufficient_stock'])
+        <span class="item-quantity">Qty: {{ $cart['quantity'] }} {{ $cart['stock_uom'] }}</span>
+        {{-- @if ($cart['insufficient_stock'])
         <small class="item-detail text-danger">Insufficient Stock</small>
         @else
         <small class="item-detail text-success">Available :  {{ $cart['stock_qty'] }}</small>
-        @endif
+        @endif --}}
     </li>
     @empty
     <li class="clearfix text-center">
@@ -30,7 +30,7 @@
     </li>
     @endforelse
 </ul>
-<div style="text-align: right; margin: 10px; font-size: 10pt;">
+<div class="text-danger" style="text-align: right; margin: 10px; font-size: 10pt;">
     Total: ₱ {{ number_format(collect($cart_arr)->sum('amount'), 2, '.', ',') }}
 </div>
   @php

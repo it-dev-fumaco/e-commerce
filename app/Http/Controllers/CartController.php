@@ -189,6 +189,7 @@ class CartController extends Controller
                 'amount' => ($price * $cart[$item->f_idcode]['quantity']),
                 'quantity' => $cart[$item->f_idcode]['quantity'],
                 'stock_qty' => $item->f_qty - $item->f_reserved_qty,
+                'stock_uom' => $item->f_stock_uom,
                 'item_image' => ($item_image) ? $item_image->imgprimayx : null,
                 'insufficient_stock' => ($cart[$item->f_idcode]['quantity'] > $item->f_qty) ? 1 : 0
             ];
