@@ -94,25 +94,31 @@
         <div class="container">
           <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4 overflow-auto flex-row flex-nowrap scroll-pane" id="best-selling-container" style="min-height: 10px;">
             @foreach($best_selling_arr as $bs)
-              <div class="col-md-3 animated animatedFadeInUp fadeInUp equal-height-columns mb-3 best-selling-card">
+              <div class="col-md-4 col-lg-3 animated animatedFadeInUp fadeInUp equal-height-columns mb-3 best-selling-card">
                 <div class="card shadow-sm">
                   <div class="equal-column-content">
-
-@php
-$img_bs = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/gallery/preview/'. $bs['bs_img'] : '/storage/no-photo-available.png';
-$img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/gallery/preview/'. explode(".", $bs['bs_img'])[0] . '.webp' : '/storage/no-photo-available.png';
-@endphp
-
-                    <picture>
-                      <source srcset="{{ asset($img_bs_webp) }}" type="image/webp" class="img-responsive" style="width: 100% !important;">
-                      <source srcset="{{ asset($img_bs) }}" type="image/jpeg" class="img-responsive" style="width: 100% !important;">
-                      <img src="{{ asset($img_bs) }}" alt="{{ Str::slug(explode(".", $bs['bs_img'])[0], '-') }}" class="img-responsive hover" style="width: 100% !important;">
-                    </picture>
+                    @php
+                    $img_bs = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/gallery/preview/'. $bs['bs_img'] : '/storage/no-photo-available.png';
+                    $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/gallery/preview/'. explode(".", $bs['bs_img'])[0] . '.webp' : '/storage/no-photo-available.png';
+                    @endphp
+                    <div class="hover-container product-card" style="position: relative">
+                      <div class="overlay-bg"></div>
+                      <div class="btn-container">
+                        <a href="/product/{{ ($bs['slug']) ? $bs['slug'] : $bs['item_code'] }}" class="view-products-btn btn" role="button"><i class="fas fa-search"></i>&nbsp;View Product</a>
+                      </div>
+  
+                      <picture>
+                        <source srcset="{{ asset($img_bs_webp) }}" type="image/webp" class="img-responsive" style="width: 100% !important;">
+                        <source srcset="{{ asset($img_bs) }}" type="image/jpeg" class="img-responsive" style="width: 100% !important;">
+                        <img src="{{ asset($img_bs) }}" alt="{{ Str::slug(explode(".", $bs['bs_img'])[0], '-') }}" class="img-responsive hover" style="width: 100% !important;">
+                      </picture>
+                    </div>
+                    
 
 
                     <div class="card-body">
                       <div class="text ellipsis">
-                        <p class="card-text product-head fumacoFont_card_title text-concat prod_desc" style="color:#0062A5 !important;  min-height: 100px;">{{ $bs['item_name'] }}</p>
+                        <a href="/product/{{ ($bs['slug']) ? $bs['slug'] : $bs['item_code'] }}" class="card-text product-head fumacoFont_card_title text-concat prod_desc" style="text-transform: none !important; text-decoration: none !important; color:#0062A5 !important;  min-height: 100px;">{{ $bs['item_name'] }}</a>
                       </div>
                       <p class="card-text fumacoFont_card_price price-card d-none d-md-block d-lg-none" style="color:#000000 !important; ">
                         @if ($bs['is_discounted'])
@@ -142,9 +148,12 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
                       </div>
                       <br>
                     </div>
-                  </div>
-                  <a href="/product/{{ ($bs['slug']) ? $bs['slug'] : $bs['item_code'] }}" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto" role="button" style="width: 90% !important; margin-bottom: 20px">View</a>
-
+                  </div><br/>&nbsp;
+                  @if ($bs['on_stock'] == 1)
+                  <a href="#" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto add-to-cart" role="button" style="width: 90% !important; margin-bottom: 20px" data-item-code="{{ $bs['item_code'] }}"><i class="fas fa-shopping-cart d-inline-block" style="margin-right: 3%;"></i> Add to Cart</a>
+                  @else
+                  <a href="/login" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto {{ Auth::check() ? 'add-to-wishlist' : '' }}" role="button" style="width: 90% !important; margin-bottom: 20px" data-item-code="{{ $bs['item_code'] }}"><i class="far fa-heart d-inline-block" style="margin-right: 3%;"></i> Add to Wishlist</a>
+                  @endif
                 </div>
               </div>
             @endforeach
@@ -152,11 +161,12 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
         </div>
       </div>
       {{-- Scroll --}}
-      <button type="button" class="scroll-control bs-prev prev-btn d-sm-block d-md-none d-lg-block"><i class="fas fa-chevron-left scroll-btn"></i></button>
-      <button type="button" class="scroll-control bs-next next-btn d-sm-block d-md-none d-lg-block"><i class="fas fa-chevron-right scroll-btn"></i></button>
+      <button type="button" class="scroll-control bs-control bs-prev prev-btn d-sm-block d-md-none d-lg-block"><i class="fas fa-chevron-left scroll-btn"></i></button>
+      <button type="button" class="scroll-control bs-control bs-next next-btn d-sm-block d-md-none d-lg-block"><i class="fas fa-chevron-right scroll-btn"></i></button>
 
-      <button type="button" class="scroll-control bs-prev tab-prev-btn prev-btn d-none d-md-block d-lg-none"><i class="fas fa-chevron-left scroll-btn"></i></button>
-      <button type="button" class="scroll-control bs-next tab-next-btn next-btn d-none d-md-block d-lg-none"><i class="fas fa-chevron-right scroll-btn"></i></button>
+      <button type="button" class="scroll-control bs-control bs-prev tab-prev-btn prev-btn d-none d-md-block d-lg-none"><i class="fas fa-chevron-left scroll-btn"></i></button>
+      <button type="button" class="scroll-control bs-control bs-next tab-next-btn next-btn d-none d-md-block d-lg-none"><i class="fas fa-chevron-right scroll-btn"></i></button>
+      
   </div>
   <div class="container marketing" style="position: relative">
     <section class="py-5 text-center container" style="padding-bottom: 0rem !important;">
@@ -175,20 +185,26 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
             $img_os = ($os['os_img']) ? '/storage/item_images/'. $os['item_code'] .'/gallery/preview/'. $os['os_img'] : '/storage/no-photo-available.png';
             $img_os_webp = ($os['os_img']) ? '/storage/item_images/'. $os['item_code'] .'/gallery/preview/'. explode(".", $os['os_img'])[0] . '.webp' : '/storage/no-photo-available.png';
           @endphp
-              <div class="col animated animatedFadeInUp fadeInUp equal-height-columns mb-3 on-sale-card">
+              <div class="col-md-4 col-lg-3 animated animatedFadeInUp fadeInUp equal-height-columns mb-3 on-sale-card">
                 <div class="card shadow-sm">
                   <div class="equal-column-content">
-
-
+                    
+                    <div class="hover-container product-card" style="position: relative !important">
+                      <div class="btn-container">
+                        <a href="/product/{{ ($os['slug']) ? $os['slug'] : $os['item_code'] }}" class="view-products-btn btn" role="button"><i class="fas fa-search"></i>&nbsp;View Product</a>
+                      </div>
+                      <div class="overlay-bg"></div>
                       <picture>
                         <source srcset="{{ asset($img_os_webp) }}" type="image/webp" class="img-responsive" style="width: 100% !important;">
                         <source srcset="{{ asset($img_os) }}" type="image/jpeg" class="img-responsive" style="width: 100% !important;">
                         <img src="{{ asset($img_os) }}" alt="{{ Str::slug(explode(".", $os['os_img'])[0], '-') }}" class="img-responsive hover" style="width: 100% !important;">
                       </picture>
+                    </div>
+                      
 
                     <div class="card-body">
                       <div class="text ellipsis">
-                        <p class="card-text product-head fumacoFont_card_title text-concat prod_desc" style="color:#0062A5 !important; min-height: 100px;">{{ $os['item_name'] }}</p>
+                        <a href="/product/{{ ($os['slug']) ? $os['slug'] : $os['item_code'] }}" class="card-text product-head fumacoFont_card_title text-concat prod_desc" style="text-decoration: none !important; text-transform: none !important; color:#0062A5 !important; min-height: 100px;">{{ $os['item_name'] }}</a>
                       </div>
                       <p class="card-text fumacoFont_card_price price-card d-none d-md-block d-lg-none" style="color:#000000 !important; min-height: 30px">
                         @if ($os['is_discounted'])
@@ -221,9 +237,12 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
                       <br/>
                     </div>
                   </div>
-                  
-                  <a href="/product/{{ ($os['slug']) ? $os['slug'] : $os['item_code'] }}" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto" role="button" style="width: 90% !important; margin-bottom: 20px">View</a>
-
+                  <br/>&nbsp;
+                  @if ($os['on_stock'] == 1)
+                  <a href="#" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto add-to-cart" role="button" style="width: 90% !important; margin-bottom: 20px" data-item-code="{{ $os['item_code'] }}"><i class="fas fa-shopping-cart d-inline-block" style="margin-right: 3%;"></i> Add to Cart</a>
+                  @else
+                  <a href="/login" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto {{ Auth::check() ? 'add-to-wishlist' : '' }}" role="button" style="width: 90% !important; margin-bottom: 20px" data-item-code="{{ $os['item_code'] }}"><i class="far fa-heart d-inline-block" style="margin-right: 3%;"></i> Add to Wishlist</a>
+                  @endif
                 </div>
               </div>
             @endforeach
@@ -231,8 +250,9 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
       </div>
     </div>
     {{-- Scroll --}}
-    <button id="os-prev" type="button" class="scroll-control prev-btn"><i class="fas fa-chevron-left scroll-btn"></i></button>
-    <button id="os-next" type="button" class="scroll-control next-btn"><i class="fas fa-chevron-right scroll-btn"></i></button>
+    <button id="os-prev" type="button" class="scroll-control os-control prev-btn"><i class="fas fa-chevron-left scroll-btn"></i></button>
+    <button id="os-next" type="button" class="scroll-control os-control next-btn"><i class="fas fa-chevron-right scroll-btn"></i></button>
+    
   </div>
 
 @endsection
@@ -309,6 +329,10 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
       -ms-overflow-style: scroll;  /* IE 10+ */
       scrollbar-width: none; /* Firefox */
     }
+
+    #best-selling-container::-webkit-scrollbar, #on-sale-container::-webkit-scrollbar{ /* Chrome */
+      display: none;
+    }
     .scroll-control{
       height: 80px;
       width: 80px;
@@ -348,6 +372,63 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
     .scroll-btn{
       font-size: 30px;
     }
+
+    .overlay-bg{
+      position: absolute !important;
+      background-color: rgba(255,255,255,0.3) !important;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      z-index: 1;
+      transition:all .15s ease-in;
+      opacity: 0;
+    }
+	.product-card{
+		position:relative;
+		margin: 0 auto;
+		transition:all .15s ease-in !important;
+	}
+
+  .btn-container{
+    width: 100%;
+    position: absolute; 
+    top: 50%; 
+    left: 0; 
+    z-index: 9; 
+    display: none; 
+    text-align: center;
+  }
+
+	.view-products-btn{
+		z-index: 2;
+		text-align: center;
+		background-color: #0062A5;
+		color:#fff;
+		font-size:13px;
+		letter-spacing:2px;
+		text-transform:uppercase;
+		padding:8px 20px;
+		font-weight:400;
+		transition:all .15s ease-in;
+	}
+
+	.view-products-btn:hover{
+		/* color: #fff;
+		background-color: #000; */
+    background-color: #f8b878; 
+    color: black;
+	}
+
+	.product-card:hover .overlay-bg{ 
+		transition:all .15s ease-in !important;
+		opacity: 1 !important;
+	}
+
+	.hover-container:hover img{
+		-ms-transform: scale(0.95); /* IE 9 */
+      	-webkit-transform: scale(0.95); /* Safari 3-8 */
+      	transform: scale(0.95); 
+	}
     
     @media (max-width: 575.98px) {
       .article-title{
@@ -384,10 +465,18 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
       
     }
   </style>
+  <style>
+
+  </style>
 @endsection
 
 @section('script')
   <script>
+    // Product Image Hover
+    $('.hover-container').hover(function(){
+      $(this).children('.btn-container').slideToggle('fast');
+    });
+
     // Best Selling
     $('.bs-next').click(function() {
       event.preventDefault();
@@ -416,6 +505,20 @@ $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/ga
       $('#on-sale-container').animate({
         scrollLeft: "-="+$('.on-sale-card').outerWidth()+"px"
       }, "slow");
+    });
+
+    $(document).ready(function() {
+      if ($("#best-selling-container").prop('scrollWidth') > $("#best-selling-container").width() ) {
+        $('.bs-control').addClass('d-block');
+      }else{
+        $('.bs-control').addClass('d-none');
+      }
+
+      if ($("#on-sale-container").prop('scrollWidth') > $("#on-sale-container").width() ) {
+        $('.os-control').addClass('d-block');
+      }else{
+        $('.os-control').addClass('d-none');
+      }
     });
   </script>
 @endsection

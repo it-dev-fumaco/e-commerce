@@ -144,7 +144,7 @@
                     }
                 @endphp
                 <div class="row">
-                    <div class="col-md-6 d-none d-lg-block d-xl-block">
+                    <div class="col-md-6 d-none d-md-block">
                         <div class="card-body col-md-8 mx-auto">
                             <a href="/" class="btn btn-secondary" style="width:100% !important;" role="button"><span style="font-size: 12pt; font-weight: 700">˂ </span> CONTINUE SHOPPING</a>
                         </div>
@@ -154,7 +154,7 @@
                             <button id="checkout-btn" class="btn btn-outline-primary" role="button" style="width:100% !important;" {{ (count($cart_arr) > 0) ? '' : 'disabled' }}>PROCEED TO CHECKOUT</button>
                         </div>
                     </div>
-                    <div class="col-md-6 d-lg-none d-xl-none">
+                    <div class="col-md-6 d-md-none">
                         <div class="card-body col-md-8 mx-auto">
                             <a href="/" class="btn btn-secondary" style="width:100% !important;" role="button"><span style="font-size: 12pt; font-weight: 700">˂ </span> CONTINUE SHOPPING</a>
                         </div>

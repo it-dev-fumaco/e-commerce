@@ -28,7 +28,6 @@
 
     <link href="{{ asset('/assets/dist/css/bootstrap.min.css') }}" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.gstatic.com">
-    {{-- <script src="https://kit.fontawesome.com/ec0415ab92.js"></script> --}}
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -78,13 +77,6 @@
           font-family: 'poppins', sans-serif !important; font-weight:600 !important; font-size: 16px !important; text-decoration: none !important;
       }
       /* homepage */
-      /* .carousel-item > img {
-          position: absolute !important;
-          top: 0 !important;
-          left: 0 !important;
-          max-width: 100% !important;
-          height: 100% !important;
-      } */
       .spinner-wrapper {
           position: fixed;
           top: 0;
@@ -214,25 +206,7 @@
           animation-name: fadeInUp;
           -webkit-animation-name: fadeInUp;
       }
-      /* About, Journals, Homepage, product page, search results */
-      /* .abt_standard{
-        font-family: 'poppins', sans-serif !important;
-        text-decoration: none !important;
-      } */
-      /* Product Page, Homepage */
-      /* .prod_desc{
-        font-size: 16px !important;
-        font-weight: 500 !important;
-        text-align: left !important;
-      } */
-      /* Product Page */
-      /* .prod_standard{
-        font-family: 'poppins', sans-serif !important;
-        font-weight: 300 !important;
-        text-decoration: none !important;
-      } */
-      /* Product List Page */
-      /*.filter-btn, */.mbl-welcome{
+      .mbl-welcome{
         display: none !important;
       }
       .user-icon{
@@ -241,17 +215,6 @@
       .search-bar{
         width: 400px !important;
       }
-       /* homepage */
-      /* .article-title{
-        min-height: 55px !important
-      } */
-      /* .menu-burger{
-        float: right !important
-      } */
-      /* Product List Page */
-      /* .prod-sort{
-        margin-right: 5%;
-      } */
 
       .payment-icons{
         width: 60px !important;
@@ -263,39 +226,12 @@
         header{
           min-height: 50px;
         }
-        /* Ordering Pages */
-        /* .breadcrumb{
-          font-size: 8pt !important;
-          font-weight: 500;
-        } */
-        /* Track Order */
-        /* .track-order-eta{
-          text-align: left !important;
-        } */
-       /* homepage */
-        /* .article-title{
-          min-height: auto !important
-        } */
-
       }
 
       @media (max-width: 767.98px) {
         header{
           min-height: 50px;
         }
-        /* Ordering Pages */
-        /* .breadcrumb{
-          font-size: 8pt !important;
-          font-weight: 500;
-        } */
-        /* Track Order */
-        /* .track-order-eta{
-          text-align: left !important;
-        } */
-        /* homepage */
-        /* .article-title{
-          min-height: auto !important
-        } */
       }
 
       @media (max-width: 1199.98px) {/* tablet */
@@ -312,15 +248,11 @@
         .search-bar{
           width: auto !important;
         }
-        /* Product List Page */
-        /* .mb-pad{
-          padding: 0 !important;
-        } */
       }
 
       @media only screen and (min-device-width : 768px) and (max-device-width : 1024px) and (orientation : portrait) {/* portrait tablet */
         /* Product List Page */
-        /* .filter-btn, .filter-slide,  */.mob-srch{
+     .mob-srch{
           display: inline-block !important;
         }
         .pc-cart, .search-bar{
@@ -329,18 +261,11 @@
         .mb-cart{
           display: inline-block !important;
         }
-        /* .menu-burger{
-          float: right !important
-        } */
-        /* Product List Page */
-        /* .sort-by{
-          white-space: nowrap !important;
-        } */
       }
 
       @media only screen and (min-device-height : 427.98px) and (max-device-height : 767.98px) and (orientation : landscape) {/* landscape mobile */
         /* Product List Page */
-        /* .filter-btn, .filter-slide,  */.mob-srch{
+       .mob-srch{
           display: inline-block !important;
         }
         .pc-cart, .search-bar{
@@ -349,11 +274,103 @@
         .mb-cart{
           display: inline-block !important;
         }
-        /* Product List Page */
-        /* .sort-by{
-          white-space: nowrap !important;
-        } */
       }
+
+      #shopping-cart {
+    background: white;
+    width: 320px;
+    position: absolute;
+    top: 80px;
+    right: 13px;
+    border-radius: 3px;
+    padding: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26) !important;
+    -webkit-transition: all 0.2s ease;
+    transition: all 0.2s ease;
+    opacity: 0;
+    -webkit-transform-origin: right top 0;
+    -webkit-transform: scale(0);
+    transform-origin: right top 0;
+    transform: scale(0);
+  }
+  #shopping-cart.active {
+    opacity: 1;
+    -webkit-transform-origin: right top 0;
+    -webkit-transform: scale(1);
+    transform-origin: right top 0;
+    transform: scale(1);
+  }
+  #shopping-cart .shopping-cart-header {
+    border-bottom: 1px solid #E8E8E8;
+    padding-bottom: 15px;
+  }
+  /* #shopping-cart .shopping-cart-header .shopping-cart-total {
+    float: right;
+  } */
+  #shopping-cart .shopping-cart-items {
+    padding: 5px;
+    list-style: none;
+  }
+  #shopping-cart .shopping-cart-items li {
+    margin-bottom: 10px;
+  }
+  #shopping-cart .shopping-cart-items picture {
+    float: left;
+    margin-right: 12px;
+    max-width: 70px;
+    max-height: 70px;
+  }
+  #shopping-cart .shopping-cart-items .item-name {
+    display: block;
+    font-size: 14px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  #shopping-cart .shopping-cart-items .item-price {
+    color: #404040;
+    margin-right: 8px;
+    font-size: 12px;
+  }
+  #shopping-cart .shopping-cart-items .item-quantity {
+    color: #ABB0BE;
+    font-size: 12px;
+  }
+
+  #shopping-cart .badge-danger {
+    background-color: red;
+    font-size: 13px;
+    margin: 5px;
+  }
+
+  #shopping-cart .shopping-cart-items .item-detail {
+  display: block;
+  font-size: 11px !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+  
+  #shopping-cart:after {
+    bottom: 100%;
+    left: 89%;
+    border: solid transparent;
+    content: " ";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none;
+    border-bottom-color: white;
+    border-width: 8px;
+    margin-left: -8px;
+  }
+
+  .clearfix:after {
+  content: "";
+  display: table;
+  clear: both;
+}
     </style>
     @yield('style')
     @if($activePage == 'contact')
@@ -371,20 +388,19 @@
             <img src="{{ asset('/assets/site-img/logo-sm.png') }}" alt="" width="155" height="54">
           </a>
           {{-- Mobile Icons --}}
-          {{-- Login Icon --}}
-          {{-- <a class="d-md-none d-lg-none d-xl-none" style="color: #000; margin-left: 10px !important" href="/login">
-            <i class="far fa-user user-icon" style=""></i>
-          </a> --}}
           <div class="d-flex justify-content-end">
-          <a class="d-md-block d-lg-none d-xl-none mb-cart" href="/cart" style="text-decoration: none !important; margin-left:33px !important; padding-top: 8px">
-            <div class="" style="width: 50px !important; padding: 0 !important;">
-              <i class="fa" style="font-size:24px; color:#126cb6;">&#xf07a;</i><span class="badge badge-warning count-cart-items" id="lblCartCount" style="font-size: 12px; background: #ff0000; color: #fff; padding: 4px 7px; vertical-align: top; margin-left: -10px;display: unset !important; font-weight: 500 !important; border-radius: 1rem !important; margin-top: -15px;">0</span>
-            </div>
-          </a>
+            @if (!Auth::check())
+              <a class="nav-link d-md-block d-lg-none" href="/login"><i class="far fa-user" style="font-size:24px; color: #404040;"></i></a>
+            @endif
+            <a class="d-md-block d-lg-none mb-cart" href="/cart" style="text-decoration: none !important; !important; padding-top: 8px">
+              <div class="" style="width: 50px !important; padding: 0 !important;">
+                <i class="fa" style="font-size:24px; color:#126cb6;">&#xf07a;</i><span class="badge badge-warning count-cart-items" id="lblCartCount" style="font-size: 12px; background: #ff0000; color: #fff; padding: 4px 7px; vertical-align: top; margin-left: -10px;display: unset !important; font-weight: 500 !important; border-radius: 1rem !important; margin-top: -15px;">0</span>
+              </div>
+            </a>
 
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" style="float: right !important">
-            <span class="navbar-toggler-icon"></span>
-          </button>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" style="float: right !important">
+              <span class="navbar-toggler-icon"></span>
+            </button>
           </div>
           {{-- Mobile Icons --}}
           <div class="collapse navbar-collapse nav_fumaco_res nav-a" id="navbarCollapse">
@@ -411,6 +427,11 @@
               </div>
             </form>
             <ul class="navbar-nav d-lg-inline-block">
+              @if (!Auth::check())
+              <li class="nav-item d-none d-lg-block">
+                <a class="nav-link" href="/login" style="margin-left: 10px; margin-right: 5px;"><i class="far fa-user" style="font-size:24px; color: #404040;"></i></a>
+              </li>
+              @else
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle navbar-header welcome-msg" href="#" id="navbarDarkDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">Welcome, {{ (Auth::check()) ? Auth::user()->f_name : 'Guest' }}</a>
                 <a class="nav-link dropdown-toggle navbar-header mbl-welcome" href="#" id="navbarDarkDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="far fa-user" style="font-size: 20px"></i></a>
@@ -450,15 +471,16 @@
                   @endif
                 </ul>
               </li>
+              @endif
             </ul>
-
           </div>
           {{-- Cart Icon --}}
-          <a class="d-none d-lg-block pc-cart" style="text-decoration: none !important" href="/cart">
-            <div class="" style="width: 50px !important; padding: 0 !important; margin-right: -20px !important">
-              <i class="fa" style="font-size:24px; color:#126cb6;">&#xf07a;</i><span class="badge badge-warning count-cart-items" id="lblCartCount" style="font-size: 12px; background: #ff0000; color: #fff; padding: 4px 7px; vertical-align: top; margin-left: -10px;display: unset !important; font-weight: 500 !important; border-radius: 1rem !important; margin-top: -15px;">0</span>
-            </div>
-          </a>
+            <a class="d-none d-lg-block pc-cart cart-icon" style="text-decoration: none !important" href="/cart" id="cart">
+              <div  style="width: 50px !important; padding: 0 !important; margin-right: -20px !important">
+                <i class="fa" style="font-size:24px; color:#126cb6;">&#xf07a;</i><span class="badge badge-warning count-cart-items" id="lblCartCount" style="font-size: 12px; background: #ff0000; color: #fff; padding: 4px 7px; vertical-align: top; margin-left: -10px;display: unset !important; font-weight: 500 !important; border-radius: 1rem !important; margin-top: -15px;">0</span>
+              </div>
+            </a>
+            <div id="shopping-cart"></div>
           {{-- Cart Icon --}}
           <div class="d-md-block d-lg-none mob-srch" style="width: 100% !important">
             <div class="col-md-12">
@@ -546,7 +568,6 @@
       <br>
       <br>
     </main>
-
   </footer>
   <script src="https://kit.fontawesome.com/ec0415ab92.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -554,10 +575,83 @@
   <script src="https://www.google.com/recaptcha/api.js" async defer></script>
   @endif
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.4/Chart.bundle.min.js'></script>
 
   <script src="{{ asset('/assets/dist/js/bootstrap.bundle.min.js') }}"></script>
   <script>
     $(document).ready(function() {
+      $('#cart').click(function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        $("#shopping-cart").toggleClass("active");
+        var preloader = '<div class="text-center"><div class="spinner-border text-muted m-3 text-center"></div></div>';
+        $('#shopping-cart').html(preloader);
+        $.ajax({
+          type:"GET",
+          url:"/cart",
+          success:function(response){
+            $('#shopping-cart').html(response).fadeIn();
+          }
+        });
+      });
+      $(document).click(function() {
+        var $item = $("#shopping-cart");
+        if (!$item.is(event.target) && !$item.has(event.target).length) {
+          if ($item.hasClass("active")) {
+            $item.removeClass("active");
+          }
+        }
+      });
+
+      @if (in_array($activePage, ['homepage', 'product_page', 'search_result', 'product_list']))
+        $(document).on('click', '.add-to-cart', function(e){
+          e.preventDefault();
+          var btn = $(this);
+          btn.removeClass('add-to-cart').text('Adding . . .');
+          var data = {
+            'item_code': $(this).data('item-code'),
+            'quantity': 1,
+            '_token': '{{ csrf_token() }}',
+            'addtocart': 1
+          }
+
+          $.ajax({
+            type:"POST",
+            url:"/product_actions",
+            data: data,
+            success:function(response){
+              setTimeout(function() { 
+                btn.addClass('add-to-cart').html('<i class="fas fa-shopping-cart"></i> Add to Cart');
+              }, 1800);
+            
+              countCartItems();
+            }
+          });
+        });
+
+        $(document).on('click', '.add-to-wishlist', function(e){
+          e.preventDefault();
+          var btn = $(this);
+          btn.removeClass('add-to-wishlist').text('Adding . . .');
+          var data = {
+            'item_code': $(this).data('item-code'),
+            'quantity': 1,
+            '_token': '{{ csrf_token() }}',
+            'addtowishlist': 1
+          }
+
+          $.ajax({
+            type:"POST",
+            url:"/product_actions",
+            data: data,
+            success:function(response){
+              setTimeout(function() { 
+                btn.addClass('add-to-wishlist').html('<i class="far fa-heart"></i> Add to Wishlist');
+              }, 1800);
+            }
+          });
+        });
+      @endif
       websiteSettings();
       productCategories();
       countCartItems();

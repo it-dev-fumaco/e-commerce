@@ -58,7 +58,7 @@
 						</div>
 					</div>
 				@endif
-				<div class="col-md-8 mx-auto">
+				<div class="col-md-12 col-lg-8 mx-auto">
 					<div class="card" style="background-color: #f4f4f4 !important; border-radius: 0rem !important;">
 						@php
 							$shipping_fname = $shipping_details['fname'];
@@ -96,7 +96,7 @@
 							<div class="card-body he1x" style="padding-bottom: 0px !important;">
 								<div class="accordion" id="accordionExample">
 									<div class="row">
-										<div class="col-md-{{ $col }} d-flex align-items-stretch">
+										<div class="col-md-12 col-lg-{{ $col }} d-flex align-items-stretch">
 											<div class="card" style="width: 100%">
 												<div class="card-header" id="headingOne">
 													<h2 class="mb-0">
@@ -139,7 +139,7 @@
 											</div>
 										</div>
 										@if ($shipping_details['same_as_billing'] == 0)
-											<div class="col-md-6 d-flex align-items-stretch">
+											<div class="col-md-12 col-lg-6 d-flex align-items-stretch">
 												<div class="card" style="width: 100%">
 													<div class="card-header" id="headingOne1">
 														<h2 class="mb-0">
@@ -187,7 +187,7 @@
 					</div><br/>
 				</div>
 
-				<div class="col-md-4 mx-auto">
+				<div class="col-md-12 col-lg-4 mx-auto">
 					<div class="card" style="background-color: #f4f4f4 !important; border-radius: 0rem !important;">
 						<div class="card-body he1x" style="padding-bottom: 0px !important;">Order Summary<hr></div>
 						<table class="table" id="cart-items">

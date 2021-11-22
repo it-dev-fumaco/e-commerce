@@ -10,7 +10,7 @@
 					<img src="{{ asset('/assets/site-img/header3-sm.png') }}" alt="" style="position: absolute; bottom: 0 !important;left: 0;min-width: 100%; height: 100% !important;">
 					<div class="container">
 						<div class="carousel-caption text-start" style="bottom: 1rem !important; right: 25% !important; left: 25%; !important;">
-							<center><h3 class="carousel-header-font">ORDER STATUS</h3></center>
+							<center><h3 class="carousel-header-font">TRACK ORDER</h3></center>
 						</div>
 					</div>
 				</div>
@@ -21,7 +21,7 @@
 	<main style="background-color:#ffffff; min-height: 550px;" class="products-head">
 		<div class="container-fluid">
 			<div class="row">
-				<div class="col-lg-8 offset-lg-2 mx-auto" >
+				<div class="col-lg-8 offset-lg-2 mx-auto {{ $order_details ? 'd-none' : '' }}" >
 					<br><br>
 					<center><h3>Order Tracking</h3></center>
 					<br>
@@ -50,28 +50,53 @@
 								<span class="badge" style="background-color: #DC3545; font-size: 0.9rem;">{{ $order_details->order_status }}</span>
 							@endif
 						</div>
-						<div class="col-md-6 mt-4 track-order-eta" style="text-align: right;">Estimated Delivery Date : <br class="d-lg-none d-xl-none"/><b>{{ $order_details->estimated_delivery_date ? $order_details->estimated_delivery_date : "-"}}</b></div>
+						@if($order_details->order_shipping != 'Store Pickup')
+							<div class="col-md-6 mt-4 track-order-eta" style="text-align: right;">Estimated Delivery Date : <br class="d-lg-none d-xl-none"/><b>{{ $order_details->estimated_delivery_date }}</b></div>
+						@else
+							<div class="col-md-6 mt-4 track-order-eta" style="text-align: right;">Pickup Date : <br class="d-lg-none d-xl-none"/><b>{{ $order_details->pickup_date }}</b></div>
+						@endif
 					</div>
 				</div>
-				@php
-					if($track_order_details->track_status == "Order Placed"){
-						$status = 1;
-					}else if($track_order_details->track_status == "Order Confirmed"){
-						$status = 2;
-					}else if($track_order_details->track_status == "Ready for Delivery"){
-						$status = 3;
-					}else if($track_order_details->track_status == "Out for Delivery" or $track_order_details->track_status == "Ready for Pickup" ){
-						$status = 4;
-					}else if($track_order_details->track_status == "Delivered"){
-						$status = 5;
-					}else{
-						$status = 0;
-					}
-				@endphp
 				<div class="row">
 					<div class="col-md-8 mx-auto" style="margin-bottom: 100px !important">
 						<div class="card-body">
-							<div class="track">
+							<div class="track-container">
+								<div class="track">
+									@php
+										$step = trim(collect($order_status)->where('status', $order_details->order_status)->pluck('order_sequence'), '[""]');
+									@endphp
+									<div class="step active">
+										<span class="icon {{ $step > 0 ? 'inactive' : '' }}"><i class="fa fa-check {{ $step > 0 ? 'd-none' : '' }}"></i></span>
+										<span class="text status-text">Order Placed</span>
+										<span class="text status-text" style="font-size: 9pt; color: #a39f9f !important; font-style: italic !important">{{ date('M d, Y H:i A', strtotime(trim(collect($track_order_details)->where('track_status', 'Order Placed')->pluck('track_date_update'), '[""]'))) }}</span>
+									</div>
+									@foreach ($order_status as $key => $name)
+										@php
+											$date = '';
+											if(trim(collect($track_order_details)->where('track_status', $name->status)->pluck('track_date_update'), '[""]') != null){
+												$date = date('M d, Y H:i A', strtotime(trim(collect($track_order_details)->where('track_status', $name->status)->pluck('track_date_update'), '[""]')));
+											}
+											
+											$icon = '';
+											if($name->status == "Order Confirmed"){
+												$icon = 'user';
+											}else if($name->status == "Out for Delivery" or $name->status == "Ready for Pickup" ){
+												$icon = 'truck';
+											}else if($name->status == "Order Delivered" or $name->status == "Order Completed"){
+												$icon = 'shopping-bag';
+											}
+										@endphp
+										<div class="step {{ collect($track_order_details)->contains('track_status', $name->status) ? 'active' : '' }}">
+											<span class="icon {{ $step != $key + 1 ? 'inactive' : '' }}"><i class="fa fa-{{ $icon }} {{ $step != $key + 1 ? 'd-none' : '' }}"></i></span>
+											<span class="text status-text">{{ $name->status }}</span>
+											<span class="text status-text" style="font-size: 9pt; color: #a39f9f !important; font-style: italic !important">{{ $date }}</span>
+											<span class="text status-text {{ $step != $key + 1 ? 'd-none' : '' }}" style="font-size: 9pt; color: #a39f9f !important; font-style: italic !important">{{ $name->status_description }}</span>
+										</div>
+									@endforeach
+								</div>
+							</div>
+							
+							{{-- <div class="track">
 								<div class="step {{ $status >= 1 ? 'active' : '' }}"> <span class="icon"> <i class="fa fa-check"></i> </span> <span class="text">Order placed</span> </div>
 								<div class="step {{ $status >= 2 ? 'active' : '' }}"> <span class="icon"> <i class="fa fa-check"></i> </span> <span class="text">Order confirmed</span> </div>
 								@if($order_details->order_shipping == 'Store Pickup')
@@ -81,8 +106,38 @@
 								@endif
 								
 								<div class="step {{ $status >= 5 ? 'active' : '' }}"> <span class="icon"> <i class="fa fa-box"></i> </span> <span class="text">Delivered</span> </div>
-							</div>
-							<hr> <a href="#TrackItemsData" data-toggle="modal" class="btn btn-warning" data-abc="true">View Order Details</a>
+							</div> --}}
+							{{-- <hr> <a href="#TrackItemsData" data-toggle="modal" class="btn btn-warning" data-abc="true">View Order Details</a> --}}
+						</div>
+						<div class="card-body">
+							<table class="table" style="border-top: 1px solid #000">
+								<thead>
+									<tr style="font-size: 16px;">
+										<th></th>
+										<th class="text-center">ITEM DESCRIPTION</th>
+										<th class="text-center">QTY</th>
+										<th class="text-center">PRICE</th>
+										<th class="text-center">TOTAL</th>
+									</tr>
+								</thead>
+								<tbody>
+									@forelse ($items as $item)
+									<tr style="font-size: 11pt;">
+										<td class="text-center">
+											<img src="{{ asset('/storage/item_images/'. $item['item_code'] .'/gallery/preview/'.$item['image']) }}" class="img-responsive" alt="" width="55" height="55">
+										</td>
+										<td>{{ $item['item_name'] }}</td>
+										<td class="text-center">{{ $item['quantity'] }}</td>
+										<td class="text-center">{{ 'P ' . number_format($item['price'], 2) }}</td>
+										<td class="text-center">{{ 'P ' . number_format($item['amount'], 2) }}</td>
+									</tr>
+									@empty
+									<tr>
+										<td colspan="6" class="text-center">No items found.</td>
+									</tr>
+									@endforelse
+								</tbody>
+							</table>
 						</div>
 					</div>
 				</div>
@@ -231,6 +286,7 @@
 		}
 	}
 
+
 	@import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');
 
 .card {
@@ -264,12 +320,13 @@
 .track {
     position: relative;
     background-color: #ddd;
-    height: 7px;
+    height: 4px;
     display: -webkit-box;
     display: -ms-flexbox;
     display: flex;
     margin-bottom: 60px;
-    margin-top: 50px
+    margin-top: 50px;
+
 }
 
 .track .step {
@@ -283,11 +340,11 @@
 }
 
 .track .step.active:before {
-    background: #FF5722
+    background: #008CFF
 }
 
 .track .step::before {
-    height: 7px;
+    height: 4px;
     position: absolute;
     content: "";
     width: 100%;
@@ -296,18 +353,30 @@
 }
 
 .track .step.active .icon {
-    background: #ee5435;
-    color: #fff
+    background: #008CFF;
+    color: #fff;
 }
 
 .track .icon {
     display: inline-block;
-    width: 40px;
-    height: 40px;
+    width: 50px;
+    height: 50px;
     line-height: 40px;
     position: relative;
     border-radius: 100%;
-    background: #ddd
+    background: #ddd;
+	margin-top: -5px;
+	padding: 10px !important;
+}
+
+.inactive{
+	height: 20px !important;
+	width: 20px !important;
+	margin-top: 10px !important;
+}
+
+.fa{
+	font-size: 24px !important;
 }
 
 .track .step.active .text {
@@ -375,5 +444,52 @@ p {
     border-color: #ff2b00;
     border-radius: 1px
 }
+.login_2 {
+		font-weight: 400 !important;
+		font-size: 14px !important;
+		color: #655f5f !important;
+	}
+	.active-btn {
+		border-bottom: 3px solid #dc6f12;
+	}
+	.track-container{
+		min-height: 120px;
+	}
+@media (max-width: 575.98px) {
+		.products-head{
+			padding-left: 0 !important;
+			padding-right: 0 !important;
+		}
+		.table-text{
+			font-size: 14px;
+		}
+		.status-text{
+			font-size: 12px;
+		}
+		.track-container{
+			min-height: 200px
+		}
+    }
+
+    @media (max-width: 767.98px) {
+		.products-head{
+			padding-left: 0 !important;
+			padding-right: 0 !important;
+		}
+		.table-text{
+			font-size: 14px;
+		}
+		.status-text{
+			font-size: 12px;
+		}
+		.track-container{
+			min-height: 200px
+		}
+    }
+	@media (max-width: 1199.98px) {
+		.track-container{
+			min-height: 200px
+		}
+	}
 </style>
 @endsection

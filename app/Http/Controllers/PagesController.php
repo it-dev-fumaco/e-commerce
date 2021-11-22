@@ -14,11 +14,13 @@ use Illuminate\Support\Str;
 
 class PagesController extends Controller
 {
-    public function viewPages(){
-        $pages = DB::table('fumaco_pages')->where('is_thirdpage', 0)->get();
+    public function viewPages(Request $request){
+        if($request->ajax()) {
+            $pages = DB::table('fumaco_pages')->where('is_homepage', 0)->get();
 
-        // return view('backend.pages.list', compact('pages'));
-        return response()->json($pages);
+            // return view('backend.pages.list', compact('pages'));
+            return response()->json($pages);
+        }
     }
 
     public function editForm($page_id){
@@ -407,5 +409,11 @@ class PagesController extends Controller
             DB::rollback();
             return redirect()->back()->with('error', 'An error occured. Please try again.');
         }
+    }
+
+    public function searchList(Request $request){
+        $search_list = DB::table('fumaco_search_terms')->where('search_term', 'LIKE', '%'.$request->q.'%')->orderBy('frequency', 'desc')->paginate(10);
+
+        return view('backend.marketing.list_search', compact('search_list'));
     }
 }

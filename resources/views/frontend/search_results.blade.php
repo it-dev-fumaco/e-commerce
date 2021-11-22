@@ -72,21 +72,28 @@
 				<h4 class="mt-4 mb-3 fw-light bestsellinghead fumacoFont1 animated animatedFadeInUp fadeInUp" style="color:#000000 !important;">{{ request()->s == null ? 'FEATURED PRODUCT(S)' : 'PRODUCT(S)' }}</h4>
 			</div>
 			@foreach ($products as $product)
-			<div class="col-md-3 animated animatedFadeInUp fadeInUp equal-height-columns">
+			<div class="col-md-4 col-lg-3 animated animatedFadeInUp fadeInUp equal-height-columns">
 				<div class="card mb-4">
 					<div class="equal-column-content">
-						@php
-						$image = ($product['image']) ? '/storage/item_images/'.$product['item_code'].'/gallery/preview/'.$product['image'] : '/storage/no-photo-available.png';
-						$image_webp = ($product['image']) ? '/storage/item_images/'.$product['item_code'].'/gallery/preview/'.explode(".", $product['image'])[0] .'.webp' : '/storage/no-photo-available.png';
-						@endphp              
-						<picture>
-							<source srcset="{{ asset($image_webp) }}" type="image/webp" class="card-img-top">
-							<source srcset="{{ asset($image) }}" type="image/jpeg" class="card-img-top"> 
-							<img src="{{ asset($image) }}" alt="{{ $product['item_code'] }}" class="card-img-top">
-						</picture>
+						<div class="hover-container product-card" style="position: relative;">
+							<div class="overlay-bg"></div>
+							<div class="btn-container">
+								<a href="/product/{{ $product['slug'] ? $product['slug'] : $product['item_code'] }}" class="view-products-btn btn" role="button"><i class="fas fa-search"></i>&nbsp;View Product</a>
+							</div>
+							@php
+							$image = ($product['image']) ? '/storage/item_images/'.$product['item_code'].'/gallery/preview/'.$product['image'] : '/storage/no-photo-available.png';
+							$image_webp = ($product['image']) ? '/storage/item_images/'.$product['item_code'].'/gallery/preview/'.explode(".", $product['image'])[0] .'.webp' : '/storage/no-photo-available.png';
+							@endphp              
+							<picture>
+								<source srcset="{{ asset($image_webp) }}" type="image/webp" class="card-img-top">
+								<source srcset="{{ asset($image) }}" type="image/jpeg" class="card-img-top"> 
+								<img src="{{ asset($image) }}" alt="{{ $product['item_code'] }}" class="card-img-top hover">
+							</picture>
+						</div>
+						
 						<div class="card-body">
 							<div class="text ellipsis">
-								<p class="card-text product-head fumacoFont_card_title text-concat prod_desc" style="color:#0062A5 !important;  min-height: 98px; font-weight: 500 !important">{{ $product['item_name'] }}</p>
+								<a href="/product/{{ $product['slug'] ? $product['slug'] : $product['item_code'] }}" class="card-text product-head fumacoFont_card_title text-concat prod_desc" style="text-transform: none !important; text-decoration: none !important; color:#0062A5 !important;  min-height: 98px; font-weight: 500 !important">{{ $product['item_name'] }}</a>
 							</div>
 							<p class="card-text fumacoFont_card_price price-card d-none d-md-block d-lg-none" style="color:#000000 !important;">
 								@if($product['is_discounted'])
@@ -113,10 +120,13 @@
 								<small class="text-muted stylecap" style="color:#c4cad0 !important; font-weight:100 !important;">( 0 Reviews )</small>
 							</div>
 						</div>
-						<div class="card-body">
-							<a href="/product/{{ $product['slug'] ? $product['slug'] : $product['item_code'] }}" class="btn btn-outline-primary fumacoFont_card_readmore" role="button" style="width:100% !important;">View</a>
-						</div>
 					</div>
+					<br/>
+					@if ($product['on_stock'] == 1)
+					<a href="#" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto add-to-cart" role="button" style="width: 90% !important; margin-bottom: 20px" data-item-code="{{ $product['item_code'] }}"><i class="fas fa-shopping-cart d-inline-block" style="margin-right: 3%;"></i> Add to Cart</a>
+					@else
+					<a href="/login" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto {{ Auth::check() ? 'add-to-wishlist' : '' }}" role="button" style="width: 90% !important; margin-bottom: 20px" data-item-code="{{ $product['item_code'] }}"><i class="far fa-heart d-inline-block" style="margin-right: 3%;"></i> Add to Wishlist</a>
+					@endif
 				</div>
 			</div>
 			@endforeach
@@ -226,6 +236,62 @@
         font-weight: 500 !important;
         text-align: left !important;
     }
+	.overlay-bg{
+		position: absolute !important;
+		background-color: rgba(255,255,255,0.2) !important;
+		width: 100%;
+		height: 100%;
+		top: 0;
+		z-index: 1;
+		transition:all .15s ease-in;
+		opacity: 0;
+	}
+	.product-card{
+		position:relative;
+		margin: 0 auto;
+		transition:all .15s ease-in !important;
+	}
+	
+	.btn-container{
+    width: 100%;
+    position: absolute; 
+    top: 50%; 
+    left: 0; 
+    z-index: 9; 
+    display: none; 
+    text-align: center;
+  }
+
+	.view-products-btn{
+		z-index: 2;
+		text-align: center;
+		background-color: #0062A5;
+		color:#fff;
+		font-size:13px;
+		letter-spacing:2px;
+		text-transform:uppercase;
+		padding:8px 20px;
+		font-weight:400;
+		transition:all .15s ease-in;
+	}
+
+	.view-products-btn:hover{
+		/* color: #fff;
+		background-color: #000; */
+		background-color: #f8b878; 
+    color: black;
+	}
+
+	.product-card:hover .overlay-bg{ 
+		transition:all .15s ease-in !important;
+		opacity: 1 !important;
+	}
+
+	.hover-container:hover img{
+		-ms-transform: scale(0.95); /* IE 9 */
+      	-webkit-transform: scale(0.95); /* Safari 3-8 */
+      	transform: scale(0.95); 
+	}
 	@media (max-width: 1199.98px) {/* tablet */
       .price-card{
         min-height: 80px !important;
@@ -246,6 +312,11 @@
    });
 
   })();
+
+  // Product Image Hover
+  $('.hover-container').hover(function(){
+      $(this).children('.btn-container').slideToggle('fast');
+    });
 
 </script>
 @endsection

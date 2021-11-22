@@ -357,7 +357,7 @@
             }
 
 
-            .active {
+            .form-signin .active {
               border-bottom: 3px solid #dc6f12;
             }
 
