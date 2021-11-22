@@ -62,11 +62,20 @@
         <a href="{{ $action }}" class="co-btn btn btn-outline-primary fumacoFont_card_readmore mx-auto" role="button" style="width: 100% !important;" {{ (count($cart_arr) > 0) ? '' : 'disabled' }} {{ $disabled_co }}>Checkout <i class="fa fa-chevron-right"></i></a>
     </div>
 </div>
+@if (Auth::check())
+<div class="d-flex flex-row justify-content-between">
+    <div class="p-1 col">
+        <a href="/myorders" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto" role="button" style="width: 100% !important;"><i class="fas fa-box"></i> My Orders</a>
+    </div>
+</div>
+@else
 <div class="d-flex flex-row justify-content-between">
     <div class="p-1 col">
         <a href="/track_order" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto" role="button" style="width: 100% !important;"><i class="fas fa-box"></i> Track Order</a>
     </div>
 </div>
+@endif
+
 <style>
 .co-btn:disabled,
 .co-btn[disabled]{
