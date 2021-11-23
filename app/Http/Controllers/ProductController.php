@@ -626,6 +626,7 @@ class ProductController extends Controller
                 'product_category' => $product->f_category,
                 'brand' => $product->f_brand,
                 'on_sale' => $product->f_onsale,
+                'erp_stock' => $product->stock_source,
                 'status' => $product->f_status,
                 'featured' => $product->f_featured
             ];
