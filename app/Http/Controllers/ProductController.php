@@ -45,7 +45,7 @@ class ProductController extends Controller
     }
 
     // function to get item details from ERP via API
-    public function getItemDetails($item_code) {
+    public function getItemDetails($item_code, $item_type) {
         try {
             $erp_api = DB::table('api_setup')->where('type', 'erp_api')->first();
             if (!$erp_api) {
@@ -172,6 +172,31 @@ class ProductController extends Controller
                 $result['attributes'] = $response['data'];
             }
 
+            $product_bundle_items = [];
+            if($item_type == 'product_bundle') {
+                 // get product bundle items
+                $fields = '?fields=["parent","item_code","idx","qty","description","uom"]';
+                $filter = '&filters=[["parent","=","' . $item_code . '"]]&limit_page_length=100&order_by=idx';
+
+                $params = $fields . '' . $filter;
+                
+                $response = Http::withHeaders([
+                    'Content-Type' => 'application/json',
+                    'Authorization' => 'token '. $erp_api->api_key. ':' . $erp_api->api_secret_key . '',
+                    'Accept-Language' => 'en'
+                ])->get($erp_api->base_url . '/api/resource/Product Bundle Item' . $params);
+
+                if ($response->failed()) {
+                    return response()->json(['status' => 0, 'message' => 'An error occured. Please try again.']);
+                }
+
+                if (count($response['data']) <= 0 && isset($response['data'])) {
+                    $result['bundle_items'] = 0;
+                } else{
+                    $result['bundle_items'] = $response['data'];
+                }
+            }
+
             return $result;
         } catch (Exception $e) {
             return response()->json(['status' => 0, 'message' => 'An error occured. Please try again.']);
@@ -186,7 +211,7 @@ class ProductController extends Controller
                 return redirect()->back()->withInput($request->all())->with('error', 'Product code <b>' . $request->item_code . '</b> already exists.');
             }
 
-            $item = $this->getItemDetails($request->item_code);
+            $item = $this->getItemDetails($request->item_code, $request->item_type);
 
             $request->validate(
                 [
@@ -218,17 +243,19 @@ class ProductController extends Controller
             );
 
             // validate if item attributes matches the current attributes registered in database based on parent item code
-            $mismatch_attr_query = DB::table('fumaco_items as a')
-                ->join('fumaco_items_attributes as b', 'a.f_idcode', 'b.idcode')
-                ->join('fumaco_attributes_per_category as c', 'c.id', 'b.attribute_name_id')
-                ->where('a.f_parent_code', $item['parent_item_code'])
-                ->whereNotIn('attribute_name', array_column($item['attributes'], 'attribute'))
-                ->distinct()->count();
+            if($item['attributes'] != 0) {
+                $mismatch_attr_query = DB::table('fumaco_items as a')
+                    ->join('fumaco_items_attributes as b', 'a.f_idcode', 'b.idcode')
+                    ->join('fumaco_attributes_per_category as c', 'c.id', 'b.attribute_name_id')
+                    ->where('a.f_parent_code', $item['parent_item_code'])
+                    ->whereNotIn('attribute_name', array_column($item['attributes'], 'attribute'))
+                    ->distinct()->count();
 
-            if ($mismatch_attr_query > 0) {
-                return redirect()->back()->withInput($request->all())->with('error', 'Some of the attributes of this item did not exists in the parent attributes <b>' . $item['parent_item_code'] . '</b>.');
+                if ($mismatch_attr_query > 0) {
+                    return redirect()->back()->withInput($request->all())->with('error', 'Some of the attributes of this item did not exists in the parent attributes <b>' . $item['parent_item_code'] . '</b>.');
+                }
             }
-
+       
             $item_category = DB::table('fumaco_categories')->where('id', $request->product_category)->first(); 
             $item_category = ($item_category) ? $item_category->name : null;
             if(!$item_category) {
@@ -244,6 +271,7 @@ class ProductController extends Controller
                     return redirect()->back()->with('error', 'Slug must be unique');
                 }
             }
+
             $id = DB::table('fumaco_items')->insertGetId([
                 'f_idcode' => $item['item_code'],
                 'f_parent_code' => $item['parent_item_code'],
@@ -278,52 +306,74 @@ class ProductController extends Controller
                 'url_title' => $request->url_title,
                 'meta_description' => $request->meta_description,
                 'slug' => strtolower($request->slug),
+                'f_item_type' => $request->item_type,
                 'created_by' => Auth::user()->username,
                 'last_modified_by' => Auth::user()->username,
             ]);
 
-            // insert item attributes
-            $item_attr = [];
-            foreach($item['attributes'] as $attr) {
-                $existing_attribute = DB::table('fumaco_attributes_per_category')
-                    ->where('category_id', $request->product_category)
-                    ->where('attribute_name', $attr['attribute'])->first();
+            if($item['attributes'] != 0) {
+                // insert item attributes
+                $item_attr = [];
+                foreach($item['attributes'] as $attr) {
+                    $existing_attribute = DB::table('fumaco_attributes_per_category')
+                        ->where('category_id', $request->product_category)
+                        ->where('attribute_name', $attr['attribute'])->first();
 
-                if (!$existing_attribute) {
-                    // insert attribute names
-                    $attr_id = DB::table('fumaco_attributes_per_category')->insertGetId([
-                        'category_id' => $request->product_category,
-                        'attribute_name' => $attr['attribute'],
-                        'slug' => Str::slug($attr['attribute'], '-'),
-                        'created_by' => Auth::user()->username
-                    ]);
+                    if (!$existing_attribute) {
+                        // insert attribute names
+                        $attr_id = DB::table('fumaco_attributes_per_category')->insertGetId([
+                            'category_id' => $request->product_category,
+                            'attribute_name' => $attr['attribute'],
+                            'slug' => Str::slug($attr['attribute'], '-'),
+                            'created_by' => Auth::user()->username
+                        ]);
+                    }
+                    // get attribute name id
+                    $attr_name_id = ($existing_attribute) ? $existing_attribute->id : $attr_id;
+
+                    $attribute_value = $attr['attribute_value'];
+                    if (strtoupper($attribute_value) == 'n/a') {
+                        $attribute_value = strtoupper($attribute_value);
+                    }
+
+                    $item_attr[] = [
+                        'idx' => $attr['idx'],
+                        'idcode' => $attr['parent'],
+                        'attribute_name_id' => $attr_name_id,
+                        'attribute_value' => $attribute_value,
+                        'created_by' => Auth::user()->username,
+                        'last_modified_by' => Auth::user()->username,
+                    ];
                 }
-                // get attribute name id
-                $attr_name_id = ($existing_attribute) ? $existing_attribute->id : $attr_id;
 
-                $attribute_value = $attr['attribute_value'];
-                if (strtoupper($attribute_value) == 'n/a') {
-                    $attribute_value = strtoupper($attribute_value);
-                }
-
-                $item_attr[] = [
-                    'idx' => $attr['idx'],
-                    'idcode' => $attr['parent'],
-                    'attribute_name_id' => $attr_name_id,
-                    'attribute_value' => $attribute_value,
-                    'created_by' => Auth::user()->username,
-                    'last_modified_by' => Auth::user()->username,
-                ];
+                DB::table('fumaco_items_attributes')->insert($item_attr);
             }
 
+            if ($request->item_type == 'product_bundle') {
+                // insert product bundle items
+                $bundle_items = [];
+                foreach($item['bundle_items'] as $bundle) {
+                    $bundle_items[] = [
+                        'idx' => $bundle['idx'],
+                        'parent_item_code' => $bundle['parent'],
+                        'item_code' => $bundle['item_code'],
+                        'item_description' => $bundle['description'],
+                        'qty' => $bundle['qty'],
+                        'uom' => $bundle['uom'],
+                        'created_by' => Auth::user()->username,
+                        'last_modified_by' => Auth::user()->username,
+                    ];
+                }
+
+                DB::table('fumaco_product_bundle_item')->insert($bundle_items);
+            }
+           
             // insert brand
             $existing_brand = DB::table('fumaco_brands')->where('brandname', $item['brand'])->exists();
             if(!$existing_brand) {
                 DB::table('fumaco_brands')->insert(['brandname' => $item['brand'], 'slug' => Str::slug($item['brand'], '-')]);
             }
             
-            DB::table('fumaco_items_attributes')->insert($item_attr);
-
             DB::commit();
 
             return redirect('/admin/product/' . $id . '/edit')->with('success', 'Product has been saved.');
@@ -431,6 +481,8 @@ class ProductController extends Controller
 
             DB::table('fumaco_items_attributes')->where('idcode', $item_code)->delete();
 
+            DB::table('fumaco_product_bundle_item')->where('parent_item_code', $item_code)->delete();
+
             DB::table('fumaco_items_image_v1')->where('idcode', $item_code)->delete();
 
             DB::commit();
@@ -493,17 +545,23 @@ class ProductController extends Controller
         }
     }
 
-	public function viewAddForm() {
+	public function viewAddForm($type) {
+        if (!in_array($type, ['simple_product', 'product_bundle'])) {
+            return redirect('/admin/product/list');
+        }
+
         $item_categories = DB::table('fumaco_categories')->get();
 
-		return view('backend.products.add', compact('item_categories'));
+		return view('backend.products.add', compact('item_categories', 'type'));
 	}
 
     public function viewList(Request $request) {
         $q_string = $request->q;
         $search_str = explode(' ', $q_string);
         $product_list = DB::table('fumaco_items')->where('f_brand', 'LIKE', "%".$request->brands."%")
-            ->where('f_parent_code', 'LIKE', "%".$request->parent_code."%")
+            ->when($request->parent_code, function ($query) use ($request) {
+                return $query->where('f_parent_code', 'LIKE', "%".$request->parent_code."%");
+            })
             ->where('f_cat_id', 'LIKE', "%".$request->category."%")
             ->when($request->is_featured, function($c) use ($request) {
                 $c->where('f_featured', $request->is_featured);
@@ -574,6 +632,7 @@ class ProductController extends Controller
             ->where('b.item_code', $details->f_idcode)
             ->get();
 
+        $bundle_items = DB::table('fumaco_product_bundle_item')->where('parent_item_code', $details->f_idcode)->orderBy('idx', 'asc')->get();
         $related_products = [];
         foreach($related_products_query as $row) {
             $image = DB::table('fumaco_items_image_v1')->where('idcode', $row->related_item_code)->first();
@@ -587,7 +646,7 @@ class ProductController extends Controller
             ];
         }
 
-        return view('backend.products.view', compact('details', 'item_categories', 'attributes', 'item_image', 'related_products'));
+        return view('backend.products.view', compact('details', 'item_categories', 'attributes', 'item_image', 'related_products', 'bundle_items'));
     }
 
     public function viewCategoryAttr(Request $request) {

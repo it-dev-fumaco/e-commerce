@@ -168,12 +168,12 @@ Route::prefix('admin')->group(function () {
         
 
         Route::get('/product/list', 'ProductController@viewList');
-        Route::get('/product/add', 'ProductController@viewAddForm');
+        Route::get('/product/add/{type}', 'ProductController@viewAddForm');
         Route::post('/product/save', 'ProductController@saveItem');
 
         Route::get('/product/search', 'ProductController@searchItem');
-        Route::get('/product/{item_code}', 'ProductController@getItemDetails');
         Route::get('/product/{id}/edit', 'ProductController@viewProduct');
+        Route::get('/product/{item_code}/{item_type}', 'ProductController@getItemDetails');
         Route::get('/product/images/{id}', 'ProductController@uploadImagesForm');
         Route::post('/add_product_images', 'ProductController@uploadImages');
         Route::post('/delete_product_image', 'ProductController@deleteProductImage');

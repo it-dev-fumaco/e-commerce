@@ -80,13 +80,20 @@
 												  </div>
 											</div>
 											<div class="col-md-1">
-												<button type="submit" class="btn btn-primary">Search</button>
+												<button type="submit" class="btn btn-secondary">Search</button>
 											</div>
 										</div>
 									</div>
 									<div class="col-md-2">
 										<div class="float-right">
-											<a href="/admin/product/add" class="btn btn-primary">Create New Product</a>
+											<div class="dropdown">
+												<button class="btn btn-primary dropdown-toggle" type="button" id="dropdowncreate" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Create New Product
+												</button>
+												<div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdowncreate">
+													<a class="dropdown-item" href="/admin/product/add/simple_product">Simple Product</a>
+													<a class="dropdown-item" href="/admin/product/add/product_bundle">Product Bundle</a>
+												</div>
+											</div>
 										</div>
 									</div>
 								</div>
@@ -142,7 +149,7 @@
 										<td class="text-center">{{ $item['product_category'] }}</td>
 										<td class="text-center">{{ $item['brand'] }}</td>
 										<td class="text-center" style="font-size: 1.2rem;">
-											<a href="/admin/product/{{ $item['id'] }}/featured">	{!! ($item['featured']) ? '<i class="fas fa-star"></i>' : '<i class="far fa-star"></i>' !!}</a>
+											<a href="/admin/product/{{ $item['id'] }}/featured">{!! ($item['featured']) ? '<i class="fas fa-star"></i>' : '<i class="far fa-star"></i>' !!}</a>
 										</td>
 										<td class="text-center">
 											@if ($item['on_sale'] == 1)

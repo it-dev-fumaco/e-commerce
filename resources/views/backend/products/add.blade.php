@@ -10,13 +10,13 @@
 		<div class="container-fluid">
 			<div class="row mb-2">
 				<div class="col-sm-6">
-					<h1 class="m-0">Create New Product</h1>
+					<h1 class="m-0">{{ $type == 'simple_product' ? 'Create New Simple Product' : 'Create New Product Bundle' }}</h1>
 				</div><!-- /.col -->
 				<div class="col-sm-6">
 					<ol class="breadcrumb float-sm-right">
 						<li class="breadcrumb-item"><a href="/admin/dashboard">Home</a></li>
             <li class="breadcrumb-item"><a href="/admin/product/list">Products</a></li>
-						<li class="breadcrumb-item active">Create New Product</li>
+						<li class="breadcrumb-item active">{{ $type == 'simple_product' ? 'Create New Simple Product' : 'Create New Product Bundle' }}</li>
 					</ol>
 				</div><!-- /.col -->
 			</div><!-- /.row -->
@@ -49,6 +49,7 @@
                 @endforeach
               </div>
             @endif
+            <input type="hidden" name="item_type" value="{{ $type }}" id="item-type">
             <!-- general form elements -->
             <div class="card">
               <!-- /.card-header -->
@@ -225,6 +226,21 @@
                   <tbody></tbody>
                 </table>
                 <br>
+                @if ($type == 'product_bundle')
+                <h5>Product Bundle</h5>
+                <hr>
+                <table class="table table-striped table-bordered" id="bundle-table">
+                  <thead>
+                    <tr>
+                      <th style="width: 8%;">No.</th>
+                      <th style="width: 82;">Item Description</th>
+                      <th style="width: 10%;">Quantity</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+                <br>
+                @endif
                 <h5 class="mt-3">Search Engine Optimization (SEO)</h5>
                 <hr>
                 <div class="form-group">
@@ -339,9 +355,10 @@
       var data = e.params.data;
       $('#custom-overlay').fadeIn();
       $('#attributes-table tbody').empty();
+      $('#bundle-table tbody').empty();
       $.ajax({
         type:"GET",
-        url:"/admin/product/" + data.id,
+        url:"/admin/product/" + data.id + '/' + $('#item-type').val(),
         success:function(response){
           // if status = 0 (error)
           if (response.status || response.status === 0) {
@@ -375,6 +392,13 @@
             });
 
             $('#attributes-table tbody').append(tbl_row);
+
+            var bundle = '';
+            $(response.bundle_items).each(function(i, d) {
+              bundle += '<tr><td>' + d.idx + '</td><td><b>' + d.item_code + '</b> - ' + d.description + '</td><td>' + d.qty + ' ' + d.uom + '</td></tr>';
+            });
+
+            $('#bundle-table tbody').append(bundle);
           }
 
           $('#custom-overlay').fadeOut();

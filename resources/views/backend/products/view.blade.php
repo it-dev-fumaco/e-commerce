@@ -54,7 +54,14 @@
                      <div class="card-body">
                         <h4 class="d-inline-block">Product Information</h4>
                         <div class="float-right">
-                           <a href="/admin/product/add" class="btn btn-secondary mr-2">Create New Product</a>
+                           <div class="dropdown d-inline-block mr-2">
+                              <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdowncreate" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Create New Product
+                              </button>
+                              <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdowncreate">
+                                 <a class="dropdown-item" href="/admin/product/add/simple_product">Simple Product</a>
+                                 <a class="dropdown-item" href="/admin/product/add/product_bundle">Product Bundle</a>
+                              </div>
+                           </div>
                            <button type="submit" class="btn btn-primary">Update</button>
                         </div>
                         <hr>
@@ -250,6 +257,33 @@
                               @endforelse
                            </tbody>
                         </table>
+                        @if ($details->f_item_type == 'product_bundle')
+                        <h5 class="mt-3">Product Bundle</h5>
+                        <hr>
+                        <table class="table table-striped table-bordered" id="bundle-table">
+                           <thead>
+                           <tr>
+                              <th style="width: 8%;">No.</th>
+                              <th style="width: 82;">Item Description</th>
+                              <th style="width: 10%;">Quantity</th>
+                           </tr>
+                           </thead>
+                           <tbody>
+                              @forelse ($bundle_items as $bundle)
+                              <tr>
+                                 <td class="text-center">{{ $bundle->idx }}</td>
+                                 <td><b>{{ $bundle->item_code }}</b> - {{ $bundle->item_description }}</td>
+                                 <td>{{ $bundle->qty }} {{ $bundle->uom }}</td>
+                              </tr>
+                              @empty
+                              <tr>
+                                 <td colspan="3" class="text-center text-muted">No product attributes found.</td>
+                              </tr>
+                              @endforelse
+                           </tbody>
+                        </table>
+                        <br>
+                        @endif
                         <h5 class="mt-3">Related Product(s)</h5>
                         <hr>
                         <div class="float-left mb-2">
