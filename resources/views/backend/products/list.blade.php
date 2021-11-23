@@ -163,7 +163,8 @@
 												<div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
 												  <a class="dropdown-item" href="/admin/product/{{ $item['id'] }}/edit">View Details</a>
 												  @if ($item['on_sale'] == 1)
-												  <a class="dropdown-item" href="#" data-toggle="modal" data-target="#sd{{ $item['id'] }}"><small>Disable On Sale</small></a>
+												  <a class="dropdown-item" href="#" data-toggle="modal" data-target="#onsale-details-{{ $item['id'] }}"><small>View On Sale Details</small></a>
+												  {{-- <a class="dropdown-item" href="#" data-toggle="modal" data-target="#sd{{ $item['id'] }}"><small>Disable On Sale</small></a> --}}
 												  @else
 												  <a class="dropdown-item" href="#" data-toggle="modal" data-target="#s{{ $item['id'] }}"><small>Set On Sale</small></a>
 												  @endif
@@ -177,7 +178,7 @@
 												</div>
 											</div>
 
-											<div class="modal fade" id="sd{{ $item['id'] }}" tabindex="-1" role="dialog" aria-labelledby="onsalemodal" aria-hidden="true">
+											<div class="modal fade" id="sd{{ $item['id'] }}" role="dialog" aria-labelledby="onsalemodal" aria-hidden="true" style="z-index: 9999 !important; background-color: rgba(0,0,0, 0.4);">
 												<form action="/admin/product/{{ $item['item_code'] }}/disable_on_sale" method="POST">
 													@csrf
 													<div class="modal-dialog" role="document">
@@ -201,30 +202,153 @@
 											</div>
 
 											<div class="modal fade" id="s{{ $item['id'] }}" tabindex="-1" role="dialog" aria-labelledby="onsalemodal" aria-hidden="true">
-												<form action="/admin/product/{{ $item['item_code'] }}/enable_on_sale" method="POST">
+												<form action="/admin/product/{{ $item['item_code'] }}/enable_on_sale" method="POST" enctype="multipart/form-data">
 													@csrf
-													<div class="modal-dialog" role="document">
+													<div class="modal-dialog modal-xl" role="document">
 														<div class="modal-content">
 															<div class="modal-header">
 																<h5 class="modal-title">Set Product On Sale</h5>
 															</div>
 															<div class="modal-body">
-																<p>Original Price: <b>{{ 'P ' . number_format((float)$item['price'], 2, '.', ',') }}</b></p>
 																<div class="row">
-																	<div class="col-md-8 offset-md-2">
-																		<div class="form-group">
-																			<label>Enter Discount Percentage (%)</label>
-																			<input type="number" class="form-control" name="discount_percentage" placeholder="Discount %" required>
+																	<div class="col-12">
+																		<p>Original Price: <b>{{ 'P ' . number_format((float)$item['price'], 2, '.', ',') }}</b></p>
+																		<div class="row">
+																			<div class="col-6 mx-auto">
+																				<div class="form-group col-8 mx-auto">
+																					<label>Enter Discount Percentage (%)</label>
+																					<input type="number" class="form-control" name="discount_percentage" placeholder="Discount %" required>
+																				</div>
+																			</div>
+																		</div>
+																	</div>
+																</div>
+																<div class="row">
+																	<div class="col-6">
+																		<div class="form-group col-8 mx-auto">
+																			<label for="img_primary">"On Sale" Image Primary</label>
+																			<div class="input-group">
+																				<div class="custom-file text-left">
+																					<input type="file" class="custom-file-input" name="on_sale_img_primary">
+																					<label id="primary_label" class="custom-file-label">Choose file</label>
+																				</div>
+																			</div>
+																		</div>
+																	</div>
+																	<div class="col-6">
+																		<div class="form-group col-8 mx-auto">
+																			<label for="img_zoom">"On Sale" Image Zoom</label>
+																			<div class="input-group">
+																				<div class="custom-file text-left">
+																					<input type="file" class="custom-file-input" name="on_sale_img_zoom">
+																					<label id="zoom_label" class="custom-file-label">Choose file</label>
+																				</div>
+																			</div>
 																		</div>
 																	</div>
 																</div>
 															</div>
 															<div class="modal-footer">
 																<button type="submit" class="btn btn-primary">Submit</button>
-																<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
 															</div>
 														</div>
 													</div>
+												</form>
+											</div>
+
+											<div class="modal fade" id="onsale-details-{{ $item['id'] }}" tabindex="-1" role="dialog" aria-labelledby="onsalemodal" aria-hidden="true">
+												<form action="/admin/product/{{ $item['item_code'] }}/enable_on_sale" method="POST" enctype="multipart/form-data">
+													@csrf{{-- For adding "On Sale" Images --}}
+												<div class="modal-dialog modal-xl" role="document">
+													<div class="modal-content">
+														<div class="modal-header">
+															<h5 class="modal-title">On Sale Details</h5>
+														</div>
+														<div class="modal-body">
+															<div class="row">
+																<div class="col-12">
+																	<p>Original Price: <b>{{ 'P ' . number_format((float)$item['price'], 2, '.', ',') }}</b></p>
+																	<p>Discount Percentage (%): <b>{{ $item['discount_percentage'] }}</b></p>
+																	<input type="checkbox" name="on_sale_enabled" checked readonly hidden>
+																</div>
+															</div>
+															
+															<div class="row">
+																<div class="col-6">
+																	<div class="form-group col-8 mx-auto">
+																		<label for="img_primary">"On Sale" Image Primary</label>
+																		<div class="input-group">
+																			<div class="custom-file text-left">
+																				<input type="file" class="custom-file-input" name="on_sale_img_primary">
+																				<label id="primary_label" class="custom-file-label">Choose file</label>
+																			</div>
+																		</div>
+																	</div>
+																</div>
+																<div class="col-6">
+																	<div class="form-group col-8 mx-auto">
+																		<label for="img_zoom">"On Sale" Image Zoom</label>
+																		<div class="input-group">
+																			<div class="custom-file text-left">
+																				<input type="file" class="custom-file-input" name="on_sale_img_zoom">
+																				<label id="zoom_label" class="custom-file-label">Choose file</label>
+																			</div>
+																		</div>
+																	</div>
+																</div>
+															</div>
+
+															<div class="row">
+																<div class="col-12">
+																	<table class="table table-hover">
+																		<tr>
+																			<th>ID</th>
+																			<th>Primary Image</th>
+																			<th>Original Image</th>
+																			<th>Action</th>
+																		</tr>
+																		@forelse ($item['on_sale_image'] as $onsaleimg)
+																			<tr>
+																				<td>{{ $onsaleimg['id'] }}</td>
+																				<td>{{ $onsaleimg['orig'] }}</td>
+																				<td>{{ $onsaleimg['primary'] }}</td>
+																				<td>
+																					<a type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#exampleModal">
+																						Delete
+																					</a>
+
+																					<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+																						<div class="modal-dialog" role="document" style="background-color: rgba(0,0,0, 0.4) !important">
+																							<div class="modal-content">
+																								<div class="modal-header">
+																									<h5 class="modal-title" id="exampleModalLabel">Delete</h5>
+																								</div>
+																								<div class="modal-body">
+																									Delete On Sale Image?
+																								</div>
+																								<div class="modal-footer">
+																									<a href="/admin/delete_product_image/{{ $onsaleimg['id'] }}" class="btn btn-sm btn-danger">Delete</a>
+																								</div>
+																							</div>
+																						</div>
+																					</div>
+																				</td>
+																			</tr>
+																		@empty
+																			<tr>
+																				<td colspan=4 class="text-center">No "On Sale" Images</td>
+																			</tr>
+																		@endforelse
+																	</table>
+																</div>
+															</div>
+														</div>
+														<div class="modal-footer">
+															<button type="submit" class="btn btn-primary">Upload</button>
+															<a class="btn btn-danger" href="#" data-toggle="modal" data-target="#sd{{ $item['id'] }}"><small>Disable On Sale</small></a>
+														</div>
+													</div>
+												</div>
 												</form>
 											</div>
 
@@ -316,7 +440,12 @@
 	<!-- /.content -->
  </div>
 @endsection
-
 @section('script')
-
+ 	<script>
+		 // Add the following code if you want the name of the file appear on select
+		$(".custom-file-input").change(function() {
+			var fileName = $(this).val().split("\\").pop();
+			$(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+		});
+	</script>
 @endsection

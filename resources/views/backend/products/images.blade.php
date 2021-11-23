@@ -102,11 +102,7 @@
                                         <td>{{ $img['primary'] }}</td>
                                         <td>{{ $img['zoom'] }}</td>
                                         <td>
-                                            <form action="/admin/delete_product_image" method="post">
-                                                @csrf
-                                                <input type="text" value="{{ $img['img_id'] }}" name="img_id" hidden/>
-                                                <button type="submit"  class="btn btn-success">DELETE</button>
-                                            </form>
+                                            <a href="/admin/delete_product_image/{{ $img['img_id'] }}" class="btn btn-sm btn-danger">DELETE</a>
                                         </td>
                                     </tr>
                                     @endforeach
