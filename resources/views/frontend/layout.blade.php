@@ -384,23 +384,30 @@
     <header>
       <nav class="navbar navbar-expand-lg navbar-light fixed-top bg-light" style="padding-left: 20px; padding-right: 20px; padding-bottom:0px; border-bottom: 1px solid #e4e4e4;">
         <div class="container-fluid">
-          <a class="navbar-brand" href="/" id="navbar-brand">
+          <a class="navbar-brand d-none d-md-block" href="/" id="navbar-brand">
             <img src="{{ asset('/assets/site-img/logo-sm.png') }}" alt="" width="155" height="54">
           </a>
           {{-- Mobile Icons --}}
-          <div class="d-flex justify-content-end">
-            @if (!Auth::check())
-              <a class="nav-link d-md-block d-lg-none" href="/login"><i class="far fa-user" style="font-size:24px; color: #404040;"></i></a>
-            @endif
-            <a class="d-md-block d-lg-none mb-cart" href="/cart" style="text-decoration: none !important; !important; padding-top: 8px">
-              <div class="" style="width: 50px !important; padding: 0 !important;">
-                <i class="fa" style="font-size:24px; color:#126cb6;">&#xf07a;</i><span class="badge badge-warning count-cart-items" id="lblCartCount" style="font-size: 12px; background: #ff0000; color: #fff; padding: 4px 7px; vertical-align: top; margin-left: -10px;display: unset !important; font-weight: 500 !important; border-radius: 1rem !important; margin-top: -15px;">0</span>
+          <div class="row">
+            <div class="col d-md-none">
+              <img src="{{ asset('/assets/site-img/logo-sm.png') }}" style="width: 100%" />
+            </div>
+            <div class="col">
+              <div class="d-flex">
+                @if (!Auth::check())
+                  <a class="nav-link d-md-block d-lg-none" href="/login"><i class="far fa-user" style="font-size:24px; color: #404040;"></i></a>
+                @endif
+                <a class="d-md-block d-lg-none mb-cart" href="/cart" style="text-decoration: none !important; !important; padding-top: 8px">
+                  <div class="" style="width: 50px !important; padding: 0 !important;">
+                    <i class="fa" style="font-size:24px; color:#126cb6;">&#xf07a;</i><span class="badge badge-warning count-cart-items" id="lblCartCount" style="font-size: 12px; background: #ff0000; color: #fff; padding: 4px 7px; vertical-align: top; margin-left: -10px;display: unset !important; font-weight: 500 !important; border-radius: 1rem !important; margin-top: -15px;">0</span>
+                  </div>
+                </a>
+    
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" style="float: right !important">
+                  <span class="navbar-toggler-icon"></span>
+                </button>
               </div>
-            </a>
-
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" style="float: right !important">
-              <span class="navbar-toggler-icon"></span>
-            </button>
+            </div>
           </div>
           {{-- Mobile Icons --}}
           <div class="collapse navbar-collapse nav_fumaco_res nav-a" id="navbarCollapse">
@@ -580,19 +587,44 @@
   <script src="{{ asset('/assets/dist/js/bootstrap.bundle.min.js') }}"></script>
   <script>
     $(document).ready(function() {
+
+      
+      $(document).on('click', '.remove-cart-btn', function(e){
+            e.preventDefault();
+            var tr = $(this);
+            var data = {
+                'id': $(this).data('id'),
+                '_token': "{{ csrf_token() }}",
+            }
+
+            $.ajax({
+                type:'DELETE',
+                url:'/removefromcart',
+                data: data,
+                success: function (response) {
+                  countCartItems();
+                  loadcart();
+                }
+            });
+        });
+
+        function loadcart() {
+          var preloader = '<div class="text-center"><div class="spinner-border text-muted m-3 text-center"></div></div>';
+        $('#shopping-cart').html(preloader);
+          $.ajax({
+          type:"GET",
+          url:"/cart",
+          success:function(response){
+            $('#shopping-cart').html(response);
+          }
+        });
+        }
       $('#cart').click(function(e) {
         e.preventDefault();
         e.stopPropagation();
         $("#shopping-cart").toggleClass("active");
-        var preloader = '<div class="text-center"><div class="spinner-border text-muted m-3 text-center"></div></div>';
-        $('#shopping-cart').html(preloader);
-        $.ajax({
-          type:"GET",
-          url:"/cart",
-          success:function(response){
-            $('#shopping-cart').html(response).fadeIn();
-          }
-        });
+        
+        loadcart();
       });
       $(document).click(function() {
         var $item = $("#shopping-cart");

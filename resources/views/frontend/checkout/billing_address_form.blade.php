@@ -303,31 +303,45 @@
 						<div class="modal-content">
 							<div class="modal-header">
 								<h5 class="modal-title" id="loginModalLabel">Login</h5>
+								<a type="button" class="close text-dark" data-dismiss="modal" aria-label="Close">
+									<span aria-hidden="true"><i class="fas fa-times"></i></span>
+								</a>
 							</div>
-							<div class="modal-body">
-								<div class="row">
-									<div class="col">
-										<label for="username" class="formslabelfnt">Username</label>
-										<input type="text" class="form-control formslabelfnt" name="username" required>
+							<div class="modal-body" style="min-height: 500px;">
+								<div class="row justify-content-center">
+									<div class="col-md-10">
+										<div class="form-group">
+											<label for="username" class="formslabelfnt">Email Address <span class="text-danger">*</span></label>
+											<input type="text" class="form-control formslabelfnt" name="username" required>
+										</div>
+										<div class="form-group mt-3">
+											<label for="password" class="formslabelfnt">Password <span class="text-danger">*</span></label>
+											<input type="password" class="form-control formslabelfnt" name="password" required>
+										</div>
+										<div class="form-group">
+											<input type="submit" class="btn btn-primary mt-3" style="display: block; width: 100%;" value="LOGIN">
+										</div>
+										<br/>
+										<a href="/password/reset" style="font-size: 13px; color: #404040; font-weight: 500;">Forgot Password?</a>
+										<p style=" font-size: 1rem !important; margin-top: 12px;">
+											<span style="display: inline-block; color:  #616a6b ">New member? </span> <a href="/signup" class="forgot-1" style="display: inline-block; font-size: 1rem !important; color: #404040;">Create new account.</a>
+										</p>
+										<hr>
+										<small class="text-muted"> or sign in with</small>
+										<a href="{{ route('facebook.login') }}" class="btn mt-2 text-white align-middle" style="display: block; width: 100%; background-color:  #115cf3;">
+											<i class="fab fa-facebook mr-3" style="font-size: 1.3rem;"></i> <span style="font-size: 14px;">Sign in with Facebook</span> 
+										</a>
+										<a href="{{ route('google.login') }}" class="btn text-dark login-with-google-btn mt-2">
+											<img src="{{ asset('assets/google.svg') }}" width="23" class="m-1"> Sign in with Google
+										</a>
 									</div>
 								</div>
-								<div class="row">
-									<div class="col">
-										<label for="password" class="formslabelfnt">Password</label>
-										<input type="password" class="form-control formslabelfnt" name="password" required>
-									</div>
-								</div>
-								<br/>
-								<a href="/password/reset">Forgot Password?</a>
-								<p style=" font-size: 1rem !important; margin-top: 12px;">
-									<span style="display: inline-block; color:  #616a6b ">New member? </span> <a href="/signup" class="forgot-1" style="display: inline-block; font-size: 1rem !important;">Create new account.</a>
-								</p>
 							</div>
-							<div class="modal-footer">
+							{{-- <div class="modal-footer">
 								<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
 								<input type="checkbox" name="summary" readonly checked hidden>
 								<button type="submit" class="btn btn-primary">Login</button>
-							</div>
+							</div> --}}
 						</div>
 					</form>
 				</div>
@@ -343,6 +357,31 @@
 	</div>
 @endsection
 @section('style')
+<style>
+
+	.login-with-google-btn {
+		display: block;
+		width: 100%;
+	   transition: background-color 0.3s, box-shadow 0.3s;
+	   border: none;
+	   border-radius: 3px;
+	   box-shadow: 0 -1px 0 rgba(0, 0, 0, 0.04), 0 1px 1px rgba(0, 0, 0, 0.25);
+	   color: #757575;
+	   font-size: 14px;
+	   font-weight: 500;
+	   background-color: white;
+	 }
+	 .login-with-google-btn:hover {
+	   box-shadow: 0 -1px 0 rgba(0, 0, 0, 0.04), 0 2px 4px rgba(0, 0, 0, 0.25);
+	 }
+	 .login-with-google-btn:active {
+	   background-color: #eeeeee;
+	 }
+	 .login-with-google-btn:focus {
+	   outline: none;
+	   box-shadow: 0 -1px 0 rgba(0, 0, 0, 0.04), 0 2px 4px rgba(0, 0, 0, 0.25), 0 0 0 3px #c8dafc;
+	 }
+	</style>
 <style>
 	.products-head {
 		margin-top: 10px !important;

@@ -1,5 +1,5 @@
 <div class="shopping-cart-header">
-    <div class="shopping-cart-total" style="font-size: 14pt; text-align: left !important; margin-left: 10px;">
+    <div class="shopping-cart-total" style="font-size: 14pt; text-align: center !important; margin-left: 10px;">
         <span class="lighter-text">My Cart</span>
     </div>
 </div> <!--end shopping-cart-header -->
@@ -18,6 +18,9 @@
         <span class="item-name">{{ $cart['item_description'] }}</span>
         <span class="item-price">₱ {{ number_format($cart['price'], 2, '.', ',') }}</span>
         <span class="item-quantity">Qty: {{ $cart['quantity'] }} {{ $cart['stock_uom'] }}</span>
+        <span class="item-price m-1" style="display: inline-block; float: right;">
+            <a href="#" class="remove-cart-btn" href="#" role="button" data-id="{{ $cart['item_code'] }}" style="color: #ABB0BE;"><i class="fas fa-trash-alt"></i></a>
+        </span>
         @if ($cart['insufficient_stock'])
         <small class="item-detail text-danger">Insufficient Stock</small>
         @endif
