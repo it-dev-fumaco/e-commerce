@@ -587,19 +587,44 @@
   <script src="{{ asset('/assets/dist/js/bootstrap.bundle.min.js') }}"></script>
   <script>
     $(document).ready(function() {
+
+      
+      $(document).on('click', '.remove-cart-btn', function(e){
+            e.preventDefault();
+            var tr = $(this);
+            var data = {
+                'id': $(this).data('id'),
+                '_token': "{{ csrf_token() }}",
+            }
+
+            $.ajax({
+                type:'DELETE',
+                url:'/removefromcart',
+                data: data,
+                success: function (response) {
+                  countCartItems();
+                  loadcart();
+                }
+            });
+        });
+
+        function loadcart() {
+          var preloader = '<div class="text-center"><div class="spinner-border text-muted m-3 text-center"></div></div>';
+        $('#shopping-cart').html(preloader);
+          $.ajax({
+          type:"GET",
+          url:"/cart",
+          success:function(response){
+            $('#shopping-cart').html(response);
+          }
+        });
+        }
       $('#cart').click(function(e) {
         e.preventDefault();
         e.stopPropagation();
         $("#shopping-cart").toggleClass("active");
-        var preloader = '<div class="text-center"><div class="spinner-border text-muted m-3 text-center"></div></div>';
-        $('#shopping-cart').html(preloader);
-        $.ajax({
-          type:"GET",
-          url:"/cart",
-          success:function(response){
-            $('#shopping-cart').html(response).fadeIn();
-          }
-        });
+        
+        loadcart();
       });
       $(document).click(function() {
         var $item = $("#shopping-cart");
