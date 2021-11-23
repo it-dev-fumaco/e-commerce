@@ -176,7 +176,7 @@ Route::prefix('admin')->group(function () {
         Route::get('/product/{item_code}/{item_type}', 'ProductController@getItemDetails');
         Route::get('/product/images/{id}', 'ProductController@uploadImagesForm');
         Route::post('/add_product_images', 'ProductController@uploadImages');
-        Route::post('/delete_product_image', 'ProductController@deleteProductImage');
+        Route::get('/delete_product_image/{id}', 'ProductController@deleteProductImage');
 
         Route::get('/select_related_products/{category_id}', 'ProductController@selectProductsRelated');
         Route::post('/product/{parent_code}/save_related_products', 'ProductController@saveRelatedProducts');

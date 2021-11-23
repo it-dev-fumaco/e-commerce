@@ -586,7 +586,28 @@ class ProductController extends Controller
 
         $list = [];
         foreach ($product_list as $product) {
-            $item_image = DB::table('fumaco_items_image_v1')->where('idcode', $product->f_idcode)->first();
+            $item_image = DB::table('fumaco_items_image_v1')->where('idcode', $product->f_idcode)->where('onsale_img', 0)->first();
+
+            $image = $item_image ? $item_image->imgprimayx : null;
+
+            $image_sale = [];
+
+            $sale_image = null;
+
+            if($product->f_onsale == 1){
+                $sale_image = DB::table('fumaco_items_image_v1')->where('idcode', $product->f_idcode)->where('onsale_img', 1)->first();
+                $on_sale_imgs = DB::table('fumaco_items_image_v1')->where('idcode', $product->f_idcode)->where('onsale_img', 1)->get();
+
+                $sale_image = $sale_image ? $sale_image->imgprimayx : null;
+
+                foreach($on_sale_imgs as $sale_img){
+                    $image_sale[] = [
+                        'id' => $sale_img->id,
+                        'orig' => $sale_img->imgoriginalx,
+                        'primary' => $sale_img->imgprimayx
+                    ];
+                }
+            }
 
             $item_name = strip_tags($product->f_name_name);
             $list[] = [
@@ -595,7 +616,8 @@ class ProductController extends Controller
                 'item_code' => $product->f_idcode,
                 'product_name' => $product->f_name_name,
                 'item_name' => $item_name,
-                'image' => ($item_image) ? $item_image->imgprimayx : null,
+                'image' => $sale_image ? $sale_image : $image,
+                'on_sale_image' => $image_sale,
                 'price' => $product->f_original_price,
                 'new_price' => $product->f_price,
                 'discount_percentage' => $product->f_discount_percent,
@@ -605,8 +627,7 @@ class ProductController extends Controller
                 'brand' => $product->f_brand,
                 'on_sale' => $product->f_onsale,
                 'status' => $product->f_status,
-                'featured' => $product->f_featured,
-                'erp_stock' => $product->stock_source,
+                'featured' => $product->f_featured
             ];
         }
 
@@ -686,7 +707,7 @@ class ProductController extends Controller
     public function uploadImagesForm($id){
         $details = DB::table('fumaco_items')->where('id', $id)->first();
         
-        $item_image = DB::table('fumaco_items_image_v1')->where('idcode', $details->f_idcode)->get();
+        $item_image = DB::table('fumaco_items_image_v1')->where('idcode', $details->f_idcode)->where('onsale_img', 0)->get();
 
         $img_arr = [];
         foreach($item_image as $img){
@@ -705,37 +726,37 @@ class ProductController extends Controller
         return view('backend.products.images', compact('img_arr', 'details'));
     }
 
-    public function deleteProductImage(Request $request){
+    public function deleteProductImage($id){
         DB::beginTransaction();
 		try{
-            $img = DB::table('fumaco_items_image_v1')->where('id', $request->img_id)->first();
+            $img = DB::table('fumaco_items_image_v1')->where('id', $id)->first();
 
             $primary_img = explode(".", $img->imgprimayx)[0];
             $original_img = explode(".", $img->imgoriginalx)[0];
 
-            $primary = storage_path('/app/public/item_images/'.$img->idcode.'/gallery/preview/') . $img->imgprimayx;
-            $original = storage_path('/app/public/item_images/'.$img->idcode.'/gallery/original/') . $img->imgoriginalx;
+            $primary = storage_path('/app/public/item_images/'.$img->idcode.'/gallery/preview/'.$img->imgprimayx);
+            $original = storage_path('/app/public/item_images/'.$img->idcode.'/gallery/original/'.$img->imgoriginalx);
 
-            $primary_webp = storage_path('/app/public/item_images/'.$img->idcode.'/gallery/preview/') . $primary_img .'.webp';
-            $original_webp = storage_path('/app/public/item_images/'.$img->idcode.'/gallery/original/') . $original_img .'.webp';
-   
-			if (file_exists($primary)) {
-				unlink($primary);
-			}
+            $primary_webp = storage_path('/app/public/item_images/'.$img->idcode.'/gallery/preview/'.$primary_img.'.webp');
+            $original_webp = storage_path('/app/public/item_images/'.$img->idcode.'/gallery/original/'.$original_img.'.webp');
+
+            if (file_exists($primary)) {
+                unlink($primary);
+            }
 
             if (file_exists($original)) {
-				unlink($original);
-			}
+                unlink($original);
+            }
 
             if (file_exists($primary_webp)) {
-				unlink($primary_webp);
-			}
+                unlink($primary_webp);
+            }
 
-			if (file_exists($original_webp)) {
-				unlink($original_webp);
-			}
-
-            DB::table('fumaco_items_image_v1')->where('id', $request->img_id)->delete();
+            if (file_exists($original_webp)) {
+                unlink($original_webp);
+            }
+            
+            DB::table('fumaco_items_image_v1')->where('id', $id)->delete();
 
             DB::commit();
 			return redirect()->back()->with('success', 'Media Successfully Deleted');
@@ -748,71 +769,86 @@ class ProductController extends Controller
     public function uploadImages(Request $request){
         DB::beginTransaction();
 		try{
-			$checker = DB::table('fumaco_items_image_v1')->where('idcode', $request->item_code)->get();
+			$checker = DB::table('fumaco_items_image_v1')->where('idcode', $request->item_code)->where('onsale_img', 0)->get();
 
-			$img_primary = $request->file('img_primary'); //400
-			$img_zoom = $request->file('img_zoom');//1024
+            $image_error = '';
 
-			$p_filename = pathinfo($img_primary->getClientOriginalName(), PATHINFO_FILENAME);//400
-			$z_filename = pathinfo($img_zoom->getClientOriginalName(), PATHINFO_FILENAME);//1024
-			$p_extension = pathinfo($img_primary->getClientOriginalName(), PATHINFO_EXTENSION);//400
-			$z_extension = pathinfo($img_zoom->getClientOriginalName(), PATHINFO_EXTENSION);//1024
+            $item_code = $request->item_code;
 
-            $p_filename = Str::slug($p_filename, '-');
-            $z_filename = Str::slug($z_filename, '-');
-
-			$p_name = $p_filename.".".$p_extension;//400
-			$z_name = $z_filename.".".$z_extension;//1024
-
-			$image_error = '';
-			$rules = array(
+            $rules = array(
 				'uploadFile' => 'image|max:500000'
 			);
 
 			$validation = Validator::make($request->all(), $rules);
 
-			if ($validation->fails()){
-				$image_error = "Sorry, your file is too large.";
-				return redirect()->back()->with('image_error', $image_error);
+            if ($validation->fails()){
+				$error = "Sorry, your file is too large.";
+				return redirect()->back()->with('error', $error);
 			}
 
-			if($p_extension != "jpg" and $p_extension != "png" and $p_extension != "jpeg" and $p_extension != "gif"){
-				$image_error = "Sorry, only JPG, JPEG, PNG, and GIF files are allowed.";
-				return redirect()->back()->with('image_error', $image_error);
-			}
+            $allowed_extensions = array('jpg', 'png', 'jpeg', 'gif');
+            $extension_error = "Sorry, only JPG, JPEG, PNG and GIF files are allowed.";
 
-			foreach($checker as $c){
-				if($c->imgprimayx == $p_name){
-					$image_error = "Sorry, file already exists.";
-					return redirect()->back()->with('image_error', $image_error);
-				}
-                if($c->imgoriginalx == $z_name){
-                    $image_error = "Sorry, file already exists.";
-					return redirect()->back()->with('image_error', $image_error);
+            $origImgPath = storage_path('/app/public/item_images/'.$item_code.'/gallery/original/'); // on sale
+            $prevImgPath = storage_path('/app/public/item_images/'.$item_code.'/gallery/preview/'); // on sale
+
+            if($request->hasFile('img_zoom')){
+                if(!$request->hasFile('img_primary')){
+                    return redirect()->back()->with('error', 'Zoom/Preview Image cannot be empty');
                 }
-			}
+                $img_primary = $request->file('img_primary'); //400
+                $img_zoom = $request->file('img_zoom');//1024
+    
+                $p_filename = pathinfo($img_primary->getClientOriginalName(), PATHINFO_FILENAME);//400
+                $z_filename = pathinfo($img_zoom->getClientOriginalName(), PATHINFO_FILENAME);//1024
+                $p_extension = pathinfo($img_primary->getClientOriginalName(), PATHINFO_EXTENSION);//400
+                $z_extension = pathinfo($img_zoom->getClientOriginalName(), PATHINFO_EXTENSION);//1024
+    
+                $p_filename = Str::slug($p_filename, '-');
+                $z_filename = Str::slug($z_filename, '-');
+    
+                $p_name = $p_filename.".".$p_extension;//400
+                $z_name = $z_filename.".".$z_extension;//1024
+    
+                if(!in_array($p_extension, $allowed_extensions) or !in_array($z_extension, $allowed_extensions)){
+                    $image_error = "Sorry, only JPG, JPEG, PNG, and GIF files are allowed.";
+                    return redirect()->back()->with('image_error', $image_error);
+                }
+    
+                foreach($checker as $c){
+                    if($c->imgprimayx == $p_name){
+                        $image_error = "Sorry, file already exists.";
+                        return redirect()->back()->with('image_error', $image_error);
+                    }
+                    if($c->imgoriginalx == $z_name){
+                        $image_error = "Sorry, file already exists.";
+                        return redirect()->back()->with('image_error', $image_error);
+                    }
+                }
+    
+                $folder_name = 'public/item_images/'.$item_code.'/gallery/';
+                $img_primary->storeAs($folder_name . 'preview', $p_name); // 400px
+                $img_zoom->storeAs($folder_name . 'original', $z_name); // 1024px
+    
+                $webp_primary = Webp::make($request->file('img_primary'));
+                $webp_zoom = Webp::make($request->file('img_zoom'));
+    
+                $webp_primary->save(storage_path('/app/' .$folder_name . 'preview/') . $p_filename  .'.webp');
+                $webp_zoom->save(storage_path('/app/' .$folder_name . 'original/') . $z_filename .'.webp');
+            
+                $images_arr = [
+                    'idcode' => $item_code,
+                    'img_name' => $p_filename,
+                    'imgprimayx' => $p_name,
+                    'imgoriginalx' => $z_name,
+                    'img_status' => 1,
+                    'created_by' => Auth::user()->username,
+                ];
+    
+                DB::table('fumaco_items_image_v1')->insert($images_arr);
+            }
 
-            $folder_name = 'public/item_images/'.$request->item_code.'/gallery/';
-            $img_primary->storeAs($folder_name . 'preview', $p_name); // 400px
-			$img_zoom->storeAs($folder_name . 'original', $z_name); // 1024px
-
-            $webp_primary = Webp::make($request->file('img_primary'));
-            $webp_zoom = Webp::make($request->file('img_zoom'));
-
-			$webp_primary->save(storage_path('/app/' .$folder_name . 'preview/') . $p_filename  .'.webp');
-            $webp_zoom->save(storage_path('/app/' .$folder_name . 'original/') . $z_filename .'.webp');
-		
-			$images_arr[] = [
-				'idcode' => $request->item_code,
-                'imgnum' => " ",
-                'img_name' => " ",
-                'imgprimayx' => $p_name,
-                'imgoriginalx' => $z_name,
-                'img_status' => 1,
-                'created_by' => Auth::user()->username,
-			];
-
-            DB::table('fumaco_items_image_v1')->insert($images_arr);
+            // On sale image
 
             DB::commit();
 
@@ -899,34 +935,113 @@ class ProductController extends Controller
     public function setProductOnSale($item_code, Request $request) {
         DB::beginTransaction();
         try {
-            $discount_percentage = $request->discount_percentage;
-            if (!$discount_percentage && $discount_percentage <= 0) {
-                return redirect()->back()->with('error', 'Discount percentage cannot be less than or equal to zero.');
-            }
-            
-            $item = DB::table('fumaco_items')->where('f_idcode', $item_code)->first();
-            if (!$item) {
-                return redirect()->back()->with('error', 'Product not found.');
+            $success_msg = 'Image Uploaded';
+            if(!isset($request->on_sale_enabled)){ // If adding images, ignore if Product is already "On Sale"
+                $discount_percentage = $request->discount_percentage;
+                if (!$discount_percentage && $discount_percentage <= 0) {
+                    return redirect()->back()->with('error', 'Discount percentage cannot be less than or equal to zero.');
+                }
+                
+                $item = DB::table('fumaco_items')->where('f_idcode', $item_code)->first();
+                if (!$item) {
+                    return redirect()->back()->with('error', 'Product not found.');
+                }
+    
+                $discounted_price = $item->f_original_price - ($item->f_original_price * $discount_percentage / 100);
+    
+                DB::table('fumaco_items')->where('f_idcode', $item_code)->update([
+                    'f_price' => $discounted_price,
+                    'f_onsale' => 1,
+                    'f_discount_percent' => $discount_percentage,
+                    'f_discount_trigger' => 1,
+                    'last_modified_by' => Auth::user()->username,
+                ]);
+
+                $success_msg = 'Product has been set "On Sale".';
             }
 
-            $discounted_price = $item->f_original_price - ($item->f_original_price * $discount_percentage / 100);
+            // Adding On sale images
 
-            DB::table('fumaco_items')->where('f_idcode', $item_code)->update([
-                'f_price' => $discounted_price,
-                'f_onsale' => 1,
-                'f_discount_percent' => $discount_percentage,
-                'f_discount_trigger' => 1,
-                'last_modified_by' => Auth::user()->username,
-            ]);
+            $rules = array(
+				'uploadFile' => 'image|max:500000'
+			);
+
+			$validation = Validator::make($request->all(), $rules);
+
+            if ($validation->fails()){
+				$error = "Sorry, your file is too large.";
+				return redirect()->back()->with('error', $error);
+			}
+
+            $allowed_extensions = array('jpg', 'png', 'jpeg', 'gif');
+            $extension_error = "Sorry, only JPG, JPEG, PNG and GIF files are allowed.";
+
+            $origImgPath = storage_path('/app/public/item_images/'.$item_code.'/gallery/original/'); // on sale
+            $prevImgPath = storage_path('/app/public/item_images/'.$item_code.'/gallery/preview/'); // on sale
+
+            if($request->hasFile('on_sale_img_zoom')){
+                $img_sale = $request->file('on_sale_img_zoom');
+                $img_sale_prev = $request->file('on_sale_img_primary');
+
+                $onsale_primary_name = pathinfo($img_sale->getClientOriginalName(), PATHINFO_FILENAME);
+			    $onsale_primary_ext = pathinfo($img_sale->getClientOriginalName(), PATHINFO_EXTENSION);
+
+                $onsale_zoom_name = pathinfo($img_sale_prev->getClientOriginalName(), PATHINFO_FILENAME);
+			    $onsale_zoom_ext = pathinfo($img_sale_prev->getClientOriginalName(), PATHINFO_EXTENSION);
+
+                $onsale_primary_name = Str::slug($onsale_primary_name, '-');
+                $onsale_zoom_name = Str::slug($onsale_zoom_name, '-');
+
+                $sale_image_name_small = $onsale_primary_name.".".$onsale_primary_ext;
+                $sale_image_name_big = $onsale_zoom_name.".".$onsale_zoom_ext;
+
+                $zoom_checker = DB::table('fumaco_items_image_v1')->where('imgoriginalx', $sale_image_name_big)->first();
+                $primary_checker = DB::table('fumaco_items_image_v1')->where('imgprimayx', $sale_image_name_small)->first();
+
+                if($zoom_checker or $primary_checker){
+                    return redirect()->back()->with('error', 'Image already exists');
+                }
+
+                if(!in_array($onsale_primary_ext, $allowed_extensions) or !in_array($onsale_zoom_ext, $allowed_extensions)){
+                    return redirect()->back()->with('error', $extension_error);
+                }
+
+                $webp_orig = Webp::make($img_sale);
+                $webp_prev = Webp::make($img_sale_prev);
+
+                if ($webp_orig->save(storage_path('/app/public/item_images/'.$item_code.'/gallery/original/'.$onsale_primary_name.'.webp'))) {
+                    $img_sale->move($origImgPath, $sale_image_name_small);
+                }
+
+                if ($webp_prev->save(storage_path('/app/public/item_images/'.$item_code.'/gallery/preview/'.$onsale_primary_name.'.webp'))) {
+                    $img_sale_prev->move($prevImgPath, $sale_image_name_big);
+                }
+
+                $insert = [
+                    'idcode' => $item_code,
+                    'img_name' => $onsale_primary_name,
+                    'imgoriginalx' => $sale_image_name_big,
+                    'imgprimayx' => $sale_image_name_small,
+                    'onsale_img' => 1,
+                    'img_status' => 1,
+                    'created_by' => Auth::user()->username
+                ];
+
+                DB::table('fumaco_items_image_v1')->insert($insert);
+            }
 
             DB::commit();
 
-            return redirect()->back()->with('success', 'Product has been set "On Sale".');
+            return redirect()->back()->with('success', $success_msg);
         } catch (Exception $e) {
             DB::rollback();
 
             return redirect()->back()->with('error', 'An error occured. Please try again.');
         }
+    }
+
+    public function addOnSaleImages($item_code, $img_sale = null, $img_sale_prev = null){
+        
     }
 
     public function disableProductOnSale($item_code) {
