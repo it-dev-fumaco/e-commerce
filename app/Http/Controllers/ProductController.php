@@ -19,14 +19,24 @@ class ProductController extends Controller
             if (!$erp_api) {
                 return response()->json(['status' => 0, 'ERP API not configured.']);
             }
+
+            if($request->item_type == 'product_bundle') {
+                $params = '?filters=[["name","LIKE","%25' . $request->q . '%25"]]';
     
-            $params = '?filters=[["name","LIKE","%25' . $request->q . '%25"],["custom_show_in_website","=","1"],["has_variants","=","0"]]';
+                $response = Http::withHeaders([
+                    'Content-Type' => 'application/json',
+                    'Authorization' => 'token '. $erp_api->api_key. ':' . $erp_api->api_secret_key . '',
+                    'Accept-Language' => 'en'
+                ])->get($erp_api->base_url . '/api/resource/Product Bundle' . ($params));
+            } else {
+                $params = '?filters=[["name","LIKE","%25' . $request->q . '%25"],["custom_show_in_website","=","1"],["has_variants","=","0"]]';
     
-            $response = Http::withHeaders([
-                'Content-Type' => 'application/json',
-                'Authorization' => 'token '. $erp_api->api_key. ':' . $erp_api->api_secret_key . '',
-                'Accept-Language' => 'en'
-            ])->get($erp_api->base_url . '/api/resource/Item' . ($params));
+                $response = Http::withHeaders([
+                    'Content-Type' => 'application/json',
+                    'Authorization' => 'token '. $erp_api->api_key. ':' . $erp_api->api_secret_key . '',
+                    'Accept-Language' => 'en'
+                ])->get($erp_api->base_url . '/api/resource/Item' . ($params));
+            }
     
             if ($response->failed()) {
                 return response()->json(['status' => 0, 'message' => 'An error occured. Please try again.']);

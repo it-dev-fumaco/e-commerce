@@ -336,7 +336,8 @@
         dataType: 'json',
         data: function (data) {
           return {
-            q: data.term // search term
+            q: data.term, // search term
+            item_type: $('#item-type').val()
           };
         },
         processResults: function (response) {
