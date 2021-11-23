@@ -264,7 +264,7 @@ class FrontendController extends Controller
                 'on_stock' => $on_stock,
                 'os_img' => ($os_img) ? $os_img->imgprimayx : null,
                 'discount_percent' => $os->f_discount_percent,
-                'slug' => $bs->slug
+                'slug' => $os->slug
             ];
         }
 
