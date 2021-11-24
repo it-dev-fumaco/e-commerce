@@ -33,7 +33,7 @@
 									$src = (count($product_images) > 0) ? '/storage/item_images/'. $product_images[0]->idcode.'/gallery/preview/'. $product_images[0]->imgprimayx : '/storage/no-photo-available.png';
 									$xoriginal = (count($product_images) > 0)  ? '/storage/item_images/'. $product_images[0]->idcode.'/gallery/original/'. $product_images[0]->imgoriginalx : '/storage/no-photo-available.png';
 									@endphp
-									<img style="width: 100% !important;" alt="{{ Str::slug(explode(".", $product_images[0]->imgprimayx)[0], '-') }}" class="xzoom4 imgx" id="xzoom-fancy" src="{{ asset($src) }}" xoriginal="{{ asset($xoriginal) }}" />
+									<img style="width: 100% !important;" alt="{{ isset($product_images[0]) ? Str::slug(explode(".", $product_images[0]->imgprimayx)[0], '-') : '' }}" class="xzoom4 imgx" id="xzoom-fancy" src="{{ asset($src) }}" xoriginal="{{ asset($xoriginal) }}" />
 									<br><br>
 									<div class="xzoom-thumbs">
 										@foreach ($product_images as $image)

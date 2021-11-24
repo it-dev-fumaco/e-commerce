@@ -89,7 +89,7 @@
 											<div class="dropdown">
 												<button class="btn btn-primary dropdown-toggle" type="button" id="dropdowncreate" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Create New Product
 												</button>
-												<div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdowncreate">
+												<div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdowncreate" style="width: 100%;">
 													<a class="dropdown-item" href="/admin/product/add/simple_product">Simple Product</a>
 													<a class="dropdown-item" href="/admin/product/add/product_bundle">Product Bundle</a>
 												</div>

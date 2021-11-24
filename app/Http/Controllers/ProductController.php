@@ -223,34 +223,64 @@ class ProductController extends Controller
 
             $item = $this->getItemDetails($request->item_code, $request->item_type);
 
-            $request->validate(
-                [
-                    'item_code' => 'required',
-                    'parent_item_code' => 'required',
-                    'item_code' => 'required',
-                    'product_name' => 'required',
-                    'item_name' => 'required',
-                    'product_category' => 'required',
-                    'brand' => 'required',
-                    'item_classification' => 'required',
-                    'stock_uom' => 'required',
-                    'weight_per_unit' => 'required',
-                    'weight_uom' => 'required',
-                    'package_dimension_uom' => 'required',
-                    'package_length' => 'required',
-                    'package_width' => 'required',
-                    'package_height' => 'required',
-                    'package_weight' => 'required',
-                    'warehouse' => 'required',
-                    'stock_qty' => 'required|integer',
-                    'alert_qty' => 'required|integer',
-                    'item_description' => 'required',
-                    'website_caption' => 'required',
-                    'full_detail' => 'required',
-                    'price' => 'required|numeric',
-                    'slug' => 'required'
-                ]
-            );
+            if($request->item_type == 'product_bundle') {
+                $request->validate(
+                    [
+                        'item_code' => 'required',
+                        'item_code' => 'required',
+                        'product_name' => 'required',
+                        'item_name' => 'required',
+                        'product_category' => 'required',
+                        'brand' => 'required',
+                        'item_classification' => 'required',
+                        'stock_uom' => 'required',
+                        'weight_per_unit' => 'required',
+                        'weight_uom' => 'required',
+                        'package_dimension_uom' => 'required',
+                        'package_length' => 'required',
+                        'package_width' => 'required',
+                        'package_height' => 'required',
+                        'package_weight' => 'required',
+                        'warehouse' => 'required',
+                        'stock_qty' => 'required|integer',
+                        'alert_qty' => 'required|integer',
+                        'item_description' => 'required',
+                        'website_caption' => 'required',
+                        'full_detail' => 'required',
+                        'price' => 'required|numeric',
+                        'slug' => 'required'
+                    ]
+                );
+            } else {
+                $request->validate(
+                    [
+                        'item_code' => 'required',
+                        'parent_item_code' => 'required',
+                        'item_code' => 'required',
+                        'product_name' => 'required',
+                        'item_name' => 'required',
+                        'product_category' => 'required',
+                        'brand' => 'required',
+                        'item_classification' => 'required',
+                        'stock_uom' => 'required',
+                        'weight_per_unit' => 'required',
+                        'weight_uom' => 'required',
+                        'package_dimension_uom' => 'required',
+                        'package_length' => 'required',
+                        'package_width' => 'required',
+                        'package_height' => 'required',
+                        'package_weight' => 'required',
+                        'warehouse' => 'required',
+                        'stock_qty' => 'required|integer',
+                        'alert_qty' => 'required|integer',
+                        'item_description' => 'required',
+                        'website_caption' => 'required',
+                        'full_detail' => 'required',
+                        'price' => 'required|numeric',
+                        'slug' => 'required'
+                    ]
+                );
+            }
 
             // validate if item attributes matches the current attributes registered in database based on parent item code
             if($item['attributes'] != 0) {
@@ -282,6 +312,12 @@ class ProductController extends Controller
                 }
             }
 
+            if ($request->item_type == 'product_bundle') {
+                $stock_qty = $request->stock_qty;
+            } else {
+                $stock_qty = ($request->is_manual) ? $request->stock_qty : $item['stock_qty'];
+            }
+
             $id = DB::table('fumaco_items')->insertGetId([
                 'f_idcode' => $item['item_code'],
                 'f_parent_code' => $item['parent_item_code'],
@@ -295,14 +331,14 @@ class ProductController extends Controller
                 'f_item_classification' => $item['item_classification'],
                 'f_stock_uom' => $item['stock_uom'],
                 'f_weight_per_unit' => $item['weight_per_unit'],
-                'f_weight_uom' => $item['weight_uom'],
+                'f_weight_uom' => (!$item['weight_uom']) ? $request->weight_uom : $item['weight_uom'],
                 'f_package_d_uom' => $item['package_dimension_uom'],
                 'f_package_length' => $item['package_length'],
                 'f_package_width'	 => $item['package_width'],
                 'f_package_height' => $item['package_height'],
                 'f_package_weight' => $item['package_weight'],
                 'f_warehouse' => $item['warehouse'],
-                'f_qty' => ($request->is_manual) ? $request->stock_qty : $item['stock_qty'],
+                'f_qty' => $stock_qty,
                 'stock_source' => ($request->is_manual) ? 0 : 1,
                 'f_alert_qty' => $request->alert_qty,
                 'f_description' => $item['item_description'],
@@ -386,7 +422,9 @@ class ProductController extends Controller
             
             DB::commit();
 
-            return redirect('/admin/product/' . $id . '/edit')->with('success', 'Product has been saved.');
+            $redirect_to = ($request->item_type == 'product_bundle') ? '/admin/product/' . $id . '/edit_bundle' : '/admin/product/' . $id . '/edit';
+
+            return redirect($redirect_to)->with('success', 'Product has been saved.');
         } catch (Exception $e) {
             DB::rollback();
 
@@ -556,13 +594,17 @@ class ProductController extends Controller
     }
 
 	public function viewAddForm($type) {
-        if (!in_array($type, ['simple_product', 'product_bundle'])) {
-            return redirect('/admin/product/list');
-        }
-
         $item_categories = DB::table('fumaco_categories')->get();
 
-		return view('backend.products.add', compact('item_categories', 'type'));
+        if ($type == 'product_bundle') {
+            return view('backend.products.add_bundle', compact('item_categories'));
+        }
+
+        if ($type == 'simple_product') {
+            return view('backend.products.add', compact('item_categories'));
+        }
+
+        return redirect('/admin/product/list');
 	}
 
     public function viewList(Request $request) {
@@ -676,6 +718,10 @@ class ProductController extends Controller
                 'image' => ($image) ? $image->imgprimayx : null,
                 'original_price' => $row->f_original_price,
             ];
+        }
+
+        if($details->f_item_type == 'product_bundle') {
+            return view('backend.products.view_bundle', compact('details', 'item_categories', 'attributes', 'item_image', 'related_products', 'bundle_items'));    
         }
 
         return view('backend.products.view', compact('details', 'item_categories', 'attributes', 'item_image', 'related_products', 'bundle_items'));

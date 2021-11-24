@@ -173,8 +173,9 @@ Route::prefix('admin')->group(function () {
 
         Route::get('/product/search', 'ProductController@searchItem');
         Route::get('/product/{id}/edit', 'ProductController@viewProduct');
-        Route::get('/product/{item_code}/{item_type}', 'ProductController@getItemDetails');
+        Route::get('/product/{id}/edit_bundle', 'ProductController@viewProduct');
         Route::get('/product/images/{id}', 'ProductController@uploadImagesForm');
+        Route::get('/product/{item_code}/{item_type}', 'ProductController@getItemDetails');
         Route::post('/add_product_images', 'ProductController@uploadImages');
         Route::get('/delete_product_image/{id}', 'ProductController@deleteProductImage');
 
