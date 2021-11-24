@@ -48,24 +48,60 @@ class ErpStockReservationCommand extends Command
                 'Accept-Language' => 'en'
             ];
 
+            // for product bundles
             // get webiste orders which does not exists in erp stock reservation
-            $orders = DB::table('fumaco_order_items as a')
+            $product_bundle_orders = DB::table('fumaco_order_items as a')
+                ->join('fumaco_items as b', 'a.item_code', 'b.f_idcode')
+                ->join('fumaco_order as c', 'a.order_number', 'c.order_number')
+                ->join('fumaco_product_bundle_item as d', 'b.f_idcode', 'd.parent_item_code')
+                ->whereNotIn('c.order_status', ['Cancelled', 'Delivered', 'Delivered Order'])
+                ->where('c.stock_reserve_status', 0)->where('a.item_type', 'product_bundle')
+                ->select('d.item_code', 'c.id', 'd.item_description', 'b.f_warehouse', 'a.item_qty', 'c.order_number', 'd.qty', 'd.uom')
+                ->get();
+
+            // for simple products
+            // get webiste orders which does not exists in erp stock reservation
+            $simple_product_orders = DB::table('fumaco_order_items as a')
                 ->join('fumaco_items as b', 'a.item_code', 'b.f_idcode')
                 ->join('fumaco_order as c', 'a.order_number', 'c.order_number')
                 ->whereNotIn('c.order_status', ['Cancelled', 'Delivered', 'Delivered Order'])
-                ->where('c.stock_reserve_status', 0)
-                ->select('a.item_code', 'c.id', 'a.item_name', 'b.f_warehouse', 'a.item_qty', 'c.order_number')
+                ->where('c.stock_reserve_status', 0)->where('a.item_type', '!=', 'product_bundle')
+                ->select('a.item_code', 'c.id', 'a.item_name', 'b.f_warehouse', 'a.item_qty', 'c.order_number', 'b.f_stock_uom')
                 ->get();
 
-            if (count($orders) > 0) {
-                foreach ($orders as $order) {
+            if (count($product_bundle_orders) > 0) {
+                foreach ($product_bundle_orders as $order) {
+                    $new_stock_reservations = [
+                        'type' => 'Website Stocks',
+                        'item_code' => $order->item_code,
+                        'description' => $order->item_description,
+                        'warehouse' => $order->f_warehouse,
+                        'reserve_qty' => ($order->item_qty * $order->qty),
+                        'reference_no' => $order->order_number,
+                        'stock_uom' => $order->uom
+                    ];
+
+                    // reserve stocks in erp
+                    $insert_response = Http::withHeaders($headers)
+                        ->post($erp_api->base_url . '/api/resource/Stock Reservation', ($new_stock_reservations));
+
+                    if ($insert_response->successful()) {
+                        DB::table('fumaco_order')->where('id', $order->id)->update(['stock_reserve_status' => 1]);
+                        info('success (product bundle)');
+                    }
+                }
+            }
+       
+            if (count($simple_product_orders) > 0) {
+                foreach ($simple_product_orders as $order) {
                     $new_stock_reservations = [
                         'type' => 'Website Stocks',
                         'item_code' => $order->item_code,
                         'description' => $order->item_name,
                         'warehouse' => $order->f_warehouse,
                         'reserve_qty' => $order->item_qty,
-                        'reference_no' => $order->order_number
+                        'reference_no' => $order->order_number,
+                        'stock_uom' => $order->f_stock_uom
                     ];
                     // reserve stocks in erp
                     $insert_response = Http::withHeaders($headers)
@@ -73,7 +109,7 @@ class ErpStockReservationCommand extends Command
 
                     if ($insert_response->successful()) {
                         DB::table('fumaco_order')->where('id', $order->id)->update(['stock_reserve_status' => 1]);
-                        info('success');
+                        info('success (simple product)');
                     }
                 }
             }

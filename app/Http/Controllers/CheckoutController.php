@@ -501,7 +501,8 @@ class CheckoutController extends Controller
 						'item_status' => 2,
 						'date_update' => Carbon::now()->toDateTimeString(),
 						'ip_address' => $request->ip(),
-						'item_total_price' => ($price * $cart[$item->f_idcode]['quantity'])
+						'item_total_price' => ($price * $cart[$item->f_idcode]['quantity']),
+						'item_type' => $item->f_item_type
 					];
 				}
 			}
