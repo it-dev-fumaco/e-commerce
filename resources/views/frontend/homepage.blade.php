@@ -92,7 +92,7 @@
     </section>
       <div class="album py-5">
         <div class="container">
-          <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4 overflow-auto flex-row flex-nowrap scroll-pane" id="best-selling-container" style="min-height: 10px;">
+            <section class="regular slider">
             @foreach($best_selling_arr as $bs)
               <div class="col-md-4 col-lg-3 animated animatedFadeInUp fadeInUp equal-height-columns mb-3 best-selling-card">
                 <div class="card shadow-sm">
@@ -113,9 +113,6 @@
                         <img src="{{ asset($img_bs) }}" alt="{{ Str::slug(explode(".", $bs['bs_img'])[0], '-') }}" class="img-responsive hover" style="width: 100% !important;">
                       </picture>
                     </div>
-                    
-
-
                     <div class="card-body">
                       <div class="text ellipsis">
                         <a href="/product/{{ ($bs['slug']) ? $bs['slug'] : $bs['item_code'] }}" class="card-text product-head fumacoFont_card_title text-concat prod_desc" style="text-transform: none !important; text-decoration: none !important; color:#0062A5 !important;  min-height: 100px;">{{ $bs['item_name'] }}</a>
@@ -157,16 +154,9 @@
                 </div>
               </div>
             @endforeach
-          </div>
+            </section>
         </div>
       </div>
-      {{-- Scroll --}}
-      <button type="button" class="scroll-control bs-control bs-prev prev-btn d-sm-block d-md-none d-lg-block"><i class="fas fa-chevron-left scroll-btn"></i></button>
-      <button type="button" class="scroll-control bs-control bs-next next-btn d-sm-block d-md-none d-lg-block"><i class="fas fa-chevron-right scroll-btn"></i></button>
-
-      <button type="button" class="scroll-control bs-control bs-prev tab-prev-btn prev-btn d-none d-md-block d-lg-none"><i class="fas fa-chevron-left scroll-btn"></i></button>
-      <button type="button" class="scroll-control bs-control bs-next tab-next-btn next-btn d-none d-md-block d-lg-none"><i class="fas fa-chevron-right scroll-btn"></i></button>
-      
   </div>
   <div class="container marketing" style="position: relative">
     <section class="py-5 text-center container" style="padding-bottom: 0rem !important;">
@@ -179,7 +169,7 @@
 
     <div class="album py-5">
       <div class="container">
-        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4 overflow-auto flex-row flex-nowrap scroll-pane" id="on-sale-container" style="min-height: 10px;">
+          <section class="regular slider">
           @foreach($on_sale_arr as $os)
            @php
             $img_os = ($os['os_img']) ? '/storage/item_images/'. $os['item_code'] .'/gallery/preview/'. $os['os_img'] : '/storage/no-photo-available.png';
@@ -200,8 +190,6 @@
                         <img src="{{ asset($img_os) }}" alt="{{ Str::slug(explode(".", $os['os_img'])[0], '-') }}" class="img-responsive hover" style="width: 100% !important;">
                       </picture>
                     </div>
-                      
-
                     <div class="card-body">
                       <div class="text ellipsis">
                         <a href="/product/{{ ($os['slug']) ? $os['slug'] : $os['item_code'] }}" class="card-text product-head fumacoFont_card_title text-concat prod_desc" style="text-decoration: none !important; text-transform: none !important; color:#0062A5 !important; min-height: 100px;">{{ $os['item_name'] }}</a>
@@ -246,13 +234,9 @@
                 </div>
               </div>
             @endforeach
-        </div>
+            </section>
       </div>
     </div>
-    {{-- Scroll --}}
-    <button id="os-prev" type="button" class="scroll-control os-control prev-btn"><i class="fas fa-chevron-left scroll-btn"></i></button>
-    <button id="os-next" type="button" class="scroll-control os-control next-btn"><i class="fas fa-chevron-right scroll-btn"></i></button>
-    
   </div>
 
 @endsection
@@ -317,50 +301,6 @@
       -ms-transform: scale(0.95); /* IE 9 */
       -webkit-transform: scale(0.95); /* Safari 3-8 */
       transform: scale(0.95); 
-    }
-
-    .scoll-pane::-webkit-scrollbar { 
-      display: none;  /* Safari and Chrome */
-    }
-    #best-selling-container, #on-sale-container{
-      overflow: auto;
-      outline: none;
-      overflow-y: hidden;
-      -ms-overflow-style: scroll;  /* IE 10+ */
-      scrollbar-width: none; /* Firefox */
-    }
-
-    #best-selling-container::-webkit-scrollbar, #on-sale-container::-webkit-scrollbar{ /* Chrome */
-      display: none;
-    }
-    .scroll-control{
-      height: 80px;
-      width: 80px;
-      background-color: rgba(0,0,0,0);
-      border-radius: 50%;
-      color: rgba(0,0,0,0.2);
-      border: none !important;
-      text-transform: none !important;
-      text-decoration: none !important;
-      transition: .4s
-    }
-
-    .scroll-control:hover{
-      color: #000;
-    }
-
-    .scroll-control:focus {
-      outline: none;
-      box-shadow: none;
-      text-transform: none !important;
-      text-decoration: none !important;
-      border: none !important;
-    }
-
-    .prev-btn, .next-btn{
-      position: absolute;
-      top: 50%;
-      bottom: 50%;
     }
 
     .prev-btn{
@@ -437,11 +377,11 @@
       .prod_desc{
         font-size: 12px !important;
       }
-      .prev-btn{
-        left: 20px !important;
-      }
-      .next-btn{
+      .slick-next{
         right: 20px !important;
+      }
+      .slick-prev{
+        left: 20px !important;
       }
     }
     @media (max-width: 767.98px) {
@@ -451,11 +391,11 @@
       .prod_desc{
         font-size: 12px !important;
       }
-      .prev-btn{
-        left: 20px !important;
-      }
-      .next-btn{
+      .slick-next{
         right: 20px !important;
+      }
+      .slick-prev{
+        left: 20px !important;
       }
     }
     @media (max-width: 1199.98px) {
@@ -465,60 +405,90 @@
       
     }
   </style>
-  <style>
+<link rel="stylesheet" type="text/css" href="{{ asset('/slick/slick.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ asset('/slick/slick-theme.css') }}">
+<style type="text/css">
 
-  </style>
+  html, body {
+    margin: 0;
+    padding: 0;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  .slick-slide {
+    margin: 0px 20px;
+  }
+
+  .slick-slide img {
+    width: 100%;
+  }
+
+  .slick-slide {
+    transition: all ease-in-out .3s;
+    opacity: .2;
+  }
+  
+  .slick-active {
+    opacity: .5;
+  }
+
+  .slick-current, .slick-slide  {
+    opacity: 1;
+  }
+</style>
 @endsection
 
 @section('script')
-  <script>
-    // Product Image Hover
-    $('.hover-container').hover(function(){
-      $(this).children('.btn-container').slideToggle('fast');
-    });
-
-    // Best Selling
-    $('.bs-next').click(function() {
-      event.preventDefault();
-      $('#best-selling-container').animate({
-        scrollLeft: "+="+$('.best-selling-card').outerWidth()+"px"
-      }, "slow");
-    });
-
-    $('.bs-prev').click(function() {
-      event.preventDefault();
-      $('#best-selling-container').animate({
-        scrollLeft: "-="+$('.best-selling-card').outerWidth()+"px"
-      }, "slow");
-    });
-
-    // On Sale
-    $('#os-next').click(function() {
-      event.preventDefault();
-      $('#on-sale-container').animate({
-        scrollLeft: "+="+$('.on-sale-card').outerWidth()+"px"
-      }, "slow");
-    });
-
-    $('#os-prev').click(function() {
-      event.preventDefault();
-      $('#on-sale-container').animate({
-        scrollLeft: "-="+$('.on-sale-card').outerWidth()+"px"
-      }, "slow");
-    });
-
+  <script src="{{ asset('/slick/slick.js') }}" type="text/javascript" charset="utf-8"></script>
+  <script type="text/javascript">
     $(document).ready(function() {
-      if ($("#best-selling-container").prop('scrollWidth') > $("#best-selling-container").width() ) {
-        $('.bs-control').addClass('d-block');
-      }else{
-        $('.bs-control').addClass('d-none');
-      }
+      // Product Image Hover
+      $('.hover-container').hover(function(){
+        $(this).children('.btn-container').slideToggle('fast');
+      });
 
-      if ($("#on-sale-container").prop('scrollWidth') > $("#on-sale-container").width() ) {
-        $('.os-control').addClass('d-block');
-      }else{
-        $('.os-control').addClass('d-none');
-      }
+      $(".regular").slick({
+        dots: false,
+        infinite: true,
+        slidesToShow: 4,
+        slidesToScroll: 1,
+        touchMove: true,
+        responsive: [
+        {
+          breakpoint: 1024,
+          settings: {
+            slidesToShow: 3,
+            slidesToScroll: 1,
+            infinite: true,
+            dots: false
+          }
+        },
+        {
+          breakpoint: 600,
+          settings: {
+            slidesToShow: 2,
+            slidesToScroll: 1
+          }
+        },
+        {
+          breakpoint: 480,
+          settings: {
+            slidesToShow: 1,
+            slidesToScroll: 1
+          }
+        },
+        {
+          breakpoint: 575.98,
+          settings: {
+            slidesToShow: 1,
+            slidesToScroll: 1
+          }
+        }
+      ]
+      });
     });
   </script>
 @endsection

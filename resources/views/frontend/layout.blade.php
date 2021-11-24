@@ -46,6 +46,9 @@
     @endif
  
     <style>
+      * {
+    -webkit-overflow-scrolling: touch !important;
+}
 	html,body{
 		width: 100% !important;
 		height: 100% !important;

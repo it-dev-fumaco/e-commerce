@@ -230,7 +230,7 @@
 
 							<div class="album py-5" style="position: relative">
 								<div class="container related-prod">
-									<div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4 overflow-auto flex-row flex-nowrap scroll-pane" id="related-products-container" style="min-height: 10px;">
+										<section class="regular slider">
 										@foreach($related_products as $rp)
 										<div class="col-md-4 col-lg-3 animated animatedFadeInUp fadeInUp equal-height-columns mb-3 related-products-card">
 											<div class="card shadow-sm" style="border: 1px solid  #d5dbdb; background-color: #fff;">
@@ -286,8 +286,6 @@
 															<small class="text-muted stylecap" style="color:#c4cad0 !important; font-weight:100 !important;">( 0 Reviews )</small>
 														</div>
 														<br>
-														{{-- <a href="/product/{{ ($rp['slug']) ? $rp['slug'] : $rp['item_code'] }}" class="btn btn-outline-primary fumacoFont_card_readmore" role="button" style="width:100% !important;">View</a> --}}
-														{{-- <a href="#" class="btn btn-outline-primary fumacoFont_card_readmore add-to-cart" role="button" style="width: 100% !important; margin-bottom: 20px" data-item-code="{{ $rp['item_code'] }}"><i class="fas fa-shopping-cart"></i> Add to Cart</a> --}}
 													</div>
 												</div><br/>&nbsp;
 												@if ($rp['on_stock'] == 1)
@@ -298,11 +296,8 @@
 											</div>
 										</div>
 										@endforeach
-									</div>
+										</section>
 								</div>
-								{{-- Scroll --}}
-								<button type="button" class="scroll-control prev prev-btn"><i class="fas fa-chevron-left" style="font-size: 30px"></i></button>
-								<button type="button" class="scroll-control next next-btn"><i class="fas fa-chevron-right" style="font-size: 30px"></i></button>
 							</div>
 						@endif
 						</div>
@@ -1080,10 +1075,22 @@
 			.price-card{
 				min-height: 20px;
 			}
+			.slick-next{
+				right: 20px !important;
+			}
+			.slick-prev{
+				left: 20px !important;
+			}
 		}
     	@media (max-width: 767.98px) {
 			.price-card{
 				min-height: 20px;
+			}
+			.slick-next{
+				right: 20px !important;
+			}
+			.slick-prev{
+				left: 20px !important;
 			}
 		}
 
@@ -1096,6 +1103,47 @@
 			}
 		}
 	</style>
+	<link rel="stylesheet" type="text/css" href="{{ asset('/slick/slick.css') }}">
+	<link rel="stylesheet" type="text/css" href="{{ asset('/slick/slick-theme.css') }}">
+	<style type="text/css">
+	  html, body {
+		margin: 0;
+		padding: 0;
+	  }
+	
+	  * {
+		box-sizing: border-box;
+	  }
+	
+	  .slick-slide {
+		margin: 0px 20px;
+	  }
+	
+	  .slick-slide img {
+		width: 100%;
+	  }
+	
+	  .slick-prev:before,
+	  .slick-next:before {
+		background-color: rgba(255,255,255,0);
+		border-radius: 50%;
+		color: rgba(0,0,0,0.4);
+		transition: .4s;
+	  }
+	
+	  .slick-slide {
+		transition: all ease-in-out .3s;
+		opacity: .2;
+	  }
+	  
+	  .slick-active {
+		opacity: .5;
+	  }
+	
+	  .slick-current, .slick-slide  {
+		opacity: 1;
+	  }
+	</style>
 @endsection
 
 @section('script')
@@ -1106,6 +1154,7 @@
 <script type="text/javascript" src="{{ asset('/item/hammer.js/1.0.5/jquery.hammer.min.js') }}"></script>
 <script type="text/javascript" src="{{ asset('/item/fancybox/source/jquery.fancybox.js') }}"></script>
 <script type="text/javascript" src="{{ asset('/item/magnific-popup/js/magnific-popup.js') }}"></script>
+<script src="{{ asset('/slick/slick.js') }}" type="text/javascript" charset="utf-8"></script>
 
 <script>
    (function() {
@@ -1129,31 +1178,51 @@
 		});
   	})();
 
-	$(document).ready(function() {
-		if ($(".scroll-pane").prop('scrollWidth') > $(".scroll-pane").width() ) {
-			$('.scroll-control').addClass('d-block');
-		}else{
-			$('.scroll-control').addClass('d-none');
-		}
-	});
-
-	$('.next').click(function() {
-      event.preventDefault();
-      $('#related-products-container').animate({
-        scrollLeft: "+="+$('.related-products-card').outerWidth()+"px"
-      }, "slow");
-    });
-
-    $('.prev').click(function() {
-      event.preventDefault();
-      $('#related-products-container').animate({
-        scrollLeft: "-="+$('.related-products-card').outerWidth()+"px"
-      }, "slow");
-    });
-
+  $(document).ready(function() {
 	// Product Image Hover
 	$('.hover-container').hover(function(){
-      $(this).children('.btn-container').slideToggle('fast');
-    });
+	  $(this).children('.btn-container').slideToggle('fast');
+	});
+
+	$(".regular").slick({
+	  dots: false,
+	  infinite: true,
+	  slidesToShow: 4,
+	  slidesToScroll: 1,
+	  touchMove: true,
+	  responsive: [
+	  {
+		breakpoint: 1024,
+		settings: {
+		  slidesToShow: 3,
+		  slidesToScroll: 1,
+		  infinite: true,
+		  dots: false
+		}
+	  },
+	  {
+		breakpoint: 600,
+		settings: {
+		  slidesToShow: 2,
+		  slidesToScroll: 1
+		}
+	  },
+	  {
+		breakpoint: 480,
+		settings: {
+		  slidesToShow: 1,
+		  slidesToScroll: 1
+		}
+	  },
+	  {
+		breakpoint: 575.98,
+		settings: {
+		  slidesToShow: 1,
+		  slidesToScroll: 1
+		}
+	  }
+	]
+	});
+  });
 </script>
 @endsection
