@@ -6,7 +6,7 @@
 @section('meta')
 
 @php
-	$src = (count($product_images) > 0) ? '/storage/item_images/'. $product_images[0]->idcode.'/gallery/preview/'. $product_images[0]->imgprimayx : '/storage/no-photo-available.png';
+	$src = (count($product_images) > 0) ? '/storage/item_images/'. $product_images[0]->idcode.'/gallery/original/'. $product_images[0]->imgoriginalx : '/storage/no-photo-available.png';
 	@endphp
 
 
@@ -14,11 +14,12 @@
 	<meta name="keywords" content="{{ $product_details->keywords }}" />
 
 
-	<meta property="og:url" content="https://www.fumaco.com/product/{{ $product_details->slug }}" />
+	<meta property="og:url" content="https://www.fumaco.com/product/{{ ($product_details->slug) ? $product_details->slug : $product_details->id }}" />
+	<meta property="og:type" content="article" />
 	<meta property="og:title" content="{{ $product_details->f_name_name }}" />
 	<meta property="og:image" content="{{ asset($src) }}" />
-	<meta property="og:image:width" content="1024" >
-	<meta property="og:image:height" content="1024" >
+	<meta property="og:image:width" content="1920" >
+	<meta property="og:image:height" content="720" >
 
 @endsection
 
