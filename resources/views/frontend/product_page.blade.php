@@ -4,8 +4,19 @@
 ])
 
 @section('meta')
+
+@php
+	$src = (count($product_images) > 0) ? '/storage/item_images/'. $product_images[0]->idcode.'/gallery/preview/'. $product_images[0]->imgprimayx : '/storage/no-photo-available.png';
+	@endphp
+
+
 <meta name="description" content="{{ $product_details->meta_description }}">
 	<meta name="keywords" content="{{ $product_details->keywords }}" />
+
+
+	<meta property="og:url" content="https://www.fumaco.com/product/{{ $product_details->slug }}" />
+	<meta property="og:title" content="{{ $product_details->f_name_name }}" />
+	<meta property="og:image" content="{{ asset($src) }}" />
 @endsection
 
 @section('content')
