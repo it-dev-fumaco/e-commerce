@@ -3,6 +3,14 @@
 'activePage' => 'blog'
 ])
 
+@section('meta')
+    @php
+        $b_tags = implode(",", $tags);
+    @endphp
+    <meta name="description" content="{{ $blog->blog_caption }}">
+	<meta name="keywords" content="{{ $b_tags }}" />
+@endsection
+
 @section('content')
 <main>
     <br>
