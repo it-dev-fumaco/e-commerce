@@ -17,6 +17,7 @@
 	<meta property="og:url" content="https://www.fumaco.com/product/{{ ($product_details->slug) ? $product_details->slug : $product_details->id }}" />
 	<meta property="og:type" content="article" />
 	<meta property="og:title" content="{{ $product_details->f_name_name }}" />
+	<meta property="og:description" content="{{ $product_details->f_description }}" />
 	<meta property="og:image" content="{{ asset($src) }}" />
 	<meta property="og:image:width" content="600" >
 	<meta property="og:image:height" content="315" >
