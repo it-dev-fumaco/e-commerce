@@ -367,10 +367,14 @@
   }
 
   .clearfix:after {
-  content: "";
-  display: table;
-  clear: both;
-}
+    content: "";
+    display: table;
+    clear: both;
+  }
+  .card-btn:focus, a:focus, .btn:focus{
+    box-shadow: none !important;
+    border: none !important;
+  }
     </style>
     @yield('style')
     @if($activePage == 'contact')
