@@ -6,9 +6,21 @@
 @section('meta')
     @php
         $b_tags = implode(",", $tags);
+        $image = ($blog->blogprimaryimage) ? '/storage/journals/'.$blog->blogprimaryimage : '/storage/no-photo-available.png';
+
+        if (Str::startsWith($current = url()->current(), 'https://www')) {
+            $s_url = $current;
+        } else {
+            $s_url = str_replace('https://', 'https://www.', $current);
+        }
     @endphp
     <meta name="description" content="{{ $blog->blog_caption }}">
 	<meta name="keywords" content="{{ $b_tags }}" />
+    <meta property="og:url" content="{{ $s_url }}" />
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="{{ $blog->blogtitle }}" />
+    <meta property="og:description" content="{{ $blog->blog_caption }}" />
+    <meta property="og:image" content="{{ asset($image) }}" />
 @endsection
 
 @section('content')
@@ -114,7 +126,7 @@
                 <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v11.0&appId=974569840046115&autoLogAppEvents=1"
                     nonce="1VBl9fa6"></script>
                 <!-- Your share button code -->
-                <div class="fb-like" data-href="https://test.fumaco.com.ph/blog?id={{ $id }}" data-width="" data-layout="standard" data-action="like" data-size="small" data-share="true"></div>
+                <div class="fb-like" data-href="{{ $s_url }}" data-width="" data-layout="standard" data-action="like" data-size="small" data-share="true"></div>
             </div>
 
             <div class="col-lg-6" style="text-align:right;" id="comments">
