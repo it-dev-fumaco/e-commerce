@@ -6,6 +6,10 @@
 @section('meta')
 <meta name="description" content="{{ $page_meta->meta_description }}">
 	<meta name="keywords" content="{{ $page_meta->meta_keywords }}" />
+
+  <meta property="og:url" content="https://www.fumaco.com" />
+	<meta property="og:title" content="Fumaco" />
+	<meta property="og:image" content="{{ asset('/assets/site-img/'. $carousel_data[0]->fumaco_image1) }}" />
 @endsection
 
 @section('content')
