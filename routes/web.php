@@ -78,6 +78,7 @@ Route::get('/website_settings', 'FrontendController@websiteSettings');
 Route::post('/getvariantcode', 'FrontendController@getVariantItemCode');
 Route::post('/subscribe', 'FrontendController@newsletterSubscription');
 Route::get('/thankyou', 'FrontendController@subscribeThankyou');
+Route::get('/testing', 'FrontendController@testing');
 
 Route::get('/policy_pages', 'FrontendController@pagesList');
 Route::get('/pages/{slug}', 'FrontendController@viewPage')->name('pages');
@@ -265,6 +266,13 @@ Route::prefix('admin')->group(function () {
         Route::get('/edit/page/about_us/sponsor/reset/{id}', 'PagesController@resetSort');
 
         Route::get('/marketing/search/list', 'PagesController@searchList');
+        Route::get('/marketing/on_sale/list', 'ProductController@onSaleList');
+        Route::get('/marketing/voucher/list', 'ProductController@voucherList');
+        Route::get('/marketing/on_sale/addForm', 'ProductController@addOnsaleForm');
+        Route::post('/marketing/on_sale/add', 'ProductController@addOnsale');
+        Route::post('/marketing/on_sale/{id}/edit', 'ProductController@editOnsaleForm');
+        Route::post('/marketing/voucher/add', 'ProductController@addVoucher');
+        Route::get('/marketing/voucher/add_voucher', 'ProductController@addVoucherForm');
 
         // SHIPPING SERVICES ROUTES CMS
         Route::get('/shipping/list', 'ShippingController@viewList');

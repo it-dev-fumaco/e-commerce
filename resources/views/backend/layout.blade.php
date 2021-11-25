@@ -383,7 +383,7 @@
             </ul>
           </li>
           @php
-              $marketing_pages = ['Price Rule/Discounts', 'search_terms_list'];
+              $marketing_pages = ['Price Rule/Discounts', 'search_terms_list', 'on_sale_list', 'vouchers_list'];
           @endphp
           <li class="nav-header">MARKETING</li>
           <li class="nav-item {{ (in_array($activePage, $marketing_pages) ? 'menu-open' : '') }}">
@@ -396,6 +396,18 @@
                 <a href="#" class="nav-link {{ $activePage == 'Price Rule/Discounts' ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Price Rule/Discounts</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="/admin/marketing/on_sale/list" class="nav-link {{ $activePage == 'on_sale_list' ? 'active' : '' }}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>On Sale</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="/admin/marketing/voucher/list" class="nav-link {{ $activePage == 'vouchers_list' ? 'active' : '' }}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Vouchers/Coupons</p>
                 </a>
               </li>
               <li class="nav-item">

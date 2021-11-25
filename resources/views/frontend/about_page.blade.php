@@ -444,7 +444,7 @@
     flex-wrap: wrap;
     }
     .img-thumbnail {
-    height: 100%;
+    height: auto;
     }
 </style>
 @endsection

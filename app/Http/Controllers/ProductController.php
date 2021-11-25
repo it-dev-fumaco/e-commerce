@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Carbon\Carbon;
 use Auth;
 use Webp;
 use DB;
@@ -737,6 +738,147 @@ class ProductController extends Controller
         }
 
         return view('backend.products.category_attribute_settings', compact('list', 'attributes'));
+    }
+
+    public function voucherList(){
+        $coupon = DB::table('fumaco_voucher')->paginate(10);
+        return view('backend.marketing.list_voucher', compact('coupon'));
+    }
+
+    public function onSaleList(){
+        $on_sale = DB::table('fumaco_on_sale')->paginate(10);
+
+        $sale_arr = [];
+        foreach($on_sale as $sale){
+            $coupon = DB::table('fumaco_voucher')->where('id', $sale->coupon)->first();
+            $categories_arr = [];
+            if($sale->discount_for == 'Per Category'){
+                $cat_ids = explode(',', $sale->apply_discount_to);
+                foreach($cat_ids as $cat_id){
+                    $cat_name = DB::table('fumaco_categories')->where('id', $cat_id)->first();
+                    $categories_arr[] = [
+                        'id' => $cat_id,
+                        'name' => $cat_name->name
+                    ];
+                }
+            }
+            
+            $sale_arr[] = [
+                'id' => $sale->id,
+                'name' => $sale->sale_name,
+                'discount_type' => $sale->discount_type,
+                'discount_rate' => $sale->discount_rate,
+                'capped_amount' => $sale->capped_amount,
+                'coupon' => $coupon ? $coupon->code : '',
+                'discount_for' => $sale->discount_for,
+                'categories' => $categories_arr,
+                'sale_duration' => Carbon::parse($sale->start_date)->format('M d, Y').' - '.Carbon::parse($sale->end_date)->format('M d, Y'),
+                'status' => $sale->status
+            ];
+        }
+
+        // return $sale_arr;
+        return view('backend.marketing.list_sale', compact('on_sale', 'sale_arr'));
+    }
+
+    public function addOnsaleForm(){
+        $categories = DB::table('fumaco_categories')->where('publish', 1)->where('external_link', null)->get();
+
+        $vouchers = DB::table('fumaco_voucher')->get();
+
+        return view('backend.marketing.add_onsale', compact('categories', 'vouchers'));
+    }
+
+    public function editOnsaleForm($id){
+        $on_sale = DB::table('fumaco_on_sale')->where('id', $id)->first();
+
+        $categories = DB::table('fumaco_categories')->where('publish', 1)->where('external_link', null)->get();
+
+        $vouchers = DB::table('fumaco_voucher')->get();
+
+        return view('backend.marketing.edit_onsale', compact('on_sale', 'categories', 'vouchers'));
+    }
+
+    public function addVoucherForm(){
+        return view('backend.marketing.add_voucher');
+    }
+
+    public function addVoucher(Request $request){
+        DB::beginTransaction();
+        try {
+            $rules = array(
+				'name' => 'required|unique:fumaco_voucher,name',
+                'coupon_code' => 'required|unique:fumaco_voucher,code'
+			);
+
+			$validation = Validator::make($request->all(), $rules);
+
+            if ($validation->fails()){
+				return redirect()->back()->with('error', "Voucher Name/Code must be unique.");
+			}
+
+            $insert = [
+                'name' => $request->name,
+                'code' => $request->coupon_code,
+                'total_allotment' => $request->allotment,
+                'created_by' => Auth::user()->username
+            ];
+
+            DB::table('fumaco_voucher')->insert($insert);
+            DB::commit();
+            return redirect('/admin/marketing/voucher/list')->with('success', 'Voucher Added!');
+        } catch (Exception $e) {
+            DB::rollback();
+            return redirect()->back()->with('error', 'An error occured. Please try again.');
+        }
+    }
+
+    // public function onSaleItemList(Request $request){
+    //     $items = DB::table('fumaco_items')->paginate(15);
+    //     return view('backend.marketing.item_list', compact('items'));
+    // }
+
+    public function addOnSale(Request $request){
+        DB::beginTransaction();
+        try {
+            $from = '';
+            $to = '';
+            $discount_rate = null;
+
+            if(isset($request->set_duration)){
+                $sale_duration = explode(' - ', $request->sale_duration);
+
+                $from = $sale_duration[0];
+                $to = $sale_duration[1];
+            }            
+
+            if($request->discount_type == 'Fixed Amount'){
+                $discount_rate = $request->discount_amount;
+            }else if($request->discount_type == 'By Percentage'){
+                $discount_rate = $request->discount_percentage;
+            }
+
+            $insert = [
+                'sale_name' => $request->sale_name,
+                'start_date' => $from,
+                'end_date' => $to,
+                'discount_type' => $request->discount_type,
+                'discount_rate' => $discount_rate,
+                'capped_amount' => $request->capped_amount,
+                'discount_for' => $request->discount_for,
+                'apply_discount_to' => $request->discount_for == 'All Items' ? $request->discount_for : $request->selected_categories,
+                'coupon' => $request->coupon,
+                'created_by' => Auth::user()->username
+            ];
+
+            DB::table('fumaco_on_sale')->insert($insert);
+
+            DB::commit();
+            return redirect('/admin/marketing/on_sale/list')->with('success', 'On Sale Added.');
+        } catch (Exception $e) {
+            DB::rollback();
+            return redirect()->back()->with('error', 'An error occured. Please try again.');
+        }
     }
 
     // update parent variant attribute status
