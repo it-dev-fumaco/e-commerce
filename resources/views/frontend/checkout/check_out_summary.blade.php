@@ -247,20 +247,20 @@
 								<div class="col-md-6 offset-md-3">
 									<div class="form-group">
 										<label for="store-selection">Select Store</label>
-										<select id="store-selection" class="form-control card-btn formslabelfnt" style="text-align: center;">
+										<select id="store-selection" class="form-control formslabelfnt" style="text-align: center;">
 											<option value="">Select Store</option>
 											@foreach ($srate['stores'] as $store)
 											<option value="{{ $store->store_name }}" data-address="{{ $store->address }}" data-available-time="Available Time: <br>{{ date("h:i A", strtotime($store->available_from)) . ' - ' . date("h:i A", strtotime($store->available_to)) }}">{{ $store->store_name }}</option>
 											@endforeach
 										</select>
-										<div class="m-1 text-left" id="store-address"></div>
-										<div class="m-1 text-left" id="available-time"></div>
+										<div class="m-1 text-center" id="store-address"></div>
+										<div class="m-1 text-center" id="available-time"></div>
 									</div>
 								</div>
 								<div class="col-md-6 offset-md-3 bootstrap-timepicker">
 									<div class="form-group">
 										<label for="pickup-time">Pickup by</label>
-										<input type="text" class="form-control card-btn" id="pickup-time" style="text-align: center;">
+										<input type="text" class="form-control" id="pickup-time" style="text-align: center;">
 									</div>
 								</div>
 							</div>
