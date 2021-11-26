@@ -74,6 +74,7 @@
                                             <th class="text-center">Apply Discount to</th>
                                             <th class="text-center">Coupon Code</th>
                                             <th class="text-center">Active</th>
+                                            <th class="text-center">Action</th>
                                         </tr>
                                         @forelse ($sale_arr as $sale)
                                             <tr>
@@ -124,17 +125,40 @@
                                                 </td>
                                                 <td class="text-center">{{ $sale['coupon'] }}</td>
                                                 <td class="text-center">
-                                                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
-                                                        <a class="dropdown-item" href="/admin/marketing/on_sale/{{ $sale['id'] }}/edit">View Details</a>
-                                                        @if ($sale['status'] == 1)
-                                                            <a class="dropdown-item" href="#" data-toggle="modal" data-target="#rm{{ $sale['id'] }}">Remove Active</a>
-                                                        @else
-                                                            <a class="dropdown-item" href="#" data-toggle="modal" data-target="#sm{{ $sale['id'] }}">Set Active</a>
-                                                        @endif
-                                                        <a class="dropdown-item" href="#" data-toggle="modal" data-target="#d{{ $sale['id'] }}"><small>Delete</small></a>
+                                                    <center>
+                                                        <label class="switch">
+                                                            <input type="checkbox" class="toggle" name="publish" {{ ($sale['status'] == 1) ? 'checked' : '' }} value="{{ $sale['id'] }}"/>
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </center>
+                                                </td>
+                                                <td class="text-center">
+                                                    <div class="dropdown">
+                                                        <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Action
+                                                        </button>
+                                                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
+                                                            <a class="dropdown-item" href="/admin/marketing/on_sale/{{ $sale['id'] }}/edit_form">View Details</a>
+                                                            <a class="dropdown-item" data-toggle="modal" data-target="#delete{{ $sale['id'] }}"><small>Delete</small></a>
+                                                        </div>
                                                     </div>
                                                 </td>
                                             </tr>
+                                            <div class="modal fade" id="delete{{ $sale['id'] }}" role="dialog" aria-labelledby="delete{{ $sale['id'] }}Label" aria-hidden="true">
+                                                <div class="modal-dialog" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="exampleModalLabel">Delete "On Sale"</h5>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            Delete {{ $sale['name'] }}?
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                            <a href="/admin/marketing/on_sale/{{ $sale['id'] }}/delete" type="button" class="btn btn-danger">Delete</a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         @empty
                                             <tr>
                                                 <td colspan=9 class="text-center">No "On Sale" Promos</td>
@@ -152,4 +176,90 @@
             </section>
         </div>
     </div>
+    <style>
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 30px;
+            height: 16px;
+        }
+    
+        .switch input { 
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+    
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+    
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 10px;
+            width: 10px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+    
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+    
+        input:focus + .slider {
+            box-shadow: 0 0 1px #2196F3;
+        }
+    
+        input:checked + .slider:before {
+            -webkit-transform: translateX(16px);
+            -ms-transform: translateX(16px);
+            transform: translateX(16px);
+        }
+    
+        /* Rounded sliders */
+        .slider.round {
+            border-radius: 34px;
+        }
+    
+        .slider.round:before {
+            border-radius: 50%;
+        }
+    </style>
+@endsection
+@section('script')
+    <script>
+        $(document).ready(function() {
+            $(".toggle").change(function(){
+                var data = {
+                    'status': $(this).prop('checked') == true ? 1 : 0,
+                    'sale_id': $(this).val(),
+                    '_token': "{{ csrf_token() }}",
+                }
+                console.log(data);
+                $.ajax({
+                    type:'POST',
+                    url:'/admin/marketing/on_sale/set_status',
+                    data: data,
+                    success: function (response) {
+                        console.log('success');
+                    },
+                    error: function () {
+                        alert('An error occured.');
+                    }
+                });
+            });
+        });
+    </script>
 @endsection

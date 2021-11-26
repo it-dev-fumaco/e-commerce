@@ -740,6 +740,7 @@ class ProductController extends Controller
         return view('backend.products.category_attribute_settings', compact('list', 'attributes'));
     }
 
+
     public function voucherList(){
         $coupon = DB::table('fumaco_voucher')->paginate(10);
         return view('backend.marketing.list_voucher', compact('coupon'));
@@ -762,6 +763,12 @@ class ProductController extends Controller
                     ];
                 }
             }
+
+            $sale_duration = '';
+
+            if($sale->start_date and $sale->end_date){
+                $sale_duration = Carbon::parse($sale->start_date)->format('M d, Y').' - '.Carbon::parse($sale->end_date)->format('M d, Y');
+            }
             
             $sale_arr[] = [
                 'id' => $sale->id,
@@ -772,7 +779,7 @@ class ProductController extends Controller
                 'coupon' => $coupon ? $coupon->code : '',
                 'discount_for' => $sale->discount_for,
                 'categories' => $categories_arr,
-                'sale_duration' => Carbon::parse($sale->start_date)->format('M d, Y').' - '.Carbon::parse($sale->end_date)->format('M d, Y'),
+                'sale_duration' => $sale_duration,
                 'status' => $sale->status
             ];
         }
@@ -793,10 +800,23 @@ class ProductController extends Controller
         $on_sale = DB::table('fumaco_on_sale')->where('id', $id)->first();
 
         $categories = DB::table('fumaco_categories')->where('publish', 1)->where('external_link', null)->get();
-
         $vouchers = DB::table('fumaco_voucher')->get();
 
-        return view('backend.marketing.edit_onsale', compact('on_sale', 'categories', 'vouchers'));
+        $discounted_categories = $on_sale->apply_discount_to ? explode(',', $on_sale->apply_discount_to) : '';
+
+        return view('backend.marketing.edit_onsale', compact('on_sale', 'discounted_categories', 'categories', 'vouchers'));
+    }
+
+    public function setOnSaleStatus(Request $request){
+        DB::beginTransaction();
+        try {
+            DB::table('fumaco_on_sale')->where('id', $request->sale_id)->update(['status' => $request->status]);
+            DB::commit();
+            return response()->json(['status' => 1]);
+        } catch (Exception $e) {
+            DB::rollback();
+            return redirect()->back()->with('error', 'An error occured. Please try again.');
+        }
     }
 
     public function addVoucherForm(){
@@ -833,29 +853,39 @@ class ProductController extends Controller
         }
     }
 
-    // public function onSaleItemList(Request $request){
-    //     $items = DB::table('fumaco_items')->paginate(15);
-    //     return view('backend.marketing.item_list', compact('items'));
-    // }
-
     public function addOnSale(Request $request){
         DB::beginTransaction();
         try {
             $from = '';
             $to = '';
             $discount_rate = null;
+            $capped_amount = null;
 
             if(isset($request->set_duration)){
                 $sale_duration = explode(' - ', $request->sale_duration);
 
                 $from = $sale_duration[0];
                 $to = $sale_duration[1];
-            }            
+
+                // check if date overlaps with other "On Sale"
+                $date_check = DB::table('fumaco_on_sale')->where('start_date', '!=', '')->where('end_date', '!=', '')->get();
+                foreach($date_check as $date){
+                    if($from >= $date->start_date and $from <= $date->end_date){
+                        return redirect()->back()->with('error', 'On Sale dates cannot overlap');
+                    }
+
+                    if($to >= $date->start_date and $to <= $date->end_date){
+                        return redirect()->back()->with('error', 'On Sale dates cannot overlap');
+                    }
+                }
+
+            }
 
             if($request->discount_type == 'Fixed Amount'){
                 $discount_rate = $request->discount_amount;
             }else if($request->discount_type == 'By Percentage'){
                 $discount_rate = $request->discount_percentage;
+                $capped_amount = $request->capped_amount;
             }
 
             $insert = [
@@ -864,7 +894,7 @@ class ProductController extends Controller
                 'end_date' => $to,
                 'discount_type' => $request->discount_type,
                 'discount_rate' => $discount_rate,
-                'capped_amount' => $request->capped_amount,
+                'capped_amount' => $capped_amount,
                 'discount_for' => $request->discount_for,
                 'apply_discount_to' => $request->discount_for == 'All Items' ? $request->discount_for : $request->selected_categories,
                 'coupon' => $request->coupon,
@@ -881,6 +911,63 @@ class ProductController extends Controller
         }
     }
 
+    public function editOnSale($id, Request $request){
+        DB::beginTransaction();
+        try {
+            $from = '';
+            $to = '';
+            $discount_rate = null;
+            $capped_amount = null;
+
+            if(isset($request->set_duration)){
+                $sale_duration = explode(' - ', $request->sale_duration);
+
+                $from = $sale_duration[0];
+                $to = $sale_duration[1];
+            }            
+
+            if($request->discount_type == 'Fixed Amount'){
+                $discount_rate = $request->discount_amount;
+            }else if($request->discount_type == 'By Percentage'){
+                $discount_rate = $request->discount_percentage;
+                $capped_amount = $request->capped_amount;
+            }
+
+            $update = [
+                'sale_name' => $request->sale_name,
+                'start_date' => $from,
+                'end_date' => $to,
+                'discount_type' => $request->discount_type,
+                'discount_rate' => $discount_rate,
+                'capped_amount' => $capped_amount,
+                'discount_for' => $request->discount_for,
+                'apply_discount_to' => $request->discount_for == 'All Items' ? $request->discount_for : $request->selected_categories,
+                'coupon' => $request->coupon,
+                'last_modified_at' => Carbon::now()->toDateTimeString(),
+                'last_modified_by' => Auth::user()->username
+            ];
+
+            DB::table('fumaco_on_sale')->where('id', $id)->update($update);
+            // return $update;
+            DB::commit();
+            return redirect('/admin/marketing/on_sale/list')->with('success', 'On Sale Added.');
+        } catch (Exception $e) {
+            DB::rollback();
+            return redirect()->back()->with('error', 'An error occured. Please try again.');
+        }
+    }
+
+    public function removeOnSale($id){
+        DB::beginTransaction();
+        try {
+            DB::table('fumaco_on_sale')->where('id', $id)->delete();
+            DB::commit();
+            return redirect()->back()->with('success', 'On Sale Deleted.');
+        } catch (Exception $e) {
+            DB::rollback();
+            return redirect()->back()->with('error', 'An error occured. Please try again.');
+        }
+    }
     // update parent variant attribute status
     public function updateCategoryAttr($cat_id, Request $request) {
         DB::beginTransaction();

@@ -266,11 +266,15 @@ Route::prefix('admin')->group(function () {
         Route::get('/edit/page/about_us/sponsor/reset/{id}', 'PagesController@resetSort');
 
         Route::get('/marketing/search/list', 'PagesController@searchList');
+
         Route::get('/marketing/on_sale/list', 'ProductController@onSaleList');
         Route::get('/marketing/voucher/list', 'ProductController@voucherList');
         Route::get('/marketing/on_sale/addForm', 'ProductController@addOnsaleForm');
         Route::post('/marketing/on_sale/add', 'ProductController@addOnsale');
-        Route::post('/marketing/on_sale/{id}/edit', 'ProductController@editOnsaleForm');
+        Route::get('/marketing/on_sale/{id}/edit_form', 'ProductController@editOnsaleForm');
+        Route::post('/marketing/on_sale/{id}/edit', 'ProductController@editOnsale');
+        Route::get('/marketing/on_sale/{id}/delete', 'ProductController@removeOnsale');
+        Route::post('/marketing/on_sale/set_status', 'ProductController@setOnSaleStatus');
         Route::post('/marketing/voucher/add', 'ProductController@addVoucher');
         Route::get('/marketing/voucher/add_voucher', 'ProductController@addVoucherForm');
 

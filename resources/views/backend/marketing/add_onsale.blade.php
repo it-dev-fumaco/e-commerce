@@ -37,7 +37,7 @@
                                     </div>
                                 @endif
                                 <div class="card-body">
-                                    <form action="/admin/marketing/on_sale/add" method="post">
+                                    <form action="/admin/marketing/on_sale/add" method="post" enctype="multipart/form-data">
                                         @csrf
                                         <div class="row">
                                             <div class="col-9"><h4>On Sale</h4></div>
@@ -47,8 +47,52 @@
                                         </div>
                                         <div class="row">
                                             <div class="col-6">
-                                                <label>Sale Name</label>
+                                                <label>Sale Name *</label>
                                                 <input type="text" class="form-control" name="sale_name" placeholder="Sale Name" required>
+                                            </div>
+                                            <div class="col-6">
+                                                <label>Discount Type *</label>
+                                                @php
+                                                    $discount_type = array('Free Delivery', 'Fixed Amount', 'By Percentage');
+                                                @endphp
+                                                <select class="form-control" name="discount_type" id="discount_type" required>
+                                                    <option disabled selected value="">Discount Type</option>
+                                                    @foreach ($discount_type as $discount)
+                                                        <option value="{{ $discount }}">{{ $discount }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            {{-- <div class="col-4">
+                                                <label>Banner Image</label>
+                                                <div class="custom-file mb-3">
+                                                    <input type="file" class="custom-file-input" id="customFile" name="banner_img">
+                                                    <label class="custom-file-label" for="customFile">Choose File</label>
+                                                </div>
+                                            </div> --}}
+                                        </div>
+                                        <div id="fixed_amount" class="row" style="display: none">
+                                            <br>&nbsp;
+                                            <div class="col-12">
+                                                <label>Amount *</label>
+                                                <input type="text" class="form-control" id="discount_amount" name="discount_amount" placeholder="Amount">
+                                            </div>
+                                        </div>
+                                        <div id="percentage" class="row" style="display: none">
+                                            <div class="col-12"><br></div>
+                                            <div class="col-6">
+                                                <label>Percentage *</label>
+                                                <input type="text" class="form-control" id="discount_percentage" name="discount_percentage" placeholder="Percentage">
+                                            </div>
+                                            <div class="col-6">
+                                                <label>Capped Amount</label>
+                                                <input type="text" class="form-control" name="capped_amount" id="capped_amount" placeholder="Capped Amount"/>
+                                            </div>
+                                        </div>
+                                        <br>
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <label><input type="checkbox" name="set_duration" id="set_duration"> Set Sale Duration</label>
+                                                <input type="text" class="form-control set_duration" id="daterange" name="sale_duration" disabled/>
                                             </div>
                                             <div class="col-6">
                                                 <label><input type="checkbox" name="require_coupon" id="require_coupon" {{ count($vouchers) == 0 ? 'disabled' : '' }}> Require Coupon</label>
@@ -63,47 +107,10 @@
                                                 </select>
                                             </div>
                                         </div>
-                                        <br>
-                                        <div class="row">
-                                            <div class="col-6">
-                                                <label><input type="checkbox" name="set_duration" id="set_duration"> Set Sale Duration</label>
-                                                <input type="text" class="form-control set_duration" id="daterange" name="sale_duration" disabled/>
-                                            </div>
-                                            <div class="col-6">
-                                                <label>Discount Type</label>
-                                                @php
-                                                    $discount_type = array('Free Delivery', 'Fixed Amount', 'By Percentage');
-                                                @endphp
-                                                <select class="form-control" name="discount_type" id="discount_type" required>
-                                                    <option disabled selected value="">Discount Type</option>
-                                                    @foreach ($discount_type as $discount)
-                                                        <option value="{{ $discount }}">{{ $discount }}</option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div id="fixed_amount" class="row" style="display: none">
-                                            <br>&nbsp;
-                                            <div class="col-12">
-                                                <label>Amount</label>
-                                                <input type="text" class="form-control" id="discount_amount" name="discount_amount" placeholder="Amount">
-                                            </div>
-                                        </div>
-                                        <div id="percentage" class="row" style="display: none">
-                                            <div class="col-12"><br></div>
-                                            <div class="col-6">
-                                                <label>Percentage</label>
-                                                <input type="text" class="form-control" id="discount_percentage" name="discount_percentage" placeholder="Percentage">
-                                            </div>
-                                            <div class="col-6">
-                                                <label>Capped Amount</label>
-                                                <input type="text" class="form-control" name="capped_amount" placeholder="Capped Amount"/>
-                                            </div>
-                                        </div>
                                         <br/>
                                         <div class="row">
                                             <div class="col-6">
-                                                <label>Discount For</label>
+                                                <label>Discount For *</label>
                                                 <select class="form-control" name="discount_for" id="discount_for" required>
                                                     <option disabled selected value="">Discount For</option>
                                                     <option value="Per Category">Per Category</option>
@@ -111,7 +118,7 @@
                                                 </select>
                                             </div>
                                             <div id="categories" class="col-6" style="display: none">
-                                                <label>Categories</label><br/>
+                                                <label>Categories *</label><br/>
                                                 <input class="d-none" type="text" name="selected_categories" id="selected_categories">
                                                 @forelse ($categories as $cat)
                                                     <input type="checkbox" name="category" class="categories" value="{{ $cat->id }}"> {{ $cat->name }}<br/>
@@ -142,7 +149,6 @@
         });
 
         $('#discount_type').change(function(){
-            console.log($('#discount_type').val());
             if($('#discount_type').val() == 'Fixed Amount'){
                 $('#fixed_amount').slideDown();
                 $("#discount_amount").prop('required',true);
@@ -196,6 +202,12 @@
             }).get().join(",");
             $('#selected_categories').val(string);
         });
+
+        // Add the following code if you want the name of the file appear on select
+        // $(".custom-file-input").change(function() {
+        //     var fileName = $(this).val().split("\\").pop();
+        //     $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+        // });
     });
     </script>
 @endsection
