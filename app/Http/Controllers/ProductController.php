@@ -741,8 +741,8 @@ class ProductController extends Controller
     }
 
 
-    public function voucherList(){
-        $coupon = DB::table('fumaco_voucher')->paginate(10);
+    public function voucherList(Request $request){
+        $coupon = DB::table('fumaco_voucher')->where('name', 'LIKE', '%'.$request->q.'%')->paginate(10);
         return view('backend.marketing.list_voucher', compact('coupon'));
     }
 
@@ -809,6 +809,12 @@ class ProductController extends Controller
         return view('backend.marketing.edit_onsale', compact('on_sale', 'discounted_categories', 'categories', 'vouchers'));
     }
 
+    public function editVoucherForm($id){
+        $coupon = DB::table('fumaco_voucher')->where('id', $id)->first();
+
+        return view('backend.marketing.edit_voucher', compact('coupon'));
+    }
+
     public function setOnSaleStatus(Request $request){
         DB::beginTransaction();
         try {
@@ -841,14 +847,42 @@ class ProductController extends Controller
 
             $insert = [
                 'name' => $request->name,
-                'code' => $request->coupon_code,
-                'total_allotment' => $request->allotment,
+                'code' => strtoupper($request->coupon_code),
+                'total_allotment' => isset($request->unlimited_allotment) ? null : $request->allotment,
+                'unlimited' => isset($request->unlimited_allotment) ? 1 : 0,
                 'created_by' => Auth::user()->username
             ];
 
             DB::table('fumaco_voucher')->insert($insert);
             DB::commit();
             return redirect('/admin/marketing/voucher/list')->with('success', 'Voucher Added!');
+        } catch (Exception $e) {
+            DB::rollback();
+            return redirect()->back()->with('error', 'An error occured. Please try again.');
+        }
+    }
+
+    public function editVoucher($id, Request $request){
+        DB::beginTransaction();
+        try {
+            $name_checker = DB::table('fumaco_voucher')->where('name', $request->name)->where('id', '!=', $id)->first();
+            $code_checker = DB::table('fumaco_voucher')->where('code', $request->coupon_code)->where('id', '!=', $id)->first();
+
+            if($name_checker or $code_checker){
+				return redirect()->back()->with('error', "Voucher Name/Code must be unique.");
+            }
+
+            $update = [
+                'name' => $request->name,
+                'code' => strtoupper($request->coupon_code),
+                'total_allotment' => isset($request->unlimited_allotment) ? null : $request->allotment,
+                'unlimited' => isset($request->unlimited_allotment) ? 1 : 0,
+                'last_modified_by' => Auth::user()->username
+            ];
+
+            DB::table('fumaco_voucher')->where('id', $id)->update($update);
+            DB::commit();
+            return redirect('/admin/marketing/voucher/list')->with('success', 'Voucher Edited!');
         } catch (Exception $e) {
             DB::rollback();
             return redirect()->back()->with('error', 'An error occured. Please try again.');
@@ -1048,6 +1082,19 @@ class ProductController extends Controller
             return redirect()->back()->with('error', 'An error occured. Please try again.');
         }
     }
+
+    public function removeVoucher($id){
+        DB::beginTransaction();
+        try {
+            DB::table('fumaco_voucher')->where('id', $id)->delete();
+            DB::commit();
+            return redirect()->back()->with('success', 'Coupon Deleted.');
+        } catch (Exception $e) {
+            DB::rollback();
+            return redirect()->back()->with('error', 'An error occured. Please try again.');
+        }
+    }
+
     // update parent variant attribute status
     public function updateCategoryAttr($cat_id, Request $request) {
         DB::beginTransaction();

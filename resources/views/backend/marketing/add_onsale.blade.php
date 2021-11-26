@@ -198,7 +198,7 @@
         }
 
         function requireCoupon(){
-            if($('#set_duration').is(':checked')){
+            if($('#require_coupon').is(':checked')){
                 $("#coupon").prop('required',true);
                 $("#coupon").prop('disabled',false);
             }else{

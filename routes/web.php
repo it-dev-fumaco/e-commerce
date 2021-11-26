@@ -277,6 +277,9 @@ Route::prefix('admin')->group(function () {
         Route::post('/marketing/on_sale/set_status', 'ProductController@setOnSaleStatus');
         Route::post('/marketing/voucher/add', 'ProductController@addVoucher');
         Route::get('/marketing/voucher/add_voucher', 'ProductController@addVoucherForm');
+        Route::get('/marketing/voucher/{id}/edit_form', 'ProductController@editVoucherForm');
+        Route::post('/marketing/voucher/{id}/edit', 'ProductController@editVoucher');
+        Route::get('/marketing/voucher/{id}/delete', 'ProductController@removeVoucher');
 
         // SHIPPING SERVICES ROUTES CMS
         Route::get('/shipping/list', 'ShippingController@viewList');

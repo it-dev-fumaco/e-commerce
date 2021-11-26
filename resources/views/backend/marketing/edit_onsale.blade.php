@@ -117,6 +117,13 @@
                                                     <img class="img-thumbnail" src="{{ asset('/assets/site-img/'.$on_sale->banner_image) }}" alt="" style="width: 100%">
                                                 </div>
                                             </div>
+                                            <div class="col-12">
+                                                <br/>
+                                                <div class="float-right font-italic">
+                                                    <small>Last modified by: {{ $on_sale->last_modified_by }} - {{ $on_sale->last_modified_at }}</small><br>
+                                                    <small>Created by: {{ $on_sale->created_by }} - {{ $on_sale->created_at }}</small>
+                                                </div>
+                                            </div>
                                         </div>
                                     </form>
                                 </div>
