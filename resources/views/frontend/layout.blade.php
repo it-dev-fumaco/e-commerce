@@ -374,8 +374,9 @@
     display: table;
     clear: both;
   }
-  a:focus, .btn:focus, .no-click-outline:focus, .btn-check:focus + label{
+  .btn:focus, a:focus, .btn-check:focus + label{
     box-shadow: none !important;
+    border: none !important;
   }
     </style>
     @yield('style')
