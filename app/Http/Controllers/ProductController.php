@@ -746,9 +746,8 @@ class ProductController extends Controller
         return view('backend.marketing.list_voucher', compact('coupon'));
     }
 
-    public function onSaleList(){
-        $on_sale = DB::table('fumaco_on_sale')->paginate(10);
-
+    public function onSaleList(Request $request){
+        $on_sale = DB::table('fumaco_on_sale')->where('sale_name', 'LIKE', '%'.$request->q.'%')->paginate(10);
         $sale_arr = [];
         foreach($on_sale as $sale){
             $coupon = DB::table('fumaco_voucher')->where('id', $sale->coupon)->first();
@@ -757,10 +756,13 @@ class ProductController extends Controller
                 $cat_ids = explode(',', $sale->apply_discount_to);
                 foreach($cat_ids as $cat_id){
                     $cat_name = DB::table('fumaco_categories')->where('id', $cat_id)->first();
-                    $categories_arr[] = [
-                        'id' => $cat_id,
-                        'name' => $cat_name->name
-                    ];
+
+                    if($cat_name){
+                        $categories_arr[] = [
+                            'id' => $cat_id,
+                            'name' => $cat_name->name
+                        ];
+                    }
                 }
             }
 
@@ -773,6 +775,7 @@ class ProductController extends Controller
             $sale_arr[] = [
                 'id' => $sale->id,
                 'name' => $sale->sale_name,
+                'banner' => $sale->banner_image,
                 'discount_type' => $sale->discount_type,
                 'discount_rate' => $sale->discount_rate,
                 'capped_amount' => $sale->capped_amount,
@@ -784,14 +787,13 @@ class ProductController extends Controller
             ];
         }
 
-        // return $sale_arr;
         return view('backend.marketing.list_sale', compact('on_sale', 'sale_arr'));
     }
 
     public function addOnsaleForm(){
         $categories = DB::table('fumaco_categories')->where('publish', 1)->where('external_link', null)->get();
 
-        $vouchers = DB::table('fumaco_voucher')->get();
+        $vouchers = DB::table('fumaco_voucher')->where('total_consumed', 0)->get();
 
         return view('backend.marketing.add_onsale', compact('categories', 'vouchers'));
     }
@@ -800,7 +802,7 @@ class ProductController extends Controller
         $on_sale = DB::table('fumaco_on_sale')->where('id', $id)->first();
 
         $categories = DB::table('fumaco_categories')->where('publish', 1)->where('external_link', null)->get();
-        $vouchers = DB::table('fumaco_voucher')->get();
+        $vouchers = DB::table('fumaco_voucher')->where('total_consumed', 0)->get();
 
         $discounted_categories = $on_sale->apply_discount_to ? explode(',', $on_sale->apply_discount_to) : '';
 
@@ -901,6 +903,45 @@ class ProductController extends Controller
                 'created_by' => Auth::user()->username
             ];
 
+            // Image upload
+            $rules = array(
+				'uploadFile' => 'image|max:500000'
+			);
+
+			$validation = Validator::make($request->all(), $rules);
+
+            if ($validation->fails()){
+				return redirect()->back()->with('error', "Sorry, your file is too large.");
+			}
+
+            $allowed_extensions = array('jpg', 'png', 'jpeg', 'gif');
+            $extension_error = "Sorry, only JPG, JPEG, PNG and GIF files are allowed.";
+
+            $destinationPath = public_path('/assets/site-img/');
+
+            if($request->hasFile('banner_img')){
+                $banner_img = $request->file('banner_img');
+
+                $img_name = pathinfo($banner_img->getClientOriginalName(), PATHINFO_FILENAME);
+			    $img_ext = pathinfo($banner_img->getClientOriginalName(), PATHINFO_EXTENSION);
+
+                $img_name = Str::slug($img_name, '-');
+
+                $banner_image_name = $img_name.".".$img_ext;
+
+                if(!in_array($img_ext, $allowed_extensions)){
+                    return redirect()->back()->with('image_error', $extension_error);
+                }
+
+                $webp_pr = Webp::make($banner_img);
+
+                if($webp_pr->save(public_path('/assets/site-img/'.$img_name.'.webp'))) {
+                    $banner_img->move($destinationPath, $banner_image_name);
+                }
+
+                $insert['banner_image'] = $banner_image_name;
+            }
+
             DB::table('fumaco_on_sale')->insert($insert);
 
             DB::commit();
@@ -946,6 +987,45 @@ class ProductController extends Controller
                 'last_modified_at' => Carbon::now()->toDateTimeString(),
                 'last_modified_by' => Auth::user()->username
             ];
+
+            // Image upload
+            $rules = array(
+				'uploadFile' => 'image|max:500000'
+			);
+
+			$validation = Validator::make($request->all(), $rules);
+
+            if ($validation->fails()){
+				return redirect()->back()->with('error', "Sorry, your file is too large.");
+			}
+
+            $allowed_extensions = array('jpg', 'png', 'jpeg', 'gif');
+            $extension_error = "Sorry, only JPG, JPEG, PNG and GIF files are allowed.";
+
+            $destinationPath = public_path('/assets/site-img/');
+
+            if($request->hasFile('banner_img')){
+                $banner_img = $request->file('banner_img');
+
+                $img_name = pathinfo($banner_img->getClientOriginalName(), PATHINFO_FILENAME);
+			    $img_ext = pathinfo($banner_img->getClientOriginalName(), PATHINFO_EXTENSION);
+
+                $img_name = Str::slug($img_name, '-');
+
+                $banner_image_name = $img_name.".".$img_ext;
+
+                if(!in_array($img_ext, $allowed_extensions)){
+                    return redirect()->back()->with('image_error', $extension_error);
+                }
+
+                $webp_pr = Webp::make($banner_img);
+
+                if($webp_pr->save(public_path('/assets/site-img/'.$img_name.'.webp'))) {
+                    $banner_img->move($destinationPath, $banner_image_name);
+                }
+
+                $update['banner_image'] = $banner_image_name;
+            }
 
             DB::table('fumaco_on_sale')->where('id', $id)->update($update);
             // return $update;

@@ -46,22 +46,19 @@
                                         </div>
                                     @endif
                                     <div class="col-md-12">
-                                        <div class="float-right">
-                                            <form action="/admin/marketing/search/list" class="text-center" method="GET">
-                                                <div class="form-group row">
-                                                    <div class="col-sm-7">
-                                                        <input type="text" class="form-control" id="search-box" name="q" placeholder="Search" value="{{request()->get('q')}}">
-                                                    </div>
-                                                        
-                                                    <div class="col-sm-2 mr-2">
-                                                        <button type="submit" class="btn btn-primary">Search</button>
-                                                    </div>
-                                                    <div class="col-sm-2">
-                                                        <a href="/admin/marketing/on_sale/addForm" class="btn btn-primary">Add</a>
-                                                    </div>
+                                        <form action="/admin/marketing/on_sale/list" class="text-center" method="GET">
+                                            <div class="form-group row">
+                                                <div class="col-4 text-left">
+                                                    <input type="text" class="form-control" id="search-box" name="q" placeholder="Search" value="{{request()->get('q')}}">
                                                 </div>
-                                            </form>
-                                        </div>
+                                                <div class="col-1">
+                                                    <button type="submit" class="btn btn-secondary mx-auto" style='width: 100%'>Search</button>
+                                                </div>
+                                                <div class="col-1">
+                                                    <a href="/admin/marketing/on_sale/addForm" class="btn btn-primary mx-auto" style='width: 100%'>Add</a>
+                                                </div>
+                                            </div>
+                                        </form>
                                     </div>
                                     <table class="table table-hover table-bordered">
                                         <tr>
@@ -69,7 +66,7 @@
                                             <th class="text-center">Sale Name</th>
                                             <th class="text-center">Sale Duration</th>
                                             <th class="text-center">Discount Type</th>
-                                            <th class="text-center">Discount Rate</th>
+                                            <th class="text-center">Discount/Amount</th>
                                             <th class="text-center">Capped Amount</th>
                                             <th class="text-center">Apply Discount to</th>
                                             <th class="text-center">Coupon Code</th>
@@ -82,8 +79,18 @@
                                                 <td class="text-center">{{ $sale['name'] }}</td>
                                                 <td class="text-center">{{ $sale['sale_duration'] }}</td>
                                                 <td class="text-center">{{ $sale['discount_type'] }}</td>
-                                                <td class="text-center">{{ $sale['discount_rate'] }}</td>
-                                                <td class="text-center">{{ $sale['capped_amount'] }}</td>
+                                                <td class="text-center">
+                                                    @if ($sale['discount_type'] == 'Fixed Amount')
+                                                        ₱ {{ number_format($sale['discount_rate'], 2, '.', ',') }}
+                                                    @elseif($sale['discount_type'] == 'By Percentage')
+                                                        {{ $sale['discount_rate'] }}%
+                                                    @endif
+                                                </td>
+                                                <td class="text-center">
+                                                    @if ($sale['capped_amount'])
+                                                        ₱ {{ number_format($sale['capped_amount'], 2, '.', ',') }}
+                                                    @endif
+                                                </td>
                                                 <td class="text-center">
                                                     @if ($sale['discount_for'] == 'All Items')
                                                         {{ $sale['discount_for'] }}

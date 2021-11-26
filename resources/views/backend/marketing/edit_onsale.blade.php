@@ -37,7 +37,7 @@
                                     </div>
                                 @endif
                                 <div class="card-body">
-                                    <form action="/admin/marketing/on_sale/{{ $on_sale->id }}/edit" method="post">
+                                    <form action="/admin/marketing/on_sale/{{ $on_sale->id }}/edit" method="post" enctype="multipart/form-data">
                                         @csrf
                                         <div class="row">
                                             <div class="col-9"><h4>On Sale</h4></div>
@@ -46,29 +46,10 @@
                                             </div>
                                         </div>
                                         <div class="row">
-                                            <div class="col-6">
+                                            <div class="col-6 ">
                                                 <label>Sale Name</label>
                                                 <input type="text" class="form-control" name="sale_name" placeholder="Sale Name" value="{{ $on_sale->sale_name }}" required>
-                                            </div>
-                                            <div class="col-6">
-                                                <label><input type="checkbox" name="require_coupon" id="require_coupon" {{ count($vouchers) == 0 ? 'disabled' : '' }} {{ $on_sale->coupon ? 'checked' : '' }}> Require Coupon</label>
-                                                <select class="form-control" name="coupon" id="coupon" {{ $on_sale->coupon ? '' : 'disabled' }}>
-                                                    <option disabled selected value="">Select a Voucher</option>
-                                                    @forelse ($vouchers as $voucher)
-                                                        <option value="{{ $voucher->id }}" {{ $voucher->id == $on_sale->coupon ? 'selected' : '' }}>{{ $voucher->name }}</option>
-                                                    @empty
-                                                        <option disabled value="">No Vouchers</option>
-                                                    @endforelse
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <br>
-                                        <div class="row">
-                                            <div class="col-6">
-                                                <label><input type="checkbox" name="set_duration" id="set_duration" {{ $on_sale->start_date ? 'checked' : '' }}> Set Sale Duration</label>
-                                                <input type="text" class="form-control set_duration" id="daterange" name="sale_duration" {{ $on_sale->start_date ? '' : 'disabled' }}/>
-                                            </div>
-                                            <div class="col-6">
+                                                <br/>
                                                 <label>Discount Type</label>
                                                 @php
                                                     $discount_type = array('Free Delivery', 'Fixed Amount', 'By Percentage');
@@ -79,44 +60,62 @@
                                                         <option value="{{ $discount }}">{{ $discount }}</option>
                                                     @endforeach
                                                 </select>
-                                            </div>
-                                        </div>
-                                        <div id="fixed_amount" class="row" style="display: none">
-                                            <br>&nbsp;
-                                            <div class="col-12">
-                                                <label>Amount</label>
-                                                <input type="text" class="form-control" id="discount_amount" name="discount_amount" value="{{ $on_sale->discount_rate }}" placeholder="Amount">
-                                            </div>
-                                        </div>
-                                        <div id="percentage" class="row" style="display: none">
-                                            <div class="col-12"><br></div>
-                                            <div class="col-6">
-                                                <label>Percentage</label>
-                                                <input type="text" class="form-control" id="discount_percentage" name="discount_percentage" value="{{ $on_sale->discount_rate }}" placeholder="Percentage">
-                                            </div>
-                                            <div class="col-6">
-                                                <label>Capped Amount</label>
-                                                <input type="text" class="form-control" id="capped_amount" name="capped_amount" value="{{ $on_sale->capped_amount }}" placeholder="Capped Amount"/>
-                                            </div>
-                                        </div>
-                                        <br/>
-                                        <div class="row">
-                                            <div class="col-6">
+                                                <div id="fixed_amount" class="col-12">
+                                                    <br/>&nbsp;
+                                                    <label>Amount</label>
+                                                    <input type="text" class="form-control" id="discount_amount" name="discount_amount" value="{{ $on_sale->discount_rate }}" placeholder="Amount">
+                                                </div>
+                                                <div id="percentage" class="row">
+                                                    <div class="col-12"><br/></div>
+                                                    <div class="col-6">
+                                                        <label>Percentage</label>
+                                                        <input type="text" class="form-control" id="discount_percentage" name="discount_percentage" value="{{ $on_sale->discount_rate }}" placeholder="Percentage">
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <label>Capped Amount</label>
+                                                        <input type="text" class="form-control" id="capped_amount" name="capped_amount" value="{{ $on_sale->capped_amount }}" placeholder="Capped Amount"/>
+                                                    </div>
+                                                </div>
+                                                <br/>
                                                 <label>Discount For</label>
                                                 <select class="form-control" name="discount_for" id="discount_for" required>
                                                     <option disabled selected value="">Discount For</option>
                                                     <option value="Per Category">Per Category</option>
                                                     <option value="All Items">All Items</option>
                                                 </select>
+                                                <br/>
+                                                <div id="categories" style="display: none">
+                                                    <label>Categories</label><br/>
+                                                    <input class="d-none" type="text" name="selected_categories" id="selected_categories" value="{{ $on_sale->apply_discount_to }}">
+                                                    @forelse ($categories as $cat)
+                                                        <input type="checkbox" name="category" class="categories" value="{{ $cat->id }}" {{ in_array($cat->id, $discounted_categories) ? 'checked' : '' }}> {{ $cat->name }}<br/>
+                                                    @empty
+                                                        No Published Category
+                                                    @endforelse
+                                                </div>
                                             </div>
-                                            <div id="categories" class="col-6" style="display: none">
-                                                <label>Categories</label><br/>
-                                                <input class="d-none" type="text" name="selected_categories" id="selected_categories" value="{{ $on_sale->apply_discount_to }}">
-                                                @forelse ($categories as $cat)
-                                                    <input type="checkbox" name="category" class="categories" value="{{ $cat->id }}" {{ in_array($cat->id, $discounted_categories) ? 'checked' : '' }}> {{ $cat->name }}<br/>
-                                                @empty
-                                                    No Published Category
-                                                @endforelse
+                                            <div class="col-6 ">
+                                                <label><input type="checkbox" name="set_duration" id="set_duration" {{ $on_sale->start_date ? 'checked' : '' }}> Set Sale Duration</label>
+                                                <input type="text" class="form-control set_duration" id="daterange" name="sale_duration" {{ $on_sale->start_date ? '' : 'disabled' }}/>
+                                                <br/>
+                                                <label><input type="checkbox" name="require_coupon" id="require_coupon" {{ count($vouchers) == 0 ? 'disabled' : '' }} {{ $on_sale->coupon ? 'checked' : '' }}> Require Coupon</label>
+                                                <select class="form-control" name="coupon" id="coupon" {{ $on_sale->coupon ? '' : 'disabled' }}>
+                                                    <option disabled selected value="">Select a Voucher</option>
+                                                    @forelse ($vouchers as $voucher)
+                                                        <option value="{{ $voucher->id }}" {{ $voucher->id == $on_sale->coupon ? 'selected' : '' }}>{{ $voucher->name }}</option>
+                                                    @empty
+                                                        <option disabled value="">No Vouchers</option>
+                                                    @endforelse
+                                                </select>
+                                                <br/>
+                                                <label>Banner Image</label>
+                                                <div class="custom-file mb-3">
+                                                    <input type="file" class="custom-file-input" id="customFile" name="banner_img">
+                                                    <label class="custom-file-label" for="customFile">{{ $on_sale->banner_image ? $on_sale->banner_image : 'Choose File' }}</label>
+                                                </div>
+                                                <div class="col-6 mx-auto">
+                                                    <img class="img-thumbnail" src="{{ asset('/assets/site-img/'.$on_sale->banner_image) }}" alt="" style="width: 100%">
+                                                </div>
                                             </div>
                                         </div>
                                     </form>
@@ -212,6 +211,12 @@
                 $("#selected_categories").prop('required',false);
             }
         }
+
+        // Add the following code if you want the name of the file appear on select
+        $(".custom-file-input").change(function() {
+            var fileName = $(this).val().split("\\").pop();
+            $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+        });
     });
     </script>
 @endsection
