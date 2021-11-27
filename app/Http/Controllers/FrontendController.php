@@ -847,7 +847,51 @@ class FrontendController extends Controller
             ];
         }
 
-        return view('frontend.product_page', compact('product_details', 'product_images', 'attributes', 'variant_attr_arr', 'related_products', 'filtered_attributes'));
+        // product comparison
+        $products_compare = collect($variant_items)->take(3);
+
+        $comparison_arr = [];
+
+        $testing = [];
+
+        $variant_attributes_to_compare = DB::table('fumaco_items_attributes as a')
+            ->join('fumaco_attributes_per_category as c', 'c.id', 'a.attribute_name_id')
+            ->whereIn('idcode', $products_compare)->where('c.status', 1)->select('idcode', 'attribute_name', 'attribute_value')->orderBy('a.idx', 'asc')->get();
+        $variant_attributes_to_compare = collect($variant_attributes_to_compare)->groupBy('attribute_name');
+        
+        $variant_attr_array = [];
+        if (count($variant_items) > 1) {
+            foreach ($variant_attributes_to_compare as $attrib => $attrib_name) {
+                $idcode_to_compare = collect($attrib_name)->groupBy('idcode')->map(function($d) {
+                    return $d[0]->attribute_value;
+                });
+                $variant_attr_array[$attrib] = $idcode_to_compare;
+            }
+        }
+
+        $compare_variant_attributes = DB::table('fumaco_items_attributes as a')
+                ->join('fumaco_attributes_per_category as c', 'c.id', 'a.attribute_name_id')
+                ->whereIn('idcode', $variant_items)->where('c.status', 1)->distinct()->pluck('attribute_name');
+
+        foreach($products_compare as $idcode_compare){
+            $for_comparison = DB::table('fumaco_items')->where('f_idcode', $idcode_compare)->first();
+            $compare_image = DB::table('fumaco_items_image_v1')->where('idcode', $idcode_compare)->first();
+
+            $comparison_arr[] = [
+                'idcode' => $idcode_compare,
+                'product_name' => $for_comparison->f_name_name,
+                'slug' => $for_comparison->slug,
+                'on_stock' => ($for_comparison->f_qty - $for_comparison->f_reserved_qty) > 0 ? 1 : 0,
+                'orig_price' => $for_comparison->f_original_price,
+                'is_discounted' => $for_comparison->f_discount_trigger,
+                'new_price' => $for_comparison->f_price,
+                'image' => $compare_image->imgprimayx
+            ];
+        }
+
+        // return $variant_attr_array;
+
+        return view('frontend.product_page', compact('product_details', 'product_images', 'attributes', 'variant_attr_arr', 'related_products', 'filtered_attributes', 'comparison_arr', 'compare_variant_attributes', 'variant_attr_array'));
     }
 
     public function viewWishlist() {
