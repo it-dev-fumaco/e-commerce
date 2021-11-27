@@ -66,7 +66,8 @@ class FrontendController extends Controller
                             }
     
                             $q->orWhere('f_idcode', 'LIKE', "%".$search_str."%")
-                                ->orWhere('f_item_classification', 'LIKE', "%".$search_str."%");
+                                ->orWhere('f_item_classification', 'LIKE', "%".$search_str."%")
+                                ->orWhere('keywords', 'LIKE', '%'.$search_str.'%');
                         })
                         ->where('f_status', 1)->where('f_status', 1)
                         ->orderBy($sortby, $orderby)->get();
