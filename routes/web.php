@@ -213,6 +213,13 @@ Route::prefix('admin')->group(function () {
         Route::get('/order/delivered/', 'OrderController@deliveredOrders');
         Route::get('/order/print/{order_id}', 'OrderController@printOrder');
         Route::post('/order/status_update', 'OrderController@statusUpdate');
+        
+        Route::get('/order/status_list', 'OrderController@statusList');
+        Route::get('/order/status/add_form', 'OrderController@addStatusForm');
+        Route::post('/order/status/add', 'OrderController@addStatus');
+        Route::get('/order/status/{id}/edit_form', 'OrderController@editStatusForm');
+        Route::post('/order/status/{id}/edit', 'OrderController@editStatus');
+        Route::get('/order/status/{id}/delete', 'OrderController@deleteStatus');
 
         Route::get('/order/payment_status', 'OrderController@checkPaymentStatus');
         Route::post('/order/payment_status', 'OrderController@checkPaymentStatus');

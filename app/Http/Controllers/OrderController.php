@@ -401,6 +401,88 @@ class OrderController extends Controller
         return view('backend.orders.track_payment_status', compact('output', 'payment_id', 'details'));
     }
 
+    public function statusList(){
+        $status_list = DB::table('order_status')->paginate(10);
+        return view('backend.orders.status_list', compact('status_list'));
+    }
+
+    public function addStatusForm(){
+        return view('backend.orders.add_status');
+    }
+
+    public function addStatus(Request $request){
+        DB::beginTransaction();
+		try{
+            $rules = array(
+				'status_name' => 'required|unique:order_status,status',
+			);
+
+			$validation = Validator::make($request->all(), $rules);
+
+            if ($validation->fails()){
+				return redirect()->back()->with('error', "Order Status Name must be unique.");
+			}
+
+            $insert = [
+                'status' => $request->status_name,
+                'status_description' => $request->status_description,
+                'update_stocks' => isset($request->update_stocks) ? 1 : 0,
+                'created_by' => Auth::user()->username
+            ];
+
+            DB::table('order_status')->insert($insert);
+
+            DB::commit();
+            return redirect('/admin/order/status_list')->with('success', 'Order Status Added!');
+        }catch(Exception $e){
+			DB::rollback();
+			return redirect()->back()->with('error', 'An error occured. Please try again.');
+		}
+    }
+
+    public function editStatusForm($id){
+        $status = DB::table('order_status')->where('order_status_id', $id)->first();
+        return view('backend.orders.edit_status', compact('status'));
+    }
+
+    public function editStatus($id, Request $request){
+        DB::beginTransaction();
+		try{
+            $checker = DB::table('order_status')->where('order_status_id', '!=', $id)->where('status', $request->status_name)->first();
+            
+            if($checker){
+                return redirect()->back()->with('error', "Order Status Name must be unique.");
+            }
+
+            $update = [
+                'status' => $request->status_name,
+                'status_description' => $request->status_description,
+                'update_stocks' => isset($request->update_stocks) ? 1 : 0,
+                'last_modified_by' => Auth::user()->username
+            ];
+
+            DB::table('order_status')->where('order_status_id', $id)->update($update);
+
+            DB::commit();
+            return redirect('/admin/order/status_list')->with('success', 'Order Status Added!');
+        }catch(Exception $e){
+			DB::rollback();
+			return redirect()->back()->with('error', 'An error occured. Please try again.');
+		}
+    }
+
+    public function deleteStatus($id){
+        DB::beginTransaction();
+		try{
+            DB::table('order_status')->where('order_status_id', $id)->delete();
+            DB::commit();
+            return redirect()->back()->with('success', 'Order Status Deleted!');
+        }catch(Exception $e){
+			DB::rollback();
+			return redirect()->back()->with('error', 'An error occured. Please try again.');
+		}
+    }
+
     public function printOrder($order_id){
         $orders = DB::table('fumaco_order')->where('order_number', $order_id)->first();
 
