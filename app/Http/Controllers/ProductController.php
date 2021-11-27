@@ -768,7 +768,7 @@ class ProductController extends Controller
 
             $sale_duration = '';
 
-            if($sale->start_date and $sale->end_date){
+            if($sale->start_date != '0000-00-00' and $sale->end_date != '0000-00-00'){
                 $sale_duration = Carbon::parse($sale->start_date)->format('M d, Y').' - '.Carbon::parse($sale->end_date)->format('M d, Y');
             }
             
@@ -900,8 +900,8 @@ class ProductController extends Controller
             if(isset($request->set_duration)){
                 $sale_duration = explode(' - ', $request->sale_duration);
 
-                $from = $sale_duration[0];
-                $to = $sale_duration[1];
+                $from = date('Y-m-d', strtotime($sale_duration[0]));
+                $to = date('Y-m-d', strtotime($sale_duration[1]));
 
                 // check if date overlaps with other "On Sale"
                 $date_check = DB::table('fumaco_on_sale')->where('start_date', '!=', '')->where('end_date', '!=', '')->get();
@@ -997,8 +997,20 @@ class ProductController extends Controller
             if(isset($request->set_duration)){
                 $sale_duration = explode(' - ', $request->sale_duration);
 
-                $from = $sale_duration[0];
-                $to = $sale_duration[1];
+                $from = date('Y-m-d', strtotime($sale_duration[0]));
+                $to = date('Y-m-d', strtotime($sale_duration[1]));
+
+                // check if date overlaps with other "On Sale"
+                $date_check = DB::table('fumaco_on_sale')->where('start_date', '!=', '')->where('end_date', '!=', '')->get();
+                foreach($date_check as $date){
+                    if($from >= $date->start_date and $from <= $date->end_date){
+                        return redirect()->back()->with('error', 'On Sale dates cannot overlap');
+                    }
+
+                    if($to >= $date->start_date and $to <= $date->end_date){
+                        return redirect()->back()->with('error', 'On Sale dates cannot overlap');
+                    }
+                }
             }            
 
             if($request->discount_type == 'Fixed Amount'){
