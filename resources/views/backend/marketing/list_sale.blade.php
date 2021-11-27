@@ -54,6 +54,7 @@
                                                 <div class="col-1">
                                                     <button type="submit" class="btn btn-secondary mx-auto" style='width: 100%'>Search</button>
                                                 </div>
+                                                <div class="col-6">&nbsp;</div>
                                                 <div class="col-1">
                                                     <a href="/admin/marketing/on_sale/addForm" class="btn btn-primary mx-auto" style='width: 100%'>Add</a>
                                                 </div>

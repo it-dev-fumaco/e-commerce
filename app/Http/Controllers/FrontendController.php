@@ -223,8 +223,9 @@ class FrontendController extends Controller
             return view('frontend.search_results', compact('results', 'blogs', 'products'));
         }
 
-        $carousel_data = DB::table('fumaco_header')->where('fumaco_status', 1)
-            ->orderBy('fumaco_active', 'desc')->get();
+        $carousel_data = DB::table('fumaco_header')->where('fumaco_status', 1)->orderBy('fumaco_active', 'desc')->get();
+        $onsale_carousel_data = DB::table('fumaco_on_sale')->where('status', 1)->where('banner_image', '!=', null)->where('start_date', '<=', Carbon::now())->where('end_date', '>=', Carbon::now())->get();
+        // return $onsale_carousel_data;
 
         $blogs = DB::table('fumaco_blog')->where('blog_featured', 1)
             ->where('blog_enable', 1)->take(3)->get();
@@ -280,7 +281,7 @@ class FrontendController extends Controller
 
         $page_meta = DB::table('fumaco_pages')->where('is_homepage', 1)->first();
 
-        return view('frontend.homepage', compact('carousel_data', 'blogs', 'best_selling_arr', 'on_sale_arr', 'page_meta'));
+        return view('frontend.homepage', compact('carousel_data', 'onsale_carousel_data', 'blogs', 'best_selling_arr', 'on_sale_arr', 'page_meta'));
     }
 
     public function newsletterSubscription(Request $request){

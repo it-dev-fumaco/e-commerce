@@ -12,13 +12,38 @@
   <main style="background-color:#0062A5;">
     <div id="myCarousel" class="carousel slide" data-bs-ride="carousel">
       <ol class="carousel-indicators">
-
-        @foreach($carousel_data as $key => $carousel)
+        @php
+            $carousel_count = count($carousel_data) + count($onsale_carousel_data);
+        @endphp
+        @for ($i = 0; $i < $carousel_count; $i++)
+          <li data-bs-target="#myCarousel" data-bs-slide-to="{{$i}}" class="{{ $i == 0 ? "active" : "" }}"></li>
+        @endfor
+        {{-- @foreach($carousel_data as $key => $carousel)
           <li data-bs-target="#myCarousel" data-bs-slide-to="{{$key}}" class="{{ $loop->first ? "active" : "" }}"></li>
-        @endforeach
+        @endforeach --}}
       </ol>
 
       <div class="carousel-inner">
+          @forelse($onsale_carousel_data as $onsale)
+            <div class="carousel-item {{ $loop->first ? "active" : ""}}" style="background: black;">
+              <picture>
+                <source srcset="{{ asset('/assets/site-img/'. explode(".", $onsale->banner_image)[0] .'.webp') }}" type="image/webp" style="object-fit: cover;opacity: 0.6;">
+                <source srcset="{{ asset('/assets/site-img/'. $onsale->banner_image) }}" type="image/jpeg" style="object-fit: cover;opacity: 0.6;">
+                <img src="{{ asset('/assets/site-img/'. $onsale->banner_image) }}" alt="{{ Str::slug(explode(".", $onsale->banner_image)[0], '-') }}" style="object-fit: cover;opacity: 0.6;">
+              </picture>
+
+              {{-- <div class="container">
+                <div class="carousel-caption text-start">
+                  <h3 class="carousel-header-font fumacoFont1">{{ $carousel->fumaco_title }}</h3>
+                  <div class="text ellipsis">
+                    <p class="carousel-caption-font fumacoFont2 carousel-text-concat" style="text-align: left; text-justify: left; letter-spacing: 1px;">{{ $string }}</p>
+                  </div>
+                  <p><a class="btn btn-lg btn-primary btn-fumaco fumacoFont_btn" href="{{ $carousel->fumaco_url }}"role="button">{{ $carousel->fumaco_btn_name }}</a></p>
+                </div>
+              </div> --}}
+            </div>
+            @empty
+          @endforelse
         @foreach ($carousel_data as $carousel)
           @php
             $string = strip_tags($carousel->fumaco_caption);
@@ -32,8 +57,14 @@
               $string = $endPoint? substr($stringCut, 0, $endPoint) : substr($stringCut, 0);
               $string .= '...';
             }
+            $active = '';
+            if(count($onsale_carousel_data) == 0){
+              if($loop->first){
+                $active = 'active';
+              }
+            }
           @endphp
-          <div class="carousel-item {{ $loop->first ? "active" : ""}}" style="background: black;">
+          <div class="carousel-item {{ $active }}" style="background: black;">
             <picture>
               <source srcset="{{ asset('/assets/site-img/'. explode(".", $carousel->fumaco_image1)[0] .'.webp') }}" type="image/webp" style="object-fit: cover;opacity: 0.6;">
               <source srcset="{{ asset('/assets/site-img/'. $carousel->fumaco_image1) }}" type="image/jpeg" style="object-fit: cover;opacity: 0.6;">
