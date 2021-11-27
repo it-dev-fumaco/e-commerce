@@ -151,8 +151,8 @@
             $('#daterange').daterangepicker({
                 opens: 'left',
                 placeholder: 'Select Date Range',
-                startDate: start ? '01-01-2021' : moment(),
-                endDate: end ? '01-01-2021' : moment().add(7, 'days'),
+                startDate: start ? start : moment(),
+                endDate: end ? end : moment().add(7, 'days'),
                 // locale: {
                 //     format: 'MMM d, Y'
                 // }
