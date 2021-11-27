@@ -89,7 +89,10 @@ class FrontendController extends Controller
 
             $results = [];
             foreach($product_list as $item){
-                $image = DB::table('fumaco_items_image_v1')->where('idcode', $item->f_idcode)->first();
+                $image = DB::table('fumaco_items_image_v1')->where('idcode', $item->f_idcode)->where('onsale_img', $item->f_onsale == 1 ? 1 : 0)->first();
+                if(!$image){ // No onsale image
+                    $image = DB::table('fumaco_items_image_v1')->where('idcode', $item->f_idcode)->first();
+                }
                 $results[] = [
                     'id' => $item->id,
                     'item_code' => $item->f_idcode,
@@ -231,7 +234,10 @@ class FrontendController extends Controller
         $on_sale_arr = [];
 
         foreach($best_selling as $bs){
-            $bs_img = DB::table('fumaco_items_image_v1')->where('idcode', $bs->f_idcode)->first();
+            $bs_img = DB::table('fumaco_items_image_v1')->where('idcode', $bs->f_idcode)->where('onsale_img', $bs->f_onsale == 1 ? 1 : 0)->first();
+            if(!$bs_img){ // No onsale image
+                $bs_img = DB::table('fumaco_items_image_v1')->where('idcode', $bs->f_idcode)->first();
+            }
 
             $bs_item_name = $bs->f_name_name;
 
@@ -251,7 +257,10 @@ class FrontendController extends Controller
         }
 
         foreach($on_sale as $os){
-            $os_img = DB::table('fumaco_items_image_v1')->where('idcode', $os->f_idcode)->first();
+            $os_img = DB::table('fumaco_items_image_v1')->where('idcode', $os->f_idcode)->where('onsale_img', $os->f_onsale == 1 ? 1 : 0)->first();
+            if(!$os_img){ // No onsale image
+                $os_img = DB::table('fumaco_items_image_v1')->where('idcode', $os->f_idcode)->first();
+            }
 
             $os_item_name = $os->f_name_name;
             $on_stock = ($os->f_qty - $os->f_reserved_qty) > 0 ? 1 : 0;
@@ -760,7 +769,10 @@ class FrontendController extends Controller
 
         $products_arr = [];
         foreach ($products as $product) {
-            $item_image = DB::table('fumaco_items_image_v1')->where('idcode', $product->f_idcode)->first();
+            $item_image = DB::table('fumaco_items_image_v1')->where('idcode', $product->f_idcode)->where('onsale_img', $product->f_onsale == 1 ? 1 : 0)->first();
+            if(!$item_image){
+                $item_image = DB::table('fumaco_items_image_v1')->where('idcode', $product->f_idcode)->first();
+            }
 
             $item_name = strip_tags($product->f_name_name);
             $on_stock = ($product->f_qty - $product->f_reserved_qty) > 0 ? 1 : 0;
@@ -822,17 +834,20 @@ class FrontendController extends Controller
             }
         }
 
-        $product_images = DB::table('fumaco_items_image_v1')->where('idcode', $product_details->f_idcode)->get();
+        $product_images = DB::table('fumaco_items_image_v1')->where('idcode', $product_details->f_idcode)->orderBy('onsale_img', 'desc')->get();
 
         $related_products_query = DB::table('fumaco_items as a')
             ->join('fumaco_items_relation as b', 'a.f_idcode', 'b.related_item_code')
             ->where('b.item_code', $product_details->f_idcode)->where('a.f_status', 1)
-            ->select('a.id', 'a.f_idcode', 'a.f_original_price', 'a.f_discount_trigger', 'a.f_price', 'a.f_name_name', 'a.slug', 'a.f_qty', 'a.f_reserved_qty')
+            ->select('a.id', 'a.f_idcode', 'a.f_original_price', 'a.f_discount_trigger', 'a.f_price', 'a.f_name_name', 'a.slug', 'a.f_qty', 'a.f_reserved_qty', 'a.f_onsale')
             ->get();
 
         $related_products = [];
         foreach($related_products_query as $row) {
-            $image = DB::table('fumaco_items_image_v1')->where('idcode', $row->f_idcode)->first();
+            $image = DB::table('fumaco_items_image_v1')->where('idcode', $row->f_idcode)->where('onsale_img', $row->f_onsale == 1 ? 1 : 0)->first();
+            if(!$image){ // No onsale image
+                $image = DB::table('fumaco_items_image_v1')->where('idcode', $row->f_idcode)->first();
+            }
 
             $on_stock = ($row->f_qty - $row->f_reserved_qty) > 0 ? 1 : 0;
             $related_products[] = [
@@ -876,7 +891,10 @@ class FrontendController extends Controller
 
         foreach($products_compare as $idcode_compare){
             $for_comparison = DB::table('fumaco_items')->where('f_idcode', $idcode_compare)->first();
-            $compare_image = DB::table('fumaco_items_image_v1')->where('idcode', $idcode_compare)->first();
+            $compare_image = DB::table('fumaco_items_image_v1')->where('idcode', $idcode_compare)->where('onsale_img', $for_comparison->f_onsale == 1 ? 1 : 0)->first();
+            if(!$compare_image){ // No onsale image
+                $compare_image = DB::table('fumaco_items_image_v1')->where('idcode', $idcode_compare)->first();
+            }
 
             $comparison_arr[] = [
                 'idcode' => $idcode_compare,
@@ -889,8 +907,6 @@ class FrontendController extends Controller
                 'image' => $compare_image->imgprimayx
             ];
         }
-
-        // return $variant_attr_array;
 
         return view('frontend.product_page', compact('product_details', 'product_images', 'attributes', 'variant_attr_arr', 'related_products', 'filtered_attributes', 'comparison_arr', 'compare_variant_attributes', 'variant_attr_array'));
     }
