@@ -124,7 +124,7 @@
 																</div>
 																<button type="button" class="close" data-dismiss="modal">&times;</button>
 															</div>
-															<div class="modal-body">
+															<div class="modal-body" id="customer-order-{{ $order['order_no'] }}">
 																<div class="row {{ ($order['status'] == 'Delivered') ? 'd-none' : '' }}">
 																	<div class="col-md-6">
 																		<p class="mt-3 mb-0"><strong>Customer Name : </strong> {{ $order['first_name'] . " " . $order['last_name'] }}</p>
@@ -133,7 +133,7 @@
 																		@endif
 																		<p class="text-muted mb-0"><strong>{{ $order['order_type'] }} Checkout</strong></p>
 																	</div>
-																	<div class="col-md-6">
+																	<div class="col-md-6 d-print-none">
 																		<form class="btn-group" action="/admin/order/status_update" method="POST" style="width: 100%; height: 40px !important;">
 																			@csrf
 																			<label class="stat-label" for="status">Order Status</label>
@@ -246,7 +246,9 @@
 </div>
 
 
-<div class="modal-footer">
+<div class="modal-footer d-print-none">
+	{{-- <a class="print_order btn btn-sm btn-primary {{ $order['order_no'] }}">Print</a> --}}
+	<a href="/admin/order/print/{{ $order['order_no'] }}" class="print_order btn btn-sm btn-primary" target="_blank">Print</a>
 
 <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#tracker-{{ $order['order_no'] }}">
 Add Tracker Code
@@ -303,7 +305,6 @@ Add Tracker Code
 </section>
 </div>
 </div>
-
 <style>
 .confirm-modal{
 background: rgba(0, 0, 0, .7);
