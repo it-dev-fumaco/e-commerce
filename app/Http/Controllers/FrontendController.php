@@ -750,6 +750,13 @@ class FrontendController extends Controller
 
         $orderby = ($request->order) ? $request->order : 'asc';
 
+        $image_for_sharing = null;
+        // get image for social media sharing
+        $default_image_for_sharing = DB::table('fumaco_social_image')->where('is_default', 1)->first();
+        if ($default_image_for_sharing) {
+            $image_for_sharing = ($default_image_for_sharing->filename) ? asset('/storage/social_images/'. $default_image_for_sharing->filename) : null;
+        }
+
         // get items based on category id
         $products = DB::table('fumaco_items')->where('f_cat_id', $product_category->id)
             ->when(count($request->except(['page', 'sel_attr', 'sortby', 'order'])) > 0, function($c) use ($filtered_items) {
@@ -778,7 +785,7 @@ class FrontendController extends Controller
             ];
         }
 
-        return view('frontend.product_list', compact('product_category', 'products_arr', 'products', 'filters'));
+        return view('frontend.product_list', compact('product_category', 'products_arr', 'products', 'filters', 'image_for_sharing'));
     }
 
     public function viewProduct($slug) { // Product Page

@@ -265,6 +265,11 @@ Route::prefix('admin')->group(function () {
 
         Route::get('/marketing/search/list', 'PagesController@searchList');
 
+        Route::get('/marketing/social/images', 'SocialImagesController@viewList');
+        Route::post('/marketing/social/create', 'SocialImagesController@uploadImage');
+        Route::delete('/marketing/social/delete/{id}', 'SocialImagesController@deleteImage');
+        Route::get('/marketing/social/default/{id}', 'SocialImagesController@setDefault');
+
         // SHIPPING SERVICES ROUTES CMS
         Route::get('/shipping/list', 'ShippingController@viewList');
         Route::get('/shipping/add', 'ShippingController@viewAddForm');

@@ -5,6 +5,16 @@
 @section('meta')
 <meta name="description" content="{{ $product_category->meta_description }}">
 	<meta name="keywords" content="{{ $product_category->meta_keywords }}" />
+
+	<meta property="og:url" content="https://www.fumaco.com/products/{{ ($product_category->slug) ? $product_category->slug : $product_category->id }}" />
+	<meta property="og:type" content="article" />
+	<meta property="og:title" content="{{ $product_category->name }}" />
+	<meta property="og:description" content="{{ $product_category->meta_description }}" />
+	@if ($image_for_sharing)
+	<meta property="og:image" content="{{ $image_for_sharing }}" />
+	<meta property="og:image:width" content="600">
+	<meta property="og:image:height" content="315">
+	@endif
 @endsection
 @section('content')
 	<main style="background-color:#0062A5;">
