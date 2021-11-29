@@ -12,8 +12,6 @@
 	<meta property="og:description" content="{{ $product_category->meta_description }}" />
 	@if ($image_for_sharing)
 	<meta property="og:image" content="{{ $image_for_sharing }}" />
-	<meta property="og:image:width" content="600">
-	<meta property="og:image:height" content="315">
 	@endif
 @endsection
 @section('content')
