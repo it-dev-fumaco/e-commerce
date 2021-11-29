@@ -54,6 +54,7 @@
                                                 <div class="col-1">
                                                     <button type="submit" class="btn btn-secondary mx-auto" style='width: 100%'>Search</button>
                                                 </div>
+                                                <div class="col-6"></div>
                                                 <div class="col-1">
                                                     <a href="/admin/marketing/voucher/add_voucher" class="btn btn-primary mx-auto" style='width: 100%'>Add</a>
                                                 </div>
@@ -67,6 +68,8 @@
                                             <th class="text-center">Coupon Code</th>
                                             <th class="text-center">Total Allotment</th>
                                             <th class="text-center">Total Consumed</th>
+                                            <th class="text-center">Validity Date</th>
+                                            <th class="text-center">Remarks</th>
                                             <th class="text-center">Action</th>
                                         </tr>
                                         @forelse ($coupon as $c)
@@ -76,6 +79,8 @@
                                                 <td class="text-center">{{ $c->code }}</td>
                                                 <td class="text-center">{{ $c->unlimited == 1 ? 'Unlimited' : $c->total_allotment }}</td>
                                                 <td class="text-center">{{ $c->total_consumed }}</td>
+                                                <td class="text-center">{{ $c->validity_date_start ? date('M d, Y', strtotime($c->validity_date_start)).' - '.date('M d, Y', strtotime($c->validity_date_end)) : '' }}</td>
+                                                <td class="text-center">{{ $c->remarks }}</td>
                                                 <td class="text-center">
                                                     <div class="dropdown">
                                                         <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Action

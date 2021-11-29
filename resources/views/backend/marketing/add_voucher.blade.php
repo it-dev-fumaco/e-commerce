@@ -61,10 +61,24 @@
                                         <br>
                                         <div class="row">
                                             <div class="col-12">
+                                                <label><input type="checkbox" name="require_validity" id="require_validity"> Set Validity</label>
+                                                <input type="text" class="form-control set_duration" id="daterange" name="validity" disabled/>
+                                            </div>
+                                        </div>
+                                        <br/>
+                                        <div class="row">
+                                            <div class="col-12">
                                                 <label><input type="checkbox" name="unlimited_allotment" id="unlimited_allotment" checked> Unlimited Allotment</label>
                                                 <br/>
                                                 <label>Allotment</label>
                                                 <input type="number" class="form-control" name="allotment" id="allotment" placeholder="Allotment">
+                                            </div>
+                                        </div>
+                                        <br/>
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <label>Remarks</label>
+                                                <textarea name="remarks" cols="3" rows="5" class="form-control" placeholder="Remarks"></textarea>
                                             </div>
                                         </div>
                                     </form>
@@ -81,9 +95,14 @@
 <script>
     $(document).ready(function(){
         allotment();
+        validityDate();
 
         $('#unlimited_allotment').click(function(){
             allotment();
+        });
+
+        $('#require_validity').click(function(){
+            validityDate();
         });
 
         function allotment(){
@@ -93,9 +112,24 @@
             }else{
                 $("#allotment").prop('required',true);
                 $("#allotment").prop('disabled',false);
-                
             }
         }
+
+        function validityDate(){
+            if($('#require_validity').is(':checked')){
+                $("#daterange").prop('required',true);
+                $("#daterange").prop('disabled',false);
+            }else{
+                $("#daterange").prop('required',false);
+                $("#daterange").prop('disabled',true);
+            }
+        }
+
+        $('#daterange').daterangepicker({
+            opens: 'left',
+            placeholder: 'Select Date Range',
+            startDate: moment(), endDate: moment().add(7, 'days'),
+        });
     });
     </script>
 @endsection

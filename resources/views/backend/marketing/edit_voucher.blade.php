@@ -61,10 +61,24 @@
                                         <br>
                                         <div class="row">
                                             <div class="col-12">
+                                                <label><input type="checkbox" name="require_validity" id="require_validity" {{ $coupon->validity_date_start ? 'checked' : '' }}> Set Validity</label>
+                                                <input type="text" class="form-control set_duration" id="daterange" name="validity" disabled/>
+                                            </div>
+                                        </div>
+                                        <br>
+                                        <div class="row">
+                                            <div class="col-12">
                                                 <label><input type="checkbox" name="unlimited_allotment" id="unlimited_allotment" {{ $coupon->unlimited == 1 ? 'checked' : '' }}> Unlimited Allotment</label>
                                                 <br/>
                                                 <label>Allotment</label>
                                                 <input type="number" class="form-control" name="allotment" id="allotment" value="{{ $coupon->total_allotment }}" placeholder="Allotment">
+                                            </div>
+                                        </div>
+                                        <br/>
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <label>Remarks</label>
+                                                <textarea name="remarks" cols="3" rows="5" class="form-control" placeholder="Remarks">{{ $coupon->remarks }}</textarea>
                                             </div>
                                         </div>
                                         <br/>
@@ -86,10 +100,16 @@
 <script>
     $(document).ready(function(){
         allotment();
+        validityDate();
 
         $('#unlimited_allotment').click(function(){
             allotment();
         });
+
+        $('#require_validity').click(function(){
+            validityDate();
+        });
+
 
         function allotment(){
             if($('#unlimited_allotment').is(':checked')){
@@ -101,6 +121,26 @@
                 
             }
         }
+
+        function validityDate(){
+            if($('#require_validity').is(':checked')){
+                $("#daterange").prop('required',true);
+                $("#daterange").prop('disabled',false);
+            }else{
+                $("#daterange").prop('required',false);
+                $("#daterange").prop('disabled',true);
+            }
+        }
+
+        var start = "{{ $coupon->validity_date_start != null ? date('m/d/Y', strtotime($coupon->validity_date_start)) : null  }}";
+        var end = "{{ $coupon->validity_date_end != null ? date('m/d/Y', strtotime($coupon->validity_date_end)) : null }}";
+
+        $('#daterange').daterangepicker({
+            opens: 'left',
+            placeholder: 'Select Date Range',
+            startDate: start ? start : moment(),
+            endDate: end ? end : moment().add(7, 'days'),
+        });
     });
     </script>
 @endsection

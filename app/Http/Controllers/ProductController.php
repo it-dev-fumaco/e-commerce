@@ -887,11 +887,22 @@ class ProductController extends Controller
 				return redirect()->back()->with('error', "Voucher Name/Code must be unique.");
 			}
 
+            $start = null;
+            $end = null;
+            if(isset($request->require_validity)){
+                $date = explode(' - ', $request->validity);
+                $start = Carbon::parse($date[0])->format('Y/m/d');
+                $end = Carbon::parse($date[1])->format('Y/m/d');
+            }
+
             $insert = [
                 'name' => $request->name,
                 'code' => strtoupper($request->coupon_code),
                 'total_allotment' => isset($request->unlimited_allotment) ? null : $request->allotment,
                 'unlimited' => isset($request->unlimited_allotment) ? 1 : 0,
+                'validity_date_start' => $start,
+                'validity_date_end' => $end,
+                'remarks' => $request->remarks,
                 'created_by' => Auth::user()->username
             ];
 
@@ -914,11 +925,22 @@ class ProductController extends Controller
 				return redirect()->back()->with('error', "Voucher Name/Code must be unique.");
             }
 
+            $start = null;
+            $end = null;
+            if(isset($request->require_validity)){
+                $date = explode(' - ', $request->validity);
+                $start = Carbon::parse($date[0])->format('Y/m/d');
+                $end = Carbon::parse($date[1])->format('Y/m/d');
+            }
+
             $update = [
                 'name' => $request->name,
                 'code' => strtoupper($request->coupon_code),
                 'total_allotment' => isset($request->unlimited_allotment) ? null : $request->allotment,
                 'unlimited' => isset($request->unlimited_allotment) ? 1 : 0,
+                'validity_date_start' => $start,
+                'validity_date_end' => $end,
+                'remarks' => $request->remarks,
                 'last_modified_by' => Auth::user()->username
             ];
 
