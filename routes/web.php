@@ -221,6 +221,11 @@ Route::prefix('admin')->group(function () {
         Route::post('/order/status/{id}/edit', 'OrderController@editStatus');
         Route::get('/order/status/{id}/delete', 'OrderController@deleteStatus');
 
+        Route::get('/order/sequence_list', 'OrderController@sequenceList');
+        Route::get('/order/sequence_list/add_form', 'OrderController@addSequenceForm');
+        Route::post('/order/sequence_list/add', 'OrderController@addSequence');
+        Route::get('/order/sequence_list/{shipping}/delete', 'OrderController@deleteSequence');
+
         Route::get('/order/payment_status', 'OrderController@checkPaymentStatus');
         Route::post('/order/payment_status', 'OrderController@checkPaymentStatus');
         
