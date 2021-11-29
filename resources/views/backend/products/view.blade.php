@@ -118,18 +118,24 @@
                                        <label for="stock-uom">Stock UoM</label>
                                        <input type="text" class="form-control" id="stock-uom" value="{{ $details->f_stock_uom }}" readonly required>
                                     </div>
+                                    <div class="form-group">
+                                       <label><input type="checkbox" id="set_as_new_item" name="is_new_item" {{ $details->f_new_item == 1 ? 'checked' : '' }}> New on this duration</label>
+                                       <div class="col-12">
+                                          <input type="text" class="form-control" id="new_item_date" name="new_item_duration"/>
+                                       </div>
+                                    </div>
                                  </div>
                               </div>
-                              <div class="row">
+                              {{-- <div class="row">
                                  <div class="col-12">
                                     <div class="form-group">
-                                       <label><input type="checkbox" id="set_as_new_item" name="is_new_item" {{ $details->f_new_item == 1 ? 'checked' : '' }}> Set as new item</label>
+                                       <label><input type="checkbox" id="set_as_new_item" name="is_new_item" {{ $details->f_new_item == 1 ? 'checked' : '' }}> New on this duration</label>
                                        <div class="col-6">
                                           <input type="text" class="form-control" id="new_item_date" name="new_item_duration" disabled/>
                                        </div>
                                     </div>
                                  </div>
-                              </div>
+                              </div> --}}
                            </div>
                         </div>
                         <h5>Product Weight & Dimensions</h5>
@@ -498,10 +504,10 @@
       function setAsNewItem(){
          if($('#set_as_new_item').is(':checked')){
                $("#new_item_date").prop('required',true);
-               $("#new_item_date").prop('disabled',false);
+               $("#new_item_date").slideDown('fast');
          }else{
                $("#new_item_date").prop('required',false);
-               $("#new_item_date").prop('disabled',true);
+               $("#new_item_date").slideUp('fast');
          }
       }
       // Is new Item date
