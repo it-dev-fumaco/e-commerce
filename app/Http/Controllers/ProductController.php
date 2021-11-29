@@ -1089,8 +1089,13 @@ class ProductController extends Controller
             $image_to_delete = DB::table('fumaco_on_sale')->Where('id', $id)->first();
             $image_name = explode('.', $image_to_delete->banner_image);
 
-            unlink(public_path('/assets/site-img/'.$image_to_delete->banner_image));
-            unlink(public_path('/assets/site-img/'.$image_name[0].'.webp'));
+            if(file_exists(public_path('/assets/site-img/'.$image_to_delete->banner_image))){
+                unlink(public_path('/assets/site-img/'.$image_to_delete->banner_image));
+            }
+
+            if(file_exists(public_path('/assets/site-img/'.$image_name[0].'.webp'))){
+                unlink(public_path('/assets/site-img/'.$image_name[0].'.webp'));
+            }
 
             DB::table('fumaco_on_sale')->where('id', $id)->delete();
             DB::commit();
