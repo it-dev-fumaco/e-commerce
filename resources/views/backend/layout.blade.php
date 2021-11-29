@@ -339,7 +339,7 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a href="/admin/order/status_list" class="nav-link {{ $activePage == 'order_status_sequence' ? 'active' : '' }}">
+                <a href="/admin/order/sequence_list" class="nav-link {{ $activePage == 'order_status_sequence' ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Order Status Sequence</p>
                 </a>
