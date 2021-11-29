@@ -86,13 +86,13 @@
 											</picture>
 										</td>
 										<td>{{ $row->filename }}</td>
-										<td class="text-center align-middle" style="font-size: 15pt;">
-                                            @if ($row->is_default)
-                                            <a href="#"><i class="fas fa-check-circle"></i></a>
-                                            @else
-                                            <a href="/admin/marketing/social/default/{{ $row->id }}">
-                                            <i class="far fa-check-circle"></i></a>
-                                            @endif
+										<td class="text-center align-middle">
+											<div class="form-group">
+												<div class="custom-control custom-switch">
+													<input type="checkbox" class="custom-control-input toggle" id="toggle_{{ $row->id }}" {{ ($row->is_default == 1) ? 'checked' : '' }} value="{{ $row->id }}">
+													<label class="custom-control-label" for="toggle_{{ $row->id }}"></label>
+												</div>
+											</div>
                                         </td>
                                         <td class="text-center align-middle">{{ $row->last_modified_by }}</td>
                                         <td class="text-center align-middle">{{ $row->last_modified_at }}</td>
@@ -185,6 +185,20 @@
 		$(".custom-file-input").change(function() {
 			var fileName = $(this).val().split("\\").pop();
 			$(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+		});
+
+		$(document).on('change', '.toggle', function(e){
+			e.preventDefault();
+			$.ajax({
+				type:'get',
+				url:'/admin/marketing/social/default/' + $(this).val(),
+				success: function (response) {
+					window.location.href="/admin/marketing/social/images";
+				},
+				error: function () {
+					alert('An error occured.');
+				}
+			});
 		});
 	</script>
 @endsection
