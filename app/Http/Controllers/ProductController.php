@@ -1001,7 +1001,7 @@ class ProductController extends Controller
                 $to = date('Y-m-d', strtotime($sale_duration[1]));
 
                 // check if date overlaps with other "On Sale"
-                $date_check = DB::table('fumaco_on_sale')->where('start_date', '!=', '')->where('end_date', '!=', '')->get();
+                $date_check = DB::table('fumaco_on_sale')->where('id', '!=', $id)->where('start_date', '!=', '')->where('end_date', '!=', '')->get();
                 foreach($date_check as $date){
                     if($from >= $date->start_date and $from <= $date->end_date){
                         return redirect()->back()->with('error', 'On Sale dates cannot overlap');
@@ -1086,6 +1086,12 @@ class ProductController extends Controller
     public function removeOnSale($id){
         DB::beginTransaction();
         try {
+            $image_to_delete = DB::table('fumaco_on_sale')->Where('id', $id)->first();
+            $image_name = explode('.', $image_to_delete->banner_image);
+
+            unlink(public_path('/assets/site-img/'.$image_to_delete->banner_image));
+            unlink(public_path('/assets/site-img/'.$image_name[0].'.webp'));
+
             DB::table('fumaco_on_sale')->where('id', $id)->delete();
             DB::commit();
             return redirect()->back()->with('success', 'On Sale Deleted.');
