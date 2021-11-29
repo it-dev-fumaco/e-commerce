@@ -481,6 +481,63 @@ class OrderController extends Controller
 		}
     }
 
+    public function sequenceList(){
+        $shipping_method = DB::table('order_status_process')->groupBy('shipping_method')->select('shipping_method')->paginate(10);
+
+        return view('backend.orders.status_process_list', compact('shipping_method'));
+    }
+
+    public function addSequenceForm(){
+        $order_status = DB::table('order_status')->get();
+
+        return view('backend.orders.add_status_process', compact('order_status'));
+    }
+
+    public function addSequence(Request $request){
+        DB::beginTransaction();
+		try{
+            $rules = array(
+				'shipping_name' => 'required|unique:order_status_process,shipping_method',
+			);
+
+			$validation = Validator::make($request->all(), $rules);
+
+            if ($validation->fails()){
+				return redirect()->back()->with('error', "Order Status Sequence Name must be unique.");
+			}
+
+            if(!$request->status){
+                return redirect()->back()->with('error', 'Please select a status');
+            }
+
+            foreach($request->status as $order_sequence_id => $status){
+                $insert = [
+                    'order_sequence' => $order_sequence_id + 1,
+                    'shipping_method' => $request->shipping_name,
+                    'order_status_id' => $status
+                ];
+                DB::table('order_status_process')->insert($insert);
+            }
+            DB::commit();
+            return redirect('/admin/order/sequence_list')->with('success', 'Order Status Sequence Added!');
+        }catch(Exception $e){
+			DB::rollback();
+			return redirect()->back()->with('error', 'An error occured. Please try again.');
+		}
+    }
+
+    public function deleteSequence($shipping){
+        DB::beginTransaction();
+		try{
+            DB::table('order_status_process')->where('shipping_method', $shipping)->delete();
+            DB::commit();
+            return redirect()->back()->with('success', 'Order Status Deleted!');
+        }catch(Exception $e){
+			DB::rollback();
+			return redirect()->back()->with('error', 'An error occured. Please try again.');
+		}
+    }
+
     public function printOrder($order_id){
         $orders = DB::table('fumaco_order')->where('order_number', $order_id)->first();
 
