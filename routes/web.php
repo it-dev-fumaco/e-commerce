@@ -191,6 +191,7 @@ Route::prefix('admin')->group(function () {
         Route::post('/product/{item_code}/enable', 'ProductController@enableItem');
         Route::delete('/product/{item_code}/delete', 'ProductController@deleteItem');
         Route::get('/product/{id}/featured', 'ProductController@featureItem');
+        Route::get('/is_new_item/{id}', 'ProductController@isNewItem');
         Route::post('/product/{item_code}/enable_on_sale', 'ProductController@setProductOnSale');
         Route::post('/product/{item_code}/disable_on_sale', 'ProductController@disableProductOnSale');
 

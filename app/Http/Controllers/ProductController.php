@@ -459,6 +459,17 @@ class ProductController extends Controller
                     return redirect()->back()->with('error', 'Slug must be unique.');
                 }
             }
+
+            $start_date = null;
+            $end_date = null;
+            $is_new = 0;
+            if(isset($request->is_new_item)){
+                $set_as_new_date = explode(' - ', $request->new_item_duration);
+                $is_new = 1;
+                $start_date = Carbon::parse($set_as_new_date[0])->format('Y/m/d');
+                $end_date = Carbon::parse($set_as_new_date[1])->format('Y/m/d');
+            }
+            
             DB::table('fumaco_items')->where('id', $id)->update([
                 'f_name_name' => $request->product_name,
                 'f_cat_id' => $request->product_category,
@@ -473,6 +484,9 @@ class ProductController extends Controller
                 'url_title' => $request->url_title,
                 'meta_description' => $request->meta_description,
                 'slug' => strtolower($request->slug),
+                'f_new_item' => $is_new,
+                'f_new_item_start' => $start_date,
+                'f_new_item_end' => $end_date,
                 'last_modified_by' => Auth::user()->username,
             ]);
 
@@ -594,6 +608,26 @@ class ProductController extends Controller
         }
     }
 
+    public function isNewItem($id) {
+        DB::beginTransaction();
+        try {
+            $details = DB::table('fumaco_items')->where('id', $id)->first();
+
+            if ($details) {
+                $is_new_item = $details->f_new_item == 0 ? 1 : 0;
+                DB::table('fumaco_items')->where('id', $id)->update(['f_new_item' => $is_new_item, 'last_modified_by' => Auth::user()->username]);
+            }
+
+            DB::commit();
+
+            return redirect()->back();
+        } catch (Exception $e) {
+            DB::rollback();
+
+            return redirect()->back()->with('error', 'An error occured. Please try again.');
+        }
+    }
+
 	public function viewAddForm($type) {
         $item_categories = DB::table('fumaco_categories')->get();
 
@@ -662,6 +696,13 @@ class ProductController extends Controller
                 }
             }
 
+            $is_new_item = 0;
+            if($product->f_new_item == 1){
+                if($product->f_new_item_start <= Carbon::now() and $product->f_new_item_end >= Carbon::now()){
+                    $is_new_item = 1;
+                }
+            }
+
             $item_name = strip_tags($product->f_name_name);
             $list[] = [
                 'id' => $product->id,
@@ -681,7 +722,8 @@ class ProductController extends Controller
                 'on_sale' => $product->f_onsale,
                 'erp_stock' => $product->stock_source,
                 'status' => $product->f_status,
-                'featured' => $product->f_featured
+                'featured' => $product->f_featured,
+                'is_new_item' => $is_new_item
             ];
         }
 

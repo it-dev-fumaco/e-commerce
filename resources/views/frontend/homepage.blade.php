@@ -133,6 +133,21 @@
                     $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/gallery/preview/'. explode(".", $bs['bs_img'])[0] . '.webp' : '/storage/no-photo-available.png';
                     @endphp
                     <div class="hover-container product-card" style="position: relative">
+                      <div class="pt-2" style="position: absolute; top: 0; right: 0; z-index: 10;">
+                        <div class="col-12 mb-2 {{ $bs['is_new_item'] == 1 ? '' : 'd-none' }}">
+                          <span class="p-1 text-center" style="background-color: #438539; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px !important">
+                            &nbsp;<b>New</b>&nbsp;
+                          </span>
+                        </div><br class="{{ $bs['is_new_item'] == 1 ? '' : 'd-none' }}"/>
+                        @if ($bs['is_discounted'])
+                          <div class="col-12">
+                            <span class="p-1 text-center" style="background-color: #FF0000; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; width: 100%">
+                              &nbsp;<b>{{ $bs['discount'] }}% OFF</b>&nbsp;
+                            </span>
+                          </div>
+                        @endif
+                      </div>
+
                       <div class="overlay-bg"></div>
                       <div class="btn-container">
                         <a href="/product/{{ ($bs['slug']) ? $bs['slug'] : $bs['item_code'] }}" class="view-products-btn btn" role="button"><i class="fas fa-search"></i>&nbsp;View Product</a>
@@ -153,14 +168,14 @@
                       </div>
                       <p class="card-text fumacoFont_card_price price-card d-none d-md-block d-lg-none" style="color:#000000 !important; ">
                         @if ($bs['is_discounted'])
-                        ₱ {{ number_format(str_replace(",","",$bs['new_price']), 2) }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$bs['orig_price']), 2) }}</s>&nbsp;&nbsp;&nbsp;<span class="badge badge-danger" style="vertical-align: middle;background-color: red;">{{ $bs['discount'] }}% OFF</span>
+                        ₱ {{ number_format(str_replace(",","",$bs['new_price']), 2) }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$bs['orig_price']), 2) }}</s>{{-- &nbsp;&nbsp;&nbsp;<spanclass="badgebadge-danger"style="vertical-align:middle;background-color:red;">{{ $bs['discount'] }}% OFF</span> --}}
                         @else
                         ₱ {{ number_format(str_replace(",","",$bs['orig_price']), 2) }}
                         @endif
                       </p>
                       <p class="card-text fumacoFont_card_price d-sm-block d-md-none d-lg-block" style="color:#000000 !important; ">
                         @if ($bs['is_discounted'])
-                        ₱ {{ number_format(str_replace(",","",$bs['new_price']), 2) }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$bs['orig_price']), 2) }}</s>&nbsp;&nbsp;&nbsp;<span class="badge badge-danger" style="vertical-align: middle;background-color: red;">{{ $bs['discount'] }}% OFF</span>
+                        ₱ {{ number_format(str_replace(",","",$bs['new_price']), 2) }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$bs['orig_price']), 2) }}</s>{{-- &nbsp;&nbsp;&nbsp;<span class="badge badge-danger" style="vertical-align: middle;background-color: red;">{{ $bs['discount'] }}% OFF</span> --}}
                         @else
                         ₱ {{ number_format(str_replace(",","",$bs['orig_price']), 2) }}
                         @endif
@@ -220,7 +235,20 @@
                 <div class="card shadow-sm">
                   <div class="equal-column-content">
                     
-                    <div class="hover-container product-card" style="position: relative !important">
+                    <div class="hover-container product-card" style="position: relative !important;">
+                      <div class="pt-2" style="position: absolute; top: 0; right: 0; z-index: 10;">
+                        <div class="col-12 mb-2 {{ $os['is_new_item'] == 1 ? '' : 'd-none' }}">
+                          <span class="p-1 text-center" style="background-color: #438539; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px !important">
+                            &nbsp;<b>New</b>&nbsp;
+                          </span>
+                        </div><br class="{{ $os['is_new_item'] == 1 ? '' : 'd-none' }}"/>
+                        <div class="col-12">
+                          <span class="p-1 text-center" style="background-color: #FF0000; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
+                            &nbsp;<b>{{ $os['discount_percent'] }}% OFF</b>&nbsp;
+                          </span>
+                        </div>
+                      </div>
+                      
                       <div class="btn-container">
                         <a href="/product/{{ ($os['slug']) ? $os['slug'] : $os['item_code'] }}" class="view-products-btn btn" role="button"><i class="fas fa-search"></i>&nbsp;View Product</a>
                       </div>
@@ -243,7 +271,7 @@
                         @else
                         ₱ {{ number_format(str_replace(",","",$os['orig_price']), 2) }}
                         @endif
-                        &nbsp;&nbsp;<span class="badge badge-danger" style="vertical-align: middle;background-color: red;">{{ $os['discount_percent'] }}% OFF</span>
+                        {{-- &nbsp;&nbsp;<span class="badge badge-danger" style="vertical-align: middle;background-color: red;">{{ $os['discount_percent'] }}% OFF</span> --}}
                       </p>
                       <p class="card-text fumacoFont_card_price d-sm-block d-md-none d-lg-block" style="color:#000000 !important; min-height: 30px">
                         @if ($os['is_discounted'])
@@ -251,7 +279,7 @@
                         @else
                         ₱ {{ number_format(str_replace(",","",$os['orig_price']), 2) }}
                         @endif
-                        &nbsp;&nbsp;<span class="badge badge-danger" style="vertical-align: middle;background-color: red;">{{ $os['discount_percent'] }}% OFF</span>
+                        {{-- &nbsp;&nbsp;<span class="badge badge-danger" style="vertical-align: middle;background-color: red;">{{ $os['discount_percent'] }}% OFF</span> --}}
                       </p>
                     </div>
                     <div class="mx-auto" style="width: 90%;">
@@ -495,9 +523,6 @@
       }
       
     }
-  </style>
-  <style>
-
   </style>
 @endsection
 

@@ -120,6 +120,16 @@
                                     </div>
                                  </div>
                               </div>
+                              <div class="row">
+                                 <div class="col-12">
+                                    <div class="form-group">
+                                       <label><input type="checkbox" id="set_as_new_item" name="is_new_item" {{ $details->f_new_item == 1 ? 'checked' : '' }}> Set as new item</label>
+                                       <div class="col-6">
+                                          <input type="text" class="form-control" id="new_item_date" name="new_item_duration" disabled/>
+                                       </div>
+                                    </div>
+                                 </div>
+                              </div>
                            </div>
                         </div>
                         <h5>Product Weight & Dimensions</h5>
@@ -426,6 +436,13 @@
 @section('script')
 <script>
    (function() {
+      setAsNewItem();
+
+      $('#set_as_new_item').click(function(){
+         setAsNewItem();
+      });
+
+
       $('#is-manual').click(function(){
          if($(this).prop('checked')) {
             $('#stock-qty').removeAttr('readonly').attr('required', true);
@@ -477,6 +494,25 @@
 				}
 			});
       }
+
+      function setAsNewItem(){
+         if($('#set_as_new_item').is(':checked')){
+               $("#new_item_date").prop('required',true);
+               $("#new_item_date").prop('disabled',false);
+         }else{
+               $("#new_item_date").prop('required',false);
+               $("#new_item_date").prop('disabled',true);
+         }
+      }
+      // Is new Item date
+      var start = "{{ $details->f_new_item_start ? date('m/d/Y', strtotime($details->f_new_item_start)) : '' }}";
+      var end = "{{ $details->f_new_item_end ? date('m/d/Y', strtotime($details->f_new_item_end)) : '' }}";
+      $('#new_item_date').daterangepicker({
+            opens: 'left',
+            placeholder: 'Select Date Range',
+            startDate: start ? start : moment(),
+            endDate: end ? end : moment().add(7, 'days'),
+      });
    })();
 </script>
 @endsection

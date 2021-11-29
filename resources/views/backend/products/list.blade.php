@@ -135,7 +135,7 @@
 											</picture>
 										</td>
 										<td>
-											<span class="d-block font-weight-bold">{{ $item['item_code'] }}</span> {{ $item['product_name'] }}
+											<span class="d-block font-weight-bold">{{ $item['item_code'] }} <span class="badge badge-success {{ $item['is_new_item'] == 1 ? '' : 'd-none' }}">New Item</span></span> {{ $item['product_name'] }}
 										</td>
 										<td class="text-center">{{ $item['product_code'] }}</td>
 										<td class="text-center">{{ 'P ' . number_format((float)$item['price'], 2, '.', ',') }}</td>

@@ -93,6 +93,14 @@ class FrontendController extends Controller
                 if(!$image){ // No onsale image
                     $image = DB::table('fumaco_items_image_v1')->where('idcode', $item->f_idcode)->first();
                 }
+
+                $is_new_item = 0;
+                if($item->f_new_item == 1){
+                    if($item->f_new_item_start <= Carbon::now() and $item->f_new_item_end >= Carbon::now()){
+                        $is_new_item = 1;
+                    }
+                }
+
                 $results[] = [
                     'id' => $item->id,
                     'item_code' => $item->f_idcode,
@@ -110,7 +118,8 @@ class FrontendController extends Controller
                     'caption' => null,
                     'slug' => $item->slug,
                     'f_qty' => $item->f_qty,
-                    'f_reserved_qty' => $item->f_reserved_qty
+                    'f_reserved_qty' => $item->f_reserved_qty,
+                    'is_new_item' => $is_new_item
                 ];
             }
 
@@ -167,6 +176,7 @@ class FrontendController extends Controller
                         'discount_percent' => $result['discount_percent'],
                         'image' => $result['image'],
                         'slug' => $result['slug'],
+                        'is_new_item' => $result['is_new_item'],
                         'on_stock' => $on_stock,
                     ];
                 } else {
@@ -240,6 +250,13 @@ class FrontendController extends Controller
                 $bs_img = DB::table('fumaco_items_image_v1')->where('idcode', $bs->f_idcode)->first();
             }
 
+            $is_new_item = 0;
+            if($bs->f_new_item == 1){
+                if($bs->f_new_item_start <= Carbon::now() and $bs->f_new_item_end >= Carbon::now()){
+                    $is_new_item = 1;
+                }
+            }
+
             $bs_item_name = $bs->f_name_name;
 
             $on_stock = ($bs->f_qty - $bs->f_reserved_qty) > 0 ? 1 : 0;
@@ -253,7 +270,8 @@ class FrontendController extends Controller
                 'new_price' => $bs->f_price,
                 'discount' => $bs->f_discount_percent,
                 'bs_img' => ($bs_img) ? $bs_img->imgprimayx : null,
-                'slug' => $bs->slug
+                'slug' => $bs->slug,
+                'is_new_item' => $is_new_item
             ];
         }
 
@@ -261,6 +279,13 @@ class FrontendController extends Controller
             $os_img = DB::table('fumaco_items_image_v1')->where('idcode', $os->f_idcode)->where('onsale_img', $os->f_onsale == 1 ? 1 : 0)->first();
             if(!$os_img){ // No onsale image
                 $os_img = DB::table('fumaco_items_image_v1')->where('idcode', $os->f_idcode)->first();
+            }
+
+            $is_new_item = 0;
+            if($os->f_new_item == 1){
+                if($os->f_new_item_start <= Carbon::now() and $os->f_new_item_end >= Carbon::now()){
+                    $is_new_item = 1;
+                }
             }
 
             $os_item_name = $os->f_name_name;
@@ -275,9 +300,12 @@ class FrontendController extends Controller
                 'on_stock' => $on_stock,
                 'os_img' => ($os_img) ? $os_img->imgprimayx : null,
                 'discount_percent' => $os->f_discount_percent,
-                'slug' => $bs->slug
+                'slug' => $os->slug,
+                'is_new_item' => $is_new_item,
             ];
         }
+
+        // return $on_sale_arr;
 
         $page_meta = DB::table('fumaco_pages')->where('is_homepage', 1)->first();
 
@@ -788,7 +816,8 @@ class FrontendController extends Controller
                 'on_sale' => $product->f_onsale,
                 'on_stock' => $on_stock,
                 'discount_percent' => $product->f_discount_percent,
-                'slug' => $product->slug
+                'slug' => $product->slug,
+                'is_new_item' => $product->f_new_item
             ];
         }
 
@@ -840,7 +869,7 @@ class FrontendController extends Controller
         $related_products_query = DB::table('fumaco_items as a')
             ->join('fumaco_items_relation as b', 'a.f_idcode', 'b.related_item_code')
             ->where('b.item_code', $product_details->f_idcode)->where('a.f_status', 1)
-            ->select('a.id', 'a.f_idcode', 'a.f_original_price', 'a.f_discount_trigger', 'a.f_price', 'a.f_name_name', 'a.slug', 'a.f_qty', 'a.f_reserved_qty', 'a.f_onsale')
+            ->select('a.id', 'a.f_idcode', 'a.f_original_price', 'a.f_discount_trigger', 'a.f_price', 'a.f_name_name', 'a.slug', 'a.f_qty', 'a.f_reserved_qty', 'a.f_onsale', 'a.f_new_item', 'a.f_new_item_start', 'a.f_new_item_end', 'a.f_discount_percent')
             ->get();
 
         $related_products = [];
@@ -850,6 +879,13 @@ class FrontendController extends Controller
                 $image = DB::table('fumaco_items_image_v1')->where('idcode', $row->f_idcode)->first();
             }
 
+            $is_new_item = 0;
+            if($row->f_new_item == 1){
+                if($row->f_new_item_start <= Carbon::now() and $row->f_new_item_end >= Carbon::now()){
+                    $is_new_item = 1;
+                }
+            }
+
             $on_stock = ($row->f_qty - $row->f_reserved_qty) > 0 ? 1 : 0;
             $related_products[] = [
                 'id' => $row->id,
@@ -857,10 +893,12 @@ class FrontendController extends Controller
                 'item_name' => $row->f_name_name,
                 'orig_price' => $row->f_original_price,
                 'is_discounted' => $row->f_discount_trigger,
+                'discount_percent' => $row->f_discount_percent,
                 'new_price' => $row->f_price,
                 'on_stock' => $on_stock,
                 'image' => ($image) ? $image->imgprimayx : null,
-                'slug' => $row->slug
+                'slug' => $row->slug,
+                'is_new_item' => $is_new_item
             ];
         }
 
