@@ -97,7 +97,7 @@
 									<th class="text-left" colspan="2">Item Description</th>
 									<th class="text-center d-none d-sm-table-cell">Qty</th>
 									@if ($sum_discount > 0)
-									<th class="text-center d-none d-sm-table-cell">Discount (%)</th>
+									<th class="text-center d-none d-sm-table-cell">Discount</th>
 									@endif
 									<th class="text-center d-none d-sm-table-cell">Price</th>
 									<th class="text-center d-none d-sm-table-cell">Amount</th>
@@ -118,7 +118,11 @@
 										<br/>
 										<p><b>Qty:</b> {{ $item['qty'] }}</p>
 										@if ($sum_discount > 0)
-											<p><b>Discount (%):</b> {{ $item['discount'] . '%' }}</p>
+										@if ($item['discount_type'] == 'percentage')
+										<p><b>Discount (%):</b> {{ $item['discount'] . '%' }}</p>
+										@else
+										<p><b>Discount:</b> ₱ {{ number_format(str_replace(",","",$item['discount']), 2) }}</p>
+										@endif
 										@endif
 										<p><b>Price:</b> ₱ {{ number_format(str_replace(",","",$item['price']), 2) }}</p>
 										<p><b>Amount:</b> ₱ {{ number_format(str_replace(",","",$item['amount']), 2) }}</p>
@@ -127,7 +131,11 @@
 									</td>
 									<td class="text-center d-none d-sm-table-cell">{{ $item['qty'] }}</td>
 									@if ($sum_discount > 0)
+									@if ($item['discount_type'] == 'percentage')
 									<td class="text-center d-none d-sm-table-cell">{{ $item['discount'] . '%' }}</td>
+									@else
+									<td class="text-center d-none d-sm-table-cell">₱ {{ number_format(str_replace(",","",$item['discount']), 2) }}</td>
+									@endif
 									@endif
 									<td class="text-right d-none d-sm-table-cell" style="text-align: right;">₱ {{ number_format(str_replace(",","",$item['price']), 2) }}</td>
 									<td class="text-right d-none d-sm-table-cell" style="text-align: right;">₱ {{ number_format(str_replace(",","",$item['amount']), 2) }}</td>

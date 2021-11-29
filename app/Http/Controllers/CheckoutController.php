@@ -334,6 +334,8 @@ class CheckoutController extends Controller
 	public function checkoutSummary(Request $request){
         DB::beginTransaction();
 		try{
+			session()->forget('fumVoucher');
+
 			$cart = session()->get('fumCart');
 			$cart = (!$cart) ? [] : $cart;
 
@@ -372,7 +374,7 @@ class CheckoutController extends Controller
 				$item_image = DB::table('fumaco_items_image_v1')
 					->where('idcode', $item->f_idcode)->first();
 
-				$price = ($item->f_price > 0) ? $item->f_price : $item->f_original_price;
+				$price = ($item->f_onsale) ? $item->f_price : $item->f_original_price;
 
 				$cart_arr[] = [
 					'item_code' => $item->f_idcode,
@@ -380,7 +382,7 @@ class CheckoutController extends Controller
 					'price' => $price,
 					'subtotal' => ($price * $cart[$item->f_idcode]['quantity']),
 					'original_price' => $item->f_original_price,
-					'discount' => $item->f_discount_percent,
+					'discount' => $item->f_onsale,
 					'quantity' => $cart[$item->f_idcode]['quantity'],
 					'stock_qty' => $item->f_qty,
 					'item_image' => ($item_image) ? $item_image->imgprimayx : 'test.jpg'
@@ -410,7 +412,8 @@ class CheckoutController extends Controller
 			$order_no = session()->get('fumOrderNo');
 			$shipping_details = session()->get('fumShipDet');
 			$billing_details = session()->get('fumBillDet');
-			
+			$voucher_code = session()->get('fumVoucher');
+	
 			$temp_data = [
 				'xtempcode' => uniqid(),
 				'xfname' => (Auth::check()) ? Auth::user()->f_name : $shipping_details['fname'],
@@ -455,25 +458,73 @@ class CheckoutController extends Controller
 				'estimated_delivery_date' => $request->estimated_del,
 				'xstore_location' => ($request->s_name == 'Store Pickup') ? $request->storeloc : null,
 				'xpickup_date' => ($request->s_name == 'Store Pickup') ? Carbon::parse($request->picktime)->format('Y-m-d') : null,
+				'voucher_code' => strtoupper($voucher_code)
 			];
 
-			$existing_order_temp = DB::table('fumaco_temp')->where('order_tracker_code', $order_no)->exists();
+			$existing_order_temp = DB::table('fumaco_temp')->where('order_tracker_code', $order_no)->first();
 			if(!$existing_order_temp){
 				DB::table('fumaco_temp')->insert($temp_data);
+			} else {
+				if ($voucher_code) {
+					DB::table('fumaco_temp')->where('id', $existing_order_temp->id)->update(['voucher_code' => strtoupper($voucher_code)]);
+				}
+			}
+
+			$voucher_details = DB::table('fumaco_on_sale as sale_config')->join('fumaco_voucher as voucher', 'sale_config.coupon', 'voucher.id')
+				->where('voucher.code', strtoupper($voucher_code))->where('sale_config.status', 1)->first();
+			
+			$is_voucher_valid = false;
+			if ($voucher_details) {
+				$is_voucher_valid = true;
+				if ($voucher_details->start_date && $voucher_details->end_date) {
+					$startDate = Carbon::parse($voucher_details->start_date);
+					$endDate = Carbon::parse($voucher_details->end_date);
+					$checkDate = Carbon::now()->between($startDate, $endDate);
+					if (!$checkDate) {
+						$is_voucher_valid = false;
+					}
+				}
+
+				if (!$voucher_details->unlimited) {
+					if ($voucher_details->total_consumed >= $voucher_details->total_allotment) {
+						$is_voucher_valid = false;
+					}
+				}
 			}
 
 			$cart = session()->get('fumCart');
 			$cart = (!$cart) ? [] : $cart;
-			if(count($cart) <= 0) {
-				return redirect('/cart');
-			}
 	
 			$cart_items = DB::table('fumaco_items')
 				->whereIn('f_idcode', array_column($cart, 'item_code'))->get();
 			
 			$cart_arr = [];
 			foreach ($cart_items as $n => $item) {
-				$price = ($item->f_discount_trigger) ? $item->f_price : $item->f_original_price;
+				$discount_amount = 0;
+				$price = ($item->f_onsale) ? $item->f_price : $item->f_original_price;
+				$total_amount = $price * $cart[$item->f_idcode]['quantity'];
+				$item_discount = $item->f_discount_percent;
+				$discount_type = 'percentage';
+				if ($is_voucher_valid) {
+					if (!$item->f_onsale) {
+						if ($voucher_details->discount_for != 'All Items') {
+							// apply discount per item category
+							$discounted_categories = explode(",", $voucher_details->apply_discount_to);
+							if (in_array($item->f_cat_id, $discounted_categories)) {
+								// calculated discount amount
+								$discount_amount = $this->calculateDiscountAmount($voucher_details->discount_type, $voucher_details->discount_rate, $voucher_details->capped_amount, $total_amount);
+								$item_discount = $voucher_details->discount_rate;
+								$discount_type = ($voucher_details->discount_type == 'By Percentage') ? 'percentage' : 'amount';
+							}
+						} else {
+							$discount_amount = $this->calculateDiscountAmount($voucher_details->discount_type, $voucher_details->discount_rate, $voucher_details->capped_amount, $total_amount);
+							$item_discount = $voucher_details->discount_rate;
+							$discount_type = ($voucher_details->discount_type == 'By Percentage') ? 'percentage' : 'amount';
+						}
+					}
+				}
+
+				$total_amount = $total_amount - $discount_amount;
 
 				$existing_order_item = DB::table('fumaco_order_items')->where('order_number', $order_no)
 						->where('item_code', $item->f_idcode)->exists();
@@ -483,26 +534,28 @@ class CheckoutController extends Controller
 					DB::table('fumaco_order_items')->where('order_number', $order_no)
 						->where('item_code', $item->f_idcode)->update([
 							'item_name' => $item->f_name_name,
-							'item_discount' => $item->f_discount_percent,
+							'item_discount' => $item_discount,
 							'item_original_price' => $item->f_original_price,
 							'item_qty' => $cart[$item->f_idcode]['quantity'],
 							'item_price' => $price,	
-							'item_total_price' => ($price * $cart[$item->f_idcode]['quantity'])
+							'item_total_price' => $total_amount,
+							'discount_type' => ($item_discount > 0) ? $discount_type : null
 						]);
 				} else {
 					$cart_arr[] = [
 						'order_number' => $order_no,
 						'item_code' => $item->f_idcode,
 						'item_name' => $item->f_name_name,
-						'item_discount' => $item->f_discount_percent,
+						'item_discount' => $item_discount,
 						'item_original_price' => $item->f_original_price,
 						'item_qty' => $cart[$item->f_idcode]['quantity'],
 						'item_price' => $price,
 						'item_status' => 2,
 						'date_update' => Carbon::now()->toDateTimeString(),
 						'ip_address' => $request->ip(),
-						'item_total_price' => ($price * $cart[$item->f_idcode]['quantity']),
-						'item_type' => $item->f_item_type
+						'item_total_price' => $total_amount,
+						'item_type' => $item->f_item_type,
+						'discount_type' => ($item_discount > 0) ? $discount_type : null
 					];
 				}
 			}
@@ -510,6 +563,8 @@ class CheckoutController extends Controller
 			DB::table('fumaco_order_items')->insert($cart_arr);
 
 			DB::commit();
+
+			session()->forget('fumVoucher');
 
 			return response()->json(['status' => 1, 'id' => $order_no]);
 		} catch (Exception $e) {
@@ -619,7 +674,8 @@ class CheckoutController extends Controller
 					'billing_business_name' => $temp->xbusiness_name,
 					'billing_tin' => $temp->xtin_no,
 					'store_location' => $temp->xstore_location,
-					'pickup_date' => $temp->xpickup_date
+					'pickup_date' => $temp->xpickup_date,
+					'voucher_code' => $temp->voucher_code
 				]);
 
 				// insert order in tracking order table
@@ -647,6 +703,7 @@ class CheckoutController extends Controller
 					'item_name' => $row->item_name,
 					'price' => $row->item_price,
 					'discount' => $row->item_discount,
+					'discount_type' => $row->discount_type,
 					'qty' => $row->item_qty,
 					'amount' => $row->item_total_price,
 					'image' => ($image) ? $image->imgprimayx : null
@@ -658,6 +715,28 @@ class CheckoutController extends Controller
 					DB::table('fumaco_items')->where('f_idcode', $row->item_code)->update([
 						'f_reserved_qty' => $item_details->f_reserved_qty + $row->item_qty,
 					]);
+				}
+			}
+
+			if($temp->voucher_code) {
+				$voucher_details = DB::table('fumaco_on_sale as sale_config')->join('fumaco_voucher as voucher', 'sale_config.coupon', 'voucher.id')
+					->where('voucher.code', strtoupper($temp->voucher_code))->where('sale_config.status', 1)->first();
+				
+				$is_voucher_valid = false;
+				if ($voucher_details) {
+					$is_voucher_valid = true;
+					if ($voucher_details->start_date && $voucher_details->end_date) {
+						$startDate = Carbon::parse($voucher_details->start_date);
+						$endDate = Carbon::parse($voucher_details->end_date);
+						$checkDate = Carbon::now()->between($startDate, $endDate);
+						if (!$checkDate) {
+							$is_voucher_valid = false;
+						}
+					}
+
+					if ($is_voucher_valid) {
+						DB::table('fumaco_voucher')->where('code', $temp->voucher_code)->update(['total_consumed' => $voucher_details->total_consumed + 1]);
+					}
 				}
 			}
 
@@ -996,5 +1075,76 @@ class CheckoutController extends Controller
 
 	public function paymentCallback(Request $request) {
 		return ($request->urlType == 'return') ? 'Retry' : 'OK';
+	}
+
+	public function applyVoucher($code, Request $request) {
+		if ($request->ajax()) {
+			$voucher_details = DB::table('fumaco_on_sale as sale_config')->join('fumaco_voucher as voucher', 'sale_config.coupon', 'voucher.id')
+				->where('voucher.code', strtoupper($code))->where('sale_config.status', 1)->first();
+
+			if (!$voucher_details) {
+				return response()->json(['status' => 0, 'message' => 'Please enter a valid coupon code.']);
+			}
+
+			if ($voucher_details->start_date && $voucher_details->end_date) {
+				$startDate = Carbon::parse($voucher_details->start_date);
+				$endDate = Carbon::parse($voucher_details->end_date);
+				$checkDate = Carbon::now()->between($startDate, $endDate);
+				if (!$checkDate) {
+					return response()->json(['status' => 0, 'message' => 'Please enter a valid coupon code.']);
+				}
+			}
+
+			$cart = session()->get('fumCart');
+			$cart = (!$cart) ? [] : $cart;
+
+			$cart_items = DB::table('fumaco_items')
+				->whereIn('f_idcode', array_column($cart, 'item_code'))->get();
+			
+			$cart_arr = [];
+			foreach ($cart_items as $n => $item) {
+				$discount_amount = 0;
+				$price = ($item->f_onsale) ? $item->f_price : $item->f_original_price;
+				$total_amount = $price * $cart[$item->f_idcode]['quantity'];
+				if (!$item->f_onsale) {
+					if ($voucher_details->discount_for != 'All Items') {
+						// apply discount per item category
+						$discounted_categories = explode(",", $voucher_details->apply_discount_to);
+						if (in_array($item->f_cat_id, $discounted_categories)) {
+							// calculated discount amount
+							$discount_amount = $this->calculateDiscountAmount($voucher_details->discount_type, $voucher_details->discount_rate, $voucher_details->capped_amount, $total_amount);
+						}
+					} else {
+						$discount_amount = $this->calculateDiscountAmount($voucher_details->discount_type, $voucher_details->discount_rate, $voucher_details->capped_amount, $total_amount);
+					}
+				}
+				
+				$discounted_price = $total_amount - $discount_amount;
+
+				$cart_arr[] = [
+					'id' => '#' .$item->f_idcode,
+					'discounted_price' => $discounted_price,
+					'is_discounted' => $total_amount > $discounted_price ? 1 : 0,
+				];
+			}
+
+			session()->put('fumVoucher', $code);
+
+			return response()->json($cart_arr);
+		}
+	}
+
+	private function calculateDiscountAmount($type, $discount, $capped_amount, $price) {
+		$discount_amount = 0;
+		if ($type == 'By Percentage') {
+			$discount_amount = ($discount/100) * $price;
+			if ($discount_amount > $capped_amount) {
+				$discount_amount = $capped_amount;
+			}
+		} else {
+			$discount_amount = $discount;
+		}
+
+		return $discount_amount;
 	}
 }

@@ -122,6 +122,7 @@ Route::post('/checkout/update_shipping', 'CheckoutController@updateShipping');
 Route::post('/checkout/update_billing', 'CheckoutController@updateBilling');
 Route::get('/checkout/set_billing_form/{item_code_buy?}/{qty_buy?}', 'CheckoutController@setBillingForm');
 Route::post('/checkout/set_billing', 'CheckoutController@setBilling');
+Route::get('/checkout/apply_voucher/{code}', 'CheckoutController@applyVoucher');
 Route::get('/eghlform/{order_no}', 'CheckoutController@viewPaymentForm');
 Route::post('/order/save', 'CheckoutController@saveOrder');
 

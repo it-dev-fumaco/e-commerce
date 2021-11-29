@@ -97,8 +97,6 @@ class OrderController extends Controller
             ];
         }
 
-        // return $orders_arr;
-
         return view('backend.orders.order_list', compact('orders_arr', 'orders'));
     }
 

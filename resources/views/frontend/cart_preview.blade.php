@@ -16,7 +16,7 @@
             <img src="{{ asset($img) }}" alt="{{ Str::slug(explode(".", $cart['item_image'])[0], '-') }}" class="img-responsive" width="55" height="55">
         </picture>
         <span class="item-name">{{ $cart['item_description'] }}</span>
-        <span class="item-price">₱ {{ number_format($cart['price'], 2, '.', ',') }}</span>
+        <span class="item-price">₱ {{ number_format($cart['amount'], 2, '.', ',') }}</span>
         <span class="item-quantity">Qty: {{ $cart['quantity'] }} {{ $cart['stock_uom'] }}</span>
         <span class="item-price m-1" style="display: inline-block; float: right;">
             <a href="#" class="remove-cart-btn" href="#" role="button" data-id="{{ $cart['item_code'] }}" style="color: #ABB0BE;"><i class="fas fa-trash-alt"></i></a>
