@@ -57,7 +57,7 @@ class OrderController extends Controller
                 'ship_contact_person' => $o->order_ship_contactperson,
                 'email' => $o->order_email,
                 'contact' => $o->order_contact == 0 ? '' : $o->order_contact ,
-                'date' => Carbon::parse($o->order_update)->format('M d, Y - h:m A'),
+                'date' => Carbon::parse($o->order_date)->format('M d, Y - h:m A'),
                 'ordered_items' => $items_arr,
                 'order_tracker_code' => $o->tracker_code,
                 'payment_method' => $o->order_payment_method,
