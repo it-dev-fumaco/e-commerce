@@ -66,13 +66,20 @@
                                             <div class="col-6">
                                                 <label><input type="checkbox" name="unlimited_allotment" id="unlimited_allotment" checked> Unlimited Allotment</label>
                                                 <br/>
-                                                {{-- <label>Allotment</label> --}}
                                                 <input type="number" class="form-control" name="allotment" id="allotment" placeholder="Allotment">
                                             </div>
                                         </div>
                                         <br/>
                                         <div class="row">
-                                            <div class="col-6">
+                                            <div class="col-4">
+                                                <label>Coupon Type *</label>
+                                                <select class="form-control" name="coupon_type" id="coupon_type" required>
+                                                    <option disabled value="">Coupon Type</option>
+                                                    <option value="Promotional" selected>Promotional</option>
+                                                    <option value="Gift Card">Gift Card</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-4">
                                                 <label>Discount Type *</label>
                                                 @php
                                                     $discount_type = array('Free Delivery', 'Fixed Amount', 'By Percentage');
@@ -85,7 +92,7 @@
                                                 </select>
                                             </div>
 
-                                            <div class="col-6">
+                                            <div class="col-4">
                                                 <label>Minimum Spend</label>
                                                 <input type="text" class="form-control" name="minimum_spend" placeholder="Minimum Spend">
                                             </div>
@@ -111,8 +118,15 @@
                                         <br/>
                                         <div class="row">
                                             <div class="col-12">
+                                                <label>Coupon Description *</label>
+                                                <textarea class="form-control page-content" rows="10" name="coupon_description"></textarea>
+                                            </div>
+                                        </div>
+                                        <br/>
+                                        <div class="row">
+                                            <div class="col-12">
                                                 <label>Remarks</label>
-                                                <textarea name="remarks" cols="3" rows="5" class="form-control" placeholder="Remarks"></textarea>
+                                                <textarea name="remarks" cols="3" rows="3" class="form-control" placeholder="Remarks"></textarea>
                                             </div>
                                         </div>
                                     </form>
@@ -202,6 +216,12 @@
             opens: 'left',
             placeholder: 'Select Date Range',
             startDate: moment(), endDate: moment().add(7, 'days'),
+        });
+
+        $(".page-content").summernote({
+            dialogsInBody: true,
+            dialogsFade: true,
+            height: "500px",
         });
     });
     </script>

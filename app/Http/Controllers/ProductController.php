@@ -888,6 +888,10 @@ class ProductController extends Controller
 				return redirect()->back()->with('error', "Voucher Name/Code must be unique.");
 			}
 
+            if(!strip_tags($request->coupon_description)){
+                return redirect()->back()->with('error', 'Coupon description cannot be empty');
+            }
+
             $start = null;
             $end = null;
             if(isset($request->require_validity)){
@@ -915,6 +919,8 @@ class ProductController extends Controller
                 'discount_type' => $request->discount_type,
                 'discount_rate' => $discount_rate,
                 'capped_amount' => $capped_amount,
+                'coupon_type' => $request->coupon_type,
+                'description' => $request->coupon_description,
                 'validity_date_start' => $start,
                 'validity_date_end' => $end,
                 'remarks' => $request->remarks,
@@ -940,6 +946,10 @@ class ProductController extends Controller
 
             if($name_checker or $code_checker){
 				return redirect()->back()->with('error', "Voucher Name/Code must be unique.");
+            }
+
+            if(!strip_tags($request->coupon_description)){
+                return redirect()->back()->with('error', 'Coupon description cannot be empty');
             }
 
             $start = null;
@@ -968,6 +978,8 @@ class ProductController extends Controller
                 'discount_type' => $request->discount_type,
                 'discount_rate' => $discount_rate,
                 'capped_amount' => $capped_amount,
+                'coupon_type' => $request->coupon_type,
+                'description' => $request->coupon_description,
                 'validity_date_start' => $start,
                 'validity_date_end' => $end,
                 'remarks' => $request->remarks,

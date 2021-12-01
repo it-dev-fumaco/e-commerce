@@ -64,7 +64,8 @@
                                     <table class="table table-hover table-bordered">
                                         <tr>
                                             <th class="text-center">Name</th>
-                                            <th class="text-center">Coupon Code</th>
+                                            <th class="text-center">Code</th>
+                                            <th class="text-center">Type</th>
                                             <th class="text-center">Allotment</th>
                                             <th class="text-center">Consumed</th>
                                             <th class="text-center">Min. Spend</th>
@@ -87,6 +88,7 @@
                                                     @endphp
                                                     <span class="badge badge-{{ $badge }}" style="font-size: 15px">{{ $c->code }}</span>
                                                 </td>
+                                                <td class="text-center">{{ $c->coupon_type }}</td>
                                                 <td class="text-center">{{ $c->unlimited == 1 ? '∞' : $c->total_allotment }}</td>
                                                 <td class="text-center">{{ $c->total_consumed }}</td>
                                                 <td class="text-center">

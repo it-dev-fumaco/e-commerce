@@ -70,7 +70,20 @@
                                         </div>
                                         <br/>
                                         <div class="row">
-                                            <div class="col-6">
+                                            <div class="col-4">
+                                                <label>Coupon Type *</label>
+                                                @php
+                                                    $coupon_type = array('Promotional', 'Gift Card')
+                                                @endphp
+                                                <select class="form-control" name="coupon_type" id="coupon_type" required>
+                                                    <option disabled value="">Coupon Type</option>
+                                                    @foreach ($coupon_type as $coup_type)
+                                                        <option value="{{ $coup_type }}" {{ $coup_type == $coupon->coupon_type ? 'selected' : '' }}>{{ $coup_type }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+
+                                            <div class="col-4">
                                                 <label>Discount Type *</label>
                                                 @php
                                                     $discount_type = array('Free Delivery', 'Fixed Amount', 'By Percentage');
@@ -83,7 +96,7 @@
                                                 </select>
                                             </div>
 
-                                            <div class="col-6">
+                                            <div class="col-4">
                                                 <label>Minimum Spend</label>
                                                 <input type="text" class="form-control" name="minimum_spend" value="{{ $coupon->minimum_spend }}" placeholder="Minimum Spend">
                                             </div>
@@ -104,6 +117,13 @@
                                             <div class="col-6">
                                                 <label>Capped Amount</label>
                                                 <input type="text" class="form-control" name="capped_amount" value="{{ $coupon->capped_amount }}" id="capped_amount" placeholder="Capped Amount"/>
+                                            </div>
+                                        </div>
+                                        <br/>
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <label>Coupon Description *</label>
+                                                <textarea class="form-control page-content" rows="10" name="coupon_description">{{ $coupon->description }}</textarea>
                                             </div>
                                         </div>
                                         <br/>
@@ -211,6 +231,12 @@
             placeholder: 'Select Date Range',
             startDate: start ? start : moment(),
             endDate: end ? end : moment().add(7, 'days'),
+        });
+
+        $(".page-content").summernote({
+            dialogsInBody: true,
+            dialogsFade: true,
+            height: "500px",
         });
     });
     </script>
