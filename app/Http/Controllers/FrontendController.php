@@ -659,7 +659,7 @@ class FrontendController extends Controller
             return view('error');
         }
         // get requested filters
-        $request_data = $request->except(['page', 'sel_attr', 'sortby', 'brand', 'order']);
+        $request_data = $request->except(['page', 'sel_attr', 'sortby', 'brand', 'order', 'fbclid']);
         $attribute_name_filter = array_keys($request_data);
         $attribute_value_filter = [];
         $brand_filter = $request->brand;
