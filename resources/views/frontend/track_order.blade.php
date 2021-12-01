@@ -68,13 +68,13 @@
 									<div class="step active">
 										<span class="icon {{ $step > 0 ? 'inactive' : '' }}"><i class="fa fa-check {{ $step > 0 ? 'd-none' : '' }}"></i></span>
 										<span class="text status-text">Order Placed</span>
-										<span class="text status-text" style="font-size: 9pt; color: #a39f9f !important; font-style: italic !important">{{ date('M d, Y H:i A', strtotime(trim(collect($track_order_details)->where('track_status', 'Order Placed')->pluck('track_date'), '[""]'))) }}</span>
+										<span class="text status-text" style="font-size: 9pt; color: #a39f9f !important; font-style: italic !important">{{ date('M d, Y H:i A', strtotime(trim(collect($track_order_details)->where('track_status', 'Order Placed')->pluck('track_date')->first(), '[""]'))) }}</span>
 									</div>
 									@foreach ($order_status as $key => $name)
 										@php
 											$date = '';
 											if(trim(collect($track_order_details)->where('track_status', $name->status)->pluck('track_date'), '[""]') != null){
-												$date = date('M d, Y H:i A', strtotime(trim(collect($track_order_details)->where('track_status', $name->status)->pluck('track_date'), '[""]')));
+												$date = date('M d, Y H:i A', strtotime(trim(collect($track_order_details)->where('track_status', $name->status)->pluck('track_date')->first(), '[""]')));
 											}
 											
 											$icon = '';
