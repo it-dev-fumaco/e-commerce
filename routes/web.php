@@ -179,13 +179,12 @@ Route::prefix('admin')->group(function () {
         Route::get('/product/images/{id}', 'ProductController@uploadImagesForm');
         Route::get('/product/{item_code}/{item_type}', 'ProductController@getItemDetails');
         Route::post('/add_product_images', 'ProductController@uploadImages');
-        Route::get('/delete_product_image/{id}', 'ProductController@deleteProductImage');
+        Route::get('/delete_product_image/{id}/{social?}', 'ProductController@deleteProductImage');
 
         Route::get('/select_related_products/{category_id}', 'ProductController@selectProductsRelated');
         Route::post('/product/{parent_code}/save_related_products', 'ProductController@saveRelatedProducts');
         Route::delete('/product/remove_related/{id}', 'ProductController@removeRelatedProduct');
         
-    
         Route::post('/product/{id}/update', 'ProductController@updateItem');
         Route::post('/product/{item_code}/disable', 'ProductController@disableItem');
         Route::post('/product/{item_code}/enable', 'ProductController@enableItem');
