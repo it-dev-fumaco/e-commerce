@@ -198,7 +198,7 @@
                                     <table class="table">
                                         <tr>
                                             <th></th>
-                                            <th>Image Zoom</th>
+                                            <th>Image</th>
                                             <th>Action</th>
                                         </tr>
                                         @forelse ($promo_arr as $promo_img)
