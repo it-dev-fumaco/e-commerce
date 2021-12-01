@@ -24,7 +24,7 @@
             <section class="content">
                 <div class="container-fluid">
                     <div class="row">
-                        <div class="col-6">
+                        <div class="col-12">
                             <div class="card card-primary">
                                 @if(session()->has('success'))
                                     <div class="alert alert-success fade show" role="alert">
@@ -46,32 +46,66 @@
                                             </div>
                                         </div>
                                         <div class="row">
-                                            <div class="col-12">
+                                            <div class="col-6">
                                                 <label>Name</label>
                                                 <input type="text" class="form-control" name="name" placeholder="Name" required>
                                             </div>
-                                        </div>
-                                        <br/>
-                                        <div class="row">
-                                            <div class="col-12">
+
+                                            <div class="col-6">
                                                 <label>Coupon Code</label>
                                                 <input type="text" class="form-control" name="coupon_code" placeholder="Coupon Code" required>
                                             </div>
                                         </div>
-                                        <br>
+                                        <br/>
                                         <div class="row">
-                                            <div class="col-12">
+                                            <div class="col-6">
                                                 <label><input type="checkbox" name="require_validity" id="require_validity"> Set Validity</label>
                                                 <input type="text" class="form-control set_duration" id="daterange" name="validity" disabled/>
+                                            </div>
+
+                                            <div class="col-6">
+                                                <label><input type="checkbox" name="unlimited_allotment" id="unlimited_allotment" checked> Unlimited Allotment</label>
+                                                <br/>
+                                                {{-- <label>Allotment</label> --}}
+                                                <input type="number" class="form-control" name="allotment" id="allotment" placeholder="Allotment">
                                             </div>
                                         </div>
                                         <br/>
                                         <div class="row">
+                                            <div class="col-6">
+                                                <label>Discount Type *</label>
+                                                @php
+                                                    $discount_type = array('Free Delivery', 'Fixed Amount', 'By Percentage');
+                                                @endphp
+                                                <select class="form-control" name="discount_type" id="discount_type" required>
+                                                    <option disabled selected value="">Discount Type</option>
+                                                    @foreach ($discount_type as $discount)
+                                                        <option value="{{ $discount }}">{{ $discount }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+
+                                            <div class="col-6">
+                                                <label>Minimum Spend</label>
+                                                <input type="text" class="form-control" name="minimum_spend" placeholder="Minimum Spend">
+                                            </div>
+                                        </div>
+                                        <div id="fixed_amount" class="row">
+                                            <br>&nbsp;
                                             <div class="col-12">
-                                                <label><input type="checkbox" name="unlimited_allotment" id="unlimited_allotment" checked> Unlimited Allotment</label>
-                                                <br/>
-                                                <label>Allotment</label>
-                                                <input type="number" class="form-control" name="allotment" id="allotment" placeholder="Allotment">
+                                                <label>Amount *</label>
+                                                <input type="text" class="form-control" id="discount_amount" name="discount_amount" placeholder="Amount">
+                                            </div>
+                                        </div>
+                                        <div id="percentage" class="row">
+                                            <div class="col-12"><br/></div>
+                                            <div class="col-6">
+                                                <label>Percentage *</label>
+                                                <input type="text" class="form-control" id="discount_percentage" name="discount_percentage" placeholder="Percentage">
+                                            </div>
+                                            <div class="col-6">
+                                                <label>Capped Amount</label>
+                                                <input type="text" class="form-control" name="capped_amount" id="capped_amount" placeholder="Capped Amount"/>
                                             </div>
                                         </div>
                                         <br/>
@@ -96,6 +130,16 @@
     $(document).ready(function(){
         allotment();
         validityDate();
+        discountType();
+        discountFor();
+
+        $('#discount_type').change(function(){
+            discountType();
+        });
+
+        $('#discount_for').change(function(){
+            discountFor();
+        });
 
         $('#unlimited_allotment').click(function(){
             allotment();
@@ -122,6 +166,35 @@
             }else{
                 $("#daterange").prop('required',false);
                 $("#daterange").prop('disabled',true);
+            }
+        }
+
+        function discountType(){
+            if($('#discount_type').val() == 'Fixed Amount'){
+                $('#fixed_amount').slideDown();
+                $("#discount_amount").prop('required',true);
+                $("#discount_percentage").prop('required',false);
+                $('#percentage').slideUp();
+            }else if($('#discount_type').val() == 'By Percentage'){
+                $('#percentage').slideDown();
+                $("#discount_percentage").prop('required',true);
+                $("#discount_amount").prop('required',false);
+                $('#fixed_amount').slideUp();
+            }else{
+                $('#fixed_amount').slideUp();
+                $('#percentage').slideUp();
+                $("#discount_amount").prop('required',false);
+                $("#discount_percentage").prop('required',false);
+            }
+        }
+
+        function discountFor(){
+            if($('#discount_for').val() == 'Per Category'){
+                $('#categories').slideDown();
+                $("#selected_categories").prop('required',true);
+            }else{
+                $('#categories').slideUp();
+                $("#selected_categories").prop('required',false);
             }
         }
 

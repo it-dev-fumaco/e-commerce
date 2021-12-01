@@ -63,13 +63,13 @@
                                                 <div id="fixed_amount" class="col-12">
                                                     <br/>&nbsp;
                                                     <label>Amount</label>
-                                                    <input type="text" class="form-control" id="discount_amount" name="discount_amount" value="{{ $on_sale->discount_rate }}" placeholder="Amount">
+                                                    <input type="text" class="form-control" id="discount_amount" name="discount_amount" value="{{ $on_sale->discount_type == 'Fixed Amount' ? $on_sale->discount_rate : '' }}" placeholder="Amount">
                                                 </div>
                                                 <div id="percentage" class="row">
                                                     <div class="col-12"><br/></div>
                                                     <div class="col-6">
                                                         <label>Percentage</label>
-                                                        <input type="text" class="form-control" id="discount_percentage" name="discount_percentage" value="{{ $on_sale->discount_rate }}" placeholder="Percentage">
+                                                        <input type="text" class="form-control" id="discount_percentage" name="discount_percentage" value="{{ $on_sale->discount_type == 'By Percentage' ? $on_sale->discount_rate : '' }}" placeholder="Percentage">
                                                     </div>
                                                     <div class="col-6">
                                                         <label>Capped Amount</label>

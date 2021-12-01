@@ -785,7 +785,7 @@ class ProductController extends Controller
 
 
     public function voucherList(Request $request){
-        $coupon = DB::table('fumaco_voucher')->where('name', 'LIKE', '%'.$request->q.'%')->paginate(10);
+        $coupon = DB::table('fumaco_voucher')->where('name', 'LIKE', '%'.$request->q.'%')->orderBy('created_at', 'desc')->paginate(10);
         return view('backend.marketing.list_voucher', compact('coupon'));
     }
 
@@ -896,16 +896,32 @@ class ProductController extends Controller
                 $end = Carbon::parse($date[1])->format('Y/m/d');
             }
 
+            $discount_rate = null;
+            $capped_amount = null;
+
+            if($request->discount_type == 'By Percentage'){
+                $discount_rate = $request->discount_percentage;
+                $capped_amount = $request->capped_amount;
+            }else if($request->discount_type == 'Fixed Amount'){
+                $discount_rate = $request->discount_amount;
+            }
+
             $insert = [
                 'name' => $request->name,
                 'code' => strtoupper($request->coupon_code),
                 'total_allotment' => isset($request->unlimited_allotment) ? null : $request->allotment,
                 'unlimited' => isset($request->unlimited_allotment) ? 1 : 0,
+                'minimum_spend' => $request->minimum_spend,
+                'discount_type' => $request->discount_type,
+                'discount_rate' => $discount_rate,
+                'capped_amount' => $capped_amount,
                 'validity_date_start' => $start,
                 'validity_date_end' => $end,
                 'remarks' => $request->remarks,
                 'created_by' => Auth::user()->username
             ];
+
+            // return $insert;
 
             DB::table('fumaco_voucher')->insert($insert);
             DB::commit();
@@ -933,17 +949,31 @@ class ProductController extends Controller
                 $start = Carbon::parse($date[0])->format('Y/m/d');
                 $end = Carbon::parse($date[1])->format('Y/m/d');
             }
+            $discount_rate = null;
+            $capped_amount = null;
+
+            if($request->discount_type == 'By Percentage'){
+                $discount_rate = $request->discount_percentage;
+                $capped_amount = $request->capped_amount;
+            }else if($request->discount_type == 'Fixed Amount'){
+                $discount_rate = $request->discount_amount;
+            }
 
             $update = [
                 'name' => $request->name,
                 'code' => strtoupper($request->coupon_code),
                 'total_allotment' => isset($request->unlimited_allotment) ? null : $request->allotment,
                 'unlimited' => isset($request->unlimited_allotment) ? 1 : 0,
+                'minimum_spend' => $request->minimum_spend,
+                'discount_type' => $request->discount_type,
+                'discount_rate' => $discount_rate,
+                'capped_amount' => $capped_amount,
                 'validity_date_start' => $start,
                 'validity_date_end' => $end,
                 'remarks' => $request->remarks,
                 'last_modified_by' => Auth::user()->username
             ];
+            // return $update;
 
             DB::table('fumaco_voucher')->where('id', $id)->update($update);
             DB::commit();

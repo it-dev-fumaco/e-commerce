@@ -15,7 +15,7 @@ class CustomerController extends Controller
         ->when($request->q, function($c) use ($request) {
             $c->where('f_name', 'LIKE', '%'.$request->q.'%')->orWhere('f_lname', 'LIKE', '%'.$request->q.'%')->orWhere('username', 'LIKE', '%'.$request->q.'%');
         })
-            ->paginate(10);
+            ->orderBy('created_at', 'desc')->paginate(10);
 
         $user_arr = [];
         $ship_arr = [];

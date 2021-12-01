@@ -63,22 +63,50 @@
                                     </div>
                                     <table class="table table-hover table-bordered">
                                         <tr>
-                                            <th class="text-center">ID</th>
                                             <th class="text-center">Name</th>
                                             <th class="text-center">Coupon Code</th>
-                                            <th class="text-center">Total Allotment</th>
-                                            <th class="text-center">Total Consumed</th>
+                                            <th class="text-center">Allotment</th>
+                                            <th class="text-center">Consumed</th>
+                                            <th class="text-center">Min. Spend</th>
+                                            <th class="text-center">Discount Type</th>
+                                            <th class="text-center">Discount Amount/Rate</th>
+                                            <th class="text-center">Capped Amount</th>
                                             <th class="text-center">Validity Date</th>
                                             <th class="text-center">Remarks</th>
                                             <th class="text-center">Action</th>
                                         </tr>
                                         @forelse ($coupon as $c)
                                             <tr>
-                                                <td class="text-center">{{ $c->id }}</td>
                                                 <td class="text-center">{{ $c->name }}</td>
-                                                <td class="text-center">{{ $c->code }}</td>
-                                                <td class="text-center">{{ $c->unlimited == 1 ? 'Unlimited' : $c->total_allotment }}</td>
+                                                <td class="text-center">
+                                                    @php
+                                                        $badge = 'secondary';
+                                                        if(\Carbon\Carbon::parse($c->validity_date_start)->startOfDay() <= \Carbon\Carbon::now() and \Carbon\Carbon::parse($c->validity_date_end)->endOfDay() >= \Carbon\Carbon::now()){ // Check if coupon is valid
+                                                            $badge = 'danger';
+                                                        }
+                                                    @endphp
+                                                    <span class="badge badge-{{ $badge }}" style="font-size: 15px">{{ $c->code }}</span>
+                                                </td>
+                                                <td class="text-center">{{ $c->unlimited == 1 ? '∞' : $c->total_allotment }}</td>
                                                 <td class="text-center">{{ $c->total_consumed }}</td>
+                                                <td class="text-center">
+                                                    @if($c->minimum_spend)
+                                                        ₱ {{ number_format($c->minimum_spend, 2, '.', ',') }}
+                                                    @endif
+                                                </td>
+                                                <td class="text-center">{{ $c->discount_type }}</td>
+                                                <td class="text-center">
+                                                    @if ($c->discount_type == 'Fixed Amount')  
+                                                        ₱ {{ number_format($c->discount_rate, 2, '.', ',') }}
+                                                    @elseif($c->discount_type == 'By Percentage')
+                                                        {{ $c->discount_rate }}%
+                                                    @endif
+                                                </td>
+                                                <td class="text-center">
+                                                    @if ($c->capped_amount)
+                                                        ₱ {{ number_format($c->capped_amount, 2, '.', ',') }}
+                                                    @endif
+                                                </td>
                                                 <td class="text-center">{{ $c->validity_date_start ? date('M d, Y', strtotime($c->validity_date_start)).' - '.date('M d, Y', strtotime($c->validity_date_end)) : '' }}</td>
                                                 <td class="text-center">{{ $c->remarks }}</td>
                                                 <td class="text-center">
