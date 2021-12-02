@@ -1013,7 +1013,9 @@ class FrontendController extends Controller
                 'subtotal' => $order->order_subtotal,
                 'shipping_name' => $order->order_shipping,
                 'shipping_fee' => $order->order_shipping_amount,
-                'grand_total' => ($order->order_shipping_amount + $order->order_subtotal),
+                'grand_total' => ($order->order_shipping_amount + ($order->order_subtotal - $order->discount_amount)),
+                'voucher_code' => $order->voucher_code,
+                'discount_amount' => $order->discount_amount,
             ];
         }
 
@@ -1054,10 +1056,12 @@ class FrontendController extends Controller
                 'subtotal' => $new_order->order_subtotal,
                 'shipping_name' => $new_order->order_shipping,
                 'shipping_fee' => $new_order->order_shipping_amount,
-                'grand_total' => ($new_order->order_shipping_amount + $new_order->order_subtotal),
+                'grand_total' => ($new_order->order_shipping_amount + ($new_order->order_subtotal - $new_order->discount_amount)),
                 'pickup_date' => $new_order->pickup_date,
                 'order_tracker' => $track_order_details,
                 'ship_status' => $order_status,
+                'voucher_code' => $new_order->voucher_code,
+                'discount_amount' => $new_order->discount_amount,
             ];
         }
         // return $new_orders_arr;

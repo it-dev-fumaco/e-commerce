@@ -113,6 +113,11 @@
 														<td colspan=2 class="table-text" style="text-align: right;">Shipping Fee: </td>
 														<td class="table-text" style="text-align: left; white-space: nowrap !important">₱ {{ number_format($order['shipping_fee'], 2) }}</td>
 													</tr>
+													<tr class="d-lg-none d-xl-none" style="border-bottom: rgba(0,0,0,0) !important">
+														<td></td>
+														<td colspan=2 class="table-text" style="text-align: right;">Shipping Fee: </td>
+														<td class="table-text" style="text-align: left; white-space: nowrap !important">₱ {{ number_format($order['shipping_fee'], 2) }}</td>
+													</tr>
 													<tr class="d-lg-none d-xl-none" style="border-bottom: rgba(0,0,0,0) !important; font-weight: 700 !important">
 														<td></td>
 														<td colspan=2 class="table-text" style="text-align: right;">Grand Total: </td>
@@ -126,6 +131,14 @@
 														</div>
 														<div class="col-md-2" style="text-align: left;">
 															<span>₱ {{ number_format($order['subtotal'], 2) }}</span>
+														</div><br/>&nbsp;
+													</div>
+													<div class="row">
+														<div class="col-md-10" style="text-align: right;">
+															<span>Discount: <span class="text-white" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833;">{{ $order['voucher_code'] }}</span></span>
+														</div>
+														<div class="col-md-2" style="text-align: left;">
+															<span>₱ {{ number_format($order['discount_amount'], 2) }}</span>
 														</div><br/>&nbsp;
 													</div>
 													<div class="row">

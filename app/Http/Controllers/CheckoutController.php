@@ -471,11 +471,8 @@ class CheckoutController extends Controller
 					'estimated_delivery_date' => $request->estimated_del,
 					'xstore_location' => ($request->s_name == 'Store Pickup') ? $request->storeloc : null,
 					'xpickup_date' => ($request->s_name == 'Store Pickup') ? Carbon::parse($request->picktime)->format('Y-m-d') : null,
+					'voucher_code' => ($voucher_code) ? strtoupper($voucher_code) : null
 				]);
-
-				if ($voucher_code) {
-					DB::table('fumaco_temp')->where('id', $existing_order_temp->id)->update(['voucher_code' => strtoupper($voucher_code)]);
-				}
 			}
 
 			$cart = session()->get('fumCart');
@@ -556,8 +553,8 @@ class CheckoutController extends Controller
 						$is_voucher_valid = true;
 						if($voucher_details->validity_date_start && $voucher_details->validity_date_end) {
 							if ($voucher_details->validity_date_start && $voucher_details->validity_date_end) {
-								$startDate = Carbon::parse($voucher_details->validity_date_start);
-								$endDate = Carbon::parse($voucher_details->validity_date_end);
+								$startDate = Carbon::parse($voucher_details->validity_date_start)->startOfDay();
+								$endDate = Carbon::parse($voucher_details->validity_date_end)->endOfDay();
 								$checkDate = Carbon::now()->between($startDate, $endDate);
 								if (!$checkDate) {
 									$is_voucher_valid = false;
@@ -567,6 +564,12 @@ class CheckoutController extends Controller
 	
 						if($voucher_details->minimum_spend > 0) {
 							if($amount < $voucher_details->minimum_spend) {
+								$is_voucher_valid = false;
+							}
+						}
+
+						if(!$voucher_details->unlimited) {
+							if ($voucher_details->total_allotment <= $voucher_details->total_consumed) {
 								$is_voucher_valid = false;
 							}
 						}
@@ -582,7 +585,7 @@ class CheckoutController extends Controller
 							}
 				
 							if($voucher_details->discount_type == 'Fixed Amount') {
-								$discount = $amount - $voucher_details->discount_rate;
+								$discount = $voucher_details->discount_rate;
 							}
 				
 							if($voucher_details->discount_type == 'Free Delivery') {
@@ -595,7 +598,7 @@ class CheckoutController extends Controller
 	
 			$grand_total = $amount - $discount;
 			$grand_total = $grand_total + $temp->shipping_amount;
-	
+
 			return view('frontend.checkout.eghl_form', compact('temp', 'api', 'grand_total'));
 		}
 	}
@@ -650,8 +653,8 @@ class CheckoutController extends Controller
 					$is_voucher_valid = true;
 					if($voucher_details->validity_date_start && $voucher_details->validity_date_end) {
 						if ($voucher_details->validity_date_start && $voucher_details->validity_date_end) {
-							$startDate = Carbon::parse($voucher_details->validity_date_start);
-							$endDate = Carbon::parse($voucher_details->validity_date_end);
+							$startDate = Carbon::parse($voucher_details->validity_date_start)->startOfDay();
+							$endDate = Carbon::parse($voucher_details->validity_date_end)->endOfDay();
 							$checkDate = Carbon::now()->between($startDate, $endDate);
 							if (!$checkDate) {
 								$is_voucher_valid = false;
@@ -1127,12 +1130,18 @@ class CheckoutController extends Controller
 
 			if($voucher_details->validity_date_start && $voucher_details->validity_date_end) {
 				if ($voucher_details->validity_date_start && $voucher_details->validity_date_end) {
-					$startDate = Carbon::parse($voucher_details->validity_date_start);
-					$endDate = Carbon::parse($voucher_details->validity_date_end);
+					$startDate = Carbon::parse($voucher_details->validity_date_start)->startOfDay();
+					$endDate = Carbon::parse($voucher_details->validity_date_end)->endOfDay();
 					$checkDate = Carbon::now()->between($startDate, $endDate);
 					if (!$checkDate) {
 						return response()->json(['status' => 0, 'message' => 'Coupon is already expired.']);
 					}
+				}
+			}
+
+			if(!$voucher_details->unlimited) {
+				if ($voucher_details->total_allotment <= $voucher_details->total_consumed) {
+					return response()->json(['status' => 0, 'message' => 'Coupon is already expired.']);
 				}
 			}
 
@@ -1164,7 +1173,7 @@ class CheckoutController extends Controller
 			}
 
 			if($voucher_details->discount_type == 'Fixed Amount') {
-				$discount = $subtotal - $voucher_details->discount_rate;
+				$discount = $voucher_details->discount_rate;
 			}
 
 			$free_delivery = [];
@@ -1193,7 +1202,9 @@ class CheckoutController extends Controller
 
 			$discounted_subtotal = $subtotal - $discount;
 
-			session()->put('fumVoucher', $code);
+			if($voucher_details) {
+				session()->put('fumVoucher', $code);
+			}
 			
 			return response()->json([
 				'voucher_code' => strtoupper($code),
