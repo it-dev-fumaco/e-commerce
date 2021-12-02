@@ -55,7 +55,7 @@
                                     {{ session()->get('remove_active') }}
                                 </div>
                             @endif
-                            
+
                             @if(session()->has('remove_header'))
                                 <div class="alert alert-success">
                                     {{ session()->get('remove_header') }}
@@ -140,7 +140,7 @@
                                                 </script>
                                             </td>
                                         </tr>
-                                    
+
                                         <div class="modal fade" id="myModal{{ $carousel['id'] }}" role="dialog">
                                             <div class="modal-dialog">
                                                 <!-- Modal content-->
@@ -242,14 +242,14 @@
                                 <h5 class="mt-3">Search Engine Optimization (SEO)</h5>
                                 <hr>
                                 <div class="form-group">
-                                    <label for="product-keywords">Meta Keywords *</label>
-                                    <textarea class="form-control" rows="3" name="meta_keywords" required>{{ $page->meta_keywords }}</textarea>
-                                </div>
-                                <div class="form-group">
                                     <label for="product-meta-description">Meta Description *</label>
                                     <textarea class="form-control" rows="3" name="meta_description" required>{{ $page->meta_description }}</textarea>
                                     <input type="text" name="content1" value="for homepage" hidden>
                                     <input type="text" name="slug" value="/" hidden>
+                                </div>
+                                <div class="form-group">
+                                    <label for="product-keywords">Meta Keywords *</label>
+                                    <textarea class="form-control" rows="3" name="meta_keywords" required>{{ $page->meta_keywords }}</textarea>
                                 </div>
 
                                 <div class="float-right font-italic">
@@ -282,16 +282,16 @@
       border: none;
       cursor: pointer;
     }
-  
+
     .dropbtn:hover, .dropbtn:focus {
       background-color: #2980B9;
     }
-  
+
     .dropdown {
       position: relative;
       display: inline-block;
     }
-  
+
     .dropdown-content {
       display: none;
       position: absolute;
@@ -302,16 +302,16 @@
       z-index: 1;
       right: 0px;
     }
-  
+
     .dropdown-content a {
       color: black;
       padding: 12px 16px;
       text-decoration: none;
       display: block;
     }
-  
+
     .dropdown a:hover {background-color: #ddd;}
-  
+
     .show {display: block;}
 
     .menu{
