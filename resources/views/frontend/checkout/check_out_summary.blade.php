@@ -1132,11 +1132,6 @@
 
 <script>
 	$(document).ready(function() {
-		var perfEntries = performance.getEntriesByType("navigation");
-		if (perfEntries[0].type === "back_forward") {
-			location.reload(true);
-		}
-
 		$(window).bind("pageshow", function(event) {
 			if (event.originalEvent.persisted) {
 				window.location.reload(); 
