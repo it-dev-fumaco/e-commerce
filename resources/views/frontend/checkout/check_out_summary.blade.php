@@ -214,13 +214,11 @@
 										</td>
 										<td>
 											<span class="d-block">{{ $cart['item_description'] }}</span>
-											<span id="{{ $cart['item_code'] }}v" class="d-inline-block text-white d-none" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833;">Voucher Applied</span>
 										</td>
 										<td style="text-align: center;">{{ $cart['quantity'] }}</td>
 										<td class="col-md-2" style="text-align: right;">
-											<span class="d-block" id="{{ $cart['item_code'] }}o">₱ {{ number_format($cart['subtotal'], 2, '.', ',') }}</span>
-											<p class="d-block d-none text-success">₱ <span id="{{ $cart['item_code'] }}">{{ $cart['subtotal'] }}</span></p>
-											<span class="amount d-none" id="{{ $cart['item_code'] }}a">{{ $cart['subtotal'] }}</span>
+											<span class="d-block" id="{{ $cart['item_code'] }}">₱ {{ number_format($cart['subtotal'], 2, '.', ',') }}</span>
+											<span class="amount d-none">{{ $cart['subtotal'] }}</span>
 										</td>
 									</tr>
 								@endforeach
@@ -230,15 +228,16 @@
 
 						<div class="card-body he1x" style="padding-top: 0px !important; padding-bottom: 0px !important;">
 							<div class="d-flex justify-content-between align-items-center">
-								Subtotal <small class="text-muted stylecap he1x" id="cart-subtotal">₱ {{ number_format(collect($cart_arr)->sum('subtotal'), 2, '.', ',') }}</small>
+								Total Amount <small class="text-muted stylecap he1x">₱ {{ number_format(collect($cart_arr)->sum('subtotal'), 2, '.', ',') }}</small>
 							</div>
-							{{-- <div class="d-flex justify-content-between align-items-center">
-								Discount <small class="text-danger stylecap he1x">- ₱ <span id="discount-total">0.00</span></small>
+							<div class="d-flex justify-content-between align-items-center">
+								<p class="m-0">Discount <span id="voucher-code" class="text-white d-none" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833;">Voucher Applied</span></p>
+								 <small class="text-danger stylecap he1x">- ₱ <span id="discount-amount">0.00</span></small>
 							</div>
 							<hr class="mt-2 mb-2">
 							<div class="d-flex justify-content-between align-items-center">
-								Subtotal <small class="text-muted stylecap he1x" id="subtotal">₱ 0.00</small>
-							</div> --}}
+								Subtotal <small class="text-muted stylecap he1x" id="cart-subtotal">₱ {{ number_format(collect($cart_arr)->sum('subtotal'), 2, '.', ',') }}</small>
+							</div>
 							<hr class="mt-2">
 						</div>
 						<div class="card-body he1x" id="ship_blk" style="padding-top: 0px !important; padding-bottom: 0px !important;">Select Shipping Method
@@ -246,6 +245,7 @@
 							<div class="form-check">
 								<label class="form-check-label" for="shipradio">&nbsp;</label>
 							</div>
+							<div id="voucher-free" class="d-none"></div>
 							@forelse ($shipping_rates as $l => $srate)
 							<div class="d-flex justify-content-between align-items-center">
 								<div class="form-check">
@@ -1172,23 +1172,33 @@
 					success: function (response) {
 						if (response.status == 0) {
 							$('#coupon-alert').removeClass('d-none').text(response.message);
+							$('#voucher-code').addClass('d-none').text('');
+							$('#discount-amount').text('0.00');
+							$('#voucher-free').empty();
+
+							$("input:radio[name='shipping_fee']:first").attr('checked', true);
 						} else {
-							$.each(response, function(i, d) {
-								price = (isNaN(d.discounted_price)) ? 0 : d.discounted_price;
-								$(d.id).text(price.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,"));
-								$(d.id + 'a').text(price);
-								if (d.is_discounted) {
-									$(d.id).parent().removeClass('d-none');
-									$(d.id + 'o').addClass('text-muted').html('<s>' + $(d.id + 'o').text() + '</s>');
-									$(d.id + 'v').removeClass('d-none').text($('#coupon-code').val());
-								}
-							});
-
-							updateTotal();
-
+							var discount = (isNaN(response.discount)) ? 0 : response.discount;
+							$('#voucher-code').removeClass('d-none').text(response.voucher_code);
+							$('#discount-amount').text(discount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,"));
 							$('#coupon-code').removeClass('is-invalid');
 							$('#coupon-alert').addClass('d-none');
+
+							if(response.shipping) {
+								var el = '<div class="d-flex justify-content-between align-items-center">' +
+									'<div class="form-check">' +
+									'<input class="form-check-input" type="radio" name="shipping_fee" id="0l" value="'+ response.shipping.shipping_cost+'" data-sname="'+ response.shipping.shipping_service_name+'" data-est="'+ response.shipping.expected_delivery_date+'" data-pickup="false" required data-lead="'+ response.shipping.max_lead_time+'">' +
+									'<label class="form-check-label" for="0l">'+ response.shipping.shipping_service_name+' <br class="d-xl-none"/>' +
+									'<small class="fst-italic">('+ response.shipping.min_lead_time+' - '+ response.shipping.max_lead_time+' Days)</small></label>' +
+									'</div>' +
+									'<small class="text-muted stylecap he1x" style="white-space: nowrap !important">₱ 0.00</small>' +
+									'</div>';
+							
+								$('#voucher-free').html(el).removeClass('d-none');
+							}
 						}
+
+						updateTotal();
 						
 						$("#item-preloader").fadeOut();
 					},
@@ -1227,7 +1237,6 @@
 		// Add Address
 
 		$('#ship_Address_type1_1').change(function(){
-			console.log($(this).val());
 			if($(this).val() == "Business Address"){
 				$('#ship_for_business').slideDown();
 				$("#ship_business_name").prop('required',true);
@@ -1324,6 +1333,11 @@
 			});
 
 			subtotal = (isNaN(subtotal)) ? 0 : subtotal;
+
+			var voucher_discount = parseFloat($('#discount-amount').text().replace(/,/g , ''));
+			voucher_discount = (isNaN(voucher_discount)) ? 0 : voucher_discount;
+
+			subtotal = subtotal - voucher_discount;
 
 			$('#cart-subtotal').text('₱ ' + subtotal.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,"));
 
