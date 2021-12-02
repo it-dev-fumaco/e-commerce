@@ -688,8 +688,6 @@ class CheckoutController extends Controller
 				}
 			}
 
-			$subtotal = $subtotal - $discount;
-			
 			// insert orders if not existing
 			$existing_order = DB::table('fumaco_order')
 				->where('order_number', $temp->order_tracker_code)->exists();

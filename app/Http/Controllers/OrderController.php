@@ -26,6 +26,8 @@ class OrderController extends Controller
             $items_arr = [];
             $items = DB::table('fumaco_order_items')->where('order_number', $o->order_number)->get();
             foreach($items as $i){
+
+                $bundle_items = DB::table('fumaco_product_bundle_item')->where('parent_item_code', $i->item_code)->get();
                 $items_arr[] = [
                     'order_number' => $i->order_number,
                     'item_code' => $i->item_code,
@@ -34,6 +36,7 @@ class OrderController extends Controller
                     'item_price' => $i->item_price,
                     'item_discount' => $i->item_discount,
                     'item_total' => $i->item_total_price,
+                    'bundle' => $bundle_items
                 ];
             }
 
@@ -57,7 +60,7 @@ class OrderController extends Controller
                 'ship_contact_person' => $o->order_ship_contactperson,
                 'email' => $o->order_email,
                 'contact' => $o->order_contact == 0 ? '' : $o->order_contact ,
-                'date' => Carbon::parse($o->order_update)->format('M d, Y - h:m A'),
+                'date' => Carbon::parse($o->order_update)->format('M d, Y - h:i A'),
                 'ordered_items' => $items_arr,
                 'order_tracker_code' => $o->tracker_code,
                 'payment_method' => $o->order_payment_method,
@@ -80,7 +83,7 @@ class OrderController extends Controller
                 'ship_postal' => $o->order_ship_postal,
                 'shipping_name' => $o->order_shipping,
                 'shipping_amount' => $o->order_shipping_amount,
-                'grand_total' => ($o->order_shipping_amount + $o->order_subtotal),
+                'grand_total' => ($o->order_shipping_amount + ($o->order_subtotal - $o->discount_amount)),
                 'status' => $o->order_status,
                 'estimated_delivery_date' => $o->estimated_delivery_date,
                 'payment_id' => $o->payment_id,
@@ -89,6 +92,8 @@ class OrderController extends Controller
                 'order_type' => $o->order_type,
                 'user_email' => $o->user_email,
                 'billing_business_name' => $o->billing_business_name,
+                'voucher_code' => $o->voucher_code,
+                'discount_amount' => $o->discount_amount,
                 'shipping_business_name' => $o->shipping_business_name,
                 'pickup_date' => Carbon::parse($o->pickup_date)->format('M d, Y'),
                 'store_address' => $store_address,

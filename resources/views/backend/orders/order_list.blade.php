@@ -213,7 +213,19 @@
 																				@foreach ($order['ordered_items'] as $item)
 																				<tr>
 																					<td class="text-center">{{ $item['item_code'] }}</td>
-																					<td>{{ $item['item_name'] }}</td>
+																					<td>{{ $item['item_name'] }}
+																						@if (count($item['bundle']) > 0)
+																						<br>
+																						<ul>
+																							@foreach ($item['bundle'] as $bundle)
+																							<li style="font-size: 10pt;">
+																								<b>{{ $bundle->item_code }}</b> {!! $bundle->item_description !!}
+																								<span class="d-block text-muted font-italic">x{{ $bundle->qty . ' ' . $bundle->uom }}</span>
+																							</li>
+																							@endforeach
+																						</ul>
+																						@endif
+																					</td>
 																					<td class="text-center">{{ $item['item_qty'] }}</td>
 																					<td class="text-right">₱ {{ number_format(str_replace(",","",$item['item_price']), 2) }}</td>
 																					@if ($sum_discount > 0)
@@ -229,6 +241,8 @@
 																		<dl class="row">
 																			<dt class="col-sm-10 text-right">Subtotal</dt>
 																			<dd class="col-sm-2 text-right">₱ {{ number_format(str_replace(",","",$order['subtotal']), 2) }}</dd>
+																			<dt class="col-sm-10 text-right">Discount <span class="text-white" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833;">{{ $order['voucher_code'] }}</span></dt>
+																			<dd class="col-sm-2 text-right">- ₱ {{ number_format(str_replace(",","",$order['discount_amount']), 2) }}</dd>
 																			<dt class="col-sm-10 text-right">
 																				@if ($order['shipping_name'])
 																				<span class="badge badge-info" style="font-size: 11pt;">{{ $order['shipping_name'] }}</span>

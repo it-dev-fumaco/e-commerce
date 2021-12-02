@@ -1184,17 +1184,20 @@
 							$('#coupon-code').removeClass('is-invalid');
 							$('#coupon-alert').addClass('d-none');
 
-							if(response.shipping) {
-								var el = '<div class="d-flex justify-content-between align-items-center">' +
-									'<div class="form-check">' +
-									'<input class="form-check-input" type="radio" name="shipping_fee" id="0l" value="'+ response.shipping.shipping_cost+'" data-sname="'+ response.shipping.shipping_service_name+'" data-est="'+ response.shipping.expected_delivery_date+'" data-pickup="false" required data-lead="'+ response.shipping.max_lead_time+'">' +
-									'<label class="form-check-label" for="0l">'+ response.shipping.shipping_service_name+' <br class="d-xl-none"/>' +
-									'<small class="fst-italic">('+ response.shipping.min_lead_time+' - '+ response.shipping.max_lead_time+' Days)</small></label>' +
-									'</div>' +
-									'<small class="text-muted stylecap he1x" style="white-space: nowrap !important">₱ 0.00</small>' +
-									'</div>';
-							
-								$('#voucher-free').html(el).removeClass('d-none');
+							var existing_fd = $("input:radio[name='shipping_fee'][data-sname='Free Delivery']").length;
+							if (existing_fd <= 0) {
+								if(response.shipping && response.shipping.length != 0) {
+									var el = '<div class="d-flex justify-content-between align-items-center">' +
+										'<div class="form-check">' +
+										'<input class="form-check-input" type="radio" name="shipping_fee" id="0l" value="'+ response.shipping.shipping_cost+'" data-sname="'+ response.shipping.shipping_service_name+'" data-est="'+ response.shipping.expected_delivery_date+'" data-pickup="false" required data-lead="'+ response.shipping.max_lead_time+'">' +
+										'<label class="form-check-label" for="0l">'+ response.shipping.shipping_service_name+' <br class="d-xl-none"/>' +
+										'<small class="fst-italic">('+ response.shipping.min_lead_time+' - '+ response.shipping.max_lead_time+' Days)</small></label>' +
+										'</div>' +
+										'<small class="text-muted stylecap he1x" style="white-space: nowrap !important">₱ 0.00</small>' +
+										'</div>';
+								
+									$('#voucher-free').html(el).removeClass('d-none');
+								}
 							}
 						}
 
