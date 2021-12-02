@@ -40,46 +40,25 @@
                                     <form action="/admin/marketing/voucher/add" method="post">
                                         @csrf
                                         <div class="row">
-                                            <div class="col-9"><h4>Coupon</h4></div>
+                                            <div class="col-9"><h4>Coupon Details</h4></div>
                                             <div class="col-3 text-right">
                                                 <button class="btn btn-primary">Submit</button>
                                             </div>
-                                        </div>
+                                        </div><hr/>
                                         <div class="row">
                                             <div class="col-6">
-                                                <label>Name</label>
+                                                <label>Name *</label>
                                                 <input type="text" class="form-control" name="name" placeholder="Name" required>
                                             </div>
 
                                             <div class="col-6">
-                                                <label>Coupon Code</label>
+                                                <label>Coupon Code *</label>
                                                 <input type="text" class="form-control" name="coupon_code" placeholder="Coupon Code" required>
                                             </div>
                                         </div>
                                         <br/>
                                         <div class="row">
                                             <div class="col-6">
-                                                <label><input type="checkbox" name="require_validity" id="require_validity"> Set Validity</label>
-                                                <input type="text" class="form-control set_duration" id="daterange" name="validity" disabled/>
-                                            </div>
-
-                                            <div class="col-6">
-                                                <label><input type="checkbox" name="unlimited_allotment" id="unlimited_allotment" checked> Unlimited Allotment</label>
-                                                <br/>
-                                                <input type="number" class="form-control" name="allotment" id="allotment" placeholder="Allotment">
-                                            </div>
-                                        </div>
-                                        <br/>
-                                        <div class="row">
-                                            <div class="col-4">
-                                                <label>Coupon Type *</label>
-                                                <select class="form-control" name="coupon_type" id="coupon_type" required>
-                                                    <option disabled value="">Coupon Type</option>
-                                                    <option value="Promotional" selected>Promotional</option>
-                                                    <option value="Gift Card">Gift Card</option>
-                                                </select>
-                                            </div>
-                                            <div class="col-4">
                                                 <label>Discount Type *</label>
                                                 @php
                                                     $discount_type = array('Free Delivery', 'Fixed Amount', 'By Percentage');
@@ -92,7 +71,7 @@
                                                 </select>
                                             </div>
 
-                                            <div class="col-4">
+                                            <div class="col-6">
                                                 <label>Minimum Spend</label>
                                                 <input type="text" class="form-control" name="minimum_spend" placeholder="Minimum Spend">
                                             </div>
@@ -112,7 +91,22 @@
                                             </div>
                                             <div class="col-6">
                                                 <label>Capped Amount</label>
-                                                <input type="text" class="form-control" name="capped_amount" id="capped_amount" placeholder="Capped Amount"/>
+                                                <input type="text" class="form-control" name="capped_amount" id="capped_amount" value="0" placeholder="Capped Amount"/>
+                                            </div>
+                                        </div>
+                                        <br/><br/>
+                                        <h4>Validity and Usage</h4>
+                                        <hr/>
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <label><input type="checkbox" name="require_validity" id="require_validity"> Set Validity</label>
+                                                <input type="text" class="form-control set_duration" id="daterange" name="validity" disabled/>                                                
+                                            </div>
+
+                                            <div class="col-6">
+                                                <label><input type="checkbox" name="unlimited_allotment" id="unlimited_allotment" checked> Unlimited Allotment</label>
+                                                <br/>
+                                                <input type="number" class="form-control" name="allotment" id="allotment" placeholder="Allotment">
                                             </div>
                                         </div>
                                         <br/>
@@ -120,6 +114,48 @@
                                             <div class="col-12">
                                                 <label>Coupon Description *</label>
                                                 <textarea class="form-control page-content" rows="10" name="coupon_description"></textarea>
+                                            </div>
+                                        </div>
+                                        <br/><br/>
+                                        <h4>Coupon Type</h4>
+                                        <hr>
+                                        <div class="row">
+                                            <div class="col-6 mx-auto">
+                                                <label>Coupon Type *</label>
+                                                <select class="form-control" name="coupon_type" id="coupon_type" required>
+                                                    <option disabled value="">Coupon Type</option>
+                                                    <option value="Promotional" selected>Promotional</option>
+                                                    <option value="Gift Card">Gift Card</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div id="customers" class="row">
+                                            <select class="d-none form-control" name="customer_select" id="customer_select">
+                                                <option disabled selected value="">Select Customer</option>
+                                                @foreach ($customer_list as $customer)
+                                                    <option value="{{ $customer->id }}">{{ $customer->f_name.' '.$customer->f_lname }}</option>
+                                                @endforeach
+                                            </select>
+                                            <div class="col-6 mx-auto">
+                                                <br/>
+                                                <table class="table table-bordered" id="customers-table">
+                                                     <thead>
+                                                          <tr>
+                                                                <th style="width: 40%;" scope="col" class="text-center">Customer Name</th>
+                                                                <th style="width: 25%;" scope="col" class="text-center">Allowed Usage</th>
+                                                                <th class="text-center" style="width: 10%;"><button class="btn btn-outline-primary btn-sm" id="add-customers-btn">Add</button></th>
+                                                          </tr>
+                                                     </thead>
+                                                     <tbody>
+
+                                                     </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <div id="for_promotional" class="row">
+                                            <div class="col-6 mx-auto">
+                                                <br/>
+                                                <label><input type="checkbox" name="require_signin" id="require_signin"> Require Sign in</label>
                                             </div>
                                         </div>
                                         <br/>
@@ -146,6 +182,7 @@
         validityDate();
         discountType();
         discountFor();
+        couponType();
 
         $('#discount_type').change(function(){
             discountType();
@@ -161,6 +198,10 @@
 
         $('#require_validity').click(function(){
             validityDate();
+        });
+
+        $('#coupon_type').click(function(){
+            couponType();
         });
 
         function allotment(){
@@ -212,6 +253,16 @@
             }
         }
 
+        function couponType(){
+            if($('#coupon_type').val() == 'Gift Card'){
+                $('#customers').slideDown();
+                $('#for_promotional').slideUp();
+            }else{
+                $('#customers').slideUp();
+                $('#for_promotional').slideDown();
+            }
+        }
+
         $('#daterange').daterangepicker({
             opens: 'left',
             placeholder: 'Select Date Range',
@@ -221,8 +272,32 @@
         $(".page-content").summernote({
             dialogsInBody: true,
             dialogsFade: true,
-            height: "500px",
+            height: "300px",
         });
+
+        $('#add-customers-btn').click(function(e){
+			e.preventDefault();
+
+			var clone_select = $('#customer_select').html();
+			var row = '<tr>' +
+				'<td class="p-2">' +
+					'<select name="selected_customer[]" class="form-control w-100" style="width: 100%;" required>' + clone_select + '</select>' +
+				'</td>' +
+				'<td class="p-2">' +
+					'<input type="text" name="customer_allowed_usage[]" class="form-control" placeholder="Allowed Usage">' +
+				'</td>' +
+				'<td class="text-center">' +
+					'<button type="button" class="btn btn-outline-danger btn-sm remove-td-row">Remove</button>' +
+				'</td>' +
+			'</tr>';
+
+			$('#customers-table tbody').append(row);
+		});
+
+        $(document).on('click', '.remove-td-row', function(e){
+			e.preventDefault();
+			$(this).closest("tr").remove();
+		});
     });
     </script>
 @endsection

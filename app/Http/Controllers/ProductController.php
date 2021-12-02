@@ -785,8 +785,20 @@ class ProductController extends Controller
 
 
     public function voucherList(Request $request){
-        $coupon = DB::table('fumaco_voucher')->where('name', 'LIKE', '%'.$request->q.'%')->orderBy('created_at', 'desc')->paginate(10);
-        return view('backend.marketing.list_voucher', compact('coupon'));
+        $coupon = DB::table('fumaco_voucher')
+            ->whereDate('validity_date_end', '>=', Carbon::now()->endOfDay())
+            ->orWhereNull('validity_date_start')
+            ->where('name', 'LIKE', '%'.$request->q.'%')->orderBy('created_at', 'desc')->paginate(10);
+
+        $invalid_coupon = DB::table('fumaco_voucher')
+            ->whereRaw('total_consumed >= total_allotment')
+            ->orWhereRaw('total_allotment != null')
+            ->orWhereDate('validity_date_end', '<', Carbon::now()->endOfDay())
+            ->where('name', 'LIKE', '%'.$request->expired_q.'%')->orderBy('created_at', 'desc')->paginate(10);
+
+        // return $invalid_coupon;
+
+        return view('backend.marketing.list_voucher', compact('coupon', 'invalid_coupon'));
     }
 
     public function onSaleList(Request $request){
@@ -854,8 +866,12 @@ class ProductController extends Controller
 
     public function editVoucherForm($id){
         $coupon = DB::table('fumaco_voucher')->where('id', $id)->first();
+        
+        $customer_list = DB::table('fumaco_users')->where('is_email_verified', 1)->get();
 
-        return view('backend.marketing.edit_voucher', compact('coupon'));
+        $gift_card_customers = DB::table('fumaco_voucher_customers')->where('voucher_id', $id)->get();
+
+        return view('backend.marketing.edit_voucher', compact('customer_list', 'coupon', 'gift_card_customers'));
     }
 
     public function setOnSaleStatus(Request $request){
@@ -871,12 +887,14 @@ class ProductController extends Controller
     }
 
     public function addVoucherForm(){
-        return view('backend.marketing.add_voucher');
+        $customer_list = DB::table('fumaco_users')->where('is_email_verified', 1)->get();
+        return view('backend.marketing.add_voucher', compact('customer_list'));
     }
 
     public function addVoucher(Request $request){
         DB::beginTransaction();
         try {
+            // return $request->all();
             $rules = array(
 				'name' => 'required|unique:fumaco_voucher,name',
                 'coupon_code' => 'required|unique:fumaco_voucher,code'
@@ -910,6 +928,11 @@ class ProductController extends Controller
                 $discount_rate = $request->discount_amount;
             }
 
+            $require_signin = 1;
+            if($request->coupon_type == 'Promotional'){
+                $require_signin = isset($request->require_signin) ? 1 : 0;
+            }
+
             $insert = [
                 'name' => $request->name,
                 'code' => strtoupper($request->coupon_code),
@@ -921,6 +944,7 @@ class ProductController extends Controller
                 'capped_amount' => $capped_amount,
                 'coupon_type' => $request->coupon_type,
                 'description' => $request->coupon_description,
+                'require_signin' => $require_signin,
                 'validity_date_start' => $start,
                 'validity_date_end' => $end,
                 'remarks' => $request->remarks,
@@ -928,8 +952,20 @@ class ProductController extends Controller
             ];
 
             // return $insert;
-
             DB::table('fumaco_voucher')->insert($insert);
+
+            if($request->coupon_type == 'Gift Card'){
+                $voucher_id = DB::table('fumaco_voucher')->orderBy('created_at', 'desc')->first();
+                foreach($request->selected_customer as $key => $customer){
+                    DB::table('fumaco_voucher_customers')->insert([
+                        'customer_id' => $customer,
+                        'voucher_id' => $voucher_id->id,
+                        'allowed_usage' => $request->customer_allowed_usage[$key],
+                        'created_by' => Auth::user()->username
+                    ]);
+                }
+            }
+
             DB::commit();
             return redirect('/admin/marketing/voucher/list')->with('success', 'Voucher Added!');
         } catch (Exception $e) {
@@ -941,6 +977,7 @@ class ProductController extends Controller
     public function editVoucher($id, Request $request){
         DB::beginTransaction();
         try {
+            // return $request->all();
             $name_checker = DB::table('fumaco_voucher')->where('name', $request->name)->where('id', '!=', $id)->first();
             $code_checker = DB::table('fumaco_voucher')->where('code', $request->coupon_code)->where('id', '!=', $id)->first();
 
@@ -969,6 +1006,11 @@ class ProductController extends Controller
                 $discount_rate = $request->discount_amount;
             }
 
+            $require_signin = 1;
+            if($request->coupon_type == 'Promotional'){
+                $require_signin = isset($request->require_signin) ? 1 : 0;
+            }
+
             $update = [
                 'name' => $request->name,
                 'code' => strtoupper($request->coupon_code),
@@ -980,6 +1022,7 @@ class ProductController extends Controller
                 'capped_amount' => $capped_amount,
                 'coupon_type' => $request->coupon_type,
                 'description' => $request->coupon_description,
+                'require_signin' => $require_signin,
                 'validity_date_start' => $start,
                 'validity_date_end' => $end,
                 'remarks' => $request->remarks,
@@ -988,6 +1031,27 @@ class ProductController extends Controller
             // return $update;
 
             DB::table('fumaco_voucher')->where('id', $id)->update($update);
+            
+            if($request->coupon_type == 'Gift Card'){
+                $last_modified_by = null;
+                $checker = DB::table('fumaco_voucher_customers')->where('voucher_id', $id)->count();
+    
+                if ($checker > 0){
+                    $last_modified_by = Auth::user()->username;
+                }
+
+                DB::table('fumaco_voucher_customers')->where('voucher_id', $id)->delete();
+                foreach($request->selected_customer as $key => $customer){
+                    DB::table('fumaco_voucher_customers')->insert([
+                        'customer_id' => $customer,
+                        'voucher_id' => $id,
+                        'allowed_usage' => $request->customer_allowed_usage[$key],
+                        'created_by' => Auth::user()->username,
+                        'last_modified_by' => $last_modified_by
+                    ]);
+                }
+            }
+            
             DB::commit();
             return redirect('/admin/marketing/voucher/list')->with('success', 'Voucher Edited!');
         } catch (Exception $e) {
@@ -999,8 +1063,8 @@ class ProductController extends Controller
     public function addOnSale(Request $request){
         DB::beginTransaction();
         try {
-            $from = '';
-            $to = '';
+            $from = null;
+            $to = null;
             $discount_rate = null;
             $capped_amount = null;
 
@@ -1043,6 +1107,8 @@ class ProductController extends Controller
                 'coupon' => $request->coupon,
                 'created_by' => Auth::user()->username
             ];
+
+            // return $insert;
 
             // Image upload
             $rules = array(
@@ -1096,8 +1162,8 @@ class ProductController extends Controller
     public function editOnSale($id, Request $request){
         DB::beginTransaction();
         try {
-            $from = '';
-            $to = '';
+            $from = null;
+            $to = null;
             $discount_rate = null;
             $capped_amount = null;
 
@@ -1217,6 +1283,7 @@ class ProductController extends Controller
         DB::beginTransaction();
         try {
             DB::table('fumaco_voucher')->where('id', $id)->delete();
+            DB::table('fumaco_voucher_customers')->where('voucher_id', $id)->delete();
             DB::commit();
             return redirect()->back()->with('success', 'Coupon Deleted.');
         } catch (Exception $e) {
