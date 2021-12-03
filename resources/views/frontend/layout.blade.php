@@ -367,13 +367,10 @@
   }
 
   .clearfix:after {
-    content: "";
-    display: table;
-    clear: both;
-  }
-  .btn:focus, a:focus, .btn-check:focus + label{
-    box-shadow: none !important;
-  }
+  content: "";
+  display: table;
+  clear: both;
+}
     </style>
     @yield('style')
     @if($activePage == 'contact')

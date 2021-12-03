@@ -219,73 +219,6 @@
 								</div>
 							</div>
 
-							@if($variant_attr_array)
-								<section class="py-5 text-center container" style="padding-bottom: 0rem !important;">
-									<div class="row py-lg-5">
-										<div class="col-lg-6 col-md-8 mx-auto">
-											<h4 class="fw-light bestsellinghead fumacoFont1 animated animatedFadeInUp fadeInUp" style="color:#000000 !important;">PRODUCT COMPARISON</h4>
-										</div>
-									</div>
-								</section>
-								<div class="container pb-5 mb-2">
-									<div class="comparison-table">
-										<table class="table table-bordered">
-											<thead class="bg-secondary">
-												<tr>
-													<td class="align-middle"></td>
-													@foreach ($comparison_arr as $compare)
-														@php
-															$compare_src = $compare['image'] ? '/storage/item_images/'.$compare['idcode'].'/gallery/preview/'. $compare['image'] : '/storage/no-photo-available.png';
-														@endphp
-														<td>
-															<div class="comparison-item">
-																<div class="row">
-																	<div class="col-md-4">
-																		<a class="comparison-item-thumb" href="/product/{{ ($compare['slug']) ? $compare['slug'] : $compare['idcode'] }}"><img src="{{ asset($compare_src) }}" alt="{{ Str::slug($compare['product_name'], '-') }}"></a>
-																	</div>
-																	<div class="col-md-8 text-left">
-																		<a class="comparison-item-title text-left" href="/product/{{ ($compare['slug']) ? $compare['slug'] : $compare['idcode'] }}" style="text-align: left !important">{{ $compare['product_name'] }}</a>
-																	</div>
-																</div>
-																	
-																@if($compare['on_stock'] == 1)
-																	<button class="btn btn-pill btn-outline-primary btn-sm add-to-cart" type="button" data-toggle="toast" data-item-code="{{ $compare['idcode'] }}"><i class="fas fa-shopping-cart d-inline-block"></i>&nbsp;Add to Cart</button>
-																@else
-																	<a href="/login" class="btn btn-pill btn-outline-primary btn-sm {{ Auth::check() ? 'add-to-wishlist' : '' }}" type="button" data-toggle="toast" data-item-code="{{ $compare['idcode'] }}"><i class="fas fa-heart d-inline-block"></i>&nbsp;Add to Wishlist</a>
-																@endif
-															</div>
-														</td>
-													@endforeach
-												</tr>
-											</thead>
-											<tbody id="summary" data-filter="target">
-												@foreach ($compare_variant_attributes as $attrib_values)
-													<tr>
-														<th>{{ $attrib_values }}</th>
-														@foreach ($comparison_arr as $compare)
-															<td>{{ $variant_attr_array[$attrib_values][$compare['idcode']] }}</td>
-														@endforeach
-													</tr>
-												@endforeach
-												<tr>
-													<th>Price</th>
-													@foreach ($comparison_arr as $compare)
-														<td>
-															@if ($compare['is_discounted'])
-																<span style="white-space: nowrap !important">₱ {{ number_format(str_replace(",","",$compare['new_price']), 2) }}</span>&nbsp;<br class="d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$compare['orig_price']), 2) }}</s>
-															@else
-																₱ {{ number_format(str_replace(",","",$compare['orig_price']), 2) }}
-															@endif
-														</td>
-													@endforeach
-												</tr>
-											</tbody>
-										</table>
-									</div>
-								</div>
-							@endif
-							
-							
                     @if (count($related_products) > 0)
 							<section class="py-5 text-center container" style="padding-bottom: 0rem !important;">
 								<div class="row py-lg-5">
@@ -336,6 +269,8 @@
 														</picture>
 													</div>
 													
+
+
 													<div class="card-body">
 														<div class="text ellipsis">
 															<a href="/product/{{ ($rp['slug']) ? $rp['slug'] : $rp['item_code'] }}" class="card-text product-head fumacoFont_card_title text-concat prod_desc" style="text-decoration: none !important; text-transform: none !important; color:#0062A5 !important;  min-height: 100px;">{{ $rp['item_name'] }}</a>
@@ -365,6 +300,8 @@
 															<small class="text-muted stylecap" style="color:#c4cad0 !important; font-weight:100 !important;">( 0 Reviews )</small>
 														</div>
 														<br>
+														{{-- <a href="/product/{{ ($rp['slug']) ? $rp['slug'] : $rp['item_code'] }}" class="btn btn-outline-primary fumacoFont_card_readmore" role="button" style="width:100% !important;">View</a> --}}
+														{{-- <a href="#" class="btn btn-outline-primary fumacoFont_card_readmore add-to-cart" role="button" style="width: 100% !important; margin-bottom: 20px" data-item-code="{{ $rp['item_code'] }}"><i class="fas fa-shopping-cart"></i> Add to Cart</a> --}}
 													</div>
 												</div><br/>&nbsp;
 												@if ($rp['on_stock'] == 1)
@@ -1172,91 +1109,6 @@
 				min-height: 80px;
 			}
 		}
-	</style>
-	<style>
-		.comparison-table {
-    width: 100%;
-    font-size: .875rem;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    -ms-overflow-style: -ms-autohiding-scrollbar
-}
-
-.comparison-table table {
-    min-width: 41rem;
-    table-layout: fixed
-}
-
-.comparison-table table tbody+tbody {
-    border-top-width: 1px
-}
-
-.comparison-table .table-bordered thead td {
-    border-bottom-width: 1px
-}
-
-.comparison-table .comparison-item {
-    position: relative;
-    padding: .875rem .75rem 1.125rem;
-    border: 1px solid #e7e7e7;
-    background-color: #fff;
-    text-align: center
-}
-
-.comparison-table .comparison-item .comparison-item-thumb {
-    display: block;
-    width: 5rem;
-    margin-right: auto;
-    margin-bottom: .75rem;
-    margin-left: auto
-}
-
-.comparison-table .comparison-item .comparison-item-thumb>img {
-    display: block;
-    width: 100%
-}
-
-.comparison-table .comparison-item .comparison-item-title {
-    display: block;
-    width: 100%;
-    margin-bottom: 14px;
-    color: #222;
-    font-weight: 600;
-    text-decoration: none
-}
-
-.comparison-table .comparison-item .comparison-item-title:hover {
-    text-decoration: underline
-}
-
-.comparison-table .comparison-item .btn {
-    margin: 0
-}
-
-.comparison-table .comparison-item .remove-item {
-    display: block;
-    position: absolute;
-    top: -.3125rem;
-    right: -.3125rem;
-    width: 1.375rem;
-    height: 1.375rem;
-    border-radius: 50%;
-    background-color: #f44336;
-    color: #fff;
-    text-align: center;
-    cursor: pointer
-}
-
-.comparison-table .comparison-item .remove-item .feather {
-    width: .875rem;
-    height: .875rem
-}
-.table-bordered th, .table-bordered td {
-    border: 1px solid #e7e7e7;
-}
-.bg-secondary {
-    background-color: #f7f7f7 !important;
-}
 	</style>
 @endsection
 
