@@ -6,6 +6,7 @@
 @section('meta')
 <meta name="description" content="{{ $page_meta->meta_description }}">
 	<meta name="keywords" content="{{ $page_meta->meta_keywords }}" />
+    <meta name="title" content="{{ $page_meta->page_name }}"/>
 @endsection
 
 @section('content')
