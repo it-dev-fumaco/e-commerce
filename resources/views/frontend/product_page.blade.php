@@ -49,7 +49,7 @@
 									$src = (count($product_images) > 0) ? '/storage/item_images/'. $product_images[0]->idcode.'/gallery/preview/'. $product_images[0]->imgprimayx : '/storage/no-photo-available.png';
 									$xoriginal = (count($product_images) > 0)  ? '/storage/item_images/'. $product_images[0]->idcode.'/gallery/original/'. $product_images[0]->imgoriginalx : '/storage/no-photo-available.png';
 									@endphp
-									<img style="width: 100% !important;" alt="{{ Str::slug(explode(".", $product_images[0]->imgprimayx)[0], '-') }}" class="xzoom4 imgx" id="xzoom-fancy" src="{{ asset($src) }}" xoriginal="{{ asset($xoriginal) }}" />
+									<img style="width: 100% !important;" alt="{{ isset($product_images[0]) ? Str::slug(explode(".", $product_images[0]->imgprimayx)[0], '-') : '' }}" class="xzoom4 imgx" id="xzoom-fancy" src="{{ asset($src) }}" xoriginal="{{ asset($xoriginal) }}" />
 									<br><br>
 									<div class="xzoom-thumbs">
 										@foreach ($product_images as $image)
@@ -258,6 +258,20 @@
 													@endphp
 
 													<div class="hover-container product-card" style="position: relative">
+														<div class="pt-2" style="position: absolute; top: 0; right: 0; z-index: 10;">
+															<div class="col-12 mb-2 {{ $rp['is_new_item'] == 1 ? '' : 'd-none' }}">
+																<span class="p-1 text-center" style="background-color: #438539; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
+																&nbsp;<b>New</b>&nbsp;
+																</span>
+															</div><br class="{{ $rp['is_new_item'] == 1 ? '' : 'd-none' }}"/>
+															@if ($rp['is_discounted'])
+																<div class="col-12">
+																	<span class="p-1 text-center" style="background-color: #FF0000; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
+																		&nbsp;<b>{{ $rp['discount_percent'] }}% OFF</b>&nbsp;
+																	</span>
+																</div>
+															@endif
+														</div>
 														<div class="overlay-bg"></div>
 
 														<div class="btn-container">

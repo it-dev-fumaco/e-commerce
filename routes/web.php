@@ -78,6 +78,7 @@ Route::get('/website_settings', 'FrontendController@websiteSettings');
 Route::post('/getvariantcode', 'FrontendController@getVariantItemCode');
 Route::post('/subscribe', 'FrontendController@newsletterSubscription');
 Route::get('/thankyou', 'FrontendController@subscribeThankyou');
+Route::get('/testing', 'FrontendController@testing');
 
 Route::get('/policy_pages', 'FrontendController@pagesList');
 Route::get('/pages/{slug}', 'FrontendController@viewPage')->name('pages');
@@ -121,6 +122,7 @@ Route::post('/checkout/update_shipping', 'CheckoutController@updateShipping');
 Route::post('/checkout/update_billing', 'CheckoutController@updateBilling');
 Route::get('/checkout/set_billing_form/{item_code_buy?}/{qty_buy?}', 'CheckoutController@setBillingForm');
 Route::post('/checkout/set_billing', 'CheckoutController@setBilling');
+Route::get('/checkout/apply_voucher/{code}', 'CheckoutController@applyVoucher');
 Route::get('/eghlform/{order_no}', 'CheckoutController@viewPaymentForm');
 Route::post('/order/save', 'CheckoutController@saveOrder');
 
@@ -168,26 +170,27 @@ Route::prefix('admin')->group(function () {
         
 
         Route::get('/product/list', 'ProductController@viewList');
-        Route::get('/product/add', 'ProductController@viewAddForm');
+        Route::get('/product/add/{type}', 'ProductController@viewAddForm');
         Route::post('/product/save', 'ProductController@saveItem');
 
         Route::get('/product/search', 'ProductController@searchItem');
-        Route::get('/product/{item_code}', 'ProductController@getItemDetails');
         Route::get('/product/{id}/edit', 'ProductController@viewProduct');
+        Route::get('/product/{id}/edit_bundle', 'ProductController@viewProduct');
         Route::get('/product/images/{id}', 'ProductController@uploadImagesForm');
+        Route::get('/product/{item_code}/{item_type}', 'ProductController@getItemDetails');
         Route::post('/add_product_images', 'ProductController@uploadImages');
-        Route::post('/delete_product_image', 'ProductController@deleteProductImage');
+        Route::get('/delete_product_image/{id}/{social?}', 'ProductController@deleteProductImage');
 
         Route::get('/select_related_products/{category_id}', 'ProductController@selectProductsRelated');
         Route::post('/product/{parent_code}/save_related_products', 'ProductController@saveRelatedProducts');
         Route::delete('/product/remove_related/{id}', 'ProductController@removeRelatedProduct');
         
-    
         Route::post('/product/{id}/update', 'ProductController@updateItem');
         Route::post('/product/{item_code}/disable', 'ProductController@disableItem');
         Route::post('/product/{item_code}/enable', 'ProductController@enableItem');
         Route::delete('/product/{item_code}/delete', 'ProductController@deleteItem');
         Route::get('/product/{id}/featured', 'ProductController@featureItem');
+        Route::get('/is_new_item/{id}', 'ProductController@isNewItem');
         Route::post('/product/{item_code}/enable_on_sale', 'ProductController@setProductOnSale');
         Route::post('/product/{item_code}/disable_on_sale', 'ProductController@disableProductOnSale');
 
@@ -209,7 +212,20 @@ Route::prefix('admin')->group(function () {
         Route::get('/order/order_lists/', 'OrderController@orderList');
         Route::get('/order/cancelled/', 'OrderController@cancelledOrders');
         Route::get('/order/delivered/', 'OrderController@deliveredOrders');
+        Route::get('/order/print/{order_id}', 'OrderController@printOrder');
         Route::post('/order/status_update', 'OrderController@statusUpdate');
+        
+        Route::get('/order/status_list', 'OrderController@statusList');
+        Route::get('/order/status/add_form', 'OrderController@addStatusForm');
+        Route::post('/order/status/add', 'OrderController@addStatus');
+        Route::get('/order/status/{id}/edit_form', 'OrderController@editStatusForm');
+        Route::post('/order/status/{id}/edit', 'OrderController@editStatus');
+        Route::get('/order/status/{id}/delete', 'OrderController@deleteStatus');
+
+        Route::get('/order/sequence_list', 'OrderController@sequenceList');
+        Route::get('/order/sequence_list/add_form', 'OrderController@addSequenceForm');
+        Route::post('/order/sequence_list/add', 'OrderController@addSequence');
+        Route::get('/order/sequence_list/{shipping}/delete', 'OrderController@deleteSequence');
 
         Route::get('/order/payment_status', 'OrderController@checkPaymentStatus');
         Route::post('/order/payment_status', 'OrderController@checkPaymentStatus');
@@ -264,6 +280,21 @@ Route::prefix('admin')->group(function () {
         Route::get('/edit/page/about_us/sponsor/reset/{id}', 'PagesController@resetSort');
 
         Route::get('/marketing/search/list', 'PagesController@searchList');
+
+
+        Route::get('/marketing/on_sale/list', 'ProductController@onSaleList');
+        Route::get('/marketing/voucher/list', 'ProductController@voucherList');
+        Route::get('/marketing/on_sale/addForm', 'ProductController@addOnsaleForm');
+        Route::post('/marketing/on_sale/add', 'ProductController@addOnsale');
+        Route::get('/marketing/on_sale/{id}/edit_form', 'ProductController@editOnsaleForm');
+        Route::post('/marketing/on_sale/{id}/edit', 'ProductController@editOnsale');
+        Route::get('/marketing/on_sale/{id}/delete', 'ProductController@removeOnsale');
+        Route::post('/marketing/on_sale/set_status', 'ProductController@setOnSaleStatus');
+        Route::post('/marketing/voucher/add', 'ProductController@addVoucher');
+        Route::get('/marketing/voucher/add_voucher', 'ProductController@addVoucherForm');
+        Route::get('/marketing/voucher/{id}/edit_form', 'ProductController@editVoucherForm');
+        Route::post('/marketing/voucher/{id}/edit', 'ProductController@editVoucher');
+        Route::get('/marketing/voucher/{id}/delete', 'ProductController@removeVoucher');
 
         Route::get('/marketing/social/images', 'SocialImagesController@viewList');
         Route::post('/marketing/social/create', 'SocialImagesController@uploadImage');

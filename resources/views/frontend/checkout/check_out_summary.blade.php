@@ -186,53 +186,66 @@
 
 					</div><br/>
 				</div>
-
 				<div class="col-md-12 col-lg-4 mx-auto">
 					<div class="card" style="background-color: #f4f4f4 !important; border-radius: 0rem !important;">
 						<div class="card-body he1x" style="padding-bottom: 0px !important;">Order Summary<hr></div>
-						<table class="table" id="cart-items">
+						
+						  <div class="m-2">
+							<div id="item-preloader" style="display: none;">
+								<div class="spinner-border" role="status">
+									<span class="sr-only">Loading...</span>
+								  </div>
+							  </div>
+						<table class="table mb-0" id="cart-items">
 							<thead>
 							<tr style="font-size: 0.8rem !important;">
-								<th class="text-center" colspan="2">Product Description</th>
-								<th class="text-center">Qty</th>
-								<th class="text-center">Amount</th>
+								<th class="text-center" colspan="2" style="width: 70%">Product Description</th>
+								<th class="text-center" style="width: 13%">Qty</th>
+								<th class="text-center" style="width: 17%">Amount</th>
 							</tr>
 							</thead>
 							<tbody style="font-size: 0.8rem !important;">
 								@foreach ($cart_arr as $cart)
 									<tr>
-										<td class="col-md-2">
+										<td class="col-md-2" style="width: 10%">
 											<center>
 												<img src="{{ asset('/storage/item_images/'.$cart['item_code'].'/gallery/preview/'.$cart['item_image']) }}" class="img-responsive" alt="{{ Str::slug(explode(".", $cart['item_image'])[0], '-') }}" width="55" height="55">
 											</center>
 										</td>
-										<td>{{ $cart['item_description'] }}</td>
+										<td>
+											<span class="d-block">{{ $cart['item_description'] }}</span>
+										</td>
 										<td style="text-align: center;">{{ $cart['quantity'] }}</td>
 										<td class="col-md-2" style="text-align: right;">
-                                 @if ($cart['discount'])
-                                     <small class="text-muted"><s>₱ {{ number_format($cart['original_price'], 2, '.', ',') }}</s></small><br>
-                                     ₱ {{ number_format($cart['price'], 2, '.', ',') }}
-                                 @else
-                                 ₱ {{ number_format($cart['price'], 2, '.', ',') }}
-                                 @endif
-                                 <span class="amount d-none">{{ $cart['subtotal'] }}</span>
-                              </td>
+											<span class="d-block" id="{{ $cart['item_code'] }}">₱ {{ number_format($cart['subtotal'], 2, '.', ',') }}</span>
+											<span class="amount d-none">{{ $cart['subtotal'] }}</span>
+										</td>
 									</tr>
 								@endforeach
 							</tbody>
 						</table>
+					</div>
 
 						<div class="card-body he1x" style="padding-top: 0px !important; padding-bottom: 0px !important;">
 							<div class="d-flex justify-content-between align-items-center">
+								Total Amount <small class="text-muted stylecap he1x">₱ {{ number_format(collect($cart_arr)->sum('subtotal'), 2, '.', ',') }}</small>
+							</div>
+							<div class="d-flex justify-content-between align-items-center">
+								<p class="m-0">Discount <span id="voucher-code" class="text-white d-none" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833;">Voucher Applied</span></p>
+								 <small class="text-danger stylecap he1x">- ₱ <span id="discount-amount">0.00</span></small>
+							</div>
+							<hr class="mt-2 mb-2">
+							<div class="d-flex justify-content-between align-items-center">
 								Subtotal <small class="text-muted stylecap he1x" id="cart-subtotal">₱ {{ number_format(collect($cart_arr)->sum('subtotal'), 2, '.', ',') }}</small>
 							</div>
-							<hr>
+							<hr class="mt-2">
 						</div>
 						<div class="card-body he1x" id="ship_blk" style="padding-top: 0px !important; padding-bottom: 0px !important;">Select Shipping Method
 							<div class="alert alert-warning alert-dismissible fade show text-center m-1 p-3 d-none" role="alert" id="alert-box"></div>
 							<div class="form-check">
 								<label class="form-check-label" for="shipradio">&nbsp;</label>
 							</div>
+							<div id="voucher-free" class="d-none"></div>
 							@forelse ($shipping_rates as $l => $srate)
 							<div class="d-flex justify-content-between align-items-center">
 								<div class="form-check">
@@ -271,8 +284,18 @@
 							<hr>
 							<p class="d-none" id="est-div" style="font-size: 0.8rem; font-style: italic;">Estimated Delivery Date: <b><span id="estimated-delivery-date"></span></b></p>
 						</div>
-						<div class="card-body he1x">
-							<div class="d-flex justify-content-between align-items-center" style="color:#FF9D00 !important;">Grand Total <small class="text-muted stylecap he1x" style="color:#FF9D00 !important;" id="grand-total">0.00</small>
+						<div class="card-body he1x pt-0">
+							<div class="alert alert-danger fade show mb-0 d-none" id="coupon-alert" role="alert" style="border: 1px solid;"></div>
+							<label for="coupon-code" class="m-2 mb-0">Coupon</label>
+							<div class="d-flex flex-row">
+								<div class="p-2 col-md-10">
+									<input type="text" id="coupon-code" class="form-control" placeholder="Enter Coupon Code" aria-label="Enter Coupon Code" aria-describedby="basic-addon2">
+								</div>
+								<div class="p-2 col-md-2">
+									<button class="btn w-100 btn-outline-success" type="button" id="apply-coupon-btn">Apply</button></div>
+							  </div>
+							  <hr>
+							<div class="d-flex justify-content-between align-items-center" style="color:#FF9D00 !important;">Grand Total <small class="stylecap he1x" id="grand-total">0.00</small>
 							</div>
 						</div>
 					</div>
@@ -961,6 +984,19 @@
 
 @section('style')
 <style>
+	#item-preloader {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		position: absolute;
+		z-index: 999999;
+		opacity: 0.5;
+		background: rgba( 235, 237, 239 );
+		transition: opacity 200ms ease-in-out;
+		border-radius: 4px;
+		width: 100%;
+		height: 100%;
+	}
 	#available-time {
 		font-weight: normal;
 	}
@@ -1096,6 +1132,80 @@
 
 <script>
 	$(document).ready(function() {
+		$(window).bind("pageshow", function(event) {
+			if (event.originalEvent.persisted) {
+				window.location.reload(); 
+			}
+		});
+
+		var sizeTheOverlays = function() {
+			$("#item-preloader").resize().each(function() {
+				var h = $(this).parent().outerHeight();
+				var w = $(this).parent().outerWidth();
+				$(this).css("height", h);
+				$(this).css("width", w);
+			});
+		};
+
+		sizeTheOverlays();
+
+		$('#coupon-code').val('');
+		$("#coupon-code").keyup(function () {  
+            $(this).val($(this).val().toUpperCase());  
+        });
+
+		$('#apply-coupon-btn').click(function(e){
+			e.preventDefault();
+
+			if ($('#coupon-code').val() === '') {
+				$('#coupon-code').addClass('is-invalid');
+			} else {
+				$("#item-preloader").fadeIn();
+				$.ajax({
+					url: '/checkout/apply_voucher/' + $('#coupon-code').val(),
+					type:"GET",
+					success: function (response) {
+						if (response.status == 0) {
+							$('#coupon-alert').removeClass('d-none').text(response.message);
+							$('#voucher-code').addClass('d-none').text('');
+							$('#discount-amount').text('0.00');
+							$('#voucher-free').empty();
+
+							$("input:radio[name='shipping_fee']:first").attr('checked', true);
+						} else {
+							var discount = (isNaN(response.discount)) ? 0 : response.discount;
+							$('#voucher-code').removeClass('d-none').text(response.voucher_code);
+							$('#discount-amount').text(discount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,"));
+							$('#coupon-code').removeClass('is-invalid');
+							$('#coupon-alert').addClass('d-none');
+
+							var existing_fd = $("input:radio[name='shipping_fee'][data-sname='Free Delivery']").length;
+							if (existing_fd <= 0) {
+								if(response.shipping && response.shipping.length != 0) {
+									var el = '<div class="d-flex justify-content-between align-items-center">' +
+										'<div class="form-check">' +
+										'<input class="form-check-input" type="radio" name="shipping_fee" id="0l" value="'+ response.shipping.shipping_cost+'" data-sname="'+ response.shipping.shipping_service_name+'" data-est="'+ response.shipping.expected_delivery_date+'" data-pickup="false" required data-lead="'+ response.shipping.max_lead_time+'">' +
+										'<label class="form-check-label" for="0l">'+ response.shipping.shipping_service_name+' <br class="d-xl-none"/>' +
+										'<small class="fst-italic">('+ response.shipping.min_lead_time+' - '+ response.shipping.max_lead_time+' Days)</small></label>' +
+										'</div>' +
+										'<small class="text-muted stylecap he1x" style="white-space: nowrap !important">₱ 0.00</small>' +
+										'</div>';
+								
+									$('#voucher-free').html(el).removeClass('d-none');
+								}
+							}
+						}
+
+						updateTotal();
+						
+						$("#item-preloader").fadeOut();
+					},
+					error : function(data) {
+						$('#coupon-alert').removeClass('d-none').text('An error occured. Please try again.');
+					}
+				});
+			}
+		});
 		updateTotal();
 
 		// Add Address
@@ -1125,7 +1235,6 @@
 		// Add Address
 
 		$('#ship_Address_type1_1').change(function(){
-			console.log($(this).val());
 			if($(this).val() == "Business Address"){
 				$('#ship_for_business').slideDown();
 				$("#ship_business_name").prop('required',true);
@@ -1220,6 +1329,15 @@
 				var amount = $(this).find('.amount').eq(0).text();
 				subtotal += parseFloat(amount);
 			});
+
+			subtotal = (isNaN(subtotal)) ? 0 : subtotal;
+
+			var voucher_discount = parseFloat($('#discount-amount').text().replace(/,/g , ''));
+			voucher_discount = (isNaN(voucher_discount)) ? 0 : voucher_discount;
+
+			subtotal = subtotal - voucher_discount;
+
+			$('#cart-subtotal').text('₱ ' + subtotal.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,"));
 
 			var shipping_fee = $("input[name='shipping_fee']:checked").val();
 			var total = parseFloat(shipping_fee) + subtotal;

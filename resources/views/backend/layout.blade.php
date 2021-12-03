@@ -248,7 +248,7 @@
           @php
             $product_pages = ['add_product_form', 'product_list', 'view_product_form', 'product_attribute_settings', 'product_category', 'product_category_settings'];
             $media_pages = ['list_media', 'add_media'];
-            $order_pages = ['order_list', 'order_cancel', 'order_delivered', 'payment_status'];
+            $order_pages = ['order_list', 'order_cancel', 'order_delivered', 'payment_status', 'order_status', 'order_status_sequence'];
             $category_pages = ['product_category'];
             $customer_pages = ['customers_list'];
           @endphp
@@ -332,6 +332,18 @@
                   <p>Check Payment Status</p>
                 </a>
               </li>
+              <li class="nav-item">
+                <a href="/admin/order/status_list" class="nav-link {{ $activePage == 'order_status' ? 'active' : '' }}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Order Status</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="/admin/order/sequence_list" class="nav-link {{ $activePage == 'order_status_sequence' ? 'active' : '' }}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Order Status Sequence</p>
+                </a>
+              </li>
             </ul>
           </li>
           <li class="nav-item {{ (in_array($activePage, ['shipping_list', 'store_list', 'holiday_list']) ? 'menu-open' : '') }}">
@@ -396,6 +408,18 @@
                 <a href="#" class="nav-link {{ $activePage == 'Price Rule/Discounts' ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Price Rule/Discounts</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="/admin/marketing/on_sale/list" class="nav-link {{ $activePage == 'on_sale_list' ? 'active' : '' }}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>On Sale</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="/admin/marketing/voucher/list" class="nav-link {{ $activePage == 'vouchers_list' ? 'active' : '' }}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Vouchers/Coupons</p>
                 </a>
               </li>
               <li class="nav-item">

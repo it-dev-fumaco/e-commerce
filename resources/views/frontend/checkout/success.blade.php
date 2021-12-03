@@ -97,7 +97,7 @@
 									<th class="text-left" colspan="2">Item Description</th>
 									<th class="text-center d-none d-sm-table-cell">Qty</th>
 									@if ($sum_discount > 0)
-									<th class="text-center d-none d-sm-table-cell">Discount (%)</th>
+									<th class="text-center d-none d-sm-table-cell">Discount</th>
 									@endif
 									<th class="text-center d-none d-sm-table-cell">Price</th>
 									<th class="text-center d-none d-sm-table-cell">Amount</th>
@@ -118,7 +118,7 @@
 										<br/>
 										<p><b>Qty:</b> {{ $item['qty'] }}</p>
 										@if ($sum_discount > 0)
-											<p><b>Discount (%):</b> {{ $item['discount'] . '%' }}</p>
+										<p><b>Discount (%):</b> {{ $item['discount'] . '%' }}</p>
 										@endif
 										<p><b>Price:</b> ₱ {{ number_format(str_replace(",","",$item['price']), 2) }}</p>
 										<p><b>Amount:</b> ₱ {{ number_format(str_replace(",","",$item['amount']), 2) }}</p>
@@ -144,7 +144,20 @@
 									<td class="pb-1 pt-1 d-lg-none d-xl-none">Subtotal</td>
 									<td class="pb-1 pt-1">₱ {{ number_format(str_replace(",","",$order_details->order_subtotal), 2) }}</td>
 								</tr>
-								<tr style="font-size: 0.8rem; text-align: right;">
+								<tr style="font-size: 0.8rem; text-align: right; border-top: 0;">
+									<td class="pb-1 pt-1 d-none d-sm-table-cell" colspan="{{ $colspan }}">Discount
+										@if ($order_details->voucher_code)
+										<span class="text-white" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833;">{{ $order_details->voucher_code }}</span>
+										@endif
+									</td>
+									<td class="pb-1 pt-1 d-lg-none d-xl-none">Discount 
+										@if ($order_details->voucher_code)
+										<span class="text-white" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833;">{{ $order_details->voucher_code }}</span>
+										@endif
+									</td>
+									<td class="pb-1 pt-1">- ₱ {{ number_format(str_replace(",","",$order_details->discount_amount), 2) }}</td>
+								</tr>
+								<tr style="font-size: 0.8rem; text-align: right; border-top: 0;">
 									<td class="pb-1 pt-1 d-none d-sm-table-cell" colspan="{{ $colspan }}">{{ $order_details->order_shipping }}</td>
 									<td class="pb-1 pt-1 d-lg-none d-xl-none">{{ $order_details->order_shipping }}</td>
 									<td class="pb-1 pt-1">₱ {{ number_format(str_replace(",","",$order_details->order_shipping_amount), 2) }}</td>
@@ -152,7 +165,7 @@
 								<tr style="font-size: 0.9rem; text-align: right; border-top: 2px solid;">
 									<td class="pb-1 pt-1 d-none d-sm-table-cell" colspan="{{ $colspan }}"><b>Grand Total</b></td>
 									<td class="pb-1 pt-1 d-lg-none d-xl-none"><b>Grand Total</b></td>
-									<td class="pb-1 pt-1"><b>₱ {{ number_format(str_replace(",","",($order_details->order_shipping_amount + $order_details->order_subtotal)), 2) }}</b></td>
+									<td class="pb-1 pt-1"><b>₱ {{ number_format(str_replace(",","",($order_details->order_shipping_amount + ($order_details->order_subtotal - $order_details->discount_amount))), 2) }}</b></td>
 								</tr>
 							</tfoot>
 						</table>

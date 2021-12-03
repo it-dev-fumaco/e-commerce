@@ -183,7 +183,7 @@ class CartController extends Controller
             $item_image = DB::table('fumaco_items_image_v1')
                 ->where('idcode', $item->f_idcode)->first();
 
-            $price = ($item->f_price > 0) ? $item->f_price : $item->f_original_price;
+            $price = ($item->f_onsale) ? $item->f_price : $item->f_original_price;
 
             $cart_arr[] = [
                 'item_code' => $item->f_idcode,

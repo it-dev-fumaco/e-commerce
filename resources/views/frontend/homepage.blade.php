@@ -6,6 +6,7 @@
 @section('meta')
 <meta name="description" content="{{ $page_meta->meta_description }}">
 	<meta name="keywords" content="{{ $page_meta->meta_keywords }}" />
+    <meta name="title" content="{{ $page_meta->page_name }}"/>
 
   <meta property="og:url" content="https://www.fumaco.com" />
 	<meta property="og:title" content="Fumaco" />
@@ -16,13 +17,38 @@
   <main style="background-color:#0062A5;">
     <div id="myCarousel" class="carousel slide" data-bs-ride="carousel">
       <ol class="carousel-indicators">
-
-        @foreach($carousel_data as $key => $carousel)
+        @php
+            $carousel_count = count($carousel_data) + count($onsale_carousel_data);
+        @endphp
+        @for ($i = 0; $i < $carousel_count; $i++)
+          <li data-bs-target="#myCarousel" data-bs-slide-to="{{$i}}" class="{{ $i == 0 ? "active" : "" }}"></li>
+        @endfor
+        {{-- @foreach($carousel_data as $key => $carousel)
           <li data-bs-target="#myCarousel" data-bs-slide-to="{{$key}}" class="{{ $loop->first ? "active" : "" }}"></li>
-        @endforeach
+        @endforeach --}}
       </ol>
 
       <div class="carousel-inner">
+          @forelse($onsale_carousel_data as $onsale)
+            <div class="carousel-item {{ $loop->first ? "active" : ""}}" style="background: black;">
+              <picture>
+                <source srcset="{{ asset('/assets/site-img/'. explode(".", $onsale->banner_image)[0] .'.webp') }}" type="image/webp" style="object-fit: cover;opacity: 1;">
+                <source srcset="{{ asset('/assets/site-img/'. $onsale->banner_image) }}" type="image/jpeg" style="object-fit: cover;opacity: 1;">
+                <img src="{{ asset('/assets/site-img/'. $onsale->banner_image) }}" alt="{{ Str::slug(explode(".", $onsale->banner_image)[0], '-') }}" style="object-fit: cover;opacity: 1;">
+              </picture>
+
+              {{-- <div class="container">
+                <div class="carousel-caption text-start">
+                  <h3 class="carousel-header-font fumacoFont1">{{ $carousel->fumaco_title }}</h3>
+                  <div class="text ellipsis">
+                    <p class="carousel-caption-font fumacoFont2 carousel-text-concat" style="text-align: left; text-justify: left; letter-spacing: 1px;">{{ $string }}</p>
+                  </div>
+                  <p><a class="btn btn-lg btn-primary btn-fumaco fumacoFont_btn" href="{{ $carousel->fumaco_url }}"role="button">{{ $carousel->fumaco_btn_name }}</a></p>
+                </div>
+              </div> --}}
+            </div>
+            @empty
+          @endforelse
         @foreach ($carousel_data as $carousel)
           @php
             $string = strip_tags($carousel->fumaco_caption);
@@ -36,8 +62,14 @@
               $string = $endPoint? substr($stringCut, 0, $endPoint) : substr($stringCut, 0);
               $string .= '...';
             }
+            $active = '';
+            if(count($onsale_carousel_data) == 0){
+              if($loop->first){
+                $active = 'active';
+              }
+            }
           @endphp
-          <div class="carousel-item {{ $loop->first ? "active" : ""}}" style="background: black;">
+          <div class="carousel-item {{ $active }}" style="background: black;">
             <picture>
               <source srcset="{{ asset('/assets/site-img/'. explode(".", $carousel->fumaco_image1)[0] .'.webp') }}" type="image/webp" style="object-fit: cover;opacity: 0.6;">
               <source srcset="{{ asset('/assets/site-img/'. $carousel->fumaco_image1) }}" type="image/jpeg" style="object-fit: cover;opacity: 0.6;">
@@ -106,6 +138,21 @@
                     $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/gallery/preview/'. explode(".", $bs['bs_img'])[0] . '.webp' : '/storage/no-photo-available.png';
                     @endphp
                     <div class="hover-container product-card" style="position: relative">
+                      <div class="pt-2" style="position: absolute; top: 0; right: 0; z-index: 10;">
+                        <div class="col-12 mb-2 {{ $bs['is_new_item'] == 1 ? '' : 'd-none' }}">
+                          <span class="p-1 text-center" style="background-color: #438539; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px !important">
+                            &nbsp;<b>New</b>&nbsp;
+                          </span>
+                        </div><br class="{{ $bs['is_new_item'] == 1 ? '' : 'd-none' }}"/>
+                        @if ($bs['is_discounted'])
+                          <div class="col-12">
+                            <span class="p-1 text-center" style="background-color: #FF0000; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; width: 100%">
+                              &nbsp;<b>{{ $bs['discount'] }}% OFF</b>&nbsp;
+                            </span>
+                          </div>
+                        @endif
+                      </div>
+
                       <div class="overlay-bg"></div>
                       <div class="btn-container">
                         <a href="/product/{{ ($bs['slug']) ? $bs['slug'] : $bs['item_code'] }}" class="view-products-btn btn" role="button"><i class="fas fa-search"></i>&nbsp;View Product</a>
@@ -123,14 +170,14 @@
                       </div>
                       <p class="card-text fumacoFont_card_price price-card d-none d-md-block d-lg-none" style="color:#000000 !important; ">
                         @if ($bs['is_discounted'])
-                        ₱ {{ number_format(str_replace(",","",$bs['new_price']), 2) }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$bs['orig_price']), 2) }}</s>&nbsp;&nbsp;&nbsp;<span class="badge badge-danger" style="vertical-align: middle;background-color: red;">{{ $bs['discount'] }}% OFF</span>
+                        ₱ {{ number_format(str_replace(",","",$bs['new_price']), 2) }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$bs['orig_price']), 2) }}</s>{{-- &nbsp;&nbsp;&nbsp;<spanclass="badgebadge-danger"style="vertical-align:middle;background-color:red;">{{ $bs['discount'] }}% OFF</span> --}}
                         @else
                         ₱ {{ number_format(str_replace(",","",$bs['orig_price']), 2) }}
                         @endif
                       </p>
                       <p class="card-text fumacoFont_card_price d-sm-block d-md-none d-lg-block" style="color:#000000 !important; ">
                         @if ($bs['is_discounted'])
-                        ₱ {{ number_format(str_replace(",","",$bs['new_price']), 2) }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$bs['orig_price']), 2) }}</s>&nbsp;&nbsp;&nbsp;<span class="badge badge-danger" style="vertical-align: middle;background-color: red;">{{ $bs['discount'] }}% OFF</span>
+                        ₱ {{ number_format(str_replace(",","",$bs['new_price']), 2) }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$bs['orig_price']), 2) }}</s>{{-- &nbsp;&nbsp;&nbsp;<span class="badge badge-danger" style="vertical-align: middle;background-color: red;">{{ $bs['discount'] }}% OFF</span> --}}
                         @else
                         ₱ {{ number_format(str_replace(",","",$bs['orig_price']), 2) }}
                         @endif
@@ -183,7 +230,20 @@
                 <div class="card shadow-sm">
                   <div class="equal-column-content">
                     
-                    <div class="hover-container product-card" style="position: relative !important">
+                    <div class="hover-container product-card" style="position: relative !important;">
+                      <div class="pt-2" style="position: absolute; top: 0; right: 0; z-index: 10;">
+                        <div class="col-12 mb-2 {{ $os['is_new_item'] == 1 ? '' : 'd-none' }}">
+                          <span class="p-1 text-center" style="background-color: #438539; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px !important">
+                            &nbsp;<b>New</b>&nbsp;
+                          </span>
+                        </div><br class="{{ $os['is_new_item'] == 1 ? '' : 'd-none' }}"/>
+                        <div class="col-12">
+                          <span class="p-1 text-center" style="background-color: #FF0000; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
+                            &nbsp;<b>{{ $os['discount_percent'] }}% OFF</b>&nbsp;
+                          </span>
+                        </div>
+                      </div>
+                      
                       <div class="btn-container">
                         <a href="/product/{{ ($os['slug']) ? $os['slug'] : $os['item_code'] }}" class="view-products-btn btn" role="button"><i class="fas fa-search"></i>&nbsp;View Product</a>
                       </div>
@@ -204,7 +264,7 @@
                         @else
                         ₱ {{ number_format(str_replace(",","",$os['orig_price']), 2) }}
                         @endif
-                        &nbsp;&nbsp;<span class="badge badge-danger" style="vertical-align: middle;background-color: red;">{{ $os['discount_percent'] }}% OFF</span>
+                        {{-- &nbsp;&nbsp;<span class="badge badge-danger" style="vertical-align: middle;background-color: red;">{{ $os['discount_percent'] }}% OFF</span> --}}
                       </p>
                       <p class="card-text fumacoFont_card_price d-sm-block d-md-none d-lg-block" style="color:#000000 !important; min-height: 30px">
                         @if ($os['is_discounted'])
@@ -212,7 +272,7 @@
                         @else
                         ₱ {{ number_format(str_replace(",","",$os['orig_price']), 2) }}
                         @endif
-                        &nbsp;&nbsp;<span class="badge badge-danger" style="vertical-align: middle;background-color: red;">{{ $os['discount_percent'] }}% OFF</span>
+                        {{-- &nbsp;&nbsp;<span class="badge badge-danger" style="vertical-align: middle;background-color: red;">{{ $os['discount_percent'] }}% OFF</span> --}}
                       </p>
                     </div>
                     <div class="mx-auto" style="width: 90%;">
@@ -409,6 +469,7 @@
       
     }
   </style>
+
 <link rel="stylesheet" type="text/css" href="{{ asset('/slick/slick.css') }}">
 <link rel="stylesheet" type="text/css" href="{{ asset('/slick/slick-theme.css') }}">
 <style type="text/css">

@@ -10,7 +10,7 @@
 		<div class="container-fluid">
 			<div class="row mb-2">
 				<div class="col-sm-6">
-					<h1 class="m-0">View Simple Product</h1>
+					<h1 class="m-0">View Product Bundle</h1>
 				</div><!-- /.col -->
 				<div class="col-sm-6">
 					<ol class="breadcrumb float-sm-right">
@@ -97,10 +97,6 @@
                               <div class="row">
                                  <div class="col-md-6">
                                     <div class="form-group">
-                                       <label for="parent-item-code">Parent Item Code</label>
-                                       <input type="text" class="form-control" id="parent-item-code" value="{{ $details->f_parent_code }}" readonly>
-                                    </div>
-                                    <div class="form-group">
                                        <label for="item-brand">Brand</label>
                                        <input type="text" class="form-control" id="item-brand" value="{{ $details->f_brand }}" readonly required>
                                     </div>
@@ -118,26 +114,35 @@
                                        <label for="stock-uom">Stock UoM</label>
                                        <input type="text" class="form-control" id="stock-uom" value="{{ $details->f_stock_uom }}" readonly required>
                                     </div>
-                                    <div class="form-group">
-                                       <label><input type="checkbox" id="set_as_new_item" name="is_new_item" {{ $details->f_new_item == 1 ? 'checked' : '' }}> New on this duration</label>
-                                       <div class="col-12">
-                                          <input type="text" class="form-control" id="new_item_date" name="new_item_duration"/>
-                                       </div>
-                                    </div>
                                  </div>
                               </div>
-                              {{-- <div class="row">
-                                 <div class="col-12">
-                                    <div class="form-group">
-                                       <label><input type="checkbox" id="set_as_new_item" name="is_new_item" {{ $details->f_new_item == 1 ? 'checked' : '' }}> New on this duration</label>
-                                       <div class="col-6">
-                                          <input type="text" class="form-control" id="new_item_date" name="new_item_duration" disabled/>
-                                       </div>
-                                    </div>
-                                 </div>
-                              </div> --}}
                            </div>
                         </div>
+                        <h5 class="mt-3">Product Bundle</h5>
+                        <hr>
+                        <table class="table table-striped table-bordered" id="bundle-table">
+                           <thead>
+                           <tr>
+                              <th style="width: 5%;" class="text-center">No.</th>
+                              <th style="width: 85;">Item Description</th>
+                              <th style="width: 10%;" class="text-center">Quantity</th>
+                           </tr>
+                           </thead>
+                           <tbody>
+                              @forelse ($bundle_items as $bundle)
+                              <tr>
+                                 <td class="text-center">{{ $bundle->idx }}</td>
+                                 <td><b>{{ $bundle->item_code }}</b> - {{ $bundle->item_description }}</td>
+                                 <td class="text-center">{{ $bundle->qty }} {{ $bundle->uom }}</td>
+                              </tr>
+                              @empty
+                              <tr>
+                                 <td colspan="3" class="text-center text-muted">No product attributes found.</td>
+                              </tr>
+                              @endforelse
+                           </tbody>
+                        </table>
+                        <br>
                         <h5>Product Weight & Dimensions</h5>
                         <hr>
                         <div class="row">
@@ -203,12 +208,8 @@
                            </div>
                            <div class="col-md-4">
                               <div class="form-group mb-0">
-                                 <label for="stock-qty">Stock Quantity (Actual Quantity)</label>
-                                 <input type="number" class="form-control" id="stock-qty" name="stock_qty" value="{{ $details->f_qty }}"  {{ ($details->stock_source) ? 'readonly' : '' }} required>
-                              </div>
-                              <div class="form-check mt-1">
-                                 <input type="checkbox" class="form-check-input" id="is-manual" name="is_manual" value="1" {{ ($details->stock_source) ? '' : 'checked' }}>
-                                 <label class="form-check-label" for="is-manual">Manual input stocks (ERP stocks is not integrated)</label>
+                                 <label for="stock-qty">Bundle Stock Quantity (Actual Quantity)</label>
+                                 <input type="number" class="form-control" id="stock-qty" name="stock_qty" value="{{ $details->f_qty }}" required>
                               </div>
                            </div>
                            <div class="col-md-4">
@@ -249,30 +250,6 @@
                            <label for="full-detail">Full Detail</label>
                            <textarea class="form-control" rows="6" id="full-detail" name="full_detail">{{ old('website_caption') }}{{ $details->f_full_description }}</textarea>
                         </div>
-                        <h5>Product Specifications / Attributes</h5>
-                        <hr>
-                        <table class="table table-striped table-bordered" id="attributes-table">
-                           <thead>
-                              <tr>
-                                 <th style="width: 5%;" class="text-center">No.</th>
-                                 <th style="width: 50%;">Specification / Attribute Name</th>
-                                 <th style="width: 45%;">Value</th>
-                              </tr>
-                           </thead>
-                           <tbody>
-                              @forelse ($attributes as $attr)
-                              <tr>
-                                 <td class="text-center">{{ $attr->idx }}</td>
-                                 <td>{{ $attr->attribute_name }}</td>
-                                 <td>{{ $attr->attribute_value }}</td>
-                              </tr>
-                              @empty
-                              <tr>
-                                 <td colspan="3" class="text-center text-muted">No product attributes found.</td>
-                              </tr>
-                              @endforelse
-                           </tbody>
-                        </table>
                         <h5 class="mt-3">Related Product(s)</h5>
                         <hr>
                         <div class="float-left mb-2">
@@ -442,13 +419,6 @@
 @section('script')
 <script>
    (function() {
-      setAsNewItem();
-
-      $('#set_as_new_item').click(function(){
-         setAsNewItem();
-      });
-
-
       $('#is-manual').click(function(){
          if($(this).prop('checked')) {
             $('#stock-qty').removeAttr('readonly').attr('required', true);
@@ -500,25 +470,6 @@
 				}
 			});
       }
-
-      function setAsNewItem(){
-         if($('#set_as_new_item').is(':checked')){
-               $("#new_item_date").prop('required',true);
-               $("#new_item_date").slideDown('fast');
-         }else{
-               $("#new_item_date").prop('required',false);
-               $("#new_item_date").slideUp('fast');
-         }
-      }
-      // Is new Item date
-      var start = "{{ $details->f_new_item_start ? date('m/d/Y', strtotime($details->f_new_item_start)) : '' }}";
-      var end = "{{ $details->f_new_item_end ? date('m/d/Y', strtotime($details->f_new_item_end)) : '' }}";
-      $('#new_item_date').daterangepicker({
-            opens: 'left',
-            placeholder: 'Select Date Range',
-            startDate: start ? start : moment(),
-            endDate: end ? end : moment().add(7, 'days'),
-      });
    })();
 </script>
 @endsection

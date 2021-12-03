@@ -10,13 +10,13 @@
 		<div class="container-fluid">
 			<div class="row mb-2">
 				<div class="col-sm-6">
-					<h1 class="m-0">Create New Simple Product</h1>
+					<h1 class="m-0">Create New Product Bundle</h1>
 				</div><!-- /.col -->
 				<div class="col-sm-6">
 					<ol class="breadcrumb float-sm-right">
 						<li class="breadcrumb-item"><a href="/admin/dashboard">Home</a></li>
             <li class="breadcrumb-item"><a href="/admin/product/list">Products</a></li>
-						<li class="breadcrumb-item active">Create New Simple Product</li>
+						<li class="breadcrumb-item active">Create New Product Bundle</li>
 					</ol>
 				</div><!-- /.col -->
 			</div><!-- /.row -->
@@ -49,7 +49,7 @@
                 @endforeach
               </div>
             @endif
-            <input type="hidden" name="item_type" value="simple_product" id="item-type">
+            <input type="hidden" name="item_type" value="product_bundle" id="item-type">
             <!-- general form elements -->
             <div class="card">
               <!-- /.card-header -->
@@ -75,10 +75,6 @@
                     <div class="row">
                       <div class="col-md-6">
                         <div class="form-group">
-                          <label for="parent-item-code">Parent Item Code</label>
-                          <input type="text" class="form-control" id="parent-item-code" name="parent_item_code" value="{{ old('parent_item_code') }}" readonly required>
-                        </div>
-                        <div class="form-group">
                           <label for="item-brand">* Brand</label>
                           <input type="text" class="form-control" id="item-brand" name="brand" value="{{ old('brand') }}" readonly required>
                         </div>
@@ -100,6 +96,19 @@
                     </div>
                   </div>
                 </div>
+                <h5>Product Bundle</h5>
+                <hr>
+                <table class="table table-striped table-bordered" id="bundle-table">
+                  <thead>
+                    <tr>
+                      <th style="width: 5%;" class="text-center">No.</th>
+                      <th style="width: 85;">Item Description</th>
+                      <th style="width: 10%;" class="text-center">Quantity</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+                <br>
                 <h5>Product Weight & Dimensions</h5>
                 <hr>
                 <div class="row">
@@ -108,13 +117,13 @@
                       <div class="col-md-6">
                         <div class="form-group">
                           <label for="weight-uom">* Weight UoM</label>
-                          <input type="text" class="form-control" id="weight-uom" name="weight_uom" value="{{ old('weight_uom') }}" readonly>
+                          <input type="text" class="form-control" id="weight-uom" name="weight_uom" value="{{ old('weight_uom') ? old('weight_uom') : 'Kg' }}" readonly>
                         </div>
                       </div>
                       <div class="col-md-6">
                         <div class="form-group">
                           <label for="weight-per-unit">* Weight per Unit</label>
-                          <input type="text" class="form-control" id="weight-per-unit" name="weight_per_unit" value="{{ old('weight_per_unit') }}" readonly>
+                          <input type="text" class="form-control" id="weight-per-unit" name="weight_per_unit" value="{{ old('weight_per_unit') }}">
                         </div>
                       </div>
                       <div class="col-md-6">
@@ -165,13 +174,9 @@
                   </div>
                   <div class="col-md-4">
                     <div class="form-group mb-0">
-                      <label for="stock-qty"> * Stock Quantity (Actual Quantity)</label>
-                      <input type="number" class="form-control" id="stock-qty" name="stock_qty" value="{{ old('stock_qty') ? old('stock_qty') : 0 }}" min="0" readonly required>
+                      <label for="stock-qty"> * Bundle Stock Quantity (Actual Quantity)</label>
+                      <input type="number" class="form-control" id="stock-qty" name="stock_qty" value="{{ old('stock_qty') ? old('stock_qty') : 0 }}" min="0" required>
                     </div>
-                    <div class="form-check mt-1">
-                      <input type="checkbox" class="form-check-input" id="is-manual" name="is_manual" value="1">
-                      <label class="form-check-label" for="is-manual">Manual input stocks (ERP stocks is not integrated)</label>
-                   </div>
                   </div>
                   <div class="col-md-4">
                     <div class="form-group">
@@ -204,7 +209,6 @@
                   </div>
                 </div>
 
-
                 <div class="form-group">
                   <label for="website-caption">* Website Caption (more information section)</label>
                   <textarea class="form-control" rows="6" id="website-caption" name="website_caption">{{ old('website_caption') }}</textarea>
@@ -213,19 +217,6 @@
                   <label for="full-detail">* Full Detail</label>
                   <textarea class="form-control" rows="6" id="full-detail" name="full_detail">{{ old('full_detail') }}</textarea>
                 </div>
-                <h5>Product Specifications / Attributes</h5>
-                <hr>
-                <table class="table table-striped table-bordered" id="attributes-table">
-                  <thead>
-                    <tr>
-                      <th style="width: 5%;" class="text-center">No.</th>
-                      <th style="width: 50%;">Specification / Attribute Name</th>
-                      <th style="width: 45%;">Value</th>
-                    </tr>
-                  </thead>
-                  <tbody></tbody>
-                </table>
-                <br>
                 <h5 class="mt-3">Search Engine Optimization (SEO)</h5>
                 <hr>
                 <div class="form-group">
@@ -340,7 +331,7 @@
     $(document).on('select2:select', '#search-item-code', function(e){
       var data = e.params.data;
       $('#custom-overlay').fadeIn();
-      $('#attributes-table tbody').empty();
+      $('#bundle-table tbody').empty();
       $.ajax({
         type:"GET",
         url:"/admin/product/" + data.id + '/' + $('#item-type').val(),
@@ -349,7 +340,6 @@
           if (response.status || response.status === 0) {
             console.log('An error occured.');
           } else {
-            $('#parent-item-code').val(response.parent_item_code);
             $('#item-code').val(response.item_code);
             $('#item-code-text').text(response.item_code);
             $('#item-name').val(response.item_name);
@@ -361,7 +351,9 @@
             $('#item-description-text').text(response.item_description);
             $('#stock-qty').val(response.stock_qty);
             $('#product-price').val(response.item_price);
-            $('#weight-uom').val(response.weight_uom);
+            if (response.weight_uom) {
+              $('#weight-uom').val(response.weight_uom);
+            }
             $('#weight-per-unit').val(response.weight_per_unit);
             $('#package-weight').val(response.package_weight);
             $('#package-length').val(response.package_length);
@@ -371,12 +363,12 @@
             $('#product-name').val(response.product_name);
             $('#full-detail').summernote('code', response.web_long_description);
 
-            var tbl_row = '';
-            $(response.attributes).each(function(i, d) {
-              tbl_row += '<tr><td class="text-center">' + d.idx + '</td><td>' + d.attribute + '</td><td>' + d.attribute_value + '</td></tr>';
+            var bundle = '';
+            $(response.bundle_items).each(function(i, d) {
+              bundle += '<tr><td class="text-center">' + d.idx + '</td><td><b>' + d.item_code + '</b> - ' + d.description + '</td><td class="text-center">' + d.qty + ' ' + d.uom + '</td></tr>';
             });
 
-            $('#attributes-table tbody').append(tbl_row);
+            $('#bundle-table tbody').append(bundle);
           }
 
           $('#custom-overlay').fadeOut();

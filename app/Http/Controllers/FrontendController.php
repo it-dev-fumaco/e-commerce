@@ -66,7 +66,8 @@ class FrontendController extends Controller
                             }
     
                             $q->orWhere('f_idcode', 'LIKE', "%".$search_str."%")
-                                ->orWhere('f_item_classification', 'LIKE', "%".$search_str."%");
+                                ->orWhere('f_item_classification', 'LIKE', "%".$search_str."%")
+                                ->orWhere('keywords', 'LIKE', '%'.$search_str.'%');
                         })
                         ->where('f_status', 1)->where('f_status', 1)
                         ->orderBy($sortby, $orderby)->get();
@@ -89,6 +90,14 @@ class FrontendController extends Controller
             $results = [];
             foreach($product_list as $item){
                 $image = DB::table('fumaco_items_image_v1')->where('idcode', $item->f_idcode)->first();
+
+                $is_new_item = 0;
+                if($item->f_new_item == 1){
+                    if($item->f_new_item_start <= Carbon::now() and $item->f_new_item_end >= Carbon::now()){
+                        $is_new_item = 1;
+                    }
+                }
+
                 $results[] = [
                     'id' => $item->id,
                     'item_code' => $item->f_idcode,
@@ -106,7 +115,8 @@ class FrontendController extends Controller
                     'caption' => null,
                     'slug' => $item->slug,
                     'f_qty' => $item->f_qty,
-                    'f_reserved_qty' => $item->f_reserved_qty
+                    'f_reserved_qty' => $item->f_reserved_qty,
+                    'is_new_item' => $is_new_item
                 ];
             }
 
@@ -163,6 +173,7 @@ class FrontendController extends Controller
                         'discount_percent' => $result['discount_percent'],
                         'image' => $result['image'],
                         'slug' => $result['slug'],
+                        'is_new_item' => $result['is_new_item'],
                         'on_stock' => $on_stock,
                     ];
                 } else {
@@ -219,8 +230,9 @@ class FrontendController extends Controller
             return view('frontend.search_results', compact('results', 'blogs', 'products'));
         }
 
-        $carousel_data = DB::table('fumaco_header')->where('fumaco_status', 1)
-            ->orderBy('fumaco_active', 'desc')->get();
+        $carousel_data = DB::table('fumaco_header')->where('fumaco_status', 1)->orderBy('fumaco_active', 'desc')->get();
+        $onsale_carousel_data = DB::table('fumaco_on_sale')->where('status', 1)->where('banner_image', '!=', null)->where('start_date', '<=', Carbon::now())->where('end_date', '>=', Carbon::now())->get();
+        // return $onsale_carousel_data;
 
         $blogs = DB::table('fumaco_blog')->where('blog_featured', 1)
             ->where('blog_enable', 1)->take(3)->get();
@@ -231,6 +243,13 @@ class FrontendController extends Controller
 
         foreach($best_selling as $bs){
             $bs_img = DB::table('fumaco_items_image_v1')->where('idcode', $bs->f_idcode)->first();
+
+            $is_new_item = 0;
+            if($bs->f_new_item == 1){
+                if($bs->f_new_item_start <= Carbon::now() and $bs->f_new_item_end >= Carbon::now()){
+                    $is_new_item = 1;
+                }
+            }
 
             $bs_item_name = $bs->f_name_name;
 
@@ -245,12 +264,20 @@ class FrontendController extends Controller
                 'new_price' => $bs->f_price,
                 'discount' => $bs->f_discount_percent,
                 'bs_img' => ($bs_img) ? $bs_img->imgprimayx : null,
-                'slug' => $bs->slug
+                'slug' => $bs->slug,
+                'is_new_item' => $is_new_item
             ];
         }
 
         foreach($on_sale as $os){
             $os_img = DB::table('fumaco_items_image_v1')->where('idcode', $os->f_idcode)->first();
+
+            $is_new_item = 0;
+            if($os->f_new_item == 1){
+                if($os->f_new_item_start <= Carbon::now() and $os->f_new_item_end >= Carbon::now()){
+                    $is_new_item = 1;
+                }
+            }
 
             $os_item_name = $os->f_name_name;
             $on_stock = ($os->f_qty - $os->f_reserved_qty) > 0 ? 1 : 0;
@@ -264,13 +291,16 @@ class FrontendController extends Controller
                 'on_stock' => $on_stock,
                 'os_img' => ($os_img) ? $os_img->imgprimayx : null,
                 'discount_percent' => $os->f_discount_percent,
-                'slug' => $os->slug
+                'slug' => $os->slug,
+                'is_new_item' => $is_new_item,
             ];
         }
 
+        // return $on_sale_arr;
+
         $page_meta = DB::table('fumaco_pages')->where('is_homepage', 1)->first();
 
-        return view('frontend.homepage', compact('carousel_data', 'blogs', 'best_selling_arr', 'on_sale_arr', 'page_meta'));
+        return view('frontend.homepage', compact('carousel_data', 'onsale_carousel_data', 'blogs', 'best_selling_arr', 'on_sale_arr', 'page_meta'));
     }
 
     public function newsletterSubscription(Request $request){
@@ -781,7 +811,8 @@ class FrontendController extends Controller
                 'on_sale' => $product->f_onsale,
                 'on_stock' => $on_stock,
                 'discount_percent' => $product->f_discount_percent,
-                'slug' => $product->slug
+                'slug' => $product->slug,
+                'is_new_item' => $product->f_new_item
             ];
         }
 
@@ -833,12 +864,19 @@ class FrontendController extends Controller
         $related_products_query = DB::table('fumaco_items as a')
             ->join('fumaco_items_relation as b', 'a.f_idcode', 'b.related_item_code')
             ->where('b.item_code', $product_details->f_idcode)->where('a.f_status', 1)
-            ->select('a.id', 'a.f_idcode', 'a.f_original_price', 'a.f_discount_trigger', 'a.f_price', 'a.f_name_name', 'a.slug', 'a.f_qty', 'a.f_reserved_qty')
+            ->select('a.id', 'a.f_idcode', 'a.f_original_price', 'a.f_discount_trigger', 'a.f_price', 'a.f_name_name', 'a.slug', 'a.f_qty', 'a.f_reserved_qty', 'a.f_onsale', 'a.f_new_item', 'a.f_new_item_start', 'a.f_new_item_end', 'a.f_discount_percent')
             ->get();
 
         $related_products = [];
         foreach($related_products_query as $row) {
             $image = DB::table('fumaco_items_image_v1')->where('idcode', $row->f_idcode)->first();
+
+            $is_new_item = 0;
+            if($row->f_new_item == 1){
+                if($row->f_new_item_start <= Carbon::now() and $row->f_new_item_end >= Carbon::now()){
+                    $is_new_item = 1;
+                }
+            }
 
             $on_stock = ($row->f_qty - $row->f_reserved_qty) > 0 ? 1 : 0;
             $related_products[] = [
@@ -847,10 +885,12 @@ class FrontendController extends Controller
                 'item_name' => $row->f_name_name,
                 'orig_price' => $row->f_original_price,
                 'is_discounted' => $row->f_discount_trigger,
+                'discount_percent' => $row->f_discount_percent,
                 'new_price' => $row->f_price,
                 'on_stock' => $on_stock,
                 'image' => ($image) ? $image->imgprimayx : null,
-                'slug' => $row->slug
+                'slug' => $row->slug,
+                'is_new_item' => $is_new_item
             ];
         }
 
@@ -938,7 +978,9 @@ class FrontendController extends Controller
                 'subtotal' => $order->order_subtotal,
                 'shipping_name' => $order->order_shipping,
                 'shipping_fee' => $order->order_shipping_amount,
-                'grand_total' => ($order->order_shipping_amount + $order->order_subtotal),
+                'grand_total' => ($order->order_shipping_amount + ($order->order_subtotal - $order->discount_amount)),
+                'voucher_code' => $order->voucher_code,
+                'discount_amount' => $order->discount_amount,
             ];
         }
 
@@ -979,10 +1021,12 @@ class FrontendController extends Controller
                 'subtotal' => $new_order->order_subtotal,
                 'shipping_name' => $new_order->order_shipping,
                 'shipping_fee' => $new_order->order_shipping_amount,
-                'grand_total' => ($new_order->order_shipping_amount + $new_order->order_subtotal),
+                'grand_total' => ($new_order->order_shipping_amount + ($new_order->order_subtotal - $new_order->discount_amount)),
                 'pickup_date' => $new_order->pickup_date,
                 'order_tracker' => $track_order_details,
                 'ship_status' => $order_status,
+                'voucher_code' => $new_order->voucher_code,
+                'discount_amount' => $new_order->discount_amount,
             ];
         }
         // return $new_orders_arr;

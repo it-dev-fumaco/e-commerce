@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Carbon\Carbon;
 use Auth;
 use Webp;
 use DB;
@@ -19,14 +21,24 @@ class ProductController extends Controller
             if (!$erp_api) {
                 return response()->json(['status' => 0, 'ERP API not configured.']);
             }
+
+            if($request->item_type == 'product_bundle') {
+                $params = '?filters=[["name","LIKE","%25' . $request->q . '%25"]]';
     
-            $params = '?filters=[["name","LIKE","%25' . $request->q . '%25"],["custom_show_in_website","=","1"],["has_variants","=","0"]]';
+                $response = Http::withHeaders([
+                    'Content-Type' => 'application/json',
+                    'Authorization' => 'token '. $erp_api->api_key. ':' . $erp_api->api_secret_key . '',
+                    'Accept-Language' => 'en'
+                ])->get($erp_api->base_url . '/api/resource/Product Bundle' . ($params));
+            } else {
+                $params = '?filters=[["name","LIKE","%25' . $request->q . '%25"],["custom_show_in_website","=","1"],["has_variants","=","0"]]';
     
-            $response = Http::withHeaders([
-                'Content-Type' => 'application/json',
-                'Authorization' => 'token '. $erp_api->api_key. ':' . $erp_api->api_secret_key . '',
-                'Accept-Language' => 'en'
-            ])->get($erp_api->base_url . '/api/resource/Item' . ($params));
+                $response = Http::withHeaders([
+                    'Content-Type' => 'application/json',
+                    'Authorization' => 'token '. $erp_api->api_key. ':' . $erp_api->api_secret_key . '',
+                    'Accept-Language' => 'en'
+                ])->get($erp_api->base_url . '/api/resource/Item' . ($params));
+            }
     
             if ($response->failed()) {
                 return response()->json(['status' => 0, 'message' => 'An error occured. Please try again.']);
@@ -45,7 +57,7 @@ class ProductController extends Controller
     }
 
     // function to get item details from ERP via API
-    public function getItemDetails($item_code) {
+    public function getItemDetails($item_code, $item_type) {
         try {
             $erp_api = DB::table('api_setup')->where('type', 'erp_api')->first();
             if (!$erp_api) {
@@ -172,6 +184,31 @@ class ProductController extends Controller
                 $result['attributes'] = $response['data'];
             }
 
+            $product_bundle_items = [];
+            if($item_type == 'product_bundle') {
+                 // get product bundle items
+                $fields = '?fields=["parent","item_code","idx","qty","description","uom"]';
+                $filter = '&filters=[["parent","=","' . $item_code . '"]]&limit_page_length=100&order_by=idx';
+
+                $params = $fields . '' . $filter;
+                
+                $response = Http::withHeaders([
+                    'Content-Type' => 'application/json',
+                    'Authorization' => 'token '. $erp_api->api_key. ':' . $erp_api->api_secret_key . '',
+                    'Accept-Language' => 'en'
+                ])->get($erp_api->base_url . '/api/resource/Product Bundle Item' . $params);
+
+                if ($response->failed()) {
+                    return response()->json(['status' => 0, 'message' => 'An error occured. Please try again.']);
+                }
+
+                if (count($response['data']) <= 0 && isset($response['data'])) {
+                    $result['bundle_items'] = 0;
+                } else{
+                    $result['bundle_items'] = $response['data'];
+                }
+            }
+
             return $result;
         } catch (Exception $e) {
             return response()->json(['status' => 0, 'message' => 'An error occured. Please try again.']);
@@ -186,49 +223,81 @@ class ProductController extends Controller
                 return redirect()->back()->withInput($request->all())->with('error', 'Product code <b>' . $request->item_code . '</b> already exists.');
             }
 
-            $item = $this->getItemDetails($request->item_code);
+            $item = $this->getItemDetails($request->item_code, $request->item_type);
 
-            $request->validate(
-                [
-                    'item_code' => 'required',
-                    'parent_item_code' => 'required',
-                    'item_code' => 'required',
-                    'product_name' => 'required',
-                    'item_name' => 'required',
-                    'product_category' => 'required',
-                    'brand' => 'required',
-                    'item_classification' => 'required',
-                    'stock_uom' => 'required',
-                    'weight_per_unit' => 'required',
-                    'weight_uom' => 'required',
-                    'package_dimension_uom' => 'required',
-                    'package_length' => 'required',
-                    'package_width' => 'required',
-                    'package_height' => 'required',
-                    'package_weight' => 'required',
-                    'warehouse' => 'required',
-                    'stock_qty' => 'required|integer',
-                    'alert_qty' => 'required|integer',
-                    'item_description' => 'required',
-                    'website_caption' => 'required',
-                    'full_detail' => 'required',
-                    'price' => 'required|numeric',
-                    'slug' => 'required'
-                ]
-            );
-
-            // validate if item attributes matches the current attributes registered in database based on parent item code
-            $mismatch_attr_query = DB::table('fumaco_items as a')
-                ->join('fumaco_items_attributes as b', 'a.f_idcode', 'b.idcode')
-                ->join('fumaco_attributes_per_category as c', 'c.id', 'b.attribute_name_id')
-                ->where('a.f_parent_code', $item['parent_item_code'])
-                ->whereNotIn('attribute_name', array_column($item['attributes'], 'attribute'))
-                ->distinct()->count();
-
-            if ($mismatch_attr_query > 0) {
-                return redirect()->back()->withInput($request->all())->with('error', 'Some of the attributes of this item did not exists in the parent attributes <b>' . $item['parent_item_code'] . '</b>.');
+            if($request->item_type == 'product_bundle') {
+                $request->validate(
+                    [
+                        'item_code' => 'required',
+                        'item_code' => 'required',
+                        'product_name' => 'required',
+                        'item_name' => 'required',
+                        'product_category' => 'required',
+                        'brand' => 'required',
+                        'item_classification' => 'required',
+                        'stock_uom' => 'required',
+                        'weight_per_unit' => 'required',
+                        'weight_uom' => 'required',
+                        'package_dimension_uom' => 'required',
+                        'package_length' => 'required',
+                        'package_width' => 'required',
+                        'package_height' => 'required',
+                        'package_weight' => 'required',
+                        'warehouse' => 'required',
+                        'stock_qty' => 'required|integer',
+                        'alert_qty' => 'required|integer',
+                        'item_description' => 'required',
+                        'website_caption' => 'required',
+                        'full_detail' => 'required',
+                        'price' => 'required|numeric',
+                        'slug' => 'required'
+                    ]
+                );
+            } else {
+                $request->validate(
+                    [
+                        'item_code' => 'required',
+                        'parent_item_code' => 'required',
+                        'item_code' => 'required',
+                        'product_name' => 'required',
+                        'item_name' => 'required',
+                        'product_category' => 'required',
+                        'brand' => 'required',
+                        'item_classification' => 'required',
+                        'stock_uom' => 'required',
+                        'weight_per_unit' => 'required',
+                        'weight_uom' => 'required',
+                        'package_dimension_uom' => 'required',
+                        'package_length' => 'required',
+                        'package_width' => 'required',
+                        'package_height' => 'required',
+                        'package_weight' => 'required',
+                        'warehouse' => 'required',
+                        'stock_qty' => 'required|integer',
+                        'alert_qty' => 'required|integer',
+                        'item_description' => 'required',
+                        'website_caption' => 'required',
+                        'full_detail' => 'required',
+                        'price' => 'required|numeric',
+                        'slug' => 'required'
+                    ]
+                );
             }
 
+            // validate if item attributes matches the current attributes registered in database based on parent item code
+            if($item['attributes'] != 0) {
+                $mismatch_attr_query = DB::table('fumaco_items as a')
+                    ->join('fumaco_items_attributes as b', 'a.f_idcode', 'b.idcode')
+                    ->join('fumaco_attributes_per_category as c', 'c.id', 'b.attribute_name_id')
+                    ->where('a.f_parent_code', $item['parent_item_code'])
+                    ->whereNotIn('attribute_name', array_column($item['attributes'], 'attribute'))
+                    ->distinct()->count();
+
+                if ($mismatch_attr_query > 0) {
+                    return redirect()->back()->withInput($request->all())->with('error', 'Some of the attributes of this item did not exists in the parent attributes <b>' . $item['parent_item_code'] . '</b>.');
+                }
+            }
+       
             $item_category = DB::table('fumaco_categories')->where('id', $request->product_category)->first(); 
             $item_category = ($item_category) ? $item_category->name : null;
             if(!$item_category) {
@@ -244,6 +313,13 @@ class ProductController extends Controller
                     return redirect()->back()->with('error', 'Slug must be unique');
                 }
             }
+
+            if ($request->item_type == 'product_bundle') {
+                $stock_qty = $request->stock_qty;
+            } else {
+                $stock_qty = ($request->is_manual) ? $request->stock_qty : $item['stock_qty'];
+            }
+
             $id = DB::table('fumaco_items')->insertGetId([
                 'f_idcode' => $item['item_code'],
                 'f_parent_code' => $item['parent_item_code'],
@@ -257,14 +333,14 @@ class ProductController extends Controller
                 'f_item_classification' => $item['item_classification'],
                 'f_stock_uom' => $item['stock_uom'],
                 'f_weight_per_unit' => $item['weight_per_unit'],
-                'f_weight_uom' => $item['weight_uom'],
+                'f_weight_uom' => (!$item['weight_uom']) ? $request->weight_uom : $item['weight_uom'],
                 'f_package_d_uom' => $item['package_dimension_uom'],
                 'f_package_length' => $item['package_length'],
                 'f_package_width'	 => $item['package_width'],
                 'f_package_height' => $item['package_height'],
                 'f_package_weight' => $item['package_weight'],
                 'f_warehouse' => $item['warehouse'],
-                'f_qty' => ($request->is_manual) ? $request->stock_qty : $item['stock_qty'],
+                'f_qty' => $stock_qty,
                 'stock_source' => ($request->is_manual) ? 0 : 1,
                 'f_alert_qty' => $request->alert_qty,
                 'f_description' => $item['item_description'],
@@ -278,55 +354,79 @@ class ProductController extends Controller
                 'url_title' => $request->url_title,
                 'meta_description' => $request->meta_description,
                 'slug' => strtolower($request->slug),
+                'f_item_type' => $request->item_type,
                 'created_by' => Auth::user()->username,
                 'last_modified_by' => Auth::user()->username,
             ]);
 
-            // insert item attributes
-            $item_attr = [];
-            foreach($item['attributes'] as $attr) {
-                $existing_attribute = DB::table('fumaco_attributes_per_category')
-                    ->where('category_id', $request->product_category)
-                    ->where('attribute_name', $attr['attribute'])->first();
+            if($item['attributes'] != 0) {
+                // insert item attributes
+                $item_attr = [];
+                foreach($item['attributes'] as $attr) {
+                    $existing_attribute = DB::table('fumaco_attributes_per_category')
+                        ->where('category_id', $request->product_category)
+                        ->where('attribute_name', $attr['attribute'])->first();
 
-                if (!$existing_attribute) {
-                    // insert attribute names
-                    $attr_id = DB::table('fumaco_attributes_per_category')->insertGetId([
-                        'category_id' => $request->product_category,
-                        'attribute_name' => $attr['attribute'],
-                        'slug' => Str::slug($attr['attribute'], '-'),
-                        'created_by' => Auth::user()->username
-                    ]);
+                    if (!$existing_attribute) {
+                        // insert attribute names
+                        $attr_id = DB::table('fumaco_attributes_per_category')->insertGetId([
+                            'category_id' => $request->product_category,
+                            'attribute_name' => $attr['attribute'],
+                            'slug' => Str::slug($attr['attribute'], '-'),
+                            'created_by' => Auth::user()->username
+                        ]);
+                    }
+                    // get attribute name id
+                    $attr_name_id = ($existing_attribute) ? $existing_attribute->id : $attr_id;
+
+                    $attribute_value = $attr['attribute_value'];
+                    if (strtoupper($attribute_value) == 'n/a') {
+                        $attribute_value = strtoupper($attribute_value);
+                    }
+
+                    $item_attr[] = [
+                        'idx' => $attr['idx'],
+                        'idcode' => $attr['parent'],
+                        'attribute_name_id' => $attr_name_id,
+                        'attribute_value' => $attribute_value,
+                        'created_by' => Auth::user()->username,
+                        'last_modified_by' => Auth::user()->username,
+                    ];
                 }
-                // get attribute name id
-                $attr_name_id = ($existing_attribute) ? $existing_attribute->id : $attr_id;
 
-                $attribute_value = $attr['attribute_value'];
-                if (strtoupper($attribute_value) == 'n/a') {
-                    $attribute_value = strtoupper($attribute_value);
-                }
-
-                $item_attr[] = [
-                    'idx' => $attr['idx'],
-                    'idcode' => $attr['parent'],
-                    'attribute_name_id' => $attr_name_id,
-                    'attribute_value' => $attribute_value,
-                    'created_by' => Auth::user()->username,
-                    'last_modified_by' => Auth::user()->username,
-                ];
+                DB::table('fumaco_items_attributes')->insert($item_attr);
             }
 
+            if ($request->item_type == 'product_bundle') {
+                // insert product bundle items
+                $bundle_items = [];
+                foreach($item['bundle_items'] as $bundle) {
+                    $bundle_items[] = [
+                        'idx' => $bundle['idx'],
+                        'parent_item_code' => $bundle['parent'],
+                        'item_code' => $bundle['item_code'],
+                        'item_description' => $bundle['description'],
+                        'qty' => $bundle['qty'],
+                        'uom' => $bundle['uom'],
+                        'created_by' => Auth::user()->username,
+                        'last_modified_by' => Auth::user()->username,
+                    ];
+                }
+
+                DB::table('fumaco_product_bundle_item')->insert($bundle_items);
+            }
+           
             // insert brand
             $existing_brand = DB::table('fumaco_brands')->where('brandname', $item['brand'])->exists();
             if(!$existing_brand) {
                 DB::table('fumaco_brands')->insert(['brandname' => $item['brand'], 'slug' => Str::slug($item['brand'], '-')]);
             }
             
-            DB::table('fumaco_items_attributes')->insert($item_attr);
-
             DB::commit();
 
-            return redirect('/admin/product/' . $id . '/edit')->with('success', 'Product has been saved.');
+            $redirect_to = ($request->item_type == 'product_bundle') ? '/admin/product/' . $id . '/edit_bundle' : '/admin/product/' . $id . '/edit';
+
+            return redirect($redirect_to)->with('success', 'Product has been saved.');
         } catch (Exception $e) {
             DB::rollback();
 
@@ -360,6 +460,17 @@ class ProductController extends Controller
                     return redirect()->back()->with('error', 'Slug must be unique.');
                 }
             }
+
+            $start_date = null;
+            $end_date = null;
+            $is_new = 0;
+            if(isset($request->is_new_item)){
+                $set_as_new_date = explode(' - ', $request->new_item_duration);
+                $is_new = 1;
+                $start_date = Carbon::parse($set_as_new_date[0])->format('Y/m/d');
+                $end_date = Carbon::parse($set_as_new_date[1])->format('Y/m/d');
+            }
+            
             DB::table('fumaco_items')->where('id', $id)->update([
                 'f_name_name' => $request->product_name,
                 'f_cat_id' => $request->product_category,
@@ -374,6 +485,9 @@ class ProductController extends Controller
                 'url_title' => $request->url_title,
                 'meta_description' => $request->meta_description,
                 'slug' => strtolower($request->slug),
+                'f_new_item' => $is_new,
+                'f_new_item_start' => $start_date,
+                'f_new_item_end' => $end_date,
                 'last_modified_by' => Auth::user()->username,
             ]);
 
@@ -430,6 +544,8 @@ class ProductController extends Controller
             DB::table('fumaco_items')->where('f_idcode', $item_code)->delete();
 
             DB::table('fumaco_items_attributes')->where('idcode', $item_code)->delete();
+
+            DB::table('fumaco_product_bundle_item')->where('parent_item_code', $item_code)->delete();
 
             DB::table('fumaco_items_image_v1')->where('idcode', $item_code)->delete();
 
@@ -493,17 +609,47 @@ class ProductController extends Controller
         }
     }
 
-	public function viewAddForm() {
+    public function isNewItem($id) {
+        DB::beginTransaction();
+        try {
+            $details = DB::table('fumaco_items')->where('id', $id)->first();
+
+            if ($details) {
+                $is_new_item = $details->f_new_item == 0 ? 1 : 0;
+                DB::table('fumaco_items')->where('id', $id)->update(['f_new_item' => $is_new_item, 'last_modified_by' => Auth::user()->username]);
+            }
+
+            DB::commit();
+
+            return redirect()->back();
+        } catch (Exception $e) {
+            DB::rollback();
+
+            return redirect()->back()->with('error', 'An error occured. Please try again.');
+        }
+    }
+
+	public function viewAddForm($type) {
         $item_categories = DB::table('fumaco_categories')->get();
 
-		return view('backend.products.add', compact('item_categories'));
+        if ($type == 'product_bundle') {
+            return view('backend.products.add_bundle', compact('item_categories'));
+        }
+
+        if ($type == 'simple_product') {
+            return view('backend.products.add', compact('item_categories'));
+        }
+
+        return redirect('/admin/product/list');
 	}
 
     public function viewList(Request $request) {
         $q_string = $request->q;
         $search_str = explode(' ', $q_string);
         $product_list = DB::table('fumaco_items')->where('f_brand', 'LIKE', "%".$request->brands."%")
-            ->where('f_parent_code', 'LIKE', "%".$request->parent_code."%")
+            ->when($request->parent_code, function ($query) use ($request) {
+                return $query->where('f_parent_code', 'LIKE', "%".$request->parent_code."%");
+            })
             ->where('f_cat_id', 'LIKE', "%".$request->category."%")
             ->when($request->is_featured, function($c) use ($request) {
                 $c->where('f_featured', $request->is_featured);
@@ -530,6 +676,15 @@ class ProductController extends Controller
         foreach ($product_list as $product) {
             $item_image = DB::table('fumaco_items_image_v1')->where('idcode', $product->f_idcode)->first();
 
+            $image = $item_image ? $item_image->imgprimayx : null;
+
+            $is_new_item = 0;
+            if($product->f_new_item == 1){
+                if($product->f_new_item_start <= Carbon::now() and $product->f_new_item_end >= Carbon::now()){
+                    $is_new_item = 1;
+                }
+            }
+
             $item_name = strip_tags($product->f_name_name);
             $list[] = [
                 'id' => $product->id,
@@ -537,7 +692,7 @@ class ProductController extends Controller
                 'item_code' => $product->f_idcode,
                 'product_name' => $product->f_name_name,
                 'item_name' => $item_name,
-                'image' => ($item_image) ? $item_image->imgprimayx : null,
+                'image' => $image,
                 'price' => $product->f_original_price,
                 'new_price' => $product->f_price,
                 'discount_percentage' => $product->f_discount_percent,
@@ -546,9 +701,10 @@ class ProductController extends Controller
                 'product_category' => $product->f_category,
                 'brand' => $product->f_brand,
                 'on_sale' => $product->f_onsale,
+                'erp_stock' => $product->stock_source,
                 'status' => $product->f_status,
                 'featured' => $product->f_featured,
-                'erp_stock' => $product->stock_source,
+                'is_new_item' => $is_new_item
             ];
         }
 
@@ -574,6 +730,7 @@ class ProductController extends Controller
             ->where('b.item_code', $details->f_idcode)
             ->get();
 
+        $bundle_items = DB::table('fumaco_product_bundle_item')->where('parent_item_code', $details->f_idcode)->orderBy('idx', 'asc')->get();
         $related_products = [];
         foreach($related_products_query as $row) {
             $image = DB::table('fumaco_items_image_v1')->where('idcode', $row->related_item_code)->first();
@@ -587,7 +744,11 @@ class ProductController extends Controller
             ];
         }
 
-        return view('backend.products.view', compact('details', 'item_categories', 'attributes', 'item_image', 'related_products'));
+        if($details->f_item_type == 'product_bundle') {
+            return view('backend.products.view_bundle', compact('details', 'item_categories', 'attributes', 'item_image', 'related_products', 'bundle_items'));    
+        }
+
+        return view('backend.products.view', compact('details', 'item_categories', 'attributes', 'item_image', 'related_products', 'bundle_items'));
     }
 
     public function viewCategoryAttr(Request $request) {
@@ -600,6 +761,574 @@ class ProductController extends Controller
         }
 
         return view('backend.products.category_attribute_settings', compact('list', 'attributes'));
+    }
+
+
+    public function voucherList(Request $request){
+        $coupon = DB::table('fumaco_voucher')
+            ->whereDate('validity_date_end', '>=', Carbon::now()->endOfDay())
+            ->orWhereNull('validity_date_start')
+            ->where('name', 'LIKE', '%'.$request->q.'%')->orderBy('created_at', 'desc')->paginate(10);
+
+        $invalid_coupon = DB::table('fumaco_voucher')
+            ->whereRaw('total_consumed >= total_allotment')
+            ->orWhereRaw('total_allotment != null')
+            ->orWhereDate('validity_date_end', '<', Carbon::now()->endOfDay())
+            ->where('name', 'LIKE', '%'.$request->expired_q.'%')->orderBy('created_at', 'desc')->paginate(10);
+
+        return view('backend.marketing.list_voucher', compact('coupon', 'invalid_coupon'));
+    }
+
+    public function onSaleList(Request $request){
+        $on_sale = DB::table('fumaco_on_sale')->where('sale_name', 'LIKE', '%'.$request->q.'%')->paginate(10);
+        $sale_arr = [];
+        foreach($on_sale as $sale){
+            $categories_arr = [];
+            if($sale->discount_for == 'Per Category'){
+                $sale_categories = DB::table('fumaco_on_sale_categories as sc')->join('fumaco_categories as c', 'sc.category_id', 'c.id')->where('sc.sale_id', $sale->id)
+                    ->select('c.id', 'c.name', 'sc.discount_type', 'sc.discount_rate', 'sc.capped_amount', 'sc.sale_id')->get();
+                
+                foreach($sale_categories as $category){
+                    $categories_arr[] = [
+                        'sale_id' => $category->sale_id,
+                        'category_id' => $category->id,
+                        'category_name' => $category->name,
+                        'discount_type' => $category->discount_type,
+                        'discount_rate' => $category->discount_rate,
+                        'capped_amount' => $category->capped_amount
+                    ];
+                }
+            }
+
+            $sale_duration = null;
+
+            if($sale->start_date and $sale->end_date){
+                $sale_duration = Carbon::parse($sale->start_date)->format('M d, Y').' - '.Carbon::parse($sale->end_date)->format('M d, Y');
+            }
+            
+            $sale_arr[] = [
+                'id' => $sale->id,
+                'name' => $sale->sale_name,
+                'banner' => $sale->banner_image,
+                'discount_type' => $sale->discount_type,
+                'discount_rate' => $sale->discount_rate,
+                'capped_amount' => $sale->capped_amount,
+                'discount_for' => $sale->discount_for,
+                'categories' => $categories_arr,
+                'sale_duration' => $sale_duration,
+                'status' => $sale->status
+            ];
+        }
+
+        // return $sale_arr;
+
+        return view('backend.marketing.list_sale', compact('on_sale', 'sale_arr'));
+    }
+
+    public function addOnsaleForm(){
+        $categories = DB::table('fumaco_categories')->where('publish', 1)->where('external_link', null)->get();
+
+        return view('backend.marketing.add_onsale', compact('categories'));
+    }
+
+    public function editOnsaleForm($id){
+        $on_sale = DB::table('fumaco_on_sale')->where('id', $id)->first();
+
+        $categories = DB::table('fumaco_categories')->where('publish', 1)->where('external_link', null)->get();
+
+        $discounted_categories = DB::table('fumaco_on_sale_categories as sc')->join('fumaco_categories as c', 'sc.category_id', 'c.id')->where('sc.sale_id', $id)
+            ->select('c.id', 'c.name', 'sc.discount_type', 'sc.discount_rate', 'sc.capped_amount', 'sc.sale_id')->get();
+
+        return view('backend.marketing.edit_onsale', compact('on_sale', 'categories', 'discounted_categories'));
+    }
+
+    public function editVoucherForm($id){
+        $coupon = DB::table('fumaco_voucher')->where('id', $id)->first();
+        
+        $customer_list = DB::table('fumaco_users')->where('is_email_verified', 1)->get();
+
+        $gift_card_customers = DB::table('fumaco_voucher_customers')->where('voucher_id', $id)->get();
+
+        return view('backend.marketing.edit_voucher', compact('customer_list', 'coupon', 'gift_card_customers'));
+    }
+
+    public function setOnSaleStatus(Request $request){
+        DB::beginTransaction();
+        try {
+            DB::table('fumaco_on_sale')->where('id', $request->sale_id)->update(['status' => $request->status]);
+            DB::commit();
+            return response()->json(['status' => 1]);
+        } catch (Exception $e) {
+            DB::rollback();
+            return redirect()->back()->with('error', 'An error occured. Please try again.');
+        }
+    }
+
+    public function addVoucherForm(){
+        $customer_list = DB::table('fumaco_users')->where('is_email_verified', 1)->get();
+        return view('backend.marketing.add_voucher', compact('customer_list'));
+    }
+
+    public function addVoucher(Request $request){
+        DB::beginTransaction();
+        try {
+            // return $request->all();
+            $rules = array(
+				'name' => 'required|unique:fumaco_voucher,name',
+                'coupon_code' => 'required|unique:fumaco_voucher,code'
+			);
+
+			$validation = Validator::make($request->all(), $rules);
+
+            if ($validation->fails()){
+				return redirect()->back()->with('error', "Voucher Name/Code must be unique.");
+			}
+
+            if(!strip_tags($request->coupon_description)){
+                return redirect()->back()->with('error', 'Coupon description cannot be empty');
+            }
+
+            $start = null;
+            $end = null;
+            if(isset($request->require_validity)){
+                $date = explode(' - ', $request->validity);
+                $start = Carbon::parse($date[0])->format('Y/m/d');
+                $end = Carbon::parse($date[1])->format('Y/m/d');
+            }
+
+            $discount_rate = null;
+            $capped_amount = null;
+
+            if($request->discount_type == 'By Percentage'){
+                $discount_rate = $request->discount_percentage;
+                $capped_amount = $request->capped_amount;
+            }else if($request->discount_type == 'Fixed Amount'){
+                $discount_rate = $request->discount_amount;
+            }
+
+            $require_signin = 1;
+            if($request->coupon_type == 'Promotional'){
+                $require_signin = isset($request->require_signin) ? 1 : 0;
+            }
+
+            $insert = [
+                'name' => $request->name,
+                'code' => strtoupper($request->coupon_code),
+                'total_allotment' => isset($request->unlimited_allotment) ? null : $request->allotment,
+                'unlimited' => isset($request->unlimited_allotment) ? 1 : 0,
+                'minimum_spend' => $request->minimum_spend,
+                'discount_type' => $request->discount_type,
+                'discount_rate' => $discount_rate,
+                'capped_amount' => $capped_amount,
+                'coupon_type' => $request->coupon_type,
+                'description' => $request->coupon_description,
+                'require_signin' => $require_signin,
+                'validity_date_start' => $start,
+                'validity_date_end' => $end,
+                'remarks' => $request->remarks,
+                'created_by' => Auth::user()->username
+            ];
+
+            // return $insert;
+            DB::table('fumaco_voucher')->insert($insert);
+
+            if($request->coupon_type == 'Gift Card'){
+                $voucher_id = DB::table('fumaco_voucher')->orderBy('created_at', 'desc')->first();
+                foreach($request->selected_customer as $key => $customer){
+                    DB::table('fumaco_voucher_customers')->insert([
+                        'customer_id' => $customer,
+                        'voucher_id' => $voucher_id->id,
+                        'allowed_usage' => $request->customer_allowed_usage[$key],
+                        'created_by' => Auth::user()->username
+                    ]);
+                }
+            }
+
+            DB::commit();
+            return redirect('/admin/marketing/voucher/list')->with('success', 'Voucher Added!');
+        } catch (Exception $e) {
+            DB::rollback();
+            return redirect()->back()->with('error', 'An error occured. Please try again.');
+        }
+    }
+
+    public function editVoucher($id, Request $request){
+        DB::beginTransaction();
+        try {
+            // return $request->all();
+            $name_checker = DB::table('fumaco_voucher')->where('name', $request->name)->where('id', '!=', $id)->first();
+            $code_checker = DB::table('fumaco_voucher')->where('code', $request->coupon_code)->where('id', '!=', $id)->first();
+
+            if($name_checker or $code_checker){
+				return redirect()->back()->with('error', "Voucher Name/Code must be unique.");
+            }
+
+            if(!strip_tags($request->coupon_description)){
+                return redirect()->back()->with('error', 'Coupon description cannot be empty');
+            }
+
+            $start = null;
+            $end = null;
+            if(isset($request->require_validity)){
+                $date = explode(' - ', $request->validity);
+                $start = Carbon::parse($date[0])->format('Y/m/d');
+                $end = Carbon::parse($date[1])->format('Y/m/d');
+            }
+            $discount_rate = null;
+            $capped_amount = null;
+
+            if($request->discount_type == 'By Percentage'){
+                $discount_rate = $request->discount_percentage;
+                $capped_amount = $request->capped_amount;
+            }else if($request->discount_type == 'Fixed Amount'){
+                $discount_rate = $request->discount_amount;
+            }
+
+            $require_signin = 1;
+            if($request->coupon_type == 'Promotional'){
+                $require_signin = isset($request->require_signin) ? 1 : 0;
+            }
+
+            $update = [
+                'name' => $request->name,
+                'code' => strtoupper($request->coupon_code),
+                'total_allotment' => isset($request->unlimited_allotment) ? null : $request->allotment,
+                'unlimited' => isset($request->unlimited_allotment) ? 1 : 0,
+                'minimum_spend' => $request->minimum_spend,
+                'discount_type' => $request->discount_type,
+                'discount_rate' => $discount_rate,
+                'capped_amount' => $capped_amount,
+                'coupon_type' => $request->coupon_type,
+                'description' => $request->coupon_description,
+                'require_signin' => $require_signin,
+                'validity_date_start' => $start,
+                'validity_date_end' => $end,
+                'remarks' => $request->remarks,
+                'last_modified_by' => Auth::user()->username
+            ];
+            // return $update;
+
+            DB::table('fumaco_voucher')->where('id', $id)->update($update);
+            
+            if($request->coupon_type == 'Gift Card'){
+                $last_modified_by = null;
+                $checker = DB::table('fumaco_voucher_customers')->where('voucher_id', $id)->count();
+    
+                if ($checker > 0){
+                    $last_modified_by = Auth::user()->username;
+                }
+
+                DB::table('fumaco_voucher_customers')->where('voucher_id', $id)->delete();
+                foreach($request->selected_customer as $key => $customer){
+                    DB::table('fumaco_voucher_customers')->insert([
+                        'customer_id' => $customer,
+                        'voucher_id' => $id,
+                        'allowed_usage' => $request->customer_allowed_usage[$key],
+                        'created_by' => Auth::user()->username,
+                        'last_modified_by' => $last_modified_by
+                    ]);
+                }
+            }
+            
+            DB::commit();
+            return redirect('/admin/marketing/voucher/list')->with('success', 'Voucher Edited!');
+        } catch (Exception $e) {
+            DB::rollback();
+            return redirect()->back()->with('error', 'An error occured. Please try again.');
+        }
+    }
+
+    public function addOnSale(Request $request){
+        DB::beginTransaction();
+        try {
+            // return $request->all();
+            $from = null;
+            $to = null;
+            $discount_rate = null;
+            $capped_amount = null;
+
+            if(isset($request->set_duration)){
+                $sale_duration = explode(' - ', $request->sale_duration);
+
+                $from = date('Y-m-d', strtotime($sale_duration[0]));
+                $to = date('Y-m-d', strtotime($sale_duration[1]));
+
+                // check if date overlaps with other "On Sale"
+                $date_check = DB::table('fumaco_on_sale')->where('start_date', '!=', '')->where('end_date', '!=', '')->get();
+                foreach($date_check as $date){
+                    if($from >= $date->start_date and $from <= $date->end_date){
+                        return redirect()->back()->with('error', 'On Sale dates cannot overlap');
+                    }
+
+                    if($to >= $date->start_date and $to <= $date->end_date){
+                        return redirect()->back()->with('error', 'On Sale dates cannot overlap');
+                    }
+                }
+
+            }
+            
+            if($request->discount_for == 'All Items'){
+                if($request->discount_type == 'Fixed Amount'){
+                    $discount_rate = $request->discount_amount;
+                }else if($request->discount_type == 'By Percentage'){
+                    $discount_rate = $request->discount_percentage;
+                    $capped_amount = $request->capped_amount;
+                }
+            }
+
+            $insert = [
+                'sale_name' => $request->sale_name,
+                'start_date' => $from,
+                'end_date' => $to,
+                'discount_type' => $request->discount_type,
+                'discount_rate' => $discount_rate,
+                'capped_amount' => $capped_amount,
+                'discount_for' => $request->discount_for,
+                'created_by' => Auth::user()->username
+            ];
+
+            // return $insert;
+
+            // Image upload
+            $rules = array(
+				'uploadFile' => 'image|max:500000'
+			);
+
+			$validation = Validator::make($request->all(), $rules);
+
+            if ($validation->fails()){
+				return redirect()->back()->with('error', "Sorry, your file is too large.");
+			}
+
+            $allowed_extensions = array('jpg', 'png', 'jpeg', 'gif');
+            $extension_error = "Sorry, only JPG, JPEG, PNG and GIF files are allowed.";
+
+            $destinationPath = public_path('/assets/site-img/');
+
+            if($request->hasFile('banner_img')){
+                $banner_img = $request->file('banner_img');
+
+                $img_name = pathinfo($banner_img->getClientOriginalName(), PATHINFO_FILENAME);
+			    $img_ext = pathinfo($banner_img->getClientOriginalName(), PATHINFO_EXTENSION);
+
+                $img_name = Str::slug($img_name, '-');
+
+                $banner_image_name = $img_name.".".$img_ext;
+
+                if(!in_array($img_ext, $allowed_extensions)){
+                    return redirect()->back()->with('image_error', $extension_error);
+                }
+
+                $webp_pr = Webp::make($banner_img);
+
+                if($webp_pr->save(public_path('/assets/site-img/'.$img_name.'.webp'))) {
+                    $banner_img->move($destinationPath, $banner_image_name);
+                }
+
+                $insert['banner_image'] = $banner_image_name;
+            }
+
+            DB::table('fumaco_on_sale')->insert($insert);
+
+            if($request->discount_for == 'Per Category'){
+                $sale_id = DB::table('fumaco_on_sale')->orderBy('id', 'desc')->first();
+                foreach($request->selected_category as $key => $category){
+                    $category_discount_rate = 0;
+                    $category_capped_amount = 0;
+
+                    if($request->selected_discount_type[$key] == 'By Percentage'){
+                        $category_discount_rate = $request->category_discount_rate[$key];
+                        $category_capped_amount = $request->category_capped_amount[$key];
+                    }else if($request->selected_discount_type[$key] == 'Fixed Amount'){
+                        $category_discount_rate = $request->category_discount_rate[$key];
+                    }
+
+                    DB::table('fumaco_on_sale_categories')->insert([
+                        'sale_id' => $sale_id->id,
+                        'category_id' => $category,
+                        'discount_type' => $request->selected_discount_type[$key],
+                        'discount_rate' => $category_discount_rate,
+                        'capped_amount' => $category_capped_amount,
+                        'created_by' => Auth::user()->username
+                    ]);
+                }
+            }
+
+            DB::commit();
+            return redirect('/admin/marketing/on_sale/list')->with('success', 'On Sale Added.');
+        } catch (Exception $e) {
+            DB::rollback();
+            return redirect()->back()->with('error', 'An error occured. Please try again.');
+        }
+    }
+
+    public function editOnSale($id, Request $request){
+        DB::beginTransaction();
+        try {
+            $from = null;
+            $to = null;
+            $discount_rate = null;
+            $capped_amount = null;
+
+            if(isset($request->set_duration)){
+                $sale_duration = explode(' - ', $request->sale_duration);
+
+                $from = date('Y-m-d', strtotime($sale_duration[0]));
+                $to = date('Y-m-d', strtotime($sale_duration[1]));
+
+                // check if date overlaps with other "On Sale"
+                $date_check = DB::table('fumaco_on_sale')->where('id', '!=', $id)->where('start_date', '!=', '')->where('end_date', '!=', '')->get();
+                foreach($date_check as $date){
+                    if($from >= $date->start_date and $from <= $date->end_date){
+                        return redirect()->back()->with('error', 'On Sale dates cannot overlap');
+                    }
+
+                    if($to >= $date->start_date and $to <= $date->end_date){
+                        return redirect()->back()->with('error', 'On Sale dates cannot overlap');
+                    }
+                }
+            }            
+
+            if($request->discount_for == 'All Items'){
+                DB::table('fumaco_on_sale_categories')->where('sale_id', $id)->delete(); // if sale is from per category to all items
+
+                if($request->discount_type == 'Fixed Amount'){
+                    $discount_rate = $request->discount_amount;
+                }else if($request->discount_type == 'By Percentage'){
+                    $discount_rate = $request->discount_percentage;
+                    $capped_amount = $request->capped_amount;
+                }
+            }
+
+            $update = [
+                'sale_name' => $request->sale_name,
+                'start_date' => $from,
+                'end_date' => $to,
+                'discount_type' => $request->discount_type,
+                'discount_rate' => $discount_rate,
+                'capped_amount' => $capped_amount,
+                'discount_for' => $request->discount_for,
+                'last_modified_at' => Carbon::now()->toDateTimeString(),
+                'last_modified_by' => Auth::user()->username
+            ];
+
+            // Image upload
+            $rules = array(
+				'uploadFile' => 'image|max:500000'
+			);
+
+			$validation = Validator::make($request->all(), $rules);
+
+            if ($validation->fails()){
+				return redirect()->back()->with('error', "Sorry, your file is too large.");
+			}
+
+            $allowed_extensions = array('jpg', 'png', 'jpeg', 'gif');
+            $extension_error = "Sorry, only JPG, JPEG, PNG and GIF files are allowed.";
+
+            $destinationPath = public_path('/assets/site-img/');
+
+            if($request->hasFile('banner_img')){
+                $banner_img = $request->file('banner_img');
+
+                $img_name = pathinfo($banner_img->getClientOriginalName(), PATHINFO_FILENAME);
+			    $img_ext = pathinfo($banner_img->getClientOriginalName(), PATHINFO_EXTENSION);
+
+                $img_name = Str::slug($img_name, '-');
+
+                $banner_image_name = $img_name.".".$img_ext;
+
+                if(!in_array($img_ext, $allowed_extensions)){
+                    return redirect()->back()->with('image_error', $extension_error);
+                }
+
+                $webp_pr = Webp::make($banner_img);
+
+                if($webp_pr->save(public_path('/assets/site-img/'.$img_name.'.webp'))) {
+                    $banner_img->move($destinationPath, $banner_image_name);
+                }
+
+                $update['banner_image'] = $banner_image_name;
+            }
+
+            DB::table('fumaco_on_sale')->where('id', $id)->update($update);
+
+            if($request->discount_for == 'Per Category'){
+                $last_modified_by = null;
+                $checker = DB::table('fumaco_on_sale_categories')->where('sale_id', $id)->count();
+
+                if($checker > 0){
+                    $last_modified_by = Auth::user()->username;
+                }
+                DB::table('fumaco_on_sale_categories')->where('sale_id', $id)->delete();
+                foreach($request->selected_category as $key => $category){
+                    $category_discount_rate = 0;
+                    $category_capped_amount = 0;
+
+                    if($request->selected_discount_type[$key] == 'By Percentage'){
+                        $category_discount_rate = $request->category_discount_rate[$key];
+                        $category_capped_amount = $request->category_capped_amount[$key];
+                    }else if($request->selected_discount_type[$key] == 'Fixed Amount'){
+                        $category_discount_rate = $request->category_discount_rate[$key];
+                    }
+
+                    DB::table('fumaco_on_sale_categories')->insert([
+                        'sale_id' => $id,
+                        'category_id' => $category,
+                        'discount_type' => $request->selected_discount_type[$key],
+                        'discount_rate' => $category_discount_rate,
+                        'capped_amount' => $category_capped_amount,
+                        'created_by' => Auth::user()->username,
+                        'last_modified_by' => $last_modified_by
+                    ]);
+                }
+            }
+            // return $update;
+            DB::commit();
+            return redirect('/admin/marketing/on_sale/list')->with('success', 'On Sale Added.');
+        } catch (Exception $e) {
+            DB::rollback();
+            return redirect()->back()->with('error', 'An error occured. Please try again.');
+        }
+    }
+
+    public function removeOnSale($id){
+        DB::beginTransaction();
+        try {
+            $image_to_delete = DB::table('fumaco_on_sale')->Where('id', $id)->first();
+
+            if($image_to_delete->banner_image){
+                $image_name = explode('.', $image_to_delete->banner_image);
+                if(file_exists(public_path('/assets/site-img/'.$image_to_delete->banner_image))){
+                    unlink(public_path('/assets/site-img/'.$image_to_delete->banner_image));
+                }
+    
+                if(file_exists(public_path('/assets/site-img/'.$image_name[0].'.webp'))){
+                    unlink(public_path('/assets/site-img/'.$image_name[0].'.webp'));
+                }
+            }            
+
+            DB::table('fumaco_on_sale')->where('id', $id)->delete();
+            DB::table('fumaco_on_sale_categories')->where('sale_id', $id)->delete();
+            DB::commit();
+            return redirect()->back()->with('success', 'On Sale Deleted.');
+        } catch (Exception $e) {
+            DB::rollback();
+            return redirect()->back()->with('error', 'An error occured. Please try again.');
+        }
+    }
+
+    public function removeVoucher($id){
+        DB::beginTransaction();
+        try {
+            DB::table('fumaco_voucher')->where('id', $id)->delete();
+            DB::table('fumaco_voucher_customers')->where('voucher_id', $id)->delete();
+            DB::commit();
+            return redirect()->back()->with('success', 'Coupon Deleted.');
+        } catch (Exception $e) {
+            DB::rollback();
+            return redirect()->back()->with('error', 'An error occured. Please try again.');
+        }
     }
 
     // update parent variant attribute status
@@ -627,7 +1356,9 @@ class ProductController extends Controller
     public function uploadImagesForm($id){
         $details = DB::table('fumaco_items')->where('id', $id)->first();
         
-        $item_image = DB::table('fumaco_items_image_v1')->where('idcode', $details->f_idcode)->get();
+        $image_query = DB::table('fumaco_items_image_v1')->where('idcode', $details->f_idcode)->get();
+        
+        $item_image = collect($image_query)->where('promotion_img', 0);
 
         $img_arr = [];
         foreach($item_image as $img){
@@ -636,47 +1367,67 @@ class ProductController extends Controller
 
             $img_arr[] = [
                 'img_id' => $img->id,
-                'item_code' => $img->idcode,
+                // 'item_code' => $img->idcode,
                 'item_name' => $details->f_name_name,
                 'primary' => $img_primary,
                 'zoom' => $img_zoom 
             ];
         }
 
-        return view('backend.products.images', compact('img_arr', 'details'));
+        $promo_image = collect($image_query)->where('promotion_img', 1);
+
+        $promo_arr = [];
+        if($promo_image){
+            foreach($promo_image as $promo){
+                $promo_img = $promo->imgoriginalx ? $promo->imgoriginalx : null;
+                $promo_arr[] = [
+                    'img_id' => $promo->id,
+                    // 'item_code' => $promo->idcode,
+                    'item_name' => $details->f_name_name,
+                    'zoom' => $promo_img 
+                ];
+            }
+        }
+
+        return view('backend.products.images', compact('img_arr', 'promo_arr', 'details'));
     }
 
-    public function deleteProductImage(Request $request){
+    public function deleteProductImage($id, $social = null){
         DB::beginTransaction();
 		try{
-            $img = DB::table('fumaco_items_image_v1')->where('id', $request->img_id)->first();
+            $img = DB::table('fumaco_items_image_v1')->where('id', $id)->first();
 
             $primary_img = explode(".", $img->imgprimayx)[0];
             $original_img = explode(".", $img->imgoriginalx)[0];
 
-            $primary = storage_path('/app/public/item_images/'.$img->idcode.'/gallery/preview/') . $img->imgprimayx;
-            $original = storage_path('/app/public/item_images/'.$img->idcode.'/gallery/original/') . $img->imgoriginalx;
+            if($social){
+                $original = storage_path('/app/public/item_images/'.$img->idcode.'/gallery/original/'.$img->imgoriginalx);
+                $original_webp = storage_path('/app/public/item_images/'.$img->idcode.'/gallery/original/'.$original_img.'.webp');    
+            }else{
+                $primary = storage_path('/app/public/item_images/'.$img->idcode.'/gallery/preview/'.$img->imgprimayx);
+                $original = storage_path('/app/public/item_images/'.$img->idcode.'/gallery/original/'.$img->imgoriginalx);
 
-            $primary_webp = storage_path('/app/public/item_images/'.$img->idcode.'/gallery/preview/') . $primary_img .'.webp';
-            $original_webp = storage_path('/app/public/item_images/'.$img->idcode.'/gallery/original/') . $original_img .'.webp';
-   
-			if (file_exists($primary)) {
-				unlink($primary);
-			}
+                $primary_webp = storage_path('/app/public/item_images/'.$img->idcode.'/gallery/preview/'.$primary_img.'.webp');
+                $original_webp = storage_path('/app/public/item_images/'.$img->idcode.'/gallery/original/'.$original_img.'.webp');
+
+                if (file_exists($primary)) {
+                    unlink($primary);
+                }
+
+                if (file_exists($primary_webp)) {
+                    unlink($primary_webp);
+                }
+            }
 
             if (file_exists($original)) {
-				unlink($original);
-			}
+                unlink($original);
+            }
 
-            if (file_exists($primary_webp)) {
-				unlink($primary_webp);
-			}
-
-			if (file_exists($original_webp)) {
-				unlink($original_webp);
-			}
-
-            DB::table('fumaco_items_image_v1')->where('id', $request->img_id)->delete();
+            if (file_exists($original_webp)) {
+                unlink($original_webp);
+            }
+            
+            DB::table('fumaco_items_image_v1')->where('id', $id)->delete();
 
             DB::commit();
 			return redirect()->back()->with('success', 'Media Successfully Deleted');
@@ -691,69 +1442,129 @@ class ProductController extends Controller
 		try{
 			$checker = DB::table('fumaco_items_image_v1')->where('idcode', $request->item_code)->get();
 
-			$img_primary = $request->file('img_primary'); //400
-			$img_zoom = $request->file('img_zoom');//1024
+            $image_error = '';
 
-			$p_filename = pathinfo($img_primary->getClientOriginalName(), PATHINFO_FILENAME);//400
-			$z_filename = pathinfo($img_zoom->getClientOriginalName(), PATHINFO_FILENAME);//1024
-			$p_extension = pathinfo($img_primary->getClientOriginalName(), PATHINFO_EXTENSION);//400
-			$z_extension = pathinfo($img_zoom->getClientOriginalName(), PATHINFO_EXTENSION);//1024
+            $item_code = $request->item_code;
 
-            $p_filename = Str::slug($p_filename, '-');
-            $z_filename = Str::slug($z_filename, '-');
-
-			$p_name = $p_filename.".".$p_extension;//400
-			$z_name = $z_filename.".".$z_extension;//1024
-
-			$image_error = '';
-			$rules = array(
+            $rules = array(
 				'uploadFile' => 'image|max:500000'
 			);
 
 			$validation = Validator::make($request->all(), $rules);
 
-			if ($validation->fails()){
-				$image_error = "Sorry, your file is too large.";
-				return redirect()->back()->with('image_error', $image_error);
+            if ($validation->fails()){
+				$error = "Sorry, your file is too large.";
+				return redirect()->back()->with('error', $error);
 			}
 
-			if($p_extension != "jpg" and $p_extension != "png" and $p_extension != "jpeg" and $p_extension != "gif"){
-				$image_error = "Sorry, only JPG, JPEG, PNG, and GIF files are allowed.";
-				return redirect()->back()->with('image_error', $image_error);
-			}
+            $allowed_extensions = array('jpg', 'png', 'jpeg', 'gif');
+            $extension_error = "Sorry, only JPG, JPEG, PNG and GIF files are allowed.";
 
-			foreach($checker as $c){
-				if($c->imgprimayx == $p_name){
-					$image_error = "Sorry, file already exists.";
-					return redirect()->back()->with('image_error', $image_error);
-				}
-                if($c->imgoriginalx == $z_name){
-                    $image_error = "Sorry, file already exists.";
-					return redirect()->back()->with('image_error', $image_error);
+            $origImgPath = storage_path('/app/public/item_images/'.$item_code.'/gallery/original/'); // on sale
+            $prevImgPath = storage_path('/app/public/item_images/'.$item_code.'/gallery/preview/'); // on sale
+
+            if($request->hasFile('img_zoom')){
+                if(!$request->hasFile('img_primary')){
+                    return redirect()->back()->with('error', 'Zoom/Preview Image cannot be empty');
                 }
-			}
+                $img_primary = $request->file('img_primary'); //400
+                $img_zoom = $request->file('img_zoom');//1024
+    
+                $p_filename = pathinfo($img_primary->getClientOriginalName(), PATHINFO_FILENAME);//400
+                $z_filename = pathinfo($img_zoom->getClientOriginalName(), PATHINFO_FILENAME);//1024
+                $p_extension = pathinfo($img_primary->getClientOriginalName(), PATHINFO_EXTENSION);//400
+                $z_extension = pathinfo($img_zoom->getClientOriginalName(), PATHINFO_EXTENSION);//1024
+    
+                $p_filename = Str::slug($p_filename, '-');
+                $z_filename = Str::slug($z_filename, '-');
+    
+                $p_name = $p_filename.".".$p_extension;//400
+                $z_name = $z_filename.".".$z_extension;//1024
+    
+                if(!in_array($p_extension, $allowed_extensions) or !in_array($z_extension, $allowed_extensions)){
+                    $image_error = "Sorry, only JPG, JPEG, PNG, and GIF files are allowed.";
+                    return redirect()->back()->with('image_error', $image_error);
+                }
+    
+                foreach($checker as $c){
+                    if($c->imgprimayx == $p_name){
+                        $image_error = "Sorry, file already exists.";
+                        return redirect()->back()->with('image_error', $image_error);
+                    }
+                    if($c->imgoriginalx == $z_name){
+                        $image_error = "Sorry, file already exists.";
+                        return redirect()->back()->with('image_error', $image_error);
+                    }
+                }
+    
+                $folder_name = 'public/item_images/'.$item_code.'/gallery/';
+                $img_primary->storeAs($folder_name . 'preview', $p_name); // 400px
+                $img_zoom->storeAs($folder_name . 'original', $z_name); // 1024px
+    
+                $webp_primary = Webp::make($request->file('img_primary'));
+                $webp_zoom = Webp::make($request->file('img_zoom'));
+    
+                $webp_primary->save(storage_path('/app/' .$folder_name . 'preview/') . $p_filename  .'.webp');
+                $webp_zoom->save(storage_path('/app/' .$folder_name . 'original/') . $z_filename .'.webp');
+            
+                $images_arr = [
+                    'idcode' => $item_code,
+                    'img_name' => $p_filename,
+                    'imgprimayx' => $p_name,
+                    'imgoriginalx' => $z_name,
+                    'img_status' => 1,
+                    'created_by' => Auth::user()->username,
+                ];
+    
+                DB::table('fumaco_items_image_v1')->insert($images_arr);
+            }
 
-            $folder_name = 'public/item_images/'.$request->item_code.'/gallery/';
-            $img_primary->storeAs($folder_name . 'preview', $p_name); // 400px
-			$img_zoom->storeAs($folder_name . 'original', $z_name); // 1024px
+            if($request->hasFile('promotion_image')){
+                $social_image = $request->file('promotion_image');
 
-            $webp_primary = Webp::make($request->file('img_primary'));
-            $webp_zoom = Webp::make($request->file('img_zoom'));
+                $image_name = pathinfo($social_image->getClientOriginalName(), PATHINFO_FILENAME);
+			    $image_ext = pathinfo($social_image->getClientOriginalName(), PATHINFO_EXTENSION);
 
-			$webp_primary->save(storage_path('/app/' .$folder_name . 'preview/') . $p_filename  .'.webp');
-            $webp_zoom->save(storage_path('/app/' .$folder_name . 'original/') . $z_filename .'.webp');
-		
-			$images_arr[] = [
-				'idcode' => $request->item_code,
-                'imgnum' => " ",
-                'img_name' => " ",
-                'imgprimayx' => $p_name,
-                'imgoriginalx' => $z_name,
-                'img_status' => 1,
-                'created_by' => Auth::user()->username,
-			];
+                $image_name = Str::slug($image_name, '-');
+                
+                $social_image_name = $image_name.".".$image_ext;
 
-            DB::table('fumaco_items_image_v1')->insert($images_arr);
+                $checker = collect($checker)->where('promotion_img', 1);
+
+                foreach($checker as $c){
+                    if($c->imgoriginalx == $social_image_name){
+                        $image_error = "Sorry, file already exists.";
+                        return redirect()->back()->with('image_error', $image_error);
+                    }
+                }
+
+                if(!in_array($image_ext, $allowed_extensions)){
+                    return redirect()->back()->with('image_error', $extension_error);
+                }
+
+                $webp = Webp::make($request->file('promotion_image'));
+
+                if(!Storage::disk('public')->exists('/item_images/'.$item_code.'/gallery/social/')){
+                    Storage::disk('public')->makeDirectory('/item_images/'.$item_code.'/gallery/social/');
+                }
+
+                $destinationPath = storage_path('/app/public/item_images/'.$item_code.'/gallery/social/');
+
+                if ($webp->save(storage_path('/app/public/item_images/'.$item_code.'/gallery/social/'.$image_name.'.webp'))) {
+                    $social_image->move($destinationPath, $social_image_name);
+                }
+
+                $insert = [
+                    'idcode' => $item_code,
+                    'img_name' => $social_image_name,
+                    'imgoriginalx' => $social_image_name,
+                    'promotion_img' => 1,
+                    'img_status' => 1,
+                    'created_by' => Auth::user()->username
+                ];
+                
+                DB::table('fumaco_items_image_v1')->insert($insert);
+            }
 
             DB::commit();
 
@@ -840,29 +1651,104 @@ class ProductController extends Controller
     public function setProductOnSale($item_code, Request $request) {
         DB::beginTransaction();
         try {
-            $discount_percentage = $request->discount_percentage;
-            if (!$discount_percentage && $discount_percentage <= 0) {
-                return redirect()->back()->with('error', 'Discount percentage cannot be less than or equal to zero.');
-            }
-            
-            $item = DB::table('fumaco_items')->where('f_idcode', $item_code)->first();
-            if (!$item) {
-                return redirect()->back()->with('error', 'Product not found.');
-            }
+            // $success_msg = 'Image Uploaded';
+            // if(!isset($request->on_sale_enabled)){ // If adding images, ignore if Product is already "On Sale"
+                $discount_percentage = $request->discount_percentage;
+                if (!$discount_percentage && $discount_percentage <= 0) {
+                    return redirect()->back()->with('error', 'Discount percentage cannot be less than or equal to zero.');
+                }
+                
+                $item = DB::table('fumaco_items')->where('f_idcode', $item_code)->first();
+                if (!$item) {
+                    return redirect()->back()->with('error', 'Product not found.');
+                }
+    
+                $discounted_price = $item->f_original_price - ($item->f_original_price * $discount_percentage / 100);
+    
+                DB::table('fumaco_items')->where('f_idcode', $item_code)->update([
+                    'f_price' => $discounted_price,
+                    'f_onsale' => 1,
+                    'f_discount_percent' => $discount_percentage,
+                    'f_discount_trigger' => 1,
+                    'last_modified_by' => Auth::user()->username,
+                ]);
 
-            $discounted_price = $item->f_original_price - ($item->f_original_price * $discount_percentage / 100);
+                $success_msg = 'Product has been set "On Sale".';
+            // }
 
-            DB::table('fumaco_items')->where('f_idcode', $item_code)->update([
-                'f_price' => $discounted_price,
-                'f_onsale' => 1,
-                'f_discount_percent' => $discount_percentage,
-                'f_discount_trigger' => 1,
-                'last_modified_by' => Auth::user()->username,
-            ]);
+            // Adding On sale images
+
+            // $rules = array(
+			// 	'uploadFile' => 'image|max:500000'
+			// );
+
+			// $validation = Validator::make($request->all(), $rules);
+
+            // if ($validation->fails()){
+			// 	$error = "Sorry, your file is too large.";
+			// 	return redirect()->back()->with('error', $error);
+			// }
+
+            // $allowed_extensions = array('jpg', 'png', 'jpeg', 'gif');
+            // $extension_error = "Sorry, only JPG, JPEG, PNG and GIF files are allowed.";
+
+            // $origImgPath = storage_path('/app/public/item_images/'.$item_code.'/gallery/original/'); // on sale
+            // $prevImgPath = storage_path('/app/public/item_images/'.$item_code.'/gallery/preview/'); // on sale
+
+            // if($request->hasFile('on_sale_img_zoom')){
+            //     $img_sale = $request->file('on_sale_img_zoom');
+            //     $img_sale_prev = $request->file('on_sale_img_primary');
+
+            //     $onsale_primary_name = pathinfo($img_sale->getClientOriginalName(), PATHINFO_FILENAME);
+			//     $onsale_primary_ext = pathinfo($img_sale->getClientOriginalName(), PATHINFO_EXTENSION);
+
+            //     $onsale_zoom_name = pathinfo($img_sale_prev->getClientOriginalName(), PATHINFO_FILENAME);
+			//     $onsale_zoom_ext = pathinfo($img_sale_prev->getClientOriginalName(), PATHINFO_EXTENSION);
+
+            //     $onsale_primary_name = Str::slug($onsale_primary_name, '-');
+            //     $onsale_zoom_name = Str::slug($onsale_zoom_name, '-');
+
+            //     $sale_image_name_small = $onsale_primary_name.".".$onsale_primary_ext;
+            //     $sale_image_name_big = $onsale_zoom_name.".".$onsale_zoom_ext;
+
+            //     $zoom_checker = DB::table('fumaco_items_image_v1')->where('imgoriginalx', $sale_image_name_big)->first();
+            //     $primary_checker = DB::table('fumaco_items_image_v1')->where('imgprimayx', $sale_image_name_small)->first();
+
+            //     if($zoom_checker or $primary_checker){
+            //         return redirect()->back()->with('error', 'Image already exists');
+            //     }
+
+            //     if(!in_array($onsale_primary_ext, $allowed_extensions) or !in_array($onsale_zoom_ext, $allowed_extensions)){
+            //         return redirect()->back()->with('error', $extension_error);
+            //     }
+
+            //     $webp_orig = Webp::make($img_sale);
+            //     $webp_prev = Webp::make($img_sale_prev);
+
+            //     if ($webp_orig->save(storage_path('/app/public/item_images/'.$item_code.'/gallery/original/'.$onsale_primary_name.'.webp'))) {
+            //         $img_sale->move($origImgPath, $sale_image_name_small);
+            //     }
+
+            //     if ($webp_prev->save(storage_path('/app/public/item_images/'.$item_code.'/gallery/preview/'.$onsale_primary_name.'.webp'))) {
+            //         $img_sale_prev->move($prevImgPath, $sale_image_name_big);
+            //     }
+
+            //     $insert = [
+            //         'idcode' => $item_code,
+            //         'img_name' => $onsale_primary_name,
+            //         'imgoriginalx' => $sale_image_name_big,
+            //         'imgprimayx' => $sale_image_name_small,
+            //         'onsale_img' => 1,
+            //         'img_status' => 1,
+            //         'created_by' => Auth::user()->username
+            //     ];
+
+            //     DB::table('fumaco_items_image_v1')->insert($insert);
+            // }
 
             DB::commit();
 
-            return redirect()->back()->with('success', 'Product has been set "On Sale".');
+            return redirect()->back()->with('success', $success_msg);
         } catch (Exception $e) {
             DB::rollback();
 

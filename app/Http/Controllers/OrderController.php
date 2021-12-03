@@ -26,6 +26,8 @@ class OrderController extends Controller
             $items_arr = [];
             $items = DB::table('fumaco_order_items')->where('order_number', $o->order_number)->get();
             foreach($items as $i){
+
+                $bundle_items = DB::table('fumaco_product_bundle_item')->where('parent_item_code', $i->item_code)->get();
                 $items_arr[] = [
                     'order_number' => $i->order_number,
                     'item_code' => $i->item_code,
@@ -34,6 +36,7 @@ class OrderController extends Controller
                     'item_price' => $i->item_price,
                     'item_discount' => $i->item_discount,
                     'item_total' => $i->item_total_price,
+                    'bundle' => $bundle_items
                 ];
             }
 
@@ -57,7 +60,7 @@ class OrderController extends Controller
                 'ship_contact_person' => $o->order_ship_contactperson,
                 'email' => $o->order_email,
                 'contact' => $o->order_contact == 0 ? '' : $o->order_contact ,
-                'date' => Carbon::parse($o->order_date)->format('M d, Y - h:m A'),
+                'date' => Carbon::parse($o->order_update)->format('M d, Y - h:i A'),
                 'ordered_items' => $items_arr,
                 'order_tracker_code' => $o->tracker_code,
                 'payment_method' => $o->order_payment_method,
@@ -80,7 +83,7 @@ class OrderController extends Controller
                 'ship_postal' => $o->order_ship_postal,
                 'shipping_name' => $o->order_shipping,
                 'shipping_amount' => $o->order_shipping_amount,
-                'grand_total' => ($o->order_shipping_amount + $o->order_subtotal),
+                'grand_total' => ($o->order_shipping_amount + ($o->order_subtotal - $o->discount_amount)),
                 'status' => $o->order_status,
                 'estimated_delivery_date' => $o->estimated_delivery_date,
                 'payment_id' => $o->payment_id,
@@ -89,6 +92,8 @@ class OrderController extends Controller
                 'order_type' => $o->order_type,
                 'user_email' => $o->user_email,
                 'billing_business_name' => $o->billing_business_name,
+                'voucher_code' => $o->voucher_code,
+                'discount_amount' => $o->discount_amount,
                 'shipping_business_name' => $o->shipping_business_name,
                 'pickup_date' => Carbon::parse($o->pickup_date)->format('M d, Y'),
                 'store_address' => $store_address,
@@ -96,8 +101,6 @@ class OrderController extends Controller
                 'order_status' => $order_status
             ];
         }
-
-        // return $orders_arr;
 
         return view('backend.orders.order_list', compact('orders_arr', 'orders'));
     }
@@ -399,5 +402,224 @@ class OrderController extends Controller
         }
 
         return view('backend.orders.track_payment_status', compact('output', 'payment_id', 'details'));
+    }
+
+    public function statusList(){
+        $status_list = DB::table('order_status')->paginate(10);
+        return view('backend.orders.status_list', compact('status_list'));
+    }
+
+    public function addStatusForm(){
+        return view('backend.orders.add_status');
+    }
+
+    public function addStatus(Request $request){
+        DB::beginTransaction();
+		try{
+            $rules = array(
+				'status_name' => 'required|unique:order_status,status',
+			);
+
+			$validation = Validator::make($request->all(), $rules);
+
+            if ($validation->fails()){
+				return redirect()->back()->with('error', "Order Status Name must be unique.");
+			}
+
+            $insert = [
+                'status' => $request->status_name,
+                'status_description' => $request->status_description,
+                'update_stocks' => isset($request->update_stocks) ? 1 : 0,
+                'created_by' => Auth::user()->username
+            ];
+
+            DB::table('order_status')->insert($insert);
+
+            DB::commit();
+            return redirect('/admin/order/status_list')->with('success', 'Order Status Added!');
+        }catch(Exception $e){
+			DB::rollback();
+			return redirect()->back()->with('error', 'An error occured. Please try again.');
+		}
+    }
+
+    public function editStatusForm($id){
+        $status = DB::table('order_status')->where('order_status_id', $id)->first();
+        return view('backend.orders.edit_status', compact('status'));
+    }
+
+    public function editStatus($id, Request $request){
+        DB::beginTransaction();
+		try{
+            $checker = DB::table('order_status')->where('order_status_id', '!=', $id)->where('status', $request->status_name)->first();
+            
+            if($checker){
+                return redirect()->back()->with('error', "Order Status Name must be unique.");
+            }
+
+            $update = [
+                'status' => $request->status_name,
+                'status_description' => $request->status_description,
+                'update_stocks' => isset($request->update_stocks) ? 1 : 0,
+                'last_modified_by' => Auth::user()->username
+            ];
+
+            DB::table('order_status')->where('order_status_id', $id)->update($update);
+
+            DB::commit();
+            return redirect('/admin/order/status_list')->with('success', 'Order Status Added!');
+        }catch(Exception $e){
+			DB::rollback();
+			return redirect()->back()->with('error', 'An error occured. Please try again.');
+		}
+    }
+
+    public function deleteStatus($id){
+        DB::beginTransaction();
+		try{
+            DB::table('order_status')->where('order_status_id', $id)->delete();
+            DB::commit();
+            return redirect()->back()->with('success', 'Order Status Deleted!');
+        }catch(Exception $e){
+			DB::rollback();
+			return redirect()->back()->with('error', 'An error occured. Please try again.');
+		}
+    }
+
+    public function sequenceList(){
+        $shipping_method = DB::table('order_status_process')->groupBy('shipping_method')->select('shipping_method')->paginate(10);
+
+        return view('backend.orders.status_process_list', compact('shipping_method'));
+    }
+
+    public function addSequenceForm(){
+        $order_status = DB::table('order_status')->get();
+
+        return view('backend.orders.add_status_process', compact('order_status'));
+    }
+
+    public function addSequence(Request $request){
+        DB::beginTransaction();
+		try{
+            $rules = array(
+				'shipping_name' => 'required|unique:order_status_process,shipping_method',
+			);
+
+			$validation = Validator::make($request->all(), $rules);
+
+            if ($validation->fails()){
+				return redirect()->back()->with('error', "Order Status Sequence Name must be unique.");
+			}
+
+            if(!$request->status){
+                return redirect()->back()->with('error', 'Please select a status');
+            }
+
+            foreach($request->status as $order_sequence_id => $status){
+                $insert = [
+                    'order_sequence' => $order_sequence_id + 1,
+                    'shipping_method' => $request->shipping_name,
+                    'order_status_id' => $status
+                ];
+                DB::table('order_status_process')->insert($insert);
+            }
+            DB::commit();
+            return redirect('/admin/order/sequence_list')->with('success', 'Order Status Sequence Added!');
+        }catch(Exception $e){
+			DB::rollback();
+			return redirect()->back()->with('error', 'An error occured. Please try again.');
+		}
+    }
+
+    public function deleteSequence($shipping){
+        DB::beginTransaction();
+		try{
+            DB::table('order_status_process')->where('shipping_method', $shipping)->delete();
+            DB::commit();
+            return redirect()->back()->with('success', 'Order Status Deleted!');
+        }catch(Exception $e){
+			DB::rollback();
+			return redirect()->back()->with('error', 'An error occured. Please try again.');
+		}
+    }
+
+    public function printOrder($order_id){
+        $orders = DB::table('fumaco_order')->where('order_number', $order_id)->first();
+
+        $items_arr = [];
+        $items = DB::table('fumaco_order_items')->where('order_number', $orders->order_number)->get();
+        foreach($items as $i){
+            $items_arr[] = [
+                'order_number' => $i->order_number,
+                'item_code' => $i->item_code,
+                'item_name' => $i->item_name,
+                'item_qty' => $i->item_qty,
+                'item_price' => $i->item_price,
+                'item_discount' => $i->item_discount,
+                'item_total' => $i->item_total_price,
+            ];
+        }
+
+        $store_address = null;
+        if($orders->order_shipping == 'Store Pickup') {
+            $store = DB::table('fumaco_store')->where('store_name', $orders->store_location)->first();
+            $store_address = ($store) ? $store->address : null;
+        }
+
+        $order_status = DB::table('order_status as s')
+            ->join('order_status_process as p', 's.order_status_id', 'p.order_status_id')
+            ->where('shipping_method', $orders->order_shipping)
+            ->orderBy('order_sequence', 'asc')
+            ->get();
+
+        $orders_arr = [
+            'order_no' => $orders->order_number,
+            'first_name' => $orders->order_name,
+            'last_name' => $orders->order_lastname,
+            'bill_contact_person' => $orders->order_contactperson,
+            'ship_contact_person' => $orders->order_ship_contactperson,
+            'email' => $orders->order_email,
+            'contact' => $orders->order_contact == 0 ? '' : $orders->order_contact ,
+            'date' => Carbon::parse($orders->order_update)->format('M d, Y - h:m A'),
+            'ordered_items' => $items_arr,
+            'order_tracker_code' => $orders->tracker_code,
+            'payment_method' => $orders->order_payment_method,
+            'cust_id' => $orders->order_account,
+            'bill_address1' => $orders->order_bill_address1,
+            'bill_address2' => $orders->order_bill_address2,
+            'bill_province' => $orders->order_bill_prov,
+            'bill_city' => $orders->order_bill_city,
+            'bill_brgy' => $orders->order_bill_brgy,
+            'bill_country' => $orders->order_bill_country,
+            'bill_postal' => $orders->order_bill_postal,
+            'bill_email' => $orders->order_bill_email,
+            'bill_contact' => $orders->order_bill_contact,
+            'ship_address1' => $orders->order_ship_address1,
+            'ship_address2' => $orders->order_ship_address2,
+            'ship_province' => $orders->order_ship_prov,
+            'ship_city' => $orders->order_ship_city,
+            'ship_brgy' => $orders->order_ship_brgy,
+            'ship_country' => $orders->order_ship_country,
+            'ship_postal' => $orders->order_ship_postal,
+            'shipping_name' => $orders->order_shipping,
+            'shipping_amount' => $orders->order_shipping_amount,
+            'grand_total' => ($orders->order_shipping_amount + $orders->order_subtotal),
+            'status' => $orders->order_status,
+            'estimated_delivery_date' => $orders->estimated_delivery_date,
+            'payment_id' => $orders->payment_id,
+            'payment_method' => $orders->order_payment_method,
+            'subtotal' => $orders->order_subtotal,
+            'order_type' => $orders->order_type,
+            'user_email' => $orders->user_email,
+            'billing_business_name' => $orders->billing_business_name,
+            'shipping_business_name' => $orders->shipping_business_name,
+            'pickup_date' => Carbon::parse($orders->pickup_date)->format('M d, Y'),
+            'store_address' => $store_address,
+            'store' => $orders->store_location,
+            'order_status' => $order_status
+        ];
+
+        // return $orders_arr;
+        return view('backend.orders.print_order', compact('orders_arr'));
     }
 }

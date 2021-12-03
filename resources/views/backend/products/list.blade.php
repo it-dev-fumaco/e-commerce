@@ -80,13 +80,20 @@
 												  </div>
 											</div>
 											<div class="col-md-1">
-												<button type="submit" class="btn btn-primary">Search</button>
+												<button type="submit" class="btn btn-secondary">Search</button>
 											</div>
 										</div>
 									</div>
 									<div class="col-md-2">
 										<div class="float-right">
-											<a href="/admin/product/add" class="btn btn-primary">Create New Product</a>
+											<div class="dropdown">
+												<button class="btn btn-primary dropdown-toggle" type="button" id="dropdowncreate" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Create New Product
+												</button>
+												<div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdowncreate" style="width: 100%;">
+													<a class="dropdown-item" href="/admin/product/add/simple_product">Simple Product</a>
+													<a class="dropdown-item" href="/admin/product/add/product_bundle">Product Bundle</a>
+												</div>
+											</div>
 										</div>
 									</div>
 								</div>
@@ -128,7 +135,7 @@
 											</picture>
 										</td>
 										<td>
-											<span class="d-block font-weight-bold">{{ $item['item_code'] }}</span> {{ $item['product_name'] }}
+											<span class="d-block font-weight-bold">{{ $item['item_code'] }} <span class="badge badge-success {{ $item['is_new_item'] == 1 ? '' : 'd-none' }}">New Item</span></span> {{ $item['product_name'] }}
 										</td>
 										<td class="text-center">{{ $item['product_code'] }}</td>
 										<td class="text-center">{{ 'P ' . number_format((float)$item['price'], 2, '.', ',') }}</td>
@@ -142,7 +149,7 @@
 										<td class="text-center">{{ $item['product_category'] }}</td>
 										<td class="text-center">{{ $item['brand'] }}</td>
 										<td class="text-center" style="font-size: 1.2rem;">
-											<a href="/admin/product/{{ $item['id'] }}/featured">	{!! ($item['featured']) ? '<i class="fas fa-star"></i>' : '<i class="far fa-star"></i>' !!}</a>
+											<a href="/admin/product/{{ $item['id'] }}/featured">{!! ($item['featured']) ? '<i class="fas fa-star"></i>' : '<i class="far fa-star"></i>' !!}</a>
 										</td>
 										<td class="text-center">
 											@if ($item['on_sale'] == 1)
@@ -163,6 +170,7 @@
 												<div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
 												  <a class="dropdown-item" href="/admin/product/{{ $item['id'] }}/edit">View Details</a>
 												  @if ($item['on_sale'] == 1)
+												  {{-- <a class="dropdown-item" href="#" data-toggle="modal" data-target="#onsale-details-{{ $item['id'] }}"><small>View On Sale Details</small></a> --}}
 												  <a class="dropdown-item" href="#" data-toggle="modal" data-target="#sd{{ $item['id'] }}"><small>Disable On Sale</small></a>
 												  @else
 												  <a class="dropdown-item" href="#" data-toggle="modal" data-target="#s{{ $item['id'] }}"><small>Set On Sale</small></a>
@@ -177,7 +185,7 @@
 												</div>
 											</div>
 
-											<div class="modal fade" id="sd{{ $item['id'] }}" tabindex="-1" role="dialog" aria-labelledby="onsalemodal" aria-hidden="true">
+											<div class="modal fade" id="sd{{ $item['id'] }}" role="dialog" aria-labelledby="onsalemodal" aria-hidden="true" style="z-index: 9999 !important; background-color: rgba(0,0,0, 0.4);">
 												<form action="/admin/product/{{ $item['item_code'] }}/disable_on_sale" method="POST">
 													@csrf
 													<div class="modal-dialog" role="document">
@@ -201,7 +209,7 @@
 											</div>
 
 											<div class="modal fade" id="s{{ $item['id'] }}" tabindex="-1" role="dialog" aria-labelledby="onsalemodal" aria-hidden="true">
-												<form action="/admin/product/{{ $item['item_code'] }}/enable_on_sale" method="POST">
+												<form action="/admin/product/{{ $item['item_code'] }}/enable_on_sale" method="POST" enctype="multipart/form-data">
 													@csrf
 													<div class="modal-dialog" role="document">
 														<div class="modal-content">
@@ -209,19 +217,22 @@
 																<h5 class="modal-title">Set Product On Sale</h5>
 															</div>
 															<div class="modal-body">
-																<p>Original Price: <b>{{ 'P ' . number_format((float)$item['price'], 2, '.', ',') }}</b></p>
 																<div class="row">
-																	<div class="col-md-8 offset-md-2">
-																		<div class="form-group">
-																			<label>Enter Discount Percentage (%)</label>
-																			<input type="number" class="form-control" name="discount_percentage" placeholder="Discount %" required>
+																	<div class="col-12">
+																		<p>Original Price: <b>{{ 'P ' . number_format((float)$item['price'], 2, '.', ',') }}</b></p>
+																		<div class="row">
+																			<div class="col-12">
+																				<div class="form-group col-8 mx-auto">
+																					<label>Enter Discount Percentage (%)</label>
+																					<input type="number" class="form-control" name="discount_percentage" placeholder="Discount %" required>
+																				</div>
+																			</div>
 																		</div>
 																	</div>
 																</div>
 															</div>
 															<div class="modal-footer">
 																<button type="submit" class="btn btn-primary">Submit</button>
-																<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
 															</div>
 														</div>
 													</div>
@@ -316,7 +327,12 @@
 	<!-- /.content -->
  </div>
 @endsection
-
 @section('script')
-
+ 	<script>
+		 // Add the following code if you want the name of the file appear on select
+		$(".custom-file-input").change(function() {
+			var fileName = $(this).val().split("\\").pop();
+			$(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+		});
+	</script>
 @endsection
