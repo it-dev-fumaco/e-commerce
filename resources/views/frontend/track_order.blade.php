@@ -141,7 +141,9 @@
 										<td class="table-text p-1" style="text-align: right; white-space: nowrap !important">₱ {{ number_format($order_details->order_subtotal, 2) }}</td>
 									</tr>
 									<tr style="border-bottom: rgba(0,0,0,0) !important; font-size: 10pt;">
-										<td colspan="4" class="table-text p-1" style="text-align: right;">Discount : <span class="text-white" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833;">{{ $order_details->voucher_code }}</span></td>
+										<td colspan="4" class="table-text p-1" style="text-align: right;">Discount :@if ($order_details->voucher_code)
+											<span class="text-white" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833;">{{ $order_details->voucher_code }}</span>
+											@endif </td>
 										<td class="table-text p-1" style="text-align: right; white-space: nowrap !important">- ₱ {{ number_format($order_details->discount_amount, 2) }}</td>
 									</tr>
 									

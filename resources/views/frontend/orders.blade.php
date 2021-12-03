@@ -110,7 +110,8 @@
 													</tr>
 													<tr class="d-lg-none d-xl-none" style="border-bottom: rgba(0,0,0,0) !important">
 														<td></td>
-														<td colspan=2 class="table-text" style="text-align: right;">Discount: <span class="text-white" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833;">{{ $order['voucher_code'] }}</span></td>
+														<td colspan=2 class="table-text" style="text-align: right;">Discount:@if ($order['voucher_code']) <span class="text-white" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833;">{{ $order['voucher_code'] }}</span>
+															@endif</td>
 														<td class="table-text" style="text-align: left; white-space: nowrap !important">₱ {{ number_format($order['discount_amount'], 2) }}</td>
 													</tr>
 													<tr class="d-lg-none d-xl-none" style="border-bottom: rgba(0,0,0,0) !important">
@@ -125,37 +126,38 @@
 													</tr>
 												</table>
 												<div class="d-none d-xl-block">
-													<div class="row">
-														<div class="col-md-10" style="text-align: right;">
+													<div class="row m-1">
+														<div class="col-md-10 p-0" style="text-align: right;">
 															<span>Subtotal: </span>
 														</div>
-														<div class="col-md-2" style="text-align: left;">
+														<div class="col-md-2" style="text-align: right;">
 															<span>₱ {{ number_format($order['subtotal'], 2) }}</span>
-														</div><br/>&nbsp;
-													</div>
-													<div class="row">
-														<div class="col-md-10" style="text-align: right;">
-															<span>Discount: <span class="text-white" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833;">{{ $order['voucher_code'] }}</span></span>
 														</div>
-														<div class="col-md-2" style="text-align: left;">
-															<span>₱ {{ number_format($order['discount_amount'], 2) }}</span>
-														</div><br/>&nbsp;
 													</div>
-													<div class="row">
+													<div class="row m-1">
+														<div class="col-md-10" style="text-align: right;">
+															<span>Discount: @if ($order['voucher_code']) <span class="text-white" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833;">{{ $order['voucher_code'] }}</span>
+															@endif</span>
+														</div>
+														<div class="col-md-2" style="text-align: right;">
+															<span>₱ {{ number_format($order['discount_amount'], 2) }}</span>
+														</div>
+													</div>
+													<div class="row m-1">
 														<div class="col-md-10" style="text-align: right;">
 															<span>Shipping Fee: </span>
 														</div>
-														<div class="col-md-2" style="text-align: left;">
+														<div class="col-md-2" style="text-align: right;">
 															<span>₱ {{ number_format($order['shipping_fee'], 2) }}</span>
-														</div><br/>&nbsp;
+														</div>
 													</div>
-													<div class="row">
+													<div class="row m-1">
 														<div class="col-md-10" style="text-align: right;">
 															<span style="font-weight: 700">Grand Total: </span>
 														</div>
-														<div class="col-md-2" style="text-align: left;">
+														<div class="col-md-2" style="text-align: right;">
 															<span style="font-weight: 700">₱ {{ number_format($order['grand_total'], 2) }}</span>
-														</div><br/>&nbsp;
+														</div>
 													</div>
 												</div>
 												<button href="#" class="btn btn-primary table-text" data-toggle="modal" data-target="#{{ $order['order_number'] }}-Modal">Track Order</button>
