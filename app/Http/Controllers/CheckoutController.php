@@ -679,7 +679,7 @@ class CheckoutController extends Controller
 						}
 			
 						if($voucher_details->discount_type == 'Fixed Amount') {
-							$discount = $amount - $voucher_details->discount_rate;
+							$discount = $voucher_details->discount_rate;
 						}
 			
 						if($voucher_details->discount_type == 'Free Delivery') {
