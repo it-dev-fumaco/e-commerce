@@ -60,7 +60,7 @@ class SyncErpStockCommand extends Command
                 ])->get($erp_api->base_url . '/api/resource/Bin' . $params);
 
                 if ($response->successful()) {
-                    if (count($response['data']) > 0 && isset($response['data'])) {
+                    if (isset($response['data']) && count($response['data']) > 0) {
                         DB::table('fumaco_items')->where('f_idcode', $item_code)->where('f_warehouse', $warehouse)
                             ->where('stock_source', 1)->update(['f_qty' => $response['data'][0]['actual_qty']]);
                     }                   
@@ -79,9 +79,10 @@ class SyncErpStockCommand extends Command
                 ])->get($erp_api->base_url . '/api/resource/Item Price' . $params);
 
                 if ($response->successful()) {
-                    if (count($response['data']) > 0 && isset($response['data'])) {
+                    if (isset($response['data']) && count($response['data']) > 0) {
+                        info($item_code);
                         DB::table('fumaco_items')->where('f_idcode', $item_code)->where('f_warehouse', $warehouse)
-                            ->where('stock_source', 1)->update(['f_original_price' => $response['data'][0]['price_list_rate']]);
+                            ->update(['f_original_price' => $response['data'][0]['price_list_rate']]);
                     }
                 }
             }

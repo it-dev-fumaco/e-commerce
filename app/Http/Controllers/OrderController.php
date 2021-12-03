@@ -298,7 +298,7 @@ class OrderController extends Controller
                 if($status == 'Order Confirmed'){
                     $checker = DB::table('track_order')->where('track_code', $request->order_number)->where('track_status', 'Out for Delivery')->count();
 
-                    if($checker > 1){
+                    if($checker > 0){
                         DB::table('track_order')->where('track_code', $request->order_number)->where('track_status', 'Out for Delivery')->update(['track_active' => 0]);
                         DB::table('track_order')->where('track_code', $request->order_number)->where('track_status', 'Order Confirmed')->update(['track_active' => 0]);
                     }

@@ -281,6 +281,7 @@ Route::prefix('admin')->group(function () {
 
         Route::get('/marketing/search/list', 'PagesController@searchList');
 
+
         Route::get('/marketing/on_sale/list', 'ProductController@onSaleList');
         Route::get('/marketing/voucher/list', 'ProductController@voucherList');
         Route::get('/marketing/on_sale/addForm', 'ProductController@addOnsaleForm');
@@ -294,6 +295,11 @@ Route::prefix('admin')->group(function () {
         Route::get('/marketing/voucher/{id}/edit_form', 'ProductController@editVoucherForm');
         Route::post('/marketing/voucher/{id}/edit', 'ProductController@editVoucher');
         Route::get('/marketing/voucher/{id}/delete', 'ProductController@removeVoucher');
+
+        Route::get('/marketing/social/images', 'SocialImagesController@viewList');
+        Route::post('/marketing/social/create', 'SocialImagesController@uploadImage');
+        Route::delete('/marketing/social/delete/{id}', 'SocialImagesController@deleteImage');
+        Route::get('/marketing/social/default/{id}', 'SocialImagesController@setDefault');
 
         // SHIPPING SERVICES ROUTES CMS
         Route::get('/shipping/list', 'ShippingController@viewList');

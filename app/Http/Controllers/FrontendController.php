@@ -689,7 +689,7 @@ class FrontendController extends Controller
             return view('error');
         }
         // get requested filters
-        $request_data = $request->except(['page', 'sel_attr', 'sortby', 'brand', 'order']);
+        $request_data = $request->except(['page', 'sel_attr', 'sortby', 'brand', 'order', 'fbclid']);
         $attribute_name_filter = array_keys($request_data);
         $attribute_value_filter = [];
         $brand_filter = $request->brand;
@@ -780,6 +780,13 @@ class FrontendController extends Controller
 
         $orderby = ($request->order) ? $request->order : 'asc';
 
+        $image_for_sharing = null;
+        // get image for social media sharing
+        $default_image_for_sharing = DB::table('fumaco_social_image')->where('is_default', 1)->first();
+        if ($default_image_for_sharing) {
+            $image_for_sharing = ($default_image_for_sharing->filename) ? asset('/storage/social_images/'. $default_image_for_sharing->filename) : null;
+        }
+
         // get items based on category id
         $products = DB::table('fumaco_items')->where('f_cat_id', $product_category->id)
             ->when(count($request->except(['page', 'sel_attr', 'sortby', 'order'])) > 0, function($c) use ($filtered_items) {
@@ -809,7 +816,7 @@ class FrontendController extends Controller
             ];
         }
 
-        return view('frontend.product_list', compact('product_category', 'products_arr', 'products', 'filters'));
+        return view('frontend.product_list', compact('product_category', 'products_arr', 'products', 'filters', 'image_for_sharing'));
     }
 
     public function viewProduct($slug) { // Product Page
@@ -1389,7 +1396,7 @@ class FrontendController extends Controller
     public function viewOrderTracking(Request $request) {
         $order_details = DB::table('fumaco_order')->where('order_number', $request->id)->first();
 
-        $track_order_details = DB::table('track_order')->where('track_code', $request->id)->where('track_active', 1)->select('track_status', 'track_date_update')->get();
+        $track_order_details = DB::table('track_order')->where('track_code', $request->id)->get();
 
         $ordered_items = DB::table('fumaco_order_items')->where('order_number', $request->id)->get();
         $order_status = '';
