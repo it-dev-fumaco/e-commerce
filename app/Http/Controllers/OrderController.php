@@ -298,7 +298,7 @@ class OrderController extends Controller
                 if($status == 'Order Confirmed'){
                     $checker = DB::table('track_order')->where('track_code', $request->order_number)->where('track_status', 'Out for Delivery')->count();
 
-                    if($checker > 0){
+                    if($checker > 1){
                         DB::table('track_order')->where('track_code', $request->order_number)->where('track_status', 'Out for Delivery')->update(['track_active' => 0]);
                         DB::table('track_order')->where('track_code', $request->order_number)->where('track_status', 'Order Confirmed')->update(['track_active' => 0]);
                     }
@@ -489,7 +489,18 @@ class OrderController extends Controller
     public function sequenceList(){
         $shipping_method = DB::table('order_status_process')->groupBy('shipping_method')->select('shipping_method')->paginate(10);
 
-        return view('backend.orders.status_process_list', compact('shipping_method'));
+        $sequence_arr = [];
+        foreach($shipping_method as $shipping){
+            $status_process = DB::table('order_status as stat')->join('order_status_process as prc', 'stat.order_status_id', 'prc.order_status_id')->where('shipping_method', $shipping->shipping_method)->select('stat.status')->orderBy('prc.order_sequence', 'asc')->get();
+            $sequence_arr[] = [
+                'shipping_method' => $shipping->shipping_method,
+                'status_sequence' => $status_process
+            ];
+        }
+
+        // return $sequence_arr;
+
+        return view('backend.orders.status_process_list', compact('shipping_method', 'sequence_arr'));
     }
 
     public function addSequenceForm(){

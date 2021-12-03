@@ -25,7 +25,7 @@
 		<section class="content">
 			<div class="container-fluid">
 				<div class="row">
-					<div class="col-md-12">
+					<div class="col-6">
 						<div class="card card-primary">
 							<div class="card-body">
                                 @if(session()->has('success'))
@@ -45,20 +45,62 @@
                                     </div>
                                 </div>
                                 <br/>
+                                <div class="col-6">
+                                    
+                                </div>
                                 <table class="table table-bordered">
                                     <tr>
                                         <th>Shipping Method</th>
+                                        <th>Sequence</th>
                                         <th>Action</th>
                                     </tr>
-                                    @forelse ($shipping_method as $shipping)
+                                    @forelse ($sequence_arr as $shipping)
                                         <tr>
-                                            <td>{{ $shipping->shipping_method }}</td>
+                                            <td>{{ $shipping['shipping_method'] }}</td>
                                             <td class="text-center">
-                                                <button class="btn btn-danger" data-toggle="modal" data-target="#dm{{ Str::slug($shipping->shipping_method, '-') }}">Delete</button>
+                                                <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#view{{ Str::slug($shipping['shipping_method'], '-') }}Modal">
+                                                    View Sequence
+                                                </button>
+                                                {{--  --}}
+                                                <!-- Modal -->
+                                                <div class="modal fade" id="view{{ Str::slug($shipping['shipping_method'], '-') }}Modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                    <div class="modal-dialog" role="document">
+                                                        <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="exampleModalLabel">Order Sequence</h5>
+                                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                            </button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <center>
+                                                                <table class="table-hover table-bordered">
+                                                                    <tr>
+                                                                        <td>1</td>
+                                                                        <td>Order Placed</td>
+                                                                    </tr>
+                                                                    @foreach ($shipping['status_sequence'] as $key => $sequence)
+                                                                        <tr>
+                                                                            <td>{{ $key + 2 }}</td>
+                                                                            <td>{{ $sequence->status }}</td>
+                                                                        </tr>
+                                                                    @endforeach
+                                                                </table>
+                                                            </center>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                        </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="text-center">
+                                                <button class="btn btn-danger" data-toggle="modal" data-target="#dm{{ Str::slug($shipping['shipping_method'], '-') }}">Delete</button>
                                             </td>
                                         </tr>                                          
                                           <!-- Modal -->
-                                        <div class="modal fade" id="dm{{ Str::slug($shipping->shipping_method, '-') }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                        <div class="modal fade" id="dm{{ Str::slug($shipping['shipping_method'], '-') }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                             <div class="modal-dialog" role="document">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
@@ -68,11 +110,11 @@
                                                         </button>
                                                     </div>
                                                     <div class="modal-body">
-                                                        Delete {{ $shipping->shipping_method }}?
+                                                        Delete {{ $shipping['shipping_method'] }}?
                                                     </div>
                                                     <div class="modal-footer">
                                                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                                        <a href="/admin/order/sequence_list/{{ $shipping->shipping_method }}/delete" class="btn btn-danger">Delete</a>
+                                                        <a href="/admin/order/sequence_list/{{ $shipping['shipping_method'] }}/delete" class="btn btn-danger">Delete</a>
                                                     </div>
                                                 </div>
                                             </div>
