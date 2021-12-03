@@ -46,13 +46,43 @@
                                             </div>
                                         </div>
                                         <div class="row">
-                                            <div class="col-6 ">
+                                            <div class="col-6">
+                                                <div class="col-7 mx-auto">
+                                                    <img class="img-thumbnail" src="{{ asset('/assets/site-img/'.$on_sale->banner_image) }}" alt="" style="width: 100%">
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="col-6">
                                                 <label>Sale Name</label>
                                                 <input type="text" class="form-control" name="sale_name" placeholder="Sale Name" value="{{ $on_sale->sale_name }}" required>
                                                 <br/>
+                                                <label>Banner Image</label>
+                                                <div class="custom-file mb-3">
+                                                    <input type="file" class="custom-file-input" id="customFile" name="banner_img">
+                                                    <label class="custom-file-label" for="customFile">{{ $on_sale->banner_image ? $on_sale->banner_image : 'Choose File' }}</label>
+                                                </div>                                                
+                                                <br/>
+                                                <label><input type="checkbox" name="set_duration" id="set_duration" {{ $on_sale->start_date ? 'checked' : '' }}> Set Sale Duration</label>
+                                                <input type="text" class="form-control set_duration" id="daterange" name="sale_duration" {{ $on_sale->start_date ? '' : 'disabled' }}/>
+                                            </div>
+                                        </div>
+                                        <br/>
+                                        <div class="row">
+                                            <div class="col-6 mx-auto">
+                                                <label>Discount For</label>
+                                                <select class="form-control" name="discount_for" id="discount_for" required>
+                                                    <option disabled selected value="">Discount For</option>
+                                                    <option value="Per Category">Per Category</option>
+                                                    <option value="All Items">All Items</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="row" id="for_all_items">
+                                            <div class="col-6 mx-auto">
+                                                <br/>
                                                 <label>Discount Type</label>
                                                 @php
-                                                    $discount_type = array('Free Delivery', 'Fixed Amount', 'By Percentage');
+                                                    $discount_type = array('Fixed Amount', 'By Percentage');
                                                 @endphp
                                                 <select class="form-control" name="discount_type" id="discount_type" required>
                                                     <option disabled selected value="">Discount Type</option>
@@ -76,47 +106,75 @@
                                                         <input type="text" class="form-control" id="capped_amount" name="capped_amount" value="{{ $on_sale->capped_amount }}" placeholder="Capped Amount"/>
                                                     </div>
                                                 </div>
-                                                <br/>
-                                                <label>Discount For</label>
-                                                <select class="form-control" name="discount_for" id="discount_for" required>
-                                                    <option disabled selected value="">Discount For</option>
-                                                    <option value="Per Category">Per Category</option>
-                                                    <option value="All Items">All Items</option>
-                                                </select>
-                                                <br/>
-                                                <div id="categories" style="display: none">
-                                                    <label>Categories</label><br/>
-                                                    <input class="d-none" type="text" name="selected_categories" id="selected_categories" value="{{ $on_sale->apply_discount_to }}">
-                                                    @forelse ($categories as $cat)
-                                                        <input type="checkbox" name="category" class="categories" value="{{ $cat->id }}" {{ in_array($cat->id, $discounted_categories) ? 'checked' : '' }}> {{ $cat->name }}<br/>
-                                                    @empty
-                                                        No Published Category
-                                                    @endforelse
+                                            </div>
+                                        </div>
+                                        <div class="row" id="categories">
+                                            <div class="col-12">
+                                                <div class="row">
+                                                    <select class="d-none form-control" name="category_select" id="category_select">
+                                                        <option disabled selected value="">Select a Category</option>
+                                                        @foreach ($categories as $cat)
+                                                            <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                    @php
+                                                        $discount_type = array('Fixed Amount', 'By Percentage');
+                                                    @endphp
+                                                    <select class="d-none form-control" name="discount_type_select" id="discount_type_select">
+                                                        <option disabled selected value="">Select Discount Type</option>
+                                                        @foreach ($discount_type as $discount)
+                                                            <option value="{{ $discount }}">{{ $discount }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                    <div class="col-8 mx-auto">
+                                                        <br/>
+                                                        <table class="table table-bordered" id="categories-table">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th style="width: 30%;" scope="col" class="text-center">Category Name</th>
+                                                                    <th style="width: 20%;" scope="col" class="text-center">Discount Type</th>
+                                                                    <th style="width: 20%;" scope="col" class="text-center">Amount/Rate</th>
+                                                                    <th style="width: 20%;" scope="col" class="text-center capped_amount">Capped Amount</th>
+                                                                    <th class="text-center" style="width: 10%;"><button class="btn btn-outline-primary btn-sm" id="add-categories-btn">Add</button></th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                @foreach($discounted_categories as $sale_cat) 
+                                                                <tr>
+                                                                   <td class="p-2">
+                                                                        <select class="form-control" name="selected_category[]">
+                                                                            <option disabled value="">Select Category</option>
+                                                                            @foreach ($categories as $category)
+                                                                                <option value="{{ $category->id }}" {{ $sale_cat->id == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
+                                                                            @endforeach
+                                                                        </select>
+                                                                    </td>
+                                                                    <td class="p-2">
+                                                                        <select class="form-control category_discount_type" name="selected_discount_type[]" id="selected_discount_type">
+                                                                            <option disabled selected value="">Select Discount Type</option>
+                                                                            @foreach ($discount_type as $discount)
+                                                                                <option value="{{ $discount }}" {{ $discount == $sale_cat->discount_type ? 'selected' : '' }}>{{ $discount }}</option>
+                                                                            @endforeach
+                                                                        </select>
+                                                                    </td>
+                                                                    <td class="p-2">
+                                                                        <input type="text" name="category_discount_rate[]" class="form-control" value="{{ $sale_cat->discount_rate }}" placeholder="Amount/Rate" required>
+                                                                    </td>
+                                                                    <td class="p-2">
+                                                                        <input type="text" name="category_capped_amount[]" class="form-control cap_amount" value="{{ $sale_cat->capped_amount }}" placeholder="Capped Amount">
+                                                                    </td>
+                                                                    <td class="text-center">
+                                                                        <button class="btn btn-outline-danger btn-sm remove-td-row">Remove</button>
+                                                                    </td>
+                                                               </tr>
+                                                                @endforeach
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div class="col-6 ">
-                                                <label><input type="checkbox" name="set_duration" id="set_duration" {{ $on_sale->start_date ? 'checked' : '' }}> Set Sale Duration</label>
-                                                <input type="text" class="form-control set_duration" id="daterange" name="sale_duration" {{ $on_sale->start_date ? '' : 'disabled' }}/>
-                                                <br/>
-                                                <label><input type="checkbox" name="require_coupon" id="require_coupon" {{ count($vouchers) == 0 ? 'disabled' : '' }} {{ $on_sale->coupon ? 'checked' : '' }}> Require Coupon</label>
-                                                <select class="form-control" name="coupon" id="coupon" {{ $on_sale->coupon ? '' : 'disabled' }}>
-                                                    <option disabled selected value="">Select a Voucher</option>
-                                                    @forelse ($vouchers as $voucher)
-                                                        <option value="{{ $voucher->id }}" {{ $voucher->id == $on_sale->coupon ? 'selected' : '' }}>{{ $voucher->name }}</option>
-                                                    @empty
-                                                        <option disabled value="">No Vouchers</option>
-                                                    @endforelse
-                                                </select>
-                                                <br/>
-                                                <label>Banner Image</label>
-                                                <div class="custom-file mb-3">
-                                                    <input type="file" class="custom-file-input" id="customFile" name="banner_img">
-                                                    <label class="custom-file-label" for="customFile">{{ $on_sale->banner_image ? $on_sale->banner_image : 'Choose File' }}</label>
-                                                </div>
-                                                <div class="col-6 mx-auto">
-                                                    <img class="img-thumbnail" src="{{ asset('/assets/site-img/'.$on_sale->banner_image) }}" alt="" style="width: 100%">
-                                                </div>
-                                            </div>
+                                        </div>
+                                        <div class="row">
                                             <div class="col-12">
                                                 <br/>
                                                 <div class="float-right font-italic">
@@ -144,8 +202,8 @@
         discountType();
         discountFor();
 
-        var start = "{{ $on_sale->start_date != '0000-00-00' ? date('m/d/Y', strtotime($on_sale->start_date)) : null  }}";
-        var end = "{{ $on_sale->end_date != '0000-00-00' ? date('m/d/Y', strtotime($on_sale->end_date)) : null }}";
+        var start = "{{ $on_sale->start_date ? date('m/d/Y', strtotime($on_sale->start_date)) : null  }}";
+        var end = "{{ $on_sale->end_date ? date('m/d/Y', strtotime($on_sale->end_date)) : null }}";
         console.log(start + end);
         $(function() {
             $('#daterange').daterangepicker({
@@ -159,13 +217,22 @@
             });
         });
 
+        $('#discount_for').change(function(){
+            discountFor();
+        });
+
         $('#discount_type').change(function(){
             discountType();
         });
 
-        $('#discount_for').change(function(){
-            discountFor();
-        });
+        $(document).on('change', '.category_discount_type', function(e){
+			e.preventDefault();
+            if($(this).val() == 'Fixed Amount'){
+                $(this).closest('td').next('td').next('td').find('input').prop('readonly', true);
+            }else{
+                $(this).closest('td').next('td').next('td').find('input').prop('readonly', false);
+            }
+		});
 
         $('#require_coupon').click(function(){
             if($(this).is(':checked')){
@@ -183,14 +250,6 @@
             }else{
                 $(".set_duration").prop('disabled',true);
             }
-        });
-
-        $checks = $(".categories");
-        $checks.on('change', function() {
-            var string = $checks.filter(":checked").map(function(i,v){
-                return this.value;
-            }).get().join(",");
-            $('#selected_categories').val(string);
         });
 
         function discountType(){
@@ -213,12 +272,18 @@
         }
 
         function discountFor(){
-            if($('#discount_for').val() == 'Per Category'){
-                $('#categories').slideDown();
-                $("#selected_categories").prop('required',true);
-            }else{
+            if($('#discount_for').val() == 'All Items'){
+                $('#for_all_items').slideDown();
                 $('#categories').slideUp();
-                $("#selected_categories").prop('required',false);
+                $('#discount_type').prop('required', true);
+            }else if($('#discount_for').val() == 'Per Category'){
+                $('#for_all_items').slideUp();
+                $('#categories').slideDown();
+                $('#discount_type').prop('required', false);
+            }else{
+                $('#for_all_items').slideUp();
+                $('#categories').slideUp();
+                $('#discount_type').prop('required', false);
             }
         }
 
@@ -227,6 +292,37 @@
             var fileName = $(this).val().split("\\").pop();
             $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
         });
+
+        $('#add-categories-btn').click(function(e){
+			e.preventDefault();
+
+			var clone_select = $('#category_select').html();
+            var clone_discount_type = $('#discount_type_select').html();
+			var row = '<tr>' +
+				'<td class="p-2">' +
+					'<select name="selected_category[]" class="form-control w-100" style="width: 100%;" required>' + clone_select + '</select>' +
+				'</td>' +
+				'<td class="p-2">' +
+					'<select name="selected_discount_type[]" class="form-control w-100 category_discount_type" style="width: 100%;" required>' + clone_discount_type + '</select>' +
+				'</td>' +
+                '<td class="p-2">' +
+					'<input type="number" name="category_discount_rate[]" class="form-control" placeholder="Amount/Rate" required>' +
+				'</td>' +
+                '<td class="p-2">' +
+					'<input type="number" name="category_capped_amount[]" class="form-control cap_amount" value="0" placeholder="Capped Amount">' +
+				'</td>' +
+				'<td class="text-center">' +
+					'<button type="button" class="btn btn-outline-danger btn-sm remove-td-row">Remove</button>' +
+				'</td>' +
+			'</tr>';
+
+			$('#categories-table tbody').append(row);
+		});
+
+        $(document).on('click', '.remove-td-row', function(e){
+			e.preventDefault();
+			$(this).closest("tr").remove();
+		});
     });
     </script>
 @endsection

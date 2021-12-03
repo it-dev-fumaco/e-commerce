@@ -66,11 +66,8 @@
                                             <th class="text-center">ID</th>
                                             <th class="text-center">Sale Name</th>
                                             <th class="text-center">Sale Duration</th>
-                                            <th class="text-center">Discount Type</th>
-                                            <th class="text-center">Discount/Amount</th>
-                                            <th class="text-center">Capped Amount</th>
-                                            <th class="text-center">Apply Discount to</th>
-                                            <th class="text-center">Coupon Code</th>
+                                            <th class="text-center">Apply Discount To</th>
+                                            <th class="text-center">Sale Details</th>
                                             <th class="text-center">Active</th>
                                             <th class="text-center">Action</th>
                                         </tr>
@@ -78,46 +75,82 @@
                                             <tr>
                                                 <td class="text-center">{{ $sale['id'] }}</td>
                                                 <td class="text-center">{{ $sale['name'] }}</td>
-                                                <td class="text-center">{{ $sale['sale_duration'] }}</td>
-                                                <td class="text-center">{{ $sale['discount_type'] }}</td>
+                                                <td class="text-center">{{ $sale['sale_duration'] ? $sale['sale_duration'] : 'Lifelong Validity' }}</td>
+                                                <td class="text-center">{{ $sale['discount_for'] }}</td>
                                                 <td class="text-center">
-                                                    @if ($sale['discount_type'] == 'Fixed Amount')
-                                                        ₱ {{ number_format($sale['discount_rate'], 2, '.', ',') }}
-                                                    @elseif($sale['discount_type'] == 'By Percentage')
-                                                        {{ $sale['discount_rate'] }}%
-                                                    @endif
-                                                </td>
-                                                <td class="text-center">
-                                                    @if ($sale['capped_amount'])
-                                                        ₱ {{ number_format($sale['capped_amount'], 2, '.', ',') }}
-                                                    @endif
-                                                </td>
-                                                <td class="text-center">
+                                                    <a type="button" data-toggle="modal" data-target="#sale{{ $sale['id'] }}Modal" style="color: #007BFF;">
+                                                        View Details
+                                                    </a>
                                                     @if ($sale['discount_for'] == 'All Items')
-                                                        {{ $sale['discount_for'] }}
-                                                    @else
-                                                        <a type="button" data-toggle="modal" data-target="#sale{{ $sale['id'] }}Modal" style="color: #007BFF;">
-                                                            View Categories
-                                                        </a>
-                                                      
                                                         <!-- Modal -->
                                                         <div class="modal fade" id="sale{{ $sale['id'] }}Modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                                             <div class="modal-dialog" role="document">
                                                             <div class="modal-content">
                                                                 <div class="modal-header">
-                                                                    <h5 class="modal-title" id="exampleModalLabel">Apply Discount to</h5>
+                                                                    <h5 class="modal-title" id="exampleModalLabel">{{ $sale['name'] }}</h5>
+                                                                </div>
+                                                                <div class="modal-body text-left">
+                                                                    @if ($sale['banner'])
+                                                                        <div class="col-10 mx-auto">
+                                                                            <img class="img-thumbnail" src="{{ asset('/assets/site-img/'.$sale['banner']) }}" alt="" style="width: 100%">
+                                                                        </div>
+                                                                        <br/>
+                                                                    @endif
+                                                                    <p><b>Discount Type:</b> {{ $sale['discount_type'] }}</p>
+                                                                    <p><b>Discount Amount/Rate:</b> 
+                                                                        @if ($sale['discount_type'] == 'Fixed Amount')
+                                                                            ₱ {{ number_format($sale['discount_rate'], 2, '.', ',') }}
+                                                                        @elseif($sale['discount_type'] == 'By Percentage')
+                                                                            {{ $sale['discount_rate'] }}%
+                                                                        @endif
+                                                                    </p>
+                                                                    @if ($sale['capped_amount'])
+                                                                        <p><b>Capped Amount</b> ₱ {{ number_format($sale['capped_amount'], 2, '.', ',') }}</p>
+                                                                    @endif
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                                </div>
+                                                            </div>
+                                                            </div>
+                                                        </div>
+                                                    @else                                                      
+                                                        <!-- Modal -->
+                                                        <div class="modal fade" id="sale{{ $sale['id'] }}Modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                            <div class="modal-dialog modal-xl" role="document">
+                                                            <div class="modal-content">
+                                                                <div class="modal-header">
+                                                                    <h5 class="modal-title" id="exampleModalLabel">Categories</h5>
                                                                 </div>
                                                                 <div class="modal-body">
                                                                     <center>
+                                                                        @if ($sale['banner'])
+                                                                            <div class="col-4 mx-auto">
+                                                                                <img class="img-thumbnail" src="{{ asset('/assets/site-img/'.$sale['banner']) }}" alt="" style="width: 100%">
+                                                                            </div>
+                                                                            <br/>
+                                                                        @endif
                                                                         <table class="table-hover table-bordered">
                                                                             <tr>
-                                                                                <th>ID</th>
-                                                                                <th>Category Name</th>
+                                                                                <th class="text-center">ID</th>
+                                                                                <th class="text-center">Category Name</th>
+                                                                                <th class="text-center">Discount Type</th>
+                                                                                <th class="text-center">Discount Amount/Rate</th>
+                                                                                <th class="text-center">Capped Amount</th>
                                                                             </tr>
                                                                             @foreach ($sale['categories'] as $category)
                                                                                 <tr>
-                                                                                    <td>{{ $category['id'] }}</td>
-                                                                                    <td>{{ $category['name'] }}</td>
+                                                                                    <td class="text-center">{{ $category['category_id'] }}</td>
+                                                                                    <td class="text-center">{{ $category['category_name'] }}</td>
+                                                                                    <td class="text-center">{{ $category['discount_type'] }}</td>
+                                                                                    <td class="text-center">
+                                                                                        @if ($category['discount_type'] == 'Fixed Amount')
+                                                                                            ₱ {{ number_format($category['discount_rate'], 2, '.', ',') }}
+                                                                                        @elseif($category['discount_type'] == 'By Percentage')
+                                                                                            {{ $category['discount_rate'] }}%
+                                                                                        @endif
+                                                                                    </td>
+                                                                                    <td class="text-center">{{ $category['capped_amount'] ? '₱ '.number_format($category['capped_amount'], 2, '.', ',') : '' }}</td>
                                                                                 </tr>
                                                                             @endforeach
                                                                         </table>
@@ -131,7 +164,6 @@
                                                         </div>
                                                     @endif
                                                 </td>
-                                                <td class="text-center">{{ $sale['coupon'] }}</td>
                                                 <td class="text-center">
                                                     <center>
                                                         <label class="switch">
