@@ -644,11 +644,11 @@ class CheckoutController extends Controller
 			}
 
 			$discount = 0;
+			$is_voucher_valid = false;
 			if($temp->voucher_code) {
 				$voucher_details = DB::table('fumaco_voucher')
 					->where('code', strtoupper($temp->voucher_code))->first();
 				
-				$is_voucher_valid = false;
 				if ($voucher_details) {
 					$is_voucher_valid = true;
 					if($voucher_details->validity_date_start && $voucher_details->validity_date_end) {
