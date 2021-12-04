@@ -296,11 +296,16 @@ class FrontendController extends Controller
             ];
         }
 
-        // return $on_sale_arr;
+        $image_for_sharing = null;
+        // get image for social media sharing
+        $default_image_for_sharing = DB::table('fumaco_social_image')->where('is_default', 1)->where('page_type', 'main_page')->first();
+        if ($default_image_for_sharing) {
+            $image_for_sharing = ($default_image_for_sharing->filename) ? asset('/storage/social_images/'. $default_image_for_sharing->filename) : null;
+        } 
 
         $page_meta = DB::table('fumaco_pages')->where('is_homepage', 1)->first();
 
-        return view('frontend.homepage', compact('carousel_data', 'onsale_carousel_data', 'blogs', 'best_selling_arr', 'on_sale_arr', 'page_meta'));
+        return view('frontend.homepage', compact('carousel_data', 'onsale_carousel_data', 'blogs', 'best_selling_arr', 'on_sale_arr', 'page_meta', 'image_for_sharing'));
     }
 
     public function newsletterSubscription(Request $request){
@@ -508,7 +513,14 @@ class FrontendController extends Controller
         $bg2 = explode('.',$about_data->background_2);
         $bg3 = explode('.',$about_data->background_3);
 
-        return view('frontend.about_page', compact('about_data', 'partners', 'bg1', 'bg2', 'bg3'));
+        $image_for_sharing = null;
+        // get image for social media sharing
+        $default_image_for_sharing = DB::table('fumaco_social_image')->where('is_default', 1)->where('page_type', 'main_page')->first();
+        if ($default_image_for_sharing) {
+            $image_for_sharing = ($default_image_for_sharing->filename) ? asset('/storage/social_images/'. $default_image_for_sharing->filename) : null;
+        } 
+
+        return view('frontend.about_page', compact('about_data', 'partners', 'bg1', 'bg2', 'bg3', 'image_for_sharing'));
     }
 
     public function viewJournalsPage(Request $request) {
@@ -596,7 +608,14 @@ class FrontendController extends Controller
 
         $fumaco_map = DB::table('fumaco_map_1')->first();
 
-        return view('frontend.contact', compact('fumaco_contact', 'fumaco_map'));
+        $image_for_sharing = null;
+        // get image for social media sharing
+        $default_image_for_sharing = DB::table('fumaco_social_image')->where('is_default', 1)->where('page_type', 'main_page')->first();
+        if ($default_image_for_sharing) {
+            $image_for_sharing = ($default_image_for_sharing->filename) ? asset('/storage/social_images/'. $default_image_for_sharing->filename) : null;
+        } 
+
+        return view('frontend.contact', compact('fumaco_contact', 'fumaco_map', 'image_for_sharing'));
     }
 
     public function addContact(Request $request){
@@ -782,8 +801,11 @@ class FrontendController extends Controller
 
         $image_for_sharing = null;
         // get image for social media sharing
-        $default_image_for_sharing = DB::table('fumaco_social_image')->where('is_default', 1)->first();
+        $default_image_for_sharing = DB::table('fumaco_social_image')->where('is_default', 1)->where('category_id', $product_category->id)->first();
         if ($default_image_for_sharing) {
+            $image_for_sharing = ($default_image_for_sharing->filename) ? asset('/storage/social_images/'. $default_image_for_sharing->filename) : null;
+        } else {
+            $default_image_for_sharing = DB::table('fumaco_social_image')->where('is_default', 1)->where('page_type', 'main_page')->first();
             $image_for_sharing = ($default_image_for_sharing->filename) ? asset('/storage/social_images/'. $default_image_for_sharing->filename) : null;
         }
 

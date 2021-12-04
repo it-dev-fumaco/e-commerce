@@ -64,10 +64,12 @@
 								<thead>
 									<tr>
 										<th class="text-center align-middle" style="width: 10%;">Image</th>
-										<th class="text-center align-middle" style="width: 40%;">Filename</th>
+										<th class="text-center align-middle" style="width: 25%;">Filename</th>
+										<th class="text-center align-middle" style="width: 10%;">Page</th>
+										<th class="text-center align-middle" style="width: 15%;">Category</th>
 										<th class="text-center align-middle" style="width: 10%;">Is Default</th>
-										<th class="text-center align-middle" style="width: 15%;">Created by</th>
-                                        <th class="text-center align-middle" style="width: 15%;">Last modified at</th>
+										<th class="text-center align-middle" style="width: 10%;">Created by</th>
+                                        <th class="text-center align-middle" style="width: 10%;">Last modified at</th>
 										<th class="text-center align-middle" style="width: 10%;">Action</th>
 									</tr>
 								</thead>
@@ -86,6 +88,8 @@
 											</picture>
 										</td>
 										<td>{{ $row->filename }}</td>
+										<td class="text-center">{{ ($row->page_type == 'main_page') ? 'Main Page' : 'Product Category' }}</td>
+										<td class="text-center">{{ ($row->page_type != 'main_page') ? $product_categories[$row->category_id] : null }}</td>
 										<td class="text-center align-middle">
 											<div class="form-group">
 												<div class="custom-control custom-switch">
@@ -163,12 +167,28 @@
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
-                        <label for="social-image">Select Image (600 x 315 pixels)</label>
+                        <label for="social-image">Select Image (600 x 315 pixels) *</label>
                         <div class="custom-file">
                             <input type="file" class="custom-file-input" id="social-image" name="img" required>
                             <label class="custom-file-label" for="social-image">Choose file</label>
                         </div>
                     </div>
+					<div class="form-group">
+						<label for="page-type">Page Type *</label>
+						<select class="form-control" id="page-type" name="page_type" required>
+							<option value="main_page">Main Page</option>
+							<option value="product_category">Product Category</option>
+						</select>
+					</div>
+					<div class="form-group d-none">
+						<label for="product-category">Category *</label>
+						<select class="form-control" id="product-category" name="product_category">
+							<option value="">Select Category</option>
+							@foreach ($product_categories as $i => $category)
+							<option value="{{ $i }}">{{ $category }}</option>
+							@endforeach
+						</select>
+					</div>
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-primary">Upload</button>
@@ -199,6 +219,17 @@
 					alert('An error occured.');
 				}
 			});
+		});
+
+		$('#page-type').change(function(e){
+			e.preventDefault();
+			if ($(this).val() != 'main_page') {
+				$('#product-category').parent().removeClass('d-none');
+				$('#product-category').attr('required', true);
+			} else {
+				$('#product-category').parent().addClass('d-none');
+				$('#product-category').removeAttr('required');
+			}
 		});
 	</script>
 @endsection

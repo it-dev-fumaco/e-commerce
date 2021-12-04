@@ -15,7 +15,9 @@ class SocialImagesController extends Controller
     public function viewList(){
 		$list = DB::table('fumaco_social_image')->paginate(10);
 
-        return view('backend.social_image.list', compact('list'));
+		$product_categories = DB::table('fumaco_categories')->pluck('name', 'id')->toArray();
+
+        return view('backend.social_image.list', compact('list', 'product_categories'));
 	}
 
     public function uploadImage(Request $request) {
@@ -45,6 +47,8 @@ class SocialImagesController extends Controller
 
 			$data = [
 				'filename' => $image_name,
+				'page_type' => $request->page_type,
+				'category_id' => $request->product_category,
 				'created_by' => Auth::user()->username,
                 'last_modified_by' => Auth::user()->username,
 			];
@@ -90,13 +94,16 @@ class SocialImagesController extends Controller
 			DB::table('fumaco_social_image')->where('id', $id)->delete();
 
             if($image->is_default) {
-                $new_default_image = DB::table('fumaco_social_image')->first();
+                $new_default_image = DB::table('fumaco_social_image')
+					->where('page_type', $image->page_type)->where('category_id', $image->category_id)->first();
                 if ($new_default_image) {
                    DB::table('fumaco_social_image')
                         ->where('id', $new_default_image->id)
                         ->update(['is_default' => 1, 'last_modified_by' => Auth::user()->username]);
 
-                    DB::table('fumaco_social_image')->where('id', '!=', $new_default_image->id)->update(['is_default' => 0, 'last_modified_by' => Auth::user()->username]);
+                    DB::table('fumaco_social_image')->where('id', '!=', $new_default_image->id)
+						->where('page_type', $image->page_type)->where('category_id', $image->category_id)
+						->update(['is_default' => 0, 'last_modified_by' => Auth::user()->username]);
                 }
             }
 
@@ -113,19 +120,24 @@ class SocialImagesController extends Controller
     public function setDefault($id) {
         DB::beginTransaction();
 		try{
-			DB::table('fumaco_social_image')
-                ->where('id', $id)->update(['is_default' => 1, 'last_modified_by' => Auth::user()->username]);
+			$image = DB::table('fumaco_social_image')->where('id', $id)->first();
+			if ($image) {
+				DB::table('fumaco_social_image')
+					->where('page_type', $image->page_type)->where('category_id', $image->category_id)
+					->where('id', $id)->update(['is_default' => 1, 'last_modified_by' => Auth::user()->username]);
 
-            DB::table('fumaco_social_image')->where('id', '!=', $id)
-                ->update(['is_default' => 0, 'last_modified_by' => Auth::user()->username]);
+				DB::table('fumaco_social_image')->where('id', '!=', $id)
+				->where('page_type', $image->page_type)->where('category_id', $image->category_id)
+					->update(['is_default' => 0, 'last_modified_by' => Auth::user()->username]);
 
-            DB::commit();
+				DB::commit();
+			}
 
             return redirect()->back();
 		}catch(Exception $e){
 			DB::rollback();
 
-            return redirect()->back()->with('success', 'Image successfully deleted.');
+            return redirect()->back()->with('error', 'An error occured. Please try again.');
 		}
     }
 }

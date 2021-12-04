@@ -3,6 +3,14 @@
     'activePage' => 'about_page'
 ])
 
+@section('meta')
+  <meta property="og:url" content="https://www.fumaco.com/about" />
+	<meta property="og:title" content="Fumaco | About Us" />
+  @if ($image_for_sharing)
+	<meta property="og:image" content="{{ $image_for_sharing }}" />
+	@endif
+@endsection
+
 @section('content')
 <main>
     <section class="py-5 container">
