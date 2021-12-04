@@ -58,6 +58,11 @@ Route::namespace('Auth')->group(function(){
      // linkedin login
      Route::get('auth/linkedin', 'LoginController@loginUsingLinkedin')->name('linkedin.login');
      Route::get('auth/linkedin/callback', 'LoginController@callbackFromLinkedin')->name('linkedin.callback');
+
+     Route::post('/data_deletion_request', 'LoginController@fbDataDeletionCallback');
+     Route::get('/data_deletion_status', function(Request $request) {
+         return $request->all();
+     });
 });
 
 Route::get('/signup', 'FrontendController@signupForm');
