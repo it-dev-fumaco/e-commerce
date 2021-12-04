@@ -77,19 +77,26 @@
 												<span style="color:#000000 !important; font-weight:200 !important;">&nbsp;&nbsp;( 0 Reviews )</span>
 											</div>
 										</div>
-										<div id="fb-root"></div>
-										<script>
-											(function(d, s, id) {
-												var js, fjs = d.getElementsByTagName(s)[0];
-												if (d.getElementById(id)) return;
-												js = d.createElement(s); js.id = id;
-												js.src = "https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.0";
-												fjs.parentNode.insertBefore(js, fjs);
-											}(document, 'script', 'facebook-jssdk'));
-										</script>
-										<script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v11.0&appId=974569840046115&autoLogAppEvents=1" nonce="1VBl9fa6"></script>
-										<!-- Your share button code -->
-										<div class="fb-like" data-href="{{ \Request::fullUrl() }}" data-width="" data-layout="standard" data-action="like" data-size="small" data-share="true"></div>
+										<div class="d-flex flex-row p-0">
+											<div style="font-size: 16pt; padding: 3px 8px;">
+												<a target="_blank" href="mailto:?subject=Check this out!&body=Hi, I found this product and thought you might like it {{ \Request::fullUrl() }}" class="m-0"><i class="far fa-envelope m-0"></i></a>
+											</div>
+											<div class="pt-2">
+												<div id="fb-root"></div>
+												<script>
+													(function(d, s, id) {
+														var js, fjs = d.getElementsByTagName(s)[0];
+														if (d.getElementById(id)) return;
+														js = d.createElement(s); js.id = id;
+														js.src = "https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.0";
+														fjs.parentNode.insertBefore(js, fjs);
+													}(document, 'script', 'facebook-jssdk'));
+												</script>
+												<script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v11.0&appId=974569840046115&autoLogAppEvents=1" nonce="1VBl9fa6"></script>
+												<!-- Your share button code -->
+												<div class="fb-like p-0" data-href="{{ \Request::fullUrl() }}" data-width="" data-layout="standard" data-action="like" data-size="small" data-share="true"></div>
+											</div>
+										</div>
 									</div>
 									<div>
 										@if ($product_details->f_discount_trigger)
