@@ -139,8 +139,13 @@
           </div>
         </div>
         <br>
+       <div class="row animated animatedFadeInUp fadeInUp">
+          <div class="col">
+            <div class="g-recaptcha" data-callback='recaptchaCallback' data-sitekey="6LfbWpwcAAAAAEPssgZuCMj8MKeVy7UVAXFkIbME"></div>
+          </div>
+        </div>
        <center>
-          <button type="submit" class="btn btn-primary mt-3 fumacoFont_btn animated animatedFadeInUp fadeInUp" id="submitBtn">Submit</button>
+          <button type="submit" class="btn btn-primary mt-3 fumacoFont_btn animated animatedFadeInUp fadeInUp" id="submitBtn" disabled>Submit</button>
         </center>
       </form>
       &nbsp;<br>&nbsp;<br>
@@ -150,5 +155,9 @@
 @endsection
 
 @section('script')
-
+<script>
+  function recaptchaCallback() {
+    $('#submitBtn').removeAttr('disabled');
+  };
+</script>
 @endsection
