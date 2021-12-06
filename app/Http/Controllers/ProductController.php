@@ -916,6 +916,7 @@ class ProductController extends Controller
                 'code' => strtoupper($request->coupon_code),
                 'total_allotment' => isset($request->unlimited_allotment) ? null : $request->allotment,
                 'unlimited' => isset($request->unlimited_allotment) ? 1 : 0,
+                'allowed_usage' => $request->allowed_usage,
                 'minimum_spend' => $request->minimum_spend,
                 'discount_type' => $request->discount_type,
                 'discount_rate' => $discount_rate,
@@ -932,13 +933,13 @@ class ProductController extends Controller
             // return $insert;
             DB::table('fumaco_voucher')->insert($insert);
 
-            if($request->coupon_type == 'Gift Card'){
+            if($request->coupon_type == 'Exclusive Voucher'){
                 $voucher_id = DB::table('fumaco_voucher')->orderBy('created_at', 'desc')->first();
                 foreach($request->selected_customer as $key => $customer){
                     DB::table('fumaco_voucher_customers')->insert([
                         'customer_id' => $customer,
                         'voucher_id' => $voucher_id->id,
-                        'allowed_usage' => $request->customer_allowed_usage[$key],
+                        // 'allowed_usage' => $request->customer_allowed_usage[$key],
                         'created_by' => Auth::user()->username
                     ]);
                 }
@@ -994,6 +995,7 @@ class ProductController extends Controller
                 'code' => strtoupper($request->coupon_code),
                 'total_allotment' => isset($request->unlimited_allotment) ? null : $request->allotment,
                 'unlimited' => isset($request->unlimited_allotment) ? 1 : 0,
+                'allowed_usage' => $request->allowed_usage,
                 'minimum_spend' => $request->minimum_spend,
                 'discount_type' => $request->discount_type,
                 'discount_rate' => $discount_rate,
@@ -1010,7 +1012,7 @@ class ProductController extends Controller
 
             DB::table('fumaco_voucher')->where('id', $id)->update($update);
             
-            if($request->coupon_type == 'Gift Card'){
+            if($request->coupon_type == 'Exclusive Voucher'){
                 $last_modified_by = null;
                 $checker = DB::table('fumaco_voucher_customers')->where('voucher_id', $id)->count();
     
@@ -1023,7 +1025,7 @@ class ProductController extends Controller
                     DB::table('fumaco_voucher_customers')->insert([
                         'customer_id' => $customer,
                         'voucher_id' => $id,
-                        'allowed_usage' => $request->customer_allowed_usage[$key],
+                        // 'allowed_usage' => $request->customer_allowed_usage[$key],
                         'created_by' => Auth::user()->username,
                         'last_modified_by' => $last_modified_by
                     ]);

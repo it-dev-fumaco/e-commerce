@@ -10,7 +10,9 @@
 
   <meta property="og:url" content="https://www.fumaco.com" />
 	<meta property="og:title" content="Fumaco" />
-	<meta property="og:image" content="{{ asset('/assets/site-img/'. $carousel_data[0]->fumaco_image1) }}" />
+  @if ($image_for_sharing)
+	<meta property="og:image" content="{{ $image_for_sharing }}" />
+	@endif
 @endsection
 
 @section('content')

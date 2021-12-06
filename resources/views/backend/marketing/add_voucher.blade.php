@@ -121,13 +121,22 @@
                                         <hr>
                                         <div class="row">
                                             <div class="col-6 mx-auto">
-                                                <label>Coupon Type *</label>
-                                                <select class="form-control" name="coupon_type" id="coupon_type" required>
-                                                    <option disabled value="">Coupon Type</option>
-                                                    <option value="Promotional" selected>Promotional</option>
-                                                    <option value="Gift Card">Gift Card</option>
-                                                </select>
+                                                <div class="row">
+                                                    <div class="col-8 mx-auto">
+                                                        <label>Coupon Type *</label>
+                                                        <select class="form-control" name="coupon_type" id="coupon_type" required>
+                                                            <option disabled value="">Coupon Type</option>
+                                                            <option value="Promotional" selected>Promotional</option>
+                                                            <option value="Exclusive Voucher">Exclusive Voucher</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-4">
+                                                        <label>Allowed Usage *</label>
+                                                        <input type="text" class="form-control" name="allowed_usage" id="allowed_usage" placeholder="Allowed Usage" value="1" >
+                                                    </div>
+                                                </div>
                                             </div>
+                                            
                                         </div>
                                         <div id="customers" class="row">
                                             <select class="d-none form-control" name="customer_select" id="customer_select">
@@ -141,8 +150,7 @@
                                                 <table class="table table-bordered" id="customers-table">
                                                      <thead>
                                                           <tr>
-                                                                <th style="width: 40%;" scope="col" class="text-center">Customer Name</th>
-                                                                <th style="width: 25%;" scope="col" class="text-center">Allowed Usage</th>
+                                                                <th scope="col" class="text-center">Customer Name</th>
                                                                 <th class="text-center" style="width: 10%;"><button class="btn btn-outline-primary btn-sm" id="add-customers-btn">Add</button></th>
                                                           </tr>
                                                      </thead>
@@ -254,7 +262,7 @@
         }
 
         function couponType(){
-            if($('#coupon_type').val() == 'Gift Card'){
+            if($('#coupon_type').val() == 'Exclusive Voucher'){
                 $('#customers').slideDown();
                 $('#for_promotional').slideUp();
             }else{
@@ -283,9 +291,9 @@
 				'<td class="p-2">' +
 					'<select name="selected_customer[]" class="form-control w-100" style="width: 100%;" required>' + clone_select + '</select>' +
 				'</td>' +
-				'<td class="p-2">' +
-					'<input type="text" name="customer_allowed_usage[]" class="form-control" placeholder="Allowed Usage">' +
-				'</td>' +
+				// '<td class="p-2">' +
+				// 	'<input type="text" name="customer_allowed_usage[]" class="form-control" placeholder="Allowed Usage">' +
+				// '</td>' +
 				'<td class="text-center">' +
 					'<button type="button" class="btn btn-outline-danger btn-sm remove-td-row">Remove</button>' +
 				'</td>' +

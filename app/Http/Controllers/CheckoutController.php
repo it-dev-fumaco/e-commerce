@@ -573,7 +573,42 @@ class CheckoutController extends Controller
 								$is_voucher_valid = false;
 							}
 						}
-				
+
+						if($voucher_details->coupon_type == 'Promotional') {
+							if($voucher_details->require_signin) {
+								if (!Auth::check()) {
+									$is_voucher_valid = false;
+								}
+			
+								// count consumed voucher for loggedin user
+								$consumed_voucher = DB::table('fumaco_order')->where('user_email', Auth::user()->username)
+									->where('voucher_code', $voucher_details->code)->count();
+								if ($consumed_voucher >= $voucher_details->allowed_usage) {
+									$is_voucher_valid = false;
+								}
+							}
+						}
+			
+						if($voucher_details->coupon_type == 'Exclusive Voucher') {
+							if(Auth::check()) {
+								// check if voucher is applicable for loggedin user
+								$not_existing_voucher_customer = DB::table('fumaco_voucher_customers as a')
+									->join('fumaco_users as b', 'a.customer_id', 'b.id')->where('a.voucher_id', $voucher_details->id)
+									->where('b.username', Auth::user()->username)->doesntExist();
+								if ($not_existing_voucher_customer) {
+									$is_voucher_valid = false;
+								}
+								// count consumed voucher for loggedin user
+								$consumed_voucher = DB::table('fumaco_order')->where('user_email', Auth::user()->username)
+									->where('voucher_code', $voucher_details->code)->count();
+								if ($consumed_voucher >= $voucher_details->allowed_usage) {
+									$is_voucher_valid = false;
+								}
+							} else {
+								$is_voucher_valid = false;
+							}
+						}
+						
 						if ($is_voucher_valid) {
 							if($voucher_details->discount_type == 'By Percentage') {
 								$discount = ($voucher_details->discount_rate/100) * $amount;
@@ -667,7 +702,48 @@ class CheckoutController extends Controller
 							$is_voucher_valid = false;
 						}
 					}
-			
+
+					if(!$voucher_details->unlimited) {
+						if ($voucher_details->total_allotment <= $voucher_details->total_consumed) {
+							$is_voucher_valid = false;
+						}
+					}
+
+					if($voucher_details->coupon_type == 'Promotional') {
+						if($voucher_details->require_signin) {
+							if (!$loggedin) {
+								$is_voucher_valid = false;
+							}
+		
+							// count consumed voucher for loggedin user
+							$consumed_voucher = DB::table('fumaco_order')->where('user_email', $loggedin)
+								->where('voucher_code', $voucher_details->code)->count();
+							if ($consumed_voucher >= $voucher_details->allowed_usage) {
+								$is_voucher_valid = false;
+							}
+						}
+					}
+		
+					if($voucher_details->coupon_type == 'Exclusive Voucher') {
+						if($loggedin) {
+							// check if voucher is applicable for loggedin user
+							$not_existing_voucher_customer = DB::table('fumaco_voucher_customers as a')
+								->join('fumaco_users as b', 'a.customer_id', 'b.id')->where('a.voucher_id', $voucher_details->id)
+								->where('b.username', $loggedin)->doesntExist();
+							if ($not_existing_voucher_customer) {
+								$is_voucher_valid = false;
+							}
+							// count consumed voucher for loggedin user
+							$consumed_voucher = DB::table('fumaco_order')->where('user_email', $loggedin)
+								->where('voucher_code', $voucher_details->code)->count();
+							if ($consumed_voucher >= $voucher_details->allowed_usage) {
+								$is_voucher_valid = false;
+							}
+						} else {
+							$is_voucher_valid = false;
+						}
+					}
+					
 					if ($is_voucher_valid) {
 						if($voucher_details->discount_type == 'By Percentage') {
 							$discount = ($voucher_details->discount_rate/100) * $subtotal;
@@ -756,7 +832,7 @@ class CheckoutController extends Controller
 					'payment_transaction_time' => $request->RespTime,
 					'amount_paid' => $request->Amount,
 					'order_type' => $temp->xusertype,
-					'user_email' => $temp->xusernamex,
+					'user_email' => $loggedin,
 					'shipping_business_name' => $temp->xship_business_name,
 					'shipping_tin' => $temp->xship_tin,
 					'billing_business_name' => $temp->xbusiness_name,
@@ -1145,6 +1221,41 @@ class CheckoutController extends Controller
 				}
 			}
 
+			if($voucher_details->coupon_type == 'Promotional') {
+				if($voucher_details->require_signin) {
+					if (!Auth::check()) {
+						return response()->json(['status' => 0, 'message' => 'Please login to use this voucher.']);
+					}
+
+					// count consumed voucher for loggedin user
+					$consumed_voucher = DB::table('fumaco_order')->where('user_email', Auth::user()->username)
+						->where('voucher_code', $voucher_details->code)->count();
+					if ($consumed_voucher >= $voucher_details->allowed_usage) {
+						return response()->json(['status' => 0, 'message' => 'Coupon is already expired.']);
+					}
+				}
+			}
+
+			if($voucher_details->coupon_type == 'Exclusive Voucher') {
+				if(Auth::check()) {
+					// check if voucher is applicable for loggedin user
+					$not_existing_voucher_customer = DB::table('fumaco_voucher_customers as a')
+						->join('fumaco_users as b', 'a.customer_id', 'b.id')->where('a.voucher_id', $voucher_details->id)
+						->where('b.username', Auth::user()->username)->doesntExist();
+					if ($not_existing_voucher_customer) {
+						return response()->json(['status' => 0, 'message' => 'Please enter a valid coupon code.']);
+					}
+					// count consumed voucher for loggedin user
+					$consumed_voucher = DB::table('fumaco_order')->where('user_email', Auth::user()->username)
+						->where('voucher_code', $voucher_details->code)->count();
+					if ($consumed_voucher >= $voucher_details->allowed_usage) {
+						return response()->json(['status' => 0, 'message' => 'Coupon is already expired.']);
+					}
+				} else {
+					return response()->json(['status' => 0, 'message' => 'Please enter a valid coupon code.']);
+				}
+			}
+			
 			$cart = session()->get('fumCart');
 			$cart = (!$cart) ? [] : $cart;
 
