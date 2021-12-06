@@ -155,7 +155,7 @@
 <script> 
   grecaptcha.ready(function() {
     grecaptcha.execute("{{ config('recaptcha.api_site_key') }}", {action: 'homepage'}).then(function(token) {
-      if(token) { //js 
+      if(token) {
         $("#recaptcha_v3").val(token); 
       } 
     });

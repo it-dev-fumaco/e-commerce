@@ -51,6 +51,7 @@
                         <br>
                         <center>
                             <div class="col-lg-7" style="text-align: left;">
+                                <input type="hidden" name="g-recaptcha-response" id="recaptcha_v3">
                                 <div class="row">
                                     <label for="mobile_1" class="myprofile-font-form login_1">First Name : <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control caption_1" id="fname" name="first_name" value="{{ old('first_name') }}" required>
@@ -121,7 +122,16 @@
 @endsection
 
 @section('script')
-
+<script src="https://www.google.com/recaptcha/api.js?render={{ config('recaptcha.api_site_key') }}"></script>
+<script> 
+  grecaptcha.ready(function() {
+    grecaptcha.execute("{{ config('recaptcha.api_site_key') }}", {action: 'homepage'}).then(function(token) {
+      if(token) {
+        $("#recaptcha_v3").val(token); 
+      } 
+    });
+  });
+</script> 
 <script>
 
     function toggleResetPswd(e){
