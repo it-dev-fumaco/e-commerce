@@ -79,7 +79,7 @@
 										</div>
 										<div class="d-flex flex-row p-0">
 											<div style="font-size: 16pt; padding: 3px 8px;">
-												<a target="_blank" href="mailto:?subject=Check this out!&body=Hi, I found this product and thought you might like it {{ \Request::fullUrl() }}" class="m-0"><i class="far fa-envelope m-0"></i></a>
+												<a target="_blank" href="mailto:?subject=Check this out!&body=Hi, I found this product and thought you might like it {{ \Request::fullUrl() }}" class="m-0" style=" color: #f49332;"><i class="far fa-envelope m-0"></i></a>
 											</div>
 											<div class="pt-2">
 												<div id="fb-root"></div>
