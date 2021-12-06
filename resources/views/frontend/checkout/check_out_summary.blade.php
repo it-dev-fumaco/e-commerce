@@ -97,16 +97,16 @@
 								<div class="accordion" id="accordionExample">
 									<div class="row">
 										<div class="col-md-12 col-lg-{{ $col }} d-flex align-items-stretch">
-											<div class="card" style="width: 100%">
+											<div class="card" style="width: 100%;">
 												<div class="card-header" id="headingOne">
 													<h2 class="mb-0">
 														<div class="row">
-															<div class="col-md-6">
+															<div class="col-md-6 col-lg-12 col-xl-6">
 																<button class="btn btn-link he1x" type="button" data-toggle="collapse" data-target="" aria-expanded="true" aria-controls="collapseOne" style="text-decoration: none; color:#2c2c2d;">
 																	<b>Shipping{{ $ship_text }} Address</b>
 																</button>
 															</div>
-															<div class="col-md-6" style="text-align: right;">
+															<div class="col-md-6 col-lg-12 col-xl-6" style="text-align: right;">
 																@if (Auth::check())
 																	<a href="#" style="font-size: 14px; width:100%; text-decoration: none;" role="button" data-toggle="modal" data-target="#selectShippingModal">UPDATE YOUR ADDRESS</a>
 																@endif
@@ -139,17 +139,19 @@
 											</div>
 										</div>
 										@if ($shipping_details['same_as_billing'] == 0)
+											
+											<div class="col-12 d-block d-md-none"><br/></div>
 											<div class="col-md-12 col-lg-6 d-flex align-items-stretch">
 												<div class="card" style="width: 100%">
 													<div class="card-header" id="headingOne1">
 														<h2 class="mb-0">
 															<div class="row">
-																<div class="col-md-6">
+																<div class="col-md-6 col-lg-12 col-xl-6">
 																	<button class="btn btn-link he1x" type="button" data-toggle="collapse" data-target="" aria-expanded="true" aria-controls="collapseOne" style="text-decoration: none; color:#2c2c2d;">
 																		<b>Billing Address</b>
 																	</button>
 																</div>
-																<div class="col-md-6" style="text-align: right;">
+																<div class="col-md-6 col-lg-12 col-xl-6" style="text-align: right;">
 																	@if (Auth::check())
 																		<a href="#" style="font-size: 14px; width:100%; text-decoration: none;" role="button"  data-toggle="modal" data-target="#selectBillingModal">UPDATE YOUR ADDRESS</a>
 																	@endif
@@ -288,12 +290,12 @@
 							<div class="alert alert-danger fade show mb-0 d-none" id="coupon-alert" role="alert" style="border: 1px solid;"></div>
 							<label for="coupon-code" class="m-2 mb-0">Coupon</label>
 							<div class="d-flex flex-row">
-								<div class="p-2 col-md-10">
+								<div class="p-2 col-md-10 col-lg-7 col-xl-10">
 									<input type="text" id="coupon-code" class="form-control" placeholder="Enter Coupon Code" aria-label="Enter Coupon Code" aria-describedby="basic-addon2">
 								</div>
-								<div class="p-2 col-md-2">
+								<div class="p-2 col-md-2 col-lg-5 col-xl-2">
 									<button class="btn w-100 btn-outline-success" type="button" id="apply-coupon-btn">Apply</button></div>
-							  </div>
+							  	</div>
 							  <hr>
 							<div class="d-flex justify-content-between align-items-center" style="color:#FF9D00 !important;">Grand Total <small class="stylecap he1x" id="grand-total">0.00</small>
 							</div>
