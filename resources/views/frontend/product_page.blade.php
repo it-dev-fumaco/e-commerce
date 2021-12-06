@@ -271,10 +271,20 @@
 																&nbsp;<b>New</b>&nbsp;
 																</span>
 															</div><br class="{{ $rp['is_new_item'] == 1 ? '' : 'd-none' }}"/>
-															@if ($rp['is_discounted'])
+															@if ($rp['is_discounted'] == 1)
 																<div class="col-12">
 																	<span class="p-1 text-center" style="background-color: #FF0000; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
 																		&nbsp;<b>{{ $rp['discount_percent'] }}% OFF</b>&nbsp;
+																	</span>
+																</div>
+															@elseif ($rp['is_discounted_from_category'] == 1)
+																<div class="col-12">
+																	<span class="p-1 text-center" style="background-color: #FF0000; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
+																		@if ($rp['category_discount_type'] == 'By Percentage')
+																			&nbsp;<b>{{ $rp['category_discount_rate'] }}% OFF</b>&nbsp;
+																		@else
+																			&nbsp;<b>₱ {{ number_format($rp['category_discount_rate'], 2, '.', ',') }} OFF</b>&nbsp;
+																		@endif
 																	</span>
 																</div>
 															@endif
@@ -291,23 +301,16 @@
 															<img src="{{ asset($img) }}" alt="{{ Str::slug(explode(".", $rp['image'])[0], '-') }}" class="img-responsive hover" style="width: 100% !important;">
 														</picture>
 													</div>
-													
-
-
-													<div class="card-body">
+													<div class="card-body d-flex flex-column">
 														<div class="text ellipsis">
 															<a href="/product/{{ ($rp['slug']) ? $rp['slug'] : $rp['item_code'] }}" class="card-text product-head fumacoFont_card_title text-concat prod_desc" style="text-decoration: none !important; text-transform: none !important; color:#0062A5 !important;  min-height: 100px;">{{ $rp['item_name'] }}</a>
 														</div>
-														<p class="card-text fumacoFont_card_price price-card d-none d-md-block d-lg-none" style="color:#000000 !important; ">
-															@if ($rp['is_discounted'])
-															<span style="white-space: nowrap !important">₱ {{ number_format(str_replace(",","",$rp['new_price']), 2) }}</span>&nbsp;<br class="d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$rp['orig_price']), 2) }}</s>
-															@else
-															₱ {{ number_format(str_replace(",","",$rp['orig_price']), 2) }}
-															@endif
-														</p>
+
 														<p class="card-text fumacoFont_card_price d-sm-block d-md-none d-lg-block" style="color:#000000 !important; ">
-															@if ($rp['is_discounted'])
+															@if ($rp['is_discounted'] == 1)
 															<span style="white-space: nowrap !important">₱ {{ number_format(str_replace(",","",$rp['new_price']), 2) }}</span>&nbsp;<br class="d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$rp['orig_price']), 2) }}</s>
+															@elseif($rp['is_discounted_from_category'] == 1)
+																₱ {{ number_format(str_replace(",","",$rp['category_discounted_price']), 2) }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$rp['orig_price']), 2) }}</s>
 															@else
 															₱ {{ number_format(str_replace(",","",$rp['orig_price']), 2) }}
 															@endif

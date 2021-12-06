@@ -46,15 +46,15 @@
                                             </div>
                                         </div>
                                         <div class="row">
-                                            <div class="col-4">
+                                            <div class="col-6">
                                                 <label>Sale Name *</label>
                                                 <input type="text" class="form-control" name="sale_name" placeholder="Sale Name" required>
                                             </div>
-                                            <div class="col-4">
+                                            <div class="col-6">
                                                 <label>Set Sale Duration</label>
                                                 <input type="text" class="form-control set_duration" id="daterange" name="sale_duration" required/>
                                             </div>
-                                            <div class="col-4">
+                                            {{-- <div class="col-4">
                                                 @php
                                                     $discount_for = array('General', 'Member', 'Guest');
                                                 @endphp
@@ -65,7 +65,7 @@
                                                         <option value="{{ $for }}">{{ $for }}</option>
                                                     @endforeach
                                                 </select>
-                                            </div>
+                                            </div> --}}
                                         </div>
                                         <br/>
                                         <div class="row">

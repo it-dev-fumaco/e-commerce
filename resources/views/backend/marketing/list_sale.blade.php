@@ -66,7 +66,7 @@
                                             <th class="text-center">ID</th>
                                             <th class="text-center">Sale Name</th>
                                             <th class="text-center">Sale Duration</th>
-                                            <th class="text-center">Discount For</th>
+                                            {{-- <th class="text-center">Discount For</th> --}}
                                             <th class="text-center">Apply Discount To</th>
                                             <th class="text-center">Sale Details</th>
                                             <th class="text-center">Active</th>
@@ -77,7 +77,7 @@
                                                 <td class="text-center">{{ $sale['id'] }}</td>
                                                 <td class="text-center">{{ $sale['name'] }}</td>
                                                 <td class="text-center">{{ $sale['sale_duration'] ? $sale['sale_duration'] : 'Lifelong Validity' }}</td>
-                                                <td class="text-center">{{ $sale['discount_for'] }}</td>
+                                                {{-- <td class="text-center">{{ $sale['discount_for'] }}</td> --}}
                                                 <td class="text-center">{{ $sale['apply_discount_to'] }}</td>
                                                 <td class="text-center">
                                                     <a type="button" data-toggle="modal" data-target="#sale{{ $sale['id'] }}Modal" style="color: #007BFF;">

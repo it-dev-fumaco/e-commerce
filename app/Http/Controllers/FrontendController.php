@@ -102,6 +102,7 @@ class FrontendController extends Controller
                     'id' => $item->id,
                     'item_code' => $item->f_idcode,
                     'item_name' => $item->f_name_name,
+                    'category' => $item->f_category,
                     'original_price' => $item->f_original_price,
                     'is_discounted' => $item->f_discount_trigger,
                     'discounted_price' => $item->f_price,
@@ -162,12 +163,37 @@ class FrontendController extends Controller
             foreach ($results as $result) {
                 if($result['item_code'] != null) {
                     $on_stock = ($result['f_qty'] - $result['f_reserved_qty']) > 0 ? 1 : 0;
+
+                    $category = DB::table('fumaco_categories')->where('name', $result['category'])->select('id')->first();
+
+                    $category_discount = DB::table('fumaco_on_sale as sale')->join('fumaco_on_sale_categories as cat_sale', 'sale.id', 'cat_sale.sale_id')->whereDate('sale.start_date', '<=', Carbon::now())->whereDate('sale.end_date', '>=', Carbon::now())->where('status', 1)->where('cat_sale.category_id', $category->id)->first();
+
+                    $product_price = null;
+                    $discount_from_category = 0;
+
+                    if($category_discount){
+                        $discount_from_category = 1;
+                        if($category_discount->discount_type == 'By Percentage'){
+                            $product_price = $result['original_price'] - ($result['original_price'] * ($category_discount->discount_rate/100));
+                        }else if($category_discount->discount_type == 'Fixed Amount'){
+                            $discount_from_category = 0;
+                            if($result['original_price'] > $category_discount->discount_rate){
+                                $discount_from_category = 1;
+                                $product_price = $result['original_price'] - $category_discount->discount_rate;
+                            }
+                        }
+                    }
+
                     $products[] = [
                         'id' => $result['id'],
                         'item_code' => $result['item_code'],
                         'item_name' => $result['item_name'],
                         'original_price' => $result['original_price'],
                         'is_discounted' => $result['is_discounted'],
+                        'is_discounted_from_category' => $discount_from_category,
+                        'category_discounted_price' => $product_price,
+                        'category_discount_rate' => $category_discount ? $category_discount->discount_rate : null,
+                        'category_discount_type' => $category_discount ? $category_discount->discount_type : null,
                         'discounted_price' => $result['discounted_price'],
                         'on_sale' => $result['on_sale'],
                         'discount_percent' => $result['discount_percent'],
@@ -251,6 +277,26 @@ class FrontendController extends Controller
                 }
             }
 
+            $bs_category = DB::table('fumaco_categories')->where('name', $bs->f_category)->select('id')->first();
+
+            $bs_category_discount = DB::table('fumaco_on_sale as sale')->join('fumaco_on_sale_categories as cat_sale', 'sale.id', 'cat_sale.sale_id')->whereDate('sale.start_date', '<=', Carbon::now())->whereDate('sale.end_date', '>=', Carbon::now())->where('status', 1)->where('cat_sale.category_id', $bs_category->id)->first();
+
+            $bs_product_price = null;
+            $discount_from_category = 0;
+
+            if($bs_category_discount){
+                $discount_from_category = 1;
+                if($bs_category_discount->discount_type == 'By Percentage'){
+                    $bs_product_price = $bs->f_original_price - ($bs->f_original_price * ($bs_category_discount->discount_rate/100));
+                }else if($bs_category_discount->discount_type == 'Fixed Amount'){
+                    $discount_from_category = 0;
+                    if($bs->f_original_price > $bs_category_discount->discount_rate){
+                        $discount_from_category = 1;
+                        $bs_product_price = $bs->f_original_price - $bs_category_discount->discount_rate;
+                    }
+                }
+            }
+
             $bs_item_name = $bs->f_name_name;
 
             $on_stock = ($bs->f_qty - $bs->f_reserved_qty) > 0 ? 1 : 0;
@@ -259,7 +305,11 @@ class FrontendController extends Controller
                 'item_code' => $bs->f_idcode,
                 'item_name' => $bs_item_name,
                 'orig_price' => $bs->f_original_price,
+                'category_discounted_price' => $bs_product_price,
+                'category_discount_rate' => $bs_category_discount ? $bs_category_discount->discount_rate : null,
+                'category_discount_type' => $bs_category_discount ? $bs_category_discount->discount_type : null,
                 'is_discounted' => $bs->f_discount_trigger,
+                'is_discounted_from_category' => $bs_category_discount ? 1 : 0,
                 'on_stock' => $on_stock,
                 'new_price' => $bs->f_price,
                 'discount' => $bs->f_discount_percent,
@@ -268,6 +318,8 @@ class FrontendController extends Controller
                 'is_new_item' => $is_new_item
             ];
         }
+
+        // return $best_selling_arr;
 
         foreach($on_sale as $os){
             $os_img = DB::table('fumaco_items_image_v1')->where('idcode', $os->f_idcode)->first();
@@ -816,9 +868,33 @@ class FrontendController extends Controller
             })
             ->where('f_status', 1)->orderBy($sortby, $orderby)->paginate(15);
 
+        $cat_id = $category_id;
+        if(!is_int($cat_id)){
+            $id = DB::table('fumaco_categories')->where('slug', $cat_id)->select('id')->first();
+            $cat_id = $id->id;
+        }
+        
+        $category_discount = DB::table('fumaco_on_sale as sale')->join('fumaco_on_sale_categories as cat_sale', 'sale.id', 'cat_sale.sale_id')->whereDate('sale.start_date', '<=', Carbon::now())->whereDate('sale.end_date', '>=', Carbon::now())->where('status', 1)->where('cat_sale.category_id', $cat_id)->first();
+
         $products_arr = [];
         foreach ($products as $product) {
             $item_image = DB::table('fumaco_items_image_v1')->where('idcode', $product->f_idcode)->first();
+
+            $product_price = $product->f_original_price;
+            $discount_from_category = 0;
+
+            if($category_discount){
+                $discount_from_category = 1;
+                if($category_discount->discount_type == 'By Percentage'){
+                    $product_price = $product->f_original_price - ($product->f_original_price * ($category_discount->discount_rate/100));
+                }else if($category_discount->discount_type == 'Fixed Amount'){
+                    $discount_from_category = 0;
+                    if($product->f_original_price > $category_discount->discount_rate){
+                        $discount_from_category = 1;
+                        $product_price = $product->f_original_price - $category_discount->discount_rate;
+                    }
+                }
+            }
 
             $item_name = strip_tags($product->f_name_name);
             $on_stock = ($product->f_qty - $product->f_reserved_qty) > 0 ? 1 : 0;
@@ -828,8 +904,9 @@ class FrontendController extends Controller
                 'item_name' => $item_name,
                 'image' => ($item_image) ? $item_image->imgprimayx : null,
                 'price' => $product->f_original_price,
-                'discounted_price' => number_format(str_replace(",","",$product->f_price), 2),
+                'discounted_price' => $product->f_discount_trigger == 1 ? number_format(str_replace(",","",$product->f_price), 2) : $product_price,
                 'is_discounted' => $product->f_discount_trigger,
+                'is_discounted_from_category' => $discount_from_category,
                 'on_sale' => $product->f_onsale,
                 'on_stock' => $on_stock,
                 'discount_percent' => $product->f_discount_percent,
@@ -838,7 +915,7 @@ class FrontendController extends Controller
             ];
         }
 
-        return view('frontend.product_list', compact('product_category', 'products_arr', 'products', 'filters', 'image_for_sharing'));
+        return view('frontend.product_list', compact('product_category', 'products_arr', 'products', 'filters', 'image_for_sharing', 'category_discount'));
     }
 
     public function viewProduct($slug) { // Product Page
@@ -886,7 +963,7 @@ class FrontendController extends Controller
         $related_products_query = DB::table('fumaco_items as a')
             ->join('fumaco_items_relation as b', 'a.f_idcode', 'b.related_item_code')
             ->where('b.item_code', $product_details->f_idcode)->where('a.f_status', 1)
-            ->select('a.id', 'a.f_idcode', 'a.f_original_price', 'a.f_discount_trigger', 'a.f_price', 'a.f_name_name', 'a.slug', 'a.f_qty', 'a.f_reserved_qty', 'a.f_onsale', 'a.f_new_item', 'a.f_new_item_start', 'a.f_new_item_end', 'a.f_discount_percent')
+            ->select('a.id', 'a.f_idcode', 'a.f_original_price', 'a.f_discount_trigger', 'a.f_price', 'a.f_name_name', 'a.slug', 'a.f_qty', 'a.f_reserved_qty', 'a.f_onsale', 'a.f_new_item', 'a.f_new_item_start', 'a.f_new_item_end', 'a.f_discount_percent', 'a.f_category')
             ->get();
 
         $related_products = [];
@@ -900,13 +977,37 @@ class FrontendController extends Controller
                 }
             }
 
+            $category = DB::table('fumaco_categories')->where('name', $row->f_category)->select('id')->first();
+
+            $category_discount = DB::table('fumaco_on_sale as sale')->join('fumaco_on_sale_categories as cat_sale', 'sale.id', 'cat_sale.sale_id')->whereDate('sale.start_date', '<=', Carbon::now())->whereDate('sale.end_date', '>=', Carbon::now())->where('status', 1)->where('cat_sale.category_id', $category->id)->first();
+
+            $product_price = null;
+            $discount_from_category = 0;
+
+            if($category_discount){
+                $discount_from_category = 1;
+                if($category_discount->discount_type == 'By Percentage'){
+                    $product_price = $row->f_original_price - ($row->f_original_price * ($category_discount->discount_rate/100));
+                }else if($category_discount->discount_type == 'Fixed Amount'){
+                    $discount_from_category = 0;
+                    if($row->f_original_price > $category_discount->discount_rate){
+                        $discount_from_category = 1;
+                        $product_price = $row->f_original_price - $category_discount->discount_rate;
+                    }
+                }
+            }
+
             $on_stock = ($row->f_qty - $row->f_reserved_qty) > 0 ? 1 : 0;
             $related_products[] = [
                 'id' => $row->id,
                 'item_code' => $row->f_idcode,
                 'item_name' => $row->f_name_name,
                 'orig_price' => $row->f_original_price,
+                'category_discounted_price' => $product_price,
+                'category_discount_rate' => $category_discount ? $category_discount->discount_rate : null,
+                'category_discount_type' => $category_discount ? $category_discount->discount_type : null,
                 'is_discounted' => $row->f_discount_trigger,
+                'is_discounted_from_category' => $discount_from_category,
                 'discount_percent' => $row->f_discount_percent,
                 'new_price' => $row->f_price,
                 'on_stock' => $on_stock,
@@ -915,6 +1016,8 @@ class FrontendController extends Controller
                 'is_new_item' => $is_new_item
             ];
         }
+
+        // return $related_products;
 
         return view('frontend.product_page', compact('product_details', 'product_images', 'attributes', 'variant_attr_arr', 'related_products', 'filtered_attributes'));
     }
