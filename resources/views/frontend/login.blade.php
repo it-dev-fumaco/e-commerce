@@ -4,11 +4,6 @@
 ])
 
 @section('content')
-
-<div id="fb-root"></div>
-<script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v12.0&appId=435536724607670&autoLogAppEvents=1" nonce="wN93XQra"></script>
-
-
 <main style="background-color:#0062A5;">
     <div id="myCarousel" class="carousel slide" data-bs-ride="carousel">
         <div class="carousel-inner">
@@ -51,6 +46,15 @@
                     @endif
                         @csrf
                         <h4 style="color: #404040; border-bottom: 2px solid  #e59866 ; padding-bottom: 8px; text-align: center;">Sign In</h4>
+                        {{-- <ul class="nav nav-tabs">
+                            <li class="nav-item active" style="width: 50%;">
+                            <a class="nav-link" href="#"><center><span class="login_2">Sign in</span></center></a>
+                            </li>
+
+                            {{-- <li class="nav-item" style="width: 50%;">
+                            <a class="nav-link" href="#" type="button" id="btn-signup"><center><span class="login_2">Register</span></center></a>
+                            </li> --}}
+                        {{-- </ul> --}}
                         <center>
                         <div class="col-lg-7" style="text-align: left;">
                             <br>
@@ -75,13 +79,16 @@
                             </p>
                             <hr>
                             <small class="text-muted"> or sign in with</small>
-
-
-<div class="fb-login-button" data-width="100%" data-size="large" data-button-type="continue_with" data-layout="default" data-auto-logout-link="false" data-use-continue-as="false" style="width: 100%;"></div>
-
-                            {{-- <a href="{{ route('facebook.login') }}" class="btn mt-2 text-white align-middle" style="display: block; width: 100%; background-color:  #115cf3;">
+                            <a href="{{ route('facebook.login') }}" class="btn mt-2 text-white align-middle" style="display: block; width: 100%; background-color:  #115cf3;">
                                 <i class="fab fa-facebook mr-3" style="font-size: 1.3rem;"></i> <span style="font-size: 14px;">Sign in with Facebook</span> 
+                            </a>
+                            {{-- <a href="{{ route('google.login') }}" class="btn text-white mt-2" style="display: block; width: 100%; background-color:  #fffff;">
+                                <i class="fab fa-google mr-2"></i> Login with Google
                             </a> --}}
+                            {{-- <a href="{{ route('linkedin.login') }}" class="btn text-white mt-2" style="display: block; width: 100%; background-color: #0c6caf;">
+                                <i class="fab fa-linkedin mr-2"></i> Login with LinkedIn
+                            </a> --}} 
+
                             <a href="{{ route('google.login') }}" class="btn text-dark login-with-google-btn mt-2">
                                 <img src="{{ asset('assets/google.svg') }}" width="23" class="m-1"> Sign in with Google
                             </a>
@@ -154,47 +161,6 @@
 
 @endsection
 
-@section('script')
-<script>
-
-    function statusChangeCallback(response) {  // Called with the results from FB.getLoginStatus().
-      console.log('statusChangeCallback');
-      console.log(response);                   // The current login status of the person.
-      if (response.status === 'connected') {   // Logged into your webpage and Facebook.
-        console.log('success');
-      } else {                                 // Not logged into your webpage or we are unable to tell.
-        console.log('please log in');
-      }
-    }
-  
-  
-    function checkLoginState() {               // Called when a person is finished with the Login Button.
-      FB.getLoginStatus(function(response) {   // See the onlogin handler
-        statusChangeCallback(response);
-      });
-    }
-  
-  
-    window.fbAsyncInit = function() {
-      FB.init({
-        appId      : '435536724607670',
-        cookie     : true,                     // Enable cookies to allow the server to access the session.
-        xfbml      : true,                     // Parse social plugins on this webpage.
-        version    : 'v12.0'           // Use this Graph API version for this call.
-      });
-  
-  
-      FB.getLoginStatus(function(response) {   // Called after the JS SDK has been initialized.
-        statusChangeCallback(response);        // Returns the login status.
-      });
-    };
-
-  </script>
-
-<!-- Load the JS SDK asynchronously -->
-<script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
-
-@endsection
 @section('style')
 <style>
     .reg_link{
