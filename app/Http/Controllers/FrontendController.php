@@ -628,7 +628,7 @@ class FrontendController extends Controller
                 'subject' => ['required', 'string', 'max:255'],
                 'comment' => ['required', 'string', 'max:255'],
                 'g-recaptcha-response' => ['required',function ($attribute, $value, $fail) {
-                    $secret_key = '6LfbWpwcAAAAAPKCS6T0eiS06UkINMtn5NBpde54';
+                    $secret_key = config('recaptcha.api_secret_key');
                     $response = $value;
                     $userIP = $_SERVER['REMOTE_ADDR'];
                     $url = "https://www.google.com/recaptcha/api/siteverify?secret=$secret_key&response=$response&remoteip=$userIP";
