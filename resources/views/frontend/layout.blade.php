@@ -422,21 +422,25 @@
             <img src="{{ asset('/assets/site-img/logo-sm.png') }}" alt="" width="155" height="54">
           </a>
           {{-- Mobile Icons --}}
-          <div class="row">
+          <div class="row justify-content-between">
             <div class="col d-md-none">
-              <img src="{{ asset('/assets/site-img/logo-sm.png') }}" style="width: 100%" />
+              <a class="navbar-brand" href="/" id="navbar-brand">
+                <img src="{{ asset('/assets/site-img/logo-sm.png') }}" style="width: 100%" />
+              </a>
             </div>
             <div class="col">
-              <div class="d-flex">
+              <div class="d-flex justify-content-end">
                 @if (!Auth::check())
                   <a class="nav-link d-md-block d-lg-none" href="/login"><i class="far fa-user" style="font-size:24px; color: #404040;"></i></a>
+                @else
+                  <div class="d-md-none" style="width: 55px; height: 1px">&nbsp;</div>
                 @endif
                 <a class="d-md-block d-lg-none mb-cart" href="/cart" style="text-decoration: none !important; !important; padding-top: 8px">
                   <div class="" style="width: 50px !important; padding: 0 !important;">
                     <i class="fa" style="font-size:24px; color:#126cb6;">&#xf07a;</i><span class="badge badge-warning count-cart-items" id="lblCartCount" style="font-size: 12px; background: #ff0000; color: #fff; padding: 4px 7px; vertical-align: top; margin-left: -10px;display: unset !important; font-weight: 500 !important; border-radius: 1rem !important; margin-top: -15px;">0</span>
                   </div>
                 </a>
-    
+        
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" style="float: right !important">
                   <span class="navbar-toggler-icon"></span>
                 </button>
