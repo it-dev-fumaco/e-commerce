@@ -141,7 +141,7 @@
         <br>
        <div class="row animated animatedFadeInUp fadeInUp">
           <div class="col">
-            <div class="g-recaptcha" data-callback='recaptchaCallback' data-sitekey="6LfbWpwcAAAAAEPssgZuCMj8MKeVy7UVAXFkIbME"></div>
+            <div class="g-recaptcha" data-callback='recaptchaCallback' data-sitekey="6Lc0UW0dAAAAAF2jOZ35n6SDZEkAmQXEIU3rO9nV"></div>
           </div>
         </div>
        <center>
