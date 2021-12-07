@@ -74,38 +74,6 @@ class LoginController extends Controller
         return redirect('/');
     }
 
-    public function loginUsingFacebook() {
-        return Socialite::driver('facebook')->redirect();
-    }
-
-    public function callbackFromFacebook() {
-        try {
-            $user = Socialite::driver('facebook')->user();
-            $finduser = User::where('facebook_id', $user->id)->first();
-            if($finduser){
-                Auth::loginUsingId($finduser->id);
-
-                return redirect('/');
-            }else{
-                $newUser = new User;
-                $newUser->username = trim($user->email);
-                $newUser->password = password_hash($user->getName().'@'.$user->getId(), PASSWORD_DEFAULT);
-                $newUser->f_name = $user->name;
-                $newUser->facebook_id = $user->id;
-                $newUser->f_email = 'fumacoco_dev';
-                $newUser->f_temp_passcode = 'fumaco12345';
-                $newUser->is_email_verified = 1;
-                $newUser->save();
-
-                Auth::loginUsingId($newUser->id);
-
-                return redirect('/');
-            }
-        } catch (\Throwable $th) {
-            return redirect('/login')->with('error', 'Your email address or password is incorrect, please try again');
-        }
-    }
-
     public function loginUsingGoogle() {
         return Socialite::driver('google')->redirect();
     }
@@ -215,5 +183,33 @@ class LoginController extends Controller
 
     private function base64_url_decode($input) {
         return base64_decode(strtr($input, '-_', '+/'));
+    }
+
+    public function loginFbSdk(Request $request) {
+        try {
+            $finduser = User::where('facebook_id', $request->id)->first();
+            if($finduser){
+                Auth::loginUsingId($finduser->id);
+
+                return response()->json(['status' => 200, 'message' => 'Logged in']);
+            }else{
+                $newUser = new User;
+                $newUser->username = trim($request->email);
+                $newUser->password = password_hash($request->email.'@'.$request->id, PASSWORD_DEFAULT);
+                $newUser->f_name = $request->first_name;
+                $newUser->f_lname = $request->last_name;
+                $newUser->facebook_id = $request->id;
+                $newUser->f_email = 'fumacoco_dev';
+                $newUser->f_temp_passcode = 'fumaco12345';
+                $newUser->is_email_verified = 1;
+                $newUser->save();
+
+                Auth::loginUsingId($newUser->id);
+
+                return response()->json(['status' => 200, 'message' => 'Logged in new user']);
+            }
+        } catch (\Throwable $th) {
+            return response()->json(['status' => 500, 'message' => 'Your email address or password is incorrect, please try again']);
+        }
     }
 }

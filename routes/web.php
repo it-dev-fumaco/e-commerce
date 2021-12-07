@@ -48,8 +48,7 @@ Route::namespace('Auth')->group(function(){
     Route::post('/password/reset','ResetPasswordController@reset')->name('password.update');
 
     // facebook login
-    Route::get('auth/facebook', 'LoginController@loginUsingFacebook')->name('facebook.login');
-    Route::get('auth/facebook/callback', 'LoginController@callbackFromFacebook')->name('facebook.callback');
+    Route::post('/facebook/login', 'LoginController@loginFbSdk')->name('facebook.login');
 
     // google login
     Route::get('auth/google', 'LoginController@loginUsingGoogle')->name('google.login');
