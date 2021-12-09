@@ -5,20 +5,11 @@
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
-        'reference' => '2d4a6969a8c12c62c2009d4ea9acbd0cab957e31',
+        'reference' => '78bdaf6f377aad39de53f41afba0cf86a52113d4',
         'name' => 'laravel/laravel',
         'dev' => true,
     ),
     'versions' => array(
-        'adrianorosa/laravel-geolocation' => array(
-            'pretty_version' => 'v1.0.0',
-            'version' => '1.0.0.0',
-            'type' => 'library',
-            'install_path' => __DIR__ . '/../adrianorosa/laravel-geolocation',
-            'aliases' => array(),
-            'reference' => 'dba3e65e6b05ef6b922e385c06a3a221509de233',
-            'dev_requirement' => false,
-        ),
         'alexpechkarev/geometry-library' => array(
             'pretty_version' => '1.0.2',
             'version' => '1.0.2.0',
@@ -454,7 +445,7 @@
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
-            'reference' => '2d4a6969a8c12c62c2009d4ea9acbd0cab957e31',
+            'reference' => '78bdaf6f377aad39de53f41afba0cf86a52113d4',
             'dev_requirement' => false,
         ),
         'laravel/sail' => array(

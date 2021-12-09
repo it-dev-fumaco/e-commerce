@@ -20,10 +20,10 @@ class ComposerStaticInit0f1e38f3feaf9a00f758a56db0972401
         '7b11c4dc42b3b3023073cb14e519683c' => __DIR__ . '/..' . '/ralouphie/getallheaders/src/getallheaders.php',
         'a0edc8309cc5e1d60e3047b5df6b7052' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/functions_include.php',
         'def43f6c87e4f8dfd0c9e1b1bab14fe8' => __DIR__ . '/..' . '/symfony/polyfill-iconv/bootstrap.php',
-        'c964ee0ededf28c96ebd9db5099ef910' => __DIR__ . '/..' . '/guzzlehttp/promises/src/functions_include.php',
         '2c102faa651ef8ea5874edb585946bce' => __DIR__ . '/..' . '/swiftmailer/swiftmailer/lib/swift_required.php',
-        '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
+        'c964ee0ededf28c96ebd9db5099ef910' => __DIR__ . '/..' . '/guzzlehttp/promises/src/functions_include.php',
         'a1105708a18b76903365ca1c4aa61b02' => __DIR__ . '/..' . '/symfony/translation/Resources/functions.php',
+        '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
         '801c31d8ed748cfa537fa45402288c95' => __DIR__ . '/..' . '/psy/psysh/src/functions.php',
         '23c18046f52bef3eea034657bafda50f' => __DIR__ . '/..' . '/symfony/polyfill-php81/bootstrap.php',
         '538ca81a9a966a6716601ecf48f4eaef' => __DIR__ . '/..' . '/opis/closure/functions.php',
@@ -199,7 +199,6 @@ class ComposerStaticInit0f1e38f3feaf9a00f758a56db0972401
         array (
             'Asm89\\Stack\\' => 12,
             'App\\' => 4,
-            'Adrianorosa\\GeoLocation\\' => 24,
         ),
     );
 
@@ -608,10 +607,6 @@ class ComposerStaticInit0f1e38f3feaf9a00f758a56db0972401
         array (
             0 => __DIR__ . '/../..' . '/app',
         ),
-        'Adrianorosa\\GeoLocation\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/adrianorosa/laravel-geolocation/src',
-        ),
     );
 
     public static $prefixesPsr0 = array (
@@ -632,14 +627,6 @@ class ComposerStaticInit0f1e38f3feaf9a00f758a56db0972401
     );
 
     public static $classMap = array (
-        'Adrianorosa\\GeoLocation\\Console\\GeoLocationCommand' => __DIR__ . '/..' . '/adrianorosa/laravel-geolocation/src/Console/GeoLocationCommand.php',
-        'Adrianorosa\\GeoLocation\\Contracts\\LookupInterface' => __DIR__ . '/..' . '/adrianorosa/laravel-geolocation/src/Contracts/LookupInterface.php',
-        'Adrianorosa\\GeoLocation\\GeoLocation' => __DIR__ . '/..' . '/adrianorosa/laravel-geolocation/src/GeoLocation.php',
-        'Adrianorosa\\GeoLocation\\GeoLocationDetails' => __DIR__ . '/..' . '/adrianorosa/laravel-geolocation/src/GeoLocationDetails.php',
-        'Adrianorosa\\GeoLocation\\GeoLocationException' => __DIR__ . '/..' . '/adrianorosa/laravel-geolocation/src/GeoLocationException.php',
-        'Adrianorosa\\GeoLocation\\GeoLocationManager' => __DIR__ . '/..' . '/adrianorosa/laravel-geolocation/src/GeoLocationManager.php',
-        'Adrianorosa\\GeoLocation\\GeoLocationServiceProvider' => __DIR__ . '/..' . '/adrianorosa/laravel-geolocation/src/GeoLocationServiceProvider.php',
-        'Adrianorosa\\GeoLocation\\Providers\\IpInfo' => __DIR__ . '/..' . '/adrianorosa/laravel-geolocation/src/Providers/IpInfo.php',
         'App\\Console\\Commands\\ErpStockReservationCommand' => __DIR__ . '/../..' . '/app/Console/Commands/ErpStockReservationCommand.php',
         'App\\Console\\Commands\\GenerateSitemap' => __DIR__ . '/../..' . '/app/Console/Commands/GenerateSitemap.php',
         'App\\Console\\Commands\\SyncErpStockCommand' => __DIR__ . '/../..' . '/app/Console/Commands/SyncErpStockCommand.php',
@@ -669,7 +656,6 @@ class ComposerStaticInit0f1e38f3feaf9a00f758a56db0972401
         'App\\Http\\Controllers\\ProductController' => __DIR__ . '/../..' . '/app/Http/Controllers/ProductController.php',
         'App\\Http\\Controllers\\SettingsController' => __DIR__ . '/../..' . '/app/Http/Controllers/SettingsController.php',
         'App\\Http\\Controllers\\ShippingController' => __DIR__ . '/../..' . '/app/Http/Controllers/ShippingController.php',
-        'App\\Http\\Controllers\\SocialImagesController' => __DIR__ . '/../..' . '/app/Http/Controllers/SocialImagesController.php',
         'App\\Http\\Controllers\\StoreController' => __DIR__ . '/../..' . '/app/Http/Controllers/StoreController.php',
         'App\\Http\\Controllers\\UserManagementController' => __DIR__ . '/../..' . '/app/Http/Controllers/UserManagementController.php',
         'App\\Http\\Kernel' => __DIR__ . '/../..' . '/app/Http/Kernel.php',
@@ -682,12 +668,12 @@ class ComposerStaticInit0f1e38f3feaf9a00f758a56db0972401
         'App\\Http\\Middleware\\TrustProxies' => __DIR__ . '/../..' . '/app/Http/Middleware/TrustProxies.php',
         'App\\Http\\Middleware\\VerifyCsrfToken' => __DIR__ . '/../..' . '/app/Http/Middleware/VerifyCsrfToken.php',
         'App\\Mail\\OrderSuccess' => __DIR__ . '/../..' . '/app/Mail/OrderSuccess.php',
+        'App\\Mail\\WelcomeEmail' => __DIR__ . '/../..' . '/app/Mail/WelcomeEmail.php',
         'App\\Models\\Admin' => __DIR__ . '/../..' . '/app/Models/Admin.php',
         'App\\Models\\ShippingCondition' => __DIR__ . '/../..' . '/app/Models/ShippingCondition.php',
         'App\\Models\\ShippingService' => __DIR__ . '/../..' . '/app/Models/ShippingService.php',
         'App\\Models\\ShippingZoneRate' => __DIR__ . '/../..' . '/app/Models/ShippingZoneRate.php',
         'App\\Models\\User' => __DIR__ . '/../..' . '/app/Models/User.php',
-        'App\\Models\\UserVerify' => __DIR__ . '/../..' . '/app/Models/UserVerify.php',
         'App\\Providers\\AppServiceProvider' => __DIR__ . '/../..' . '/app/Providers/AppServiceProvider.php',
         'App\\Providers\\AuthServiceProvider' => __DIR__ . '/../..' . '/app/Providers/AuthServiceProvider.php',
         'App\\Providers\\BroadcastServiceProvider' => __DIR__ . '/../..' . '/app/Providers/BroadcastServiceProvider.php',

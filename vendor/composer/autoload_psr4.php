@@ -106,5 +106,4 @@ return array(
     'Biscolab\\ReCaptcha\\' => array($vendorDir . '/biscolab/laravel-recaptcha/src'),
     'Asm89\\Stack\\' => array($vendorDir . '/asm89/stack-cors/src'),
     'App\\' => array($baseDir . '/app'),
-    'Adrianorosa\\GeoLocation\\' => array($vendorDir . '/adrianorosa/laravel-geolocation/src'),
 );

@@ -6,14 +6,12 @@ use Illuminate\Http\Request;
 use DB;
 use Auth;
 use Carbon\Carbon;
-use Adrianorosa\GeoLocation\GeoLocation;
 
 class CartController extends Controller
 {
     public function productActions(Request $request) {
         $data = $request->all();
         $data['is_ajax'] = ($request->ajax());
-        $data['ip'] = ($request->ip());
 
         $order_no = 'FUM-' . date('yd') . random_int(0, 9999);
 
@@ -130,45 +128,6 @@ class CartController extends Controller
                 $discounted_from_category = 1;
                 $product_price = $product_details->f_original_price - $category_discount->discount_rate;
             }
-        }
-
-        $order_no = 'FUM-' . date('yd') . random_int(0, 9999);
-        if(!session()->get('fumOrderNo')){
-            session()->put('fumOrderNo', $order_no);
-        } else {
-            $order_no = session()->get('fumOrderNo');
-        }
-
-        $loc = GeoLocation::lookup($data['ip']);
-        // add data to fumaco cart table
-        $existing_cart = DB::table('fumaco_cart')->where('transaction_id', $order_no)->where('item_code', $product_details->f_idcode)->first();
-        if ($existing_cart) {
-            DB::table('fumaco_cart')->where('id', $existing_cart->id)->update([
-                'user_type' => (Auth::check()) ? 'member' : 'guest',
-                'user_email' => (Auth::check()) ? Auth::user()->username : null,
-                'qty' => $existing_cart->qty + $data['quantity'],
-                'ip' => $data['ip'],
-                'city' => $loc->getCity(),
-                'region' => $loc->getRegion(),
-                'country' => $loc->getCountry(),
-                'latitude' => $loc->getLatitude(),
-                'longitude' => $loc->getLongitude(),
-            ]);
-        } else {
-            DB::table('fumaco_cart')->insert([
-                'transaction_id' => $order_no,
-                'user_type' => (Auth::check()) ? 'member' : 'guest',
-                'user_email' => (Auth::check()) ? Auth::user()->username : null,
-                'item_description' => $product_details->f_name_name,
-                'item_code' => $product_details->f_idcode,
-                'qty' => $data['quantity'],
-                'ip' => $data['ip'],
-                'city' => $loc->getCity(),
-                'region' => $loc->getRegion(),
-                'country' => $loc->getCountry(),
-                'latitude' => $loc->getLatitude(),
-                'longitude' => $loc->getLongitude(),
-            ]);
         }
 
         // if cart is empty then this the first product
@@ -290,35 +249,6 @@ class CartController extends Controller
             } else {
                 $cart[$id]["quantity"]--;
             }
-            $loc = GeoLocation::lookup($request->ip());
-            $product_details = DB::table('fumaco_items')->where('f_idcode', $id)->first();
-            if ($product_details) {
-                $order_no = 'FUM-' . date('yd') . random_int(0, 9999);
-                if(!session()->get('fumOrderNo')){
-                    session()->put('fumOrderNo', $order_no);
-                } else {
-                    $order_no = session()->get('fumOrderNo');
-                }
-        
-                // add qty to fumaco cart table
-                $existing_cart = DB::table('fumaco_cart')->where('transaction_id', $order_no)
-                    ->where('item_code', $product_details->f_idcode)->first();
-                if ($existing_cart) {
-                    $plus_qty = $existing_cart->qty + 1;
-                    $minus_qty = $existing_cart->qty - 1;
-                    DB::table('fumaco_cart')->where('id', $existing_cart->id)->update([
-                        'user_type' => (Auth::check()) ? 'member' : 'guest',
-                        'user_email' => (Auth::check()) ? Auth::user()->username : null,
-                        'qty' => ($request->type == 'increment') ? $plus_qty : $minus_qty,
-                        'ip' => $request->ip(),
-                        'city' => $loc->getCity(),
-                        'region' => $loc->getRegion(),
-                        'country' => $loc->getCountry(),
-                        'latitude' => $loc->getLatitude(),
-                        'longitude' => $loc->getLongitude(),
-                    ]);
-                }
-            }
 
             session()->put('fumCart', $cart);
 
@@ -327,26 +257,11 @@ class CartController extends Controller
     }
 
     public function removeFromCart(Request $request) {
-        $id = $request->id;
-        if($id) {
+        if($request->id) {
             $cart = session()->get('fumCart');
-            if(isset($cart[$id])) {
+            if(isset($cart[$request->id])) {
 
-                unset($cart[$id]);
-
-                $product_details = DB::table('fumaco_items')->where('f_idcode', $id)->first();
-                if ($product_details) {
-                    $order_no = 'FUM-' . date('yd') . random_int(0, 9999);
-                    if(!session()->get('fumOrderNo')){
-                        session()->put('fumOrderNo', $order_no);
-                    } else {
-                        $order_no = session()->get('fumOrderNo');
-                    }
-            
-                    // delete data from fumaco cart table
-                    DB::table('fumaco_cart')->where('transaction_id', $order_no)
-                        ->where('item_code', $product_details->f_idcode)->delete();
-                }
+                unset($cart[$request->id]);
 
                 session()->put('fumCart', $cart);
             }
@@ -405,7 +320,7 @@ class CartController extends Controller
         unset($session_cart['shipping']);
 
         if (Auth::check()) {
-            $count = DB::table('fumaco_cart')->where('user_email', Auth::user()->username)->sum('qty');
+            $count += DB::table('fumaco_cart')->where('f_account_id', Auth::user()->id)->count();
         }
 
         return $count;
