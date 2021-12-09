@@ -104,7 +104,12 @@
 										<s class="product_discount">
 											<span style='color:black; '>₱ {{ number_format(str_replace(",","",$product_details->f_original_price), 2) }}<span>
 										</s>
-										
+										@elseif($discount_from_sale == 1)
+											<span class="product_price fumacoFont_item_price">₱ {{ number_format(str_replace(",","",$product_price), 2) }}</span>
+											<s class="product_discount">
+												<span style='color:black; '>₱ {{ number_format(str_replace(",","",$product_details->f_original_price), 2) }}<span>
+											</s>
+											<span class="badge badge-danger" style="margin-left: 8px; vertical-align: middle;background-color: red; display: inline !important;">{{ $sale_discount_rate }}% OFF</span>
 										@else
 										<span class="product_price fumacoFont_item_price">₱ {{ number_format(str_replace(",","",$product_details->f_original_price), 2) }}</span>
 										@endif
@@ -277,13 +282,13 @@
 																		&nbsp;<b>{{ $rp['discount_percent'] }}% OFF</b>&nbsp;
 																	</span>
 																</div>
-															@elseif ($rp['is_discounted_from_category'] == 1)
+															@elseif ($rp['is_discounted_from_sale'] == 1)
 																<div class="col-12">
 																	<span class="p-1 text-center" style="background-color: #FF0000; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
-																		@if ($rp['category_discount_type'] == 'By Percentage')
-																			&nbsp;<b>{{ $rp['category_discount_rate'] }}% OFF</b>&nbsp;
+																		@if ($rp['sale_discount_type'] == 'By Percentage')
+																			&nbsp;<b>{{ $rp['sale_discount_rate'] }}% OFF</b>&nbsp;
 																		@else
-																			&nbsp;<b>₱ {{ number_format($rp['category_discount_rate'], 2, '.', ',') }} OFF</b>&nbsp;
+																			&nbsp;<b>₱ {{ number_format($rp['sale_discount_rate'], 2, '.', ',') }} OFF</b>&nbsp;
 																		@endif
 																	</span>
 																</div>
@@ -309,8 +314,8 @@
 														<p class="card-text fumacoFont_card_price d-sm-block d-md-none d-lg-block" style="color:#000000 !important; ">
 															@if ($rp['is_discounted'] == 1)
 															<span style="white-space: nowrap !important">₱ {{ number_format(str_replace(",","",$rp['new_price']), 2) }}</span>&nbsp;<br class="d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$rp['orig_price']), 2) }}</s>
-															@elseif($rp['is_discounted_from_category'] == 1)
-																₱ {{ number_format(str_replace(",","",$rp['category_discounted_price']), 2) }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$rp['orig_price']), 2) }}</s>
+															@elseif($rp['is_discounted_from_sale'] == 1)
+																₱ {{ number_format(str_replace(",","",$rp['sale_discounted_price']), 2) }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$rp['orig_price']), 2) }}</s>
 															@else
 															₱ {{ number_format(str_replace(",","",$rp['orig_price']), 2) }}
 															@endif

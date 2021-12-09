@@ -263,13 +263,13 @@
 															&nbsp;<b>{{ $product['discount_percent'] }}% OFF</b>&nbsp;
 														</span>
 													</div>
-												@elseif ($product['is_discounted_from_category'] == 1)
+												@elseif ($product['is_discounted_from_sale'] == 1)
 													<div class="col-12">
 														<span class="p-1 text-center" style="background-color: #FF0000; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
-															@if ($category_discount->discount_type == 'By Percentage')
-																&nbsp;<b>{{ $category_discount->discount_rate }}% OFF</b>&nbsp;
+															@if ($product['sale_discount_type'] == 'By Percentage')
+																&nbsp;<b>{{ $product['sale_discount_rate'] }}% OFF</b>&nbsp;
 															@else
-																&nbsp;<b>₱ {{ number_format($category_discount->discount_rate, 2, '.', ',') }} OFF</b>&nbsp;
+																&nbsp;<b>₱ {{ number_format($product['sale_discount_rate'], 2, '.', ',') }} OFF</b>&nbsp;
 															@endif
 														</span>
 													</div>
@@ -296,7 +296,7 @@
 											<p class="card-text fumacoFont_card_price" style="color:#000000 !important;">
 												@if($product['is_discounted'] == 1)
 												₱ {{ number_format(str_replace(",","",$product['discounted_price']), 2) }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$product['price']), 2) }}</s>
-												@elseif($product['is_discounted_from_category'] == 1)
+												@elseif($product['is_discounted_from_sale'] == 1)
 													₱ {{ number_format(str_replace(",","",$product['discounted_price']), 2) }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$product['price']), 2) }}</s>
 												@else
 												₱ {{ number_format(str_replace(",","",$product['price']), 2) }}
