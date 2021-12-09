@@ -459,9 +459,23 @@ class FrontendController extends Controller
                 'last_name' => 'required',
                 'username' => 'required|email|unique:fumaco_users,username',
                 'password' => 'required|confirmed|min:6',
+                'g-recaptcha-response' => ['required',function ($attribute, $value, $fail) {
+                    $secret_key = config('recaptcha.api_secret_key');
+                    $response = $value;
+                    $userIP = $_SERVER['REMOTE_ADDR'];
+                    $url = "https://www.google.com/recaptcha/api/siteverify?secret=$secret_key&response=$response&remoteip=$userIP";
+                    $response = \file_get_contents($url);
+                    $response = json_decode($response);
+                    if (!$response->success) {
+                        $fail('ReCaptcha failed.');
+                    }
+                }],
             ],
             [
-                'password.confirmed' => 'Password does not match.'
+                'password.confirmed' => 'Password does not match.',
+                'g-recaptcha-response' => [
+                    'required' => 'Please check ReCaptcha.'
+                ]
             ]);
 
             $user = new User;
@@ -680,7 +694,7 @@ class FrontendController extends Controller
                 'subject' => ['required', 'string', 'max:255'],
                 'comment' => ['required', 'string', 'max:255'],
                 'g-recaptcha-response' => ['required',function ($attribute, $value, $fail) {
-                    $secret_key = '6LfbWpwcAAAAAPKCS6T0eiS06UkINMtn5NBpde54';
+                    $secret_key = config('recaptcha.api_secret_key');
                     $response = $value;
                     $userIP = $_SERVER['REMOTE_ADDR'];
                     $url = "https://www.google.com/recaptcha/api/siteverify?secret=$secret_key&response=$response&remoteip=$userIP";
@@ -858,7 +872,9 @@ class FrontendController extends Controller
             $image_for_sharing = ($default_image_for_sharing->filename) ? asset('/storage/social_images/'. $default_image_for_sharing->filename) : null;
         } else {
             $default_image_for_sharing = DB::table('fumaco_social_image')->where('is_default', 1)->where('page_type', 'main_page')->first();
-            $image_for_sharing = ($default_image_for_sharing->filename) ? asset('/storage/social_images/'. $default_image_for_sharing->filename) : null;
+            if ($default_image_for_sharing) {
+                $image_for_sharing = ($default_image_for_sharing->filename) ? asset('/storage/social_images/'. $default_image_for_sharing->filename) : null;
+            }
         }
 
         // get items based on category id

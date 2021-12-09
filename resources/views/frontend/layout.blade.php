@@ -4,28 +4,24 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     @hasSection('meta')
-@yield('meta')
+      @yield('meta')
     @else
-<meta name="description" content="Fumaco Inc. is the Philippine’s premiere lighting solutions powerhouse. It has manufacturing, import, distribution and sales capabilities of high quality lighting fixtures. The company employs industry experts and engineers to provide clients with utmost support for various lighting services.">
-    <meta name="keywords" content="FUMACO, Lighting, Philippines, Philippine, Leading, Luminaire, Manufacturing, ISO, Quality, light"  />
-    @endif<meta name="author" content="Fumaco Website">
-
+      <meta name="description" content="Fumaco Inc. is the Philippine’s premiere lighting solutions powerhouse. It has manufacturing, import, distribution and sales capabilities of high quality lighting fixtures. The company employs industry experts and engineers to provide clients with utmost support for various lighting services.">
+      <meta name="keywords" content="FUMACO, Lighting, Philippines, Philippine, Leading, Luminaire, Manufacturing, ISO, Quality, light"  />
+    @endif
+    <meta name="author" content="Fumaco Website">
     <title>{{ $namePage }}</title>
-
     @if (Str::startsWith($current = url()->current(), 'https://www'))
       <link rel="canonical" href="{{ $current }}">
     @else
       <link rel="canonical" href="{{ str_replace('https://', 'https://www.', $current) }}">
     @endif
-
     <link rel="shortcut icon" type="image/x-icon" href="{{ asset('/assets/icon/favicon.ico') }}">
     <link rel="icon" type="image/png" href="{{ asset('/assets/icon/favicon-16x16.png') }}" sizes="16x16">
     <link rel="icon" type="image/png" href="{{ asset('/assets/icon/favicon-32x32.png') }}" sizes="32x32">
-
       <!-- Select2 -->
-  <link rel="stylesheet" href="{{ asset('/assets/admin/plugins/select2/css/select2.min.css') }}">
-  <link rel="stylesheet" href="{{ asset('/assets/admin/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css') }}">
-
+    <link rel="stylesheet" href="{{ asset('/assets/admin/plugins/select2/css/select2.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('/assets/admin/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css') }}">
     <link href="{{ asset('/assets/dist/css/bootstrap.min.css') }}" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -71,20 +67,76 @@
         fjs.parentNode.insertBefore(js, fjs);
       }(document, 'script', 'facebook-jssdk'));
     </script>
+
+    @if ($activePage == 'login')
+    <script>
+      function statusChangeCallback(response) {  // Called with the results from FB.getLoginStatus().
+        if (response.status === 'connected') {   // Logged into your webpage and Facebook.
+          loginUser();  
+        }
+      }
+    
+      function checkLoginState() {               // Called when a person is finished with the Login Button.
+        FB.getLoginStatus(function(response) {   // See the onlogin handler
+          statusChangeCallback(response);
+        });
+      }
+    
+      window.fbAsyncInit = function() {
+        FB.init({
+          appId      : '435536724607670',
+          cookie     : true,                     // Enable cookies to allow the server to access the session.
+          xfbml      : true,                     // Parse social plugins on this webpage.
+          version    : 'v12.0'           // Use this Graph API version for this call.
+        });
+      };
+
+      function loginUser () {
+        FB.api('/me?fields=id,email,first_name,last_name', function(response) {
+          var data = {
+            'id': response.id,
+            'email': response.email,
+            'first_name': response.first_name,
+            'last_name': response.last_name,
+            '_token': "{{ csrf_token() }}",
+          }
+
+          $.ajax({
+            type:'POST',
+            url:'/facebook/login',
+            data: data,
+            success: function (res) {
+              if (res.status == 200) {
+                window.location.href="{{ route('website') }}";
+              } else {
+                $('#login-fb').removeClass('d-none').text(res.message);
+              }
+            }
+          });
+        });
+      }
+
+      function triggerLogin() {
+        FB.login(function(response) {
+          checkLoginState();
+        }, {scope: 'email'});
+      }
+    </script>
+    @endif
  
     <style>
       * {
-    -webkit-overflow-scrolling: touch !important;
-}
-	html,body{
-		width: 100% !important;
-		height: 100% !important;
-		margin: 0px !important;
-		padding: 0px !important;
-		overflow-x: hidden !important;
-			font-family: 'poppins', sans-serif !important;
-      scroll-behavior: smooth;
-	}
+        -webkit-overflow-scrolling: touch !important;
+      }
+      html,body{
+        width: 100% !important;
+        height: 100% !important;
+        margin: 0px !important;
+        padding: 0px !important;
+        overflow-x: hidden !important;
+          font-family: 'poppins', sans-serif !important;
+          scroll-behavior: smooth;
+      }
       .fumacoFont1 {
           font-family: 'poppins', sans-serif !important; font-weight:400 !important; font-size: 1.75rem!important;
       }
@@ -307,104 +359,104 @@
       }
 
       #shopping-cart {
-    background: white;
-    width: 320px;
-    position: absolute;
-    top: 80px;
-    right: 13px;
-    border-radius: 3px;
-    padding: 10px;
-    overflow: hidden;
-    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26) !important;
-    -webkit-transition: all 0.2s ease;
-    transition: all 0.2s ease;
-    opacity: 0;
-    -webkit-transform-origin: right top 0;
-    -webkit-transform: scale(0);
-    transform-origin: right top 0;
-    transform: scale(0);
-  }
-  #shopping-cart.active {
-    opacity: 1;
-    -webkit-transform-origin: right top 0;
-    -webkit-transform: scale(1);
-    transform-origin: right top 0;
-    transform: scale(1);
-  }
-  #shopping-cart .shopping-cart-header {
-    border-bottom: 1px solid #E8E8E8;
-    padding-bottom: 15px;
-  }
-  /* #shopping-cart .shopping-cart-header .shopping-cart-total {
-    float: right;
-  } */
-  #shopping-cart .shopping-cart-items {
-    padding: 5px;
-    list-style: none;
-  }
-  #shopping-cart .shopping-cart-items li {
-    margin-bottom: 10px;
-  }
-  #shopping-cart .shopping-cart-items picture {
-    float: left;
-    margin-right: 12px;
-    max-width: 70px;
-    max-height: 70px;
-  }
-  #shopping-cart .shopping-cart-items .item-name {
-    display: block;
-    font-size: 14px;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
-  }
-  #shopping-cart .shopping-cart-items .item-price {
-    color: #404040;
-    margin-right: 8px;
-    font-size: 12px;
-  }
-  #shopping-cart .shopping-cart-items .item-quantity {
-    color: #ABB0BE;
-    font-size: 12px;
-  }
+        background: white;
+        width: 320px;
+        position: absolute;
+        top: 80px;
+        right: 13px;
+        border-radius: 3px;
+        padding: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26) !important;
+        -webkit-transition: all 0.2s ease;
+        transition: all 0.2s ease;
+        opacity: 0;
+        -webkit-transform-origin: right top 0;
+        -webkit-transform: scale(0);
+        transform-origin: right top 0;
+        transform: scale(0);
+      }
+      #shopping-cart.active {
+        opacity: 1;
+        -webkit-transform-origin: right top 0;
+        -webkit-transform: scale(1);
+        transform-origin: right top 0;
+        transform: scale(1);
+      }
+      #shopping-cart .shopping-cart-header {
+        border-bottom: 1px solid #E8E8E8;
+        padding-bottom: 15px;
+      }
+      /* #shopping-cart .shopping-cart-header .shopping-cart-total {
+        float: right;
+      } */
+      #shopping-cart .shopping-cart-items {
+        padding: 5px;
+        list-style: none;
+      }
+      #shopping-cart .shopping-cart-items li {
+        margin-bottom: 10px;
+      }
+      #shopping-cart .shopping-cart-items picture {
+        float: left;
+        margin-right: 12px;
+        max-width: 70px;
+        max-height: 70px;
+      }
+      #shopping-cart .shopping-cart-items .item-name {
+        display: block;
+        font-size: 14px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+      }
+      #shopping-cart .shopping-cart-items .item-price {
+        color: #404040;
+        margin-right: 8px;
+        font-size: 12px;
+      }
+      #shopping-cart .shopping-cart-items .item-quantity {
+        color: #ABB0BE;
+        font-size: 12px;
+      }
 
-  #shopping-cart .badge-danger {
-    background-color: red;
-    font-size: 13px;
-    margin: 5px;
-  }
+      #shopping-cart .badge-danger {
+        background-color: red;
+        font-size: 13px;
+        margin: 5px;
+      }
 
-  #shopping-cart .shopping-cart-items .item-detail {
-  display: block;
-  font-size: 11px !important;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-}
-  
-  #shopping-cart:after {
-    bottom: 100%;
-    left: 89%;
-    border: solid transparent;
-    content: " ";
-    height: 0;
-    width: 0;
-    position: absolute;
-    pointer-events: none;
-    border-bottom-color: white;
-    border-width: 8px;
-    margin-left: -8px;
-  }
+      #shopping-cart .shopping-cart-items .item-detail {
+      display: block;
+      font-size: 11px !important;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+      
+      #shopping-cart:after {
+        bottom: 100%;
+        left: 89%;
+        border: solid transparent;
+        content: " ";
+        height: 0;
+        width: 0;
+        position: absolute;
+        pointer-events: none;
+        border-bottom-color: white;
+        border-width: 8px;
+        margin-left: -8px;
+      }
 
-  .clearfix:after {
-    content: "";
-    display: table;
-    clear: both;
-  }
-  .btn:focus, a:focus, .btn-check:focus + label{
-    box-shadow: none !important;
-    border: none !important;
-  }
+      .clearfix:after {
+        content: "";
+        display: table;
+        clear: both;
+      }
+      .btn:focus, a:focus, .btn-check:focus + label{
+        box-shadow: none !important;
+        border: none !important;
+      }
     </style>
     @yield('style')
     @if($activePage == 'contact')
@@ -422,29 +474,28 @@
             <img src="{{ asset('/assets/site-img/logo-sm.png') }}" alt="" width="155" height="54">
           </a>
           {{-- Mobile Icons --}}
-            <div class="row justify-content-between">
-              <div class="col d-md-none">
-                <a class="navbar-brand" href="/" id="navbar-brand">
-                  <img src="{{ asset('/assets/site-img/logo-sm.png') }}" style="width: 100%" />
+          <div class="row justify-content-between">
+            <div class="col d-md-none">
+              <a class="navbar-brand" href="/" id="navbar-brand">
+                <img src="{{ asset('/assets/site-img/logo-sm.png') }}" style="width: 100%" />
+              </a>
+            </div>
+            <div class="col">
+              <div class="d-flex justify-content-end">
+                @if (!Auth::check())
+                  <a class="nav-link d-md-block d-lg-none" href="/login"><i class="far fa-user" style="font-size:24px; color: #404040;"></i></a>
+                @else
+                  <div class="d-md-none" style="width: 55px; height: 1px">&nbsp;</div>
+                @endif
+                <a class="d-md-block d-lg-none mb-cart" href="/cart" style="text-decoration: none !important; !important; padding-top: 8px">
+                  <div class="" style="width: 50px !important; padding: 0 !important;">
+                    <i class="fa" style="font-size:24px; color:#126cb6;">&#xf07a;</i><span class="badge badge-warning count-cart-items" id="lblCartCount" style="font-size: 12px; background: #ff0000; color: #fff; padding: 4px 7px; vertical-align: top; margin-left: -10px;display: unset !important; font-weight: 500 !important; border-radius: 1rem !important; margin-top: -15px;">0</span>
+                  </div>
                 </a>
-              </div>
-              <div class="col">
-                <div class="d-flex justify-content-end">
-                  @if (!Auth::check())
-                    <a class="nav-link d-md-block d-lg-none" href="/login"><i class="far fa-user" style="font-size:24px; color: #404040;"></i></a>
-                  @else
-                    <div class="d-md-none" style="width: 55px; height: 1px">&nbsp;</div>
-                  @endif
-                  <a class="d-md-block d-lg-none mb-cart" href="/cart" style="text-decoration: none !important; !important; padding-top: 8px">
-                    <div class="" style="width: 50px !important; padding: 0 !important;">
-                      <i class="fa" style="font-size:24px; color:#126cb6;">&#xf07a;</i><span class="badge badge-warning count-cart-items" id="lblCartCount" style="font-size: 12px; background: #ff0000; color: #fff; padding: 4px 7px; vertical-align: top; margin-left: -10px;display: unset !important; font-weight: 500 !important; border-radius: 1rem !important; margin-top: -15px;">0</span>
-                    </div>
-                  </a>
-      
-                  <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" style="float: right !important">
-                    <span class="navbar-toggler-icon"></span>
-                  </button>
-                </div>
+        
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" style="float: right !important">
+                  <span class="navbar-toggler-icon"></span>
+                </button>
               </div>
             </div>
          

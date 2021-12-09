@@ -164,6 +164,7 @@
                 <div class="row">
                     <form action="/add_comment" method="post">
                         @csrf
+                        <input type="hidden" name="g-recaptcha-response" id="recaptcha_v3">
                         <div class="row">
                             <div class="col">
                                 <br>
@@ -182,6 +183,14 @@
                                     <p style="font-family: 'poppins', sans-serif !important;"  class="animated animatedFadeInUp fadeInUp" style="color:#a9a9a9 !important;">Your email address will not be published. Required fields are marked *</p>
                                 </div>
                             </div>
+                        @endif
+
+                        @if(count($errors->all()) > 0)
+                        <div class="alert alert-warning alert-dismissible fade show text-center" role="alert">
+                            @foreach ($errors->all() as $error)
+                            <span class="d-block">{{ $error }}</span>
+                            @endforeach
+                        </div>
                         @endif
 
                         <div class="row">
@@ -357,6 +366,16 @@
 @endsection
 
 @section('script')
+<script src="https://www.google.com/recaptcha/api.js?render={{ config('recaptcha.api_site_key') }}"></script>
+<script> 
+  grecaptcha.ready(function() {
+    grecaptcha.execute("{{ config('recaptcha.api_site_key') }}", {action: 'homepage'}).then(function(token) {
+      if(token) {
+        $("#recaptcha_v3").val(token); 
+      } 
+    });
+  });
+</script> 
     <script>
         $(document).ready(function(){
             $('.reply').click(function(){

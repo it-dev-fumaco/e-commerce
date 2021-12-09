@@ -139,13 +139,9 @@
           </div>
         </div>
         <br>
-       <div class="row animated animatedFadeInUp fadeInUp">
-          <div class="col">
-            <div class="g-recaptcha" data-callback='recaptchaCallback' data-sitekey="6LfbWpwcAAAAAEPssgZuCMj8MKeVy7UVAXFkIbME"></div>
-          </div>
-        </div>
+        <input type="hidden" name="g-recaptcha-response" id="recaptcha_v3">
        <center>
-          <button type="submit" class="btn btn-primary mt-3 fumacoFont_btn animated animatedFadeInUp fadeInUp" id="submitBtn" disabled>Submit</button>
+          <button type="submit" class="btn btn-primary mt-3 fumacoFont_btn animated animatedFadeInUp fadeInUp" id="submitBtn">Submit</button>
         </center>
       </form>
       &nbsp;<br>&nbsp;<br>
@@ -155,9 +151,14 @@
 @endsection
 
 @section('script')
-<script>
-  function recaptchaCallback() {
-    $('#submitBtn').removeAttr('disabled');
-  };
-</script>
+<script src="https://www.google.com/recaptcha/api.js?render={{ config('recaptcha.api_site_key') }}"></script>
+<script> 
+  grecaptcha.ready(function() {
+    grecaptcha.execute("{{ config('recaptcha.api_site_key') }}", {action: 'homepage'}).then(function(token) {
+      if(token) {
+        $("#recaptcha_v3").val(token); 
+      } 
+    });
+  });
+</script> 
 @endsection

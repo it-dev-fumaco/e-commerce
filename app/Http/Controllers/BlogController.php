@@ -456,6 +456,26 @@ class BlogController extends Controller
                 $name = Auth::user()->f_name." ".Auth::user()->f_lname;
                 $email = Auth::user()->username;
             }
+
+            $request->validate([
+                'g-recaptcha-response' => ['required',function ($attribute, $value, $fail) {
+                    $secret_key = config('recaptcha.api_secret_key');
+                    $response = $value;
+                    $userIP = $_SERVER['REMOTE_ADDR'];
+                    $url = "https://www.google.com/recaptcha/api/siteverify?secret=$secret_key&response=$response&remoteip=$userIP";
+                    $response = \file_get_contents($url);
+                    $response = json_decode($response);
+                    if (!$response->success) {
+                        $fail('ReCaptcha failed.');
+                    }
+                }],
+            ],
+            [
+                'g-recaptcha-response' => [
+                    'required' => 'Please check ReCaptcha.'
+                ]
+            ]);
+
             $add_comment = [
                 'blog_type' => $request->reply_replyId ? 2 : 1,
                 'reply_id' => $request->reply_replyId ? $request->reply_replyId : 0,

@@ -687,7 +687,6 @@ class CheckoutController extends Controller
 				$voucher_details = DB::table('fumaco_voucher')
 					->where('code', strtoupper($temp->voucher_code))->first();
 				
-				$is_voucher_valid = false;
 				if ($voucher_details) {
 					$is_voucher_valid = true;
 					if($voucher_details->validity_date_start && $voucher_details->validity_date_end) {
@@ -759,7 +758,7 @@ class CheckoutController extends Controller
 						}
 			
 						if($voucher_details->discount_type == 'Fixed Amount') {
-							$discount = $amount - $voucher_details->discount_rate;
+							$discount = $voucher_details->discount_rate;
 						}
 			
 						if($voucher_details->discount_type == 'Free Delivery') {
@@ -1229,7 +1228,7 @@ class CheckoutController extends Controller
 			if($voucher_details->coupon_type == 'Promotional') {
 				if($voucher_details->require_signin) {
 					if (!Auth::check()) {
-						return response()->json(['status' => 0, 'message' => 'Please login to use this voucher.']);
+						return response()->json(['status' => 0, 'message' => 'Please sign in to avail this coupon code.']);
 					}
 
 					// count consumed voucher for loggedin user
@@ -1257,7 +1256,7 @@ class CheckoutController extends Controller
 						return response()->json(['status' => 0, 'message' => 'Coupon is already expired.']);
 					}
 				} else {
-					return response()->json(['status' => 0, 'message' => 'Please enter a valid coupon code.']);
+					return response()->json(['status' => 0, 'message' => 'Please sign in to avail this coupon code.']);
 				}
 			}
 			
