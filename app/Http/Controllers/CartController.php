@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use DB;
 use Auth;
+use Carbon\Carbon;
 
 class CartController extends Controller
 {
@@ -112,6 +113,23 @@ class CartController extends Controller
         if (!$product_details) {
             return redirect()->back()->with('error', 'Product not found.');
         }
+
+        $category = DB::table('fumaco_categories')->where('name', $product_details->f_category)->first();
+
+        $category_discount = DB::table('fumaco_on_sale as sale')->join('fumaco_on_sale_categories as cat_sale', 'sale.id', 'cat_sale.sale_id')->whereDate('sale.start_date', '<=', Carbon::now())->whereDate('sale.end_date', '>=', Carbon::now())->where('status', 1)->where('cat_sale.category_id', $category->id)->first();
+
+        $product_price = $product_details->f_original_price;
+        $discounted_from_category = 0;
+        if($category_discount){ // check if product category is discounted
+            if($category_discount->discount_type == 'By Percentage'){
+                $discounted_from_category = 1;
+                $product_price = $product_details->f_original_price - ($product_details->f_original_price * ($category_discount->discount_rate/100));
+            }else if($category_discount->discount_type == 'Fixed Amount' and $product_details->f_original_price > $category_discount->discount_rate){
+                $discounted_from_category = 1;
+                $product_price = $product_details->f_original_price - $category_discount->discount_rate;
+            }
+        }
+
         // if cart is empty then this the first product
         $cart = session()->get('fumCart');
         if(!$cart) {
@@ -119,7 +137,8 @@ class CartController extends Controller
                 $id => [
                     "item_code" => $product_details->f_idcode,
                     "quantity" => $data['quantity'],
-                    "price" => ($product_details->f_price > 0) ? $product_details->f_price : $product_details->f_original_price,
+                    "price" => ($product_details->f_onsale == 1) ? $product_details->f_price : $product_price,
+                    'is_discounted_from_category' => $discounted_from_category
                 ]
             ];
  
@@ -132,7 +151,7 @@ class CartController extends Controller
     
                 return redirect()->back()->with('success', 'Product added to your cart!');
             } else {
-                return response()->json(['message' => 'Product added to your cart!']);
+                return response()->json(['message' => $cart]);
             }
         }
         // if cart not empty then check if this product exist then increment quantity
@@ -148,14 +167,15 @@ class CartController extends Controller
     
                 return redirect()->back()->with('success', 'Product added to your cart!');
             } else {
-                return response()->json(['message' => 'Product added to your cart!']);
+                return response()->json(['message' => $cart]);
             }
         }
         // if item not exist in cart then add to cart with quantity = 1
         $cart[$id] = [
             "item_code" => $product_details->f_idcode,
             "quantity" => $data['quantity'],
-            "price" => ($product_details->f_price > 0) ? $product_details->f_price : $product_details->f_original_price,
+            "price" => ($product_details->f_onsale == 1) ? $product_details->f_price : $product_price,
+            'is_discounted_from_category' => $discounted_from_category
         ];
 
         session()->put('fumCart', $cart);
@@ -167,7 +187,7 @@ class CartController extends Controller
     
             return redirect()->back()->with('success', 'Product added to your cart!');
         } else {
-            return response()->json(['message' => 'Product added to your cart!']);
+            return response()->json(['message' => $cart]);
         }
     }
 
@@ -183,7 +203,10 @@ class CartController extends Controller
             $item_image = DB::table('fumaco_items_image_v1')
                 ->where('idcode', $item->f_idcode)->first();
 
-            $price = ($item->f_onsale) ? $item->f_price : $item->f_original_price;
+            // $price = ($item->f_onsale) ? $item->f_price : $item->f_original_price;
+            $test = collect($cart)->where('item_code', $item->f_idcode)->pluck('price')->first();
+           
+            $price = ($item->f_onsale) ? $item->f_price : $test;
 
             $cart_arr[] = [
                 'item_code' => $item->f_idcode,
@@ -197,7 +220,7 @@ class CartController extends Controller
                 'insufficient_stock' => ($cart[$item->f_idcode]['quantity'] > $item->f_qty) ? 1 : 0
             ];
         }
-        
+
         $bill_address = "";
 		$ship_address = "";
 		if(Auth::check()){

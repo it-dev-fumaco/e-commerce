@@ -784,7 +784,7 @@ class ProductController extends Controller
         $sale_arr = [];
         foreach($on_sale as $sale){
             $categories_arr = [];
-            if($sale->discount_for == 'Per Category'){
+            if($sale->apply_discount_to == 'Per Category'){
                 $sale_categories = DB::table('fumaco_on_sale_categories as sc')->join('fumaco_categories as c', 'sc.category_id', 'c.id')->where('sc.sale_id', $sale->id)
                     ->select('c.id', 'c.name', 'sc.discount_type', 'sc.discount_rate', 'sc.capped_amount', 'sc.sale_id')->get();
                 
@@ -814,6 +814,7 @@ class ProductController extends Controller
                 'discount_rate' => $sale->discount_rate,
                 'capped_amount' => $sale->capped_amount,
                 'discount_for' => $sale->discount_for,
+                'apply_discount_to' => $sale->apply_discount_to,
                 'categories' => $categories_arr,
                 'sale_duration' => $sale_duration,
                 'status' => $sale->status
@@ -1047,32 +1048,31 @@ class ProductController extends Controller
             $from = null;
             $to = null;
             $discount_rate = null;
+            $discount_type = null;
             $capped_amount = null;
 
-            if(isset($request->set_duration)){
-                $sale_duration = explode(' - ', $request->sale_duration);
+            $sale_duration = explode(' - ', $request->sale_duration);
 
-                $from = date('Y-m-d', strtotime($sale_duration[0]));
-                $to = date('Y-m-d', strtotime($sale_duration[1]));
+            $from = date('Y-m-d', strtotime($sale_duration[0]));
+            $to = date('Y-m-d', strtotime($sale_duration[1]));
 
-                // check if date overlaps with other "On Sale"
-                $date_check = DB::table('fumaco_on_sale')->where('start_date', '!=', '')->where('end_date', '!=', '')->get();
-                foreach($date_check as $date){
-                    if($from >= $date->start_date and $from <= $date->end_date){
-                        return redirect()->back()->with('error', 'On Sale dates cannot overlap');
-                    }
-
-                    if($to >= $date->start_date and $to <= $date->end_date){
-                        return redirect()->back()->with('error', 'On Sale dates cannot overlap');
-                    }
+            // check if date overlaps with other "On Sale"
+            $date_check = DB::table('fumaco_on_sale')->where('start_date', '!=', '')->where('end_date', '!=', '')->get();
+            foreach($date_check as $date){
+                if($from >= $date->start_date and $from <= $date->end_date){
+                    return redirect()->back()->with('error', 'On Sale dates cannot overlap');
                 }
 
+                if($to >= $date->start_date and $to <= $date->end_date){
+                    return redirect()->back()->with('error', 'On Sale dates cannot overlap');
+                }
             }
-            
-            if($request->discount_for == 'All Items'){
-                if($request->discount_type == 'Fixed Amount'){
+
+            if($request->apply_discount_to == 'All Items'){
+                $discount_type = $request->discount_type;
+                if($discount_type == 'Fixed Amount'){
                     $discount_rate = $request->discount_amount;
-                }else if($request->discount_type == 'By Percentage'){
+                }else if($discount_type == 'By Percentage'){
                     $discount_rate = $request->discount_percentage;
                     $capped_amount = $request->capped_amount;
                 }
@@ -1082,10 +1082,11 @@ class ProductController extends Controller
                 'sale_name' => $request->sale_name,
                 'start_date' => $from,
                 'end_date' => $to,
-                'discount_type' => $request->discount_type,
+                'discount_type' => $discount_type,
                 'discount_rate' => $discount_rate,
                 'capped_amount' => $capped_amount,
                 'discount_for' => $request->discount_for,
+                'apply_discount_to' => $request->apply_discount_to,
                 'created_by' => Auth::user()->username
             ];
 
@@ -1132,7 +1133,7 @@ class ProductController extends Controller
 
             DB::table('fumaco_on_sale')->insert($insert);
 
-            if($request->discount_for == 'Per Category'){
+            if($request->apply_discount_to == 'Per Category'){
                 $sale_id = DB::table('fumaco_on_sale')->orderBy('id', 'desc')->first();
                 foreach($request->selected_category as $key => $category){
                     $category_discount_rate = 0;
@@ -1170,33 +1171,32 @@ class ProductController extends Controller
             $from = null;
             $to = null;
             $discount_rate = null;
+            $discount_type = null;
             $capped_amount = null;
 
-            if(isset($request->set_duration)){
-                $sale_duration = explode(' - ', $request->sale_duration);
+            $sale_duration = explode(' - ', $request->sale_duration);
 
-                $from = date('Y-m-d', strtotime($sale_duration[0]));
-                $to = date('Y-m-d', strtotime($sale_duration[1]));
+            $from = date('Y-m-d', strtotime($sale_duration[0]));
+            $to = date('Y-m-d', strtotime($sale_duration[1]));
 
-                // check if date overlaps with other "On Sale"
-                $date_check = DB::table('fumaco_on_sale')->where('id', '!=', $id)->where('start_date', '!=', '')->where('end_date', '!=', '')->get();
-                foreach($date_check as $date){
-                    if($from >= $date->start_date and $from <= $date->end_date){
-                        return redirect()->back()->with('error', 'On Sale dates cannot overlap');
-                    }
-
-                    if($to >= $date->start_date and $to <= $date->end_date){
-                        return redirect()->back()->with('error', 'On Sale dates cannot overlap');
-                    }
+            // check if date overlaps with other "On Sale"
+            $date_check = DB::table('fumaco_on_sale')->where('id', '!=', $id)->where('start_date', '!=', '')->where('end_date', '!=', '')->get();
+            foreach($date_check as $date){
+                if($from >= $date->start_date and $from <= $date->end_date){
+                    return redirect()->back()->with('error', 'On Sale dates cannot overlap');
                 }
-            }            
 
-            if($request->discount_for == 'All Items'){
+                if($to >= $date->start_date and $to <= $date->end_date){
+                    return redirect()->back()->with('error', 'On Sale dates cannot overlap');
+                }
+            }
+
+            if($request->apply_discount_to == 'All Items'){
                 DB::table('fumaco_on_sale_categories')->where('sale_id', $id)->delete(); // if sale is from per category to all items
-
-                if($request->discount_type == 'Fixed Amount'){
+                $discount_type = $request->discount_type;
+                if($discount_type == 'Fixed Amount'){
                     $discount_rate = $request->discount_amount;
-                }else if($request->discount_type == 'By Percentage'){
+                }else if($discount_type == 'By Percentage'){
                     $discount_rate = $request->discount_percentage;
                     $capped_amount = $request->capped_amount;
                 }
@@ -1206,10 +1206,11 @@ class ProductController extends Controller
                 'sale_name' => $request->sale_name,
                 'start_date' => $from,
                 'end_date' => $to,
-                'discount_type' => $request->discount_type,
+                'discount_type' => $discount_type,
                 'discount_rate' => $discount_rate,
-                'capped_amount' => $capped_amount,
                 'discount_for' => $request->discount_for,
+                'capped_amount' => $capped_amount,
+                'apply_discount_to' => $request->apply_discount_to,
                 'last_modified_at' => Carbon::now()->toDateTimeString(),
                 'last_modified_by' => Auth::user()->username
             ];
@@ -1255,7 +1256,7 @@ class ProductController extends Controller
 
             DB::table('fumaco_on_sale')->where('id', $id)->update($update);
 
-            if($request->discount_for == 'Per Category'){
+            if($request->apply_discount_to == 'Per Category'){
                 $last_modified_by = null;
                 $checker = DB::table('fumaco_on_sale_categories')->where('sale_id', $id)->count();
 

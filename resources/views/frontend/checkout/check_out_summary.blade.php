@@ -97,7 +97,7 @@
 								<div class="accordion" id="accordionExample">
 									<div class="row">
 										<div class="col-md-12 col-lg-{{ $col }} d-flex align-items-stretch">
-											<div class="card" style="width: 100%">
+											<div class="card" style="width: 100%;">
 												<div class="card-header" id="headingOne">
 													<h2 class="mb-0">
 														<div class="row">
@@ -139,6 +139,8 @@
 											</div>
 										</div>
 										@if ($shipping_details['same_as_billing'] == 0)
+											
+											<div class="col-12 d-block d-md-none"><br/></div>
 											<div class="col-md-12 col-lg-6 d-flex align-items-stretch">
 												<div class="card" style="width: 100%">
 													<div class="card-header" id="headingOne1">
@@ -293,7 +295,7 @@
 								</div>
 								<div class="p-2 col-md-2 col-lg-5 col-xl-2">
 									<button class="btn w-100 btn-outline-success" type="button" id="apply-coupon-btn">Apply</button></div>
-							  </div>
+							  	</div>
 							  <hr>
 							<div class="d-flex justify-content-between align-items-center" style="color:#FF9D00 !important;">Grand Total <small class="stylecap he1x" id="grand-total">0.00</small>
 							</div>
