@@ -197,6 +197,12 @@ Route::prefix('admin')->group(function () {
         Route::get('/is_new_item/{id}', 'ProductController@isNewItem');
         Route::post('/product/{item_code}/enable_on_sale', 'ProductController@setProductOnSale');
         Route::post('/product/{item_code}/disable_on_sale', 'ProductController@disableProductOnSale');
+        Route::get('/products/compare/list', 'ProductController@viewProductsToCompare');
+        Route::get('/products/compare/add', 'ProductController@addProductsToCompare');
+        Route::get('/products/compare/{compare_id}/edit', 'ProductController@editProductsToCompare');
+        Route::get('/products/compare/{compare_id}/delete', 'ProductController@deleteProductsToCompare');
+        Route::post('/products/compare/save', 'ProductController@saveProductsToCompare');
+        Route::post('/products/compare/set_status', 'ProductController@statusProductsToCompare');
 
         Route::get('/category/list', 'CategoryController@viewCategories');
         Route::post('/category/edit/{id}', 'CategoryController@editCategory');
