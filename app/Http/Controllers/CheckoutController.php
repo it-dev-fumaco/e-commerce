@@ -374,7 +374,7 @@ class CheckoutController extends Controller
 				$item_image = DB::table('fumaco_items_image_v1')
 					->where('idcode', $item->f_idcode)->first();
 
-				$product_price = $cart[$item->f_idcode]['is_discounted_from_category'] == 1 ? $cart[$item->f_idcode]['price'] : $item->f_original_price;
+				$product_price = $cart[$item->f_idcode]['is_discounted_from_sale'] == 1 ? $cart[$item->f_idcode]['price'] : $item->f_original_price;
 				$price = ($item->f_onsale) ? $item->f_price : $product_price;
 
 				$cart_arr[] = [
@@ -384,7 +384,7 @@ class CheckoutController extends Controller
 					'subtotal' => ($price * $cart[$item->f_idcode]['quantity']),
 					'original_price' => $item->f_original_price,
 					'discount' => $item->f_onsale,
-					'is_discounted_from_category' => $cart[$item->f_idcode]['is_discounted_from_category'],
+					'is_discounted_from_sale' => $cart[$item->f_idcode]['is_discounted_from_sale'],
 					'quantity' => $cart[$item->f_idcode]['quantity'],
 					'stock_qty' => $item->f_qty,
 					'item_image' => ($item_image) ? $item_image->imgprimayx : 'test.jpg'
@@ -485,7 +485,7 @@ class CheckoutController extends Controller
 			
 			$cart_arr = [];
 			foreach ($cart_items as $n => $item) {
-				$product_price = $cart[$item->f_idcode]['is_discounted_from_category'] == 1 ? $cart[$item->f_idcode]['price'] : $item->f_original_price;
+				$product_price = $cart[$item->f_idcode]['is_discounted_from_sale'] == 1 ? $cart[$item->f_idcode]['price'] : $item->f_original_price;
 				$price = ($item->f_onsale) ? $item->f_price : $product_price;
 				$total_amount = $price * $cart[$item->f_idcode]['quantity'];
 				$item_discount = $item->f_discount_percent;
@@ -1011,7 +1011,7 @@ class CheckoutController extends Controller
 		$total_cubic_cm = 0;
         foreach ($order_items as $row) {
 			$item_qty = $cart[$row->f_idcode]['quantity'];
-			$product_price = $cart[$row->f_idcode]['is_discounted_from_category'] == 1 ? $cart[$row->f_idcode]['price'] : $row->f_original_price;
+			$product_price = $cart[$row->f_idcode]['is_discounted_from_sale'] == 1 ? $cart[$row->f_idcode]['price'] : $row->f_original_price;
 			$price = ($row->f_price > 0) ? $row->f_price : $product_price;
 			$total_amount += ($price * $item_qty);
             $cubic_cm = ($row->f_package_length * $row->f_package_width * $row->f_package_height);
@@ -1268,7 +1268,7 @@ class CheckoutController extends Controller
 
 			$subtotal = 0;
 			foreach ($cart_items as $item) {
-				$product_price = $cart[$item->f_idcode]['is_discounted_from_category'] == 1 ? $cart[$item->f_idcode]['price'] : $item->f_original_price;
+				$product_price = $cart[$item->f_idcode]['is_discounted_from_sale'] == 1 ? $cart[$item->f_idcode]['price'] : $item->f_original_price;
 				$price = ($item->f_onsale) ? $item->f_price : $product_price;
 				$subtotal += $price * $cart[$item->f_idcode]['quantity'];
 			}

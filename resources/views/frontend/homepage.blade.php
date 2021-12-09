@@ -152,13 +152,13 @@
                               &nbsp;<b>{{ $bs['discount'] }}% OFF</b>&nbsp;
                             </span>
                           </div>
-                        @elseif ($bs['is_discounted_from_category'] == 1)
+                        @elseif ($bs['is_discounted_from_sale'] == 1)
 													<div class="col-12">
 														<span class="p-1 text-center" style="background-color: #FF0000; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
-															@if ($bs['category_discount_type'] == 'By Percentage')
-																&nbsp;<b>{{ $bs['category_discount_rate'] }}% OFF</b>&nbsp;
+															@if ($bs['sale_discount_type'] == 'By Percentage')
+																&nbsp;<b>{{ $bs['sale_discount_rate'] }}% OFF</b>&nbsp;
 															@else
-																&nbsp;<b>₱ {{ number_format($bs['category_discount_rate'], 2, '.', ',') }} OFF</b>&nbsp;
+																&nbsp;<b>₱ {{ number_format($bs['sale_discount_rate'], 2, '.', ',') }} OFF</b>&nbsp;
 															@endif
 														</span>
 													</div>
@@ -183,8 +183,8 @@
                       <p class="card-text fumacoFont_card_price" style="color:#000000 !important; ">
                         @if($bs['is_discounted'] == 1)
 												₱ {{ number_format(str_replace(",","",$bs['new_price']), 2) }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$bs['orig_price']), 2) }}</s>
-												@elseif($bs['is_discounted_from_category'] == 1)
-													₱ {{ number_format(str_replace(",","",$bs['category_discounted_price']), 2) }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$bs['orig_price']), 2) }}</s>
+												@elseif($bs['is_discounted_from_sale'] == 1)
+													₱ {{ number_format(str_replace(",","",$bs['sale_discounted_price']), 2) }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$bs['orig_price']), 2) }}</s>
 												@else
 												₱ {{ number_format(str_replace(",","",$bs['orig_price']), 2) }}
 												@endif
