@@ -26,7 +26,7 @@ class CartController extends Controller
                 $product_details = DB::table('fumaco_items')->where('f_idcode', $item->item_code)->first();
                 $category = DB::table('fumaco_categories')->where('name', $product_details->f_category)->first();
 
-                $all_item_discount = DB::table('fumaco_on_sale')->whereDate('start_date', '<', Carbon::now())->whereDate('end_date', '>=', Carbon::now())->where('status', 1)->where('apply_discount_to', 'All Items')->first();
+                $all_item_discount = DB::table('fumaco_on_sale')->whereDate('start_date', '<=', Carbon::now()->toDateString())->whereDate('end_date', '>=', Carbon::now()->toDateString())->where('status', 1)->where('apply_discount_to', 'All Items')->first();
 
                 $category_discount = DB::table('fumaco_on_sale as sale')->join('fumaco_on_sale_categories as cat_sale', 'sale.id', 'cat_sale.sale_id')->whereDate('sale.start_date', '<=', Carbon::now())->whereDate('sale.end_date', '>=', Carbon::now())->where('status', 1)->where('cat_sale.category_id', $category->id)->first();
 
@@ -114,7 +114,7 @@ class CartController extends Controller
 
             $category = DB::table('fumaco_categories')->where('name', $product_details->f_category)->first();
 
-            $all_item_discount = DB::table('fumaco_on_sale')->whereDate('start_date', '<', Carbon::now())->whereDate('end_date', '>=', Carbon::now())->where('status', 1)->where('apply_discount_to', 'All Items')->first();
+            $all_item_discount = DB::table('fumaco_on_sale')->whereDate('start_date', '<=', Carbon::now()->toDateString())->whereDate('end_date', '>=', Carbon::now()->toDateString())->where('status', 1)->where('apply_discount_to', 'All Items')->first();
 
             $category_discount = DB::table('fumaco_on_sale as sale')->join('fumaco_on_sale_categories as cat_sale', 'sale.id', 'cat_sale.sale_id')->whereDate('sale.start_date', '<=', Carbon::now())->whereDate('sale.end_date', '>=', Carbon::now())->where('status', 1)->where('cat_sale.category_id', $category->id)->first();
 
@@ -196,7 +196,7 @@ class CartController extends Controller
 
         $category = DB::table('fumaco_categories')->where('name', $product_details->f_category)->first();
 
-        $all_item_discount = DB::table('fumaco_on_sale')->whereDate('start_date', '<', Carbon::now())->whereDate('end_date', '>=', Carbon::now())->where('status', 1)->where('apply_discount_to', 'All Items')->first();
+        $all_item_discount = DB::table('fumaco_on_sale')->whereDate('start_date', '<=', Carbon::now()->toDateString())->whereDate('end_date', '>=', Carbon::now()->toDateString())->where('status', 1)->where('apply_discount_to', 'All Items')->first();
 
         $category_discount = DB::table('fumaco_on_sale as sale')->join('fumaco_on_sale_categories as cat_sale', 'sale.id', 'cat_sale.sale_id')->whereDate('sale.start_date', '<=', Carbon::now())->whereDate('sale.end_date', '>=', Carbon::now())->where('status', 1)->where('cat_sale.category_id', $category->id)->first();
 

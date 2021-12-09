@@ -166,7 +166,7 @@ class FrontendController extends Controller
 
                     $category = DB::table('fumaco_categories')->where('name', $result['category'])->select('id')->first();
 
-                    $all_item_discount = DB::table('fumaco_on_sale')->whereDate('start_date', '<', Carbon::now())->whereDate('end_date', '>=', Carbon::now())->where('status', 1)->where('apply_discount_to', 'All Items')->first();
+                    $all_item_discount = DB::table('fumaco_on_sale')->whereDate('start_date', '<=', Carbon::now()->toDateString())->whereDate('end_date', '>=', Carbon::now()->toDateString())->where('status', 1)->where('apply_discount_to', 'All Items')->first();
 
                     $category_discount = DB::table('fumaco_on_sale as sale')->join('fumaco_on_sale_categories as cat_sale', 'sale.id', 'cat_sale.sale_id')->whereDate('sale.start_date', '<=', Carbon::now())->whereDate('sale.end_date', '>=', Carbon::now())->where('status', 1)->where('cat_sale.category_id', $category->id)->first();
 
@@ -297,7 +297,7 @@ class FrontendController extends Controller
 
             $bs_category = DB::table('fumaco_categories')->where('name', $bs->f_category)->select('id')->first();
 
-            $bs_all_item_discount = DB::table('fumaco_on_sale')->whereDate('start_date', '<', Carbon::now())->whereDate('end_date', '>=', Carbon::now())->where('status', 1)->where('apply_discount_to', 'All Items')->first();
+            $bs_all_item_discount = DB::table('fumaco_on_sale')->whereDate('start_date', '<=', Carbon::now()->toDateString())->whereDate('end_date', '>=', Carbon::today()->toDateString())->where('status', 1)->where('apply_discount_to', 'All Items')->first();
 
             $bs_category_discount = DB::table('fumaco_on_sale as sale')->join('fumaco_on_sale_categories as cat_sale', 'sale.id', 'cat_sale.sale_id')->whereDate('sale.start_date', '<=', Carbon::now())->whereDate('sale.end_date', '>=', Carbon::now())->where('status', 1)->where('cat_sale.category_id', $bs_category->id)->first();
 
@@ -925,7 +925,7 @@ class FrontendController extends Controller
             $id = DB::table('fumaco_categories')->where('slug', $cat_id)->select('id')->first();
             $cat_id = $id->id;
         }
-        $all_item_discount = DB::table('fumaco_on_sale')->whereDate('start_date', '<', Carbon::now())->whereDate('end_date', '>=', Carbon::now())->where('status', 1)->where('apply_discount_to', 'All Items')->first();
+        $all_item_discount = DB::table('fumaco_on_sale')->whereDate('start_date', '<=', Carbon::now()->toDateString())->whereDate('end_date', '>=', Carbon::now()->toDateString())->where('status', 1)->where('apply_discount_to', 'All Items')->first();
 
         $category_discount = DB::table('fumaco_on_sale as sale')->join('fumaco_on_sale_categories as cat_sale', 'sale.id', 'cat_sale.sale_id')->whereDate('sale.start_date', '<=', Carbon::now())->whereDate('sale.end_date', '>=', Carbon::now())->where('status', 1)->where('cat_sale.category_id', $cat_id)->first();
 
@@ -1033,7 +1033,7 @@ class FrontendController extends Controller
 
         $category = DB::table('fumaco_categories')->where('name', $product_details->f_category)->select('id')->first();
 
-        $all_item_discount = DB::table('fumaco_on_sale')->whereDate('start_date', '<', Carbon::now())->whereDate('end_date', '>=', Carbon::now())->where('status', 1)->where('apply_discount_to', 'All Items')->first();
+        $all_item_discount = DB::table('fumaco_on_sale')->whereDate('start_date', '<=', Carbon::now()->toDateString())->whereDate('end_date', '>=', Carbon::now()->toDateString())->where('status', 1)->where('apply_discount_to', 'All Items')->first();
 
         $category_discount = DB::table('fumaco_on_sale as sale')->join('fumaco_on_sale_categories as cat_sale', 'sale.id', 'cat_sale.sale_id')->whereDate('sale.start_date', '<=', Carbon::now())->whereDate('sale.end_date', '>=', Carbon::now())->where('status', 1)->where('cat_sale.category_id', $category->id)->first();
 
@@ -1090,7 +1090,7 @@ class FrontendController extends Controller
 
             $rp_category = DB::table('fumaco_categories')->where('name', $row->f_category)->select('id')->first();
 
-            $rp_all_item_discount = DB::table('fumaco_on_sale')->whereDate('start_date', '<', Carbon::now())->whereDate('end_date', '>=', Carbon::now())->where('status', 1)->where('apply_discount_to', 'All Items')->first();
+            $rp_all_item_discount = DB::table('fumaco_on_sale')->whereDate('start_date', '<=', Carbon::now()->toDateString())->whereDate('end_date', '>=', Carbon::now()->toDateString())->where('status', 1)->where('apply_discount_to', 'All Items')->first();
 
             $rp_category_discount = DB::table('fumaco_on_sale as sale')->join('fumaco_on_sale_categories as cat_sale', 'sale.id', 'cat_sale.sale_id')->whereDate('sale.start_date', '<=', Carbon::now())->whereDate('sale.end_date', '>=', Carbon::now())->where('status', 1)->where('cat_sale.category_id', $rp_category->id)->first();
 
