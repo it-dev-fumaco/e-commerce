@@ -119,7 +119,7 @@
                                             </div>
                                         @empty
                                             <tr>
-                                                <td colspan=3 class="text-center">No Product Comparison(s)</td>
+                                                <td colspan=5 class="text-center">No Product Comparison(s)</td>
                                             </tr>
                                         @endforelse
                                     </table>
