@@ -266,7 +266,7 @@ class CartController extends Controller
                 $price = $item->f_price;
             }
 
-            $price = $price - $discount;
+            $price = ($discount > $price) ? $price : ($price - $discount);
             $cart_arr[] = [
                 'item_code' => $item->f_idcode,
                 'item_description' => $item->f_name_name,

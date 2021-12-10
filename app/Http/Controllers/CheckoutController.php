@@ -408,7 +408,7 @@ class CheckoutController extends Controller
 					$price = $item->f_price;
 				}
 	
-				$price = $price - $discount;
+				$price = ($discount > $price) ? $price : ($price - $discount);
 
 				$cart_arr[] = [
 					'item_code' => $item->f_idcode,
@@ -558,7 +558,7 @@ class CheckoutController extends Controller
 					$price = $item->f_price;
 				}
 	
-				$price = $price - $discount;
+				$price = ($discount > $price) ? $price : ($price - $discount);
 				$total_amount = $price * $item->qty;
 				$item_discount = $item->f_discount_percent;
 
