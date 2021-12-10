@@ -32,3 +32,5 @@ Disallow: /myorders/
 Disallow: /myorder/
 Disallow: /myprofile/
 Disallow: /assets/
+Disallow: /storage/payment_method/
+Disallow: /storage/about/
