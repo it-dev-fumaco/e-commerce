@@ -78,7 +78,7 @@
                                                             @if ($selected_items)
                                                                 @foreach ($selected_items as $selected)
                                                                     <tr>
-                                                                        <td colspan={{ $loop->iteration <= 2 ? 2 : 1 }} class="p-2">
+                                                                        <td class="p-2">
                                                                             <select class="form-control" name="selected_items[]" id="selected_items" required>
                                                                                 <option disabled selected value="">Select Items to Compare (Max: 4)</option>
                                                                                 @foreach ($items as $item)
@@ -86,7 +86,7 @@
                                                                                 @endforeach
                                                                             </select>
                                                                         </td>
-                                                                        <td class="text-center {{ $loop->iteration <= 2 ? 'd-none' : '' }}">
+                                                                        <td class="text-center">
                                                                             <button type="button" class="btn btn-outline-danger btn-sm remove-td-row">Remove</button>
                                                                         </td>
                                                                     </tr>
@@ -94,13 +94,16 @@
                                                             @else
                                                                 @for ($i = 0; $i < 2; $i++)
                                                                     <tr>
-                                                                        <td colspan=2 class="p-2">
+                                                                        <td class="p-2">
                                                                             <select class="form-control" name="selected_items[]" id="selected_items" required>
                                                                                 <option disabled selected value="">Select Items to Compare (Max: 4)</option>
                                                                                 @foreach ($items as $item)
                                                                                     <option value="{{ $item->f_idcode }}">{{ $item->f_idcode.' - '.$item->f_name_name }}</option>
                                                                                 @endforeach
                                                                             </select>
+                                                                        </td>
+                                                                        <td class="text-center">
+                                                                            <button type="button" class="btn btn-outline-danger btn-sm remove-td-row">Remove</button>
                                                                         </td>
                                                                     </tr>
                                                                 @endfor

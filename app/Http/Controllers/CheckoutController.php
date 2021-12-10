@@ -366,14 +366,51 @@ class CheckoutController extends Controller
 
 			$shipping_details = session()->get('fumShipDet');
 			$billing_details = session()->get('fumBillDet');
+
+			 // set sale price
+			 $sale = DB::table('fumaco_on_sale')
+				->whereDate('start_date', '<=', Carbon::now()->toDateString())
+				->whereDate('end_date', '>=', Carbon::today()->toDateString())
+				->where('status', 1)->first();
 			
 			$cart_arr = [];
 			foreach ($cart_items as $n => $item) {
+				$discount = 0;
+				$price = $item->f_original_price;
 				$item_image = DB::table('fumaco_items_image_v1')
 					->where('idcode', $item->f_idcode)->first();
 
-				$product_price = $cart[$item->f_idcode]['is_discounted_from_sale'] == 1 ? $cart[$item->f_idcode]['price'] : $item->f_original_price;
-				$price = ($item->f_onsale) ? $item->f_price : $product_price;
+				if (!$item->f_onsale) {
+					if ($sale) {
+						if ($sale->apply_discount_to == 'All Items') {
+							if ($sale->discount_type == 'By Percentage') {
+								$discount = ($item->f_original_price * ($sale->discount_rate/100));
+							} else {
+								$discount = $sale->discount_rate;
+							}
+						} else {
+							$sale_per_category = DB::table('fumaco_on_sale as sale')->join('fumaco_on_sale_categories as cat_sale', 'sale.id', 'cat_sale.sale_id')
+								->whereDate('sale.start_date', '<=', Carbon::now())->whereDate('sale.end_date', '>=', Carbon::now())
+								->where('status', 1)->where('cat_sale.category_id', $item->f_cat_id)
+								->select('cat_sale.*')->first();
+							if ($sale_per_category) {
+								if ($sale_per_category->discount_type == 'By Percentage') {
+									$discount = ($item->f_original_price * ($sale_per_category->discount_rate/100));
+								} else {
+									$discount = $sale->discount_rate;
+								}
+							}
+						}
+					} else {
+						$sale_per_category = DB::table('fumaco_on_sale as sale')->join('fumaco_on_sale_categories as cat_sale', 'sale.id', 'cat_sale.sale_id')
+							->whereDate('sale.start_date', '<=', Carbon::now())->whereDate('sale.end_date', '>=', Carbon::now())
+							->where('status', 1)->where('cat_sale.category_id', $item->f_cat_id)->first();
+					}
+				} else {
+					$price = $item->f_price;
+				}
+	
+				$price = $price - $discount;
 
 				$cart_arr[] = [
 					'item_code' => $item->f_idcode,
@@ -481,10 +518,51 @@ class CheckoutController extends Controller
 				$cart_items = DB::table('fumaco_items as a')->join('fumaco_cart as b', 'a.f_idcode', 'b.item_code')
 					->where('user_type', 'guest')->where('transaction_id', $order_no)->get();
 			}
+
+			  // set sale price
+			$sale = DB::table('fumaco_on_sale')
+				->whereDate('start_date', '<=', Carbon::now()->toDateString())
+				->whereDate('end_date', '>=', Carbon::today()->toDateString())
+				->where('status', 1)->first();
 			
 			$cart_arr = [];
 			foreach ($cart_items as $n => $item) {
-				$price = ($item->f_onsale) ? $item->f_price : $item->f_original_price;
+				$discount = 0;
+				$price = $item->f_original_price;
+				$item_image = DB::table('fumaco_items_image_v1')
+					->where('idcode', $item->f_idcode)->first();
+
+				if (!$item->f_onsale) {
+					if ($sale) {
+						if ($sale->apply_discount_to == 'All Items') {
+							if ($sale->discount_type == 'By Percentage') {
+								$discount = ($item->f_original_price * ($sale->discount_rate/100));
+							} else {
+								$discount = $sale->discount_rate;
+							}
+						} else {
+							$sale_per_category = DB::table('fumaco_on_sale as sale')->join('fumaco_on_sale_categories as cat_sale', 'sale.id', 'cat_sale.sale_id')
+								->whereDate('sale.start_date', '<=', Carbon::now())->whereDate('sale.end_date', '>=', Carbon::now())
+								->where('status', 1)->where('cat_sale.category_id', $item->f_cat_id)
+								->select('cat_sale.*')->first();
+							if ($sale_per_category) {
+								if ($sale_per_category->discount_type == 'By Percentage') {
+									$discount = ($item->f_original_price * ($sale_per_category->discount_rate/100));
+								} else {
+									$discount = $sale->discount_rate;
+								}
+							}
+						}
+					} else {
+						$sale_per_category = DB::table('fumaco_on_sale as sale')->join('fumaco_on_sale_categories as cat_sale', 'sale.id', 'cat_sale.sale_id')
+							->whereDate('sale.start_date', '<=', Carbon::now())->whereDate('sale.end_date', '>=', Carbon::now())
+							->where('status', 1)->where('cat_sale.category_id', $item->f_cat_id)->first();
+					}
+				} else {
+					$price = $item->f_price;
+				}
+	
+				$price = $price - $discount;
 				$total_amount = $price * $item->qty;
 				$item_discount = $item->f_discount_percent;
 
