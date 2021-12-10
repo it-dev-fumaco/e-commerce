@@ -104,7 +104,16 @@
 										<s class="product_discount">
 											<span style='color:black; '>₱ {{ number_format(str_replace(",","",$product_details->f_original_price), 2) }}<span>
 										</s>
-										
+										@elseif($discount_from_sale == 1)
+											<span class="product_price fumacoFont_item_price">₱ {{ number_format(str_replace(",","",$product_price), 2) }}</span>
+											<s class="product_discount">
+												<span style='color:black; '>₱ {{ number_format(str_replace(",","",$product_details->f_original_price), 2) }}<span>
+											</s>
+											@if ($sale_discount_type == 'By Percentage')
+												<span class="badge badge-danger" style="margin-left: 8px; vertical-align: middle;background-color: red; display: inline !important;">{{ $sale_discount_rate }}% OFF</span>
+											@elseif($sale_discount_type == 'Fixed Amount') 
+												<span class="badge badge-danger" style="margin-left: 8px; vertical-align: middle;background-color: red; display: inline !important;">₱ {{ number_format(str_replace(",","",$sale_discount_rate), 2) }} OFF</span>
+											@endif
 										@else
 										<span class="product_price fumacoFont_item_price">₱ {{ number_format(str_replace(",","",$product_details->f_original_price), 2) }}</span>
 										@endif
@@ -242,6 +251,165 @@
 								</div>
 							</div>
 
+							@if ($products_to_compare)
+								<section class="py-5 text-center container" style="padding-bottom: 0rem !important;">
+									<div class="row py-lg-5">
+										<div class="col-lg-6 col-md-8 mx-auto">
+											<h4 class="fw-light bestsellinghead fumacoFont1 animated animatedFadeInUp fadeInUp" style="color:#000000 !important;">COMPARE PRODUCTS</h4>
+										</div>
+									</div>
+								</section>
+								<div class="row">
+									<section class="regular slider">
+										@foreach ($compare_arr as $compare_product)
+											<div class="col-md-{{ 12/count($compare_arr) }} equal-height-columns p-1">
+												@php
+													$compare_img = ($compare_product['item_image']) ? '/storage/item_images/'. $compare_product['item_code'] .'/gallery/original/'. $compare_product['item_image'] : '/storage/no-photo-available.png';
+													$compare_img_webp = ($compare_product['item_image']) ? '/storage/item_images/'. $compare_product['item_code'] .'/gallery/original/'. explode(".", $compare_product['item_image'])[0] .'.webp' : '/storage/no-photo-available.png';
+												@endphp
+												<center>
+													<div class="hover-container product-card" style="position: relative;">
+														<div class="pt-2" style="position: absolute; top: 0; right: 0; z-index: 10;">
+															@if($compare_product['discounted_from_item'] == 1)
+																<div class="col-12">
+																	<span class="p-1 text-center" style="background-color: #FF0000; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
+																		&nbsp;<b>{{ $compare_product['individual_discount_rate'] }}% OFF</b>&nbsp;
+																	</span>
+																</div>
+															@elseif($compare_product['discounted_from_sale'] == 1)
+																<div class="col-12">
+																	<span class="p-1 text-center" style="background-color: #FF0000; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
+																		@if ($compare_product['sale_discount_type'] == 'By Percentage')
+																			&nbsp;<b>{{ $compare_product['sale_discount_rate'] }}% OFF</b>&nbsp;
+																		@elseif($compare_product['sale_discount_type'] == 'Fixed Amount')
+																			&nbsp;<b>₱ {{ number_format($compare_product['sale_discount_rate'], 2, '.', ',') }} OFF</b>&nbsp;
+																		@endif
+																	</span>
+																</div>
+															@endif
+														</div>
+														<div class="overlay-bg"></div>
+
+														<div class="btn-container">
+															<a href="/product/{{ ($compare_product['slug']) ? $compare_product['slug'] : $compare_product['item_code'] }}" class="view-products-btn btn" role="button"><i class="fas fa-search"></i>&nbsp;View Product</a>
+														</div>
+														<picture>
+															<source srcset="{{ asset($compare_img_webp) }}" type="image/webp" class="img-responsive" style="width: 100% !important;">
+															<source srcset="{{ asset($compare_img) }}" type="image/jpeg" class="img-responsive" style="width: 100% !important;">
+															<img src="{{ asset($compare_img) }}" alt="{{ Str::slug(explode(".", $compare_product['item_image'])[0], '-') }}" class="img-responsive hover" style="width: 100%" />
+														</picture>
+													</div>
+													
+													<span class="comparison-description">{{ $compare_product['product_name'] }}</span>
+													<br/>&nbsp;
+													<hr>
+
+													@if ($compare_product['discounted_from_item'] == 1)
+														<span class="comparison-price" style="white-space: nowrap !important">₱ {{ number_format(str_replace(",","",$compare_product['price']), 2) }}</span>&nbsp;<s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$compare_product['original_price']), 2) }}</s>
+													@elseif ($compare_product['discounted_from_sale'] == 1)
+														<span class="comparison-price" style="white-space: nowrap !important">₱ {{ number_format(str_replace(",","",$compare_product['price']), 2) }}</span>
+														<s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$compare_product['original_price']), 2) }}</s>
+													@else
+														₱ {{ number_format(str_replace(",","",$compare_product['original_price']), 2) }}
+													@endif
+													<br/><br/>
+													@if($compare_product['on_stock'] == 1)
+														<button class="btn btn-pill btn-outline-primary btn-sm add-to-cart comparison-add-to-cart" type="button" data-toggle="toast" data-item-code="{{ $compare_product['item_code'] }}"><i class="fas fa-shopping-cart d-inline-block"></i>&nbsp;Add to Cart</button>
+													@else
+														<a href="/login" class="btn btn-pill btn-outline-primary btn-sm {{ Auth::check() ? 'add-to-wishlist' : '' }} comparison-add-to-cart" type="button" data-toggle="toast" data-item-code="{{ $compare_product['item_code'] }}"><i class="fas fa-heart d-inline-block"></i>&nbsp;Add to Wishlist</a>
+													@endif
+													<br/><br/>
+
+													@foreach ($attribute_names as $attrib)
+														<div class="col-12">
+															<span>{{ $attrib->attribute_name }}</span>
+															<hr/>
+															<span class="comparison-description">{{ $variant_attr_array[$attrib->attribute_name][$compare_product['item_code']] }}</span>
+														</div>
+														<br/>
+													@endforeach
+												</center>
+											</div>
+										@endforeach
+									</section>
+								</div>
+								<br/>
+								{{-- <div class="row">
+									@foreach ($attribute_names as $attrib)
+										@foreach ($compare_arr as $compare_items)
+											<div class="col-{{ 12/count($compare_arr) }} p-3 text-center">
+												{{ $attrib->attribute_name }}
+												<hr>
+												<span><b>{{ $variant_attr_array[$attrib->attribute_name][$compare_items['item_code']] }}</b></span>
+											</div>
+										@endforeach
+									@endforeach
+								</div> --}}
+								{{-- <table class="table table-bordered table-hover">
+									<tr>
+										<th style="min-width: 15%;"></th>
+										@foreach ($compare_arr as $compare_image)
+											@php
+												$compare_img = ($compare_image['item_image']) ? '/storage/item_images/'. $compare_image['item_code'] .'/gallery/preview/'. $compare_image['item_image'] : '/storage/no-photo-available.png';
+												$compare_img_webp = ($compare_image['item_image']) ? '/storage/item_images/'. $compare_image['item_code'] .'/gallery/preview/'. explode(".", $compare_image['item_image'])[0] .'.webp' : '/storage/no-photo-available.png';
+											@endphp
+											<th>
+												<div class="row">
+													<div class="col-md-3 text-center">
+														<a class="comparison-item-thumb" href="/product/{{ ($compare_image['slug']) ? $compare_image['slug'] : $compare_image['item_code'] }}">
+															<picture>
+																<source srcset="{{ asset($compare_img_webp) }}" type="image/webp" class="img-responsive" style="width: 100% !important;">
+																<source srcset="{{ asset($compare_img) }}" type="image/jpeg" class="img-responsive" style="width: 100% !important;">
+																<img src="{{ asset($compare_img) }}" alt="{{ Str::slug(explode(".", $compare_image['item_image'])[0], '-') }}" class="img-responsive hover" style="width: 50px !important;">
+															</picture>
+														</a>
+													</div>
+													<div class="col-md-9 text-left">
+														<a class="comparison-item-title text-left" href="/product/{{ ($compare_image['slug']) ? $compare_image['slug'] : $compare_image['item_code'] }}" style="text-align: left !important">{{ $compare_image['product_name'] }}</a>
+														<br/><br/>
+														@if($compare_image['on_stock'] == 1)
+															<button class="btn btn-pill btn-outline-primary btn-sm add-to-cart" type="button" data-toggle="toast" data-item-code="{{ $compare_image['item_code'] }}"><i class="fas fa-shopping-cart d-inline-block"></i>&nbsp;Add to Cart</button>
+														@else
+															<a href="/login" class="btn btn-pill btn-outline-primary btn-sm {{ Auth::check() ? 'add-to-wishlist' : '' }}" type="button" data-toggle="toast" data-item-code="{{ $compare_image['item_code'] }}"><i class="fas fa-heart d-inline-block"></i>&nbsp;Add to Wishlist</a>
+														@endif
+														<br/>
+													</div>
+												</div>
+											</th>
+										@endforeach
+									</tr>
+									@foreach ($attribute_names as $attrib)
+										<tr>
+											<th>{{ $attrib->attribute_name }}</th>
+											@foreach ($compare_arr as $compare_items)
+												<td>{{ $variant_attr_array[$attrib->attribute_name][$compare_items['item_code']] }}</td>
+											@endforeach
+										</tr>
+									@endforeach
+									<tr>
+										<th>Price</th>
+										@foreach ($compare_arr as $price)
+											<td>
+												@if ($price['discounted_from_item'] == 1)
+													<span style="white-space: nowrap !important">₱ {{ number_format(str_replace(",","",$price['price']), 2) }}</span>&nbsp;<s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$price['original_price']), 2) }}</s>
+													<span class="badge badge-danger" style="margin-left: 8px; vertical-align: middle;background-color: red; display: inline !important;">{{ $price['individual_discount_rate'] }}% OFF</span>
+												@elseif ($price['discounted_from_sale'] == 1)
+													<span style="white-space: nowrap !important">₱ {{ number_format(str_replace(",","",$price['price']), 2) }}</span>
+													<s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$price['original_price']), 2) }}</s>
+													@if ($price['sale_discount_type'] == 'By Percentage')
+														<span class="badge badge-danger" style="margin-left: 8px; vertical-align: middle;background-color: red; display: inline !important;">{{ $price['sale_discount_rate'] }}% OFF</span>
+													@elseif($price['sale_discount_type'] == 'Fixed Amount')
+														<span class="badge badge-danger" style="margin-left: 8px; vertical-align: middle;background-color: red; display: inline !important;">₱ {{ number_format(str_replace(",","",$price['sale_discount_rate']), 2) }} OFF</span>
+													@endif
+												@else
+													₱ {{ number_format(str_replace(",","",$price['original_price']), 2) }}
+												@endif
+											</td>
+										@endforeach
+									</tr>
+								</table> --}}
+							@endif
+							
                     @if (count($related_products) > 0)
 							<section class="py-5 text-center container" style="padding-bottom: 0rem !important;">
 								<div class="row py-lg-5">
@@ -271,10 +439,20 @@
 																&nbsp;<b>New</b>&nbsp;
 																</span>
 															</div><br class="{{ $rp['is_new_item'] == 1 ? '' : 'd-none' }}"/>
-															@if ($rp['is_discounted'])
+															@if ($rp['is_discounted'] == 1)
 																<div class="col-12">
 																	<span class="p-1 text-center" style="background-color: #FF0000; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
 																		&nbsp;<b>{{ $rp['discount_percent'] }}% OFF</b>&nbsp;
+																	</span>
+																</div>
+															@elseif ($rp['is_discounted_from_sale'] == 1)
+																<div class="col-12">
+																	<span class="p-1 text-center" style="background-color: #FF0000; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
+																		@if ($rp['sale_discount_type'] == 'By Percentage')
+																			&nbsp;<b>{{ $rp['sale_discount_rate'] }}% OFF</b>&nbsp;
+																		@else
+																			&nbsp;<b>₱ {{ number_format($rp['sale_discount_rate'], 2, '.', ',') }} OFF</b>&nbsp;
+																		@endif
 																	</span>
 																</div>
 															@endif
@@ -291,23 +469,16 @@
 															<img src="{{ asset($img) }}" alt="{{ Str::slug(explode(".", $rp['image'])[0], '-') }}" class="img-responsive hover" style="width: 100% !important;">
 														</picture>
 													</div>
-													
-
-
-													<div class="card-body">
+													<div class="card-body d-flex flex-column">
 														<div class="text ellipsis">
 															<a href="/product/{{ ($rp['slug']) ? $rp['slug'] : $rp['item_code'] }}" class="card-text product-head fumacoFont_card_title text-concat prod_desc" style="text-decoration: none !important; text-transform: none !important; color:#0062A5 !important;  min-height: 100px;">{{ $rp['item_name'] }}</a>
 														</div>
-														<p class="card-text fumacoFont_card_price price-card d-none d-md-block d-lg-none" style="color:#000000 !important; ">
-															@if ($rp['is_discounted'])
-															<span style="white-space: nowrap !important">₱ {{ number_format(str_replace(",","",$rp['new_price']), 2) }}</span>&nbsp;<br class="d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$rp['orig_price']), 2) }}</s>
-															@else
-															₱ {{ number_format(str_replace(",","",$rp['orig_price']), 2) }}
-															@endif
-														</p>
+
 														<p class="card-text fumacoFont_card_price d-sm-block d-md-none d-lg-block" style="color:#000000 !important; ">
-															@if ($rp['is_discounted'])
+															@if ($rp['is_discounted'] == 1)
 															<span style="white-space: nowrap !important">₱ {{ number_format(str_replace(",","",$rp['new_price']), 2) }}</span>&nbsp;<br class="d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$rp['orig_price']), 2) }}</s>
+															@elseif($rp['is_discounted_from_sale'] == 1)
+																₱ {{ number_format(str_replace(",","",$rp['sale_discounted_price']), 2) }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$rp['orig_price']), 2) }}</s>
 															@else
 															₱ {{ number_format(str_replace(",","",$rp['orig_price']), 2) }}
 															@endif
@@ -1021,6 +1192,31 @@
       -webkit-transform: scale(0.95); /* Safari 3-8 */
       transform: scale(0.95); 
     }
+
+	.comparison-item-title{
+		text-transform: none;
+		text-decoration: none;
+		color: #000;
+		transition: .4s;
+	}
+
+	.comparison-description{
+		font-size: 17px;
+		font-weight: 500;
+	}
+
+	.comparison-add-to-cart{
+		border: none !important;
+		border-radius: 25px !important;
+		padding: 10px;
+		width: 80%;
+	}
+
+	.learn-more{
+		text-transform: none;
+		text-decoration: none;
+		transition: .4s;
+	}
 	@media (max-width: 575.98px) { /* Mobile */
         header{
           min-height: 50px;
@@ -1057,6 +1253,13 @@
 		}
 		.next-btn{
 			right: 10px !important;
+		}
+		.comparison-add-to-cart{
+			width: 100% !important;
+			font-size: 10pt !important;
+		}
+		.comparison-price{
+			font-size: 10pt;
 		}
       }
 
@@ -1106,6 +1309,13 @@
 		}
 		.next-btn{
 			right: 10px !important;
+		}
+		.comparison-add-to-cart{
+			width: 100% !important;
+			font-size: 10pt !important;
+		}
+		.comparison-price{
+			font-size: 10pt;
 		}
       }
 	  	@media (max-width: 575.98px) {

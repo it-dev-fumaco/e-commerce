@@ -47,37 +47,50 @@
                                         </div>
                                         <div class="row">
                                             <div class="col-6">
-                                                <div class="col-7 mx-auto">
-                                                    <img class="img-thumbnail" src="{{ asset('/assets/site-img/'.$on_sale->banner_image) }}" alt="" style="width: 100%">
-                                                </div>
-                                            </div>
-                                            
-                                            <div class="col-6">
                                                 <label>Sale Name</label>
                                                 <input type="text" class="form-control" name="sale_name" placeholder="Sale Name" value="{{ $on_sale->sale_name }}" required>
-                                                <br/>
+                                            </div>
+                                            <div class="col-6">
+                                                <label>Set Sale Duration</label>
+                                                <input type="text" class="form-control set_duration" id="daterange" name="sale_duration"/>
+                                            </div>
+                                            {{-- <div class="col-4">
+                                                @php
+                                                    $discount_for = array('General', 'Member', 'Guest');
+                                                @endphp
+                                                <label>Discount For</label>
+                                                <select class="form-control" name="discount_for" required>
+                                                    <option disabled selected value="">Discount For</option>
+                                                    @foreach ($discount_for as $for)
+                                                        <option value="{{ $for }}" {{ $for == $on_sale->discount_for ? 'selected' : '' }}>{{ $for }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div> --}}
+                                        </div>
+                                        <br/>
+                                        <div class="row">
+                                            <div class="col-1">
+                                                <img class="img-thumbnail" src="{{ asset('/assets/site-img/'.$on_sale->banner_image) }}" alt="" style="width: 100%">
+                                            </div>
+                                            <div class="col-5">
                                                 <label>Banner Image</label>
                                                 <div class="custom-file mb-3">
                                                     <input type="file" class="custom-file-input" id="customFile" name="banner_img">
                                                     <label class="custom-file-label" for="customFile">{{ $on_sale->banner_image ? $on_sale->banner_image : 'Choose File' }}</label>
-                                                </div>                                                
-                                                <br/>
-                                                <label><input type="checkbox" name="set_duration" id="set_duration" {{ $on_sale->start_date ? 'checked' : '' }}> Set Sale Duration</label>
-                                                <input type="text" class="form-control set_duration" id="daterange" name="sale_duration" {{ $on_sale->start_date ? '' : 'disabled' }}/>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <br/>
-                                        <div class="row">
-                                            <div class="col-6 mx-auto">
-                                                <label>Discount For</label>
-                                                <select class="form-control" name="discount_for" id="discount_for" required>
-                                                    <option disabled selected value="">Discount For</option>
+                                            
+                                            <div class="col-6">
+                                                <label>Apply Discount To</label>
+                                                <select class="form-control" name="apply_discount_to" id="apply_discount_to" required>
+                                                    <option disabled selected value="">Apply Discount To</option>
                                                     <option value="Per Category">Per Category</option>
                                                     <option value="All Items">All Items</option>
                                                 </select>
                                             </div>
                                         </div>
                                         <div class="row" id="for_all_items">
+                                            
                                             <div class="col-6 mx-auto">
                                                 <br/>
                                                 <label>Discount Type</label>
@@ -197,10 +210,10 @@
 <script>
     $(document).ready(function(){
         $('#discount_type').val("{{ $on_sale->discount_type }}");
-        $('#discount_for').val("{{ $on_sale->discount_for }}");
+        $('#apply_discount_to').val("{{ $on_sale->apply_discount_to }}");
 
         discountType();
-        discountFor();
+        applyDiscountTo();
 
         var start = "{{ $on_sale->start_date ? date('m/d/Y', strtotime($on_sale->start_date)) : null  }}";
         var end = "{{ $on_sale->end_date ? date('m/d/Y', strtotime($on_sale->end_date)) : null }}";
@@ -211,14 +224,11 @@
                 placeholder: 'Select Date Range',
                 startDate: start ? start : moment(),
                 endDate: end ? end : moment().add(7, 'days'),
-                // locale: {
-                //     format: 'MMM d, Y'
-                // }
             });
         });
 
-        $('#discount_for').change(function(){
-            discountFor();
+        $('#apply_discount_to').change(function(){
+            applyDiscountTo();
         });
 
         $('#discount_type').change(function(){
@@ -233,24 +243,6 @@
                 $(this).closest('td').next('td').next('td').find('input').prop('readonly', false);
             }
 		});
-
-        $('#require_coupon').click(function(){
-            if($(this).is(':checked')){
-                $("#coupon").prop('required',true);
-                $("#coupon").prop('disabled',false);
-            }else{
-                $("#coupon").prop('required',false);
-                $("#coupon").prop('disabled',true);
-            }
-        });
-
-        $('#set_duration').click(function(){
-            if($(this).is(':checked')){
-                $(".set_duration").prop('disabled',false);
-            }else{
-                $(".set_duration").prop('disabled',true);
-            }
-        });
 
         function discountType(){
             if($('#discount_type').val() == 'Fixed Amount'){
@@ -271,19 +263,25 @@
             }
         }
 
-        function discountFor(){
-            if($('#discount_for').val() == 'All Items'){
+        function applyDiscountTo(){
+            if($('#apply_discount_to').val() == 'All Items'){
                 $('#for_all_items').slideDown();
                 $('#categories').slideUp();
                 $('#discount_type').prop('required', true);
-            }else if($('#discount_for').val() == 'Per Category'){
+            }else if($('#apply_discount_to').val() == 'Per Category'){
                 $('#for_all_items').slideUp();
                 $('#categories').slideDown();
                 $('#discount_type').prop('required', false);
+                $('#discount_type').prop('required', false);
+                $('#discount_rate').prop('required', false);
+                $('#capped_amount').prop('required', false);
             }else{
                 $('#for_all_items').slideUp();
                 $('#categories').slideUp();
                 $('#discount_type').prop('required', false);
+                $('#discount_type').prop('required', false);
+                $('#discount_rate').prop('required', false);
+                $('#capped_amount').prop('required', false);
             }
         }
 

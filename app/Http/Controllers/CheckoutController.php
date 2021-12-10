@@ -372,7 +372,8 @@ class CheckoutController extends Controller
 				$item_image = DB::table('fumaco_items_image_v1')
 					->where('idcode', $item->f_idcode)->first();
 
-				$price = ($item->f_onsale) ? $item->f_price : $item->f_original_price;
+				$product_price = $cart[$item->f_idcode]['is_discounted_from_sale'] == 1 ? $cart[$item->f_idcode]['price'] : $item->f_original_price;
+				$price = ($item->f_onsale) ? $item->f_price : $product_price;
 
 				$cart_arr[] = [
 					'item_code' => $item->f_idcode,

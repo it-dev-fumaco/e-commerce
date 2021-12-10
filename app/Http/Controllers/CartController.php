@@ -174,7 +174,7 @@ class CartController extends Controller
         } else {
             $order_no = session()->get('fumOrderNo');
         }
-        
+
         $loc = GeoLocation::lookup($data['ip']);
         // add data to fumaco cart table
         if (Auth::check()) {

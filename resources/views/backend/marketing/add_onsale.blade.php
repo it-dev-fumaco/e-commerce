@@ -49,10 +49,30 @@
                                             <div class="col-6">
                                                 <label>Sale Name *</label>
                                                 <input type="text" class="form-control" name="sale_name" placeholder="Sale Name" required>
-                                                <br/>
+                                            </div>
+                                            <div class="col-6">
+                                                <label>Set Sale Duration</label>
+                                                <input type="text" class="form-control set_duration" id="daterange" name="sale_duration" required/>
+                                            </div>
+                                            {{-- <div class="col-4">
+                                                @php
+                                                    $discount_for = array('General', 'Member', 'Guest');
+                                                @endphp
                                                 <label>Discount For *</label>
-                                                <select class="form-control" name="discount_for" id="discount_for" required>
+                                                <select class="form-control" name="discount_for" required>
                                                     <option disabled selected value="">Discount For</option>
+                                                    @foreach ($discount_for as $for)
+                                                        <option value="{{ $for }}">{{ $for }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div> --}}
+                                        </div>
+                                        <br/>
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <label>Apply Discount To *</label>
+                                                <select class="form-control" name="apply_discount_to" id="apply_discount_to" required>
+                                                    <option disabled selected value="">Apply Discount To</option>
                                                     <option value="Per Category">Per Category</option>
                                                     <option value="All Items">All Items</option>
                                                 </select>
@@ -85,9 +105,6 @@
                                                 <br/>
                                             </div>
                                             <div class="col-6">
-                                                <label><input type="checkbox" name="set_duration" id="set_duration"> Set Sale Duration</label>
-                                                <input type="text" class="form-control set_duration" id="daterange" name="sale_duration" disabled/>
-                                                <br/>
                                                 <label>Banner Image</label>
                                                 <div class="custom-file mb-3">
                                                     <input type="file" class="custom-file-input" id="customFile" name="banner_img">
@@ -144,9 +161,8 @@
 <script>
     $(document).ready(function(){
         discountType();
-        discountFor();
+        applyDiscountTo();
         requireCoupon();
-        setDuration();
 
         $(function() {
             $('#daterange').daterangepicker({
@@ -160,26 +176,13 @@
             discountType();
         });
 
-        $('#discount_for').change(function(){
-            discountFor();
+        $('#apply_discount_to').change(function(){
+            applyDiscountTo();
         });
 
         $('#require_coupon').click(function(){
             requireCoupon();
         });
-
-        $('#set_duration').click(function(){
-            setDuration();
-        });
-
-        $checks = $(".categories");
-        $checks.on('change', function() {
-            var string = $checks.filter(":checked").map(function(i,v){
-                return this.value;
-            }).get().join(",");
-            $('#selected_categories').val(string);
-        });
-
         // Add the following code if you want the name of the file appear on select
         $(".custom-file-input").change(function() {
             var fileName = $(this).val().split("\\").pop();
@@ -205,16 +208,6 @@
             }
         }
 
-        function discountFor(){
-            if($('#discount_for').val() == 'Per Category'){
-                $('#categories').slideDown();
-                $("#selected_categories").prop('required',true);
-            }else{
-                $('#categories').slideUp();
-                $("#selected_categories").prop('required',false);
-            }
-        }
-
         function requireCoupon(){
             if($('#require_coupon').is(':checked')){
                 $("#coupon").prop('required',true);
@@ -225,36 +218,32 @@
             }
         }
 
-        function setDuration(){
-            if($('#set_duration').is(':checked')){
-                $(".set_duration").prop('disabled',false);
-            }else{
-                $(".set_duration").prop('disabled',true);
-            }
-        }
-
-        function discountFor(){
-            if($('#discount_for').val() == 'All Items'){
+        function applyDiscountTo(){
+            if($('#apply_discount_to').val() == 'All Items'){
                 $('#for_all_items').slideDown();
                 $('#categories').slideUp();
                 $('#discount_type').prop('required', true);
-            }else if($('#discount_for').val() == 'Per Category'){
+            }else if($('#apply_discount_to').val() == 'Per Category'){
                 $('#for_all_items').slideUp();
                 $('#categories').slideDown();
                 $('#discount_type').prop('required', false);
+                $('#discount_rate').prop('required', false);
+                $('#capped_amount').prop('required', false);
             }else{
                 $('#for_all_items').slideUp();
                 $('#categories').slideUp();
                 $('#discount_type').prop('required', false);
+                $('#discount_rate').prop('required', false);
+                $('#capped_amount').prop('required', false);
             }
         }
 
         $(document).on('change', '.category_discount_type', function(e){
 			e.preventDefault();
             if($(this).val() == 'Fixed Amount'){
-                $(this).closest('td').next('td').next('td').find('input').prop('disabled', true);
+                $(this).closest('td').next('td').next('td').find('input').prop('readonly', true);
             }else{
-                $(this).closest('td').next('td').next('td').find('input').prop('disabled', false);
+                $(this).closest('td').next('td').next('td').find('input').prop('readonly', false);
             }
 		});
 

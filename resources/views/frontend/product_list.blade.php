@@ -242,9 +242,7 @@
 						<div class="row animated animatedFade1InUp fadeInUp mx-auto">
 							@forelse ($products_arr as $product)
 							<div class="col-md-4 mb-3 btmp mb-pad">
-								
 								{{-- <div class="col-md-4 btmp animated animatedFadeInUp fadeInUp equal-height-columns"> --}}
-							{{-- <a class="product-card" href="/product/{{ ($product['slug']) ? $product['slug'] : $product['item_code'] }}" style="text-decoration: none !important; text-transform: none !important; position: relative"> --}}
 								<div class="card">
 									<div class="equal-column-content">
 										@php
@@ -255,17 +253,28 @@
 										<div class="hover-container product-card" style="position: relative">
 											<div class="pt-2" style="position: absolute; top: 0; right: 0; z-index: 10;">
 												<div class="col-12 mb-2 {{ $product['is_new_item'] == 1 ? '' : 'd-none' }}">
-												<span class="p-1 text-center" style="background-color: #438539; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
-												  &nbsp;<b>New</b>&nbsp;
-												</span>
-											  </div><br class="{{ $product['is_new_item'] == 1 ? '' : 'd-none' }}"/>
-											  @if ($product['is_discounted'])
-												<div class="col-12">
-												  <span class="p-1 text-center" style="background-color: #FF0000; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
-													&nbsp;<b>{{ $product['discount_percent'] }}% OFF</b>&nbsp;
-												  </span>
-												</div>
-											  @endif
+													<span class="p-1 text-center" style="background-color: #438539; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
+													&nbsp;<b>New</b>&nbsp;
+													</span>
+												</div><br class="{{ $product['is_new_item'] == 1 ? '' : 'd-none' }}"/>
+												@if ($product['is_discounted'])
+													<div class="col-12">
+														<span class="p-1 text-center" style="background-color: #FF0000; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
+															&nbsp;<b>{{ $product['discount_percent'] }}% OFF</b>&nbsp;
+														</span>
+													</div>
+												@elseif ($product['is_discounted_from_sale'] == 1)
+													<div class="col-12">
+														<span class="p-1 text-center" style="background-color: #FF0000; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
+															@if ($product['sale_discount_type'] == 'By Percentage')
+																&nbsp;<b>{{ $product['sale_discount_rate'] }}% OFF</b>&nbsp;
+															@else
+																&nbsp;<b>₱ {{ number_format($product['sale_discount_rate'], 2, '.', ',') }} OFF</b>&nbsp;
+															@endif
+														</span>
+													</div>
+												@endif
+											  
 											</div>
 
 											<div class="btn-container">
@@ -280,22 +289,15 @@
 										</div>
 										
 								
-										<div class="card-body">
+										<div class="card-body d-flex flex-column">
 											<div class="text ellipsis">
 												<a href="/product/{{ ($product['slug']) ? $product['slug'] : $product['item_code'] }}" class="card-text fumacoFont_card_title text-concat prod-desc" style="text-transform: none !important; text-decoration: none !important; color:#0062A5 !important; min-height: 100px; font-size: 16px !important; font-weight: 500 !important;">{{ $product['item_name'] }}</a>
 											</div>
-											<p class="card-text fumacoFont_card_price price-card d-none d-md-block d-lg-none" style="color:#000000 !important;">
-												@if($product['is_discounted'])
+											<p class="card-text fumacoFont_card_price" style="color:#000000 !important;">
+												@if($product['is_discounted'] == 1)
 												₱ {{ number_format(str_replace(",","",$product['discounted_price']), 2) }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$product['price']), 2) }}</s>
-												{{-- &nbsp;<span class="badge badge-danger" style="vertical-align: middle;background-color: red; display: {{ ($product['on_sale']) ? 'inline' : 'none' }} !important;">{{ $product['discount_percent'] }}% OFF</span> --}}
-												@else
-												₱ {{ number_format(str_replace(",","",$product['price']), 2) }}
-												@endif
-											</p>
-											<p class="card-text fumacoFont_card_price d-sm-block d-md-none d-lg-block" style="color:#000000 !important;">
-												@if($product['is_discounted'])
-												₱ {{ number_format(str_replace(",","",$product['discounted_price']), 2) }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$product['price']), 2) }}</s>
-												{{-- &nbsp;<spanclass="badgebadge-danger"style="vertical-align:middle;background-color:red;display:{{ ($product['on_sale'])?'inline':'none' }}!important;">{{ $product['discount_percent'] }}% OFF</span> --}}
+												@elseif($product['is_discounted_from_sale'] == 1)
+													₱ {{ number_format(str_replace(",","",$product['discounted_price']), 2) }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$product['price']), 2) }}</s>
 												@else
 												₱ {{ number_format(str_replace(",","",$product['price']), 2) }}
 												@endif
@@ -311,17 +313,13 @@
 												<small class="text-muted stylecap" style="color:#c4cad0 !important; font-weight:100 !important;">( 0 Reviews )</small>
 											</div>
 										</div>
-										<div class="card-body">
-											{{-- <a href="/product/{{ $product['item_code'] }}" class="btn btn-outline-primary fumacoFont_card_readmore" role="button" style="width:100% !important;">View</a> --}}
-										</div>
 									</div>
 									@if ($product['on_stock'] == 1)
-									<a href="#" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto add-to-cart" role="button" style="width: 90% !important; margin-bottom: 20px" data-item-code="{{ $product['item_code'] }}"><i class="fas fa-shopping-cart d-inline-block" style="margin-right: 2%;"></i> Add to Cart</a>
-									@else
-									<a href="/login" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto {{ Auth::check() ? 'add-to-wishlist' : '' }}" role="button" style="width: 90% !important; margin-bottom: 20px" data-item-code="{{ $product['item_code'] }}"><i class="far fa-heart d-inline-block" style="margin-right: 2%;"></i> Add to Wishlist</a>
-									@endif
+										<a href="#" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto add-to-cart" role="button" style="width: 90% !important; margin-bottom: 20px" data-item-code="{{ $product['item_code'] }}"><i class="fas fa-shopping-cart d-inline-block" style="margin-right: 2%;"></i> Add to Cart</a>
+										@else
+										<a href="/login" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto {{ Auth::check() ? 'add-to-wishlist' : '' }}" role="button" style="width: 90% !important; margin-bottom: 20px" data-item-code="{{ $product['item_code'] }}"><i class="far fa-heart d-inline-block" style="margin-right: 2%;"></i> Add to Wishlist</a>
+										@endif
 								</div>
-							{{-- </a> --}}
 							</div>
 							@empty
 							<h4 class="text-center text-muted p-5 text-uppercase">No products found</h4>
