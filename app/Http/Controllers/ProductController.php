@@ -920,7 +920,7 @@ class ProductController extends Controller
                 'allowed_usage' => $request->allowed_usage,
                 'minimum_spend' => $request->minimum_spend,
                 'discount_type' => $request->discount_type,
-                'discount_rate' => $discount_rate,
+                'discount_rate' => preg_replace("/[^0-9]/", "", $discount_rate),
                 'capped_amount' => $capped_amount,
                 'coupon_type' => $request->coupon_type,
                 'description' => $request->coupon_description,
@@ -940,7 +940,6 @@ class ProductController extends Controller
                     DB::table('fumaco_voucher_customers')->insert([
                         'customer_id' => $customer,
                         'voucher_id' => $voucher_id->id,
-                        // 'allowed_usage' => $request->customer_allowed_usage[$key],
                         'created_by' => Auth::user()->username
                     ]);
                 }
@@ -999,7 +998,7 @@ class ProductController extends Controller
                 'allowed_usage' => $request->allowed_usage,
                 'minimum_spend' => $request->minimum_spend,
                 'discount_type' => $request->discount_type,
-                'discount_rate' => $discount_rate,
+                'discount_rate' => preg_replace("/[^0-9]/", "", $discount_rate),
                 'capped_amount' => $capped_amount,
                 'coupon_type' => $request->coupon_type,
                 'description' => $request->coupon_description,

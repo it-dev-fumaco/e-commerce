@@ -1069,6 +1069,84 @@ class FrontendController extends Controller
             }
         }
 
+        $compare_arr = [];
+        $variant_attr_array = [];
+        $products_to_compare = null;
+        $variant_attributes_to_compare = null;
+        $attributes_to_compare = null;
+        $attribute_names = null;
+        $product_comparison_id = DB::table('product_comparison_attribute')->where('item_code', $product_details->f_idcode)->where('status', 1)->pluck('product_comparison_id')->first();
+        if($product_comparison_id){
+            $compare_query = DB::table('product_comparison_attribute as compare_attrib')->join('fumaco_attributes_per_category as cat_attrib', 'compare_attrib.attribute_name_id', 'cat_attrib.id')->where('compare_attrib.product_comparison_id', $product_comparison_id);
+
+            $attributes_clone = Clone $compare_query;
+            $attributes_to_compare = $attributes_clone->get();
+            
+            $variant_attributes_to_compare = collect($attributes_to_compare)->groupBy('attribute_name');
+            $attribute_names = $attributes_clone->groupBy('attribute_name')->select('attribute_name')->get();
+
+            foreach ($variant_attributes_to_compare as $attrib => $attrib_name) {
+                $idcode_to_compare = collect($attrib_name)->groupBy('item_code')->map(function($d) {
+                    return $d[0]->attribute_value;
+                });
+                $variant_attr_array[$attrib] = $idcode_to_compare;
+            }
+
+            $products_clone = Clone $compare_query;
+            $products_to_compare = $products_clone->groupBy('compare_attrib.item_code')->select('compare_attrib.item_code')->get();
+            // return $products_to_compare;
+            foreach($products_to_compare as $compare){
+                $image = DB::table('fumaco_items_image_v1')->where('idcode', $compare->item_code)->first();
+                $item_details = DB::table('fumaco_items')->where('f_idcode', $compare->item_code)->first();
+                $compare_product_price = $item_details->f_original_price;
+                $compare_discount_from_sale = 0;
+                $compare_sale_discount_rate = null;
+                $compare_sale_discount_type = null;
+                if($all_item_discount){
+                    $compare_discount_from_sale = 1;
+                    $compare_sale_discount_rate = $all_item_discount->discount_rate;
+                    $compare_sale_discount_type = $all_item_discount->discount_type;
+                    if($all_item_discount->discount_type == 'By Percentage'){
+                        $compare_product_price = $item_details->f_original_price - ($item_details->f_original_price * ($all_item_discount->discount_rate/100));
+                    }else if($all_item_discount->discount_type == 'Fixed Amount'){
+                        $compare_discount_from_sale = 0;
+                        if($item_details->f_original_price > $all_item_discount->discount_rate){
+                            $compare_discount_from_sale = 1;
+                            $compare_product_price = $item_details->f_original_price - $all_item_discount->discount_rate;
+                        }
+                    }
+                }else if($category_discount){
+                    $compare_discount_from_sale = 1;
+                    $compare_sale_discount_rate = $category_discount->discount_rate;
+                    $compare_sale_discount_type = $category_discount->discount_type;
+                    if($category_discount->discount_type == 'By Percentage'){
+                        $compare_product_price = $item_details->f_original_price - ($item_details->f_original_price * ($category_discount->discount_rate/100));
+                    }else if($category_discount->discount_type == 'Fixed Amount'){
+                        $compare_discount_from_sale = 0;
+                        if($item_details->f_original_price > $category_discount->discount_rate){
+                            $compare_discount_from_sale = 1;
+                            $compare_product_price = $item_details->f_original_price - $category_discount->discount_rate;
+                        }
+                    }
+                }
+
+                $compare_arr[] = [
+                    'item_code' => $compare->item_code,
+                    'item_image' => $image->imgoriginalx,
+                    'original_price' => $item_details->f_original_price,
+                    'individual_discount_rate' => $item_details->f_discount_percent,
+                    'price' =>  $item_details->f_onsale == 1 ? $item_details->f_price : $compare_product_price,
+                    'slug' => $item_details->slug,
+                    'product_name' => $item_details->f_name_name,
+                    'discounted_from_item' => $item_details->f_discount_trigger,
+                    'discounted_from_sale' => $compare_discount_from_sale,
+                    'sale_discount_rate' => $compare_sale_discount_rate,
+                    'sale_discount_type' => $compare_sale_discount_type,
+                    'on_stock' => $item_details->f_qty > 0 ? 1 : 0
+                ];
+            }
+        }
+
         $product_images = DB::table('fumaco_items_image_v1')->where('idcode', $product_details->f_idcode)->get();
 
         $related_products_query = DB::table('fumaco_items as a')
@@ -1148,7 +1226,7 @@ class FrontendController extends Controller
 
         // return $related_products;
 
-        return view('frontend.product_page', compact('product_details', 'product_images', 'attributes', 'variant_attr_arr', 'related_products', 'filtered_attributes', 'discount_from_sale', 'sale_discount_rate', 'product_price'));
+        return view('frontend.product_page', compact('product_details', 'product_images', 'attributes', 'variant_attr_arr', 'related_products', 'filtered_attributes', 'discount_from_sale', 'sale_discount_type', 'sale_discount_rate', 'product_price', 'products_to_compare', 'variant_attributes_to_compare', 'compare_arr', 'attributes_to_compare', 'variant_attr_array', 'attribute_names'));
     }
 
     public function viewWishlist() {
