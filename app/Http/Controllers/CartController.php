@@ -5,32 +5,42 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use DB;
 use Auth;
+use Carbon\Carbon;
+use Adrianorosa\GeoLocation\GeoLocation;
 
 class CartController extends Controller
 {
     public function productActions(Request $request) {
         $data = $request->all();
         $data['is_ajax'] = ($request->ajax());
+        $data['ip'] = ($request->ip());
 
         $order_no = 'FUM-' . date('yd') . random_int(0, 9999);
-
         if(isset($data['reorder'])){
-            session()->forget('fumCart');
             session()->forget('fumOrderNo');
             session()->put('fumOrderNo', $order_no);
-            
+            $loc = GeoLocation::lookup($request->ip());
             $items = DB::table('fumaco_order_items')->where('order_number', $request->order_number)->get();
             $cart = [];
             foreach($items as $item){
-                $cart[$item->item_code] = [
-                    "item_code" => $item->item_code,
-                    "quantity" => $item->item_qty,
-                    "price" => $item->item_price
+                $cart[] = [
+                    'transaction_id' => $order_no,
+                    'user_type' => (Auth::check()) ? 'member' : 'guest',
+                    'user_email' => (Auth::check()) ? Auth::user()->username : null,
+                    'item_description' => $item->item_name,
+                    'item_code' => $item->item_code,
+                    'qty' => $item->item_qty,
+                    'ip' => $request->ip(),
+                    'city' => $loc->getCity(),
+                    'region' => $loc->getRegion(),
+                    'country' => $loc->getCountry(),
+                    'latitude' => $loc->getLatitude(),
+                    'longitude' => $loc->getLongitude(),
                 ];
-                session()->put('fumCart', $cart);
             }
 
-            // return session()->get('fumCart');
+            DB::table('fumaco_cart')->insert($cart);
+
             $user_id = DB::table('fumaco_users')->where('username', Auth::user()->username)->first();
             $bill_address = DB::table('fumaco_user_add')->where('xdefault', 1)->where('user_idx', $user_id->id)->where('address_class', 'Billing')->count();
             $ship_address = DB::table('fumaco_user_add')->where('xdefault', 1)->where('user_idx', $user_id->id)->where('address_class', 'Delivery')->count();
@@ -70,15 +80,44 @@ class CartController extends Controller
             if (!$product_details) {
                 return redirect()->back()->with('error', 'Product not found.');
             }
-            $cart = [
-                $data['item_code'] => [
-                    "item_code" => $product_details->f_idcode,
-                    "quantity" => $data['quantity'],
-                    "price" => ($product_details->f_price > 0) ? $product_details->f_price : $product_details->f_original_price,
-                ]
-            ];
- 
-            session()->put('fumCart', $cart);
+
+            $loc = GeoLocation::lookup($data['ip']);
+            $order_no = session()->get('fumOrderNo');
+            // add data to fumaco cart table
+            if (Auth::check()) {
+                $existing_cart = DB::table('fumaco_cart')->where('user_email', Auth::user()->username)->where('user_type', 'member')->where('item_code', $product_details->f_idcode)->first();
+            } else {
+                $existing_cart = DB::table('fumaco_cart')->where('transaction_id', $order_no)->where('user_type', 'guest')->where('item_code', $product_details->f_idcode)->first();
+            }
+            
+            if ($existing_cart) {
+                DB::table('fumaco_cart')->where('id', $existing_cart->id)->update([
+                    'user_type' => (Auth::check()) ? 'member' : 'guest',
+                    'user_email' => (Auth::check()) ? Auth::user()->username : null,
+                    'qty' => $existing_cart->qty + $data['quantity'],
+                    'ip' => $data['ip'],
+                    'city' => $loc->getCity(),
+                    'region' => $loc->getRegion(),
+                    'country' => $loc->getCountry(),
+                    'latitude' => $loc->getLatitude(),
+                    'longitude' => $loc->getLongitude(),
+                ]);
+            } else {
+                DB::table('fumaco_cart')->insert([
+                    'transaction_id' => $order_no,
+                    'user_type' => (Auth::check()) ? 'member' : 'guest',
+                    'user_email' => (Auth::check()) ? Auth::user()->username : null,
+                    'item_description' => $product_details->f_name_name,
+                    'item_code' => $product_details->f_idcode,
+                    'qty' => $data['quantity'],
+                    'ip' => $data['ip'],
+                    'city' => $loc->getCity(),
+                    'region' => $loc->getRegion(),
+                    'country' => $loc->getCountry(),
+                    'latitude' => $loc->getLatitude(),
+                    'longitude' => $loc->getLongitude(),
+                ]);
+            }
             
             if(Auth::check()){
 				$user_id = DB::table('fumaco_users')->where('username', Auth::user()->username)->first();
@@ -112,71 +151,79 @@ class CartController extends Controller
         if (!$product_details) {
             return redirect()->back()->with('error', 'Product not found.');
         }
-        // if cart is empty then this the first product
-        $cart = session()->get('fumCart');
-        if(!$cart) {
-            $cart = [
-                $id => [
-                    "item_code" => $product_details->f_idcode,
-                    "quantity" => $data['quantity'],
-                    "price" => ($product_details->f_price > 0) ? $product_details->f_price : $product_details->f_original_price,
-                ]
-            ];
- 
-            session()->put('fumCart', $cart);
 
-            if(!$data['is_ajax']) {
-                if (isset($data['buynow']) && $data['buynow']) {
-                    return redirect('/checkout/summary');
-                }
-    
-                return redirect()->back()->with('success', 'Product added to your cart!');
-            } else {
-                return response()->json(['message' => 'Product added to your cart!']);
+        $category = DB::table('fumaco_categories')->where('name', $product_details->f_category)->first();
+
+        $category_discount = DB::table('fumaco_on_sale as sale')->join('fumaco_on_sale_categories as cat_sale', 'sale.id', 'cat_sale.sale_id')->whereDate('sale.start_date', '<=', Carbon::now())->whereDate('sale.end_date', '>=', Carbon::now())->where('status', 1)->where('cat_sale.category_id', $category->id)->first();
+
+        $product_price = $product_details->f_original_price;
+        $discounted_from_category = 0;
+        if($category_discount){ // check if product category is discounted
+            if($category_discount->discount_type == 'By Percentage'){
+                $discounted_from_category = 1;
+                $product_price = $product_details->f_original_price - ($product_details->f_original_price * ($category_discount->discount_rate/100));
+            }else if($category_discount->discount_type == 'Fixed Amount' and $product_details->f_original_price > $category_discount->discount_rate){
+                $discounted_from_category = 1;
+                $product_price = $product_details->f_original_price - $category_discount->discount_rate;
             }
         }
-        // if cart not empty then check if this product exist then increment quantity
-        if(isset($cart[$id])) {
-            $cart[$id]['quantity'] = $cart[$id]['quantity'] + $data['quantity'];
-            
-            session()->put('fumCart', $cart);
 
-            if(!$data['is_ajax']) {
-                if (isset($data['buynow']) && $data['buynow']) {
-                    return redirect('/cart');
-                }
-    
-                return redirect()->back()->with('success', 'Product added to your cart!');
-            } else {
-                return response()->json(['message' => 'Product added to your cart!']);
-            }
-        }
-        // if item not exist in cart then add to cart with quantity = 1
-        $cart[$id] = [
-            "item_code" => $product_details->f_idcode,
-            "quantity" => $data['quantity'],
-            "price" => ($product_details->f_price > 0) ? $product_details->f_price : $product_details->f_original_price,
-        ];
-
-        session()->put('fumCart', $cart);
-
-        if(!$data['is_ajax']) {
-            if (isset($data['buynow']) && $data['buynow']) {
-                return redirect('/cart');
-            }
-    
-            return redirect()->back()->with('success', 'Product added to your cart!');
+        $order_no = 'FUM-' . date('yd') . random_int(0, 9999);
+        if(!session()->get('fumOrderNo')){
+            session()->put('fumOrderNo', $order_no);
         } else {
-            return response()->json(['message' => 'Product added to your cart!']);
+            $order_no = session()->get('fumOrderNo');
         }
+        
+        $loc = GeoLocation::lookup($data['ip']);
+        // add data to fumaco cart table
+        if (Auth::check()) {
+            $existing_cart = DB::table('fumaco_cart')->where('user_email', Auth::user()->username)->where('user_type', 'member')->where('item_code', $product_details->f_idcode)->first();
+        } else {
+            $existing_cart = DB::table('fumaco_cart')->where('transaction_id', $order_no)->where('user_type', 'guest')->where('item_code', $product_details->f_idcode)->first();
+        }
+        
+        if ($existing_cart) {
+            DB::table('fumaco_cart')->where('id', $existing_cart->id)->update([
+                'user_type' => (Auth::check()) ? 'member' : 'guest',
+                'user_email' => (Auth::check()) ? Auth::user()->username : null,
+                'qty' => $existing_cart->qty + $data['quantity'],
+                'ip' => $data['ip'],
+                'city' => $loc->getCity(),
+                'region' => $loc->getRegion(),
+                'country' => $loc->getCountry(),
+                'latitude' => $loc->getLatitude(),
+                'longitude' => $loc->getLongitude(),
+            ]);
+        } else {
+            DB::table('fumaco_cart')->insert([
+                'transaction_id' => $order_no,
+                'user_type' => (Auth::check()) ? 'member' : 'guest',
+                'user_email' => (Auth::check()) ? Auth::user()->username : null,
+                'item_description' => $product_details->f_name_name,
+                'item_code' => $product_details->f_idcode,
+                'qty' => $data['quantity'],
+                'ip' => $data['ip'],
+                'city' => $loc->getCity(),
+                'region' => $loc->getRegion(),
+                'country' => $loc->getCountry(),
+                'latitude' => $loc->getLatitude(),
+                'longitude' => $loc->getLongitude(),
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Product added to your cart!');
     }
 
     public function viewCart(Request $request) {
-        $cart = session()->get('fumCart');
-        $cart = (!$cart) ? [] : $cart;
-
-        $cart_items = DB::table('fumaco_items')
-            ->whereIn('f_idcode', array_column($cart, 'item_code'))->get();
+        $order_no = session()->get('fumOrderNo');
+        if(Auth::check()) {
+            $cart_items = DB::table('fumaco_items as a')->join('fumaco_cart as b', 'a.f_idcode', 'b.item_code')
+                ->where('user_type', 'member')->where('user_email', Auth::user()->username)->get();
+        } else {
+            $cart_items = DB::table('fumaco_items as a')->join('fumaco_cart as b', 'a.f_idcode', 'b.item_code')
+                ->where('user_type', 'guest')->where('transaction_id', $order_no)->get();
+        }
         
         $cart_arr = [];
         foreach ($cart_items as $n => $item) {
@@ -184,24 +231,26 @@ class CartController extends Controller
                 ->where('idcode', $item->f_idcode)->first();
 
             $price = ($item->f_onsale) ? $item->f_price : $item->f_original_price;
+            // $test = collect($cart)->where('item_code', $item->f_idcode)->pluck('price')->first();
+           
+            // $price = ($item->f_onsale) ? $item->f_price : $test;
 
             $cart_arr[] = [
                 'item_code' => $item->f_idcode,
                 'item_description' => $item->f_name_name,
                 'price' => $price,
-                'amount' => ($price * $cart[$item->f_idcode]['quantity']),
-                'quantity' => $cart[$item->f_idcode]['quantity'],
+                'amount' => ($price * $item->qty),
+                'quantity' => $item->qty,
                 'stock_qty' => $item->f_qty - $item->f_reserved_qty,
                 'stock_uom' => $item->f_stock_uom,
                 'item_image' => ($item_image) ? $item_image->imgprimayx : null,
-                'insufficient_stock' => ($cart[$item->f_idcode]['quantity'] > $item->f_qty) ? 1 : 0
+                'insufficient_stock' => ($item->qty > $item->f_qty) ? 1 : 0
             ];
         }
-        
+
         $bill_address = "";
 		$ship_address = "";
 		if(Auth::check()){
-            request()->session()->put('order_no', 'FUM-'.random_int(10000000, 99999999));
 			$user_id = DB::table('fumaco_users')->where('username', Auth::user()->username)->first();
 
 			$bill_address = DB::table('fumaco_user_add')->where('xdefault', 1)->where('user_idx', $user_id->id)->where('address_class', 'Billing')->count();
@@ -219,28 +268,60 @@ class CartController extends Controller
     public function updateCart(Request $request) {
         $id = $request->id;
         if($id && $request->quantity) {
-            $cart = session()->get('fumCart');
-
-            if($request->type == 'increment') {
-                $cart[$id]["quantity"]++;
-            } else {
-                $cart[$id]["quantity"]--;
+            $loc = GeoLocation::lookup($request->ip());
+            $product_details = DB::table('fumaco_items')->where('f_idcode', $id)->first();
+            if ($product_details) {
+                $order_no = 'FUM-' . date('yd') . random_int(0, 9999);
+                if(!session()->get('fumOrderNo')){
+                    session()->put('fumOrderNo', $order_no);
+                } else {
+                    $order_no = session()->get('fumOrderNo');
+                }
+                // add qty to fumaco cart table
+                $existing_cart = DB::table('fumaco_cart')->where('transaction_id', $order_no)
+                    ->where('item_code', $product_details->f_idcode)->first();
+                if ($existing_cart) {
+                    $plus_qty = $existing_cart->qty + 1;
+                    $minus_qty = $existing_cart->qty - 1;
+                    DB::table('fumaco_cart')->where('id', $existing_cart->id)->update([
+                        'user_type' => (Auth::check()) ? 'member' : 'guest',
+                        'user_email' => (Auth::check()) ? Auth::user()->username : null,
+                        'qty' => ($request->type == 'increment') ? $plus_qty : $minus_qty,
+                        'ip' => $request->ip(),
+                        'city' => $loc->getCity(),
+                        'region' => $loc->getRegion(),
+                        'country' => $loc->getCountry(),
+                        'latitude' => $loc->getLatitude(),
+                        'longitude' => $loc->getLongitude(),
+                    ]);
+                }
             }
-
-            session()->put('fumCart', $cart);
 
             return response()->json(['status' => 1, 'message' => 'Cart updated!']);
         }
     }
 
     public function removeFromCart(Request $request) {
-        if($request->id) {
-            $cart = session()->get('fumCart');
-            if(isset($cart[$request->id])) {
+        $id = $request->id;
+        if($id) {
+            $product_details = DB::table('fumaco_items')->where('f_idcode', $id)->first();
+            if ($product_details) {
+                $order_no = 'FUM-' . date('yd') . random_int(0, 9999);
+                if(!session()->get('fumOrderNo')){
+                    session()->put('fumOrderNo', $order_no);
+                } else {
+                    $order_no = session()->get('fumOrderNo');
+                }
 
-                unset($cart[$request->id]);
-
-                session()->put('fumCart', $cart);
+                if (Auth::check()) {
+                    // delete data from fumaco cart table
+                    DB::table('fumaco_cart')->where('user_email', Auth::user()->username)
+                        ->where('item_code', $product_details->f_idcode)->delete();
+                } else {
+                    // delete data from fumaco cart table
+                    DB::table('fumaco_cart')->where('transaction_id', $order_no)
+                        ->where('item_code', $product_details->f_idcode)->delete();
+                }
             }
 
             return response()->json(['status' => 1, 'message' => 'Cart updated!']);
@@ -287,31 +368,19 @@ class CartController extends Controller
     }
 
     public function countCartItems() {
-        $session_cart = session()->get('fumCart');
-
-        $count = 0;
-        if (isset($session_cart)) {
-            $count = collect($session_cart)->sum('quantity');
-        }
-
-        unset($session_cart['shipping']);
-
         if (Auth::check()) {
-            $count += DB::table('fumaco_cart')->where('f_account_id', Auth::user()->id)->count();
+            return DB::table('fumaco_cart')->where('user_type', 'member')->where('user_email', Auth::user()->username)->sum('qty');
+        } else { 
+            return DB::table('fumaco_cart')->where('user_type', 'guest')->where('transaction_id', session()->get('fumOrderNo'))->sum('qty');
         }
-
-        return $count;
     }
 
     public function countWishlist(){
         if(Auth::check()){
-            $wishlist = DB::table('datawishlist')->where('userid', Auth::user()->id)->count();
-
-            return $wishlist;
-        }else{
-            $wishlist = 0;
-            return $wishlist;
+            return DB::table('datawishlist')->where('userid', Auth::user()->id)->count();
         }
+        
+        return 0;
     }
 
     public function setShippingBillingDetails(Request $request) {

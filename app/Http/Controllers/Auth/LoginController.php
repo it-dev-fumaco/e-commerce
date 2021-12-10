@@ -57,6 +57,8 @@ class LoginController extends Controller
                     ->with('error', '<p class="p-1 text-center">Please verify your email for a verification link. If you did not receive the email then <a href="/resend_verification/'.$request->username.'"  class="d-inline-block m-0">resend the verification email</a>.</p>');
             }
 
+            $this->updateCartItemOwner();
+
             if ($request->has('summary')){
                 return redirect('/checkout/summary');
             }
@@ -210,6 +212,20 @@ class LoginController extends Controller
             }
         } catch (\Throwable $th) {
             return response()->json(['status' => 500, 'message' => 'Your email address or password is incorrect, please try again']);
+        }
+    }
+
+    private function updateCartItemOwner() {
+        $transaction_id = session()->get('fumOrderNo');
+        if($transaction_id) {
+            // get existing items in cart
+            $existing_items = DB::table('fumaco_cart')->where(['user_type' => 'member', 'user_email' => Auth::user()->username])->pluck('item_code');
+            // delete item from cart if already exists
+            DB::table('fumaco_cart')->where('transaction_id', $transaction_id)->where('user_type', 'guest')->whereIn('item_code', $existing_items)->delete();
+            // update owner of items in the cart
+            DB::table('fumaco_cart')->where('transaction_id', $transaction_id)->update(['user_type' => 'member', 'user_email' => Auth::user()->username]);
+            // update cart transaction id
+            DB::table('fumaco_cart')->where(['user_type' => 'member', 'user_email' => Auth::user()->username])->update(['transaction_id' => $transaction_id]);
         }
     }
 }

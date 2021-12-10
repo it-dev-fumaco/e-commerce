@@ -630,7 +630,49 @@ class OrderController extends Controller
             'order_status' => $order_status
         ];
 
-        // return $orders_arr;
         return view('backend.orders.print_order', compact('orders_arr'));
+    }
+
+    public function viewItemOnCart(Request $request) {
+        $abandoned_cart = DB::table('fumaco_cart')->where('user_type', 'guest')
+            ->when($request->search, function ($query) use ($request) {
+                return $query->where('item_description', 'LIKE', "%".$request->search."%");
+            })
+            ->where('last_modified_at', '<=', Carbon::now()->subDays(1))->paginate(10);
+
+        $list_per_item = DB::table('fumaco_cart')
+            ->where('last_modified_at', '>=', Carbon::now()->subDays(1))
+            ->select('item_code', 'item_description', DB::raw('count(item_code) as count'))
+            ->orderBy(DB::raw('count(item_code)'), 'desc')
+            ->groupBy('item_code', 'item_description')->paginate(10);
+        
+        $list_per_location = DB::table('fumaco_cart')
+            ->where('last_modified_at', '>=', Carbon::now()->subDays(1))
+            ->get();
+
+        $per_location = collect($list_per_location)->groupBy('city');
+        $cart_per_loc = [];
+        foreach ($per_location as $loc => $rows) {
+            $item_arr = [];
+            $items = [];
+            foreach ($rows as $item) {
+                if (!in_array($item->item_code, $item_arr)) {
+                    $items[] = [
+                        'item_code' => $item->item_code,
+                        'item_description' => $item->item_description,
+                    ];
+                }
+
+                array_push($item_arr, $item->item_code);
+            }
+
+            $cart_per_loc[] = [
+                'location' => $loc,
+                'items' => $items,
+                'item_codes' => array_count_values($item_arr)
+            ];
+        }
+
+        return view('backend.item_on_cart', compact('list_per_item', 'abandoned_cart', 'cart_per_loc'));
     }
 }
