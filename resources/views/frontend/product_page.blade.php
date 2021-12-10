@@ -255,7 +255,7 @@
 								<section class="py-5 text-center container" style="padding-bottom: 0rem !important;">
 									<div class="row py-lg-5">
 										<div class="col-lg-6 col-md-8 mx-auto">
-											<h4 class="fw-light bestsellinghead fumacoFont1 animated animatedFadeInUp fadeInUp" style="color:#000000 !important;">COMPARE PRODUCTS</h4>
+											<h4 class="fw-light bestsellinghead fumacoFont1 animated animatedFadeInUp fadeInUp" style="color:#000000 !important;">COMPARE SIMILAR PRODUCTS</h4>
 										</div>
 									</div>
 								</section>
@@ -1259,7 +1259,7 @@
 			font-size: 10pt !important;
 		}
 		.comparison-price{
-			font-size: 10pt;
+			font-size: 12pt;
 		}
       }
 
@@ -1315,7 +1315,7 @@
 			font-size: 10pt !important;
 		}
 		.comparison-price{
-			font-size: 10pt;
+			font-size: 12pt;
 		}
       }
 	  	@media (max-width: 575.98px) {
