@@ -1842,15 +1842,6 @@ class ProductController extends Controller
             foreach($request->selected_items as $item){
                 foreach($request->attribute_names as $attrib){
                     $attrib_value = DB::table('fumaco_items_attributes')->where('attribute_name_id', $attrib)->where('idcode', $item)->first();
-                    // $test[] = [
-                    //     'product_comparison_id' => $product_comparison_id,
-                    //     'category_id' => $category ? $category->id : $request->selected_category,
-                    //     'item_code' => $item,
-                    //     'attribute_name_id' => $attrib,
-                    //     'attribute_value' => $attrib_value ? $attrib_value->attribute_value : 'N/A',
-                    //     'created_by' => $created_by,
-                    //     'last_modified_by' => $last_modified_by
-                    // ];
                     DB::table('product_comparison_attribute')->insert([
                         'product_comparison_id' => $product_comparison_id,
                         'category_id' => $category ? $category->id : $request->selected_category,
@@ -1862,9 +1853,7 @@ class ProductController extends Controller
                     ]);
                 }
 
-                // return $test;
             }
-            // return $test;
             DB::commit();
             if(isset($request->compare_edit)){
                 return redirect('/admin/products/compare/list')->with('success', 'Product Comparison Edited.');
