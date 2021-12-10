@@ -385,6 +385,7 @@ class CheckoutController extends Controller
 						if ($sale->apply_discount_to == 'All Items') {
 							if ($sale->discount_type == 'By Percentage') {
 								$discount = ($item->f_original_price * ($sale->discount_rate/100));
+								$discount = ($discount > $sale->capped_amount) ? $sale->capped_amount : $discount;
 							} else {
 								$discount = $sale->discount_rate;
 							}
@@ -396,15 +397,12 @@ class CheckoutController extends Controller
 							if ($sale_per_category) {
 								if ($sale_per_category->discount_type == 'By Percentage') {
 									$discount = ($item->f_original_price * ($sale_per_category->discount_rate/100));
+									$discount = ($discount > $sale->capped_amount) ? $sale_per_category->capped_amount : $discount;
 								} else {
 									$discount = $sale->discount_rate;
 								}
 							}
 						}
-					} else {
-						$sale_per_category = DB::table('fumaco_on_sale as sale')->join('fumaco_on_sale_categories as cat_sale', 'sale.id', 'cat_sale.sale_id')
-							->whereDate('sale.start_date', '<=', Carbon::now())->whereDate('sale.end_date', '>=', Carbon::now())
-							->where('status', 1)->where('cat_sale.category_id', $item->f_cat_id)->first();
 					}
 				} else {
 					$price = $item->f_price;
@@ -537,6 +535,7 @@ class CheckoutController extends Controller
 						if ($sale->apply_discount_to == 'All Items') {
 							if ($sale->discount_type == 'By Percentage') {
 								$discount = ($item->f_original_price * ($sale->discount_rate/100));
+								$discount = ($discount > $sale->capped_amount) ? $sale->capped_amount : $discount;
 							} else {
 								$discount = $sale->discount_rate;
 							}
@@ -548,15 +547,12 @@ class CheckoutController extends Controller
 							if ($sale_per_category) {
 								if ($sale_per_category->discount_type == 'By Percentage') {
 									$discount = ($item->f_original_price * ($sale_per_category->discount_rate/100));
+									$discount = ($discount > $sale->capped_amount) ? $sale_per_category->capped_amount : $discount;
 								} else {
 									$discount = $sale->discount_rate;
 								}
 							}
 						}
-					} else {
-						$sale_per_category = DB::table('fumaco_on_sale as sale')->join('fumaco_on_sale_categories as cat_sale', 'sale.id', 'cat_sale.sale_id')
-							->whereDate('sale.start_date', '<=', Carbon::now())->whereDate('sale.end_date', '>=', Carbon::now())
-							->where('status', 1)->where('cat_sale.category_id', $item->f_cat_id)->first();
 					}
 				} else {
 					$price = $item->f_price;
