@@ -1259,7 +1259,7 @@
 			font-size: 10pt !important;
 		}
 		.comparison-price{
-			font-size: 10pt;
+			font-size: 12pt;
 		}
       }
 
@@ -1315,7 +1315,7 @@
 			font-size: 10pt !important;
 		}
 		.comparison-price{
-			font-size: 10pt;
+			font-size: 12pt;
 		}
       }
 	  	@media (max-width: 575.98px) {
