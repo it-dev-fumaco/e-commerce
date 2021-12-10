@@ -10,7 +10,7 @@ use DB;
 class DashboardController extends Controller
 {
 	public function index() {
-		$new_orders = DB::table('fumaco_order')->where('order_status', '!=', 'Cancelled')->where('order_status', '!=', 'Delivered')->count();
+		$new_orders = DB::table('fumaco_order')->where('order_status', 'not like', '%delivered%')->count();
 
 		$total_orders = DB::table('fumaco_order')->count();
 

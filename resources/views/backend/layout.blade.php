@@ -251,6 +251,7 @@
             $order_pages = ['order_list', 'order_cancel', 'order_delivered', 'payment_status', 'order_status', 'order_status_sequence'];
             $category_pages = ['product_category'];
             $customer_pages = ['customers_list'];
+            $reports_pages = ['items_on_cart'];
           @endphp
           <li class="nav-header">PRODUCT CATALOGUE</li>
           <li class="nav-item {{ (in_array($activePage, $product_pages) ? 'menu-open' : '') }}">
@@ -283,12 +284,6 @@
                   <p>Product Settings</p>
                 </a>
               </li>
-              {{-- <li class="nav-item">
-                <a href="/admin/product/settings" class="nav-link {{ $activePage == 'product_category_settings' ? 'active' : '' }}">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Product Category Settings</p>
-                </a>
-              </li> --}}
             </ul>
           </li>
           <li class="nav-header">CUSTOMERS</li>
@@ -441,6 +436,13 @@
                 </a>
               </li>
             </ul>
+          </li>
+          <li class="nav-header">REPORTS</li>
+          <li class="nav-item">
+            <a href="/admin/items_on_cart" class="nav-link {{ $activePage == 'items_on_cart' ? 'active' : '' }}">
+              <i class="nav-icon fas fa-shopping-cart"></i>
+              <p>Items on Cart</p>
+            </a>
           </li>
 
           <li class="nav-header {{ Auth::user()->user_type != 'System Admin' ? 'd-none' : ''  }}">SYSTEM SETTINGS</li>

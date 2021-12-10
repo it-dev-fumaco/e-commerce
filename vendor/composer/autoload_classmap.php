@@ -6,6 +6,14 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
+    'Adrianorosa\\GeoLocation\\Console\\GeoLocationCommand' => $vendorDir . '/adrianorosa/laravel-geolocation/src/Console/GeoLocationCommand.php',
+    'Adrianorosa\\GeoLocation\\Contracts\\LookupInterface' => $vendorDir . '/adrianorosa/laravel-geolocation/src/Contracts/LookupInterface.php',
+    'Adrianorosa\\GeoLocation\\GeoLocation' => $vendorDir . '/adrianorosa/laravel-geolocation/src/GeoLocation.php',
+    'Adrianorosa\\GeoLocation\\GeoLocationDetails' => $vendorDir . '/adrianorosa/laravel-geolocation/src/GeoLocationDetails.php',
+    'Adrianorosa\\GeoLocation\\GeoLocationException' => $vendorDir . '/adrianorosa/laravel-geolocation/src/GeoLocationException.php',
+    'Adrianorosa\\GeoLocation\\GeoLocationManager' => $vendorDir . '/adrianorosa/laravel-geolocation/src/GeoLocationManager.php',
+    'Adrianorosa\\GeoLocation\\GeoLocationServiceProvider' => $vendorDir . '/adrianorosa/laravel-geolocation/src/GeoLocationServiceProvider.php',
+    'Adrianorosa\\GeoLocation\\Providers\\IpInfo' => $vendorDir . '/adrianorosa/laravel-geolocation/src/Providers/IpInfo.php',
     'App\\Console\\Commands\\ErpStockReservationCommand' => $baseDir . '/app/Console/Commands/ErpStockReservationCommand.php',
     'App\\Console\\Commands\\GenerateSitemap' => $baseDir . '/app/Console/Commands/GenerateSitemap.php',
     'App\\Console\\Commands\\SyncErpStockCommand' => $baseDir . '/app/Console/Commands/SyncErpStockCommand.php',

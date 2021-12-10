@@ -237,6 +237,8 @@ Route::prefix('admin')->group(function () {
         Route::post('/order/sequence_list/add', 'OrderController@addSequence');
         Route::get('/order/sequence_list/{shipping}/delete', 'OrderController@deleteSequence');
 
+        Route::get('/items_on_cart', 'OrderController@viewItemOnCart');
+
         Route::get('/order/payment_status', 'OrderController@checkPaymentStatus');
         Route::post('/order/payment_status', 'OrderController@checkPaymentStatus');
         

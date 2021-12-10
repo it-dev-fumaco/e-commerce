@@ -17,15 +17,18 @@ use App\Models\ShippingCondition;
 class CheckoutController extends Controller
 {
 	public function billingForm() {
-		$cart = session()->get('fumCart');
-        $cart = (!$cart) ? [] : $cart;
+		$order_no = session()->get('fumOrderNo');
+        if(Auth::check()) {
+            $cart_items = DB::table('fumaco_items as a')->join('fumaco_cart as b', 'a.f_idcode', 'b.item_code')
+				->where('user_type', 'member')->where('user_email', Auth::user()->username)->get();
+        } else {
+            $cart_items = DB::table('fumaco_items as a')->join('fumaco_cart as b', 'a.f_idcode', 'b.item_code')
+				->where('user_type', 'guest')->where('transaction_id', $order_no)->get();
+        }
 
-        $cart_items = DB::table('fumaco_items')
-            ->whereIn('f_idcode', array_column($cart, 'item_code'))->get();
-        
         $cart_arr = [];
         foreach ($cart_items as $n => $item) {
-			if ($cart[$item->f_idcode]['quantity'] > $item->f_qty) {
+			if ($item->qty > $item->f_qty) {
 				return redirect()->back()->with('error', 'Insufficient stock for <b>' . $item->f_name_name . '</b>');
 			}
         }
@@ -336,38 +339,33 @@ class CheckoutController extends Controller
 		try{
 			session()->forget('fumVoucher');
 
-			$cart = session()->get('fumCart');
-			$cart = (!$cart) ? [] : $cart;
+			$order_no = 'FUM-' . date('yd') . random_int(0, 9999);
+			if(!session()->get('fumOrderNo')){
+				session()->put('fumOrderNo', $order_no);
+			} else {
+				$order_no = session()->get('fumOrderNo');
+			}
 
-			$cart_items = DB::table('fumaco_items')
-				->whereIn('f_idcode', array_column($cart, 'item_code'))->get();
-			
-			$cart_arr = [];
+			if(Auth::check()) {
+				$cart_items = DB::table('fumaco_items as a')->join('fumaco_cart as b', 'a.f_idcode', 'b.item_code')
+					->where('user_type', 'member')->where('user_email', Auth::user()->username)->get();
+			} else {
+				$cart_items = DB::table('fumaco_items as a')->join('fumaco_cart as b', 'a.f_idcode', 'b.item_code')
+					->where('user_type', 'guest')->where('transaction_id', $order_no)->get();
+			}
+
+			if(count($cart_items) <= 0) {
+				return redirect('/cart');
+			}
+
 			foreach ($cart_items as $n => $item) {
-				$available_qty = ($item->f_qty - $item->f_reserved_qty);
-				if ($cart[$item->f_idcode]['quantity'] > $available_qty) {
+				if ($item->qty > $item->f_qty) {
 					return redirect()->back()->with('error', 'Insufficient stock for <b>' . $item->f_name_name . '</b>');
 				}
 			}
 
-			if (!session()->get('fumOrderNo')) {
-				$order_no = 'FUM-' . date('ymd') . random_int(9999, 100000);
-                session()->put('fumOrderNo', $order_no);
-            }
-
-			$order_no = session()->get('fumOrderNo');
-
 			$shipping_details = session()->get('fumShipDet');
 			$billing_details = session()->get('fumBillDet');
-
-			$cart = session()->get('fumCart');
-			$cart = (!$cart) ? [] : $cart;
-			if(count($cart) <= 0) {
-				return redirect('/cart');
-			}
-	
-			$cart_items = DB::table('fumaco_items')
-				->whereIn('f_idcode', array_column($cart, 'item_code'))->get();
 			
 			$cart_arr = [];
 			foreach ($cart_items as $n => $item) {
@@ -381,11 +379,10 @@ class CheckoutController extends Controller
 					'item_code' => $item->f_idcode,
 					'item_description' => $item->f_name_name,
 					'price' => $price,
-					'subtotal' => ($price * $cart[$item->f_idcode]['quantity']),
+					'subtotal' => ($price * $item->qty),
 					'original_price' => $item->f_original_price,
 					'discount' => $item->f_onsale,
-					'is_discounted_from_sale' => $cart[$item->f_idcode]['is_discounted_from_sale'],
-					'quantity' => $cart[$item->f_idcode]['quantity'],
+					'quantity' => $item->qty,
 					'stock_qty' => $item->f_qty,
 					'item_image' => ($item_image) ? $item_image->imgprimayx : 'test.jpg'
 				];
@@ -477,17 +474,18 @@ class CheckoutController extends Controller
 				]);
 			}
 
-			$cart = session()->get('fumCart');
-			$cart = (!$cart) ? [] : $cart;
-	
-			$cart_items = DB::table('fumaco_items')
-				->whereIn('f_idcode', array_column($cart, 'item_code'))->get();
+			if(Auth::check()) {
+				$cart_items = DB::table('fumaco_items as a')->join('fumaco_cart as b', 'a.f_idcode', 'b.item_code')
+					->where('user_type', 'member')->where('user_email', Auth::user()->username)->get();
+			} else {
+				$cart_items = DB::table('fumaco_items as a')->join('fumaco_cart as b', 'a.f_idcode', 'b.item_code')
+					->where('user_type', 'guest')->where('transaction_id', $order_no)->get();
+			}
 			
 			$cart_arr = [];
 			foreach ($cart_items as $n => $item) {
-				$product_price = $cart[$item->f_idcode]['is_discounted_from_sale'] == 1 ? $cart[$item->f_idcode]['price'] : $item->f_original_price;
-				$price = ($item->f_onsale) ? $item->f_price : $product_price;
-				$total_amount = $price * $cart[$item->f_idcode]['quantity'];
+				$price = ($item->f_onsale) ? $item->f_price : $item->f_original_price;
+				$total_amount = $price * $item->qty;
 				$item_discount = $item->f_discount_percent;
 
 				$existing_order_item = DB::table('fumaco_order_items')->where('order_number', $order_no)
@@ -500,7 +498,7 @@ class CheckoutController extends Controller
 							'item_name' => $item->f_name_name,
 							'item_discount' => $item_discount,
 							'item_original_price' => $item->f_original_price,
-							'item_qty' => $cart[$item->f_idcode]['quantity'],
+							'item_qty' => $item->qty,
 							'item_price' => $price,	
 							'item_total_price' => $total_amount,
 						]);
@@ -511,7 +509,7 @@ class CheckoutController extends Controller
 						'item_name' => $item->f_name_name,
 						'item_discount' => $item_discount,
 						'item_original_price' => $item->f_original_price,
-						'item_qty' => $cart[$item->f_idcode]['quantity'],
+						'item_qty' => $item->qty,
 						'item_price' => $price,
 						'item_status' => 2,
 						'date_update' => Carbon::now()->toDateTimeString(),
@@ -860,9 +858,14 @@ class CheckoutController extends Controller
 
 			DB::table('fumaco_temp')->where('xtempcode', $id)->delete();
 
+			// delete item from cart
+			if ($temp->xusertype != 'Guest') {
+				DB::table('fumaco_cart')->where('user_type', 'member')->where('user_email', $loggedin)->delete();
+			} else {
+				DB::table('fumaco_cart')->where('user_type', 'guest')->where('transaction_id', $temp->xlogs)->delete();
+			}
+			
 			$order_details = DB::table('fumaco_order')->where('order_number', $temp->xlogs)->first();
-
-			session()->forget('fumCart');
 			
 			DB::commit();
 
@@ -997,22 +1000,21 @@ class CheckoutController extends Controller
 		$region = strtolower($shipping_details['province']);
 		$city = strtolower($shipping_details['city']);
 
-		$cart = session()->get('fumCart');
-		$cart = (!$cart) ? [] : $cart;
-		if(count($cart) <= 0) {
-			return redirect('/cart');
+		$order_no = session()->get('fumOrderNo');
+		if(Auth::check()) {
+			$order_items = DB::table('fumaco_items as a')->join('fumaco_cart as b', 'a.f_idcode', 'b.item_code')
+				->where('user_type', 'member')->where('user_email', Auth::user()->username)->get();
+		} else {
+			$order_items = DB::table('fumaco_items as a')->join('fumaco_cart as b', 'a.f_idcode', 'b.item_code')
+				->where('user_type', 'guest')->where('transaction_id', $order_no)->get();
 		}
-
-		$order_items = DB::table('fumaco_items')
-			->whereIn('f_idcode', array_column($cart, 'item_code'))->get();
 
 		$total_amount = 0;
 		$total_weight_of_items = 0;
 		$total_cubic_cm = 0;
         foreach ($order_items as $row) {
-			$item_qty = $cart[$row->f_idcode]['quantity'];
-			$product_price = $cart[$row->f_idcode]['is_discounted_from_sale'] == 1 ? $cart[$row->f_idcode]['price'] : $row->f_original_price;
-			$price = ($row->f_price > 0) ? $row->f_price : $product_price;
+			$item_qty = $row->qty;
+			$price = ($row->f_price > 0) ? $row->f_price : $row->f_original_price;
 			$total_amount += ($price * $item_qty);
             $cubic_cm = ($row->f_package_length * $row->f_package_width * $row->f_package_height);
             $cubic_cm = $cubic_cm * $item_qty;
@@ -1259,18 +1261,20 @@ class CheckoutController extends Controller
 					return response()->json(['status' => 0, 'message' => 'Please sign in to avail this coupon code.']);
 				}
 			}
-			
-			$cart = session()->get('fumCart');
-			$cart = (!$cart) ? [] : $cart;
 
-			$cart_items = DB::table('fumaco_items')
-				->whereIn('f_idcode', array_column($cart, 'item_code'))->get();
+			$order_no = session()->get('fumOrderNo');
+			if(Auth::check()) {
+				$cart_items = DB::table('fumaco_items as a')->join('fumaco_cart as b', 'a.f_idcode', 'b.item_code')
+					->where('user_type', 'member')->where('user_email', Auth::user()->username)->get();
+			} else {
+				$cart_items = DB::table('fumaco_items as a')->join('fumaco_cart as b', 'a.f_idcode', 'b.item_code')
+					->where('user_type', 'guest')->where('transaction_id', $order_no)->get();
+			}
 
 			$subtotal = 0;
 			foreach ($cart_items as $item) {
-				$product_price = $cart[$item->f_idcode]['is_discounted_from_sale'] == 1 ? $cart[$item->f_idcode]['price'] : $item->f_original_price;
-				$price = ($item->f_onsale) ? $item->f_price : $product_price;
-				$subtotal += $price * $cart[$item->f_idcode]['quantity'];
+				$price = ($item->f_onsale) ? $item->f_price : $item->f_original_price;
+				$subtotal += $price * $item->qty;
 			}
 
 			if($voucher_details->minimum_spend > 0) {
