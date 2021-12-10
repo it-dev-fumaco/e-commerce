@@ -31,3 +31,4 @@ Disallow: /mywishlist/
 Disallow: /myorders/
 Disallow: /myorder/
 Disallow: /myprofile/
+Disallow: /assets/
