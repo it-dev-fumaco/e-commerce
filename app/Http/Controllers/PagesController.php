@@ -412,8 +412,46 @@ class PagesController extends Controller
     }
 
     public function searchList(Request $request){
-        $search_list = DB::table('fumaco_search_terms')->where('search_term', 'LIKE', '%'.$request->q.'%')->orderBy('frequency', 'desc')->paginate(10);
+        $search_list = DB::table('fumaco_search_terms')->where('search_term', 'LIKE', '%'.$request->q.'%')->orderBy('date_last_searched', 'desc')->orderBy('frequency', 'desc')->paginate(10);
+        $search_arr = [];
 
-        return view('backend.marketing.list_search', compact('search_list'));
+        foreach($search_list as $search){
+            $product_results = [];
+            $blog_results = [];
+            if($search->prod_results){
+                $products = explode(',', $search->prod_results);
+                foreach($products as $product){
+                    $image = DB::table('fumaco_items_image_v1 as img')->where('idcode', $product)->first();
+                    $details = DB::table('fumaco_items')->where('f_idcode', $product)->first();
+                    $product_results[] = [
+                        'image' => $image->imgprimayx,
+                        'product_name' => $details->f_name_name,
+                        'item_code' => $product
+                    ];
+                }
+            }
+
+            if($search->blog_results){
+                $blogs = explode(',', $search->blog_results);
+                foreach($blogs as $blog){
+                    $blog = DB::table('fumaco_blog')->where('id', $blog)->first();
+                    $blog_results[] = [
+                        'title' => $blog->blogtitle
+                    ];
+                }
+            }
+            
+            $search_arr[] = [
+                'id' => $search->id,
+                'search_term' => $search->search_term,
+                'frequency' => $search->frequency,
+                'results_count' => $search->prod_results_count + $search->blog_results_count,
+                'product_results' => $product_results,
+                'blog_results' => $blog_results,
+                'last_search_date' => $search->date_last_searched
+            ];
+        }
+
+        return view('backend.search_terms', compact('search_arr', 'search_list'));
     }
 }

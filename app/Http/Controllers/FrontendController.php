@@ -238,7 +238,8 @@ class FrontendController extends Controller
                 $search_data = [
                     'search_term' => $request->s,
                     'ip' => $request->ip(),
-                    'frequency' => $search_check ? $search_check->frequency + 1 : 1
+                    'frequency' => $search_check ? $search_check->frequency + 1 : 1,
+                    'date_last_searched' => Carbon::now()
                 ];
 
                 if($products){
