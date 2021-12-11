@@ -29,7 +29,7 @@
                                 <div class="card-body">
                                     <div class="col-md-12">
                                         <div class="float-right">
-                                            <form action="/admin/marketing/search/list class="text-center"" method="GET">
+                                            <form action="/admin/marketing/search/list" class="text-center" method="GET">
                                                 <div class="form-group row">
                                                     <div class="col-sm-9">
                                                         <input type="text" class="form-control" id="search-box" name="q" placeholder="Search" value="{{request()->get('q')}}">
@@ -47,7 +47,8 @@
                                             <th class="text-center">ID</th>
                                             <th class="text-center">Search Term</th>
                                             <th class="text-center">Frequency</th>
-                                            <th class="text-center">IP Address</th>
+                                            <th class="text-center">No. of Results (Products)</th>
+                                            <th class="text-center">No. of Results (Blogs)</th>
                                             <th class="text-center">Date</th>
                                         </tr>
                                         @forelse ($search_list as $terms)
@@ -55,7 +56,8 @@
                                                 <td class="text-center">{{ $terms->id }}</td>
                                                 <td>{{ $terms->search_term }}</td>
                                                 <td class="text-center">{{ $terms->frequency }}</td>
-                                                <td class="text-center">{{ $terms->ip }}</td>
+                                                <td class="text-center">{{ $terms->prod_results_count ? $terms->prod_results_count : 0 }}</td>
+                                                <td class="text-center">{{ $terms->blog_results_count ? $terms->blog_results_count : 0 }}</td>
                                                 <td class="text-center">{{ date('M d, Y H:i A', strtotime($terms->created_at)) }}</td>
                                             </tr>
                                         @empty
