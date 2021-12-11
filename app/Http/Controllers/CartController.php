@@ -152,22 +152,6 @@ class CartController extends Controller
             return redirect()->back()->with('error', 'Product not found.');
         }
 
-        $category = DB::table('fumaco_categories')->where('name', $product_details->f_category)->first();
-
-        $category_discount = DB::table('fumaco_on_sale as sale')->join('fumaco_on_sale_categories as cat_sale', 'sale.id', 'cat_sale.sale_id')->whereDate('sale.start_date', '<=', Carbon::now())->whereDate('sale.end_date', '>=', Carbon::now())->where('status', 1)->where('cat_sale.category_id', $category->id)->first();
-
-        $product_price = $product_details->f_original_price;
-        $discounted_from_category = 0;
-        if($category_discount){ // check if product category is discounted
-            if($category_discount->discount_type == 'By Percentage'){
-                $discounted_from_category = 1;
-                $product_price = $product_details->f_original_price - ($product_details->f_original_price * ($category_discount->discount_rate/100));
-            }else if($category_discount->discount_type == 'Fixed Amount' and $product_details->f_original_price > $category_discount->discount_rate){
-                $discounted_from_category = 1;
-                $product_price = $product_details->f_original_price - $category_discount->discount_rate;
-            }
-        }
-
         $order_no = 'FUM-' . date('yd') . random_int(0, 9999);
         if(!session()->get('fumOrderNo')){
             session()->put('fumOrderNo', $order_no);
