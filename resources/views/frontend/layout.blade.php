@@ -39,6 +39,13 @@
 
     gtag('config', '{{ Config::get('google_api.google_analytics_api') }}');
     </script>
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-NZJWSRR');</script>
+    <!-- End Google Tag Manager -->
     @endif
 
             <!-- Messenger Chat Plugin Code -->
@@ -46,19 +53,19 @@
 <!-- Your Chat Plugin code -->
 <div id="fb-customer-chat" class="fb-customerchat">
 </div>
-    
+
     <script>
       var chatbox = document.getElementById('fb-customer-chat');
       chatbox.setAttribute("page_id", "276044345867555");
       chatbox.setAttribute("attribution", "biz_inbox");
-      
+
       window.fbAsyncInit = function() {
         FB.init({
           xfbml : true,
           version : 'v12.0'
         });
       };
-      
+
       (function(d, s, id) {
         var js, fjs = d.getElementsByTagName(s)[0];
         if (d.getElementById(id)) return;
@@ -72,16 +79,16 @@
     <script>
       function statusChangeCallback(response) {  // Called with the results from FB.getLoginStatus().
         if (response.status === 'connected') {   // Logged into your webpage and Facebook.
-          loginUser();  
+          loginUser();
         }
       }
-    
+
       function checkLoginState() {               // Called when a person is finished with the Login Button.
         FB.getLoginStatus(function(response) {   // See the onlogin handler
           statusChangeCallback(response);
         });
       }
-    
+
       window.fbAsyncInit = function() {
         FB.init({
           appId      : '435536724607670',
@@ -123,7 +130,7 @@
       }
     </script>
     @endif
- 
+
     <style>
       * {
         -webkit-overflow-scrolling: touch !important;
@@ -433,7 +440,7 @@
       white-space: nowrap;
       overflow: hidden;
     }
-      
+
       #shopping-cart:after {
         bottom: 100%;
         left: 89%;
@@ -492,7 +499,7 @@
                     <i class="fa" style="font-size:24px; color:#126cb6;">&#xf07a;</i><span class="badge badge-warning count-cart-items" id="lblCartCount" style="font-size: 12px; background: #ff0000; color: #fff; padding: 4px 7px; vertical-align: top; margin-left: -10px;display: unset !important; font-weight: 500 !important; border-radius: 1rem !important; margin-top: -15px;">0</span>
                   </div>
                 </a>
-        
+
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" style="float: right !important">
                   <span class="navbar-toggler-icon"></span>
                 </button>
@@ -678,7 +685,7 @@
   <script>
     $(document).ready(function() {
 
-      
+
       $(document).on('click', '.remove-cart-btn', function(e){
             e.preventDefault();
             var tr = $(this);
@@ -713,7 +720,7 @@
         e.preventDefault();
         e.stopPropagation();
         $("#shopping-cart").toggleClass("active");
-        
+
         loadcart();
       });
       $(document).click(function() {
@@ -742,10 +749,10 @@
             url:"/product_actions",
             data: data,
             success:function(response){
-              setTimeout(function() { 
+              setTimeout(function() {
                 btn.addClass('add-to-cart').html('<i class="fas fa-shopping-cart"></i> Add to Cart');
               }, 1800);
-            
+
               countCartItems();
             }
           });
@@ -767,7 +774,7 @@
             url:"/product_actions",
             data: data,
             success:function(response){
-              setTimeout(function() { 
+              setTimeout(function() {
                 btn.addClass('add-to-wishlist').html('<i class="far fa-heart"></i> Add to Wishlist');
               }, 1800);
             }
