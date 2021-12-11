@@ -917,12 +917,7 @@ class FrontendController extends Controller
                 $c->whereIn('f_idcode', $filtered_items);
             })
             ->where('f_status', 1)->orderBy($sortby, $orderby)->paginate(15);
-        // return $product_category->id;
-        // $cat_id = $category_id;
-        // if(!is_int($cat_id)){
-        //     $id = DB::table('fumaco_categories')->where('slug', $cat_id)->select('id')->first();
-        //     $cat_id = $id->id;
-        // }
+
         $all_item_discount = DB::table('fumaco_on_sale')->whereDate('start_date', '<=', Carbon::now()->toDateString())->whereDate('end_date', '>=', Carbon::now()->toDateString())->where('status', 1)->where('apply_discount_to', 'All Items')->first();
 
         $category_discount = DB::table('fumaco_on_sale as sale')->join('fumaco_on_sale_categories as cat_sale', 'sale.id', 'cat_sale.sale_id')->whereDate('sale.start_date', '<=', Carbon::now())->whereDate('sale.end_date', '>=', Carbon::now())->where('status', 1)->where('cat_sale.category_id', $product_category->id)->first();
