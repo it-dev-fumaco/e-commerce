@@ -74,9 +74,9 @@
 			  <!-- small box -->
 			  <div class="small-box bg-danger">
 				 <div class="inner">
-					<h3>0</h3>
+					<h3>₱ {{ number_format($total_sales, 2, '.', ',') }}</h3>
 
-					<p>Web Site Visitors</p>
+					<p>Total Sales</p>
 				 </div>
 				 <div class="icon">
 					<i class="ion ion-pie-graph"></i>
