@@ -297,6 +297,7 @@ class FrontendController extends Controller
                 }
             }
 
+            $bs_all_item_discount = DB::table('fumaco_on_sale')->whereDate('start_date', '<=', Carbon::now()->toDateString())->whereDate('end_date', '>=', Carbon::today()->toDateString())->where('status', 1)->where('apply_discount_to', 'All Items')->first();
             $bs_category_discount = DB::table('fumaco_on_sale as sale')->join('fumaco_on_sale_categories as cat_sale', 'sale.id', 'cat_sale.sale_id')->whereDate('sale.start_date', '<=', Carbon::now())->whereDate('sale.end_date', '>=', Carbon::now())->where('status', 1)->where('cat_sale.category_id', $bs->f_cat_id)->first();
 
             $bs_product_price = null;
@@ -1148,6 +1149,8 @@ class FrontendController extends Controller
             ->select('a.id', 'a.f_idcode', 'a.f_original_price', 'a.f_discount_trigger', 'a.f_price', 'a.f_name_name', 'a.slug', 'a.f_qty', 'a.f_reserved_qty', 'a.f_onsale', 'a.f_new_item', 'a.f_new_item_start', 'a.f_new_item_end', 'a.f_discount_percent', 'a.f_category', 'a.f_cat_id')
             ->get();
 
+        $rp_all_item_discount = DB::table('fumaco_on_sale')->whereDate('start_date', '<=', Carbon::now()->toDateString())->whereDate('end_date', '>=', Carbon::now()->toDateString())->where('status', 1)->where('apply_discount_to', 'All Items')->first();
+
         $related_products = [];
         foreach($related_products_query as $row) {
             $image = DB::table('fumaco_items_image_v1')->where('idcode', $row->f_idcode)->first();
@@ -1159,6 +1162,7 @@ class FrontendController extends Controller
                 }
             }
 
+            $rp_category = DB::table('fumaco_categories')->where('name', $row->f_category)->select('id')->first();
             $rp_category_discount = DB::table('fumaco_on_sale as sale')->join('fumaco_on_sale_categories as cat_sale', 'sale.id', 'cat_sale.sale_id')->whereDate('sale.start_date', '<=', Carbon::now())->whereDate('sale.end_date', '>=', Carbon::now())->where('status', 1)->where('cat_sale.category_id', $row->f_cat_id)->first();
 
             $rp_product_price = null;
