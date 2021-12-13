@@ -321,7 +321,7 @@
 
 												@foreach ($attribute_names as $attrib)
 													<div class="col-12">
-														<span style="font-size: 9pt">{{ $attrib->attribute_name }}</span>
+														<span style="font-size: 11pt" class="text-muted">{{ $attrib->attribute_name }}</span>
 														<hr class="mt-1 mb-1"/>
 														<span class="comparison-description">{{ $variant_attr_array[$attrib->attribute_name][$compare_product['item_code']] }}</span>
 													</div>
@@ -1125,7 +1125,7 @@
 	}
 
 	.comparison-description{
-		font-size: 17px;
+		/* font-size: 14px; */
 		font-weight: 500;
 	}
 
