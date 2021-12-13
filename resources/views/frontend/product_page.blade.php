@@ -82,19 +82,8 @@
 												<a target="_blank" href="mailto:?subject=Check this out!&body=Hi, I found this product and thought you might like it {{ \Request::fullUrl() }}" class="m-0" style=" color: #f49332;"><i class="far fa-envelope m-0"></i></a>
 											</div>
 											<div class="pt-2">
-												<div id="fb-root"></div>
-												<script>
-													(function(d, s, id) {
-														var js, fjs = d.getElementsByTagName(s)[0];
-														if (d.getElementById(id)) return;
-														js = d.createElement(s); js.id = id;
-														js.src = "https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.0";
-														fjs.parentNode.insertBefore(js, fjs);
-													}(document, 'script', 'facebook-jssdk'));
-												</script>
-												<script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v12.0&appId=435536724607670&autoLogAppEvents=1" nonce="1VBl9fa6"></script>
-												<!-- Your share button code -->
-												<div class="fb-like p-0" data-href="{{ \Request::fullUrl() }}" data-width="" data-layout="standard" data-action="like" data-size="small" data-share="true"></div>
+												<script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v12.0&appId=435536724607670&autoLogAppEvents=1" nonce="oVFop3CH"></script>
+												<div class="fb-like" data-href="{{ \Request::fullUrl() }}" data-width="" data-layout="standard" data-action="like" data-size="small" data-share="true"></div>
 											</div>
 										</div>
 									</div>
