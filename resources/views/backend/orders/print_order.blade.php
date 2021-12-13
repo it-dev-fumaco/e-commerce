@@ -117,6 +117,10 @@
             <dl class="row">
                 <dt class="col-10 text-right">Subtotal</dt>
                 <dd class="col-2 text-right">₱ {{ number_format(str_replace(",","",$orders_arr['subtotal']), 2) }}</dd>
+                @if ($orders_arr['voucher_code'])
+                <dt class="col-10 text-right">Discount <span class="text-white" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833;">{{ $orders_arr['voucher_code'] }}</span></dt>
+                <dd class="col-2 text-right">- ₱ {{ number_format(str_replace(",","",$orders_arr['discount_amount']), 2) }}</dd>
+                @endif
                 <dt class="col-10 text-right">
                     @if ($orders_arr['shipping_name'])
                     <span class="badge badge-info" style="font-size: 11pt;">{{ $orders_arr['shipping_name'] }}</span>

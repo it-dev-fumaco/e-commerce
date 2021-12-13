@@ -131,7 +131,7 @@
                                                         </select>
                                                     </div>
                                                     <div class="col-4">
-                                                        <label>Allowed Usage *</label>
+                                                        <label>Allowed Usage per Account *</label>
                                                         <input type="text" class="form-control" name="allowed_usage" id="allowed_usage" placeholder="Allowed Usage" value="1" >
                                                     </div>
                                                 </div>

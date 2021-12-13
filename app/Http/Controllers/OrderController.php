@@ -614,7 +614,7 @@ class OrderController extends Controller
             'ship_postal' => $orders->order_ship_postal,
             'shipping_name' => $orders->order_shipping,
             'shipping_amount' => $orders->order_shipping_amount,
-            'grand_total' => ($orders->order_shipping_amount + $orders->order_subtotal),
+            'grand_total' => ($orders->order_shipping_amount + ($orders->order_subtotal - $orders->discount_amount)),
             'status' => $orders->order_status,
             'estimated_delivery_date' => $orders->estimated_delivery_date,
             'payment_id' => $orders->payment_id,
@@ -627,7 +627,9 @@ class OrderController extends Controller
             'pickup_date' => Carbon::parse($orders->pickup_date)->format('M d, Y'),
             'store_address' => $store_address,
             'store' => $orders->store_location,
-            'order_status' => $order_status
+            'order_status' => $order_status,
+            'voucher_code' => $orders->voucher_code,
+            'discount_amount' => $orders->discount_amount
         ];
 
         return view('backend.orders.print_order', compact('orders_arr'));
