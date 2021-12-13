@@ -1772,7 +1772,7 @@ class FrontendController extends Controller
             ->join('fumaco_attributes_per_category as c', 'c.id', 'b.attribute_name_id')
             ->whereIn('c.slug', $attr_names)->whereIn('b.attribute_value', $attr_values)
             ->where('a.f_status', 1)->where('c.status', 1)->where('a.f_parent_code', $request->parent)
-            ->select('c.slug', 'b.attribute_value', 'b.idcode')
+            ->select('c.slug', 'b.attribute_value', 'b.idcode', 'a.slug as item_slug')
             ->orderBy('b.idx', 'asc')->get();
 
         // group variant attributes by item code
@@ -1781,10 +1781,11 @@ class FrontendController extends Controller
             $attr_values = collect($values)->mapWithKeys(function($e){
                 return [$e->slug => $e->attribute_value];
             });
+
             // get difference between two arrays
             $diff = array_diff_assoc($attr_collection->toArray(),$attr_values->toArray());
             if (count($diff) <= 0) {
-                return $item_code;
+                return ($values[0]->item_slug) ? $values[0]->item_slug : $item_code;
             }
         }
 
