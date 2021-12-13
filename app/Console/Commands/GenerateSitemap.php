@@ -52,6 +52,7 @@ class GenerateSitemap extends Command
         $contact_last_modified_at = ($contact_last_modified_at) ? Carbon::parse($contact_last_modified_at) : Carbon::now();
         
         $sitemap = Sitemap::create()
+            ->add(Url::create('/')->setPriority(1.0))
             ->add(Url::create('/about')->setLastModificationDate($about_last_modified_at)->setPriority(1.0))
             ->add(Url::create('/contact')->setLastModificationDate($contact_last_modified_at)->setPriority(1.0));
 
