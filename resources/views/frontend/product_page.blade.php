@@ -92,7 +92,7 @@
 														fjs.parentNode.insertBefore(js, fjs);
 													}(document, 'script', 'facebook-jssdk'));
 												</script>
-												<script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v11.0&appId=974569840046115&autoLogAppEvents=1" nonce="1VBl9fa6"></script>
+												<script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v12.0&appId=435536724607670&autoLogAppEvents=1" nonce="1VBl9fa6"></script>
 												<!-- Your share button code -->
 												<div class="fb-like p-0" data-href="{{ \Request::fullUrl() }}" data-width="" data-layout="standard" data-action="like" data-size="small" data-share="true"></div>
 											</div>
