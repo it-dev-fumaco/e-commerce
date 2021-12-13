@@ -351,7 +351,7 @@
 										<section class="regular slider">
 										@foreach($related_products as $rp)
 										<div class="col-md-4 col-lg-3 animated animatedFadeInUp fadeInUp equal-height-columns mb-3 related-products-card">
-											<div class="card shadow-sm" style="border: 1px solid  #d5dbdb; background-color: #fff;">
+											<div class="card shadow-sm border" style="border: 1px solid  #d5dbdb !important; background-color: #fff;">
 												<div class="equal-column-content">
 													
 													@php
