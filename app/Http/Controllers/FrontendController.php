@@ -167,8 +167,6 @@ class FrontendController extends Controller
                 if($result['item_code'] != null) {
                     $on_stock = ($result['f_qty'] - $result['f_reserved_qty']) > 0 ? 1 : 0;
 
-                    // $category = DB::table('fumaco_categories')->where('name', $result['category'])->select('id')->first();
-
                     $category_discount = DB::table('fumaco_on_sale as sale')->join('fumaco_on_sale_categories as cat_sale', 'sale.id', 'cat_sale.sale_id')->whereDate('sale.start_date', '<=', Carbon::now())->whereDate('sale.end_date', '>=', Carbon::now())->where('status', 1)->where('cat_sale.category_id', $result['category_id'])->first();
 
                     $product_price = $result['original_price'];
@@ -240,7 +238,8 @@ class FrontendController extends Controller
                 $search_data = [
                     'search_term' => $request->s,
                     'ip' => $request->ip(),
-                    'frequency' => $search_check ? $search_check->frequency + 1 : 1
+                    'frequency' => $search_check ? $search_check->frequency + 1 : 1,
+                    'date_last_searched' => Carbon::now()
                 ];
 
                 if($products){
@@ -286,6 +285,8 @@ class FrontendController extends Controller
         $best_selling_arr = [];
         $on_sale_arr = [];
 
+        $bs_all_item_discount = DB::table('fumaco_on_sale')->whereDate('start_date', '<=', Carbon::now()->toDateString())->whereDate('end_date', '>=', Carbon::today()->toDateString())->where('status', 1)->where('apply_discount_to', 'All Items')->first();
+
         foreach($best_selling as $bs){
             $bs_img = DB::table('fumaco_items_image_v1')->where('idcode', $bs->f_idcode)->first();
 
@@ -297,7 +298,6 @@ class FrontendController extends Controller
             }
 
             $bs_all_item_discount = DB::table('fumaco_on_sale')->whereDate('start_date', '<=', Carbon::now()->toDateString())->whereDate('end_date', '>=', Carbon::today()->toDateString())->where('status', 1)->where('apply_discount_to', 'All Items')->first();
-
             $bs_category_discount = DB::table('fumaco_on_sale as sale')->join('fumaco_on_sale_categories as cat_sale', 'sale.id', 'cat_sale.sale_id')->whereDate('sale.start_date', '<=', Carbon::now())->whereDate('sale.end_date', '>=', Carbon::now())->where('status', 1)->where('cat_sale.category_id', $bs->f_cat_id)->first();
 
             $bs_product_price = null;
@@ -919,11 +919,6 @@ class FrontendController extends Controller
             })
             ->where('f_status', 1)->orderBy($sortby, $orderby)->paginate(15);
 
-        // $cat_id = $category_id;
-        // if(!is_int($cat_id)){
-        //     $id = DB::table('fumaco_categories')->where('slug', $cat_id)->select('id')->first();
-        //     $cat_id = $id->id;
-        // }
         $all_item_discount = DB::table('fumaco_on_sale')->whereDate('start_date', '<=', Carbon::now()->toDateString())->whereDate('end_date', '>=', Carbon::now()->toDateString())->where('status', 1)->where('apply_discount_to', 'All Items')->first();
 
         $category_discount = DB::table('fumaco_on_sale as sale')->join('fumaco_on_sale_categories as cat_sale', 'sale.id', 'cat_sale.sale_id')->whereDate('sale.start_date', '<=', Carbon::now())->whereDate('sale.end_date', '>=', Carbon::now())->where('status', 1)->where('cat_sale.category_id', $product_category->id)->first();
@@ -1168,24 +1163,23 @@ class FrontendController extends Controller
             }
 
             $rp_category = DB::table('fumaco_categories')->where('name', $row->f_category)->select('id')->first();
-
             $rp_category_discount = DB::table('fumaco_on_sale as sale')->join('fumaco_on_sale_categories as cat_sale', 'sale.id', 'cat_sale.sale_id')->whereDate('sale.start_date', '<=', Carbon::now())->whereDate('sale.end_date', '>=', Carbon::now())->where('status', 1)->where('cat_sale.category_id', $row->f_cat_id)->first();
 
             $rp_product_price = null;
             $rp_discount_from_sale = 0;
             $rp_sale_discount_rate = null;
             $rp_sale_discount_type = null;
-            if($rp_all_item_discount){
+            if($all_item_discount){
                 $rp_discount_from_sale = 1;
-                $rp_sale_discount_rate = $rp_all_item_discount->discount_rate;
-                $rp_sale_discount_type = $rp_all_item_discount->discount_type;
-                if($rp_all_item_discount->discount_type == 'By Percentage'){
-                    $rp_product_price = $row->f_original_price - ($row->f_original_price * ($rp_all_item_discount->discount_rate/100));
-                }else if($rp_all_item_discount->discount_type == 'Fixed Amount'){
+                $rp_sale_discount_rate = $all_item_discount->discount_rate;
+                $rp_sale_discount_type = $all_item_discount->discount_type;
+                if($all_item_discount->discount_type == 'By Percentage'){
+                    $rp_product_price = $row->f_original_price - ($row->f_original_price * ($all_item_discount->discount_rate/100));
+                }else if($all_item_discount->discount_type == 'Fixed Amount'){
                     $rp_discount_from_sale = 0;
-                    if($row->f_original_price > $rp_all_item_discount->discount_rate){
+                    if($row->f_original_price > $all_item_discount->discount_rate){
                         $rp_discount_from_sale = 1;
-                        $rp_product_price = $row->f_original_price - $rp_all_item_discount->discount_rate;
+                        $rp_product_price = $row->f_original_price - $all_item_discount->discount_rate;
                     }
                 }
             }else if($rp_category_discount){

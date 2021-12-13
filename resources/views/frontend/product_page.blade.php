@@ -267,147 +267,71 @@
 													$compare_img = ($compare_product['item_image']) ? '/storage/item_images/'. $compare_product['item_code'] .'/gallery/original/'. $compare_product['item_image'] : '/storage/no-photo-available.png';
 													$compare_img_webp = ($compare_product['item_image']) ? '/storage/item_images/'. $compare_product['item_code'] .'/gallery/original/'. explode(".", $compare_product['item_image'])[0] .'.webp' : '/storage/no-photo-available.png';
 												@endphp
-												<center>
-													<div class="hover-container product-card" style="position: relative;">
-														<div class="pt-2" style="position: absolute; top: 0; right: 0; z-index: 10;">
-															@if($compare_product['discounted_from_item'] == 1)
-																<div class="col-12">
-																	<span class="p-1 text-center" style="background-color: #FF0000; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
-																		&nbsp;<b>{{ $compare_product['individual_discount_rate'] }}% OFF</b>&nbsp;
-																	</span>
-																</div>
-															@elseif($compare_product['discounted_from_sale'] == 1)
-																<div class="col-12">
-																	<span class="p-1 text-center" style="background-color: #FF0000; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
-																		@if ($compare_product['sale_discount_type'] == 'By Percentage')
-																			&nbsp;<b>{{ $compare_product['sale_discount_rate'] }}% OFF</b>&nbsp;
-																		@elseif($compare_product['sale_discount_type'] == 'Fixed Amount')
-																			&nbsp;<b>₱ {{ number_format($compare_product['sale_discount_rate'], 2, '.', ',') }} OFF</b>&nbsp;
-																		@endif
-																	</span>
-																</div>
-															@endif
-														</div>
-														<div class="overlay-bg"></div>
-
-														<div class="btn-container">
-															<a href="/product/{{ ($compare_product['slug']) ? $compare_product['slug'] : $compare_product['item_code'] }}" class="view-products-btn btn" role="button"><i class="fas fa-search"></i>&nbsp;View Product</a>
-														</div>
-														<picture>
-															<source srcset="{{ asset($compare_img_webp) }}" type="image/webp" class="img-responsive" style="width: 100% !important;">
-															<source srcset="{{ asset($compare_img) }}" type="image/jpeg" class="img-responsive" style="width: 100% !important;">
-															<img src="{{ asset($compare_img) }}" alt="{{ Str::slug(explode(".", $compare_product['item_image'])[0], '-') }}" class="img-responsive hover" style="width: 100%" />
-														</picture>
+												<div class="hover-container product-card" style="position: relative;">
+													<div class="pt-2" style="position: absolute; top: 0; right: 0; z-index: 10;">
+														@if($compare_product['discounted_from_item'] == 1)
+															<div class="col-12">
+																<span class="p-1 text-center" style="background-color: #FF0000; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
+																	&nbsp;<b>{{ $compare_product['individual_discount_rate'] }}% OFF</b>&nbsp;
+																</span>
+															</div>
+														@elseif($compare_product['discounted_from_sale'] == 1)
+															<div class="col-12">
+																<span class="p-1 text-center" style="background-color: #FF0000; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
+																	@if ($compare_product['sale_discount_type'] == 'By Percentage')
+																		&nbsp;<b>{{ $compare_product['sale_discount_rate'] }}% OFF</b>&nbsp;
+																	@elseif($compare_product['sale_discount_type'] == 'Fixed Amount')
+																		&nbsp;<b>₱ {{ number_format($compare_product['sale_discount_rate'], 2, '.', ',') }} OFF</b>&nbsp;
+																	@endif
+																</span>
+															</div>
+														@endif
 													</div>
-													
-													<span class="comparison-description">{{ $compare_product['product_name'] }}</span>
-													<br/>&nbsp;
-													<hr>
+													<div class="overlay-bg"></div>
 
-													@if ($compare_product['discounted_from_item'] == 1)
-														<span class="comparison-price" style="white-space: nowrap !important">₱ {{ number_format(str_replace(",","",$compare_product['price']), 2) }}</span>&nbsp;<s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$compare_product['original_price']), 2) }}</s>
-													@elseif ($compare_product['discounted_from_sale'] == 1)
-														<span class="comparison-price" style="white-space: nowrap !important">₱ {{ number_format(str_replace(",","",$compare_product['price']), 2) }}</span>
-														<s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$compare_product['original_price']), 2) }}</s>
-													@else
-														₱ {{ number_format(str_replace(",","",$compare_product['original_price']), 2) }}
-													@endif
-													<br/><br/>
-													@if($compare_product['on_stock'] == 1)
-														<button class="btn btn-pill btn-outline-primary btn-sm add-to-cart comparison-add-to-cart" type="button" data-toggle="toast" data-item-code="{{ $compare_product['item_code'] }}"><i class="fas fa-shopping-cart d-inline-block"></i>&nbsp;Add to Cart</button>
-													@else
-														<a href="/login" class="btn btn-pill btn-outline-primary btn-sm {{ Auth::check() ? 'add-to-wishlist' : '' }} comparison-add-to-cart" type="button" data-toggle="toast" data-item-code="{{ $compare_product['item_code'] }}"><i class="fas fa-heart d-inline-block"></i>&nbsp;Add to Wishlist</a>
-													@endif
-													<br/><br/>
+													<div class="btn-container">
+														<a href="/product/{{ ($compare_product['slug']) ? $compare_product['slug'] : $compare_product['item_code'] }}" class="view-products-btn btn" role="button"><i class="fas fa-search"></i>&nbsp;View Product</a>
+													</div>
+													<picture>
+														<source srcset="{{ asset($compare_img_webp) }}" type="image/webp" class="img-responsive" style="width: 100% !important;">
+														<source srcset="{{ asset($compare_img) }}" type="image/jpeg" class="img-responsive" style="width: 100% !important;">
+														<img src="{{ asset($compare_img) }}" alt="{{ Str::slug(explode(".", $compare_product['item_image'])[0], '-') }}" class="img-responsive hover" style="width: 100%" />
+													</picture>
+												</div>
+												
+												<span class="comparison-description">{{ $compare_product['product_name'] }}</span>
+												<br/>&nbsp;
+												<hr>
+												<center>
+												@if ($compare_product['discounted_from_item'] == 1)
+													<span class="comparison-price" style="white-space: nowrap !important">₱ {{ number_format(str_replace(",","",$compare_product['price']), 2) }}</span>&nbsp;<s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$compare_product['original_price']), 2) }}</s>
+												@elseif ($compare_product['discounted_from_sale'] == 1)
+													<span class="comparison-price" style="white-space: nowrap !important">₱ {{ number_format(str_replace(",","",$compare_product['price']), 2) }}</span>
+													<s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$compare_product['original_price']), 2) }}</s>
+												@else
+													₱ {{ number_format(str_replace(",","",$compare_product['original_price']), 2) }}
+												@endif
+												<br/><br/>
+												@if($compare_product['on_stock'] == 1)
+													<button class="btn btn-pill btn-outline-primary btn-sm add-to-cart comparison-add-to-cart" type="button" data-toggle="toast" data-item-code="{{ $compare_product['item_code'] }}"><i class="fas fa-shopping-cart d-inline-block"></i>&nbsp;Add to Cart</button>
+												@else
+													<a href="/login" class="btn btn-pill btn-outline-primary btn-sm {{ Auth::check() ? 'add-to-wishlist' : '' }} comparison-add-to-cart" type="button" data-toggle="toast" data-item-code="{{ $compare_product['item_code'] }}"><i class="fas fa-heart d-inline-block"></i>&nbsp;Add to Wishlist</a>
+												@endif
+												<br/><br/>
 
-													@foreach ($attribute_names as $attrib)
-														<div class="col-12">
-															<span>{{ $attrib->attribute_name }}</span>
-															<hr/>
-															<span class="comparison-description">{{ $variant_attr_array[$attrib->attribute_name][$compare_product['item_code']] }}</span>
-														</div>
-														<br/>
-													@endforeach
+												@foreach ($attribute_names as $attrib)
+													<div class="col-12">
+														<span style="font-size: 9pt">{{ $attrib->attribute_name }}</span>
+														<hr class="mt-1 mb-1"/>
+														<span class="comparison-description">{{ $variant_attr_array[$attrib->attribute_name][$compare_product['item_code']] }}</span>
+													</div>
+													<br/>
+												@endforeach
 												</center>
 											</div>
 										@endforeach
 									</section>
 								</div>
-								<br/>
-								{{-- <div class="row">
-									@foreach ($attribute_names as $attrib)
-										@foreach ($compare_arr as $compare_items)
-											<div class="col-{{ 12/count($compare_arr) }} p-3 text-center">
-												{{ $attrib->attribute_name }}
-												<hr>
-												<span><b>{{ $variant_attr_array[$attrib->attribute_name][$compare_items['item_code']] }}</b></span>
-											</div>
-										@endforeach
-									@endforeach
-								</div> --}}
-								{{-- <table class="table table-bordered table-hover">
-									<tr>
-										<th style="min-width: 15%;"></th>
-										@foreach ($compare_arr as $compare_image)
-											@php
-												$compare_img = ($compare_image['item_image']) ? '/storage/item_images/'. $compare_image['item_code'] .'/gallery/preview/'. $compare_image['item_image'] : '/storage/no-photo-available.png';
-												$compare_img_webp = ($compare_image['item_image']) ? '/storage/item_images/'. $compare_image['item_code'] .'/gallery/preview/'. explode(".", $compare_image['item_image'])[0] .'.webp' : '/storage/no-photo-available.png';
-											@endphp
-											<th>
-												<div class="row">
-													<div class="col-md-3 text-center">
-														<a class="comparison-item-thumb" href="/product/{{ ($compare_image['slug']) ? $compare_image['slug'] : $compare_image['item_code'] }}">
-															<picture>
-																<source srcset="{{ asset($compare_img_webp) }}" type="image/webp" class="img-responsive" style="width: 100% !important;">
-																<source srcset="{{ asset($compare_img) }}" type="image/jpeg" class="img-responsive" style="width: 100% !important;">
-																<img src="{{ asset($compare_img) }}" alt="{{ Str::slug(explode(".", $compare_image['item_image'])[0], '-') }}" class="img-responsive hover" style="width: 50px !important;">
-															</picture>
-														</a>
-													</div>
-													<div class="col-md-9 text-left">
-														<a class="comparison-item-title text-left" href="/product/{{ ($compare_image['slug']) ? $compare_image['slug'] : $compare_image['item_code'] }}" style="text-align: left !important">{{ $compare_image['product_name'] }}</a>
-														<br/><br/>
-														@if($compare_image['on_stock'] == 1)
-															<button class="btn btn-pill btn-outline-primary btn-sm add-to-cart" type="button" data-toggle="toast" data-item-code="{{ $compare_image['item_code'] }}"><i class="fas fa-shopping-cart d-inline-block"></i>&nbsp;Add to Cart</button>
-														@else
-															<a href="/login" class="btn btn-pill btn-outline-primary btn-sm {{ Auth::check() ? 'add-to-wishlist' : '' }}" type="button" data-toggle="toast" data-item-code="{{ $compare_image['item_code'] }}"><i class="fas fa-heart d-inline-block"></i>&nbsp;Add to Wishlist</a>
-														@endif
-														<br/>
-													</div>
-												</div>
-											</th>
-										@endforeach
-									</tr>
-									@foreach ($attribute_names as $attrib)
-										<tr>
-											<th>{{ $attrib->attribute_name }}</th>
-											@foreach ($compare_arr as $compare_items)
-												<td>{{ $variant_attr_array[$attrib->attribute_name][$compare_items['item_code']] }}</td>
-											@endforeach
-										</tr>
-									@endforeach
-									<tr>
-										<th>Price</th>
-										@foreach ($compare_arr as $price)
-											<td>
-												@if ($price['discounted_from_item'] == 1)
-													<span style="white-space: nowrap !important">₱ {{ number_format(str_replace(",","",$price['price']), 2) }}</span>&nbsp;<s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$price['original_price']), 2) }}</s>
-													<span class="badge badge-danger" style="margin-left: 8px; vertical-align: middle;background-color: red; display: inline !important;">{{ $price['individual_discount_rate'] }}% OFF</span>
-												@elseif ($price['discounted_from_sale'] == 1)
-													<span style="white-space: nowrap !important">₱ {{ number_format(str_replace(",","",$price['price']), 2) }}</span>
-													<s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$price['original_price']), 2) }}</s>
-													@if ($price['sale_discount_type'] == 'By Percentage')
-														<span class="badge badge-danger" style="margin-left: 8px; vertical-align: middle;background-color: red; display: inline !important;">{{ $price['sale_discount_rate'] }}% OFF</span>
-													@elseif($price['sale_discount_type'] == 'Fixed Amount')
-														<span class="badge badge-danger" style="margin-left: 8px; vertical-align: middle;background-color: red; display: inline !important;">₱ {{ number_format(str_replace(",","",$price['sale_discount_rate']), 2) }} OFF</span>
-													@endif
-												@else
-													₱ {{ number_format(str_replace(",","",$price['original_price']), 2) }}
-												@endif
-											</td>
-										@endforeach
-									</tr>
-								</table> --}}
 							@endif
 							
                     @if (count($related_products) > 0)

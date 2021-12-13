@@ -397,9 +397,9 @@ class CheckoutController extends Controller
 							if ($sale_per_category) {
 								if ($sale_per_category->discount_type == 'By Percentage') {
 									$discount = ($item->f_original_price * ($sale_per_category->discount_rate/100));
-									$discount = ($discount > $sale->capped_amount) ? $sale_per_category->capped_amount : $discount;
+									$discount = ($discount > $sale_per_category->capped_amount) ? $sale_per_category->capped_amount : $discount;
 								} else {
-									$discount = $sale->discount_rate;
+									$discount = $sale_per_category->discount_rate;
 								}
 							}
 						}
@@ -547,9 +547,9 @@ class CheckoutController extends Controller
 							if ($sale_per_category) {
 								if ($sale_per_category->discount_type == 'By Percentage') {
 									$discount = ($item->f_original_price * ($sale_per_category->discount_rate/100));
-									$discount = ($discount > $sale->capped_amount) ? $sale_per_category->capped_amount : $discount;
+									$discount = ($discount > $sale_per_category->capped_amount) ? $sale_per_category->capped_amount : $discount;
 								} else {
-									$discount = $sale->discount_rate;
+									$discount = $sale_per_category->discount_rate;
 								}
 							}
 						}

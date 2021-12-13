@@ -1798,7 +1798,7 @@ class ProductController extends Controller
                 }
             }
 
-            $attribute_names = DB::table('fumaco_attributes_per_category as cat_attrib')->join('fumaco_items_attributes as item_attrib', 'cat_attrib.id', 'item_attrib.attribute_name_id')->where('cat_attrib.category_id', $category->id)->whereIn('item_attrib.idcode', $request->selected_items)->groupBy('cat_attrib.id', 'cat_attrib.attribute_name')->select('cat_attrib.id', 'cat_attrib.attribute_name')->get();
+            $attribute_names = DB::table('fumaco_attributes_per_category as cat_attrib')->join('fumaco_items_attributes as item_attrib', 'cat_attrib.id', 'item_attrib.attribute_name_id')->where('cat_attrib.category_id', $category->id)/*->whereIn('item_attrib.idcode', $request->selected_items)*/->groupBy('cat_attrib.id', 'cat_attrib.attribute_name')->select('cat_attrib.id', 'cat_attrib.attribute_name')->get();
         }
 
         return view('backend.products.add_comparison', compact('categories', 'items', 'selected_category', 'attribute_names'));
@@ -1819,7 +1819,6 @@ class ProductController extends Controller
     public function saveProductsToCompare(Request $request){
         DB::beginTransaction();
         try {
-            // return $request->selected_items;
             if($request->selected_items and count($request->selected_items) < 2){
                 return redirect()->back()->with('error', 'Please select at least 2 items');
             }
@@ -1831,12 +1830,14 @@ class ProductController extends Controller
                 DB::table('product_comparison_attribute')->where('product_comparison_id', $request->product_comparison_id)->delete();
                 $product_comparison_id = $request->product_comparison_id;
                 $created_by = $save_created_by->created_by;
+                $status = $save_created_by->status;
                 $last_modified_by = Auth::user()->username;
             }else{ // if adding product comparison
                 $product_comparison = DB::table('product_comparison_attribute')->orderBy('product_comparison_id', 'desc')->first();
                 $product_comparison_id = $product_comparison ? $product_comparison->product_comparison_id + 1 : 1;
                 $created_by = Auth::user()->username;
                 $last_modified_by = null;
+                $status = 0;
             }
 
             foreach($request->selected_items as $item){
@@ -1848,6 +1849,7 @@ class ProductController extends Controller
                         'item_code' => $item,
                         'attribute_name_id' => $attrib,
                         'attribute_value' => $attrib_value ? $attrib_value->attribute_value : 'N/A',
+                        'status' => $status,
                         'created_by' => $created_by,
                         'last_modified_by' => $last_modified_by
                     ]);

@@ -291,7 +291,7 @@ Route::prefix('admin')->group(function () {
         Route::post('/edit/page/about_us/sponsor/sort/{id}', 'PagesController@updateSort');
         Route::get('/edit/page/about_us/sponsor/reset/{id}', 'PagesController@resetSort');
 
-        Route::get('/marketing/search/list', 'PagesController@searchList');
+        Route::get('/search/list', 'PagesController@searchList');
 
 
         Route::get('/marketing/on_sale/list', 'ProductController@onSaleList');

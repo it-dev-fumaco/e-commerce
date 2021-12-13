@@ -35,22 +35,20 @@
                                     {{ session()->get('error') }}
                                 </div>
                             @endif
-                            <div class="row">
-                                <div class="col-4">
-                                    <div class="card card-primary">
-                                        <div class="card-body">
-                                            <label>Selected Category: {{ $category->name }}</label>
+                            <form action="/admin/products/compare/save" method="post">
+                                @csrf
+                                <div class="row">
+                                    <div class="col-4">
+                                        <div class="card card-primary">
+                                            <div class="card-body">
+                                                <label>Selected Category: {{ $category->name }}</label>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="card card-primary">
-                                        <div class="card-body">
-                                            <form action="/admin/products/compare/{{ collect($product_comparison)->pluck('product_comparison_id')->first() }}/edit" method="get">
+                                        <div class="card card-primary">
+                                            <div class="card-body">
                                                 <div class="row">
                                                     <div class="col-6">
                                                         <label>Select Items</label>
-                                                    </div>
-                                                    <div class="col-6 text-right">
-                                                        <button type="submit" class="btn btn-primary">Save</button>
                                                     </div>
                                                 </div>
                                                 <br/>
@@ -58,7 +56,7 @@
                                                 <select class="d-none form-control" name="selected_items" id="selected_items">
                                                     <option disabled selected value="">Select Items to Compare (Max: 4)</option>
                                                     @foreach ($items as $item)
-                                                        <option value="{{ $item->f_idcode }}">{{ $item->f_idcode }}</option>
+                                                        <option value="{{ $item->f_idcode }}">{{ $item->f_idcode.' - '.$item->f_name_name }}</option>
                                                     @endforeach
                                                 </select>
                                                 <table class="table table-bordered" id="items-table">
@@ -104,16 +102,13 @@
                                                         @endif
                                                     </tbody>
                                                 </table>
-                                            </form>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                <div class="col-6">
-                                    <div class="card card-primary">
-                                        <div class="card-body">
-                                            <form action="/admin/products/compare/save" method="post">
-                                                @csrf
+                                    <div class="col-6">
+                                        <div class="card card-primary">
+                                            <div class="card-body">
                                                 <button type="submit" class="btn btn-primary float-right">Save</button>
                                                 <br/>&nbsp;
                                                 <div class="d-none">
@@ -125,9 +120,6 @@
                                                         @endforeach
                                                     </select>
                                                     <input type="text" value="{{ $category->name }}" name="selected_category">
-                                                    @foreach ($item_codes as $item_code)
-                                                        <input type="text" value="{{ $item_code }}" name="selected_items[]">
-                                                    @endforeach
                                                     <input type="checkbox" name="compare_edit" checked readonly>
                                                 </div>
                                                 <table class="table table-bordered" id="attributes-table">
@@ -151,11 +143,11 @@
                                                         @endforeach
                                                     </tbody>
                                                 </table>
-                                            </form>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </form>
                         </div>
                     </div>
                 </div>
