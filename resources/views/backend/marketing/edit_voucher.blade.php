@@ -72,7 +72,7 @@
                                             </div>
                                             <div class="col-6">
                                                 <label>Minimum Spend</label>
-                                                <input type="text" class="form-control" name="minimum_spend" value="{{ $coupon->minimum_spend }}" placeholder="Minimum Spend">
+                                                <input type="text" class="form-control" name="minimum_spend" value="{{ $coupon->minimum_spend }}" placeholder="Minimum Spend" required>
                                             </div>
                                         </div>
                                         <div id="fixed_amount" class="row">
