@@ -247,6 +247,7 @@ Route::prefix('admin')->group(function () {
         Route::post('/order/payment_status', 'OrderController@checkPaymentStatus');
         
         Route::get('/customer/list', 'CustomerController@viewCustomers');
+        Route::get('/customer/profile/{id}', 'CustomerController@viewCustomerProfile');
 
         Route::get('/blog/list', 'BlogController@viewBlogs');
         Route::get('/blog/new', 'BlogController@newBlog');
