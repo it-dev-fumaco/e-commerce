@@ -3,7 +3,7 @@
         <span class="lighter-text">My Cart</span>
     </div>
 </div> <!--end shopping-cart-header -->
-<ul class="shopping-cart-items">
+<ul class="shopping-cart-items" style="min-height: 150px;">
     @forelse ($cart_arr as $cart)
     <li class="clearfix">
         @php
@@ -26,7 +26,7 @@
         @endif
     </li>
     @empty
-    <li class="clearfix text-center">
+    <li class="clearfix text-center m-2">
         <span class="text-muted">Cart is empty</span>
     </li>
     @endforelse
