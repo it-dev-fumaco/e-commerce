@@ -161,7 +161,7 @@
                                                         </div>
                                                     @empty
                                                         <tr>
-                                                            <td colspan=9 class="text-center">No Vouchers</td>
+                                                            <td colspan=12 class="text-center">No Vouchers</td>
                                                         </tr>
                                                     @endforelse
                                                 </table>
@@ -255,7 +255,7 @@
                                                         </div> --}}
                                                     @empty
                                                         <tr>
-                                                            <td colspan=9 class="text-center">No Vouchers</td>
+                                                            <td colspan=11 class="text-center">No Vouchers</td>
                                                         </tr>
                                                     @endforelse
                                                 </table>

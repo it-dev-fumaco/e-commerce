@@ -72,7 +72,7 @@
                                             </div>
 
                                             <div class="col-6">
-                                                <label>Minimum Spend</label>
+                                                <label>Minimum Spend *</label>
                                                 <input type="text" class="form-control" name="minimum_spend" placeholder="Minimum Spend" required>
                                             </div>
                                         </div>
@@ -127,7 +127,7 @@
                                                         <select class="form-control" name="coupon_type" id="coupon_type" required>
                                                             <option disabled value="">Coupon Type</option>
                                                             <option value="Promotional" selected>Promotional</option>
-                                                            <option value="Exclusive Voucher">Exclusive Voucher</option>
+                                                            <option value="Per Category">Per Category</option>
                                                         </select>
                                                     </div>
                                                     <div class="col-4">
@@ -138,20 +138,20 @@
                                             </div>
                                             
                                         </div>
-                                        <div id="customers" class="row">
-                                            <select class="d-none form-control" name="customer_select" id="customer_select">
-                                                <option disabled selected value="">Select Customer</option>
-                                                @foreach ($customer_list as $customer)
-                                                    <option value="{{ $customer->id }}">{{ $customer->f_name.' '.$customer->f_lname }}</option>
+                                        <div id="categories" class="row">
+                                            <select class="d-none form-control" name="category_select" id="category_select">
+                                                <option disabled selected value="">Select a Category</option>
+                                                @foreach ($category_list as $category)
+                                                    <option value="{{ $category->id }}">{{ $category->name }}</option>
                                                 @endforeach
                                             </select>
                                             <div class="col-6 mx-auto">
                                                 <br/>
-                                                <table class="table table-bordered" id="customers-table">
+                                                <table class="table table-bordered" id="categories-table">
                                                      <thead>
                                                           <tr>
-                                                                <th scope="col" class="text-center">Customer Name</th>
-                                                                <th class="text-center" style="width: 10%;"><button class="btn btn-outline-primary btn-sm" id="add-customers-btn">Add</button></th>
+                                                                <th scope="col" class="text-center">Category</th>
+                                                                <th class="text-center" style="width: 10%;"><button class="btn btn-outline-primary btn-sm" id="add-categories-btn">Add</button></th>
                                                           </tr>
                                                      </thead>
                                                      <tbody>
@@ -262,11 +262,11 @@
         }
 
         function couponType(){
-            if($('#coupon_type').val() == 'Exclusive Voucher'){
-                $('#customers').slideDown();
+            if($('#coupon_type').val() == 'Per Category'){
+                $('#categories').slideDown();
                 $('#for_promotional').slideUp();
             }else{
-                $('#customers').slideUp();
+                $('#categories').slideUp();
                 $('#for_promotional').slideDown();
             }
         }
@@ -283,13 +283,13 @@
             height: "300px",
         });
 
-        $('#add-customers-btn').click(function(e){
+        $('#add-categories-btn').click(function(e){
 			e.preventDefault();
 
-			var clone_select = $('#customer_select').html();
+			var clone_select = $('#category_select').html();
 			var row = '<tr>' +
 				'<td class="p-2">' +
-					'<select name="selected_customer[]" class="form-control w-100" style="width: 100%;" required>' + clone_select + '</select>' +
+					'<select name="selected_category[]" class="form-control w-100" style="width: 100%;" required>' + clone_select + '</select>' +
 				'</td>' +
 				// '<td class="p-2">' +
 				// 	'<input type="text" name="customer_allowed_usage[]" class="form-control" placeholder="Allowed Usage">' +
@@ -299,7 +299,7 @@
 				'</td>' +
 			'</tr>';
 
-			$('#customers-table tbody').append(row);
+			$('#categories-table tbody').append(row);
 		});
 
         $(document).on('click', '.remove-td-row', function(e){

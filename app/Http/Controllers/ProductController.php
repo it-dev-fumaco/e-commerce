@@ -846,11 +846,12 @@ class ProductController extends Controller
     public function editVoucherForm($id){
         $coupon = DB::table('fumaco_voucher')->where('id', $id)->first();
         
-        $customer_list = DB::table('fumaco_users')->where('is_email_verified', 1)->get();
+        // $customer_list = DB::table('fumaco_users')->where('is_email_verified', 1)->get();
+        $categories_list = DB::table('fumaco_categories')->where('publish', 1)->whereNull('external_link')->get();
 
-        $gift_card_customers = DB::table('fumaco_voucher_customers')->where('voucher_id', $id)->get();
+        $selected_categories = DB::table('fumaco_voucher_categories')->where('voucher_id', $id)->get();
 
-        return view('backend.marketing.edit_voucher', compact('customer_list', 'coupon', 'gift_card_customers'));
+        return view('backend.marketing.edit_voucher', compact('categories_list', 'coupon', 'selected_categories'));
     }
 
     public function setOnSaleStatus(Request $request){
@@ -866,8 +867,9 @@ class ProductController extends Controller
     }
 
     public function addVoucherForm(){
-        $customer_list = DB::table('fumaco_users')->where('is_email_verified', 1)->get();
-        return view('backend.marketing.add_voucher', compact('customer_list'));
+        // $customer_list = DB::table('fumaco_users')->where('is_email_verified', 1)->get();
+        $category_list = DB::table('fumaco_categories')->where('publish', 1)->whereNull('external_link')->get();
+        return view('backend.marketing.add_voucher', compact('category_list'));
     }
 
     public function addVoucher(Request $request){
@@ -914,7 +916,7 @@ class ProductController extends Controller
 
             $insert = [
                 'name' => $request->name,
-                'code' => strtoupper($request->coupon_code),
+                'code' => strtoupper(str_replace(' ', '', $request->coupon_code)),
                 'total_allotment' => isset($request->unlimited_allotment) ? null : $request->allotment,
                 'unlimited' => isset($request->unlimited_allotment) ? 1 : 0,
                 'allowed_usage' => $request->allowed_usage,
@@ -934,11 +936,12 @@ class ProductController extends Controller
             // return $insert;
             DB::table('fumaco_voucher')->insert($insert);
 
-            if($request->coupon_type == 'Exclusive Voucher'){
-                $voucher_id = DB::table('fumaco_voucher')->orderBy('created_at', 'desc')->first();
-                foreach($request->selected_customer as $key => $customer){
-                    DB::table('fumaco_voucher_customers')->insert([
-                        'customer_id' => $customer,
+            if($request->coupon_type == 'Per Category'){
+                $voucher_id = DB::table('fumaco_voucher')->orderBy('id', 'desc')->first();
+                foreach($request->selected_category as $key => $category){
+                    DB::table('fumaco_voucher_categories')->insert([
+                        'category_id' => $category,
+                        'allowed_usage' => $request->allowed_usage,
                         'voucher_id' => $voucher_id->id,
                         'created_by' => Auth::user()->username
                     ]);
@@ -992,7 +995,7 @@ class ProductController extends Controller
 
             $update = [
                 'name' => $request->name,
-                'code' => strtoupper($request->coupon_code),
+                'code' => strtoupper(str_replace(' ', '', $request->coupon_code)),
                 'total_allotment' => isset($request->unlimited_allotment) ? null : $request->allotment,
                 'unlimited' => isset($request->unlimited_allotment) ? 1 : 0,
                 'allowed_usage' => $request->allowed_usage,
@@ -1012,21 +1015,23 @@ class ProductController extends Controller
 
             DB::table('fumaco_voucher')->where('id', $id)->update($update);
             
-            if($request->coupon_type == 'Exclusive Voucher'){
+            if($request->coupon_type == 'Per Category'){
                 $last_modified_by = null;
-                $checker = DB::table('fumaco_voucher_customers')->where('voucher_id', $id)->count();
+                $created_by = Auth::user()->username;
+                $checker = DB::table('fumaco_voucher_categories')->where('voucher_id', $id)->first();
     
-                if ($checker > 0){
+                if ($checker){
+                    $created_by = $checker->created_by;
                     $last_modified_by = Auth::user()->username;
                 }
 
-                DB::table('fumaco_voucher_customers')->where('voucher_id', $id)->delete();
-                foreach($request->selected_customer as $key => $customer){
-                    DB::table('fumaco_voucher_customers')->insert([
-                        'customer_id' => $customer,
+                DB::table('fumaco_voucher_categories')->where('voucher_id', $id)->delete();
+                foreach($request->selected_category as $key => $category){
+                    DB::table('fumaco_voucher_categories')->insert([
+                        'category_id' => $category,
+                        'allowed_usage' => $request->allowed_usage,
                         'voucher_id' => $id,
-                        // 'allowed_usage' => $request->customer_allowed_usage[$key],
-                        'created_by' => Auth::user()->username,
+                        'created_by' => $created_by,
                         'last_modified_by' => $last_modified_by
                     ]);
                 }
