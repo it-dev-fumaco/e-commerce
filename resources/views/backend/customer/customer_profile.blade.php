@@ -142,10 +142,168 @@
                                     </table>
                                 </div>
                             </div>
+                            <br/>
+                            <div class="card card-primary">
+                                <div class="card-body">
+                                    <h4>Order History</h4>
+                                    <table class="table table-hover table-bordered">
+                                        <tr>
+                                            <th>Order Date</th>
+                                            <th>Order ID</th>
+                                            <th>Customer Name</th>
+                                            <th>Estimated Delivery Date</th>
+                                            <th>Shipping Method</th>
+                                            <th>Payment Method</th>
+                                            <th>Grand Total</th>
+                                            <th>Status</th>
+                                            <th>Action</th>
+                                        </tr>
+                                        @forelse ($orders_arr as $order)
+                                            @php
+                                                if($order['order_status'] == "Order Placed"){
+                                                    $badge = '#ffc107;';
+                                                }else if($order['order_status'] == "Order Delivered" or $order['order_status'] == 'Order Completed'){
+                                                    $badge = '#fd6300;';
+                                                }else if($order['order_status'] == "Out for Delivery" or $order['order_status'] == 'Ready for Pickup'){
+                                                    $badge = '#28a745;';
+                                                }else{
+                                                    $badge = '#007bff;';
+                                                }
+                                            @endphp
+                                            <tr>
+                                                <td>{{ date('M d, Y - h:i A', strtotime($order['date_ordered'])) }}</td>
+                                                <td>{{ $order['order_number'] }}</td>
+                                                <td>{{ $order['ordered_by'] }}</td>
+                                                <td>{{ $order['estimated_delivery_date'] }}</td>
+                                                <td>{{ $order['shipping_method'] }}</td>
+                                                <td>{{ $order['payment_method'] }}</td>
+                                                <td>₱ {{ number_format($order['grand_total'], 2) }}</td>
+                                                <td><span class="badge" style="background-color: {{ $badge }}; font-size: 11pt;">{{ $order['order_status'] }}</span></td>
+                                                <td class="text-center">
+                                                    <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#order{{ $order['order_number'] }}Modal">
+                                                        View Details
+                                                    </button>
+                                                      
+                                                      <!-- Modal -->
+                                                    <div class="modal fade" id="order{{ $order['order_number'] }}Modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                        <div class="modal-dialog modal-xl" role="document">
+                                                            <div class="modal-content">
+                                                                <div class="modal-header">
+                                                                    <div class="col-5 text-left">
+                                                                        <h5 class="modal-title" id="exampleModalLabel">ORDER NO. {{ $order['order_number'] }}</h5>
+                                                                    </div>
+                                                                    <div class="col-6 text-right font-italic">
+                                                                        <span class="badge badge-info" style="font-size: 11pt;">{{ $order['shipping_method'] }}</span>&nbsp;
+                                                                        <span>
+                                                                            @if ($order['estimated_delivery_date'])
+                                                                                <b>Est. Delivery Date:</b> {{ $order['estimated_delivery_date'] }}
+                                                                            @else
+                                                                                <b>Pickup By:</b> {{ date('D, M d, Y', strtotime($order['pickup_date'])) }}
+                                                                            @endif
+                                                                        </span>
+                                                                    </div>
+                                                                    <button type="button" class="close border" data-dismiss="modal" aria-label="Close">
+                                                                        <span aria-hidden="true">&times;</span>
+                                                                    </button>
+                                                                </div>
+                                                                <div class="modal-body text-left">
+                                                                    <div class="row">
+                                                                        <div class="col-6">
+                                                                            <h4>{{ $order['ordered_by'] }}</h4>
+                                                                            <span>{{ $order['order_email'] }}</span>
+                                                                        </div>
+                                                                    </div>
+                                                                    <br/>
+                                                                    <div class="row">
+                                                                        <div class="col-4">
+                                                                            <span><b>Order ID:</b> {{ $order['order_number'] }}</span><br/>
+                                                                            <span><b>Payment ID:</b> {{ $order['payment_id'] }}</span><br/>
+                                                                            <span><b>Payment Method:</b> {{ $order['payment_method'] }}</span><br/>
+                                                                            <span><b>Order Date:</b> {{ $order['date_ordered'] }}</span><br/>
+                                                                            <span><b>Order Status:</b> <b><span class="badge" style="background-color: {{ $badge }}; font-size: 11pt;">{{ $order['order_status'] }}</span></b></span>
+                                                                        </div>
+                                                                        <div class="col-4">
+                                                                            <span><b>Billing Address:</b></span><br/>
+                                                                            <span><b>Bill to:</b> {{ $order['billing_business_name'] ? $order['billing_business_name'] : $order['ordered_by'] }}</span>
+                                                                            <p>{{ $order['billing_address'] }}</p>
+                                                                        </div>
+                                                                        @if ($order['shipping_method'] == 'Store Pickup')
+                                                                            <div class="col-4">
+                                                                                <span><b>Pickup At:</b></span><br/>
+                                                                                <span>{{ $order['store_location'] }}</span><br/>
+                                                                                <span>{{ $order['store_address'] }}</span><br/>
+                                                                                <span><b>Pickup Date:</b> {{ date('D, M d, Y', strtotime($order['pickup_date'])) }}</span>
+                                                                            </div>
+                                                                        @else
+                                                                            <div class="col-4">
+                                                                                <span><b>Shipping Address:</b></span><br/>
+                                                                                <span><b>Ship to:</b> {{ $order['shipping_business_name'] ? $order['shipping_business_name'] : $order['ordered_by'] }}</span>
+                                                                                <p>{{ $order['shipping_address'] }}</p>
+                                                                            </div>
+                                                                        @endif
+                                                                    </div>
+                                                                    <br/>
+                                                                    <table class="table table-hover table-bordered">
+                                                                        <tr>
+                                                                            <th>Item Code</th>
+                                                                            <th>Item Name</th>
+                                                                            <th>Quantity</th>
+                                                                            <th>Price</th>
+                                                                            <th>Amount</th>
+                                                                        </tr>
+                                                                        @foreach ($order['ordered_items'] as $item)
+                                                                            <tr>
+                                                                                <td>{{ $item['item_code'] }}</td>
+                                                                                <td>{{ $item['item_name'] }}</td>
+                                                                                <td>{{ $item['quantity'] }}</td>
+                                                                                <td>₱ {{ number_format($item['price'], 2) }}</td>
+                                                                                <td>₱ {{ number_format($item['total_price'], 2) }}</td>
+                                                                            </tr>
+                                                                        @endforeach
+                                                                    </table>
+                                                                    
+                                                                    <div class="col-md-8 offset-md-4 mb-4">
+                                                                        <dl class="row">
+                                                                            <dt class="col-sm-10 text-right">Subtotal</dt>
+                                                                            <dd class="col-sm-2 text-right">₱ {{ number_format(str_replace(",","",$order['subtotal']), 2) }}</dd>
+                                                                            @if ($order['voucher_code'])
+                                                                            <dt class="col-sm-10 text-right">Discount <span class="text-white" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833;">{{ $order['voucher_code'] }}</span></dt>
+                                                                            <dd class="col-sm-2 text-right">- ₱ {{ number_format(str_replace(",","",$order['discount']), 2) }}</dd>
+                                                                            @endif
+                                                                            <dt class="col-sm-10 text-right">
+                                                                                <span class="badge badge-info" style="font-size: 11pt;">{{ $order['shipping_method'] }}</span>
+                                                                            </dt>
+                                                                            <dd class="col-sm-2 text-right">₱ {{ number_format(str_replace(",","",$order['shipping']), 2) }}</dd>
+                                                                            <dt class="col-sm-10 text-right">Grand Total</dt>
+                                                                            <dd class="col-sm-2 text-right">₱ {{ number_format(str_replace(",","",$order['grand_total']), 2) }}</dd>
+                                                                        </dl>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td class="text-center" colspan=9>No Order(s)</td>
+                                            </tr>
+                                        @endforelse
+                                    </table>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </section>
         </div>
-    </div>     
+    </div>
+    <style>
+        .table>tbody>tr:hover {
+            background-color: #ffffff;
+        }
+    </style>
 @endsection
