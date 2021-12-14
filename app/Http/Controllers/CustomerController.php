@@ -112,4 +112,20 @@ class CustomerController extends Controller
 
         return view('backend.customer.customer_profile', compact('customer', 'shipping_address', 'billing_address', 'cart_items', 'order_history', 'orders_arr'));
     }
+
+    public function changeCustomerGroup($id, Request $request){
+        DB::beginTransaction();
+		try{
+            DB::table('fumaco_users')->where('id', $id)->update([
+                'customer_group' => $request->customer_group,
+                'pricelist_id' => $request->pricelist ? $request->pricelist : null
+            ]);
+
+            DB::commit();
+            return redirect()->back()->with('success', 'Customer Profile Updated');
+		}catch(Exception $e){
+			DB::rollback();
+			return redirect()->back()->with('error', 'Error');
+		}
+    }
 }

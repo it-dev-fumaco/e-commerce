@@ -27,15 +27,49 @@
                         <div class="col-12">
                             <div class="card card-primary">
                                 <div class="card-body">
+                                    @if(session()->has('success'))
+                                        <div class="alert alert-success fade show" role="alert">
+                                            {{ session()->get('success') }}
+                                        </div>
+                                    @endif
+                                    @if(session()->has('error'))
+                                        <div class="alert alert-warning fade show" role="alert">
+                                            {{ session()->get('error') }}
+                                        </div>
+                                    @endif
                                     <div class="row">
-                                        <div class="col-6">
+                                        <div class="col-4">
                                             <h4>{{ $customer->f_name.' '.$customer->f_lname }}</h4>
                                             <p><b>{{ $customer->username }}</b></p>
                                         </div>
-                                        <div class="col-6">
+                                        <div class="col-4">
+                                            <p>Customer Group: <b>{{ $customer->customer_group }}</b></p>
                                             <p>Date Registered: <b>{{ date('M d, Y', strtotime($customer->created_at)) }}</b></p>
                                             <p>Last Login Date: <b>{{ $customer->last_login ? date('M d, Y h:i A', strtotime($customer->last_login)) : '' }}</b></p>
                                             <p>Total Number of Visits: <span class="badge badge-primary">{{ $customer->no_of_visits }}</span></p>
+                                        </div>
+                                        <div class="col-4">
+                                            <form action="/admin/customer/profile/{{ $customer->id }}/change_customer_group" method="post">
+                                                @csrf
+                                                @php
+                                                    $customer_group = array('Personal', 'Business');
+                                                @endphp
+                                                <select class="form-control" name="customer_group" id="customer_group">
+                                                    <option disabled value="">Select Customer Group</option>
+                                                    @foreach ($customer_group as $group)
+                                                        <option value="{{ $group }}" {{ $group == $customer->customer_group ? 'selected' : '' }}>{{ $group }}</option>
+                                                    @endforeach
+                                                </select>
+                                                <br/>
+                                                <div id="pricelist">
+                                                    <select class="form-control" name="pricelist">
+                                                        <option selected disabled value="">Select Price List</option>
+                                                        <option value="99">For Testing</option>
+                                                    </select>
+                                                    <br/>
+                                                </div>
+                                                <button type="submit" class="btn btn-primary float-right">Save</button>
+                                            </form>
                                         </div>
                                     </div>
                                 </div>
@@ -306,4 +340,25 @@
             background-color: #ffffff;
         }
     </style>
+@endsection
+@section('script')
+    <script>
+        $(document).ready(function(){
+            customerGroup();
+
+            $('#customer_group').change(function(){
+                customerGroup();
+            });
+
+            function customerGroup(){
+                if($('#customer_group').val() == 'Business'){
+                    $('#pricelist').slideDown();
+                    $('#pricelist').prop('required', true);
+                }else{
+                    $('#pricelist').slideUp();
+                    $('#pricelist').prop('required', false);
+                }
+            }
+        });
+    </script>
 @endsection

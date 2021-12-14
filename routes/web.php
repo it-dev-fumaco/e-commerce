@@ -253,6 +253,7 @@ Route::prefix('admin')->group(function () {
         
         Route::get('/customer/list', 'CustomerController@viewCustomers');
         Route::get('/customer/profile/{id}', 'CustomerController@viewCustomerProfile');
+        Route::post('/customer/profile/{id}/change_customer_group', 'CustomerController@changeCustomerGroup');
 
         Route::get('/blog/list', 'BlogController@viewBlogs');
         Route::get('/blog/new', 'BlogController@newBlog');
