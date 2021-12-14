@@ -68,13 +68,19 @@
 									<div class="product_name fumacoFont_item_title">{{ $product_details->f_name_name }}</div>
 									<div class="product-rating">
 										<div class="d-flex justify-content-between align-items-center">
+											@php
+												$total_reviews = $product_reviews->total();
+												$overall_rating = ($total_reviews > 0) ? ($total_rating / $total_reviews) : 0;
+											@endphp
 											<div class="btn-group stylecap">
+												@for ($i = 0; $i < 5; $i++)
+												@if ($overall_rating <= $i)
 												<span class="fa fa-star starcolorgrey"></span>
-												<span class="fa fa-star starcolorgrey"></span>
-												<span class="fa fa-star starcolorgrey"></span>
-												<span class="fa fa-star starcolorgrey"></span>
-												<span class="fa fa-star starcolorgrey"></span>
-												<span style="color:#000000 !important; font-weight:200 !important;">&nbsp;&nbsp;( 0 Reviews )</span>
+												@else
+												<span class="fa fa-star" style="color: #FFD600;"></span>
+												@endif
+												@endfor
+												<span style="color:#000000 !important; font-weight:200 !important;">&nbsp;&nbsp;( {{ $total_reviews }} Reviews )</span>
 											</div>
 										</div>
 										<div class="d-flex flex-row p-0">
@@ -519,15 +525,22 @@
 															₱ {{ number_format(str_replace(",","",$rp['orig_price']), 2) }}
 															@endif
 														</p>
+														@php
+															$total_reviews = collect($rp['product_reviews'])->count();
+															$total_rating = collect($rp['product_reviews'])->sum('rating');
+															$overall_rating = ($total_reviews > 0) ? ($total_rating / $total_reviews) : 0;
+														@endphp
 														<div class="d-flex justify-content-between align-items-center">
 															<div class="btn-group stylecap">
-															<span class="fa fa-star starcolorgrey"></span>
-															<span class="fa fa-star starcolorgrey"></span>
-															<span class="fa fa-star starcolorgrey"></span>
-															<span class="fa fa-star starcolorgrey"></span>
-															<span class="fa fa-star starcolorgrey"></span>
+																@for ($i = 0; $i < 5; $i++)
+																@if ($overall_rating <= $i)
+																<span class="fa fa-star starcolorgrey"></span>
+																@else
+																<span class="fa fa-star" style="color: #FFD600;"></span>
+																@endif
+																@endfor
 															</div>
-															<small class="text-muted stylecap" style="color:#c4cad0 !important; font-weight:100 !important;">( 0 Reviews )</small>
+															<small class="text-muted stylecap" style="color:#c4cad0 !important; font-weight:100 !important;">( {{ $total_reviews }} Reviews )</small>
 														</div>
 														<br>
 													</div>
