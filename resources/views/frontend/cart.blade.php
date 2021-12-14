@@ -68,7 +68,15 @@
                             </td>
                             <td class="tbls tbl-half" style="width:40% !important;"><a href="/product/{{ $cart['item_code'] }}" style="text-decoration: none !important; color: #000;">{{ $cart['item_description'] }}</a>
                                 <br/>{{-- for mobile --}}
-                            <span class="formatted-price d-md-none d-lg-none d-xl-none"><br/><b>P {{ number_format($cart['price'], 2, '.', ',') }}</b></span>
+                            <span class="formatted-price d-md-none d-lg-none d-xl-none">
+                                <br/>
+                                @if($cart['is_discounted'] == 1)
+                                    <b style="color: #FF0000">₱ {{ number_format($cart['price'], 2, '.', ',') }}</b>&nbsp;<s style="color: #6C757D">P {{ number_format($cart['original_price'], 2, '.', ',') }}</s>
+                                @else
+                                    <b>₱ {{ number_format($cart['price'], 2, '.', ',') }}</b>
+                                @endif
+                                
+                            </span>
                             <br/><br/>
                             <span class="d-md-none d-lg-none d-xl-none">Quantity<br/>
                                 <div class="input-group">
@@ -84,7 +92,14 @@
                                 </div>
                             </span>{{-- for mobile --}}
                             </td>
-                            <td class="tbls d-none d-sm-table-cell"><p style="white-space: nowrap !important;">P <span class="formatted-price">{{ number_format($cart['price'], 2, '.', ',') }}</span></p><span class="price d-none">{{ $cart['price'] }}</span></td>
+                            <td class="tbls d-none d-sm-table-cell">
+                                @if($cart['is_discounted'] == 1)
+                                    <p style="white-space: nowrap !important; color: #FF0000">₱ <span class="formatted-price">{{ number_format($cart['price'], 2, '.', ',') }}</span>&nbsp;<s style="color: #6C757D">P {{ number_format($cart['original_price'], 2, '.', ',') }}</s></p><span class="price d-none">{{ $cart['price'] }}</span>
+                                @else
+                                    <p style="white-space: nowrap !important;">₱ <span class="formatted-price">{{ number_format($cart['price'], 2, '.', ',') }}</span>
+                                @endif
+                                
+                            </td>
                             <td class="tbls d-none d-sm-table-cell text-center">
                                 <div class="input-group">
                                     <span class="input-group-btn">
@@ -104,7 +119,7 @@
                                 @endif
                             </td>
                             <td class="tbls d-none d-sm-table-cell">&nbsp;</td>
-                            <td class="tbls d-none d-sm-table-cell"><p style="white-space: nowrap !important;">P <span class="formatted-amount">{{ number_format($cart['amount'], 2, '.', ',') }}</span></p><span class="amount d-none">{{ $cart['amount'] }}</span></td>
+                            <td class="tbls d-none d-sm-table-cell"><p style="white-space: nowrap !important;">₱ <span class="formatted-amount">{{ number_format($cart['amount'], 2, '.', ',') }}</span></p><span class="amount d-none">{{ $cart['amount'] }}</span></td>
                             <td class="tbls tbl-qtr">
                                 <a class="btn btn-sm btn-outline-primary remove-from-cart-btn" href="#" role="button" data-id="{{ $cart['item_code'] }}">&#x2715;</a>
                             </td>

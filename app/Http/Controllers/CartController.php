@@ -219,11 +219,13 @@ class CartController extends Controller
         foreach ($cart_items as $n => $item) {
             $discount = 0;
             $price = $item->f_original_price;
+            $is_discounted = 0;
             $item_image = DB::table('fumaco_items_image_v1')
                 ->where('idcode', $item->f_idcode)->first();
 
             if (!$item->f_onsale) {
                 if ($sale) {
+                    $is_discounted = 1;
                     if ($sale->apply_discount_to == 'All Items') {
                         if ($sale->discount_type == 'By Percentage') {
                             $discount = ($item->f_original_price * ($sale->discount_rate/100));
@@ -248,13 +250,16 @@ class CartController extends Controller
                 }
             } else {
                 $price = $item->f_price;
+                $is_discounted = 1;
             }
 
             $price = ($discount > $price) ? $price : ($price - $discount);
             $cart_arr[] = [
                 'item_code' => $item->f_idcode,
                 'item_description' => $item->f_name_name,
+                'original_price' => $item->f_original_price,
                 'price' => $price,
+                'is_discounted' => $is_discounted,
                 'amount' => ($price * $item->qty),
                 'quantity' => $item->qty,
                 'stock_qty' => $item->f_qty - $item->f_reserved_qty,
