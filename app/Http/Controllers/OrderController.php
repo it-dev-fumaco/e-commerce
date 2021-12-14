@@ -10,6 +10,7 @@ use DB;
 use Mail;
 use Auth;
 use Carbon\Carbon;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class OrderController extends Controller
 {
@@ -636,45 +637,78 @@ class OrderController extends Controller
     }
 
     public function viewItemOnCart(Request $request) {
-        $abandoned_cart = DB::table('fumaco_cart')->where('user_type', 'guest')
-            ->when($request->search, function ($query) use ($request) {
-                return $query->where('item_description', 'LIKE', "%".$request->search."%");
-            })
-            ->where('last_modified_at', '<=', Carbon::now()->subDays(1))->paginate(10);
+        return view('backend.item_on_cart.item_on_cart');
+    }
 
-        $list_per_item = DB::table('fumaco_cart')
-            ->where('last_modified_at', '>=', Carbon::now()->subDays(1))
-            ->select('item_code', 'item_description', DB::raw('count(item_code) as count'))
-            ->orderBy(DB::raw('count(item_code)'), 'desc')
-            ->groupBy('item_code', 'item_description')->paginate(10);
-        
-        $list_per_location = DB::table('fumaco_cart')
-            ->where('last_modified_at', '>=', Carbon::now()->subDays(1))
-            ->get();
+    public function viewItemOnCartByLocation(Request $request) {
+        if ($request->ajax()) {
+            $list_per_location = DB::table('fumaco_cart')
+                ->where('last_modified_at', '>=', Carbon::now()->subDays(1))
+                ->get();
 
-        $per_location = collect($list_per_location)->groupBy('city');
-        $cart_per_loc = [];
-        foreach ($per_location as $loc => $rows) {
-            $item_arr = [];
-            $items = [];
-            foreach ($rows as $item) {
-                if (!in_array($item->item_code, $item_arr)) {
-                    $items[] = [
-                        'item_code' => $item->item_code,
-                        'item_description' => $item->item_description,
-                    ];
+            $per_location = collect($list_per_location)->groupBy('city');
+            $cart_per_loc = [];
+            foreach ($per_location as $loc => $rows) {
+                $item_arr = [];
+                $items = [];
+                foreach ($rows as $item) {
+                    if (!in_array($item->item_code, $item_arr)) {
+                        $items[] = [
+                            'item_code' => $item->item_code,
+                            'item_description' => $item->item_description,
+                        ];
+                    }
+
+                    array_push($item_arr, $item->item_code);
                 }
 
-                array_push($item_arr, $item->item_code);
+                $cart_per_loc[] = [
+                    'location' => $loc,
+                    'items' => $items,
+                    'item_codes' => array_count_values($item_arr)
+                ];
             }
 
-            $cart_per_loc[] = [
-                'location' => $loc,
-                'items' => $items,
-                'item_codes' => array_count_values($item_arr)
-            ];
-        }
+            // Get current page form url e.x. &page=1
+            $currentPage = LengthAwarePaginator::resolveCurrentPage();
+            // Create a new Laravel collection from the array data
+            $itemCollection = collect($cart_per_loc);
+            // Define how many items we want to be visible in each page
+            $perPage = 10;
+            // Slice the collection to get the items to display in current page
+            $currentPageItems = $itemCollection->slice(($currentPage * $perPage) - $perPage, $perPage)->all();
+            // Create our paginator and pass it to the view
+            $paginatedItems= new LengthAwarePaginator($currentPageItems , count($itemCollection), $perPage);
+            // set url path for generted links
+            $paginatedItems->setPath($request->url());
+            $cart_per_loc = $paginatedItems;
 
-        return view('backend.item_on_cart', compact('list_per_item', 'abandoned_cart', 'cart_per_loc'));
+            return view('backend.item_on_cart.item_on_cart_by_location', compact('cart_per_loc'));
+        }
+    }
+
+    public function viewItemOnCartByItem(Request $request) {
+        if ($request->ajax()) {
+            $list_per_item = DB::table('fumaco_cart')
+                ->where('last_modified_at', '>=', Carbon::now()->subDays(1))
+                ->select('item_code', 'item_description', DB::raw('count(item_code) as count'))
+                ->orderBy(DB::raw('count(item_code)'), 'desc')
+                ->groupBy('item_code', 'item_description')->paginate(10);
+
+            return view('backend.item_on_cart.item_on_cart_by_item', compact('list_per_item'));
+        }
+    }
+
+    public function viewAbandonedItemOnCart(Request $request) {
+        if ($request->ajax()) {
+            $abandoned_cart = DB::table('fumaco_cart')->where('user_type', 'guest')
+                ->when($request->q, function ($query) use ($request) {
+                    return $query->where('item_description', 'LIKE', "%".$request->q."%")->orWhere('ip', 'LIKE', "%".$request->q."%");
+                })
+                ->where('last_modified_at', '<=', Carbon::now()->subDays(1))
+                ->orderBy('last_modified_at', 'desc')->paginate(10);
+
+            return view('backend.item_on_cart.abandoned_cart_items', compact('abandoned_cart'));
+        }
     }
 }
