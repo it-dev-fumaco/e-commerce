@@ -179,6 +179,8 @@ Route::prefix('admin')->group(function () {
         Route::get('/product/list', 'ProductController@viewList');
         Route::get('/product/add/{type}', 'ProductController@viewAddForm');
         Route::post('/product/save', 'ProductController@saveItem');
+        Route::get('/product/reviews', 'ProductReviewController@viewList');
+        Route::get('/product/toggle/{id}', 'ProductReviewController@toggleStatus');
 
         Route::get('/product/search', 'ProductController@searchItem');
         Route::get('/product/{id}/edit', 'ProductController@viewProduct');
