@@ -136,6 +136,9 @@ Route::get('/checkout/failed', 'CheckoutController@orderFailed');
 Route::post('/checkout/failed', 'CheckoutController@orderFailed');
 Route::post('/checkout/callback', 'CheckoutController@paymentCallback');
 
+// product reviews
+Route::post('/submit_review', 'ProductReviewController@submitProductReview');
+
 Route::get('/verify_email/{token}', 'FrontendController@verifyAccount')->name('account.verify');
 Route::get('/resend_verification/{email}', 'FrontendController@resendVerification');
 

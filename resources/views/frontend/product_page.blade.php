@@ -240,6 +240,115 @@
 								</div>
 							</div>
 
+							<div class="card">
+								<div class="card-header" id="heading3">
+									<h2 class="mb-0">
+										<button class="btn btn-link collapsed fumacoFont_collapse_title abt_standard" type="button" data-toggle="collapse" data-target="" aria-expanded="false" aria-controls="collapseTwo">PRODUCT REVIEW(S)</button>
+									</h2>
+								</div>
+								<div id="collapseTwo" class="collapse show" aria-labelledby="heading3" data-parent="#accordionExample">
+									<div class="card-body prod_standard">
+										<div class="row">
+											@php
+												$total_reviews = $product_reviews->total();
+												$overall_rating = ($total_reviews > 0) ? ($total_rating / $total_reviews) : 0;
+											@endphp
+											<div class="col-md-6">
+												<div class="d-flex flex-row justify-content-center">
+													<div class="text-center text-white bg-warning rounded d-block" style="border: 1px solid; padding: 10px 20px;">
+														<h1 class="d-block display-3"><b>{{ (number_format($overall_rating, 1))  }}</b></h1>
+														<small class="d-block">out of 5</small>
+													</div>
+												</div>
+												<div class="d-block text-center m-1" style="font-size: 15pt;">
+													@for ($i = 0; $i < 5; $i++)
+													@if ($overall_rating <= $i)
+													<span class="fa fa-star starcolorgrey"></span>
+													@else
+													<span class="fa fa-star" style="color: #FFD600;"></span>
+													@endif
+													@endfor
+												</div>
+												<div class="d-block text-center p-2">{{ $total_reviews . ' Review(s)' }}</div>
+												@if (Auth::check())
+												<form action="/submit_review" method="POST">
+													@csrf
+													<input type="hidden" name="item_code" value="{{ $product_details->f_idcode }}">
+													<div class="row">
+														<div class="col-md-12">
+															<h5 class="m-3"><i class="far fa-edit"></i> Write a review</h5>
+															<div class="d-flex flex-row">
+																<div class="p-2 col text-center">
+																	<div class="avatar">
+																		<div class="avatar__letters">
+																			{{ substr(Auth::user()->f_name, 0, 1) . substr(Auth::user()->f_lname, 0, 1) }}
+																		</div>
+																	</div>
+																</div>
+																<div class="p-2 col-10">
+																	<b>{{ Auth::user()->f_name . ' ' . Auth::user()->f_lname }}</b>
+																	<div class="rating">
+																		<input type="radio" name="rating" value="5" id="5">
+																		<label for="5">&star;</label>
+																		<input type="radio" name="rating" value="4" id="4">
+																		<label for="4">&star;</label>
+																		<input type="radio" name="rating" value="3" id="3">
+																		<label for="3">&star;</label>
+																		<input type="radio" name="rating" value="2" id="2">
+																		<label for="2">&star;</label>
+																		<input type="radio" name="rating" value="1" id="1">
+																		<label for="1">&star;</label>
+																	</div>
+																	<textarea class="form-control caption_1" rows="3" name="message" placeholder="Message">{{ old('message') }}</textarea>
+																	<button type="submit" class="btn btn-primary mt-3 fumacoFont_btn animated animatedFadeInUp fadeInUp">Submit Review</button>
+																</div>
+															</div>
+														</div>
+													</div>
+												</form>
+												@endif
+											</div>
+											<div class="col-md-6">
+												@forelse ($product_reviews as $product_review)
+												<div class="d-flex flex-row">
+													<div class="p-2 col text-center">
+														<div class="avatar">
+															<div class="avatar__letters">
+																{{ substr($product_review->f_name, 0, 1) . substr($product_review->f_lname, 0, 1) }}
+															</div>
+														</div>
+													</div>
+													<div class="p-2 col-10">
+														<span class="d-block">
+															<b>{{ $product_review->f_name . ' ' . $product_review->f_lname }}</b>
+															<div style="float: right;">
+																<span class="text-muted d-block mb-1" style="font-size: 8pt;">{{ \Carbon\Carbon::parse($product_review->created_at)->format("d M Y") }}</span>
+															</div>
+														</span>
+														<div class="d-block mb-3">
+															@for ($i = 0; $i < 5; $i++)
+															@if ($product_review->rating <= $i)
+															<span class="fa fa-star starcolorgrey"></span>
+															@else
+															<span class="fa fa-star" style="color: #FFD600;"></span>
+															@endif
+															@endfor
+														</div>
+														<p>{{ $product_review->message }}</p>
+													</div>
+												</div>
+												@empty
+													<h6 class="text-muted text-center p-5">No reviews yet.</h6>
+												@endforelse
+												<div style="float: right;">
+													{{ $product_reviews->links('pagination::bootstrap-4') }}
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+
 							@if ($products_to_compare)
 								<section class="py-5 text-center container" style="padding-bottom: 0rem !important;">
 									<div class="row py-lg-5">
@@ -452,7 +561,69 @@
 <link rel="stylesheet" type="text/css" href="{{ asset('/item/dist/xzoom.css') }}" media="all" />
 <link type="text/css" rel="stylesheet" href="{{ asset('/assets/loading.css') }}" />
 <style>
-	
+	.rating {
+		display: flex;
+		flex-direction: row-reverse;
+		justify-content: left
+	}
+
+	.rating>input {
+		display: none
+	}
+
+	.rating>label {
+		position: relative;
+		width: 1em;
+		font-size: 22pt;
+		color: #FFD600;
+		cursor: pointer
+	}
+
+	.rating>label::before {
+		content: "\2605";
+		position: absolute;
+		opacity: 0
+	}
+
+	.rating>label:hover:before,
+	.rating>label:hover~label:before {
+		opacity: 1 !important
+	}
+
+	.rating>input:checked~label:before {
+		opacity: 1
+	}
+
+	.rating:hover>input:checked~label:before {
+		opacity: 0.4
+	}
+
+	.avatar {
+		/* Center the content */
+		display: inline-block;
+		vertical-align: middle;
+
+		/* Used to position the content */
+		position: relative;
+
+		/* Colors */
+		background-color: rgba(0, 0, 0, 0.3);
+		color: #fff;
+
+		/* Rounded border */
+		border-radius: 50%;
+		height: 40px;
+		width: 40px;
+	}
+
+	.avatar__letters {
+		/* Center the content */
+		left: 50%;
+		position: absolute;
+		top: 50%;
+		transform: translate(-50%, -50%);
+	}
+
 	._1yv {
 			box-shadow: 0 0px 0px rgb(0 0 0 / 30%), 0 0 0 1px rgb(0 0 0) !important;
 	}

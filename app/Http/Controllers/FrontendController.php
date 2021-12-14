@@ -1025,8 +1025,6 @@ class FrontendController extends Controller
             }
         }
 
-        // $category = DB::table('fumaco_categories')->where('name', $product_details->f_category)->select('id')->first();
-
         $all_item_discount = DB::table('fumaco_on_sale')->whereDate('start_date', '<=', Carbon::now()->toDateString())->whereDate('end_date', '>=', Carbon::now()->toDateString())->where('status', 1)->where('apply_discount_to', 'All Items')->first();
 
         $category_discount = DB::table('fumaco_on_sale as sale')->join('fumaco_on_sale_categories as cat_sale', 'sale.id', 'cat_sale.sale_id')->whereDate('sale.start_date', '<=', Carbon::now())->whereDate('sale.end_date', '>=', Carbon::now())->where('status', 1)->where('cat_sale.category_id', $product_details->f_cat_id)->first();
@@ -1088,7 +1086,6 @@ class FrontendController extends Controller
 
             $products_clone = Clone $compare_query;
             $products_to_compare = $products_clone->groupBy('compare_attrib.item_code')->select('compare_attrib.item_code')->get();
-            // return $products_to_compare;
             foreach($products_to_compare as $compare){
                 $image = DB::table('fumaco_items_image_v1')->where('idcode', $compare->item_code)->first();
                 $item_details = DB::table('fumaco_items')->where('f_idcode', $compare->item_code)->first();
@@ -1217,9 +1214,14 @@ class FrontendController extends Controller
             ];
         }
 
-        // return $related_products;
+        // get product reviews
+        $product_reviews = DB::table('fumaco_product_review as a')->join('fumaco_users as b', 'a.user_email', 'b.username')
+            ->where('status', '!=', 'pending')->where('item_code', $product_details->f_idcode)->select('a.*', 'b.f_name', 'b.f_lname')->orderBy('a.created_at', 'desc')->paginate(5);
+        // get total rating
+        $total_rating = DB::table('fumaco_product_review as a')->join('fumaco_users as b', 'a.user_email', 'b.username')
+            ->where('status', '!=', 'pending')->where('item_code', $product_details->f_idcode)->sum('a.rating');
 
-        return view('frontend.product_page', compact('product_details', 'product_images', 'attributes', 'variant_attr_arr', 'related_products', 'filtered_attributes', 'discount_from_sale', 'sale_discount_type', 'sale_discount_rate', 'product_price', 'products_to_compare', 'variant_attributes_to_compare', 'compare_arr', 'attributes_to_compare', 'variant_attr_array', 'attribute_names'));
+        return view('frontend.product_page', compact('product_details', 'product_images', 'attributes', 'variant_attr_arr', 'related_products', 'filtered_attributes', 'discount_from_sale', 'sale_discount_type', 'sale_discount_rate', 'product_price', 'products_to_compare', 'variant_attributes_to_compare', 'compare_arr', 'attributes_to_compare', 'variant_attr_array', 'attribute_names', 'product_reviews', 'total_rating'));
     }
 
     public function viewWishlist() {
