@@ -388,12 +388,12 @@ class BlogController extends Controller
 
     public function viewComments(Request $request){
         $comments = DB::table('fumaco_comments')->where('blog_type', 1)->where('blog_email', 'LIKE', '%'.$request->q.'%')->orderBy('blog_status', 'asc')->orderBy('blog_reply_date', 'desc')->orderBy('blog_date', 'desc')->paginate(10);
-
         $comments_arr = [];
 
         foreach($comments as $comment){
             $replies_arr = [];
             $replies = DB::table('fumaco_comments')->where('blog_type', 2)->where('reply_id', $comment->id)->orderBy('blog_status', 'asc')->get();
+            $blog_title = DB::table('fumaco_blog')->where('id', $comment->blog_id)->pluck('blogtitle')->first();
             foreach($replies as $r){
                 $replies_arr[] = [
                     'id' => $r->id,
@@ -410,6 +410,7 @@ class BlogController extends Controller
             $comments_arr[] = [
                 'id' => $comment->id,
                 'blog_type' => $comment->blog_type,
+                'blog_title' => $blog_title,
                 'blog_id' => $comment->blog_id,
                 'blog_name' => $comment->blog_name,
                 'blog_email' => $comment->blog_email,
