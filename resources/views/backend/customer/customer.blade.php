@@ -60,7 +60,7 @@
                                                 <td>{{ $user['created_at'] }}</td>
                                                 <td>{{ $user['no_of_visits'] }}</td>
                                                 <td>{{ $user['last_login'] }}</td>
-                                                <td>
+                                                <td class="text-center">
                                                     <a href="/admin/customer/profile/{{ $user['id'] }}" class="btn btn-sm btn-primary">View Profile</a>
                                                 </td>
                                             </tr>

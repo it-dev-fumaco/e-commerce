@@ -42,6 +42,8 @@ class CustomerController extends Controller
         $shipping_address = collect($address)->where('address_class', 'Delivery');
         $billing_address = collect($address)->where('address_class', 'Billing');
 
-        return view('backend.customer.customer_profile', compact('customer', 'shipping_address', 'billing_address'));
+        $cart_items = DB::table('fumaco_cart')->where('user_email', $customer->username)->get();
+
+        return view('backend.customer.customer_profile', compact('customer', 'shipping_address', 'billing_address', 'cart_items'));
     }
 }

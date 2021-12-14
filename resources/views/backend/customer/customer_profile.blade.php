@@ -40,7 +40,7 @@
                                     </div>
                                 </div>
                             </div>
-
+                            <br/>
                             <div class="card card-primary">
                                 <div class="card-body">
                                     <h4>Shipping Address(es)</h4>
@@ -113,6 +113,30 @@
                                         @empty
                                             <tr>
                                                 <td class="text-center" colspan=7>No Billing Address(es)</td>
+                                            </tr>
+                                        @endforelse
+                                    </table>
+                                </div>
+                            </div>
+                            <br/>
+                            <div class="card card-primary">
+                                <div class="card-body">
+                                    <h4>Item(s) on Cart</h4>
+                                    <table class="table table-hover table-bordered">
+                                        <tr>
+                                            <th>Item Code</th>
+                                            <th>Item Description</th>
+                                            <th>Quantity</th>
+                                        </tr>
+                                        @forelse ($cart_items as $cart)
+                                            <tr>
+                                                <td>{{ $cart->item_code }}</td>
+                                                <td>{{ $cart->item_description }}</td>
+                                                <td>{{ $cart->qty }}</td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td class="text-center" colspan=3>No Item(s) on Cart</td>
                                             </tr>
                                         @endforelse
                                     </table>
