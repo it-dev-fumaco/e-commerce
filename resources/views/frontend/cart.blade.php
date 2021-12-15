@@ -321,13 +321,14 @@
 
 @section('script')
 <script>
+        window.onpageshow = function(event) {
+            if (event.persisted) {
+                window.location.reload();
+            }
+        };
     $(document).ready(function() {
-        $(window).bind("pageshow", function(event) {
-			if (event.originalEvent.persisted) {
-				window.location.reload(); 
-			}
-		});
-        
+     
+
         updateTotal();
         $(document).on('click', '.quantity-left-minus', function(e){
             e.preventDefault();
