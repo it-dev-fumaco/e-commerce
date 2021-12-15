@@ -274,7 +274,7 @@
 							<div class="row d-none" id="for-store-pickup">
 								<div class="col-md-6 offset-md-3">
 									<div class="form-group">
-										<label for="store-selection">Select Store</label>
+										<label for="store-selection">Select Store *</label>
 										<select id="store-selection" class="form-control no-click-outline formslabelfnt" style="text-align: center;">
 											<option value="">Select Store</option>
 											@foreach ($srate['stores'] as $store)
@@ -287,7 +287,7 @@
 								</div>
 								<div class="col-md-6 offset-md-3 bootstrap-timepicker">
 									<div class="form-group">
-										<label for="pickup-time">Pickup by</label>
+										<label for="pickup-time">Pickup by *</label>
 										<input type="text" class="form-control no-click-outline" id="pickup-time" style="text-align: center;">
 									</div>
 								</div>
