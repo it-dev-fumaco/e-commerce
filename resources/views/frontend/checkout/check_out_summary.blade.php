@@ -248,10 +248,23 @@
 								<label class="form-check-label" for="shipradio">&nbsp;</label>
 							</div>
 							<div id="voucher-free" class="d-none"></div>
+							@php
+								$sd_exists = false;
+								if (in_array('Standard Delivery', array_column($shipping_rates, 'shipping_service_name'))) {
+									$sd_exists = true;
+								}
+							@endphp
 							@forelse ($shipping_rates as $l => $srate)
+							@php
+								if ($sd_exists) {
+									$defaul_selected = ($srate['shipping_service_name'] == 'Standard Delivery') ? 'checked' : '';
+								} else {
+									$defaul_selected = ($loop->first) ? 'checked' : '';
+								}
+							@endphp
 							<div class="d-flex justify-content-between align-items-center">
 								<div class="form-check">
-									<input class="form-check-input" type="radio" name="shipping_fee" id="{{ 'sr' . $l }}" value="{{ $srate['shipping_cost'] }}" data-sname="{{ $srate['shipping_service_name'] }}" data-est="{{ $srate['expected_delivery_date'] }}" data-pickup="{{ $srate['pickup'] }}" required {{ $loop->first ? 'checked' : '' }} data-lead="{{ $srate['max_lead_time'] }}">
+									<input class="form-check-input" type="radio" name="shipping_fee" id="{{ 'sr' . $l }}" value="{{ $srate['shipping_cost'] }}" data-sname="{{ $srate['shipping_service_name'] }}" data-est="{{ $srate['expected_delivery_date'] }}" data-pickup="{{ $srate['pickup'] }}" required {{ $defaul_selected }} data-lead="{{ $srate['max_lead_time'] }}">
 									<label class="form-check-label" for="{{ 'sr' . $l }}">{{ $srate['shipping_service_name'] }} <br class="d-xl-none"/>
 										@if (count($srate['stores']) <= 0)<small class="fst-italic">({{ $srate['min_lead_time'] . " - ". $srate['max_lead_time'] . " Days" }})</small>@endif</label>
 								</div>
