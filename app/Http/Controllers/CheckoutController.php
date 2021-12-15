@@ -121,10 +121,7 @@ class CheckoutController extends Controller
 					session()->put('fumShipDet', $shipping_session);
 				}
 			
-				$o_email = Auth::user()->username;
-
-				$user = DB::table('fumaco_users')->where('username', $o_email)->first();
-				$user_id = $user->id;
+				$user_id = Auth::user()->id;
 	
 				$bill_address = DB::table('fumaco_user_add')->where('xdefault', 1)->where('user_idx', $user_id)->where('address_class', 'Billing')->get();
 				$ship_address = DB::table('fumaco_user_add')->where('xdefault', 1)->where('user_idx', $user_id)->where('address_class', 'Delivery')->get();
