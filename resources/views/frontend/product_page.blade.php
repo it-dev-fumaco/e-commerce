@@ -106,7 +106,7 @@
 											</s>
 											@if ($sale_discount_type == 'By Percentage')
 												<span class="badge badge-danger" style="margin-left: 8px; vertical-align: middle;background-color: red; display: inline !important;">{{ $sale_discount_rate }}% OFF</span>
-											@elseif($sale_discount_type == 'Fixed Amount') 
+											@elseif($sale_discount_type == 'Fixed Amount')
 												<span class="badge badge-danger" style="margin-left: 8px; vertical-align: middle;background-color: red; display: inline !important;">₱ {{ number_format(str_replace(",","",$sale_discount_rate), 2) }} OFF</span>
 											@endif
 										@else
@@ -340,7 +340,7 @@
 															@endif
 															@endfor
 														</div>
-														<p>{{ $product_review->message }}</p>
+														<p style="font-size: 14px">{{ $product_review->message }}</p>
 													</div>
 												</div>
 												@empty
@@ -402,7 +402,7 @@
 														<img src="{{ asset($compare_img) }}" alt="{{ Str::slug(explode(".", $compare_product['item_image'])[0], '-') }}" class="img-responsive hover" style="width: 100%" />
 													</picture>
 												</div>
-												
+
 												<span class="comparison-description d-block mb-3">{{ $compare_product['product_name'] }}</span>
 												{{-- <br/>&nbsp;
 												<hr> --}}
@@ -429,7 +429,7 @@
 																$str = explode(' ', $variant_attr_array[$attrib->attribute_name][$compare_product['item_code']]);
 																if (strtolower($str[0]) == 'and') {
 																	$attr_val = Str::ucfirst(Str::replaceFirst('and ', '', $attr_val));
-																} 
+																}
 															@endphp
 															@if (Str::contains(strtolower($attrib->attribute_name), 'color temperature'))
 															@if (Str::contains(strtolower($attr_val), 'warm white'))
@@ -451,7 +451,7 @@
 									</section>
 								</div>
 							@endif
-							
+
                     @if (count($related_products) > 0)
 							<section class="py-5 text-center container" style="padding-bottom: 0rem !important;">
 								<div class="row py-lg-5">
@@ -468,7 +468,7 @@
 										<div class="col-md-4 col-lg-3 animated animatedFadeInUp fadeInUp equal-height-columns mb-3 related-products-card">
 											<div class="card shadow-sm border" style="border: 1px solid  #d5dbdb !important; background-color: #fff;">
 												<div class="equal-column-content">
-													
+
 													@php
 														$img = ($rp['image']) ? '/storage/item_images/'. $rp['item_code'] .'/gallery/preview/'. $rp['image'] : '/storage/no-photo-available.png';
 														$img_webp = ($rp['image']) ? '/storage/item_images/'. $rp['item_code'] .'/gallery/preview/'. explode(".", $rp['image'])[0] .'.webp' : '/storage/no-photo-available.png';
@@ -1253,14 +1253,14 @@
 		margin: 0 auto;
 		transition:all .15s ease-in !important;
 	}
-	
+
 	.btn-container{
 		width: 100%;
-		position: absolute; 
-		top: 50%; 
-		left: 0; 
-		z-index: 9; 
-		display: none; 
+		position: absolute;
+		top: 50%;
+		left: 0;
+		z-index: 9;
+		display: none;
 		text-align: center;
 	}
 
@@ -1280,11 +1280,11 @@
 	.view-products-btn:hover{
 		/* color: #fff;
 		background-color: #000; */
-		background-color: #f8b878; 
+		background-color: #f8b878;
     color: black;
 	}
 
-	.product-card:hover .overlay-bg{ 
+	.product-card:hover .overlay-bg{
 		transition:all .15s ease-in !important;
 		opacity: 1 !important;
 	}
@@ -1292,7 +1292,7 @@
 	.hover-container:hover img{
 		-ms-transform: scale(0.95); /* IE 9 */
       	-webkit-transform: scale(0.95); /* Safari 3-8 */
-      	transform: scale(0.95); 
+      	transform: scale(0.95);
 	}
 	.hover{
       transition: .5s;
@@ -1301,7 +1301,7 @@
     .hover:hover {
       -ms-transform: scale(0.95); /* IE 9 */
       -webkit-transform: scale(0.95); /* Safari 3-8 */
-      transform: scale(0.95); 
+      transform: scale(0.95);
     }
 
 	.comparison-item-title{
@@ -1468,19 +1468,19 @@
 		margin: 0;
 		padding: 0;
 	  }
-	
+
 	  * {
 		box-sizing: border-box;
 	  }
-	
+
 	  .slick-slide {
 		margin: 0px 20px;
 	  }
-	
+
 	  .slick-slide img {
 		width: 100%;
 	  }
-	
+
 	  .slick-prev:before,
 	  .slick-next:before {
 		background-color: rgba(255,255,255,0);
@@ -1488,16 +1488,16 @@
 		color: rgba(0,0,0,0.4);
 		transition: .4s;
 	  }
-	
+
 	  .slick-slide {
 		transition: all ease-in-out .3s;
 		opacity: .2;
 	  }
-	  
+
 	  .slick-active {
 		opacity: .5;
 	  }
-	
+
 	  .slick-current, .slick-slide  {
 		opacity: 1;
 	  }
