@@ -277,7 +277,7 @@
 												</div>
 												<div class="d-block text-center p-2">{{ $total_reviews . ' Review(s)' }}</div>
 												@if (Auth::check())
-												<form action="/submit_review" method="POST">
+												<form action="/submit_review" method="POST" id="review-form">
 													@csrf
 													<input type="hidden" name="item_code" value="{{ $product_details->f_idcode }}">
 													<div class="row">
@@ -293,20 +293,23 @@
 																</div>
 																<div class="p-2 col-10">
 																	<b>{{ Auth::user()->f_name . ' ' . Auth::user()->f_lname }}</b>
-																	<div class="rating">
-																		<input type="radio" name="rating" value="5" id="5">
-																		<label for="5">&star;</label>
-																		<input type="radio" name="rating" value="4" id="4">
-																		<label for="4">&star;</label>
-																		<input type="radio" name="rating" value="3" id="3">
-																		<label for="3">&star;</label>
-																		<input type="radio" name="rating" value="2" id="2">
-																		<label for="2">&star;</label>
-																		<input type="radio" name="rating" value="1" id="1">
-																		<label for="1">&star;</label>
+																	<div class="d-flex flex-row align-items-center">
+																		<div class="rating">
+																			<input type="radio" name="rating" value="5" id="5" required>
+																			<label for="5">&star;</label>
+																			<input type="radio" name="rating" value="4" id="4">
+																			<label for="4">&star;</label>
+																			<input type="radio" name="rating" value="3" id="3">
+																			<label for="3">&star;</label>
+																			<input type="radio" name="rating" value="2" id="2">
+																			<label for="2">&star;</label>
+																			<input type="radio" name="rating" value="1" id="1">
+																			<label for="1">&star;</label>
+																		</div>
+																		<div style="margin-left: 10px;" class="text-danger d-none" id="rating-alert"><small>Please rate</small></div>
 																	</div>
 																	<textarea class="form-control caption_1" rows="3" name="message" placeholder="Message">{{ old('message') }}</textarea>
-																	<button type="submit" class="btn btn-primary mt-3 fumacoFont_btn animated animatedFadeInUp fadeInUp">Submit Review</button>
+																	<button type="button" class="btn btn-primary mt-3 fumacoFont_btn animated animatedFadeInUp fadeInUp" id="submit-review">Submit Review</button>
 																</div>
 															</div>
 														</div>
@@ -340,7 +343,7 @@
 															@endif
 															@endfor
 														</div>
-														<p style="font-size: 14px">{{ $product_review->message }}</p>
+														<p style="font-size: 13px;">{{ $product_review->message }}</p>
 													</div>
 												</div>
 												@empty
@@ -1516,6 +1519,15 @@
 
 <script>
    (function() {
+	   $('#submit-review').click(function(e){
+		   e.preventDefault();
+			if(!$('input[name="rating"]:checked').val()) {
+				$('#rating-alert').removeClass('d-none');
+			} else {
+				$('#rating-alert').addClass('d-none');
+				$('#review-form').submit();
+			}
+	   });
 		$(document).on('change', '.attr-radio', function(){
 			var selected_attr = {};
 			var selected_cb = $(this).data('attribute');
