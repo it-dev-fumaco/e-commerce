@@ -313,6 +313,18 @@
                               @endforelse
                            </tbody>
                         </table>
+                        <h5 class="mt-3">Product(s) for Cross-sell</h5>
+                        <hr>
+                        <div class="col-12 mx-auto">
+                           <select class="select-cross-sell w-100" name="selected_for_cross_sell[]" multiple="multiple">
+                              @foreach ($cross_sell_arr as $cross_sell)
+                                 <option selected value="{{ $cross_sell['cross_sell_item_code'] }}">{{$cross_sell['cross_sell_item_code'].' - '.$cross_sell['cross_sell_description'] }}</option>
+                              @endforeach
+                              @foreach ($products_for_cross_sell as $cs)
+                                 <option value="{{ $cs->f_idcode }}">{{ $cs->f_idcode.' - '.$cs->f_name_name }}</option>
+                              @endforeach
+                           </select>
+                        </div>
                         <br>
                         <h5 class="mt-3">Search Engine Optimization (SEO)</h5>
                         <hr>
@@ -443,6 +455,7 @@
 <script>
    (function() {
       setAsNewItem();
+      $('.select-cross-sell').select2();
 
       $('#set_as_new_item').click(function(){
          setAsNewItem();

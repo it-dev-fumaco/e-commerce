@@ -68,7 +68,7 @@
                             </td>
                             <td class="tbls tbl-half" style="width:40% !important;"><a href="/product/{{ $cart['item_code'] }}" style="text-decoration: none !important; color: #000;">{{ $cart['item_description'] }}</a>
                                 <br/>{{-- for mobile --}}
-                            <span class="formatted-price d-md-none d-lg-none d-xl-none"><br/><b>P {{ number_format($cart['price'], 2, '.', ',') }}</b></span>
+                            <span class="formatted-price d-md-none d-lg-none d-xl-none"><br/><b>₱ {{ number_format($cart['price'], 2, '.', ',') }}</b></span>
                             <br/><br/>
                             <span class="d-md-none d-lg-none d-xl-none">Quantity<br/>
                                 <div class="input-group">
@@ -104,7 +104,7 @@
                                 @endif
                             </td>
                             <td class="tbls d-none d-sm-table-cell">&nbsp;</td>
-                            <td class="tbls d-none d-sm-table-cell"><p style="white-space: nowrap !important;">P <span class="formatted-amount">{{ number_format($cart['amount'], 2, '.', ',') }}</span></p><span class="amount d-none">{{ $cart['amount'] }}</span></td>
+                            <td class="tbls d-none d-sm-table-cell"><p style="white-space: nowrap !important;">₱ <span class="formatted-amount">{{ number_format($cart['amount'], 2, '.', ',') }}</span></p><span class="amount d-none">{{ $cart['amount'] }}</span></td>
                             <td class="tbls tbl-qtr">
                                 <a class="btn btn-sm btn-outline-primary remove-from-cart-btn" href="#" role="button" data-id="{{ $cart['item_code'] }}">&#x2715;</a>
                             </td>
@@ -161,6 +161,112 @@
                     </div>
                 </div>
                 <br><br><br>
+                @if($cross_sell_arr)
+                    <div class="container mb-3">
+                        <h4>You May Want To Try It With...</h4>
+                        <br/>
+                        <div class="row regular" style="min-height: 300px">
+                            @foreach($cross_sell_arr as $cs)
+                                <div class="col-3">
+                                    <div class="card card-primary">
+                                        <div class="card-body">
+                                            <div class="row">
+                                                @php
+                                                $img = ($cs['cross_sell_image']) ? '/storage/item_images/'. $cs['cross_sell_item_code'] .'/gallery/preview/'. $cs['cross_sell_image'] : '/storage/no-photo-available.png';
+                                                $img_webp = ($cs['cross_sell_image']) ? '/storage/item_images/'. $cs['cross_sell_item_code'] .'/gallery/preview/'. explode(".", $cs['cross_sell_image'])[0] . '.webp' : '/storage/no-photo-available.png';
+                                                @endphp
+                                                <div class="hover-container product-card" style="position: relative">
+                                                    <div class="pt-2" style="position: absolute; top: 0; right: 0; z-index: 10;">
+                                                        <div class="col-12 mb-2 {{ $cs['is_new_item'] == 1 ? '' : 'd-none' }}">
+                                                            <span class="p-1 text-center" style="background-color: #438539; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px !important">
+                                                            &nbsp;<b>New</b>&nbsp;
+                                                            </span>
+                                                        </div><br class="{{ $cs['is_new_item'] == 1 ? '' : 'd-none' }}"/>
+                                                        @if ($cs['is_discounted'] == 1)
+                                                            <div class="col-12">
+                                                                <span class="p-1 text-center" style="background-color: #FF0000; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; width: 100%">
+                                                                &nbsp;<b>{{ $cs['discount'] }}% OFF</b>&nbsp;
+                                                                </span>
+                                                            </div>
+                                                        @elseif ($cs['discounted_from_sale'] == 1)
+                                                            <div class="col-12">
+                                                                <span class="p-1 text-center" style="background-color: #FF0000; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
+                                                                    @if ($cs['discount_type'] == 'By Percentage')
+                                                                        &nbsp;<b>{{ $cs['discount_rate'] }}% OFF</b>&nbsp;
+                                                                    @else
+                                                                        &nbsp;<b>₱ {{ number_format($cs['discount_rate'], 2, '.', ',') }} OFF</b>&nbsp;
+                                                                    @endif
+                                                                </span>
+                                                            </div>
+                                                        @endif
+                                                    </div>
+
+                                                    <div class="overlay-bg"></div>
+                                                    <div class="btn-container">
+                                                        <a href="/product/{{ ($cs['slug']) ? $cs['slug'] : $cs['cross_sell_item_code'] }}" class="view-products-btn btn" role="button"><i class="fas fa-search"></i>&nbsp;View Product</a>
+                                                    </div>
+                                
+                                                    <picture>
+                                                        <source srcset="{{ asset($img_webp) }}" type="image/webp" class="img-responsive" style="width: 100% !important;">
+                                                        <source srcset="{{ asset($img) }}" type="image/jpeg" class="img-responsive" style="width: 100% !important;">
+                                                        <img src="{{ asset($img) }}" alt="{{ Str::slug(explode(".", $cs['cross_sell_image'])[0], '-') }}" class="img-responsive hover" style="width: 100% !important;">
+                                                    </picture>
+                                                </div>
+                                                <div class="col-12" style="position: relative">
+                                                    <div class="text ellipsis">
+                                                        <a href="/product/{{ ($cs['slug']) ? $cs['slug'] : $cs['item_code'] }}" class="card-text product-head fumacoFont_card_title text-concat prod_desc" style="text-decoration: none !important; text-transform: none !important; color:#0062A5 !important; min-height: 80px">{{ $cs['cross_sell_description'] }}</a>
+                                                    </div>
+                                                    <p class="card-text fumacoFont_card_price" style="color:#000000 !important; ">
+                                                        @if ($cs['is_discounted'] == 1)
+                                                            ₱ {{ number_format(str_replace(",","",$cs['cross_sell_price']), 2) }}&nbsp;<s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$cs['cross_sell_original_price']), 2) }}</s>
+                                                        @elseif($cs['discounted_from_sale'] == 1)
+                                                            ₱ {{ number_format(str_replace(",","",$cs['cross_sell_sale_price']), 2) }}&nbsp;<s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$cs['cross_sell_original_price']), 2) }}</s>
+                                                        @else
+                                                            ₱ {{ number_format(str_replace(",","",$cs['cross_sell_original_price']), 2) }}
+                                                        @endif
+                                                    </p>
+                                                    @php
+                                                        $total_reviews = collect($cs['product_reviews'])->count();
+                                                        $total_rating = collect($cs['product_reviews'])->sum('rating');
+                                                        $overall_rating = ($total_reviews > 0) ? ($total_rating / $total_reviews) : 0;
+                                                    @endphp
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <div class="btn-group stylecap">
+                                                            @for ($i = 0; $i < 5; $i++)
+                                                                @if ($overall_rating <= $i)
+                                                                    <span class="fa fa-star starcolorgrey"></span>
+                                                                @else
+                                                                    <span class="fa fa-star" style="color: #FFD600;"></span>
+                                                                @endif
+                                                            @endfor
+                                                        </div>
+                                                        <small class="stylecap" style="color:#c4cad0 !important; font-weight:400 !important;">( {{ $total_reviews }} Reviews )</small>
+                                                    </div>
+                                                    <br/>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                @if ($cs['on_stock'] == 1)
+                                                    <form action="/product_actions" method="post">
+                                                        @csrf
+                                                        <div class="d-none">
+                                                            <input type="text" name="item_code" value="{{ $cs['cross_sell_item_code'] }}">
+                                                            <input type="text" name="addtocart" value="1">
+                                                            <input type="text" name="quantity" value="1">
+                                                        </div>
+                                                        <button type="submit" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto btn-sm" id="reloadpage" role="button" style="width: 100% !important; margin-bottom: 20px" data-item-code="{{ $cs['cross_sell_item_code'] }}"><i class="fas fa-shopping-cart d-inline-block"></i> Add to Cart</button>
+                                                    </form>
+                                                @else
+                                                    <a href="/login" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto {{ Auth::check() ? 'add-to-wishlist' : '' }} btn-sm" id="reloadpage" role="button" style="width: 95% !important; margin-bottom: 20px" data-item-code="{{ $cs['cross_sell_item_code'] }}"><i class="far fa-heart d-inline-block" style="margin-right: 3%;"></i> Add to Wishlist</a>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
             </div>
             <div class="col-lg-12">&nbsp;&nbsp;</div>
         </div>
@@ -179,7 +285,125 @@
 @endsection
 
 @section('style')
+<link rel="stylesheet" type="text/css" href="{{ asset('/slick/slick.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ asset('/slick/slick-theme.css') }}">
+<style type="text/css">
+
+  html, body {
+    margin: 0;
+    padding: 0;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  .slick-slide {
+    margin: 0px 20px;
+  }
+
+  .slick-slide img {
+    width: 100%;
+  }
+
+  .slick-slide {
+    transition: all ease-in-out .3s;
+    opacity: .2;
+  }
+  
+  .slick-active {
+    opacity: .5;
+  }
+
+  .slick-current, .slick-slide  {
+    opacity: 1;
+  }
+</style>
 <style>
+    .text{
+      position: relative;
+      font-size: 16px !important;
+      width: 100%;
+    }
+
+    .text-concat {
+      position: relative;
+      display: inline-block;
+      word-wrap: break-word;
+      overflow: hidden;
+      max-height: 4.5em;
+      line-height: 1.6em;
+      text-align: left;
+      font-size: 16px !important;
+    }
+
+    .overlay-bg{
+      position: absolute !important;
+      background-color: rgba(255,255,255,0.3) !important;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      z-index: 1;
+      transition:all .15s ease-in;
+      opacity: 0;
+    }
+	.product-card{
+		position:relative;
+		margin: 0 auto;
+		transition:all .15s ease-in !important;
+	}
+
+  .btn-container{
+    width: 100%;
+    position: absolute; 
+    top: 50%; 
+    left: 0; 
+    z-index: 9; 
+    display: none; 
+    text-align: center;
+  }
+
+	.view-products-btn{
+		z-index: 2;
+		text-align: center;
+		background-color: #0062A5;
+		color:#fff;
+		font-size:13px;
+		letter-spacing:2px;
+		text-transform:uppercase;
+		padding:8px 20px;
+		font-weight:400;
+		transition:all .15s ease-in;
+	}
+
+	.view-products-btn:hover{
+		/* color: #fff;
+		background-color: #000; */
+    background-color: #f8b878; 
+    color: black;
+	}
+
+	.product-card:hover .overlay-bg{ 
+		transition:all .15s ease-in !important;
+		opacity: 1 !important;
+	}
+
+	.hover-container:hover img{
+		-ms-transform: scale(0.95); /* IE 9 */
+      	-webkit-transform: scale(0.95); /* Safari 3-8 */
+      	transform: scale(0.95); 
+	}
+
+    .hover{
+      transition: .5s;
+    }
+
+    .hover:hover {
+      -ms-transform: scale(0.95); /* IE 9 */
+      -webkit-transform: scale(0.95); /* Safari 3-8 */
+      transform: scale(0.95); 
+    }
+
     .products-head {
         margin-top: 10px !important;
         padding-left: 40px !important;
@@ -305,6 +529,7 @@
 @endsection
 
 @section('script')
+<script src="{{ asset('/slick/slick.js') }}" type="text/javascript" charset="utf-8"></script>
 <script>
     $(document).ready(function() {
         updateTotal();
@@ -440,6 +665,52 @@
                 data: data,
             });
         }
+
+        // Product Image Hover
+        $('.hover-container').hover(function(){
+            $(this).children('.btn-container').slideToggle('fast');
+        });
+
+
+        $(".regular").slick({
+            dots: false,
+            infinite: true,
+            slidesToShow: 4,
+            slidesToScroll: 1,
+            touchMove: true,
+            responsive: [
+                {
+                    breakpoint: 1024,
+                    settings: {
+                    slidesToShow: 3,
+                    slidesToScroll: 1,
+                    infinite: true,
+                    dots: false
+                    }
+                },
+                {
+                    breakpoint: 600,
+                    settings: {
+                    slidesToShow: 2,
+                    slidesToScroll: 1
+                    }
+                },
+                {
+                    breakpoint: 480,
+                    settings: {
+                    slidesToShow: 1,
+                    slidesToScroll: 1
+                    }
+                },
+                {
+                    breakpoint: 575.98,
+                    settings: {
+                    slidesToShow: 1,
+                    slidesToScroll: 1
+                    }
+                }
+            ]
+        });
     });
 </script>
 @endsection

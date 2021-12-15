@@ -723,7 +723,7 @@
         }
       });
 
-      @if (in_array($activePage, ['homepage', 'product_page', 'search_result', 'product_list']))
+      @if (in_array($activePage, ['homepage', 'product_page', 'search_result', 'product_list', 'cart']))
         $(document).on('click', '.add-to-cart', function(e){
           e.preventDefault();
           var btn = $(this);

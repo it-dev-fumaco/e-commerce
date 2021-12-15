@@ -491,6 +491,29 @@ class ProductController extends Controller
                 'last_modified_by' => Auth::user()->username,
             ]);
 
+            // save cross-sell
+            if($request->selected_for_cross_sell){
+                $created_by = Auth::user()->username;
+                $last_modified_by = null;
+
+                $checker = DB::table('fumaco_items_cross_sell')->where('item_code', $detail->f_idcode)->first();
+                if($checker){
+                    $created_by = $checker->created_by;
+                    $last_modified_by = Auth::user()->username;
+
+                    DB::table('fumaco_items_cross_sell')->where('item_code', $detail->f_idcode)->delete();
+                }
+
+                foreach($request->selected_for_cross_sell as $cross_sell){
+                    DB::table('fumaco_items_cross_sell')->insert([
+                        'item_code' => $detail->f_idcode,
+                        'item_code_cross_sell' => $cross_sell,
+                        'created_by' => $created_by,
+                        'last_modified_by' => $last_modified_by
+                    ]);
+                }
+            }
+
             if($detail->f_cat_id != $request->product_category) {
                 // update attributes per category
                 $attributes = DB::table('fumaco_items_attributes as a')
@@ -730,6 +753,9 @@ class ProductController extends Controller
             ->where('b.item_code', $details->f_idcode)
             ->get();
 
+        $selected_for_cross_sell = DB::table('fumaco_items_cross_sell')->where('item_code', $details->f_idcode)->get();
+        $products_for_cross_sell = DB::table('fumaco_items')->where('f_idcode', '!=', $details->f_idcode)->whereNotIn('f_idcode', collect($selected_for_cross_sell)->pluck('item_code_cross_sell'))->get();
+
         $bundle_items = DB::table('fumaco_product_bundle_item')->where('parent_item_code', $details->f_idcode)->orderBy('idx', 'asc')->get();
         $related_products = [];
         foreach($related_products_query as $row) {
@@ -744,11 +770,21 @@ class ProductController extends Controller
             ];
         }
 
+        $cross_sell_arr = [];
+        foreach($selected_for_cross_sell as $cross_sell){
+            $cross_sell_description = DB::table('fumaco_items')->where('f_idcode', $cross_sell->item_code_cross_sell)->pluck('f_name_name')->first();
+            $cross_sell_arr[] = [
+                'item_code' => $cross_sell->item_code,
+                'cross_sell_item_code' => $cross_sell->item_code_cross_sell, 
+                'cross_sell_description' => $cross_sell_description
+            ];
+        }
+
         if($details->f_item_type == 'product_bundle') {
             return view('backend.products.view_bundle', compact('details', 'item_categories', 'attributes', 'item_image', 'related_products', 'bundle_items'));    
         }
 
-        return view('backend.products.view', compact('details', 'item_categories', 'attributes', 'item_image', 'related_products', 'bundle_items'));
+        return view('backend.products.view', compact('details', 'item_categories', 'attributes', 'item_image', 'related_products', 'bundle_items', 'cross_sell_arr', 'products_for_cross_sell'));
     }
 
     public function viewCategoryAttr(Request $request) {

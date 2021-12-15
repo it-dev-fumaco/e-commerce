@@ -246,7 +246,6 @@ Route::prefix('admin')->group(function () {
         Route::get('/items_on_cart_by_location', 'OrderController@viewItemOnCartByLocation');
         Route::get('/items_on_cart_by_item', 'OrderController@viewItemOnCartByItem');
         Route::get('/abandoned_items_on_cart', 'OrderController@viewAbandonedItemOnCart');
-        
 
         Route::get('/order/payment_status', 'OrderController@checkPaymentStatus');
         Route::post('/order/payment_status', 'OrderController@checkPaymentStatus');
