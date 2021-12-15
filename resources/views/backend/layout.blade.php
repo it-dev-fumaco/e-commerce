@@ -246,7 +246,7 @@
             </ul>
           </li>
           @php
-            $product_pages = ['add_product_form', 'product_list', 'view_product_form', 'product_attribute_settings', 'product_category', 'product_comparison', 'product_category_settings', 'product_reviews'];
+            $product_pages = ['add_product_form', 'product_list', 'view_product_form', 'product_attribute_settings', 'product_category', 'product_comparison', 'product_category_settings', 'product_reviews', 'pricelist'];
             $media_pages = ['list_media', 'add_media'];
             $order_pages = ['order_list', 'order_cancel', 'order_delivered', 'payment_status', 'order_status', 'order_status_sequence'];
             $category_pages = ['product_category'];
@@ -288,6 +288,12 @@
                 <a href="/admin/product/reviews" class="nav-link {{ $activePage == 'product_reviews' ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Product Reviews</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="/admin/price_list" class="nav-link {{ $activePage == 'pricelist' ? 'active' : '' }}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Price List</p>
                 </a>
               </li>
             </ul>

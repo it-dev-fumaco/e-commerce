@@ -109,7 +109,7 @@
                                                                 <dt class="col-sm-3 text-right">User Account</dt>
                                                                 <dd class="col-sm-9">{{ $row->user_email }}</dd>
                                                                 <dt class="col-sm-3 text-right">Date Reviewed</dt>
-                                                                <dd class="col-sm-9">{{ \Carbon\Carbon::parse($row->review_date)->format('M d, Y - h:i A') }}/dd>
+                                                                <dd class="col-sm-9">{{ \Carbon\Carbon::parse($row->review_date)->format('M d, Y - h:i A') }}</dd>
                                                             </dl>
                                                         </div>
                                                         <div class="modal-footer">

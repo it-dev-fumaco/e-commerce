@@ -82,7 +82,6 @@ Route::get('/website_settings', 'FrontendController@websiteSettings');
 Route::post('/getvariantcode', 'FrontendController@getVariantItemCode');
 Route::post('/subscribe', 'FrontendController@newsletterSubscription');
 Route::get('/thankyou', 'FrontendController@subscribeThankyou');
-Route::get('/testing', 'FrontendController@testing');
 
 Route::get('/policy_pages', 'FrontendController@pagesList');
 Route::get('/pages/{slug}', 'FrontendController@viewPage')->name('pages');
@@ -190,6 +189,13 @@ Route::prefix('admin')->group(function () {
         Route::post('/add_product_images', 'ProductController@uploadImages');
         Route::get('/delete_product_image/{id}/{social?}', 'ProductController@deleteProductImage');
 
+        // Price list routes
+        Route::get('/price_list', 'PriceListController@viewPriceList');
+        Route::post('/price_list/create', 'PriceListController@savePriceList');
+        Route::get('/get_price_list', 'PriceListController@getErpPriceList');
+        Route::delete('/price_list/delete/{id}', 'PriceListController@deletePriceList');
+        Route::get('/item_prices/{pricelist_id}', 'PriceListController@viewItemPrices');
+        
         Route::get('/select_related_products/{category_id}', 'ProductController@selectProductsRelated');
         Route::post('/product/{parent_code}/save_related_products', 'ProductController@saveRelatedProducts');
         Route::delete('/product/remove_related/{id}', 'ProductController@removeRelatedProduct');
