@@ -332,7 +332,7 @@ class ShippingController extends Controller
                 $min_charge_amount = 0;
                 $max_charge_amount = 0;
             }
-
+            
             $shipping_service = ShippingService::find($id);
             $shipping_service->shipping_service_name = $request->shipping_service_type;
             $shipping_service->min_leadtime = $request->min_leadtime;
@@ -345,10 +345,12 @@ class ShippingController extends Controller
             $shipping_service->last_modified_by = Auth::user()->username;
             $shipping_service->save();
 
+            $shipping_zone_rate_id = (!$request->shipping_zone_rate_id) ? [] : $request->shipping_zone_rate_id;
+
             if(!isset($request->province)){
                 ShippingZoneRate::where('shipping_service_id', $id)->delete();
             }else{
-                ShippingZoneRate::where('shipping_service_id', $id)->whereNotIn('shipping_zone_rate_id', $request->shipping_zone_rate_id)->delete();
+                ShippingZoneRate::where('shipping_service_id', $id)->whereNotIn('shipping_zone_rate_id', $shipping_zone_rate_id)->delete();
             }
 
             if(!isset($request->store)){
