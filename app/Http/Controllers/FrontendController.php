@@ -201,6 +201,9 @@ class FrontendController extends Controller
                         }
                     }
 
+                    $product_review_per_code = DB::table('fumaco_product_review')
+                        ->where('status', '!=', 'pending')->where('item_code', $result['item_code'])->get();
+
                     $products[] = [
                         'id' => $result['id'],
                         'item_code' => $result['item_code'],
@@ -218,6 +221,7 @@ class FrontendController extends Controller
                         'slug' => $result['slug'],
                         'is_new_item' => $result['is_new_item'],
                         'on_stock' => $on_stock,
+                        'product_reviews' => $product_review_per_code
                     ];
                 } else {
                     $blogs[] = [
@@ -335,6 +339,10 @@ class FrontendController extends Controller
             $bs_item_name = $bs->f_name_name;
 
             $on_stock = ($bs->f_qty - $bs->f_reserved_qty) > 0 ? 1 : 0;
+
+            // get product reviews
+            $product_reviews = DB::table('fumaco_product_review')
+                ->where('status', '!=', 'pending')->where('item_code', $bs->f_idcode)->get();
             $best_selling_arr[] = [
                 'id' => $bs->id,
                 'item_code' => $bs->f_idcode,
@@ -350,11 +358,10 @@ class FrontendController extends Controller
                 'discount' => $bs->f_discount_percent,
                 'bs_img' => ($bs_img) ? $bs_img->imgprimayx : null,
                 'slug' => $bs->slug,
-                'is_new_item' => $is_new_item
+                'is_new_item' => $is_new_item,
+                'product_reviews' => $product_reviews
             ];
         }
-
-        // return $best_selling_arr;
 
         foreach($on_sale as $os){
             $os_img = DB::table('fumaco_items_image_v1')->where('idcode', $os->f_idcode)->first();
@@ -368,6 +375,10 @@ class FrontendController extends Controller
 
             $os_item_name = $os->f_name_name;
             $on_stock = ($os->f_qty - $os->f_reserved_qty) > 0 ? 1 : 0;
+
+            // get product reviews
+            $product_reviews = DB::table('fumaco_product_review')
+                ->where('status', '!=', 'pending')->where('item_code', $os->f_idcode)->get();
             $on_sale_arr[] = [
                 'id' => $os->id,
                 'item_code' => $os->f_idcode,
@@ -380,6 +391,7 @@ class FrontendController extends Controller
                 'discount_percent' => $os->f_discount_percent,
                 'slug' => $os->slug,
                 'is_new_item' => $is_new_item,
+                'product_reviews' => $product_reviews
             ];
         }
 
@@ -1195,6 +1207,10 @@ class FrontendController extends Controller
             }
 
             $on_stock = ($row->f_qty - $row->f_reserved_qty) > 0 ? 1 : 0;
+
+                 // get product reviews
+            $product_review_per_code = DB::table('fumaco_product_review')
+                ->where('status', '!=', 'pending')->where('item_code', $row->f_idcode)->get();
             $related_products[] = [
                 'id' => $row->id,
                 'item_code' => $row->f_idcode,
@@ -1210,7 +1226,8 @@ class FrontendController extends Controller
                 'on_stock' => $on_stock,
                 'image' => ($image) ? $image->imgprimayx : null,
                 'slug' => $row->slug,
-                'is_new_item' => $is_new_item
+                'is_new_item' => $is_new_item,
+                'product_reviews' => $product_review_per_code
             ];
         }
 

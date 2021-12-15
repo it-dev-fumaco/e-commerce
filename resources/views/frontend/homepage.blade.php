@@ -192,14 +192,21 @@
                     </div>
                     <div class="mx-auto" style="width: 90%;">
                       <div class="d-flex justify-content-between align-items-center">
+                        @php
+                          $total_reviews = collect($bs['product_reviews'])->count();
+                          $total_rating = collect($bs['product_reviews'])->sum('rating');
+                          $overall_rating = ($total_reviews > 0) ? ($total_rating / $total_reviews) : 0;
+                        @endphp
                         <div class="btn-group stylecap">
+                          @for ($i = 0; $i < 5; $i++)
+                          @if ($overall_rating <= $i)
                           <span class="fa fa-star starcolorgrey"></span>
-                          <span class="fa fa-star starcolorgrey"></span>
-                          <span class="fa fa-star starcolorgrey"></span>
-                          <span class="fa fa-star starcolorgrey"></span>
-                          <span class="fa fa-star starcolorgrey"></span>
+                          @else
+                          <span class="fa fa-star" style="color: #FFD600;"></span>
+                          @endif
+                          @endfor
                         </div>
-                        <small class="text-muted stylecap" style="color:#c4cad0 !important; font-weight:100 !important;">( 0 Reviews )</small>
+                        <small class="text-muted stylecap" style="color:#c4cad0 !important; font-weight:100 !important;">( {{ $total_reviews }} Reviews )</small>
                       </div>
                       <br>
                     </div>
@@ -275,15 +282,22 @@
                       </p>
                     </div>
                     <div class="mx-auto" style="width: 90%;">
+                      @php
+                        $total_reviews = collect($os['product_reviews'])->count();
+                        $total_rating = collect($os['product_reviews'])->sum('rating');
+                        $overall_rating = ($total_reviews > 0) ? ($total_rating / $total_reviews) : 0;
+                      @endphp
                       <div class="d-flex justify-content-between align-items-center">
                         <div class="btn-group stylecap">
+                          @for ($i = 0; $i < 5; $i++)
+                          @if ($overall_rating <= $i)
                           <span class="fa fa-star starcolorgrey"></span>
-                          <span class="fa fa-star starcolorgrey"></span>
-                          <span class="fa fa-star starcolorgrey"></span>
-                          <span class="fa fa-star starcolorgrey"></span>
-                          <span class="fa fa-star starcolorgrey"></span>
+                          @else
+                          <span class="fa fa-star" style="color: #FFD600;"></span>
+                          @endif
+                          @endfor
                         </div>
-                        <small class="text-muted stylecap" style="color:#c4cad0 !important; font-weight:100 !important;">( 0 Reviews )</small>
+                        <small class="text-muted stylecap" style="color:#c4cad0 !important; font-weight:100 !important;">( {{ $total_reviews }} Reviews )</small>
                       </div>
                       <br/>
                     </div>
