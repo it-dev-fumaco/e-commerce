@@ -287,10 +287,10 @@
 														<img src="{{ asset($compare_img) }}" alt="{{ Str::slug(explode(".", $compare_product['item_image'])[0], '-') }}" class="img-responsive hover" style="width: 100%" />
 													</picture>
 												</div>
-												
-												<span class="comparison-description d-block mb-3">{{ $compare_product['product_name'] }}</span>
-												{{-- <br/>&nbsp;
-												<hr> --}}
+												<div class="text ellipsis">
+													<a href="/product/{{ ($compare_product['slug']) ?$compare_product['slug'] : $compare_product['item_code'] }}" class="card-text product-head fumacoFont_card_title text-concat prod_desc" style="text-decoration: none !important; text-transform: none !important; color:#000 !important; height: 120px; max-height: 4.6em">{{ $compare_product['product_name'] }}</a>
+												</div>
+												<br class="d-block d-xl-none">
 												<center>
 												@if ($compare_product['discounted_from_item'] == 1)
 													<span class="comparison-price" style="white-space: nowrap !important">₱ {{ number_format(str_replace(",","",$compare_product['price']), 2) }}</span>&nbsp;<s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$compare_product['original_price']), 2) }}</s>
@@ -307,7 +307,7 @@
 												@endif
 												<br/>
 												@foreach ($attribute_names as $attrib)
-													<div class="col-12 mb-5">
+													<div class="col-12 mb-5 border" style="border-color: rgba(0, 0, 0, 0) !important">
 														<span class="comparison-description d-block">
 															@php
 																$attr_val = $variant_attr_array[$attrib->attribute_name][$compare_product['item_code']];
