@@ -18,6 +18,9 @@ class ProductReviewController extends Controller
                 'message' => $request->message,
                 'rating' => ($request->rating) ? $request->rating : 0,
                 'user_email' => Auth::user()->username,
+                'user_id' => Auth::user()->id,
+                'firstname' => Auth::user()->f_name,
+                'lastname' => Auth::user()->f_lname,
                 'ip' => $request->ip(),
             ];
 

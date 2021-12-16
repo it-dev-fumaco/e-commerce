@@ -973,6 +973,8 @@ class FrontendController extends Controller
 
             $item_name = strip_tags($product->f_name_name);
             $on_stock = ($product->f_qty - $product->f_reserved_qty) > 0 ? 1 : 0;
+            $product_review_per_code = DB::table('fumaco_product_review')
+                ->where('status', '!=', 'pending')->where('item_code', $product->f_idcode)->get();
             $products_arr[] = [
                 'id' => $product->id,
                 'item_code' => $product->f_idcode,
@@ -988,11 +990,10 @@ class FrontendController extends Controller
                 'on_stock' => $on_stock,
                 'discount_percent' => $product->f_discount_percent,
                 'slug' => $product->slug,
-                'is_new_item' => $product->f_new_item
+                'is_new_item' => $product->f_new_item,
+                'product_reviews' => $product_review_per_code
             ];
         }
-
-        // return $products_arr;
 
         return view('frontend.product_list', compact('product_category', 'products_arr', 'products', 'filters', 'image_for_sharing', 'category_discount'));
     }
@@ -1232,10 +1233,10 @@ class FrontendController extends Controller
         }
 
         // get product reviews
-        $product_reviews = DB::table('fumaco_product_review as a')->join('fumaco_users as b', 'a.user_email', 'b.username')
+        $product_reviews = DB::table('fumaco_product_review as a')->join('fumaco_users as b', 'a.user_id', 'b.id')
             ->where('status', '!=', 'pending')->where('item_code', $product_details->f_idcode)->select('a.*', 'b.f_name', 'b.f_lname')->orderBy('a.created_at', 'desc')->paginate(5);
         // get total rating
-        $total_rating = DB::table('fumaco_product_review as a')->join('fumaco_users as b', 'a.user_email', 'b.username')
+        $total_rating = DB::table('fumaco_product_review as a')->join('fumaco_users as b', 'a.user_id', 'b.id')
             ->where('status', '!=', 'pending')->where('item_code', $product_details->f_idcode)->sum('a.rating');
 
         return view('frontend.product_page', compact('product_details', 'product_images', 'attributes', 'variant_attr_arr', 'related_products', 'filtered_attributes', 'discount_from_sale', 'sale_discount_type', 'sale_discount_rate', 'product_price', 'products_to_compare', 'variant_attributes_to_compare', 'compare_arr', 'attributes_to_compare', 'variant_attr_array', 'attribute_names', 'product_reviews', 'total_rating'));

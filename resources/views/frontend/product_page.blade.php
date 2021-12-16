@@ -328,10 +328,27 @@
 														</div>
 													</div>
 													<div class="p-2 col-10">
+														@php
+															$d1 = strtotime(\Carbon\Carbon::parse($product_review->created_at)->format('Y-m-d H:i:s'));
+															$d2 = strtotime(\Carbon\Carbon::now()->format('Y-m-d H:i:s'));
+															$totalSecondsDiff = abs($d1-$d2);
+															$totalMinutesDiff = $totalSecondsDiff/60;
+															$totalHoursDiff   = $totalSecondsDiff/60/60;
+
+															if (round($totalHoursDiff) > 24) {
+																$duration = \Carbon\Carbon::parse($product_review->created_at)->format("d M Y");
+															} elseif (round($totalMinutesDiff) >= 60) {
+																$duration = ((round($totalHoursDiff) > 1) ? round($totalHoursDiff) . ' hours ago' : 'an hour ago');
+															} elseif ($totalMinutesDiff >= 1) {
+																$duration = (($totalMinutesDiff > 1) ? round($totalMinutesDiff) . ' minutes ago' : 'a minute ago');
+															} else {
+																$duration = round($totalSecondsDiff) . ' seconds ago';
+															}
+														@endphp
 														<span class="d-block">
 															<b>{{ $product_review->f_name . ' ' . $product_review->f_lname }}</b>
 															<div style="float: right;">
-																<span class="text-muted d-block mb-1" style="font-size: 8pt;">{{ \Carbon\Carbon::parse($product_review->created_at)->format("d M Y") }}</span>
+																<span class="text-muted d-block mb-1" style="font-size: 8pt;">{{ $duration }}</span>
 															</div>
 														</span>
 														<div class="d-block mb-3">
