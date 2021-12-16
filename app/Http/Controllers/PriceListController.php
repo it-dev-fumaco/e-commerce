@@ -82,11 +82,13 @@ class PriceListController extends Controller
                 ])->get($erp_api->base_url . '/api/resource/Item Price' . ($params));
 
                 if ($response->successful()) {
-                    $data[] = [
-                        'item_code' => $response['data'][0]['item_code'],
-                        'price' => $response['data'][0]['price_list_rate'],
-                        'price_list_id' => $id
-                    ];
+                    if (count($response['data']) > 0) {
+                        $data[] = [
+                            'item_code' => $item,
+                            'price' => $response['data'][0]['price_list_rate'],
+                            'price_list_id' => $id
+                        ];
+                    }
                 }
             }
 
