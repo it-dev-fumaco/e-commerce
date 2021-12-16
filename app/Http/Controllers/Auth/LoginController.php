@@ -88,6 +88,8 @@ class LoginController extends Controller
             if($finduser){
                 Auth::loginUsingId($finduser->id);
 
+                $this->updateCartItemOwner();
+
                 return redirect('/');
             }else{
                 $newUser = new User;
@@ -101,6 +103,8 @@ class LoginController extends Controller
                 $newUser->save();
 
                 Auth::loginUsingId($newUser->id);
+
+                $this->updateCartItemOwner();
 
                 return redirect('/');
             }
@@ -120,6 +124,8 @@ class LoginController extends Controller
             if($finduser){
                 Auth::loginUsingId($finduser->id);
 
+                $this->updateCartItemOwner();
+
                 return redirect('/');
             }else{
                 $newUser = new User;
@@ -133,6 +139,8 @@ class LoginController extends Controller
                 $newUser->save();
 
                 Auth::loginUsingId($newUser->id);
+
+                $this->updateCartItemOwner();
 
                 return redirect('/');
             }
@@ -193,6 +201,8 @@ class LoginController extends Controller
             if($finduser){
                 Auth::loginUsingId($finduser->id);
 
+                $this->updateCartItemOwner();
+
                 return response()->json(['status' => 200, 'message' => 'Logged in']);
             }else{
                 $newUser = new User;
@@ -207,6 +217,8 @@ class LoginController extends Controller
                 $newUser->save();
 
                 Auth::loginUsingId($newUser->id);
+
+                $this->updateCartItemOwner();
 
                 return response()->json(['status' => 200, 'message' => 'Logged in new user']);
             }
