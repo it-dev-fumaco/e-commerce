@@ -327,7 +327,7 @@ class OrderController extends Controller
                     });
                 }
 
-                if ($status == 'Delivered') {
+                if ($status == 'Order Delivered') {
                     $order_details = DB::table('fumaco_order')->where('order_number', $request->order_number)->first();
                     $customer_name = $order_details->order_name . ' ' . $order_details->order_lastname;
                     Mail::send('emails.delivered', ['id' => $order_details->order_number, 'customer_name' => $customer_name], function($message) use($order_details, $status){
