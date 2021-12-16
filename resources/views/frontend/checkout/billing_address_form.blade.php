@@ -328,9 +328,9 @@
 										</p>
 										<hr>
 										<small class="text-muted"> or sign in with</small>
-										<a href="{{ route('facebook.login') }}" class="btn mt-2 text-white align-middle" style="display: block; width: 100%; background-color:  #115cf3;">
+										<button class="btn mt-2 text-white align-middle" style="display: block; width: 100%; background-color:  #115cf3;" onclick="triggerLogin();" type="button">
 											<i class="fab fa-facebook mr-3" style="font-size: 1.3rem;"></i> <span style="font-size: 14px;">Sign in with Facebook</span> 
-										</a>
+										  </button>
 										<a href="{{ route('google.login') }}" class="btn text-dark login-with-google-btn mt-2">
 											<img src="{{ asset('assets/google.svg') }}" width="23" class="m-1"> Sign in with Google
 										</a>
