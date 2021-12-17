@@ -506,6 +506,8 @@ class CheckoutController extends Controller
 				]);
 			}
 
+			DB::table('fumaco_order_items')->where('order_number', $order_no)->delete();
+
 			if(Auth::check()) {
 				$cart_items = DB::table('fumaco_items as a')->join('fumaco_cart as b', 'a.f_idcode', 'b.item_code')
 					->where('user_type', 'member')->where('user_email', Auth::user()->username)->get();
@@ -1344,9 +1346,47 @@ class CheckoutController extends Controller
 					->where('user_type', 'guest')->where('transaction_id', $order_no)->get();
 			}
 
+			  // set sale price
+			$sale = DB::table('fumaco_on_sale')
+				->whereDate('start_date', '<=', Carbon::now()->toDateString())
+				->whereDate('end_date', '>=', Carbon::today()->toDateString())
+				->where('status', 1)->first();
+	
+
 			$subtotal = 0;
 			foreach ($cart_items as $item) {
-				$price = ($item->f_onsale) ? $item->f_price : $item->f_original_price;
+				$discount = 0;
+				$price = $item->f_original_price;
+				if (!$item->f_onsale) {
+					if ($sale) {
+						if ($sale->apply_discount_to == 'All Items') {
+							if ($sale->discount_type == 'By Percentage') {
+								$discount = ($item->f_original_price * ($sale->discount_rate/100));
+								$discount = ($discount > $sale->capped_amount) ? $sale->capped_amount : $discount;
+							} else {
+								$discount = $sale->discount_rate;
+							}
+						} else {
+							$sale_per_category = DB::table('fumaco_on_sale as sale')->join('fumaco_on_sale_categories as cat_sale', 'sale.id', 'cat_sale.sale_id')
+								->whereDate('sale.start_date', '<=', Carbon::now())->whereDate('sale.end_date', '>=', Carbon::now())
+								->where('status', 1)->where('cat_sale.category_id', $item->f_cat_id)
+								->select('cat_sale.*')->first();
+							if ($sale_per_category) {
+								if ($sale_per_category->discount_type == 'By Percentage') {
+									$discount = ($item->f_original_price * ($sale_per_category->discount_rate/100));
+									$discount = ($discount > $sale_per_category->capped_amount) ? $sale_per_category->capped_amount : $discount;
+								} else {
+									$discount = $sale_per_category->discount_rate;
+								}
+							}
+						}
+					}
+				} else {
+					$price = $item->f_price;
+				}
+
+				$price = ($discount > $price) ? $price : ($price - $discount);
+
 				$subtotal += $price * $item->qty;
 			}
 
