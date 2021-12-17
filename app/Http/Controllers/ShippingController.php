@@ -67,7 +67,7 @@ class ShippingController extends Controller
         return view('backend.shipping.add_holiday');
     }
 
-    private function adjustOrderDates($new_holiday){ // check and update existing estimated delivery/pickup dates
+    private function adjustOrderDates($new_holiday){
         $excluded_statuses = DB::table('order_status')->where('update_stocks', 1)->select('status')->get();
         $estimated_delivery_dates = DB::table('fumaco_order')->whereNotIn('order_status', collect($excluded_statuses)->pluck('status'))->where('order_status', '!=', 'Cancelled')->select('id', 'order_number', 'order_status', 'estimated_delivery_date', 'pickup_date', 'order_shipping')->get();
 
@@ -75,9 +75,14 @@ class ShippingController extends Controller
         $update_pickup_date = 0;
 
         foreach($estimated_delivery_dates as $edd){
-            $date = $edd->estimated_delivery_date ? explode(' - ', $edd->estimated_delivery_date) : null;
+            $update_leadtime = 0;
+            $update_pickup_date = 0;
+
+            $date = $edd->estimated_delivery_date ? explode(' - ', $edd->estimated_delivery_date) : [];
             $year = $edd->estimated_delivery_date ? explode(', ', $edd->estimated_delivery_date) : null;
             $month = $edd->estimated_delivery_date ? explode(' ', $edd->estimated_delivery_date) : null;
+
+            $date_count = count($date);
 
             $min_leadtime = null;
             $max_leadtime = null;
@@ -91,7 +96,7 @@ class ShippingController extends Controller
 
             if($edd->order_shipping != 'Store Pickup'){
                 $update_pickup_date = 0;
-                if($date){
+                if($date_count == 2){
                     if(DateTime::createFromFormat('M d, Y', $date[0])){ // check and convert min leadtime to proper date format
                         $min_leadtime = $date[0];
                     }else{
@@ -113,19 +118,27 @@ class ShippingController extends Controller
                         $new_min_leadtime = $min_leadtime;
                         $new_max_leadtime = Carbon::parse($max_leadtime)->addDays(1);
                     }
-    
-                    if($update_leadtime == 1){
-                        if(Carbon::parse($new_min_leadtime)->format('M d, Y') == Carbon::parse($new_max_leadtime)->format('M d, Y')){
-                            $new_leadtime = Carbon::parse($new_min_leadtime)->format('M d, Y');
-                        }else if(Carbon::parse($new_min_leadtime)->format('Y') == Carbon::parse($new_max_leadtime)->format('Y')){ // Same Year
-                            if(Carbon::parse($new_min_leadtime)->format('M') == Carbon::parse($new_max_leadtime)->format('M')){ // Same Month
-                                $new_leadtime = Carbon::parse($new_min_leadtime)->format('M d').' - '.Carbon::parse($new_max_leadtime)->format('d, Y');
-                            }else{
-                                $new_leadtime = Carbon::parse($new_min_leadtime)->format('M d').' - '.Carbon::parse($new_max_leadtime)->format('M d, Y');
-                            }
-                        } else {
-                            $new_leadtime = Carbon::parse($new_min_leadtime)->format('M d, Y'). ' - ' .Carbon::parse($new_max_leadtime)->format('M d, Y');
+                }
+                
+                if($update_leadtime == 1){
+                    if(Carbon::parse($new_min_leadtime)->format('M d, Y') == Carbon::parse($new_max_leadtime)->format('M d, Y')){
+                        $new_leadtime = Carbon::parse($new_min_leadtime)->format('M d, Y');
+                    }else if(Carbon::parse($new_min_leadtime)->format('Y') == Carbon::parse($new_max_leadtime)->format('Y')){ // Same Year
+                        if(Carbon::parse($new_min_leadtime)->format('M') == Carbon::parse($new_max_leadtime)->format('M')){ // Same Month
+                            $new_leadtime = Carbon::parse($new_min_leadtime)->format('M d').' - '.Carbon::parse($new_max_leadtime)->format('d, Y');
+                        }else{
+                            $new_leadtime = Carbon::parse($new_min_leadtime)->format('M d').' - '.Carbon::parse($new_max_leadtime)->format('M d, Y');
                         }
+                    } else {
+                        $new_leadtime = Carbon::parse($new_min_leadtime)->format('M d, Y'). ' - ' .Carbon::parse($new_max_leadtime)->format('M d, Y');
+                    }
+                }
+
+                if($date_count == 1){ // those with only one estimated date arrival
+                    $update_leadtime = 0;
+                    if($date[0] == $new_holiday){
+                        $update_leadtime = 1;
+                        $new_leadtime = Carbon::parse($date[0])->addDays(1)->format('M d, Y');
                     }
                 }
             }else{
@@ -137,7 +150,7 @@ class ShippingController extends Controller
                     $new_pickup_date = Carbon::parse($pickup_date)->addDays(1);
                 }
             }
-
+            
             if($update_leadtime == 1){
                 DB::table('fumaco_order')->where('id', $edd->id)->update([
                     'estimated_delivery_date' => $new_leadtime
@@ -149,8 +162,23 @@ class ShippingController extends Controller
                     'pickup_date' => $new_pickup_date
                 ]);
             }
-        }
 
+            // $test[] = [
+            //     'date_count' => $date ? count($date) : null,
+            //     'order_number' => $edd->order_number,
+            //     'estimated_delivery_date' => $edd->estimated_delivery_date,
+            //     'date2' => $date_count == 2 ? $date[1] : null, 
+            //     'new_holiday' => $new_holiday,
+            //     'min_leadtime' => $min_leadtime,
+            //     'max_leadtime' => $max_leadtime,
+            //     'new_min_leadtime' => $new_min_leadtime,
+            //     'new_max_leadtime' => $new_max_leadtime,
+            //     'new_leadtime' => $new_leadtime,
+            //     'update_leadtime' => $update_leadtime,
+            //     'pickup_date' => $edd->pickup_date,
+            //     'new_pickup_date' => $new_pickup_date
+            // ];
+        }
     }
 
     public function addHoliday(Request $request){
