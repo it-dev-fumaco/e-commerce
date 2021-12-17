@@ -72,7 +72,9 @@
                 <strong>Ship to :</strong> {{ ($orders_arr['shipping_business_name']) ? $orders_arr['shipping_business_name'] : $orders_arr['ship_contact_person'] }}<br>
                 {!! $orders_arr['ship_address1'] . " " . $orders_arr['ship_address2'] . ", <br>" . $orders_arr['ship_brgy'] . ", " . $orders_arr['ship_city'] . "<br>" . $orders_arr['ship_province'] . ', ' .  $orders_arr['ship_country'] . ' ' . $orders_arr['ship_postal'] !!}<br/>
                 {{ $orders_arr['email'] }}<br/>
-                {{ $orders_arr['contact'] }}
+                {{ $orders_arr['contact'] }}<br/>
+                <strong>Estimated Delivery Date: </strong>
+                {{ $orders_arr['estimated_delivery_date'] }}
             </p>
             @endif
         </div>
@@ -118,7 +120,7 @@
                 <dt class="col-10 text-right">Subtotal</dt>
                 <dd class="col-2 text-right">₱ {{ number_format(str_replace(",","",$orders_arr['subtotal']), 2) }}</dd>
                 @if ($orders_arr['voucher_code'])
-                <dt class="col-10 text-right">Discount <span class="text-white" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833;">{{ $orders_arr['voucher_code'] }}</span></dt>
+                <dt class="col-10 text-right">Discount <span class="badge badge-info" style="font-size: 11pt;">{{ $orders_arr['voucher_code'] }}</span></dt>
                 <dd class="col-2 text-right">- ₱ {{ number_format(str_replace(",","",$orders_arr['discount_amount']), 2) }}</dd>
                 @endif
                 <dt class="col-10 text-right">

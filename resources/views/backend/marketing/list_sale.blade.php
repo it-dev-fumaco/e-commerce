@@ -80,7 +80,7 @@
                                                 {{-- <td class="text-center">{{ $sale['discount_for'] }}</td> --}}
                                                 <td class="text-center">{{ $sale['apply_discount_to'] }}</td>
                                                 <td class="text-center">
-                                                    <a type="button" data-toggle="modal" data-target="#sale{{ $sale['id'] }}Modal" style="color: #007BFF;">
+                                                    <a class="btn btn-sm" type="button" data-toggle="modal" data-target="#sale{{ $sale['id'] }}Modal" style="color: #007BFF;">
                                                         View Details
                                                     </a>
                                                     @if ($sale['apply_discount_to'] == 'All Items')
