@@ -1,35 +1,30 @@
-<table class="table table-hover table-bordered" style="font-size: 11pt;">
-    <thead>
-        <tr>
-            <th style="width: 15%" class="text-center">Address Type</th>
-            <th style="width: 15%" class="text-center">Contact Person</th>
-            <th style="width: 15%" class="text-center">Contact No.</th>
-            <th style="width: 15%" class="text-center">Contact Email</th>
-            <th style="width: 40%" class="text-center">Address</th>
-        </tr>
-    </thead>
+<div class="row" style="min-height: 200px;">
     @forelse ($address_list as $address)
-    <tr>
-        <td class="text-center">
-            <span class="d-block">{{ $address->add_type }}</span>
-            <span class="badge badge-primary {{ $address->xdefault != 1 ? 'd-none' : '' }}">Default</span>
-        </td>
-        <td class="text-center">{{ $address->xcontactname1.' '.$address->xcontactlastname1 }}</td>
-        <td class="text-center">{{ $address->xcontactnumber1 != 0 ? $address->xcontactnumber1 : null }}</td>
-        <td class="text-center">{{ $address->xcontactemail1 }}</td>
-        <td>
-            @php
-                $bill_address2 = str_replace(' ', '', $address->xadd2) ? $address->xadd2.', ' : null;
-            @endphp
-            {{ $address->xadd1.', '.$bill_address2.$address->xbrgy.', '.$address->xcity.', '.$address->xprov.', '.$address->xcountry.' '.$address->xpostal }}
-        </td>
-    </tr>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body p-1">
+                <dl class="row m-1">
+                    <dt class="col-sm-12">{{ $address->add_type }} <span class="badge badge-primary {{ $address->xdefault != 1 ? 'd-none' : '' }}">Default</span></dt>
+                    <dd class="col-sm-12">
+                        @php
+                            $bill_address2 = str_replace(' ', '', $address->xadd2) ? $address->xadd2.', ' : null;
+                        @endphp
+                        <p class="m-0">{!! $address->xadd1.', '.$bill_address2.$address->xbrgy.', '.$address->xcity.', <br> '.$address->xprov.', '.$address->xcountry.' '.$address->xpostal !!}</p>
+                        <p class="m-0">{{ $address->xcontactname1 .' ' . $address->xcontactlastname1 }}</p>
+                        <p class="m-0">{{ $address->xcontactemail1 }}</p>
+                        <p class="m-0">{{ $address->xcontactnumber1 }}</p>
+                    </dd>
+                  </dl>
+            </div>
+        </div>
+    </div>
     @empty
-    <tr>
-        <td class="text-center" colspan="7">No Billing Address(es)</td>
-    </tr>
+    <div class="col-md-12">
+        <h4 class="text-center text-muted m-5">No address found.</h4>
+    </div>
     @endforelse
-</table>
+</div>
 <div class="float-right" id="{{ ($address_type == 'Delivery') ? 'shipping' : 'billing' }}-address-paginate">
     {{ $address_list->links('pagination::bootstrap-4') }}
 </div>
+

@@ -11,27 +11,14 @@ use DB;
 class CustomerController extends Controller
 {
     public function viewCustomers(Request $request){
-        $user_info = DB::table('fumaco_users')->where('is_email_verified', 1)
+        $users = DB::table('fumaco_users')->where('is_email_verified', 1)
             ->when($request->q, function($c) use ($request) {
                 $c->where('f_name', 'LIKE', '%'.$request->q.'%')->orWhere('f_lname', 'LIKE', '%'.$request->q.'%')->orWhere('username', 'LIKE', '%'.$request->q.'%');
             })
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
-        foreach($user_info as $user){
-            $user_arr[] = [
-                'id' => $user->id,
-                'first_name' => $user->f_name,
-                'last_name' => $user->f_lname,
-                'email' => $user->username,
-                'contact' => $user->f_mobilenumber,
-                'created_at' => $user->created_at,
-                'no_of_visits' => number_format($user->no_of_visits),
-                'last_login' => $user->last_login
-            ];
-        }
-
-        return view('backend.customer.customer', compact('user_info', 'user_arr'));
+        return view('backend.customer.customer', compact('users'));
     }
 
     public function viewCustomerProfile($id){
@@ -68,7 +55,7 @@ class CustomerController extends Controller
 
     public function getCustomerAddress($address_type, $user_id, Request $request) {
         $address_list = DB::table('fumaco_user_add')
-            ->where('user_idx', $user_id)->where('address_class', $address_type)->orderBy('xdefault', 'desc')->paginate(5);
+            ->where('user_idx', $user_id)->where('address_class', $address_type)->orderBy('xdefault', 'desc')->paginate(6);
 
         return view('backend.customer.address_list', compact('address_list', 'address_type'));
     }
@@ -207,10 +194,14 @@ class CustomerController extends Controller
             'billing_address' => $order_billing_address,
             'billing_business_name' => $order->billing_business_name,
             'billing_business_tin' => $order->billing_tin,
+            'bill_email' => $order->order_bill_email,
+            'bill_contact' => $order->order_bill_contact,
             'store_location' => $order->store_location,
             'store_address' => $store_address,
             'grand_total' => $order->order_shipping_amount + ($order->order_subtotal - $order->discount_amount),
-            'ordered_items' => $items_arr
+            'ordered_items' => $items_arr,
+            'email' => $order->order_email,
+            'contact' => $order->order_contact == 0 ? '' : $o->order_contact ,
         ];
 
         return view('backend.customer.order_details', compact('orders_arr'));

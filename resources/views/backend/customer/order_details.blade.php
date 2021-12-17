@@ -16,11 +16,15 @@
         <div class="col-6 text-right font-italic">
             <span class="badge badge-info" style="font-size: 11pt;">{{ $orders_arr['shipping_method'] }}</span>&nbsp;
             <span>
-                @if ($orders_arr['estimated_delivery_date'])
-                <b>Est. Delivery Date:</b> {{ $orders_arr['estimated_delivery_date'] }}
-                @else
-                <b>Pickup By:</b> {{ date('D, M d, Y', strtotime($orders_arr['pickup_date'])) }}
-                @endif
+               @if ($orders_arr['order_status'] == "Order Delivered" or $orders_arr['order_status'] == 'Order Completed')
+               <b>Date Delivered:</b> {{ \Carbon\Carbon::parse($orders_arr['date_delivered'])->format('M. d, Y - h:i A') }}
+               @else
+               @if ($orders_arr['estimated_delivery_date'])
+               <b>Est. Delivery Date:</b> {{ $orders_arr['estimated_delivery_date'] }}
+               @else
+               <b>Pickup By:</b> {{ date('D, M d, Y', strtotime($orders_arr['pickup_date'])) }}
+               @endif
+               @endif
             </span>
         </div>
         <button type="button" class="close border" data-dismiss="modal" aria-label="Close">
@@ -40,13 +44,13 @@
                     <span><b>Order ID:</b> {{ $orders_arr['order_number'] }}</span><br/>
                     <span><b>Payment ID:</b> {{ $orders_arr['payment_id'] }}</span><br/>
                     <span><b>Payment Method:</b> {{ $orders_arr['payment_method'] }}</span><br/>
-                    <span><b>Order Date:</b> {{ $orders_arr['date_ordered'] }}</span><br/>
+                    <span><b>Order Date:</b> {{ \Carbon\Carbon::parse($orders_arr['date_ordered'])->format('M. d, Y - h:i A') }}</span><br/>
                     <span><b>Order Status:</b> <b><span class="badge" style="background-color: {{ $badge }}; font-size: 11pt;">{{ $orders_arr['order_status'] }}</span></b></span>
                </div>
                <div class="col-4">
                     <span><b>Billing Address:</b></span><br/>
                     <span><b>Bill to:</b> {{ $orders_arr['billing_business_name'] ? $orders_arr['billing_business_name'] : $orders_arr['ordered_by'] }}</span>
-                    <p>{{ $orders_arr['billing_address'] }}</p>
+                    <p>{{ $orders_arr['billing_address'] }} <br />{{ $orders_arr['bill_email'] }}<br/>{{ $orders_arr['bill_contact'] }}</p>
                </div>
                @if ($orders_arr['shipping_method'] == 'Store Pickup')
                <div class="col-4">
@@ -59,7 +63,7 @@
                <div class="col-4">
                     <span><b>Shipping Address:</b></span><br/>
                     <span><b>Ship to:</b> {{ $orders_arr['shipping_business_name'] ? $orders_arr['shipping_business_name'] : $orders_arr['ordered_by'] }}</span>
-                    <p>{{ $orders_arr['shipping_address'] }}</p>
+                    <p>{{ $orders_arr['shipping_address'] }}<br/>{{ $orders_arr['email'] }}<br/>{{ $orders_arr['contact'] }}</p>
                </div>
                @endif
           </div>

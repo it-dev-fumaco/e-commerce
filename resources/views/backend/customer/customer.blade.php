@@ -27,41 +27,39 @@
                         <div class="col-md-12">
                             <div class="card card-primary">
                                 <div class="card-body">
-                                    <div class="col-md-12">
-                                        <div class="float-right">
-                                            <form action="" method="GET">
-                                                <div class="form-group row">
-                                                    <div class="col-sm-9">
-                                                        <input type="text" class="form-control" id="search-box" name="q" placeholder="Search" value="{{request()->get('q')}}">
-                                                    </div>
-                                                        
-                                                    <div class="col-sm-2">
-                                                        <button type="submit" class="btn btn-primary">Search</button>
-                                                    </div>
+                                    <form action="/admin/customer/list" method="GET">
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                <div class="input-group mb-3">
+                                                    <input type="text" class="form-control" id="search-box" name="q" placeholder="Search" value="{{request()->get('q')}}">
                                                 </div>
-                                            </form>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <button type="submit" class="btn btn-secondary">Search</button>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <table class="table table-hover table-bordered">
-                                        <tr>
-                                            <th>First name</th>
-                                            <th>Last Name</th>
-                                            <th>Email</th>
-                                            <th>Date Registered</th>
-                                            <th>Total No. of Visits</th>
-                                            <th>Last login</th>
-                                            <th>Action</th>
-                                        </tr>
-                                        @forelse ($user_arr as $user)
+                                    </form>
+                                    <table class="table table-hover table-bordered" style="font-size: 11pt;">
+                                        <thead>
                                             <tr>
-                                                <td>{{ $user['first_name'] }}</td>
-                                                <td>{{ $user['last_name'] }}</td>
-                                                <td>{{ $user['email'] }}</td>
-                                                <td>{{ $user['created_at'] }}</td>
-                                                <td>{{ $user['no_of_visits'] }}</td>
-                                                <td>{{ $user['last_login'] }}</td>
+                                                <th class="text-center">ID</th>
+                                                <th class="text-center">Customer Name</th>
+                                                <th class="text-center">Email Address</th>
+                                                <th class="text-center">Customer Group</th>
+                                                <th class="text-center">Date Registered</th>
+                                                <th class="text-center">Action</th>
+                                            </tr>
+                                        </thead>
+                                        
+                                        @forelse ($users as $user)
+                                            <tr>
+                                                <td class="text-center">{{ $user->id }}</td>
+                                                <td class="text-left">{{ $user->f_name . ' ' . $user->f_lname }}</td>
+                                                <td class="text-center">{{ $user->username }}</td>
+                                                <td class="text-center">{{ $user->customer_group }}</td>
+                                                <td class="text-center">{{ \Carbon\Carbon::parse($user->created_at)->format('M d, Y - h:i A') }}</td>
                                                 <td class="text-center">
-                                                    <a href="/admin/customer/profile/{{ $user['id'] }}" class="btn btn-sm btn-primary">View Profile</a>
+                                                    <a href="/admin/customer/profile/{{ $user->id }}" class="btn btn-sm btn-primary">View Profile</a>
                                                 </td>
                                             </tr>
                                         @empty
@@ -71,7 +69,7 @@
                                         @endforelse
                                     </table>
                                     <div class="float-right mt-4">
-                                        {{ $user_info->withQueryString()->links('pagination::bootstrap-4') }}
+                                        {{ $users->withQueryString()->links('pagination::bootstrap-4') }}
                                     </div>
                                 </div>
                             </div>

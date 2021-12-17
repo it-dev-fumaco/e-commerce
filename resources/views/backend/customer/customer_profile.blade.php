@@ -110,10 +110,10 @@
 							</div>
 							<div class="card-body p-1">
 								<div class="tab-content p-1">
-									<div class="active tab-pane m-0" id="activity" style="min-height: 400px;">
+									<div class="active tab-pane m-0" id="activity" style="min-height: 200px;">
 										<div id="shipping-address-div"></div>
 									</div>
-									<div class="tab-pane" id="timeline" style="min-height: 400px;">
+									<div class="tab-pane" id="timeline" style="min-height: 200px;">
 										<div id="billing-address-div"></div>
 									</div>
 								</div>
