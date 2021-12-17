@@ -39,7 +39,7 @@ return [
     'google' => [
         'client_id' => '794522382369-0pdu3n5j2ofohbae2hcbtgtfqiu898a2.apps.googleusercontent.com',
         'client_secret' => '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',
-        'redirect' => 'https://fumaco.com/auth/google/callback',
+        'redirect' => 'https://test301.fumaco.com/auth/google/callback',
     ],
 
     'linkedin' => [
