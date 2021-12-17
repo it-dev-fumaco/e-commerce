@@ -29,6 +29,16 @@
                             <div class="card card-primary">
                                 <form action="/admin/holiday/new" method="POST">
                                     <div class="card-body">
+                                        @if(session()->has('success'))
+                                            <div class="alert alert-success fade show" role="alert">
+                                                {{ session()->get('success') }}
+                                            </div>
+                                        @endif
+                                        @if(session()->has('error'))
+                                            <div class="alert alert-warning fade show" role="alert">
+                                                {{ session()->get('error') }}
+                                            </div>
+                                        @endif
                                         <h4>Register Holiday</h4>
                                         @csrf
                                         <div class="form-group col-md-6">
