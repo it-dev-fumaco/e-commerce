@@ -1014,7 +1014,7 @@ class CheckoutController extends Controller
 			$min_leadtime_d = (Carbon::parse($holiday->holiday_date)->format('m-d') == $min_leadtime->format('m-d')) ? $min_leadtime->addDays(1)->format('d') : $min_leadtime->format('d');
 		}
 
-		$min_leadtime = $min_leadtime->addDays(count($holidays));
+		// $min_leadtime = $min_leadtime->addDays(count($holidays));
 		$min_leadtime_y = $min_leadtime->format('Y');
         $min_leadtime_m = $min_leadtime->format('M');
         $min_leadtime_d = $min_leadtime->format('d');
