@@ -91,39 +91,41 @@ class ShippingController extends Controller
 
             if($edd->order_shipping != 'Store Pickup'){
                 $update_pickup_date = 0;
-                if(DateTime::createFromFormat('M d, Y', $date[0])){ // check and convert min leadtime to proper date format
-                    $min_leadtime = $date[0];
-                }else{
-                    $min_leadtime = $date[0].', '.$year[1];
-                }
-
-                if(DateTime::createFromFormat('M d, Y', $date[1])){ // check and convert max leadtime to proper date format
-                    $max_leadtime = $date[1];
-                }else{
-                    $max_leadtime = $month[0].' '.$date[1];
-                }
-
-                if($min_leadtime == $new_holiday){
-                    $update_leadtime = 1;
-                    $new_min_leadtime = Carbon::parse($min_leadtime)->addDays(1);
-                    $new_max_leadtime = Carbon::parse($max_leadtime)->addDays(1);
-                }else if($new_holiday > $min_leadtime and $new_holiday <= $max_leadtime){
-                    $update_leadtime = 1;
-                    $new_min_leadtime = $min_leadtime;
-                    $new_max_leadtime = Carbon::parse($max_leadtime)->addDays(1);
-                }
-
-                if($update_leadtime == 1){
-                    if(Carbon::parse($new_min_leadtime)->format('M d, Y') == Carbon::parse($new_max_leadtime)->format('M d, Y')){
-                        $new_leadtime = Carbon::parse($new_min_leadtime)->format('M d, Y');
-                    }else if(Carbon::parse($new_min_leadtime)->format('Y') == Carbon::parse($new_max_leadtime)->format('Y')){ // Same Year
-                        if(Carbon::parse($new_min_leadtime)->format('M') == Carbon::parse($new_max_leadtime)->format('M')){ // Same Month
-                            $new_leadtime = Carbon::parse($new_min_leadtime)->format('M d').' - '.Carbon::parse($new_max_leadtime)->format('d, Y');
-                        }else{
-                            $new_leadtime = Carbon::parse($new_min_leadtime)->format('M d').' - '.Carbon::parse($new_max_leadtime)->format('M d, Y');
+                if($date){
+                    if(DateTime::createFromFormat('M d, Y', $date[0])){ // check and convert min leadtime to proper date format
+                        $min_leadtime = $date[0];
+                    }else{
+                        $min_leadtime = $date[0].', '.$year[1];
+                    }
+    
+                    if(DateTime::createFromFormat('M d, Y', $date[1])){ // check and convert max leadtime to proper date format
+                        $max_leadtime = $date[1];
+                    }else{
+                        $max_leadtime = $month[0].' '.$date[1];
+                    }
+    
+                    if($min_leadtime == $new_holiday){
+                        $update_leadtime = 1;
+                        $new_min_leadtime = Carbon::parse($min_leadtime)->addDays(1);
+                        $new_max_leadtime = Carbon::parse($max_leadtime)->addDays(1);
+                    }else if($new_holiday > $min_leadtime and $new_holiday <= $max_leadtime){
+                        $update_leadtime = 1;
+                        $new_min_leadtime = $min_leadtime;
+                        $new_max_leadtime = Carbon::parse($max_leadtime)->addDays(1);
+                    }
+    
+                    if($update_leadtime == 1){
+                        if(Carbon::parse($new_min_leadtime)->format('M d, Y') == Carbon::parse($new_max_leadtime)->format('M d, Y')){
+                            $new_leadtime = Carbon::parse($new_min_leadtime)->format('M d, Y');
+                        }else if(Carbon::parse($new_min_leadtime)->format('Y') == Carbon::parse($new_max_leadtime)->format('Y')){ // Same Year
+                            if(Carbon::parse($new_min_leadtime)->format('M') == Carbon::parse($new_max_leadtime)->format('M')){ // Same Month
+                                $new_leadtime = Carbon::parse($new_min_leadtime)->format('M d').' - '.Carbon::parse($new_max_leadtime)->format('d, Y');
+                            }else{
+                                $new_leadtime = Carbon::parse($new_min_leadtime)->format('M d').' - '.Carbon::parse($new_max_leadtime)->format('M d, Y');
+                            }
+                        } else {
+                            $new_leadtime = Carbon::parse($new_min_leadtime)->format('M d, Y'). ' - ' .Carbon::parse($new_max_leadtime)->format('M d, Y');
                         }
-                    } else {
-                        $new_leadtime = Carbon::parse($new_min_leadtime)->format('M d, Y'). ' - ' .Carbon::parse($new_max_leadtime)->format('M d, Y');
                     }
                 }
             }else{
