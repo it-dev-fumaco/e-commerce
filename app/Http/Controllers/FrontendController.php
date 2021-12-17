@@ -98,13 +98,20 @@ class FrontendController extends Controller
                     }
                 }
 
+                $price = $item->f_original_price;
+                // get pricelist based on loggedin user
+                if (Auth::check()) {
+                    $user_price = DB::table('fumaco_product_prices')->where('item_code', $item->f_idcode)->where('price_list_id', Auth::user()->pricelist_id)->first();
+                    $price = ($user_price) ? $user_price->price : $price;
+                }
+
                 $results[] = [
                     'id' => $item->id,
                     'item_code' => $item->f_idcode,
                     'item_name' => $item->f_name_name,
                     'category' => $item->f_category,
                     'category_id' => $item->f_cat_id,
-                    'original_price' => $item->f_original_price,
+                    'original_price' => $price,
                     'is_discounted' => $item->f_discount_trigger,
                     'discounted_price' => $item->f_price,
                     'on_sale' => $item->f_onsale,

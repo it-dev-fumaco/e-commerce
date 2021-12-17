@@ -106,7 +106,7 @@
                                     </div>
                                     <div class="form-group">
                                        <label for="product-price">Product Price</label>
-                                       <input type="text" class="form-control" id="product-price" value="{{ $details->f_original_price }}" readonly>
+                                       <input type="text" class="form-control" id="product-price" value="{{ $details->f_default_price }}" readonly>
                                     </div>
                                  </div>
                                  <div class="col-md-6">
@@ -126,16 +126,6 @@
                                     </div>
                                  </div>
                               </div>
-                              {{-- <div class="row">
-                                 <div class="col-12">
-                                    <div class="form-group">
-                                       <label><input type="checkbox" id="set_as_new_item" name="is_new_item" {{ $details->f_new_item == 1 ? 'checked' : '' }}> New on this duration</label>
-                                       <div class="col-6">
-                                          <input type="text" class="form-control" id="new_item_date" name="new_item_duration" disabled/>
-                                       </div>
-                                    </div>
-                                 </div>
-                              </div> --}}
                            </div>
                         </div>
                         <h5>Product Weight & Dimensions</h5>
@@ -301,7 +291,9 @@
                                     <img src="{{ asset($image_r) }}" class="img-responsive rounded img-thumbnail d-inline-block" width="70" height="70">
                                  </td>
                                  <td><span class="d-block font-weight-bold">{{ $related_product['item_code'] }}</span>{{ $related_product['item_description'] }}</td>
-                                 <td class="text-center align-middle">P {{ number_format($related_product['original_price'], 2) }}</td>
+                                 <td class="text-center align-middle">
+                                    ₱ {{ number_format(str_replace(",","",$related_product['original_price']), 2) }}
+                                 </td>
                                  <td class="text-center align-middle">
                                     <button class="btn btn-danger btn-sm remove-rel" data-id="{{ $related_product['id'] }}">Remove</button>
                                  </td>

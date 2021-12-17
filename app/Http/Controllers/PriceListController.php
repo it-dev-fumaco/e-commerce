@@ -26,7 +26,7 @@ class PriceListController extends Controller
             return response()->json(['status' => 0, 'ERP API not configured.']);
         }
 
-        $params = '?filters=[["name","LIKE","%25' . $request->q . '%25"],["selling","=","1"],["enabled","=","1"]]';
+        $params = '?filters=[["name","LIKE","%25' . $request->q . '%25"],["selling","=","1"],["enabled","=","1"],["name","!=","Website Price List"]]';
 
         $response = Http::withHeaders([
             'Content-Type' => 'application/json',
