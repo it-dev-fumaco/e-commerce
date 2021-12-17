@@ -88,8 +88,8 @@
 		 <!-- /.row -->
 		 <!-- Main row -->
 		 <div class="row">
-			<!-- Left col -->
-			<section class="col-lg-12 connectedSortable">
+			{{-- <!-- Left col -->
+			<section class="col-6 connectedSortable">
 			  <!-- Custom tabs (Charts with tabs)-->
 			  <div class="card">
 				 <div class="card-header">
@@ -119,7 +119,31 @@
 			  </div>
 			  <!-- /.card -->
 			</section>
-			<!-- /.Left col -->
+			<!-- /.Left col --> --}}
+
+			<div class="col-6">
+				<div class="card">
+					<div class="card-header">
+						<h3 class="card-title">
+							<i class="fas fa-search mr-1"></i> Most Searched Terms 
+						</h3>
+					</div>
+					<div class="card-body">
+						<table class="table table-hover table-bordered">
+							<tr>
+								<th>Search Term</th>
+								<th>Frequency</th>
+							</tr>
+							@foreach ($most_searched as $search)
+								<tr>
+									<td>{{ $search->search_term }}</td>
+									<td>{{ $search->frequency }}</td>
+								</tr>
+							@endforeach
+						</table>
+					</div>
+				</div>
+			</div>
 		  
 		 </div>
 		 <!-- /.row (main row) -->
