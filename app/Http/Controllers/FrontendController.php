@@ -13,6 +13,7 @@ use Auth;
 use App\Models\User;
 use App\Models\UserVerify;
 use Illuminate\Support\Str;
+use Adrianorosa\GeoLocation\GeoLocation;
 
 use Illuminate\Pagination\LengthAwarePaginator;
 
@@ -237,24 +238,39 @@ class FrontendController extends Controller
             }
 
             if($request->s != ''){// Save search terms
-                $search_check = DB::table('fumaco_search_terms')->where('search_term', $request->s)->first();
+                $loc = GeoLocation::lookup($request->ip());
 
                 $search_data = [
                     'search_term' => $request->s,
                     'ip' => $request->ip(),
-                    'frequency' => $search_check ? $search_check->frequency + 1 : 1,
+                    'city' => $loc->getCity(),
+                    'region' => $loc->getRegion(),
+                    'country' => $loc->getCountry(),
+                    'latitude' => $loc->getLatitude(),
+                    'longtitude' => $loc->getLongitude(),
                     'date_last_searched' => Carbon::now()
                 ];
+
+                $search_results_data = [
+                    'search_term' => $request->s,
+                    'date_searched' => Carbon::now()
+                ];
+
+                $item_code_array = [];
+                $blog_id_array = [];
+                $prod_results = null;
+                $blog_results = null;
 
                 if($products){
                     $item_code_array = collect($products)->map(function($result){
                         return $result['item_code'];
                     });
 
-                    $item_codes = collect($item_code_array);
+                    $item_codes = $item_code_array->sort()->values()->all();
+                    $prod_results = collect($item_codes)->implode(',');
 
                     $search_data['prod_results_count'] = count($products);
-                    $search_data['prod_results'] = $item_codes->implode(',');
+                    $search_results_data['prod_results'] = $prod_results;
                 }
                 
                 if($blogs){
@@ -262,19 +278,25 @@ class FrontendController extends Controller
                         return $result['id'];
                     });
 
-                    $blog_ids = collect($blog_id_array);
+                    $blog_ids = $blog_id_array->sort()->values()->all();
+                    $blog_results = collect($blog_ids)->implode(',');
 
                     $search_data['blog_results_count'] = count($blogs);
-                    $search_data['blog_results'] = $blog_ids->implode(',');
+                    $search_results_data['blog_results'] = $blog_results;
                 }
 
-                if($search_check){
-                    DB::table('fumaco_search_terms')->where('id', $search_check->id)->update($search_data);
-                }else{
-                    DB::table('fumaco_search_terms')->insert($search_data);
+                DB::table('fumaco_search_terms')->insert($search_data);
+
+                $search_id = DB::table('fumaco_search_terms')->orderBy('id', 'desc')->pluck('id')->first();
+
+                $search_results_data['search_id'] = $search_id;
+                $checker = DB::table('fumaco_search_results')->where('search_term', $search_data['search_term'])->where('prod_results', $prod_results)->where('blog_results', $blog_results)->get();
+
+                if(count($checker) == 0){
+                    DB::table('fumaco_search_results')->insert($search_results_data);
                 }
             }
-            
+
             return view('frontend.search_results', compact('results', 'blogs', 'products'));
         }
 
