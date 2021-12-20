@@ -249,6 +249,7 @@
 																				@endif
 																			</td>
 																			<td>
+																				@if ($price->on_sale)
 																				@php
 																					$discounted_price = ($price->discount_type == 'percentage') ? $price->price - ($price->price * ($price->discount_rate/100)) : $price->price - $price->discount_rate;
 																				@endphp
@@ -259,8 +260,13 @@
 																					₱ {{ number_format(str_replace(",","",$price->discount_rate), 2) }} OFF
 																					@endif
 																				</span>
+																				@endif
 																			</td>
-																			<td>₱ {{ number_format(str_replace(",","", $discounted_price), 2) }}</td>
+																			<td>
+																				@if ($price->on_sale)
+																				₱ {{ number_format(str_replace(",","", $discounted_price), 2) }}
+																				@endif
+																			</td>
 																		</tr>
 																		@empty
 																		<tr>
@@ -340,6 +346,7 @@
 																			<td>₱ {{ number_format(str_replace(",","",$price->price), 2) }}</td>
 																			<td><span class="badge badge-danger">On Sale</span></td>
 																			<td>
+																				@if ($price->on_sale)
 																				@php
 																					$discounted_price = ($price->discount_type == 'percentage') ? $price->price - ($price->price * ($price->discount_rate/100)) : $price->price - $price->discount_rate;
 																				@endphp
@@ -350,8 +357,13 @@
 																					₱ {{ number_format(str_replace(",","",$price->discount_rate), 2) }} OFF
 																					@endif
 																				</span>
+																				@endif
 																			</td>
-																			<td>₱ {{ number_format(str_replace(",","", $discounted_price), 2) }}</td>
+																			<td>
+																				@if ($price->on_sale)
+																				₱ {{ number_format(str_replace(",","", $discounted_price), 2) }}
+																				@endif
+																			</td>
 																		</tr>
 																		@empty
 																		<tr>
