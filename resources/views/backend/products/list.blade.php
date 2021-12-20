@@ -264,7 +264,7 @@
 																		</tr>
 																		@empty
 																		<tr>
-																			<td colspan="3" class="text-center text-muted">No price list found</td>
+																			<td colspan="4" class="text-center text-muted">No price list found</td>
 																		</tr>
 																		@endforelse
 																	</tbody>
@@ -355,7 +355,9 @@
 																		</tr>
 																		@empty
 																		<tr>
+																			@if (!$item['on_sale'])
 																			<td colspan="4" class="text-center text-muted">No price list found</td>
+																			@endif
 																		</tr>
 																		@endforelse
 																	</tbody>
