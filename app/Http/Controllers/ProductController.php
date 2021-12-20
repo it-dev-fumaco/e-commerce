@@ -696,6 +696,8 @@ class ProductController extends Controller
         $brands = DB::table('fumaco_items')->select('f_brand')->orderBy('f_brand', 'asc')->groupBy('f_brand')->get();
         $categories = DB::table('fumaco_categories')->get();
 
+        $customer_groups = DB::table('fumaco_customer_group')->get();
+
         $list = [];
         foreach ($product_list as $product) {
             $item_image = DB::table('fumaco_items_image_v1')->where('idcode', $product->f_idcode)->first();
@@ -710,7 +712,8 @@ class ProductController extends Controller
             }
 
             $pricelist = DB::table('fumaco_product_prices as a')->join('fumaco_price_list as b', 'a.price_list_id', 'b.id')
-                ->where('item_code', $product->f_idcode)->select('a.id as item_price_id', 'a.*', 'b.price_list_name')->get();
+                ->join('fumaco_customer_group as c', 'b.customer_group_id', 'c.id')
+                ->where('item_code', $product->f_idcode)->select('a.id as item_price_id', 'a.*', 'b.price_list_name', 'c.customer_group_name')->get();
 
             $item_name = strip_tags($product->f_name_name);
             $list[] = [
@@ -732,11 +735,13 @@ class ProductController extends Controller
                 'status' => $product->f_status,
                 'featured' => $product->f_featured,
                 'is_new_item' => $is_new_item,
-                'pricelist' => $pricelist
+                'pricelist' => $pricelist,
+                'discount_type' => $product->f_discount_type,
+                'discount_rate' => $product->f_discount_rate,
             ];
         }
 
-        return view('backend.products.list', compact('list', 'product_list', 'brands', 'categories'));
+        return view('backend.products.list', compact('list', 'product_list', 'brands', 'categories', 'customer_groups'));
     }
 
     public function viewProduct($id) {
@@ -1708,8 +1713,9 @@ class ProductController extends Controller
             if (!$discount_rate && $discount_rate <= 0) {
                 return redirect()->back()->with('error', 'Discount rate cannot be less than or equal to zero.');
             }
-
-            if ($request->customer_group == 'Personal') {
+            
+            $customer_group = DB::table('fumaco_customer_group')->where('id', $request->customer_group)->first()->customer_group_name;
+            if ($customer_group == 'Individual') {
                 DB::table('fumaco_items')->where('f_idcode', $item_code)->update([
                     'f_discount_type' => $request->discount_type,
                     'f_onsale' => 1,
@@ -1735,10 +1741,31 @@ class ProductController extends Controller
         }
     }
 
-    public function disableProductOnSale($item_code) {
+    public function disableProductOnSale($item_code, Request $request) {
         DB::beginTransaction();
         try {
-            DB::table('fumaco_items')->where('f_idcode', $item_code)->update(['f_onsale' => 0, 'f_discount_trigger' => 0, 'last_modified_by' => Auth::user()->username]);
+            $selected_pricelists = $request->price_list;
+            if (in_array('Website Price List', $selected_pricelists)) {
+                DB::table('fumaco_items')->where('f_idcode', $item_code)->update([
+                    'f_onsale' => 0,
+                    'f_discount_rate' => 0,
+                    'f_discount_type' => null,
+                    'last_modified_by' => Auth::user()->username
+                ]);
+            }
+
+            if (($key = array_search("Website Price List", $selected_pricelists)) !== false) {
+                unset($selected_pricelists[$key]);
+            }
+    
+            foreach ($selected_pricelists as $price_list_id) {
+                DB::table('fumaco_product_prices')->where('id', $price_list_id)->update([
+                    'on_sale' => 0,
+                    'discount_rate' => 0,
+                    'discount_type' => null,
+                    'last_modified_by' => Auth::user()->username
+                ]);
+            }
 
             DB::commit();
 

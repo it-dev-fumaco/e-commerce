@@ -188,7 +188,7 @@
 											<div class="modal fade" id="pr{{ $item['id'] }}" role="dialog" aria-labelledby="onsalemodal" aria-hidden="true" style="z-index: 9999 !important; background-color: rgba(0,0,0, 0.4);">
 												<form action="/admin/product/{{ $item['item_code'] }}/disable_on_sale" method="POST">
 													@csrf
-													<div class="modal-dialog" role="document">
+													<div class="modal-dialog modal-lg" role="document">
 														<div class="modal-content">
 															<div class="modal-header">
 																<h5 class="modal-title"><b>{{ $item['item_code'] }}</b> Price List</h5>
@@ -200,13 +200,17 @@
 																<table class="table table-bordered table-hover table-sm">
 																	<thead>
 																		<tr>
+																			<th>Customer Group</th>
 																			<th>Price List</th>
 																			<th>Price</th>
-																			<th>On Sale</th>
+																			<th>Status</th>
+																			<th>Discount</th>
+																			<th>Discounted Price</th>
 																		</tr>
 																	</thead>
 																	<tbody>
 																		<tr>
+																			<td class="text-center">Individual</td>
 																			<td>Website Price List</td>
 																			<td>₱ {{ number_format(str_replace(",","",$item['price']), 2) }}</td>
 																			<td>
@@ -214,9 +218,29 @@
 																				<span class="badge badge-danger">On Sale</span>
 																				@endif
 																			</td>
+																			<td>
+																				@if ($item['on_sale'])
+																				@php
+																					$discounted_price = ($item['discount_type'] == 'percentage') ? $item['price'] - ($item['price'] * ($item['discount_rate']/100)) : $item['price'] - $item['discount_rate'];
+																				@endphp
+																				<span class="badge badge-info">
+																					@if ($item['discount_type'] == 'percentage')
+																					{{ $item['discount_rate'] }}% OFF
+																					@else
+																					₱ {{ number_format(str_replace(",","",$item['discount_rate']), 2) }} OFF
+																					@endif
+																				</span>
+																				@endif
+																			</td>
+																			<td>
+																				@if ($item['on_sale'])
+																				₱ {{ number_format(str_replace(",","", $discounted_price), 2) }}
+																				@endif
+																			</td>
 																		</tr>
 																		@forelse ($item['pricelist'] as $price)
 																		<tr>
+																			<td class="text-center">{{ $price->customer_group_name }}</td>
 																			<td>{{ $price->price_list_name }}</td>
 																			<td>₱ {{ number_format(str_replace(",","",$price->price), 2) }}</td>
 																			<td>
@@ -224,6 +248,19 @@
 																				<span class="badge badge-danger">On Sale</span>
 																				@endif
 																			</td>
+																			<td>
+																				@php
+																					$discounted_price = ($price->discount_type == 'percentage') ? $price->price - ($price->price * ($price->discount_rate/100)) : $price->price - $price->discount_rate;
+																				@endphp
+																				<span class="badge badge-info">
+																					@if ($price->discount_type == 'percentage')
+																					{{ $price->discount_rate }}% OFF
+																					@else
+																					₱ {{ number_format(str_replace(",","",$price->discount_rate), 2) }} OFF
+																					@endif
+																				</span>
+																			</td>
+																			<td>₱ {{ number_format(str_replace(",","", $discounted_price), 2) }}</td>
 																		</tr>
 																		@empty
 																		<tr>
@@ -241,7 +278,7 @@
 											<div class="modal fade" id="sd{{ $item['id'] }}" role="dialog" aria-labelledby="onsalemodal" aria-hidden="true" style="z-index: 9999 !important; background-color: rgba(0,0,0, 0.4);">
 												<form action="/admin/product/{{ $item['item_code'] }}/disable_on_sale" method="POST">
 													@csrf
-													<div class="modal-dialog" role="document">
+													<div class="modal-dialog modal-lg" role="document">
 														<div class="modal-content">
 															<div class="modal-header">
 																<h5 class="modal-title">Disable Product On Sale</h5>
@@ -254,45 +291,80 @@
 																<table class="table table-bordered table-hover table-sm">
 																	<thead>
 																		<tr>
+																			<th>Customer Group</th>
 																			<th>Price List</th>
 																			<th>Price</th>
-																			<th>On Sale</th>
+																			<th>Status</th>
+																			<th>Discount</th>
+																			<th>Discounted Price</th>
 																		</tr>
 																	</thead>
 																	<tbody>
 																		@if ($item['on_sale'])
 																		<tr>
+																			<td class="text-center">Individual</td>
 																			<td class="text-left pl-5">
 																				<div class="form-check">
-																					<input type="checkbox" class="form-check-input" id="personal-cb">
+																					<input type="checkbox" class="form-check-input" id="personal-cb" name="price_list[]" value="Website Price List">
 																					<label class="form-check-label" for="personal-cb">Website Price List</label>
 																				</div>
 																			</td>
 																			<td>₱ {{ number_format(str_replace(",","",$item['price']), 2) }}</td>
 																			<td><span class="badge badge-danger">On Sale</span></td>
+																			<td>
+																				@php
+																					$discounted_price = ($item['discount_type'] == 'percentage') ? $item['price'] - ($item['price'] * ($item['discount_rate']/100)) : $item['price'] - $item['discount_rate'];
+																				@endphp
+																				<span class="badge badge-info">
+																					@if ($item['discount_type'] == 'percentage')
+																					{{ $item['discount_rate'] }}% OFF
+																					@else
+																					₱ {{ number_format(str_replace(",","",$item['discount_rate']), 2) }} OFF
+																					@endif
+																				</span>
+																			</td>
+																			<td>
+																				₱ {{ number_format(str_replace(",","", $discounted_price), 2) }}
+																			</td>
 																		</tr>
 																		@endif
 																		@forelse (collect($item['pricelist'])->where('on_sale', 1) as $price)
 																		<tr>
+																			<td class="text-center">{{ $price->customer_group_name }}</td>
 																			<td class="text-left pl-5">
 																				<div class="form-check">
-																					<input type="checkbox" class="form-check-input" id="business-cb{{ $price->item_price_id }}">
+																					<input type="checkbox" class="form-check-input" id="business-cb{{ $price->item_price_id }}" name="price_list[]" value="{{ $price->item_price_id }}">
 																					<label class="form-check-label" for="business-cb{{ $price->item_price_id }}">{{ $price->price_list_name }}</label>
 																				</div>
 																			</td>
 																			<td>₱ {{ number_format(str_replace(",","",$price->price), 2) }}</td>
 																			<td><span class="badge badge-danger">On Sale</span></td>
+																			<td>
+																				@php
+																					$discounted_price = ($price->discount_type == 'percentage') ? $price->price - ($price->price * ($price->discount_rate/100)) : $price->price - $price->discount_rate;
+																				@endphp
+																				<span class="badge badge-info">
+																					@if ($price->discount_type == 'percentage')
+																					{{ $price->discount_rate }}% OFF
+																					@else
+																					₱ {{ number_format(str_replace(",","",$price->discount_rate), 2) }} OFF
+																					@endif
+																				</span>
+																			</td>
+																			<td>₱ {{ number_format(str_replace(",","", $discounted_price), 2) }}</td>
 																		</tr>
 																		@empty
 																		<tr>
-																			<td colspan="3" class="text-center text-muted">No price list found</td>
+																			<td colspan="4" class="text-center text-muted">No price list found</td>
 																		</tr>
 																		@endforelse
 																	</tbody>
 																</table>
 															</div>
 															<div class="modal-footer">
+																@if (collect($item['pricelist'])->where('on_sale', 1)->count() > 0 || $item['on_sale'])
 																<button type="submit" class="btn btn-primary">Submit</button>
+																@endif
 																<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
 															</div>
 														</div>
@@ -319,8 +391,9 @@
 																				<div class="form-group col-8 mx-auto">
 																					<label>Select Customer Group</label>
 																					<select name="customer_group" class="form-control">
-																						<option value="Personal">Personal</option>
-																						<option value="Business">Business</option>
+																						@foreach ($customer_groups as $customer_group)
+																						<option value="{{ $customer_group->id }}">{{ $customer_group->customer_group_name }}</option>
+																						@endforeach
 																					</select>
 																				</div>
 																				<div class="form-group col-8 mx-auto d-none">
@@ -453,7 +526,7 @@
 
 		$(document).on('change', 'select[name="customer_group"]', function(){
 			var pricelist_el = $(this).parent().parent().parent().find('select[name="price_list_id"]').eq(0);
-			if ($(this).val() === 'Personal') {
+			if ($(this).val() === 'Individual') {
 				pricelist_el.attr('required', true).parent().addClass('d-none');
 				pricelist_el.attr('required', true).parent().addClass('d-none');
 			} else {
