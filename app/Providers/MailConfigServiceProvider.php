@@ -27,27 +27,27 @@ class MailConfigServiceProvider extends ServiceProvider
     public function boot()
     {
         // 
-        // $config = Cache::remember('mail_config', 3600, function () {
-        //     $email_config = DB::table('email_config')->first();
-        //     if ($email_config) {
-        //         return $config = array(
-        //             'driver' => $email_config->driver,
-        //             'host' => $email_config->host,
-        //             'port' => $email_config->port,
-        //             'encryption' => $email_config->encryption,
-        //             'username' => $email_config->username,
-        //             'password' => $email_config->password,
-        //             'from' => [
-        //                 'address' => $email_config->address,
-        //                 'name' => $email_config->name,
-        //             ],
-        //             'timeout' => null,
-        //             'auth_mode' => null,
-        //         );
-        //     }
-        // });
+        $config = Cache::remember('mail_config', 3600, function () {
+            $email_config = DB::table('email_config')->first();
+            if ($email_config) {
+                return $config = array(
+                    'driver' => $email_config->driver,
+                    'host' => $email_config->host,
+                    'port' => $email_config->port,
+                    'encryption' => $email_config->encryption,
+                    'username' => $email_config->username,
+                    'password' => $email_config->password,
+                    'from' => [
+                        'address' => $email_config->address,
+                        'name' => $email_config->name,
+                    ],
+                    'timeout' => null,
+                    'auth_mode' => null,
+                );
+            }
+        });
 
-        // Config::set('mail', $config);
+        Config::set('mail', $config);
         
     }
 }
