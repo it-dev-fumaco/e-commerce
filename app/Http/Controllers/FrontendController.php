@@ -1300,18 +1300,17 @@ class FrontendController extends Controller
     }
 
     public function viewOrders() {
-        $orders = DB::table('fumaco_order')->where('order_account', Auth::user()->id)
-            ->where('order_status', '!=', 'Order Placed')
-            ->where('order_status', '!=', 'Order Confirmed')
-            ->where('order_status', '!=', 'Out for Delivery')
+        $completed_statuses = DB::table('order_status')->where('update_stocks', 1)->select('status')->get();
+        $active_order_statuses = array('Order Placed', 'Order Confirmed', 'Out for Delivery');
+
+        $orders = DB::table('fumaco_order')->where('user_email', Auth::user()->username)
+            ->whereNotIn('order_status', $active_order_statuses)
             ->orderBy('id', 'desc')->paginate(10);
 
-        $new_orders = DB::table('fumaco_order')->where('order_account', Auth::user()->id)
-        ->where('order_status', '!=', 'Delivered')
-        ->where('order_status', '!=', 'Order Delivered')
-        ->where('order_status', '!=', 'Order Completed')
-        ->where('order_status', '!=', 'Cancelled')
-        ->orderBy('id', 'desc')->paginate(10);
+        $new_orders = DB::table('fumaco_order')->where('user_email', Auth::user()->username)
+            ->whereNotIn('order_status', collect($completed_statuses)->pluck('status'))
+            ->where('order_status', '!=', 'Cancelled')
+            ->orderBy('id', 'desc')->paginate(10);
 
 
         $orders_arr = [];
@@ -1396,7 +1395,6 @@ class FrontendController extends Controller
                 'discount_amount' => $new_order->discount_amount,
             ];
         }
-        // return $new_orders_arr;
 
         return view('frontend.orders', compact('orders', 'orders_arr', 'new_orders', 'new_orders_arr'));
     }
