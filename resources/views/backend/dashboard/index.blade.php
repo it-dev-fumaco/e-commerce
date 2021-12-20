@@ -129,7 +129,11 @@
 				 </div><!-- /.card-header -->
 				 <div class="card-body">
 					<div class="tab-content p-0">
-					  	<canvas id="myChart" style="width:100%;"></canvas>
+						<div class="container my-4">
+							<div>
+					  			<canvas id="myChart"></canvas>
+							</div>
+						</div>
 					</div>
 				 </div><!-- /.card-body -->
 			  </div>
@@ -204,20 +208,19 @@
  </div>
 @endsection
 @section('script')
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jQuery-Knob/1.2.13/jquery.knob.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
 
 <script>
 	var xValues = ["January", "February", 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 	var yValues = [{{ collect($sales_arr)->pluck('sales')->implode(',') }}];
 	new Chart("myChart", {
-		type: "line",
+		type: "bar",
 		data: {
 			labels: xValues,
 			datasets: [{
-			backgroundColor: "rgba(0,123,255,0)",
-			borderColor: "rgba(0,123,255,1)",
-			data: yValues
+				backgroundColor: "rgba(0,123,255,1)",
+				data: yValues
 			}]
 		},
 		options: {
@@ -225,6 +228,21 @@
 			title: {
 				display: true,
 				text: "Monthly Sales Report"
+			},
+			scales: {
+				yAxes: [
+					{
+						ticks: {
+							callback: function(label, index, labels) {
+								return '₱ '+label/1000+'k';
+							}
+						},
+						scaleLabel: {
+							display: true,
+							labelString: '1k = ₱ 1,000'
+						}
+					}
+				]
 			},
 			tooltips: {
 				callbacks: {
@@ -235,5 +253,45 @@
 			}
 		}
 	});
+	// new Chart("myChart", {
+	// 	type: "line",
+	// 	data: {
+	// 		labels: xValues,
+	// 		datasets: [{
+	// 		backgroundColor: "rgba(0,123,255,0)",
+	// 		borderColor: "rgba(0,123,255,1)",
+	// 		data: yValues
+	// 		}]
+	// 	},
+	// 	options: {
+	// 		legend: {display: false},
+	// 		title: {
+	// 			display: true,
+	// 			text: "Monthly Sales Report"
+	// 		},
+	// 		scales: {
+	// 			yAxes: [
+	// 				{
+	// 					ticks: {
+	// 						callback: function(label, index, labels) {
+	// 							return '₱ '+label/1000+'k';
+	// 						}
+	// 					},
+	// 					scaleLabel: {
+	// 						display: true,
+	// 						labelString: '1k = ₱ 1,000'
+	// 					}
+	// 				}
+	// 			]
+	// 		},
+	// 		tooltips: {
+	// 			callbacks: {
+	// 				label: function(tooltipItem) {
+	// 					return "₱ " + Number(tooltipItem.yLabel).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+	// });
 </script>
 @endsection
