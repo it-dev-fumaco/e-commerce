@@ -148,12 +148,47 @@
 						<table class="table table-hover table-bordered">
 							<tr>
 								<th>Search Term</th>
-								<th>Frequency</th>
+								<th class="text-center">Frequency</th>
 							</tr>
-							@foreach ($most_searched as $search)
+							@foreach ($search_terms as $search)
 								<tr>
-									<td>{{ $search->search_term }}</td>
-									<td>{{ $search->frequency }}</td>
+									<td>
+										<a href="#" data-toggle="modal" data-target="#{{ Str::slug($search['search_term']) }}Modal">
+											{{ $search['search_term'] }}
+										</a>
+										<div class="modal fade" id="{{ Str::slug($search['search_term']) }}Modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+											<div class="modal-dialog" role="document">
+												<div class="modal-content">
+													<div class="modal-header">
+														<h5 class="modal-title" id="exampleModalLabel">{{ $search['search_term'] }}</h5>
+														<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+															<span aria-hidden="true">&times;</span>
+														</button>
+													</div>
+													<div class="modal-body">
+														<table class="table table-hover table-bordered">
+															<tr>
+																<th class="text-center">Location</th>
+																<th class="text-center">Frequency</th>
+															</tr>
+															@foreach ($search['location'] as $location)
+																<tr>
+																	<td class="text-center">
+																		{{ $location->city ? $location->city : '-' }}
+																	</td>
+																	<td class="text-center">{{ $location->count }}</td>
+																</tr>
+															@endforeach
+														</table>
+													</div>
+													<div class="modal-footer">
+														<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+													</div>
+												</div>
+											</div>
+										</div>
+									</td>
+									<td class="text-center">{{ $search['search_term_count'] }}</td>
 								</tr>
 							@endforeach
 						</table>

@@ -17,7 +17,25 @@ class DashboardController extends Controller
 		$total_sales = collect($orders)->where('order_status', '!=', 'Cancelled')->sum('amount_paid');
 		$total_orders = collect($orders)->count();
 
-		$most_searched = DB::table('fumaco_search_terms')->orderBy('frequency', 'desc')->limit(10)->get();
+		$most_searched = DB::table(DB::raw('(SELECT search_term, COUNT(*) as count FROM fumaco_search_terms GROUP BY search_term) AS subquery'))
+			->select('search_term', 'count')
+			->orderBy('count', 'desc')
+			->limit(10)
+			->get();
+
+		$search_terms = [];
+		foreach($most_searched as $search){
+			$location = DB::table(DB::raw('(SELECT search_term, city, region, country, COUNT(*) as count FROM fumaco_search_terms where search_term = "'.$search->search_term.'" GROUP BY search_term, city, region, country ) AS subquery'))
+				->select('search_term', 'city', 'region', 'country', 'count')
+				->orderBy('count', 'desc')
+				->get();
+
+			$search_terms[] = [
+				'search_term' => $search->search_term,
+				'search_term_count' => $search->count,
+				'location' => $location,
+			];
+		}
 
 		// sales per month
 		$sales_arr = [];
@@ -34,7 +52,7 @@ class DashboardController extends Controller
 		}
 		$sales_year = DB::table('fumaco_order')->selectRaw('YEAR(order_date)')->distinct()->get();
 
-		return view('backend.dashboard.index', compact('new_orders', 'total_orders', 'users', 'total_sales', 'most_searched', 'sales_arr', 'sales_year'));
+		return view('backend.dashboard.index', compact('new_orders', 'total_orders', 'users', 'total_sales', 'most_searched', 'sales_arr', 'sales_year', 'search_terms'));
 	}
 
 }
