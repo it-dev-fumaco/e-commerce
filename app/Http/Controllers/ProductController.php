@@ -879,17 +879,6 @@ class ProductController extends Controller
         return view('backend.marketing.edit_onsale', compact('on_sale', 'categories', 'discounted_categories'));
     }
 
-    public function editVoucherForm($id){
-        $coupon = DB::table('fumaco_voucher')->where('id', $id)->first();
-        
-        // $customer_list = DB::table('fumaco_users')->where('is_email_verified', 1)->get();
-        $categories_list = DB::table('fumaco_categories')->where('publish', 1)->whereNull('external_link')->get();
-
-        $selected_categories = DB::table('fumaco_voucher_categories')->where('voucher_id', $id)->get();
-
-        return view('backend.marketing.edit_voucher', compact('categories_list', 'coupon', 'selected_categories'));
-    }
-
     public function setOnSaleStatus(Request $request){
         DB::beginTransaction();
         try {
@@ -902,16 +891,34 @@ class ProductController extends Controller
         }
     }
 
+    public function editVoucherForm($id){
+        $coupon = DB::table('fumaco_voucher')->where('id', $id)->first();
+        $exclusive_vouchers = DB::table('fumaco_voucher_exclusive_to')->where('voucher_id', $id)->get();
+        
+        $categories_list = DB::table('fumaco_categories')->where('publish', 1)->whereNull('external_link')->get();
+        $selected_categories = collect($exclusive_vouchers)->where('voucher_type', 'Per Category');
+
+        $selected_items = collect($exclusive_vouchers)->where('voucher_type', 'Per Item');
+        $item_list = DB::table('fumaco_items')->where('f_status', 1)->get();
+
+        $selected_customer_groups = collect($exclusive_vouchers)->where('voucher_type', 'Per Customer Group');
+        $customer_groups = DB::table('fumaco_customer_group')->get();
+
+        return view('backend.marketing.edit_voucher', compact('categories_list', 'coupon', 'selected_categories', 'item_list', 'selected_items', 'customer_groups', 'selected_customer_groups'));
+    }
+
     public function addVoucherForm(){
-        // $customer_list = DB::table('fumaco_users')->where('is_email_verified', 1)->get();
         $category_list = DB::table('fumaco_categories')->where('publish', 1)->whereNull('external_link')->get();
-        return view('backend.marketing.add_voucher', compact('category_list'));
+        $item_list = DB::table('fumaco_items')->where('f_status', 1)->get();
+
+        $customer_group = DB::table('fumaco_customer_group')->get();
+
+        return view('backend.marketing.add_voucher', compact('category_list', 'item_list', 'customer_group'));
     }
 
     public function addVoucher(Request $request){
         DB::beginTransaction();
         try {
-            // return $request->all();
             $rules = array(
 				'name' => 'required|unique:fumaco_voucher,name',
                 'coupon_code' => 'required|unique:fumaco_voucher,code'
@@ -939,10 +946,10 @@ class ProductController extends Controller
             $capped_amount = null;
 
             if($request->discount_type == 'By Percentage'){
-                $discount_rate = $request->discount_percentage;
+                $discount_rate = preg_replace("/[^0-9]/", "", $request->discount_percentage);
                 $capped_amount = $request->capped_amount;
             }else if($request->discount_type == 'Fixed Amount'){
-                $discount_rate = $request->discount_amount;
+                $discount_rate = preg_replace("/[^0-9]/", "", $request->discount_amount);
             }
 
             $require_signin = 1;
@@ -958,7 +965,7 @@ class ProductController extends Controller
                 'allowed_usage' => $request->allowed_usage,
                 'minimum_spend' => $request->minimum_spend,
                 'discount_type' => $request->discount_type,
-                'discount_rate' => preg_replace("/[^0-9]/", "", $discount_rate),
+                'discount_rate' => $discount_rate,
                 'capped_amount' => $capped_amount,
                 'coupon_type' => $request->coupon_type,
                 'description' => $request->coupon_description,
@@ -969,16 +976,25 @@ class ProductController extends Controller
                 'created_by' => Auth::user()->username
             ];
 
-            // return $insert;
             DB::table('fumaco_voucher')->insert($insert);
 
-            if($request->coupon_type == 'Per Category'){
-                $voucher_id = DB::table('fumaco_voucher')->orderBy('id', 'desc')->first();
-                foreach($request->selected_category as $key => $category){
-                    DB::table('fumaco_voucher_categories')->insert([
-                        'category_id' => $category,
+            $voucher_id = DB::table('fumaco_voucher')->orderBy('id', 'desc')->pluck('id')->first();
+
+            if($request->coupon_type != 'Promotional'){
+                if($request->coupon_type == 'Per Category'){
+                    $selected_ids = array_unique($request->selected_category);
+                }else if($request->coupon_type == 'Per Item'){
+                    $selected_ids = array_unique($request->selected_item);
+                }else if($request->coupon_type == 'Per Customer Group'){
+                    $selected_ids = array_unique($request->selected_customer_group);
+                }
+
+                foreach($selected_ids as $included_id){
+                    DB::table('fumaco_voucher_exclusive_to')->insert([
+                        'exclusive_to' => $included_id,
                         'allowed_usage' => $request->allowed_usage,
-                        'voucher_id' => $voucher_id->id,
+                        'voucher_id' => $voucher_id,
+                        'voucher_type' => $request->coupon_type,
                         'created_by' => Auth::user()->username
                     ]);
                 }
@@ -995,7 +1011,6 @@ class ProductController extends Controller
     public function editVoucher($id, Request $request){
         DB::beginTransaction();
         try {
-            // return $request->all();
             $name_checker = DB::table('fumaco_voucher')->where('name', $request->name)->where('id', '!=', $id)->first();
             $code_checker = DB::table('fumaco_voucher')->where('code', $request->coupon_code)->where('id', '!=', $id)->first();
 
@@ -1018,10 +1033,10 @@ class ProductController extends Controller
             $capped_amount = null;
 
             if($request->discount_type == 'By Percentage'){
-                $discount_rate = $request->discount_percentage;
+                $discount_rate = preg_replace("/[^0-9]/", "", $request->discount_percentage);
                 $capped_amount = $request->capped_amount;
             }else if($request->discount_type == 'Fixed Amount'){
-                $discount_rate = $request->discount_amount;
+                $discount_rate = preg_replace("/[^0-9]/", "", $request->discount_amount);
             }
 
             $require_signin = 1;
@@ -1037,7 +1052,7 @@ class ProductController extends Controller
                 'allowed_usage' => $request->allowed_usage,
                 'minimum_spend' => $request->minimum_spend,
                 'discount_type' => $request->discount_type,
-                'discount_rate' => preg_replace("/[^0-9]/", "", $discount_rate),
+                'discount_rate' => $discount_rate,
                 'capped_amount' => $capped_amount,
                 'coupon_type' => $request->coupon_type,
                 'description' => $request->coupon_description,
@@ -1047,26 +1062,35 @@ class ProductController extends Controller
                 'remarks' => $request->remarks,
                 'last_modified_by' => Auth::user()->username
             ];
-            // return $update;
 
             DB::table('fumaco_voucher')->where('id', $id)->update($update);
-            
-            if($request->coupon_type == 'Per Category'){
-                $last_modified_by = null;
-                $created_by = Auth::user()->username;
-                $checker = DB::table('fumaco_voucher_categories')->where('voucher_id', $id)->first();
-    
-                if ($checker){
-                    $created_by = $checker->created_by;
-                    $last_modified_by = Auth::user()->username;
+
+            if($request->coupon_type != 'Promotional'){
+                if($request->coupon_type == 'Per Category'){
+                    $selected_ids = array_unique($request->selected_category);
+                }else if($request->coupon_type == 'Per Item'){
+                    $selected_ids = array_unique($request->selected_item);
+                }else if($request->coupon_type == 'Per Customer Group'){
+                    $selected_ids = array_unique($request->selected_customer_group);
                 }
 
-                DB::table('fumaco_voucher_categories')->where('voucher_id', $id)->delete();
-                foreach($request->selected_category as $key => $category){
-                    DB::table('fumaco_voucher_categories')->insert([
-                        'category_id' => $category,
+                $last_modified_by = null;
+                $created_by = Auth::user()->username;
+
+                $checker = DB::table('fumaco_voucher_exclusive_to')->where('voucher_id', $id)->first();
+                if($checker){
+                    $last_modified_by = Auth::user()->username;
+                    $created_by = $checker->created_by;
+
+                    DB::table('fumaco_voucher_exclusive_to')->where('voucher_id', $id)->delete();
+                }
+
+                foreach($selected_ids as $included_id){
+                    DB::table('fumaco_voucher_exclusive_to')->insert([
+                        'exclusive_to' => $included_id,
                         'allowed_usage' => $request->allowed_usage,
                         'voucher_id' => $id,
+                        'voucher_type' => $request->coupon_type,
                         'created_by' => $created_by,
                         'last_modified_by' => $last_modified_by
                     ]);
@@ -1084,7 +1108,6 @@ class ProductController extends Controller
     public function addOnSale(Request $request){
         DB::beginTransaction();
         try {
-            // return $request->all();
             $from = null;
             $to = null;
             $discount_rate = null;
@@ -1130,7 +1153,6 @@ class ProductController extends Controller
                 'created_by' => Auth::user()->username
             ];
 
-            // return $insert;
 
             // Image upload
             $rules = array(
@@ -1326,7 +1348,6 @@ class ProductController extends Controller
                     ]);
                 }
             }
-            // return $update;
             DB::commit();
             return redirect('/admin/marketing/on_sale/list')->with('success', 'On Sale Added.');
         } catch (Exception $e) {
@@ -1365,7 +1386,7 @@ class ProductController extends Controller
         DB::beginTransaction();
         try {
             DB::table('fumaco_voucher')->where('id', $id)->delete();
-            DB::table('fumaco_voucher_customers')->where('voucher_id', $id)->delete();
+            DB::table('fumaco_voucher_exclusive_to')->where('voucher_id', $id)->delete();
             DB::commit();
             return redirect()->back()->with('success', 'Coupon Deleted.');
         } catch (Exception $e) {
