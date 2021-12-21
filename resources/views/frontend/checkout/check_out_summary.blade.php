@@ -232,7 +232,7 @@
 							<div class="d-flex justify-content-between align-items-center">
 								Total Amount <small class="text-muted stylecap he1x">₱ {{ number_format(collect($cart_arr)->sum('subtotal'), 2, '.', ',') }}</small>
 							</div>
-							<div class="d-flex justify-content-between align-items-center">
+							<div class="d-flex justify-content-between align-items-center d-none" id="discount-div">
 								<p class="m-0">Discount <span id="voucher-code" class="text-white d-none" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833;">Voucher Applied</span></p>
 								 <small class="text-danger stylecap he1x">- ₱ <span id="discount-amount">0.00</span></small>
 							</div>
@@ -1183,6 +1183,7 @@
 						if (response.status == 0) {
 							$('#coupon-alert').removeClass('d-none').text(response.message);
 							$('#voucher-code').addClass('d-none').text('');
+							$('#discount-div').addClass('d-none');
 							$('#discount-amount').text('0.00');
 							$('#voucher-free').empty();
 
@@ -1190,6 +1191,7 @@
 						} else {
 							var discount = (isNaN(response.discount)) ? 0 : response.discount;
 							$('#voucher-code').removeClass('d-none').text(response.voucher_code);
+							$('#discount-div').removeClass('d-none');
 							$('#discount-amount').text(discount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,"));
 							$('#coupon-code').removeClass('is-invalid');
 							$('#coupon-alert').addClass('d-none');
