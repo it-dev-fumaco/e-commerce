@@ -299,7 +299,7 @@ class OrderController extends Controller
                 if($status == 'Order Confirmed'){
                     $checker = DB::table('track_order')->where('track_code', $request->order_number)->where('track_status', 'Out for Delivery')->count();
 
-                    if($checker > 1){
+                    if($checker > 0){
                         DB::table('track_order')->where('track_code', $request->order_number)->where('track_status', 'Out for Delivery')->update(['track_active' => 0]);
                         DB::table('track_order')->where('track_code', $request->order_number)->where('track_status', 'Order Confirmed')->update(['track_active' => 0]);
                     }
@@ -328,7 +328,7 @@ class OrderController extends Controller
                     });
                 }
 
-                if ($status == 'Delivered') {
+                if ($status == 'Order Delivered') {
                     $order_details = DB::table('fumaco_order')->where('order_number', $request->order_number)->first();
                     $customer_name = $order_details->order_name . ' ' . $order_details->order_lastname;
                     Mail::send('emails.delivered', ['id' => $order_details->order_number, 'customer_name' => $customer_name], function($message) use($order_details, $status){

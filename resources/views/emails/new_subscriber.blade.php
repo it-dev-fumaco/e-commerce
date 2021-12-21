@@ -19,7 +19,7 @@
 </style>
 
 
-<table border="0" width="50%" bgcolor="#ffffff" cellpadding="0" cellspacing="0" style="margin: 0 auto 0 auto;">
+<table class="table" bgcolor="#ffffff" style="margin: 0 auto 0 auto;">
   <tr>
     <td class="h2" style="padding: 5% 0 0 5%;">Thank your for subscribing to Fumaco.com</td>
   </tr>
@@ -45,13 +45,12 @@
                         <p style="margin: 1%; color:#0062A5 !important; font-size: 12px !important; font-weight: 500 !important; text-align: left; min-height: 70px;">{{ $item['item_name'] }}</p>
                         <p style="color:#000000 !important;  min-height: 70px; margin: 1%; font-size: 13px; text-align: left;">
                             @if ($item['is_discounted'])
-                            ₱ {{ number_format(str_replace(",","",$item['new_price']), 2) }}&nbsp;&nbsp;<small><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$item['orig_price']), 2) }}</s></small>&nbsp;&nbsp;&nbsp;<span class="badge badge-danger" style="vertical-align: middle;">{{ $item['discount'] }}% OFF</span>
+                            <span style="white-space: nowrap">₱ {{ number_format(str_replace(",","",$item['new_price']), 2) }}</span>&nbsp;&nbsp;<small><s style="color: #c5c5c5; white-space: nowrap">₱ {{ number_format(str_replace(",","",$item['orig_price']), 2) }}</s></small>&nbsp;&nbsp;&nbsp;<span class="badge badge-danger" style="vertical-align: middle; white-space: nowrap">{{ $item['discount'] }}% OFF</span>
                             @else
-                            ₱ {{ number_format(str_replace(",","",$item['orig_price']), 2) }}<br>&nbsp;
+                            <span style="white-space: nowrap">₱ {{ number_format(str_replace(",","",$item['orig_price']), 2) }}</span><br>&nbsp;
                             @endif
                             </p>
                     </div>
-                   
                 </td>
                 @endforeach
             </tr>
