@@ -56,7 +56,7 @@ class DashboardController extends Controller
 			$sales_arr[] = [
 				'month' => $month,
 				'sales' => number_format((float)$sales, 2, '.', ''),
-				'month_name' => "'".$month_name->format('F')."'"
+				'month_name' => "'".$month_name->format('M')."'"
 			];
 		}
 		$sales_year = DB::table('fumaco_order')->selectRaw('YEAR(order_date)')->distinct()->get();

@@ -94,7 +94,7 @@
 			  <div class="card h-100">
 				 <div class="card-header">
 					<h3 class="card-title">
-						<i class="fas fa-chart-pie mr-1"></i> Online Sales 
+						<i class="fas fa-chart-pie mr-1"></i> Monthly Sales Report
 					</h3>
 					<div class="card-tools">
 						<ul class="nav nav-pills ml-auto">
@@ -128,8 +128,8 @@
 				 </div><!-- /.card-header -->
 				 <div class="card-body">
 					<div class="tab-content p-0">
-						<div class="container mt-5">
-							<div>
+						<div class="container mt-4">
+							<div class="col-10 mx-auto">
 					  			<canvas id="myChart"></canvas>
 							</div>
 						</div>
@@ -142,16 +142,15 @@
 			<div class="col-4">
 				<div class="card h-100">
 					<div class="card-header">
-						<h3 class="card-title">
-							<i class="fas fa-search mr-1"></i> Most Searched Terms 
+						<h3 class="card-title container-fluid">
+							<div class="row">
+								<div class="col-9 text-bold"><i class="fas fa-search mr-1"></i> Most Searched Terms </div>
+								<div class="col-3 text-bold">Frequency</div>
+							</div>
 						</h3>
 					</div>
 					<div class="card-body">
 						<table class="table table-hover table-bordered">
-							<tr>
-								<th>Search Term</th>
-								<th class="text-center">Frequency</th>
-							</tr>
 							@foreach ($search_terms as $search)
 								<tr>
 									<td>
@@ -217,10 +216,18 @@
 								<th>Action</th>
 							</tr>
 							@foreach ($cart_collection as $cart)
+								@php
+									$status_color = '#DC3545';
+									if($cart['status'] == 'Active'){
+										$status_color = '#007BFF';
+									}else if($cart['status'] == 'Converted'){
+										$status_color = '#28A745';
+									}
+								@endphp
 								<tr>
 									<td>{{ $cart['user_type'] == 'member' ? $cart['owner'] : 'Guest' }}</td>
 									<td class="text-center">
-										<span class="badge badge-{{ $cart['status'] != 'Abandoned' ? 'success' : 'danger' }} w-100" style="font-size: 11pt">{{ $cart['status'] }}</span>
+										<span class="badge w-100" style="font-size: 11pt; background-color: {{ $status_color }}; color: #fff">{{ $cart['status'] }}</span>
 									</td>
 									<td style="font-size: 11pt">{{ $cart['last_online'] ? \Carbon\Carbon::parse($cart['last_online'])->format('M d, Y - h:i a') : null }}</td>
 									<td>
@@ -438,14 +445,11 @@
 		},
 		options: {
 			legend: {display: false},
-			title: {
-				display: true,
-				text: "Monthly Sales Report"
-			},
 			scales: {
 				yAxes: [
 					{
 						ticks: {
+							beginAtZero: true,
 							callback: function(label, index, labels) {
 								return '₱ '+label/1000+'k';
 							}
