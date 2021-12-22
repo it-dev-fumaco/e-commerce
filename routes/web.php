@@ -155,6 +155,7 @@ Route::prefix('admin')->group(function () {
 
     Route::group(['middleware' => 'auth:admin'], function(){
         Route::get('/dashboard', 'DashboardController@index');
+        Route::get('/send_abandoned_cart_email/{transaction_id}', 'DashboardController@sendAbandonedCartEmail');
 
         Route::get('/pages/home', 'HomeCRUDController@home_crud');
         Route::post('/add_carousel', 'HomeCRUDController@add_header_carousel');
