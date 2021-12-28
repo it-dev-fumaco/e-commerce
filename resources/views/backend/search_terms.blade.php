@@ -58,9 +58,13 @@
                                                 <td class="text-center">{{ $terms['frequency'] }}</td>
                                                 <td class="text-center">{{ $terms['results_count'] }}</td>
                                                 <td class="text-center">
-                                                    <a href="#" data-toggle="modal" data-target="#search{{ $terms['id'] }}Modal">
-                                                        View Results
-                                                    </a>
+                                                    @if (!$terms['product_results'] and !$terms['blog_results'])
+                                                        <p class="text-muted">No Result(s)</p>
+                                                    @else
+                                                        <a href="#" data-toggle="modal" data-target="#search{{ $terms['id'] }}Modal">
+                                                            View Results
+                                                        </a>
+                                                    @endif
                                                     
                                                     <!-- Modal -->
                                                     <div class="modal fade" id="search{{ $terms['id'] }}Modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
