@@ -412,12 +412,17 @@ class CartController extends Controller
                 $existing_cart = DB::table('fumaco_cart')->where('transaction_id', $order_no)
                     ->where('item_code', $product_details->f_idcode)->first();
                 if ($existing_cart) {
-                    $plus_qty = $existing_cart->qty + 1;
-                    $minus_qty = $existing_cart->qty - 1;
+                    if($request->type == 'increment'){
+                        $new_qty = $existing_cart->qty + 1;
+                    }else if($request->type == 'decrement'){
+                        $new_qty = $existing_cart->qty - 1;
+                    }else{
+                        $new_qty = $request->quantity;
+                    }
                     DB::table('fumaco_cart')->where('id', $existing_cart->id)->update([
                         'user_type' => (Auth::check()) ? 'member' : 'guest',
                         'user_email' => (Auth::check()) ? Auth::user()->username : null,
-                        'qty' => ($request->type == 'increment') ? $plus_qty : $minus_qty,
+                        'qty' => $new_qty,
                         'ip' => $request->ip(),
                         'city' => $loc->getCity(),
                         'region' => $loc->getRegion(),
