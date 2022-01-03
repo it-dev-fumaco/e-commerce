@@ -168,7 +168,7 @@
                 <br><br><br>
                 @if($cross_sell_arr)
                     <div class="container mb-3">
-                        <h4>You May Want To Try It With...</h4>
+                        <h4>Frequently Bought Together</h4>
                         <br/>
                         <div class="row regular" style="min-height: 300px">
                             @foreach($cross_sell_arr as $cs)
@@ -210,7 +210,7 @@
                                                     <div class="btn-container">
                                                         <a href="/product/{{ ($cs['slug']) ? $cs['slug'] : $cs['cross_sell_item_code'] }}" class="view-products-btn btn" role="button"><i class="fas fa-search"></i>&nbsp;View Product</a>
                                                     </div>
-                                
+
                                                     <picture>
                                                         <source srcset="{{ asset($img_webp) }}" type="image/webp" class="img-responsive" style="width: 100% !important;">
                                                         <source srcset="{{ asset($img) }}" type="image/jpeg" class="img-responsive" style="width: 100% !important;">
@@ -327,7 +327,7 @@
     transition: all ease-in-out .3s;
     opacity: .2;
   }
-  
+
   .slick-active {
     opacity: .5;
   }
@@ -372,11 +372,11 @@
 
   .btn-container{
     width: 100%;
-    position: absolute; 
-    top: 50%; 
-    left: 0; 
-    z-index: 9; 
-    display: none; 
+    position: absolute;
+    top: 50%;
+    left: 0;
+    z-index: 9;
+    display: none;
     text-align: center;
   }
 
@@ -396,11 +396,11 @@
 	.view-products-btn:hover{
 		/* color: #fff;
 		background-color: #000; */
-    background-color: #f8b878; 
+    background-color: #f8b878;
     color: black;
 	}
 
-	.product-card:hover .overlay-bg{ 
+	.product-card:hover .overlay-bg{
 		transition:all .15s ease-in !important;
 		opacity: 1 !important;
 	}
@@ -408,7 +408,7 @@
 	.hover-container:hover img{
 		-ms-transform: scale(0.95); /* IE 9 */
       	-webkit-transform: scale(0.95); /* Safari 3-8 */
-      	transform: scale(0.95); 
+      	transform: scale(0.95);
 	}
 
     .hover{
@@ -418,7 +418,7 @@
     .hover:hover {
       -ms-transform: scale(0.95); /* IE 9 */
       -webkit-transform: scale(0.95); /* Safari 3-8 */
-      transform: scale(0.95); 
+      transform: scale(0.95);
     }
 
     .products-head {
@@ -651,7 +651,7 @@
             var input_name = row.find('input[name="quantity[]"]').eq(0);
             var id = input_name.data('id');
             var max = input_name.attr('max');
-            
+
             var current_qty = input_name.val();
             var type = 'desk';
 
@@ -671,7 +671,7 @@
             var input_name = row.find('.mobile-quantity').eq(0);
             var id = input_name.data('id');
             var max = input_name.attr('max');
-            
+
             var current_qty = $(this).val();
             var type = 'mobile'
 
@@ -711,7 +711,7 @@
                 var qty = row.find('input[name="quantity[]"]').eq(0).val();
             }
             var amount = (price * qty).toFixed(2);
-            
+
             row.find('.amount').eq(0).text(amount);
             row.find('.formatted-amount').eq(0).text(parseFloat(amount).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,"));
             updateTotal();
