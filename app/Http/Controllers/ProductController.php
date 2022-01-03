@@ -883,7 +883,204 @@ class ProductController extends Controller
     public function setOnSaleStatus(Request $request){
         DB::beginTransaction();
         try {
+            $sale_details = [];
             DB::table('fumaco_on_sale')->where('id', $request->sale_id)->update(['status' => $request->status]);
+            if($request->status == 1){
+                $sale_check = DB::table('fumaco_on_sale')->where('id', $request->sale_id)->first();
+
+                $subscribers = DB::table('fumaco_subscribe')->where('status', 1)->select('email')->pluck('email');
+                $categories = DB::table('fumaco_categories as cat')->join('fumaco_on_sale_categories as sale', 'cat.id', 'sale.category_id')->where('sale.sale_id', $request->sale_id)->select('sale.*', 'cat.name')->get();
+
+                $items_on_sale = DB::table('fumaco_items')->whereIn('f_cat_id', collect($categories)->pluck('category_id'))->pluck('f_idcode');
+
+                foreach($subscribers as $subscriber){
+                    $items = [];
+                    $cart_items = [];
+                    $wish_items = [];
+                    $category_arr = [];
+                    $customer = DB::table('fumaco_users')->where('username', $subscriber)->select('id', 'f_name', 'f_lname')->first();
+
+                    $discount_rate = null;
+                    $discount_type = null;
+                    $type = null;
+
+                    if($categories){
+                        $cart_check = DB::table('fumaco_cart as cart')->join('fumaco_items as items', 'items.f_idcode', 'cart.item_code')->where('items.f_discount_trigger', 0)->whereIn('cart.category_id', collect($categories)->pluck('category_id'))->where('cart.user_email', $subscriber)->exists();
+                        $wish_check = DB::table('datawishlist as wish')->join('fumaco_items as items', 'items.f_idcode', 'wish.item_code')->where('items.f_discount_trigger', 0)->whereIn('wish.category_id', collect($categories)->pluck('category_id'))->where('userid', $customer->id)->exists();
+                    }else{
+                        $cart_check = DB::table('fumaco_cart as cart')->join('fumaco_items as items', 'items.f_idcode', 'cart.item_code')->where('f_discount_trigger', 0)->where('cart.user_email', $subscriber)->exists();
+                        $wish_check = DB::table('datawishlist as wish')->join('fumaco_items as items', 'items.f_idcode', 'wish.item_code')->where('items.f_discount_trigger', 0)->where('wish.userid', $customer->id)->exists();
+                    }
+
+                    if($cart_check){
+                        $type = 'cart';
+                        if($sale_check->apply_discount_to == 'Per Category'){
+                            $cart_items = DB::table('fumaco_cart as cart')->join('fumaco_items as items', 'cart.item_code', 'items.f_idcode')->where('cart.user_email', $subscriber)->where('items.f_discount_trigger', 0)->whereIn('items.f_cat_id', collect($categories)->pluck('category_id'))->select('cart.*', 'items.f_original_price', 'items.f_price', 'items.f_name_name')->get();
+    
+                            foreach($cart_items as $item){
+                                $price = $item->f_original_price;
+                                
+                                $image = DB::table('fumaco_items_image_v1')->where('idcode', $item->item_code)->pluck('imgprimayx')->first();
+                                $cat_id = DB::table('fumaco_items')->where('f_idcode', $item->item_code)->pluck('f_cat_id')->first();
+
+                                $discount_type = collect($categories)->where('category_id', $cat_id)->pluck('discount_type')->first();
+                                $discount_rate = collect($categories)->where('category_id', $cat_id)->pluck('discount_rate')->first();
+
+                                if($discount_type == 'By Percentage'){
+                                    $price = $item->f_original_price - ($item->f_original_price * ($discount_rate/100));
+                                }else if ($discount_type == 'Fixed Amount'){
+                                    if($discount_rate < $price){
+                                        $price = $item->f_original_price - $discount_rate;
+                                    }else{
+                                        $type = 'general';
+                                    }
+                                }
+        
+                                $items[] = [
+                                    'item_code' => $item->item_code,
+                                    'name' => $item->f_name_name,
+                                    'image' => $image,
+                                    'original_price' => $item->f_original_price,
+                                    'discount_type' => $discount_type,
+                                    'discount_rate' => $discount_rate,
+                                    'discounted_price' => $price
+                                ];
+                            }
+                        }else{
+                            $cart_items = DB::table('fumaco_cart as cart')->join('fumaco_items as items', 'cart.item_code', 'items.f_idcode')->where('cart.user_email', $subscriber)->where('items.f_discount_trigger', 0)->select('cart.*', 'items.f_original_price', 'items.f_price')->get();
+    
+                            foreach($cart_items as $item){
+                                $price = $item->f_original_price;
+                                $image = DB::table('fumaco_items_image_v1')->where('idcode', $item->item_code)->pluck('imgprimayx')->first();
+    
+                                $discount_type = $sale_check->discount_type;
+                                $discount_rate = $sale_check->discount_rate;
+
+                                if($discount_type == 'By Percentage'){
+                                    $price = $item->f_original_price - ($item->f_original_price * ($discount_rate/100));
+                                }else if ($sale_check->discount_type == 'Fixed Amount'){
+                                    if($discount_rate < $price){
+                                        $price = $item->f_original_price - $discount_rate;
+                                    }else{
+                                        $type = 'general';
+                                    }
+                                }
+        
+                                $items[] = [
+                                    'item_code' => $item->item_code,
+                                    'name' => $item->item_description,
+                                    'image' => $image,
+                                    'original_price' => $item->f_original_price,
+                                    'discount_type' => $discount_type,
+                                    'discount_rate' => $discount_rate,
+                                    'discounted_price' => $price
+                                ];
+                            }
+                        }
+                    }else if($wish_check){
+                        $type = 'wishlist';
+                        if($sale_check->apply_discount_to == 'Per Category'){
+                            $wish_items = DB::table('datawishlist as wish')->join('fumaco_items as items', 'wish.item_code', 'items.f_idcode')->where('wish.userid', $customer->id)->where('items.f_discount_trigger', 0)->select('wish.*', 'items.f_name_name', 'items.f_original_price', 'items.f_price')->get();
+
+                            foreach($wish_items as $item){
+                                $price = $item->f_original_price;
+                                $image = DB::table('fumaco_items_image_v1')->where('idcode', $item->item_code)->pluck('imgprimayx')->first();
+                                $cat_id = DB::table('fumaco_items')->where('f_idcode', $item->item_code)->pluck('f_cat_id')->first();
+    
+                                $discount_type = collect($categories)->where('category_id', $cat_id)->pluck('discount_type')->first();
+                                $discount_rate = collect($categories)->where('category_id', $cat_id)->pluck('discount_rate')->first();
+                                if($discount_type == 'By Percentage'){
+                                    $price = $item->f_original_price - ($item->f_original_price * ($discount_rate/100));
+                                }else if ($discount_type == 'Fixed Amount'){
+                                    if($discount_rate < $price){
+                                        $price = $item->f_original_price - $discount_rate;
+                                    }else{
+                                        $type = 'general';
+                                    }
+                                }
+        
+                                $items[] = [
+                                    'item_code' => $item->item_code,
+                                    'name' => $item->f_name_name,
+                                    'image' => $image,
+                                    'original_price' => $item->f_original_price,
+                                    'discount_type' => $discount_type,
+                                    'discount_rate' => $discount_rate,
+                                    'discounted_price' => $price
+                                ];
+                            }
+                        }else{
+                            $wish_items = DB::table('datawishlist as wish')->join('fumaco_items as items', 'wish.item_code', 'items.f_idcode')->where('wish.userid', $customer->id)->where('items.f_discount_trigger', 0)->select('wish.*', 'items.f_name_name', 'items.f_original_price', 'items.f_price')->get();
+
+                            foreach($wish_items as $item){
+                                $price = $item->f_original_price;
+                                $image = DB::table('fumaco_items_image_v1')->where('idcode', $item->item_code)->pluck('imgprimayx')->first();
+    
+                                $discount_type = $sale_check->discount_type;
+                                $discount_rate = $sale_check->discount_rate;
+
+                                if($discount_type == 'By Percentage'){
+                                    $price = $item->f_original_price - ($item->f_original_price * ($discount_rate/100));
+                                }else if ($sale_check->discount_type == 'Fixed Amount'){
+                                    if($discount_rate < $price){
+                                        $price = $item->f_original_price - $discount_rate;
+                                    }else{
+                                        $type = 'general';
+                                    }
+                                }
+        
+                                $items[] = [
+                                    'item_code' => $item->item_code,
+                                    'name' => $item->f_name_name,
+                                    'image' => $image,
+                                    'original_price' => $item->f_original_price,
+                                    'discount_type' => $discount_type,
+                                    'discount_rate' => $discount_rate,
+                                    'discounted_price' => $price
+                                ];
+                            }
+                        }
+                    }else{ // Subscriber has no items listed on cart and wishlist
+                        $type = 'general';
+                    }
+
+                    $sale_details = [
+                        'user_account' => $subscriber,
+                        'customer_name' => $customer->f_name.' '.$customer->f_lname,
+                        'items' => $items,
+                        'type' => $type
+                    ];
+
+                    if($type == 'cart' or $type == 'wishlist'){
+                        Mail::send('emails.multiple_items_on_cart', $sale_details, function($message) use($subscriber){
+                            $message->to(trim($subscriber));
+                            $message->subject("Hurry or you might miss out - FUMACO");
+                        });
+                    }else if($type == 'general'){
+                        if($sale_check->apply_discount_to == 'Per Category'){
+                            
+                            foreach($categories as $category){
+                                $category_arr[] = [
+                                    'category_name' => $category->name,
+                                    'discount_type' => $category->discount_type,
+                                    'discount_rate' => $category->discount_rate
+                                ];
+                            }
+
+                            Mail::send('emails.sale_per_category', ['categories' => $category_arr, 'user_account' => $subscriber, 'customer_name' => $customer->f_name.' '.$customer->f_lname], function($message) use($subscriber){
+                                $message->to(trim($subscriber));
+                                $message->subject("Hurry or you might miss out - FUMACO");
+                            });
+                        }else{
+                            Mail::send('emails.sitewide_sale', ['discount_rate' => $sale_check->discount_rate, 'discount_type' => $sale_check->discount_type, 'user_account' => $subscriber, 'customer_name' => $customer->f_name.' '.$customer->f_lname], function($message) use($subscriber){
+                                $message->to(trim($subscriber));
+                                $message->subject("Hurry or you might miss out - FUMACO");
+                            });
+                        }
+                    }
+                }
+            }
+
             DB::commit();
             return response()->json(['status' => 1]);
         } catch (Exception $e) {

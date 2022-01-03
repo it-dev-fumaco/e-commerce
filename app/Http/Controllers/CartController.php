@@ -109,6 +109,7 @@ class CartController extends Controller
                     'user_email' => (Auth::check()) ? Auth::user()->username : null,
                     'item_description' => $product_details->f_name_name,
                     'item_code' => $product_details->f_idcode,
+                    'category_id' => $product_details->f_cat_id,
                     'qty' => $data['quantity'],
                     'ip' => $data['ip'],
                     'city' => $loc->getCity(),
@@ -186,6 +187,7 @@ class CartController extends Controller
                 'user_email' => (Auth::check()) ? Auth::user()->username : null,
                 'item_description' => $product_details->f_name_name,
                 'item_code' => $product_details->f_idcode,
+                'category_id' => $product_details->f_cat_id,
                 'qty' => $data['quantity'],
                 'ip' => $data['ip'],
                 'city' => $loc->getCity(),
@@ -313,46 +315,6 @@ class CartController extends Controller
                     }
                 }
             }
-
-            // $cross_sell_discount = 0;
-            // $cross_sell_price = $item_details->f_original_price;
-            // $discount_from_sale = 0;
-            // $sale_discount_rate = null;
-            // $sale_discount_type = null;
-            // if (!$item_details->f_onsale) {
-            //     if ($sale) {
-            //         $discount_from_sale = 1;
-            //         if ($sale->apply_discount_to == 'All Items') {
-            //             if ($sale->discount_type == 'By Percentage') {
-            //                 $cross_sell_discount = ($item_details->f_original_price * ($sale->discount_rate/100));
-            //                 $cross_sell_discount = ($cross_sell_discount > $sale->capped_amount) ? $sale->capped_amount : $cross_sell_discount;
-            //             } else {
-            //                 $discount_from_sale = $sale->discount_rate > $item_details->f_original_price ? 0 : 1;
-            //                 $cross_sell_discount = $sale->discount_rate;
-            //             }
-            //             $sale_discount_rate = $sale->discount_rate;
-            //             $sale_discount_type = $sale->discount_type;
-            //         } else {
-            //             $sale_per_category = DB::table('fumaco_on_sale as sale')->join('fumaco_on_sale_categories as cat_sale', 'sale.id', 'cat_sale.sale_id')
-            //                 ->whereDate('sale.start_date', '<=', Carbon::now())->whereDate('sale.end_date', '>=', Carbon::now())
-            //                 ->where('status', 1)->where('cat_sale.category_id', $item_details->f_cat_id)
-            //                 ->select('cat_sale.*')->first();
-            //             if ($sale_per_category) {
-            //                 if ($sale_per_category->discount_type == 'By Percentage') {
-            //                     $cross_sell_discount = ($item_details->f_original_price * ($sale_per_category->discount_rate/100));
-            //                     $cross_sell_discount = ($cross_sell_discount > $sale_per_category->capped_amount) ? $sale_per_category->capped_amount : $cross_sell_discount;
-            //                 } else {
-            //                     $discount_from_sale = $sale_per_category->discount_rate > $item_details->f_original_price ? 0 : 1;
-            //                     $cross_sell_discount = $sale_per_category->discount_rate;
-            //                 }
-            //                 $sale_discount_rate = $sale_per_category->discount_rate;
-            //                 $sale_discount_type = $sale_per_category->discount_type;
-            //             }
-            //         }
-            //     }
-            // } else {
-            //     $cross_sell_price = $item->f_price;
-            // }
 
             $product_review_per_code = DB::table('fumaco_product_review')->where('status', '!=', 'pending')->where('item_code', $item_details->f_idcode)->get();
             
@@ -487,6 +449,7 @@ class CartController extends Controller
                     [
                         'userid' => Auth::user()->id,
                         'item_code' => $id,
+                        'category_id' => $product_details->f_cat_id,
                         'item_name' => $product_details->f_name_name,
                         'item_price' => ($product_details->f_price > 0) ? $product_details->f_price : $product_details->f_original_price
                     ]
