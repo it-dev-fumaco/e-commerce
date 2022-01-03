@@ -240,6 +240,19 @@
 									</h2>
 								</div>
 								<div id="collapseTwo" class="collapse show" aria-labelledby="headingTwo" data-parent="#accordionExample">
+									@if ($product_details->f_featured_image)
+										<div class="card-body prod_standard">
+											@php
+												$f_img = $product_details->f_featured_image ? '/storage/item_images/'. $product_details->f_idcode .'/gallery/featured/'. $product_details->f_featured_image : '/storage/no-photo-available.png';
+												$f_img_webp = $product_details->f_featured_image ? '/storage/item_images/'. $product_details->f_idcode .'/gallery/featured/'. explode(".", $product_details->f_featured_image)[0] .'.webp' : '/storage/no-photo-available.png';
+											@endphp
+											<picture>
+												<source srcset="{{ asset($f_img_webp) }}" type="image/webp" class="img-responsive" style="width: 100% !important;">
+												<source srcset="{{ asset($f_img) }}" type="image/jpeg" class="img-responsive" style="width: 100% !important;">
+												<img src="{{ asset($f_img) }}" alt="{{ Str::slug(explode(".", $product_details->f_featured_image)[0], '-') }}" class="img-responsive" style="width: 100% !important;">
+											</picture>
+										</div>
+									@endif
 									<div class="card-body prod_standard">
 										<p class="card-text">{!! $product_details->f_full_description !!}</p>
 									</div>

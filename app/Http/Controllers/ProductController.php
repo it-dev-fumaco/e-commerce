@@ -219,6 +219,7 @@ class ProductController extends Controller
     public function saveItem(Request $request) {
         DB::beginTransaction();
         try {
+            // return $request->all();
             $existing_item = DB::table('fumaco_items')->where('f_idcode', $request->item_code)->exists();
             if ($existing_item) {
                 return redirect()->back()->withInput($request->all())->with('error', 'Product code <b>' . $request->item_code . '</b> already exists.');
@@ -321,6 +322,38 @@ class ProductController extends Controller
                 $stock_qty = ($request->is_manual) ? $request->stock_qty : $item['stock_qty'];
             }
 
+            // Image upload
+            $featured_image_name = null;
+            if($request->hasFile('featured_image')){
+                $allowed_extensions = array('jpg', 'png', 'jpeg', 'gif');
+                $extension_error = "Sorry, only JPG, JPEG, PNG and GIF files are allowed.";
+
+                $featured_image = $request->file('featured_image');
+
+                $image_name = pathinfo($featured_image->getClientOriginalName(), PATHINFO_FILENAME);
+			    $image_ext = pathinfo($featured_image->getClientOriginalName(), PATHINFO_EXTENSION);
+
+                $image_name = Str::slug($image_name, '-');
+                
+                $featured_image_name = $image_name.".".$image_ext;
+
+                if(!in_array($image_ext, $allowed_extensions)){
+                    return redirect()->back()->with('error', $extension_error);
+                }
+
+                $webp = Webp::make($request->file('featured_image'));
+
+                if(!Storage::disk('public')->exists('/item_images/'.$request->item_code.'/gallery/featured/')){
+                    Storage::disk('public')->makeDirectory('/item_images/'.$request->item_code.'/gallery/featured/');
+                }
+
+                $destinationPath = storage_path('/app/public/item_images/'.$request->item_code.'/gallery/featured/');
+
+                if ($webp->save(storage_path('/app/public/item_images/'.$request->item_code.'/gallery/featured/'.$image_name.'.webp'))) {
+                    $featured_image->move($destinationPath, $featured_image_name);
+                }
+            } 
+
             $id = DB::table('fumaco_items')->insertGetId([
                 'f_idcode' => $item['item_code'],
                 'f_parent_code' => $item['parent_item_code'],
@@ -347,6 +380,7 @@ class ProductController extends Controller
                 'f_description' => $item['item_description'],
                 'f_caption' => $request->website_caption,
                 'f_full_description' => $request->full_detail,
+                'f_featured_image' => $featured_image_name,
                 'f_status' => 1,
                 'f_by' => Auth::user()->username,
                 'f_ip' => $request->ip(),
@@ -471,6 +505,52 @@ class ProductController extends Controller
                 $start_date = Carbon::parse($set_as_new_date[0])->format('Y/m/d');
                 $end_date = Carbon::parse($set_as_new_date[1])->format('Y/m/d');
             }
+
+            // Image upload
+            $featured_image_name = null;
+            if(isset($request->add_featured)){
+                $featured_image_name = $detail->f_featured_image;
+                if($request->hasFile('featured_image')){
+                    $allowed_extensions = array('jpg', 'png', 'jpeg', 'gif');
+                    $extension_error = "Sorry, only JPG, JPEG, PNG and GIF files are allowed.";
+
+                    $featured_image = $request->file('featured_image');
+
+                    $image_name = pathinfo($featured_image->getClientOriginalName(), PATHINFO_FILENAME);
+                    $image_ext = pathinfo($featured_image->getClientOriginalName(), PATHINFO_EXTENSION);
+
+                    $image_name = Str::slug($image_name, '-');
+                    
+                    $featured_image_name = $image_name.".".$image_ext;
+
+                    if(!in_array($image_ext, $allowed_extensions)){
+                        return redirect()->back()->with('error', $extension_error);
+                    }
+
+                    $webp = Webp::make($request->file('featured_image'));
+
+                    if(!Storage::disk('public')->exists('/item_images/'.$detail->f_idcode.'/gallery/featured/')){
+                        Storage::disk('public')->makeDirectory('/item_images/'.$detail->f_idcode.'/gallery/featured/');
+                    }
+
+                    $destinationPath = storage_path('/app/public/item_images/'.$detail->f_idcode.'/gallery/featured/');
+
+                    if ($webp->save(storage_path('/app/public/item_images/'.$detail->f_idcode.'/gallery/featured/'.$image_name.'.webp'))) {
+                        $featured_image->move($destinationPath, $featured_image_name);
+                    }
+                }
+            }else{
+                $featured = storage_path('/app/public/item_images/'.$detail->f_idcode.'/gallery/featured/'.$detail->f_featured_image);
+                $featured_webp = storage_path('/app/public/item_images/'.$detail->f_idcode.'/gallery/featured/'.explode('.', $detail->f_featured_image)[0].'.webp');
+
+                if (file_exists($featured)) {
+                    unlink($featured);
+                }
+
+                if (file_exists($featured_webp)) {
+                    unlink($featured_webp);
+                }
+            }
             
             DB::table('fumaco_items')->where('id', $id)->update([
                 'f_name_name' => $request->product_name,
@@ -479,6 +559,7 @@ class ProductController extends Controller
                 'f_alert_qty' => $request->alert_qty,
                 'f_caption' => $request->website_caption,
                 'f_full_description' => $request->full_detail,
+                'f_featured_image' => $featured_image_name,
                 'f_status' => ($request->is_disabled) ? 0 : 1,
                 'f_qty' => $request->stock_qty,
                 'stock_source' => ($request->is_manual) ? 0 : 1,

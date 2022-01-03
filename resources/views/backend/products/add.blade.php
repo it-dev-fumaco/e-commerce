@@ -28,7 +28,7 @@
 	<section class="content">
 		<div class="container-fluid">
 			<div class="row">
-        <form action="/admin/product/save" method="POST">
+        <form action="/admin/product/save" method="POST" enctype="multipart/form-data">
           @csrf
           <!-- left column -->
           <div class="col-md-12">
@@ -204,11 +204,19 @@
                   </div>
                 </div>
 
-
                 <div class="form-group">
                   <label for="website-caption">* Website Caption (more information section)</label>
                   <textarea class="form-control" rows="6" id="website-caption" name="website_caption">{{ old('website_caption') }}</textarea>
                 </div>
+
+                <div class="form-group">
+                  <label for="featured-image">Featured Image</label>
+                  <div class="custom-file mb-3">
+                    <input type="file" class="custom-file-input" id="customFile" name="featured_image">
+                    <label class="custom-file-label" for="customFile">Choose File</label>
+                  </div>
+                </div>
+
                 <div class="form-group">
                   <label for="full-detail">* Full Detail</label>
                   <textarea class="form-control" rows="6" id="full-detail" name="full_detail">{{ old('full_detail') }}</textarea>
@@ -395,6 +403,12 @@
 			dialogsFade: true,
 			height: "200px",
 		});
+
+    // Add the following code if you want the name of the file appear on select
+    $(".custom-file-input").change(function() {
+        var fileName = $(this).val().split("\\").pop();
+        $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+    });
   })();
 
 </script>
