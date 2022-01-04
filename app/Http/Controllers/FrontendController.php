@@ -145,6 +145,8 @@ class FrontendController extends Controller
                 ];
             }
 
+            $searched_item_codes = collect($results)->whereNotNull('item_code')->pluck('item_code');
+
             // Get current page form url e.x. &page=1
             $currentPage = LengthAwarePaginator::resolveCurrentPage();
             // Create a new Laravel collection from the array data
@@ -295,9 +297,70 @@ class FrontendController extends Controller
                 if(count($checker) == 0){
                     DB::table('fumaco_search_results')->insert($search_results_data);
                 }
+
+                $recently_added_items = DB::table('fumaco_items')->whereNotIn('f_idcode', $searched_item_codes)->where('f_status', 1)->where('f_new_item', 1)->whereDate('f_new_item_start', '<=', Carbon::now())->whereDate('f_new_item_end', '>=', Carbon::now())->get();
+
+                $recently_added_arr = [];
+                foreach($recently_added_items as $recent){
+                    $image = DB::table('fumaco_items_image_v1')->where('idcode', $recent->f_idcode)->pluck('imgprimayx')->first();
+                    $product_reviews = DB::table('fumaco_product_review')->where('status', '!=', 'pending')->where('item_code', $recent->f_idcode)->get();
+
+                    $recent_category_discount = DB::table('fumaco_on_sale as sale')->join('fumaco_on_sale_categories as cat_sale', 'sale.id', 'cat_sale.sale_id')->whereDate('sale.start_date', '<=', Carbon::now())->whereDate('sale.end_date', '>=', Carbon::now())->where('status', 1)->where('cat_sale.category_id', $recent->f_cat_id)->first();
+
+                    $recent_product_price = null;
+                    $recent_discount_from_sale = 0;
+                    $recent_sale_discount_rate = null;
+                    $recent_sale_discount_type = null;
+                    if($all_item_discount){
+                        $recent_discount_from_sale = 1;
+                        $recent_sale_discount_rate = $all_item_discount->discount_rate;
+                        $recent_sale_discount_type = $all_item_discount->discount_type;
+                        if($all_item_discount->discount_type == 'By Percentage'){
+                            $recent_product_price = $recent->f_original_price - ($recent->f_original_price * ($all_item_discount->discount_rate/100));
+                        }else if($all_item_discount->discount_type == 'Fixed Amount'){
+                            $recent_discount_from_sale = 0;
+                            if($recent->f_original_price > $all_item_discount->discount_rate){
+                                $recent_discount_from_sale = 1;
+                                $recent_product_price = $recent->f_original_price - $all_item_discount->discount_rate;
+                            }
+                        }
+                    }else if($recent_category_discount){
+                        $recent_discount_from_sale = 1;
+                        $recent_sale_discount_rate = $recent_category_discount->discount_rate;
+                        $recent_sale_discount_type = $recent_category_discount->discount_type;
+                        if($recent_category_discount->discount_type == 'By Percentage'){
+                            $recent_product_price = $recent->f_original_price - ($recent->f_original_price * ($recent_category_discount->discount_rate/100));
+                        }else if($recent_category_discount->discount_type == 'Fixed Amount'){
+                            $recent_discount_from_sale = 0;
+                            if($recent->f_original_price > $recent_category_discount->discount_rate){
+                                $recent_discount_from_sale = 1;
+                                $recent_product_price = $recent->f_original_price - $recent_category_discount->discount_rate;
+                            }
+                        }
+                    }
+
+                    $recently_added_arr[] = [
+                        'id' => $recent->id,
+                        'item_code' => $recent->f_idcode,
+                        'item_name' => $recent->f_name_name,
+                        'orig_price' => $recent->f_original_price,
+                        'sale_discounted_price' => $recent_product_price,
+                        'sale_discount_rate' => $recent_sale_discount_rate,
+                        'sale_discount_type' => $recent_sale_discount_type,
+                        'is_discounted' => $recent->f_discount_trigger,
+                        'is_discounted_from_sale' => $recent_discount_from_sale,
+                        'on_stock' => $on_stock,
+                        'new_price' => $recent->f_price,
+                        'discount' => $recent->f_discount_percent,
+                        'image' => $image,
+                        'slug' => $recent->slug,
+                        'is_new_item' => $recent->f_new_item,
+                        'product_reviews' => $product_reviews
+                    ];
+                }
             }
 
-            return view('frontend.search_results', compact('results', 'blogs', 'products'));
+            return view('frontend.search_results', compact('results', 'blogs', 'products', 'recently_added_arr'));
         }
 
         $carousel_data = DB::table('fumaco_header')->where('fumaco_status', 1)->orderBy('fumaco_active', 'desc')->get();
