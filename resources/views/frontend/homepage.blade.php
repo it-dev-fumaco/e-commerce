@@ -124,7 +124,7 @@
     <section class="py-5 text-center container" style="padding-bottom: 0rem !important;">
       <div class="row py-lg-5">
         <div class="col-lg-6 col-md-8 mx-auto">
-          <h4 class="fw-light bestsellinghead fumacoFont1 animated animatedFadeInUp fadeInUp" style="color:#000000 !important;">BEST SELLING ITEMS</h4>
+          <h4 class="fw-light bestsellinghead fumacoFont1 animated animatedFadeInUp fadeInUp" style="color:#000000 !important; text-transform: uppercase;">Most Popular</h4>
         </div>
       </div>
     </section>
