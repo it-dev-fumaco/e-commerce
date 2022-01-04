@@ -44,7 +44,13 @@ class DashboardController extends Controller
 
 		// sales per month
 		$sales_arr = [];
-		for($month = 1; $month <= Carbon::now()->format('m'); $month++){
+
+		$available_months = 12;
+		if(!$request->year or Carbon::now()->format('Y') == $request->year){
+			$available_months = Carbon::now()->format('m');
+		}
+
+		for($month = 1; $month <= $available_months; $month++){
 			if($request->year){
 				$sales = DB::table('fumaco_order')->where('order_status', '!=', 'Cancelled')->whereMonth('order_date', $month)->whereYear('order_date', $request->year)->sum('amount_paid');
 			}else{
@@ -56,10 +62,17 @@ class DashboardController extends Controller
 			$sales_arr[] = [
 				'month' => $month,
 				'sales' => number_format((float)$sales, 2, '.', ''),
-				'month_name' => "'".$month_name->format('M')."'"
+				'month_name' => "'".$month_name->format('M')."'",
+				'js_month_name' => $month_name->format('M')
 			];
 		}
 		$sales_year = DB::table('fumaco_order')->selectRaw('YEAR(order_date)')->distinct()->get();
+
+		if($request->ajax()){
+			$sales_data = collect($sales_arr)->pluck('sales')->implode(',');
+			$month_names = json_encode(collect($sales_arr)->pluck('js_month_name')->implode(','));
+ 			return response()->json([$sales_data, $month_names]);
+		}
 
 		// items on cart
 		$cart_transactions = DB::table('fumaco_cart')->select('transaction_id', 'user_email', 'user_type')->groupBy('transaction_id', 'user_email', 'user_type')->orderBy('last_modified_at', 'desc')->get();

@@ -99,29 +99,25 @@
 					<div class="card-tools">
 						<ul class="nav nav-pills ml-auto">
 							<li class="nav-item">
-								<form action="/admin/dashboard" method="get">
-									<div class="btn-group col-12" role="group">
-										<select name="year" class="form-control" required> 
-											<option value="" disabled>Year</option>
-											@foreach ($sales_year as $year)
-												@php
-													$selected = null;
-													if(!request()->get('year')){
-														if(\Carbon\Carbon::now()->format('Y') == $year->{'YEAR(order_date)'}){
-															$selected = 'selected';
-														}
-													}else{
-														if($year->{'YEAR(order_date)'} == request()->get('year')){
-															$selected = 'selected';
-														}
-													}
-												@endphp
-												<option {{ $selected }} value="{{ $year->{'YEAR(order_date)'} }}">{{ $year->{'YEAR(order_date)'} }}</option>
-											@endforeach
-										</select>
-										<button type="submit" class="btn btn-primary btn-sm pl-3 pr-2"><i class="fas fa-search mr-1"></i></button>
-									</div>
-								</form>
+								<select name="year" class="form-control" id="year-filter" required> 
+									<option value="" disabled>Year</option>
+									<option value="2020">2020</option>
+									@foreach ($sales_year as $year)
+										@php
+											$selected = null;
+											if(!request()->get('year')){
+												if(\Carbon\Carbon::now()->format('Y') == $year->{'YEAR(order_date)'}){
+													$selected = 'selected';
+												}
+											}else{
+												if($year->{'YEAR(order_date)'} == request()->get('year')){
+													$selected = 'selected';
+												}
+											}
+										@endphp
+										<option {{ $selected }} value="{{ $year->{'YEAR(order_date)'} }}">{{ $year->{'YEAR(order_date)'} }}</option>
+									@endforeach
+								</select>
 							</li>
 						</ul>
 					</div>
@@ -129,7 +125,7 @@
 				 <div class="card-body">
 					<div class="tab-content p-0">
 						<div class="container mt-4">
-							<div class="col-10 mx-auto">
+							<div class="col-10 mx-auto" id="chart-container">
 					  			<canvas id="myChart"></canvas>
 							</div>
 						</div>
@@ -434,41 +430,77 @@
 <script>
 	var xValues = {!! '['.collect($sales_arr)->pluck('month_name')->implode(',').']' !!};
 	var yValues = [{{ collect($sales_arr)->pluck('sales')->implode(',') }}];
-	new Chart("myChart", {
-		type: "bar",
-		data: {
-			labels: xValues,
-			datasets: [{
-				backgroundColor: "rgba(0,123,255,1)",
-				data: yValues
-			}]
-		},
-		options: {
-			legend: {display: false},
-			scales: {
-				yAxes: [
-					{
-						ticks: {
-							beginAtZero: true,
-							callback: function(label, index, labels) {
-								return '₱ '+label/1000+'k';
-							}
-						},
-						scaleLabel: {
-							display: true,
-							labelString: '1k = ₱ 1,000'
-						}
-					}
-				]
+	getChartData(xValues, yValues);
+
+	function getChartData(xValues, yValues){
+		new Chart("myChart", {
+			type: "bar",
+			data: {
+				labels: xValues,
+				datasets: [{
+					backgroundColor: "rgba(0,123,255,1)",
+					data: yValues
+				}]
 			},
-			tooltips: {
-				callbacks: {
-					label: function(tooltipItem) {
-						return "₱ " + Number(tooltipItem.yLabel).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+			options: {
+				legend: {display: false},
+				scales: {
+					yAxes: [
+						{
+							ticks: {
+								beginAtZero: true,
+								callback: function(label, index, labels) {
+									if(parseInt(label) >= 1000){
+										return '₱ '+label/1000+'k';
+									}else{
+										return '₱ '+label;
+									}
+								}
+							},
+							scaleLabel: {
+								display: true,
+								labelString: '1k = ₱ 1,000'
+							}
+						}
+					]
+				},
+				tooltips: {
+					callbacks: {
+						label: function(tooltipItem) {
+							return "₱ " + Number(tooltipItem.yLabel).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+						}
 					}
 				}
 			}
+		});
+	}
+
+	$('#year-filter').change(function(){
+		var data = {
+			'year': $(this).val()
 		}
+		$.ajax({
+			type: 'GET',
+			url: '/admin/dashboard',
+			dataType: "json",
+			data: data,
+			success: function (result)
+			{
+				document.getElementById("chart-container").innerHTML = '&nbsp;';
+				document.getElementById("chart-container").innerHTML = '<canvas id="myChart"></canvas>';
+				var months = [result[1]].join(',');
+				var month_names = months.replace(new RegExp('"', 'g'), "");
+				const months_arr = [];
+				$.each( month_names.split(','), function( i,month ) {
+					months_arr.push(month);
+				});
+				
+				var xValues = months_arr;
+				var yValues = JSON.parse('['+[result[0]].join(',')+']');
+
+				getChartData(xValues, yValues);
+			}
+		});
 	});
 </script>
 @endsection
