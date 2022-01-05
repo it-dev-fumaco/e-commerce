@@ -140,6 +140,7 @@ class FrontendController extends Controller
                     'title' => $blog->blogtitle,
                     'type' => $blog->blogtype,
                     'caption' => $blog->blog_caption,
+                    'blog_slug' => $blog->slug,
                     'f_qty' => 0,
                     'f_reserved_qty' => 0
                 ];
@@ -231,6 +232,7 @@ class FrontendController extends Controller
                         'id' => $result['id'],
                         'comment_count' => $result['comment_count'],
                         'image' => $result['image'],
+                        'blog_slug' => $result['blog_slug'],
                         'publish_date' => $result['publish_date'],
                         'title' => $result['title'],
                         'type' => $result['type'],

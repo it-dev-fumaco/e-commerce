@@ -269,14 +269,14 @@
 						<img src="{{ asset($image) }}" alt="{{ Str::slug(explode(".", $blog['image'])[0], '-') }}" class="card-img-top">
 					</picture>
 					<div class="card-body align-items-stretch p-2">
-						<a href="blog?id={{ $blog['id'] }}" style="text-decoration: none !important;">
+						<a href="blog/{{ $blog['blog_slug'] ? $blog['blog_slug'] : $blog['id'] }}" style="text-decoration: none !important;">
 							<p style="color:#373b3e !important;" class="abt_standard fumacoFont_card_title">{{ $blog['title'] }}</p>
 						</a>
 						<div class="blog-text ellipsis">
                             <p class="blog-text-concat abt_standard">{{ $blog['caption'] }}</p>
                           </div>
 						
-                          <a href="/blog?id={{ $blog['id'] }}" class="text-concat mx-auto read-more">Read More</a>
+                          <a href="/blog/{{ $blog['blog_slug'] ? $blog['blog_slug'] : $blog['id'] }}" class="text-concat mx-auto read-more">Read More</a>
 					</div>
 				</div>
 			</div>
