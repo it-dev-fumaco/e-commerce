@@ -60,6 +60,7 @@ class FrontendController extends Controller
                         ->where('f_brand', 'LIKE', "%".$search_str."%")
                         ->orWhere('f_parent_code', 'LIKE', "%".$search_str."%")
                         ->orWhere('f_category', 'LIKE', "%".$search_str."%")
+                        ->orWhere('f_name_name', 'LIKE', "%".$search_str."%")
                         ->orWhere(function($q) use ($search_str) {
                             $search_strs = explode(" ", $search_str);
                             foreach ($search_strs as $str) {
@@ -240,7 +241,7 @@ class FrontendController extends Controller
                     ];
                 }
             }
-
+            $recently_added_arr = [];
             if($request->s != ''){// Save search terms
                 $loc = GeoLocation::lookup($request->ip());
 
@@ -351,7 +352,7 @@ class FrontendController extends Controller
                         'sale_discount_type' => $recent_sale_discount_type,
                         'is_discounted' => $recent->f_discount_trigger,
                         'is_discounted_from_sale' => $recent_discount_from_sale,
-                        'on_stock' => $on_stock,
+                        'on_stock' => $recent->f_qty - $recent->f_reserved_qty > 0 ? 1 : 0,
                         'new_price' => $recent->f_price,
                         'discount' => $recent->f_discount_percent,
                         'image' => $image,
@@ -492,6 +493,29 @@ class FrontendController extends Controller
         $page_meta = DB::table('fumaco_pages')->where('is_homepage', 1)->first();
 
         return view('frontend.homepage', compact('carousel_data', 'onsale_carousel_data', 'blogs', 'best_selling_arr', 'on_sale_arr', 'page_meta', 'image_for_sharing'));
+    }
+
+    public function getAutoCompleteData(Request $request){
+        if($request->ajax()){
+            $item_keywords = DB::table('fumaco_items')
+                ->where('f_name_name', 'LIKE', '%'.$request->search_term.'%')
+                ->where('f_status', 1)->select('f_name_name')->limit(8)->get();
+
+            if(count($item_keywords) == 0){
+                $item_keywords = $item_keywords->where('keywords', 'LIKE', '%'.$request->search_term.'%');
+            }
+
+            $items_arr = [];
+            foreach($item_keywords as $item){
+                $image = null;
+                $items_arr[] = [
+                    'item_name' => $item->f_name_name,
+                    // 'image' => $image,
+                ];
+            }
+
+            return response()->json(collect($items_arr)->pluck('item_name'));
+        }
     }
 
     public function newsletterSubscription(Request $request){

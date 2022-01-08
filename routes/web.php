@@ -82,6 +82,7 @@ Route::get('/website_settings', 'FrontendController@websiteSettings');
 Route::post('/getvariantcode', 'FrontendController@getVariantItemCode');
 Route::post('/subscribe', 'FrontendController@newsletterSubscription');
 Route::get('/thankyou', 'FrontendController@subscribeThankyou');
+Route::get('/search', 'FrontendController@getAutoCompleteData');
 
 Route::get('/policy_pages', 'FrontendController@pagesList');
 Route::get('/pages/{slug}', 'FrontendController@viewPage')->name('pages');

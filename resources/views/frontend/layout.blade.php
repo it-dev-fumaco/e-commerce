@@ -29,6 +29,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
     <link href="{{ asset('/assets/fumaco.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="https://resources/demos/style.css">
     @if ($activePage != 'error_page')
     <!-- Google Tag Manager -->
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -455,6 +457,13 @@
         box-shadow: none !important;
         border: none !important;
       }
+
+      .ui-menu-item{
+        padding: 8px !important;
+      }
+      .ui-widget{
+        z-index: 9999 !important;
+      }
     </style>
     @yield('style')
     @if($activePage == 'contact')
@@ -517,8 +526,9 @@
             </ul>
             <form class="d-none d-lg-block search-bar" action="/" method="GET">
               <div class="input-group mb-0 searchbar search-bar">
-                <input type="text" placeholder="Search" name="s" value="{{ request()->s }}" class="form-control searchstyle" aria-label="Text input with dropdown button">
+                <input type="text" placeholder="Search" name="s" value="{{ request()->s }}" class="form-control searchstyle autocomplete-search" aria-label="Text input with dropdown button">
                   <button class="btn btn-outline-secondary searchstyle" type="submit"><i class="fas fa-search"></i></button>
+                  <div id="desk-search-container"></div>
               </div>
             </form>
             <ul class="navbar-nav d-lg-inline-block">
@@ -581,8 +591,9 @@
             <div class="col-md-12">
               <form action="/" method="GET">
                 <div class="input-group mb-0 searchbar" style="width: 100% !important;">
-                  <input type="text" placeholder="Search" name="s" value="{{ request()->s }}" class="form-control searchstyle" aria-label="Text input with dropdown button">
+                  <input type="text" id='mob-autocomplete-search' placeholder="Search" name="s" value="{{ request()->s }}" class="form-control searchstyle" aria-label="Text input with dropdown button">
                     <button class="btn btn-outline-secondary searchstyle" type="submit"><i class="fas fa-search"></i></button>
+                    <div id="mob-search-container"></div>
                 </div>
               </form><br/>
             </div>
@@ -671,11 +682,13 @@
   @endif
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
   <script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.4/Chart.bundle.min.js'></script>
-
   <script src="{{ asset('/assets/dist/js/bootstrap.bundle.min.js') }}"></script>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+  <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.js"></script>
   <script>
     $(document).ready(function() {
-
+      // $('.autocomplete-search').select2();
 
       $(document).on('click', '.remove-cart-btn', function(e){
             e.preventDefault();
@@ -815,7 +828,43 @@
         });
       }
 
-      // set product category dropdown in navbar and links in footer
+      $('.autocomplete-search').keyup(function(){
+        var data = {
+          'search_term': $(this).val()
+        }
+        $.ajax({
+          type:'GET',
+          data: data,
+          url:'/search',
+          success: function (autocomplete_data) {
+            $(".autocomplete-search").autocomplete({
+              source: autocomplete_data,
+              appendTo: '#desk-search-container'
+            });
+            console.log($('.test').width());
+          }
+        });
+      });
+
+      $('#mob-autocomplete-search').keyup(function(){
+        var data = {
+          'search_term': $(this).val()
+        }
+        $.ajax({
+          type:'GET',
+          data: data,
+          url:'/search',
+          success: function (autocomplete_data) {
+            $("#mob-autocomplete-search").autocomplete({
+              source: autocomplete_data,
+              appendTo: '#mob-search-container'
+            });
+            console.log(autocomplete_data);
+          }
+        });
+      });
+
+      // set product category dropdown in navbar and links in dooter
       function productCategories() {
         $('#product-category-dropdown').empty();
         $('#product-category-footer').empty();

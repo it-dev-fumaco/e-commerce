@@ -17,7 +17,7 @@
 								<h3 class="carousel-header-font text-center"><b>{{ $results->total() }} result(s) found</b></h3>
 								<form action="/" method="GET">
 								<div class="input-group mb-3">
-									<input type="text" class="form-control" placeholder="Search" name="s" value="{{ request()->s }}">
+									<input type="text" class="form-control autocomplete-search" placeholder="Search" name="s" value="{{ request()->s }}">
 									<div class="input-group-append">
 									  <button class="btn btn-outline-secondary btn-light rounded-right" type="submit"><i class="fas fa-search"></i></button>
 									</div>
@@ -67,97 +67,101 @@
 			<h4 class="text-center text-muted mt-5 text-uppercase">No search result(s) found</h4>
 		@endif
 		@if(count($products) > 0)
+		
 		<div class="row">
-			<div class="col-12 text-center">
-				<h4 class="mt-4 mb-3 fw-light bestsellinghead fumacoFont1 animated animatedFadeInUp fadeInUp" style="color:#000000 !important;">RECENTLY ADDED PRODUCT(S)</h4>
-			</div>
-			@foreach ($recently_added_arr as $item)
-			<div class="col-md-4 col-lg-3 animated animatedFadeInUp fadeInUp equal-height-columns">
-				<div class="card mb-4">
-					<div class="equal-column-content">
-						<div class="hover-container product-card" style="position: relative;">
-							<div class="pt-2" style="position: absolute; top: 0; right: 0; z-index: 10;">
-								<div class="col-12 mb-2 {{ $item['is_new_item'] == 1 ? '' : 'd-none' }}">
-								<span class="p-1 text-center" style="background-color: #438539; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
-								  &nbsp;<b>New</b>&nbsp;
-								</span>
-							  </div><br class="{{ $item['is_new_item'] == 1 ? '' : 'd-none' }}"/>
-								@if ($item['is_discounted'])
-									<div class="col-12">
-										<span class="p-1 text-center" style="background-color: #FF0000; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
-											&nbsp;<b>{{ $item['discount'] }}% OFF</b>&nbsp;
-										</span>
-									</div>
-								@elseif ($item['is_discounted_from_sale'] == 1)
-									<div class="col-12">
-										<span class="p-1 text-center" style="background-color: #FF0000; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
-											@if ($item['sale_discount_type'] == 'By Percentage')
-												&nbsp;<b>{{ $item['sale_discount_rate'] }}% OFF</b>&nbsp;
-											@else
-												&nbsp;<b>₱ {{ number_format($item['sale_discount_rate'], 2, '.', ',') }} OFF</b>&nbsp;
-											@endif
-										</span>
-									</div>
-								@endif
-							</div>
-							<div class="overlay-bg"></div>
-							<div class="btn-container">
-								<a href="/product/{{ $item['slug'] ? $item['slug'] : $item['item_code'] }}" class="view-products-btn btn" role="button"><i class="fas fa-search"></i>&nbsp;View Product</a>
-							</div>
-							@php
-							$image = ($item['image']) ? '/storage/item_images/'.$item['item_code'].'/gallery/preview/'.$item['image'] : '/storage/no-photo-available.png';
-							$image_webp = ($item['image']) ? '/storage/item_images/'.$item['item_code'].'/gallery/preview/'.explode(".", $item['image'])[0] .'.webp' : '/storage/no-photo-available.png';
-							@endphp              
-							<picture>
-								<source srcset="{{ asset($image_webp) }}" type="image/webp" class="card-img-top">
-								<source srcset="{{ asset($image) }}" type="image/jpeg" class="card-img-top"> 
-								<img src="{{ asset($image) }}" alt="{{ $item['item_code'] }}" class="card-img-top hover">
-							</picture>
-						</div>
-						
-						<div class="card-body d-flex flex-column">
-							<div class="text ellipsis">
-								<a href="/product/{{ $item['slug'] ? $item['slug'] : $item['item_code'] }}" class="card-text product-head fumacoFont_card_title text-concat prod_desc" style="text-transform: none !important; text-decoration: none !important; color:#0062A5 !important;  min-height: 98px; font-weight: 500 !important">{{ $item['item_name'] }}</a>
-							</div>
-							<p class="card-text fumacoFont_card_price" style="color:#000000 !important;">
-								@if($item['is_discounted'])
-								₱ {{ number_format(str_replace(",","",$item['new_price']), 2) }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$item['orig_price']), 2) }}</s>
-								@elseif($item['is_discounted_from_sale'] == 1)
-									₱ {{ number_format(str_replace(",","",$item['sale_discounted_price']), 2) }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$item['orig_price']), 2) }}</s>
-								@else
-								₱ {{ number_format(str_replace(",","",$item['orig_price']), 2) }}
-								@endif
-							</p>
-							<div class="d-flex justify-content-between align-items-center">
-								<div class="btn-group stylecap">
-
-									@php
-                        $total_reviews = collect($item['product_reviews'])->count();
-                        $total_rating = collect($item['product_reviews'])->sum('rating');
-                        $overall_rating = ($total_reviews > 0) ? ($total_rating / $total_reviews) : 0;
-                      @endphp
-          
-						@for ($i = 0; $i < 5; $i++)
-						@if ($overall_rating <= $i)
-						<span class="fa fa-star starcolorgrey"></span>
-						@else
-						<span class="fa fa-star" style="color: #FFD600;"></span>
-						@endif
-						@endfor
-								</div>
-								<small class="text-muted stylecap" style="color:#c4cad0 !important; font-weight:100 !important;">( {{ $total_reviews }} Reviews )</small>
-							</div>
-						</div>
-					</div>
-					<br/>
-					@if ($item['on_stock'] == 1)
-					<a href="#" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto add-to-cart" role="button" style="width: 90% !important; margin-bottom: 20px" data-item-code="{{ $item['item_code'] }}"><i class="fas fa-shopping-cart d-inline-block" style="margin-right: 3%;"></i> Add to Cart</a>
-					@else
-					<a href="/login" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto {{ Auth::check() ? 'add-to-wishlist' : '' }}" role="button" style="width: 90% !important; margin-bottom: 20px" data-item-code="{{ $item['item_code'] }}"><i class="far fa-heart d-inline-block" style="margin-right: 3%;"></i> Add to Wishlist</a>
-					@endif
+			@if (count($recently_added_arr) > 0)
+				<div class="col-12 text-center">
+					<h4 class="mt-4 mb-3 fw-light bestsellinghead fumacoFont1 animated animatedFadeInUp fadeInUp" style="color:#000000 !important;">RECENTLY ADDED PRODUCT(S)</h4>
 				</div>
-			</div>
-			@endforeach
+				@foreach ($recently_added_arr as $item)
+				<div class="col-md-4 col-lg-3 animated animatedFadeInUp fadeInUp equal-height-columns">
+					<div class="card mb-4">
+						<div class="equal-column-content">
+							<div class="hover-container product-card" style="position: relative;">
+								<div class="pt-2" style="position: absolute; top: 0; right: 0; z-index: 10;">
+									<div class="col-12 mb-2 {{ $item['is_new_item'] == 1 ? '' : 'd-none' }}">
+									<span class="p-1 text-center" style="background-color: #438539; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
+									&nbsp;<b>New</b>&nbsp;
+									</span>
+								</div><br class="{{ $item['is_new_item'] == 1 ? '' : 'd-none' }}"/>
+									@if ($item['is_discounted'])
+										<div class="col-12">
+											<span class="p-1 text-center" style="background-color: #FF0000; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
+												&nbsp;<b>{{ $item['discount'] }}% OFF</b>&nbsp;
+											</span>
+										</div>
+									@elseif ($item['is_discounted_from_sale'] == 1)
+										<div class="col-12">
+											<span class="p-1 text-center" style="background-color: #FF0000; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
+												@if ($item['sale_discount_type'] == 'By Percentage')
+													&nbsp;<b>{{ $item['sale_discount_rate'] }}% OFF</b>&nbsp;
+												@else
+													&nbsp;<b>₱ {{ number_format($item['sale_discount_rate'], 2, '.', ',') }} OFF</b>&nbsp;
+												@endif
+											</span>
+										</div>
+									@endif
+								</div>
+								<div class="overlay-bg"></div>
+								<div class="btn-container">
+									<a href="/product/{{ $item['slug'] ? $item['slug'] : $item['item_code'] }}" class="view-products-btn btn" role="button"><i class="fas fa-search"></i>&nbsp;View Product</a>
+								</div>
+								@php
+								$image = ($item['image']) ? '/storage/item_images/'.$item['item_code'].'/gallery/preview/'.$item['image'] : '/storage/no-photo-available.png';
+								$image_webp = ($item['image']) ? '/storage/item_images/'.$item['item_code'].'/gallery/preview/'.explode(".", $item['image'])[0] .'.webp' : '/storage/no-photo-available.png';
+								@endphp              
+								<picture>
+									<source srcset="{{ asset($image_webp) }}" type="image/webp" class="card-img-top">
+									<source srcset="{{ asset($image) }}" type="image/jpeg" class="card-img-top"> 
+									<img src="{{ asset($image) }}" alt="{{ $item['item_code'] }}" class="card-img-top hover">
+								</picture>
+							</div>
+							
+							<div class="card-body d-flex flex-column">
+								<div class="text ellipsis">
+									<a href="/product/{{ $item['slug'] ? $item['slug'] : $item['item_code'] }}" class="card-text product-head fumacoFont_card_title text-concat prod_desc" style="text-transform: none !important; text-decoration: none !important; color:#0062A5 !important;  min-height: 98px; font-weight: 500 !important">{{ $item['item_name'] }}</a>
+								</div>
+								<p class="card-text fumacoFont_card_price" style="color:#000000 !important;">
+									@if($item['is_discounted'])
+									₱ {{ number_format(str_replace(",","",$item['new_price']), 2) }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$item['orig_price']), 2) }}</s>
+									@elseif($item['is_discounted_from_sale'] == 1)
+										₱ {{ number_format(str_replace(",","",$item['sale_discounted_price']), 2) }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$item['orig_price']), 2) }}</s>
+									@else
+									₱ {{ number_format(str_replace(",","",$item['orig_price']), 2) }}
+									@endif
+								</p>
+								<div class="d-flex justify-content-between align-items-center">
+									<div class="btn-group stylecap">
+
+										@php
+							$total_reviews = collect($item['product_reviews'])->count();
+							$total_rating = collect($item['product_reviews'])->sum('rating');
+							$overall_rating = ($total_reviews > 0) ? ($total_rating / $total_reviews) : 0;
+						@endphp
+			
+							@for ($i = 0; $i < 5; $i++)
+							@if ($overall_rating <= $i)
+							<span class="fa fa-star starcolorgrey"></span>
+							@else
+							<span class="fa fa-star" style="color: #FFD600;"></span>
+							@endif
+							@endfor
+									</div>
+									<small class="text-muted stylecap" style="color:#c4cad0 !important; font-weight:100 !important;">( {{ $total_reviews }} Reviews )</small>
+								</div>
+							</div>
+						</div>
+						<br/>
+						@if ($item['on_stock'] == 1)
+						<a href="#" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto add-to-cart" role="button" style="width: 90% !important; margin-bottom: 20px" data-item-code="{{ $item['item_code'] }}"><i class="fas fa-shopping-cart d-inline-block" style="margin-right: 3%;"></i> Add to Cart</a>
+						@else
+						<a href="/login" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto {{ Auth::check() ? 'add-to-wishlist' : '' }}" role="button" style="width: 90% !important; margin-bottom: 20px" data-item-code="{{ $item['item_code'] }}"><i class="far fa-heart d-inline-block" style="margin-right: 3%;"></i> Add to Wishlist</a>
+						@endif
+					</div>
+				</div>
+				@endforeach
+			@endif
+			
 			<div class="col-12 text-center">
 				<h4 class="mt-4 mb-3 fw-light bestsellinghead fumacoFont1 animated animatedFadeInUp fadeInUp" style="color:#000000 !important;">{{ request()->s == null ? 'FEATURED PRODUCT(S)' : 'PRODUCT(S)' }}</h4>
 			</div>
