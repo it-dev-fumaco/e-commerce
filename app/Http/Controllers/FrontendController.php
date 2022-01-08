@@ -499,7 +499,7 @@ class FrontendController extends Controller
         if($request->ajax()){
             $item_keywords = DB::table('fumaco_items')
                 ->where('f_name_name', 'LIKE', '%'.$request->search_term.'%')
-                ->where('f_status', 1)->select('f_name_name')->limit(8)->get();
+                ->where('f_status', 1)->select('f_name_name', 'f_idcode')->limit(8)->get();
 
             if(count($item_keywords) == 0){
                 $item_keywords = $item_keywords->where('keywords', 'LIKE', '%'.$request->search_term.'%');
@@ -507,14 +507,13 @@ class FrontendController extends Controller
 
             $items_arr = [];
             foreach($item_keywords as $item){
-                $image = null;
+                $image = DB::table('fumaco_items_image_v1')->where('idcode', $item->f_idcode)->pluck('imgprimayx')->first();
                 $items_arr[] = [
-                    'item_name' => $item->f_name_name,
-                    // 'image' => $image,
+                    'details' => asset('/storage/item_images/'.$item->f_idcode.'/gallery/preview/'.$image).'|'.$item->f_name_name
                 ];
             }
 
-            return response()->json(collect($items_arr)->pluck('item_name'));
+            return response()->json(collect($items_arr)->pluck('details'));
         }
     }
 

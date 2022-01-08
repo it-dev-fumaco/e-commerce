@@ -464,6 +464,12 @@
       .ui-widget{
         z-index: 9999 !important;
       }
+      .search-image{
+        width: 50px !important;
+        height: 50px !important;
+        float: left !important;
+        margin-right: 5px !important;
+      }
     </style>
     @yield('style')
     @if($activePage == 'contact')
@@ -839,9 +845,22 @@
           success: function (autocomplete_data) {
             $(".autocomplete-search").autocomplete({
               source: autocomplete_data,
-              appendTo: '#desk-search-container'
-            });
-            console.log($('.test').width());
+              appendTo: '#desk-search-container',
+              focus: function(event, ui) {
+                $(this).val(ui.item.value.split('|')[1]);
+
+                return false;
+              },
+              select: function(event, ui) {
+                $(this).val(ui.item.value.split('|')[1]);
+        
+                return false;
+              }
+            }).autocomplete("instance")._renderItem = function( ul, item ) {
+              var image_src = item.value.split('|')[0];
+              var item_name = item.value.split('|')[1];
+              return $("<li><div><span><img class='search-image' src='"+ image_src +"'>"+ item_name +"</span></div></li>").appendTo(ul);
+            };
           }
         });
       });
@@ -857,9 +876,17 @@
           success: function (autocomplete_data) {
             $("#mob-autocomplete-search").autocomplete({
               source: autocomplete_data,
-              appendTo: '#mob-search-container'
-            });
-            console.log(autocomplete_data);
+              appendTo: '#mob-search-container',
+              select: function(event, ui) {
+                $(this).val(ui.item.value.split('|')[1]);
+        
+                return false;
+              }
+            }).autocomplete("instance")._renderItem = function( ul, item ) {
+              var image_src = item.value.split('|')[0];
+              var item_name = item.value.split('|')[1];
+              return $("<li><div style='min-height: 50px !important'><span><img class='search-image' src='"+ image_src +"'>"+ item_name +"</span></div></li>").appendTo(ul);
+            };
           }
         });
       });
