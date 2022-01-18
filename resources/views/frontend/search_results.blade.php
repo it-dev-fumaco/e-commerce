@@ -17,7 +17,7 @@
 								<h3 class="carousel-header-font text-center"><b>{{ $results->total() }} result(s) found</b></h3>
 								<form action="/" method="GET">
 								<div class="input-group mb-3">
-									<input type="text" class="form-control autocomplete-search" placeholder="Search" name="s" value="{{ request()->s }}">
+									<input type="text" class="form-control search-page-autocomplete" placeholder="Search" name="s" value="{{ request()->s }}">
 									<div class="input-group-append">
 									  <button class="btn btn-outline-secondary btn-light rounded-right" type="submit"><i class="fas fa-search"></i></button>
 									</div>
@@ -423,6 +423,13 @@
       -webkit-transform: scale(0.95); /* Safari 3-8 */
       transform: scale(0.95); 
     }
+	#search-page-container{
+        position: absolute !important;
+        background-color: #fff;
+		top: 220px !important;
+        z-index: 999 !important;
+		width: 100% !important;
+    }
 	@media (max-width: 1199.98px) {/* tablet */
       .price-card{
         min-height: 80px !important;
@@ -448,6 +455,53 @@
   $('.hover-container').hover(function(){
       $(this).children('.btn-container').slideToggle('fast');
     });
+
+	$('.search-page-autocomplete').keyup(function(){
+        var data = {
+          'search_term': $(this).val(),
+          'type': 'desktop'
+        }
+        
+        $.ajax({
+          type:'GET',
+          data: data,
+          url:'/search',
+          success: function (autocomplete_data) {
+            if(autocomplete_data){
+              $("#search-page-container").show();
+              $("#search-page-container").addClass('border border-secondary');
+              $('#search-page-container').html(autocomplete_data);
+            }
+          }
+        });
+    });
+
+	$(document).mouseup(function(e) 
+      {
+          var desk_container = $("#search-page-container");
+          // if the target of the click isn't the container nor a descendant of the container
+          if (!desk_container.is(e.target) && desk_container.has(e.target).length === 0) 
+          {
+              desk_container.hide();
+          }
+    });
+
+	$('body').on('scroll', function (e){
+		$("#search-page-container").hide();
+	});
+
+	$('.checkbox-test').change(function(){
+		// console.log(document.URL);
+		var selected_attrib = $(this).data('attrname') + '=' + $(this).val();
+
+		if($(this).is(":checked")){
+			var url = document.URL + '&' + encodeURI(selected_attrib);
+		}else{
+			var url = document.URL.replace('&'+encodeURI(selected_attrib), '');
+		}
+		// console.log(url);
+		window.location.href=url;
+	});
 
 </script>
 @endsection

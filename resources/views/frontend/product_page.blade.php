@@ -493,11 +493,7 @@
 									</div>
 								</div>
 							</section>
-
-							{{-- @foreach ($most_searched as $recommended_item)
-								{{ $recommended_item['item_code'] }}
-							@endforeach --}}
-
+							
 							<div class="album py-5" style="position: relative">
 								<div class="container related-prod">
 										<section class="regular slider">

@@ -458,17 +458,25 @@
         border: none !important;
       }
 
-      .ui-menu-item{
-        padding: 8px !important;
-      }
-      .ui-widget{
-        z-index: 9999 !important;
-      }
       .search-image{
         width: 50px !important;
         height: 50px !important;
         float: left !important;
         margin-right: 5px !important;
+      }
+      #desk-search-container{
+        position: absolute !important;
+        background-color: #fff;
+        z-index: 9999;
+        top: 40px;
+        right: 0;
+        width: 280%;
+      }
+      #mob-search-container{
+        position: absolute !important;
+        background-color: #fff;
+        z-index: 9999;
+        width: 80%;
       }
     </style>
     @yield('style')
@@ -533,8 +541,8 @@
             <form class="d-none d-lg-block search-bar" action="/" method="GET">
               <div class="input-group mb-0 searchbar search-bar">
                 <input type="text" placeholder="Search" name="s" value="{{ request()->s }}" class="form-control searchstyle autocomplete-search" aria-label="Text input with dropdown button">
-                  <button class="btn btn-outline-secondary searchstyle" type="submit"><i class="fas fa-search"></i></button>
-                  <div id="desk-search-container"></div>
+                <button class="btn btn-outline-secondary searchstyle" type="submit"><i class="fas fa-search"></i></button>
+                <div id="desk-search-container" class="container mx-auto"></div>
               </div>
             </form>
             <ul class="navbar-nav d-lg-inline-block">
@@ -599,16 +607,18 @@
                 <div class="input-group mb-0 searchbar" style="width: 100% !important;">
                   <input type="text" id='mob-autocomplete-search' placeholder="Search" name="s" value="{{ request()->s }}" class="form-control searchstyle" aria-label="Text input with dropdown button">
                     <button class="btn btn-outline-secondary searchstyle" type="submit"><i class="fas fa-search"></i></button>
-                    <div id="mob-search-container"></div>
+                    {{-- <div id="mob-search-container" class="border border-danger"></div> --}}
                 </div>
-              </form><br/>
+              <div id="mob-search-container" class="container"></div>
+              <div class="col-12">&nbsp;</div>
+            </form>
             </div>
           </div>
 
-        </div>
+        </div><br/>
 
       </nav>
-    </header>
+      </header>
 
   @yield('content')
   <footer>
@@ -836,57 +846,61 @@
 
       $('.autocomplete-search').keyup(function(){
         var data = {
-          'search_term': $(this).val()
+          'search_term': $(this).val(),
+          'type': 'desktop'
         }
+        
         $.ajax({
           type:'GET',
           data: data,
           url:'/search',
           success: function (autocomplete_data) {
-            $(".autocomplete-search").autocomplete({
-              source: autocomplete_data,
-              appendTo: '#desk-search-container',
-              focus: function(event, ui) {
-                $(this).val(ui.item.value.split('|')[1]);
-
-                return false;
-              },
-              select: function(event, ui) {
-                $(this).val(ui.item.value.split('|')[1]);
-        
-                return false;
-              }
-            }).autocomplete("instance")._renderItem = function( ul, item ) {
-              var image_src = item.value.split('|')[0];
-              var item_name = item.value.split('|')[1];
-              return $("<li><div><span><img class='search-image' src='"+ image_src +"'>"+ item_name +"</span></div></li>").appendTo(ul);
-            };
+            if(autocomplete_data){
+              $("#desk-search-container").show();
+              $("#desk-search-container").addClass('border border-secondary');
+              $('#desk-search-container').html(autocomplete_data);
+            }
           }
         });
       });
 
+      $(document).mouseup(function(e) 
+      {
+          var desk_container = $("#desk-search-container");
+          var mobile_container = $("#mob-search-container");
+
+          // if the target of the click isn't the container nor a descendant of the container
+          if (!desk_container.is(e.target) && desk_container.has(e.target).length === 0) 
+          {
+              desk_container.hide();
+          }
+
+          if (!mobile_container.is(e.target) && mobile_container.has(e.target).length === 0) 
+          {
+              mobile_container.hide();
+          }
+      });
+
+      $('body').on('scroll', function (e){
+        $("#desk-search-container").hide();
+        $("#mob-search-container").hide();
+      });
+
       $('#mob-autocomplete-search').keyup(function(){
         var data = {
-          'search_term': $(this).val()
+          'search_term': $(this).val(),
+          'type': 'mobile'
         }
         $.ajax({
           type:'GET',
           data: data,
           url:'/search',
           success: function (autocomplete_data) {
-            $("#mob-autocomplete-search").autocomplete({
-              source: autocomplete_data,
-              appendTo: '#mob-search-container',
-              select: function(event, ui) {
-                $(this).val(ui.item.value.split('|')[1]);
-        
-                return false;
-              }
-            }).autocomplete("instance")._renderItem = function( ul, item ) {
-              var image_src = item.value.split('|')[0];
-              var item_name = item.value.split('|')[1];
-              return $("<li><div style='min-height: 50px !important'><span><img class='search-image' src='"+ image_src +"'>"+ item_name +"</span></div></li>").appendTo(ul);
-            };
+            if(autocomplete_data){
+              $("#mob-search-container").show();
+              $("#mob-search-container").addClass('border border-secondary');
+              $('#mob-search-container').html(autocomplete_data);
+            }
           }
         });
       });

@@ -496,24 +496,52 @@ class FrontendController extends Controller
     }
 
     public function getAutoCompleteData(Request $request){
-        if($request->ajax()){
+        if($request->ajax() and $request->search_term){
+            $search_str = $request->search_term;
             $item_keywords = DB::table('fumaco_items')
-                ->where('f_name_name', 'LIKE', '%'.$request->search_term.'%')
-                ->where('f_status', 1)->select('f_name_name', 'f_idcode')->limit(8)->get();
+                ->where('f_name_name', 'LIKE', '%'.$search_str.'%')
+                ->where('f_status', 1)->select('f_name_name', 'f_idcode', 'slug')->limit($request->type == 'desktop' ? 8 : 4)->get();
 
             if(count($item_keywords) == 0){
-                $item_keywords = $item_keywords->where('keywords', 'LIKE', '%'.$request->search_term.'%');
+                $item_keywords = $item_keywords->where('keywords', 'LIKE', '%'.$search_str.'%');
             }
 
-            $items_arr = [];
+            $search_arr = [];
             foreach($item_keywords as $item){
                 $image = DB::table('fumaco_items_image_v1')->where('idcode', $item->f_idcode)->pluck('imgprimayx')->first();
-                $items_arr[] = [
-                    'details' => asset('/storage/item_images/'.$item->f_idcode.'/gallery/preview/'.$image).'|'.$item->f_name_name
+                $search_arr[] = [
+                    'type' => 'Products',
+                    'id' => $item->f_idcode,
+                    'name' => $item->f_name_name,
+                    'image' => $image,
+                    'slug' => $item->slug,
+                    'screen' => $request->type
                 ];
             }
 
-            return response()->json(collect($items_arr)->pluck('details'));
+            $blogs = DB::table('fumaco_blog')->where('blog_enable', 1)
+                ->where(function($q) use ($search_str) {
+                    $search_strs = explode(" ", $search_str);
+                    foreach ($search_strs as $str) {
+                        $q->where('blogtitle', 'LIKE', "%".$str."%")
+                            ->orWhere('blog_caption', 'LIKE', "%".$str."%")
+                            ->orWhere('blogcontent', 'LIKE', "%".$str."%");
+                    }
+                })
+                ->get();
+
+            foreach($blogs as $blog){
+                $search_arr[] = [
+                    'type' => 'Blogs',
+                    'id' => $blog->id,
+                    'name' => $blog->blogtitle,
+                    'image' => $blog->blogprimaryimage,
+                    'slug' => $blog->slug,
+                    'screen' => $request->type
+                ];
+            }
+            
+            return view('frontend.search_autocomplete', compact('search_arr'));
         }
     }
 
@@ -1109,8 +1137,8 @@ class FrontendController extends Controller
     }
 
     private function getProductCardDetails($item_code){
-        $item = DB::table('fumaco_items as item')->join('fumaco_items_image_v1 as img', 'item.f_idcode', 'img.idcode')->where('item.f_idcode', $item_code)->first();
-
+        $item = DB::table('fumaco_items as item')->where('f_idcode', $item_code)->first();
+        $image = DB::table('fumaco_items_image_v1')->where('idcode', $item_code)->first();
         $is_new = 0;
 
         if($item->f_new_item == 1){
@@ -1173,8 +1201,8 @@ class FrontendController extends Controller
             'discount_percent' => $item->f_discount_percent,
             'new_price' => $item->f_price,
             'on_stock' => $on_stock,
-            'primary_image' => ($item->imgprimayx) ? $item->imgprimayx : null,
-            'original_image' => ($item->imgoriginalx) ? $item->imgoriginalx : null,
+            'primary_image' => ($image) ? $image->imgprimayx : null,
+            'original_image' => ($image) ? $image->imgoriginalx : null,
             'slug' => $item->slug,
             'is_new_item' => $is_new,
             'product_reviews' => $product_review_per_code
@@ -1348,7 +1376,7 @@ class FrontendController extends Controller
             $this->getProductCardDetails($item_code);
 
             $product_card_data = $this->getProductCardDetails($item_code);
-            
+             
             $most_searched[] = [
                 'id' => $product_card_data['id'],
                 'item_code' => $product_card_data['item_code'],
