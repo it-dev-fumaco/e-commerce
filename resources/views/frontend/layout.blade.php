@@ -857,7 +857,6 @@
           success: function (autocomplete_data) {
             if(autocomplete_data){
               $("#desk-search-container").show();
-              $("#desk-search-container").addClass('border border-secondary');
               $('#desk-search-container').html(autocomplete_data);
             }
           }
@@ -898,7 +897,6 @@
           success: function (autocomplete_data) {
             if(autocomplete_data){
               $("#mob-search-container").show();
-              $("#mob-search-container").addClass('border border-secondary');
               $('#mob-search-container').html(autocomplete_data);
             }
           }
