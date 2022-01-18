@@ -688,7 +688,7 @@ class ProductController extends Controller
                     }
 
                     $q->orWhere('f_idcode', 'LIKE', "%".$q_string."%")
-                        ->orWhere('f_item_classification', 'LIKE', "%".$q_string."%");
+                        ->orWhere('f_item_classification', 'LIKE', "%".$q_string."%")->orWhere('slug', 'LIKE', "%".$q_string."%");
                 });
             })
             ->orderBy('f_date', 'desc')->paginate(15);

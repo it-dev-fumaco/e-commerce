@@ -172,30 +172,22 @@
                                         <div class="card-body">
                                             <div class="row">
                                                 @php
-                                                $img = ($cs['cross_sell_image']) ? '/storage/item_images/'. $cs['cross_sell_item_code'] .'/gallery/preview/'. $cs['cross_sell_image'] : '/storage/no-photo-available.png';
-                                                $img_webp = ($cs['cross_sell_image']) ? '/storage/item_images/'. $cs['cross_sell_item_code'] .'/gallery/preview/'. explode(".", $cs['cross_sell_image'])[0] . '.webp' : '/storage/no-photo-available.png';
+                                                $img = ($cs['image']) ? '/storage/item_images/'. $cs['item_code'] .'/gallery/preview/'. $cs['image'] : '/storage/no-photo-available.png';
+                                                $img_webp = ($cs['image']) ? '/storage/item_images/'. $cs['item_code'] .'/gallery/preview/'. explode(".", $cs['image'])[0] . '.webp' : '/storage/no-photo-available.png';
                                                 @endphp
                                                 <div class="hover-container product-card" style="position: relative">
                                                     <div class="pt-2" style="position: absolute; top: 0; right: 0; z-index: 10;">
-                                                        <div class="col-12 mb-2 {{ $cs['is_new_item'] == 1 ? '' : 'd-none' }}">
+                                                        @if ($cs['is_new_item'])
+                                                        <div class="col-12 mb-2">
                                                             <span class="p-1 text-center" style="background-color: #438539; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px !important">
                                                             &nbsp;<b>New</b>&nbsp;
                                                             </span>
-                                                        </div><br class="{{ $cs['is_new_item'] == 1 ? '' : 'd-none' }}"/>
+                                                        </div><br />
+                                                        @endif
                                                         @if ($cs['is_discounted'] == 1)
                                                             <div class="col-12">
                                                                 <span class="p-1 text-center" style="background-color: #FF0000; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; width: 100%">
-                                                                &nbsp;<b>{{ $cs['discount'] }}% OFF</b>&nbsp;
-                                                                </span>
-                                                            </div>
-                                                        @elseif ($cs['discounted_from_sale'] == 1)
-                                                            <div class="col-12">
-                                                                <span class="p-1 text-center" style="background-color: #FF0000; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
-                                                                    @if ($cs['discount_type'] == 'By Percentage')
-                                                                        &nbsp;<b>{{ $cs['discount_rate'] }}% OFF</b>&nbsp;
-                                                                    @else
-                                                                        &nbsp;<b>₱ {{ number_format($cs['discount_rate'], 2, '.', ',') }} OFF</b>&nbsp;
-                                                                    @endif
+                                                                &nbsp;<b>{{ $cs['discount_display'] }}</b>&nbsp;
                                                                 </span>
                                                             </div>
                                                         @endif
@@ -203,44 +195,37 @@
 
                                                     <div class="overlay-bg"></div>
                                                     <div class="btn-container">
-                                                        <a href="/product/{{ ($cs['slug']) ? $cs['slug'] : $cs['cross_sell_item_code'] }}" class="view-products-btn btn" role="button"><i class="fas fa-search"></i>&nbsp;View Product</a>
+                                                        <a href="/product/{{ ($cs['slug']) ? $cs['slug'] : $cs['item_code'] }}" class="view-products-btn btn" role="button"><i class="fas fa-search"></i>&nbsp;View Product</a>
                                                     </div>
                                 
                                                     <picture>
                                                         <source srcset="{{ asset($img_webp) }}" type="image/webp" class="img-responsive" style="width: 100% !important;">
                                                         <source srcset="{{ asset($img) }}" type="image/jpeg" class="img-responsive" style="width: 100% !important;">
-                                                        <img src="{{ asset($img) }}" alt="{{ Str::slug(explode(".", $cs['cross_sell_image'])[0], '-') }}" class="img-responsive hover" style="width: 100% !important;">
+                                                        <img src="{{ asset($img) }}" alt="{{ Str::slug(explode(".", $cs['image'])[0], '-') }}" class="img-responsive hover" style="width: 100% !important;">
                                                     </picture>
                                                 </div>
                                                 <div class="col-12" style="position: relative">
                                                     <div class="text ellipsis">
-                                                        <a href="/product/{{ ($cs['slug']) ? $cs['slug'] : $cs['item_code'] }}" class="card-text product-head fumacoFont_card_title text-concat prod_desc" style="text-decoration: none !important; text-transform: none !important; color:#0062A5 !important; min-height: 80px">{{ $cs['cross_sell_description'] }}</a>
+                                                        <a href="/product/{{ ($cs['slug']) ? $cs['slug'] : $cs['item_code'] }}" class="card-text product-head fumacoFont_card_title text-concat prod_desc" style="text-decoration: none !important; text-transform: none !important; color:#0062A5 !important; min-height: 80px">{{ $cs['item_name'] }}</a>
                                                     </div>
                                                     <p class="card-text fumacoFont_card_price" style="color:#000000 !important; ">
                                                         @if ($cs['is_discounted'] == 1)
-                                                            ₱ {{ number_format(str_replace(",","",$cs['cross_sell_price']), 2) }}&nbsp;<s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$cs['cross_sell_original_price']), 2) }}</s>
-                                                        @elseif($cs['discounted_from_sale'] == 1)
-                                                            ₱ {{ number_format(str_replace(",","",$cs['cross_sell_sale_price']), 2) }}&nbsp;<s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$cs['cross_sell_original_price']), 2) }}</s>
+                                                            {{ $cs['discounted_price'] }}&nbsp;<s style="color: #c5c5c5;">{{ $cs['default_price'] }}</s>
                                                         @else
-                                                            ₱ {{ number_format(str_replace(",","",$cs['cross_sell_original_price']), 2) }}
+                                                            {{ $cs['default_price'] }}
                                                         @endif
                                                     </p>
-                                                    @php
-                                                        $total_reviews = collect($cs['product_reviews'])->count();
-                                                        $total_rating = collect($cs['product_reviews'])->sum('rating');
-                                                        $overall_rating = ($total_reviews > 0) ? ($total_rating / $total_reviews) : 0;
-                                                    @endphp
                                                     <div class="d-flex justify-content-between align-items-center">
                                                         <div class="btn-group stylecap">
                                                             @for ($i = 0; $i < 5; $i++)
-                                                                @if ($overall_rating <= $i)
+                                                                @if ($cs['overall_rating'] <= $i)
                                                                     <span class="fa fa-star starcolorgrey"></span>
                                                                 @else
                                                                     <span class="fa fa-star" style="color: #FFD600;"></span>
                                                                 @endif
                                                             @endfor
                                                         </div>
-                                                        <small class="stylecap" style="color:#c4cad0 !important; font-weight:400 !important;">( {{ $total_reviews }} Reviews )</small>
+                                                        <small class="stylecap" style="color:#c4cad0 !important; font-weight:400 !important;">( {{ $cs['total_reviews'] }} Reviews )</small>
                                                     </div>
                                                     <br/>
                                                 </div>
@@ -250,14 +235,14 @@
                                                     <form action="/product_actions" method="post">
                                                         @csrf
                                                         <div class="d-none">
-                                                            <input type="text" name="item_code" value="{{ $cs['cross_sell_item_code'] }}">
+                                                            <input type="text" name="item_code" value="{{ $cs['item_code'] }}">
                                                             <input type="text" name="addtocart" value="1">
                                                             <input type="text" name="quantity" value="1">
                                                         </div>
-                                                        <button type="submit" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto btn-sm" id="reloadpage" role="button" style="width: 100% !important; margin-bottom: 20px" data-item-code="{{ $cs['cross_sell_item_code'] }}"><i class="fas fa-shopping-cart d-inline-block"></i> Add to Cart</button>
+                                                        <button type="submit" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto btn-sm" id="reloadpage" role="button" style="width: 100% !important; margin-bottom: 20px" data-item-code="{{ $cs['item_code'] }}"><i class="fas fa-shopping-cart d-inline-block"></i> Add to Cart</button>
                                                     </form>
                                                 @else
-                                                    <a href="/login" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto {{ Auth::check() ? 'add-to-wishlist' : '' }} btn-sm" id="reloadpage" role="button" style="width: 95% !important; margin-bottom: 20px" data-item-code="{{ $cs['cross_sell_item_code'] }}"><i class="far fa-heart d-inline-block" style="margin-right: 3%;"></i> Add to Wishlist</a>
+                                                    <a href="/login" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto {{ Auth::check() ? 'add-to-wishlist' : '' }} btn-sm" id="reloadpage" role="button" style="width: 95% !important; margin-bottom: 20px" data-item-code="{{ $cs['item_code'] }}"><i class="far fa-heart d-inline-block" style="margin-right: 3%;"></i> Add to Wishlist</a>
                                                 @endif
                                             </div>
                                         </div>

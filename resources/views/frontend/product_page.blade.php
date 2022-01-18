@@ -68,19 +68,15 @@
 									<div class="product_name fumacoFont_item_title">{{ $product_details->f_name_name }}</div>
 									<div class="product-rating">
 										<div class="d-flex justify-content-between align-items-center">
-											@php
-												$total_reviews = $product_reviews->total();
-												$overall_rating = ($total_reviews > 0) ? ($total_rating / $total_reviews) : 0;
-											@endphp
 											<div class="btn-group stylecap">
 												@for ($i = 0; $i < 5; $i++)
-												@if ($overall_rating <= $i)
+												@if ($product_details_array['overall_rating'] <= $i)
 												<span class="fa fa-star starcolorgrey"></span>
 												@else
 												<span class="fa fa-star" style="color: #FFD600;"></span>
 												@endif
 												@endfor
-												<span style="color:#000000 !important; font-weight:200 !important;">&nbsp;&nbsp;( {{ $total_reviews }} Reviews )</span>
+												<span style="color:#000000 !important; font-weight:200 !important;">&nbsp;&nbsp;( {{ $product_details_array['total_reviews'] }} Reviews )</span>
 											</div>
 										</div>
 										<div class="d-flex flex-row p-0">
@@ -94,15 +90,18 @@
 										</div>
 									</div>
 									<div>
-										@if ($product_details->f_discount_trigger)
-										<span class="product_price fumacoFont_item_price">₱ {{ number_format(str_replace(",","",$product_details->f_price), 2) }}</span>
+										@if ($product_details->f_onsale)
+										@php
+											$discounted_price = ($product_details->f_discount_type == 'percentage') ? $product_details->f_default_price - ($product_details->f_default_price * ($product_details->f_discount_rate/100)) : $product_details->f_default_price - $product_details->f_discount_rate;
+										@endphp
+										<span class="product_price fumacoFont_item_price">₱ {{ number_format(str_replace(",","",$discounted_price), 2) }}</span>
 										<s class="product_discount">
-											<span style='color:black; '>₱ {{ number_format(str_replace(",","",$product_details->f_original_price), 2) }}<span>
+											<span style='color:black; '>₱ {{ number_format(str_replace(",","",$product_details->f_default_price), 2) }}<span>
 										</s>
 										@elseif($discount_from_sale == 1)
 											<span class="product_price fumacoFont_item_price">₱ {{ number_format(str_replace(",","",$product_price), 2) }}</span>
 											<s class="product_discount">
-												<span style='color:black; '>₱ {{ number_format(str_replace(",","",$product_details->f_original_price), 2) }}<span>
+												<span style='color:black; '>₱ {{ number_format(str_replace(",","",$product_details->f_default_price), 2) }}<span>
 											</s>
 											@if ($sale_discount_type == 'By Percentage')
 												<span class="badge badge-danger" style="margin-left: 8px; vertical-align: middle;background-color: red; display: inline !important;">{{ $sale_discount_rate }}% OFF</span>
@@ -110,9 +109,9 @@
 												<span class="badge badge-danger" style="margin-left: 8px; vertical-align: middle;background-color: red; display: inline !important;">₱ {{ number_format(str_replace(",","",$sale_discount_rate), 2) }} OFF</span>
 											@endif
 										@else
-										<span class="product_price fumacoFont_item_price">₱ {{ number_format(str_replace(",","",$product_details->f_original_price), 2) }}</span>
+										<span class="product_price fumacoFont_item_price">₱ {{ number_format(str_replace(",","",$product_details->f_default_price), 2) }}</span>
 										@endif
-										<span class="badge badge-danger" style="margin-left: 8px; vertical-align: middle;background-color: red; display: {{ ($product_details->f_discount_trigger) ? 'inline' : 'none' }} !important;">{{ $product_details->f_discount_percent }}% OFF</span>
+										<span class="badge badge-danger" style="margin-left: 8px; vertical-align: middle;background-color: red; display: {{ ($product_details->f_onsale) ? 'inline' : 'none' }} !important;">{{ $product_details->f_discount_rate }}% OFF</span>
 									</div>
 									<br class="d-md-none"/>
 									<div><span class="prod-font-size">{!! $product_details->f_caption !!}</span>
@@ -255,27 +254,23 @@
 								<div id="collapseTwo" class="collapse show" aria-labelledby="heading3" data-parent="#accordionExample">
 									<div class="card-body prod_standard">
 										<div class="row">
-											@php
-												$total_reviews = $product_reviews->total();
-												$overall_rating = ($total_reviews > 0) ? ($total_rating / $total_reviews) : 0;
-											@endphp
 											<div class="col-md-6">
 												<div class="d-flex flex-row justify-content-center">
 													<div class="text-center text-white bg-warning rounded d-block" style="border: 1px solid; padding: 10px 20px;">
-														<h1 class="d-block display-3"><b>{{ (number_format($overall_rating, 1))  }}</b></h1>
+														<h1 class="d-block display-3"><b>{{ (number_format($product_details_array['overall_rating'], 1))  }}</b></h1>
 														<small class="d-block">out of 5</small>
 													</div>
 												</div>
 												<div class="d-block text-center m-1" style="font-size: 15pt;">
 													@for ($i = 0; $i < 5; $i++)
-													@if ($overall_rating <= $i)
+													@if ($product_details_array['overall_rating'] <= $i)
 													<span class="fa fa-star starcolorgrey"></span>
 													@else
 													<span class="fa fa-star" style="color: #FFD600;"></span>
 													@endif
 													@endfor
 												</div>
-												<div class="d-block text-center p-2">{{ $total_reviews . ' Review(s)' }}</div>
+												<div class="d-block text-center p-2">{{ $product_details_array['total_reviews'] . ' Review(s)' }}</div>
 												@if (Auth::check())
 												<form action="/submit_review" method="POST" id="review-form">
 													@csrf
@@ -388,27 +383,17 @@
 										@foreach ($compare_arr as $compare_product)
 											<div class="col-md-{{ 12/count($compare_arr) }} equal-height-columns p-1">
 												@php
-													$compare_img = ($compare_product['item_image']) ? '/storage/item_images/'. $compare_product['item_code'] .'/gallery/original/'. $compare_product['item_image'] : '/storage/no-photo-available.png';
-													$compare_img_webp = ($compare_product['item_image']) ? '/storage/item_images/'. $compare_product['item_code'] .'/gallery/original/'. explode(".", $compare_product['item_image'])[0] .'.webp' : '/storage/no-photo-available.png';
+													$compare_img = ($compare_product['image']) ? '/storage/item_images/'. $compare_product['item_code'] .'/gallery/original/'. $compare_product['image'] : '/storage/no-photo-available.png';
+													$compare_img_webp = ($compare_product['image']) ? '/storage/item_images/'. $compare_product['item_code'] .'/gallery/original/'. explode(".", $compare_product['image'])[0] .'.webp' : '/storage/no-photo-available.png';
 												@endphp
 												<div class="hover-container product-card" style="position: relative;">
 													<div class="pt-2" style="position: absolute; top: 0; right: 0; z-index: 10;">
-														@if($compare_product['discounted_from_item'] == 1)
-															<div class="col-12">
-																<span class="p-1 text-center" style="background-color: #FF0000; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
-																	&nbsp;<b>{{ $compare_product['individual_discount_rate'] }}% OFF</b>&nbsp;
-																</span>
-															</div>
-														@elseif($compare_product['discounted_from_sale'] == 1)
-															<div class="col-12">
-																<span class="p-1 text-center" style="background-color: #FF0000; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
-																	@if ($compare_product['sale_discount_type'] == 'By Percentage')
-																		&nbsp;<b>{{ $compare_product['sale_discount_rate'] }}% OFF</b>&nbsp;
-																	@elseif($compare_product['sale_discount_type'] == 'Fixed Amount')
-																		&nbsp;<b>₱ {{ number_format($compare_product['sale_discount_rate'], 2, '.', ',') }} OFF</b>&nbsp;
-																	@endif
-																</span>
-															</div>
+														@if($compare_product['is_discounted'] == 1)
+														<div class="col-12">
+															<span class="p-1 text-center" style="background-color: #FF0000; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
+																&nbsp;<b>{{ $compare_product['discount_display'] }}</b>&nbsp;
+															</span>
+														</div>
 														@endif
 													</div>
 													<div class="overlay-bg"></div>
@@ -419,21 +404,18 @@
 													<picture>
 														<source srcset="{{ asset($compare_img_webp) }}" type="image/webp" class="img-responsive" style="width: 100% !important;">
 														<source srcset="{{ asset($compare_img) }}" type="image/jpeg" class="img-responsive" style="width: 100% !important;">
-														<img src="{{ asset($compare_img) }}" alt="{{ Str::slug(explode(".", $compare_product['item_image'])[0], '-') }}" class="img-responsive hover" style="width: 100%" />
+														<img src="{{ asset($compare_img) }}" alt="{{ Str::slug(explode(".", $compare_product['image'])[0], '-') }}" class="img-responsive hover" style="width: 100%" />
 													</picture>
 												</div>
 
-												<span class="comparison-description d-block mb-3">{{ $compare_product['product_name'] }}</span>
+												<span class="comparison-description d-block mb-3">{{ $compare_product['item_name'] }}</span>
 												{{-- <br/>&nbsp;
 												<hr> --}}
 												<center>
-												@if ($compare_product['discounted_from_item'] == 1)
-													<span class="comparison-price" style="white-space: nowrap !important">₱ {{ number_format(str_replace(",","",$compare_product['price']), 2) }}</span>&nbsp;<s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$compare_product['original_price']), 2) }}</s>
-												@elseif ($compare_product['discounted_from_sale'] == 1)
-													<span class="comparison-price" style="white-space: nowrap !important">₱ {{ number_format(str_replace(",","",$compare_product['price']), 2) }}</span>
-													<s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$compare_product['original_price']), 2) }}</s>
+												@if ($compare_product['is_discounted'] == 1)
+													<span class="comparison-price" style="white-space: nowrap !important">{{ $compare_product['discounted_price'] }}</span>&nbsp;<s style="color: #c5c5c5;">{{ $compare_product['default_price'] }}</s>
 												@else
-													₱ {{ number_format(str_replace(",","",$compare_product['original_price']), 2) }}
+												{{ $compare_product['default_price'] }}
 												@endif
 												@if($compare_product['on_stock'] == 1)
 													<button class="btn btn-pill btn-outline-primary btn-sm add-to-cart comparison-add-to-cart mt-3 mb-5" type="button" data-toggle="toast" data-item-code="{{ $compare_product['item_code'] }}"><i class="fas fa-shopping-cart d-inline-block"></i>&nbsp;Add to Cart</button>
@@ -502,21 +484,11 @@
 																</span>
 															</div><br class="{{ $rp['is_new_item'] == 1 ? '' : 'd-none' }}"/>
 															@if ($rp['is_discounted'] == 1)
-																<div class="col-12">
-																	<span class="p-1 text-center" style="background-color: #FF0000; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
-																		&nbsp;<b>{{ $rp['discount_percent'] }}% OFF</b>&nbsp;
-																	</span>
-																</div>
-															@elseif ($rp['is_discounted_from_sale'] == 1)
-																<div class="col-12">
-																	<span class="p-1 text-center" style="background-color: #FF0000; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
-																		@if ($rp['sale_discount_type'] == 'By Percentage')
-																			&nbsp;<b>{{ $rp['sale_discount_rate'] }}% OFF</b>&nbsp;
-																		@else
-																			&nbsp;<b>₱ {{ number_format($rp['sale_discount_rate'], 2, '.', ',') }} OFF</b>&nbsp;
-																		@endif
-																	</span>
-																</div>
+															<div class="col-12">
+																<span class="p-1 text-center" style="background-color: #FF0000; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
+																	&nbsp;<b>{{ $rp['discount_display'] }}</b>&nbsp;
+																</span>
+															</div>
 															@endif
 														</div>
 														<div class="overlay-bg"></div>
@@ -538,29 +510,22 @@
 
 														<p class="card-text fumacoFont_card_price d-sm-block d-md-none d-lg-block" style="color:#000000 !important; ">
 															@if ($rp['is_discounted'] == 1)
-															<span style="white-space: nowrap !important">₱ {{ number_format(str_replace(",","",$rp['new_price']), 2) }}</span>&nbsp;<br class="d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$rp['orig_price']), 2) }}</s>
-															@elseif($rp['is_discounted_from_sale'] == 1)
-																₱ {{ number_format(str_replace(",","",$rp['sale_discounted_price']), 2) }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$rp['orig_price']), 2) }}</s>
+															<span style="white-space: nowrap !important">{{ $rp['discounted_price'] }}</span>&nbsp;<br class="d-lg-none"/><s style="color: #c5c5c5;">{{ $rp['default_price'] }}</s>
 															@else
-															₱ {{ number_format(str_replace(",","",$rp['orig_price']), 2) }}
+															{{ $rp['default_price'] }}
 															@endif
 														</p>
-														@php
-															$total_reviews = collect($rp['product_reviews'])->count();
-															$total_rating = collect($rp['product_reviews'])->sum('rating');
-															$overall_rating = ($total_reviews > 0) ? ($total_rating / $total_reviews) : 0;
-														@endphp
 														<div class="d-flex justify-content-between align-items-center">
 															<div class="btn-group stylecap">
 																@for ($i = 0; $i < 5; $i++)
-																@if ($overall_rating <= $i)
+																@if ($rp['overall_rating'] <= $i)
 																<span class="fa fa-star starcolorgrey"></span>
 																@else
 																<span class="fa fa-star" style="color: #FFD600;"></span>
 																@endif
 																@endfor
 															</div>
-															<small class="text-muted stylecap" style="color:#c4cad0 !important; font-weight:100 !important;">( {{ $total_reviews }} Reviews )</small>
+															<small class="text-muted stylecap" style="color:#c4cad0 !important; font-weight:100 !important;">( {{ $rp['total_reviews'] }} Reviews )</small>
 														</div>
 														<br>
 													</div>

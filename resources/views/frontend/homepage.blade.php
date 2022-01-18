@@ -136,32 +136,25 @@
                 <div class="card shadow-sm">
                   <div class="equal-column-content">
                     @php
-                    $img_bs = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/gallery/preview/'. $bs['bs_img'] : '/storage/no-photo-available.png';
-                    $img_bs_webp = ($bs['bs_img']) ? '/storage/item_images/'. $bs['item_code'] .'/gallery/preview/'. explode(".", $bs['bs_img'])[0] . '.webp' : '/storage/no-photo-available.png';
+                    $img_bs = ($bs['image']) ? '/storage/item_images/'. $bs['item_code'] .'/gallery/preview/'. $bs['image'] : '/storage/no-photo-available.png';
+                    $img_bs_webp = ($bs['image']) ? '/storage/item_images/'. $bs['item_code'] .'/gallery/preview/'. explode(".", $bs['image'])[0] . '.webp' : '/storage/no-photo-available.png';
                     @endphp
                     <div class="hover-container product-card" style="position: relative">
                       <div class="pt-2" style="position: absolute; top: 0; right: 0; z-index: 10;">
-                        <div class="col-12 mb-2 {{ $bs['is_new_item'] == 1 ? '' : 'd-none' }}">
+                        @if($bs['is_new_item'])
+                        <div class="col-12 mb-2">
                           <span class="p-1 text-center" style="background-color: #438539; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px !important">
                             &nbsp;<b>New</b>&nbsp;
                           </span>
-                        </div><br class="{{ $bs['is_new_item'] == 1 ? '' : 'd-none' }}"/>
+                        </div><br />
+                        @endif
+                   
                         @if ($bs['is_discounted'])
                           <div class="col-12">
                             <span class="p-1 text-center" style="background-color: #FF0000; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; width: 100%">
-                              &nbsp;<b>{{ $bs['discount'] }}% OFF</b>&nbsp;
+                              &nbsp;<b>{{ $bs['discount_display'] }}</b>&nbsp;
                             </span>
                           </div>
-                        @elseif ($bs['is_discounted_from_sale'] == 1)
-													<div class="col-12">
-														<span class="p-1 text-center" style="background-color: #FF0000; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
-															@if ($bs['sale_discount_type'] == 'By Percentage')
-																&nbsp;<b>{{ $bs['sale_discount_rate'] }}% OFF</b>&nbsp;
-															@else
-																&nbsp;<b>₱ {{ number_format($bs['sale_discount_rate'], 2, '.', ',') }} OFF</b>&nbsp;
-															@endif
-														</span>
-													</div>
 												@endif
                       </div>
 
@@ -173,7 +166,7 @@
                       <picture>
                         <source srcset="{{ asset($img_bs_webp) }}" type="image/webp" class="img-responsive" style="width: 100% !important;">
                         <source srcset="{{ asset($img_bs) }}" type="image/jpeg" class="img-responsive" style="width: 100% !important;">
-                        <img src="{{ asset($img_bs) }}" alt="{{ Str::slug(explode(".", $bs['bs_img'])[0], '-') }}" class="img-responsive hover" style="width: 100% !important;">
+                        <img src="{{ asset($img_bs) }}" alt="{{ Str::slug(explode(".", $bs['image'])[0], '-') }}" class="img-responsive hover" style="width: 100% !important;">
                       </picture>
                     </div>
                     <div class="card-body d-flex flex-column">
@@ -182,31 +175,24 @@
                       </div>
                       <p class="card-text fumacoFont_card_price" style="color:#000000 !important; ">
                         @if($bs['is_discounted'] == 1)
-												₱ {{ number_format(str_replace(",","",$bs['new_price']), 2) }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$bs['orig_price']), 2) }}</s>
-												@elseif($bs['is_discounted_from_sale'] == 1)
-													₱ {{ number_format(str_replace(",","",$bs['sale_discounted_price']), 2) }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$bs['orig_price']), 2) }}</s>
+											  {{ $bs['discounted_price'] }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">{{ $bs['default_price'] }}</s>
 												@else
-												₱ {{ number_format(str_replace(",","",$bs['orig_price']), 2) }}
+                        {{ $bs['default_price'] }}
 												@endif
                       </p>
                     </div>
                     <div class="mx-auto" style="width: 90%;">
                       <div class="d-flex justify-content-between align-items-center">
-                        @php
-                          $total_reviews = collect($bs['product_reviews'])->count();
-                          $total_rating = collect($bs['product_reviews'])->sum('rating');
-                          $overall_rating = ($total_reviews > 0) ? ($total_rating / $total_reviews) : 0;
-                        @endphp
                         <div class="btn-group stylecap">
                           @for ($i = 0; $i < 5; $i++)
-                          @if ($overall_rating <= $i)
+                          @if ($bs['overall_rating'] <= $i)
                           <span class="fa fa-star starcolorgrey"></span>
                           @else
                           <span class="fa fa-star" style="color: #FFD600;"></span>
                           @endif
                           @endfor
                         </div>
-                        <small class="text-muted stylecap" style="color:#c4cad0 !important; font-weight:100 !important;">( {{ $total_reviews }} Reviews )</small>
+                        <small class="text-muted stylecap" style="color:#c4cad0 !important; font-weight:100 !important;">( {{ $bs['total_reviews'] }} Reviews )</small>
                       </div>
                       <br>
                     </div>
@@ -237,8 +223,8 @@
           <section class="regular slider">
           @foreach($on_sale_arr as $os)
            @php
-            $img_os = ($os['os_img']) ? '/storage/item_images/'. $os['item_code'] .'/gallery/preview/'. $os['os_img'] : '/storage/no-photo-available.png';
-            $img_os_webp = ($os['os_img']) ? '/storage/item_images/'. $os['item_code'] .'/gallery/preview/'. explode(".", $os['os_img'])[0] . '.webp' : '/storage/no-photo-available.png';
+            $img_os = ($os['image']) ? '/storage/item_images/'. $os['item_code'] .'/gallery/preview/'. $os['image'] : '/storage/no-photo-available.png';
+            $img_os_webp = ($os['image']) ? '/storage/item_images/'. $os['item_code'] .'/gallery/preview/'. explode(".", $os['image'])[0] . '.webp' : '/storage/no-photo-available.png';
           @endphp
               <div class="col-md-4 col-lg-3 animated animatedFadeInUp fadeInUp equal-height-columns mb-3 on-sale-card">
                 <div class="card shadow-sm">
@@ -246,16 +232,21 @@
                     
                     <div class="hover-container product-card" style="position: relative !important;">
                       <div class="pt-2" style="position: absolute; top: 0; right: 0; z-index: 10;">
-                        <div class="col-12 mb-2 {{ $os['is_new_item'] == 1 ? '' : 'd-none' }}">
+                        @if ($os['is_new_item'])
+                        <div class="col-12 mb-2">
                           <span class="p-1 text-center" style="background-color: #438539; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px !important">
                             &nbsp;<b>New</b>&nbsp;
                           </span>
-                        </div><br class="{{ $os['is_new_item'] == 1 ? '' : 'd-none' }}"/>
-                        <div class="col-12">
-                          <span class="p-1 text-center" style="background-color: #FF0000; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
-                            &nbsp;<b>{{ $os['discount_percent'] }}% OFF</b>&nbsp;
-                          </span>
-                        </div>
+                        </div><br />
+                        @endif
+
+                        @if ($os['is_discounted'])
+                          <div class="col-12">
+                            <span class="p-1 text-center" style="background-color: #FF0000; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; width: 100%">
+                              &nbsp;<b>{{ $os['discount_display'] }}</b>&nbsp;
+                            </span>
+                          </div>
+												@endif
                       </div>
                       
                       <div class="btn-container">
@@ -265,7 +256,7 @@
                       <picture>
                         <source srcset="{{ asset($img_os_webp) }}" type="image/webp" class="img-responsive" style="width: 100% !important;">
                         <source srcset="{{ asset($img_os) }}" type="image/jpeg" class="img-responsive" style="width: 100% !important;">
-                        <img src="{{ asset($img_os) }}" alt="{{ Str::slug(explode(".", $os['os_img'])[0], '-') }}" class="img-responsive hover" style="width: 100% !important;">
+                        <img src="{{ asset($img_os) }}" alt="{{ Str::slug(explode(".", $os['image'])[0], '-') }}" class="img-responsive hover" style="width: 100% !important;">
                       </picture>
                     </div>
                     <div class="card-body d-flex flex-column">
@@ -273,31 +264,25 @@
                         <a href="/product/{{ ($os['slug']) ? $os['slug'] : $os['item_code'] }}" class="card-text product-head fumacoFont_card_title text-concat prod_desc" style="text-decoration: none !important; text-transform: none !important; color:#0062A5 !important; min-height: 100px;">{{ $os['item_name'] }}</a>
                       </div>
                       <p class="card-text fumacoFont_card_price" style="color:#000000 !important; min-height: 30px">
-                        @if ($os['is_discounted'])
-                        ₱ {{ number_format(str_replace(",","",$os['new_price']), 2) }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$os['orig_price']), 2) }}</s>
+                        @if($os['is_discounted'] == 1)
+                          {{ $os['discounted_price'] }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">{{ $os['default_price'] }}</s>
                         @else
-                        ₱ {{ number_format(str_replace(",","",$os['orig_price']), 2) }}
+                          {{ $os['default_price'] }}
                         @endif
-                        {{-- &nbsp;&nbsp;<span class="badge badge-danger" style="vertical-align: middle;background-color: red;">{{ $os['discount_percent'] }}% OFF</span> --}}
                       </p>
                     </div>
                     <div class="mx-auto" style="width: 90%;">
-                      @php
-                        $total_reviews = collect($os['product_reviews'])->count();
-                        $total_rating = collect($os['product_reviews'])->sum('rating');
-                        $overall_rating = ($total_reviews > 0) ? ($total_rating / $total_reviews) : 0;
-                      @endphp
                       <div class="d-flex justify-content-between align-items-center">
                         <div class="btn-group stylecap">
                           @for ($i = 0; $i < 5; $i++)
-                          @if ($overall_rating <= $i)
+                          @if ($os['overall_rating'] <= $i)
                           <span class="fa fa-star starcolorgrey"></span>
                           @else
                           <span class="fa fa-star" style="color: #FFD600;"></span>
                           @endif
                           @endfor
                         </div>
-                        <small class="text-muted stylecap" style="color:#c4cad0 !important; font-weight:100 !important;">( {{ $total_reviews }} Reviews )</small>
+                        <small class="text-muted stylecap" style="color:#c4cad0 !important; font-weight:100 !important;">( {{ $os['total_reviews'] }} Reviews )</small>
                       </div>
                       <br/>
                     </div>
