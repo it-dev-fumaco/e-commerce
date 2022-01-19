@@ -55,6 +55,21 @@ class FrontendController extends Controller
                         ->where('blog_enable', 1)->get();
                 }
             } else {
+                $request_data = $request->except(['page', 'sel_attr', 'sortby', 'brand', 'order', 'fbclid', 's']);
+                $search_string = $request->s;
+                $attribute_name_filter = array_keys($request_data);
+                $attribute_value_filter = [];
+                $brand_filter = $request->brand ? $request->brand : [];
+                foreach($request_data as $data) {
+                    foreach (explode('+', $data) as $value) {
+                        $attribute_value_filter[] = $value;
+                    }
+                }
+
+                // get items based on filters
+                $filtered_items = [];
+                $filtered_item_codes = [];
+
                 if (in_array($search_by, ['products', 'all', ''])) {
                     $product_list = DB::table('fumaco_items')
                         ->where('f_brand', 'LIKE', "%".$search_str."%")
@@ -73,6 +88,23 @@ class FrontendController extends Controller
                         })
                         ->where('f_status', 1)->where('f_status', 1)
                         ->orderBy($sortby, $orderby)->get();
+
+                    if(count($request_data) > 0 or count($brand_filter) > 0){
+                        $filtered_items = DB::table('fumaco_items as a')
+                            ->join('fumaco_items_attributes as b', 'a.f_idcode', 'b.idcode')
+                            ->join('fumaco_attributes_per_category as c', 'c.id', 'b.attribute_name_id')
+                            ->when(count($brand_filter) > 0, function($c) use ($brand_filter) {
+                                $c->whereIn('a.f_brand', $brand_filter);
+                            })
+                            ->when(count($request_data) > 0, function($c) use ($attribute_name_filter, $attribute_value_filter) {
+                                $c->whereIn('c.slug', $attribute_name_filter)->whereIn('b.attribute_value', $attribute_value_filter);
+                            })
+                            ->where('a.f_status', 1)->select('c.slug', 'b.attribute_value', 'a.f_idcode', 'a.f_brand')->get();
+
+                        $filtered_item_codes = collect($filtered_items)->pluck('f_idcode');
+
+                        $product_list = $product_list->whereIn('f_idcode', $filtered_item_codes);
+                    }
                 }
 
                 if (in_array($search_by, ['blogs', 'all', ''])) {
@@ -363,7 +395,30 @@ class FrontendController extends Controller
                 }
             }
 
-            return view('frontend.search_results', compact('results', 'blogs', 'products', 'recently_added_arr'));
+            // Filters
+            $filters = DB::table('fumaco_items as a')
+                ->join('fumaco_items_attributes as b', 'a.f_idcode', 'b.idcode')
+                ->join('fumaco_attributes_per_category as c', 'c.id', 'b.attribute_name_id')
+                ->when(count($item_code_array) > 0, function($c) use ($item_code_array) {
+                    $c->whereIn('a.f_idcode', $item_code_array);
+                })
+                ->where('a.f_status', 1)
+                ->where('c.status', 1)->select('c.attribute_name', 'b.attribute_value')
+                ->groupBy('c.attribute_name', 'b.attribute_value')->get();
+
+            $filters = collect($filters)->groupBy('attribute_name')->map(function($r, $d){
+                return array_unique(array_column($r->toArray(), 'attribute_value'));
+            });
+
+            $brands = DB::table('fumaco_items')
+                ->when(count($request_data) > 1, function($c) use ($filtered_item_codes) {
+                    $c->whereIn('f_idcode', $filtered_item_codes);
+                })
+                ->where('f_status', 1)->whereNotNull('f_brand')->distinct('f_brand')->pluck('f_brand');
+
+            $filters['Brand'] = $brands;
+
+            return view('frontend.search_results', compact('results', 'blogs', 'products', 'recently_added_arr' ,'filters'));
         }
 
         $carousel_data = DB::table('fumaco_header')->where('fumaco_status', 1)->orderBy('fumaco_active', 'desc')->get();
