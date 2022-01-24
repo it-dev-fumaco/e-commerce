@@ -45,12 +45,7 @@ class DashboardController extends Controller
 		// sales per month
 		$sales_arr = [];
 
-		$available_months = 12;
-		if(!$request->year or Carbon::now()->format('Y') == $request->year){
-			$available_months = Carbon::now()->format('m');
-		}
-
-		for($month = 1; $month <= $available_months; $month++){
+		for($month = 1; $month <= 12; $month++){
 			if($request->year){
 				$sales = DB::table('fumaco_order')->where('order_status', '!=', 'Cancelled')->whereMonth('order_date', $month)->whereYear('order_date', $request->year)->sum('amount_paid');
 			}else{
