@@ -7,14 +7,14 @@
 <main style="background-color:#0062A5;">
 	<div id="myCarousel" class="carousel slide" data-bs-ride="carousel">
 		<div class="carousel-inner">
-			<div class="carousel-item active" style="height: 17rem !important;">
+			<div class="carousel-item active results-banner">
 				<img src="{{ asset('/assets/site-img/header3-sm.png') }}" alt="" style="position: absolute; bottom: 0 !important;left: 0;min-width: 100%; height: 100% !important;">
 				<div class="container">
 					<div class="carousel-caption text-start" style="bottom: 1rem !important; right: 25% !important; left: 25%; !important;">
 						<div class="row justify-content-md-center">
 							<div class="col-md-8">
-								<h3 class="carousel-header-font text-center"><b>{{ $results->total() }} result(s) found</b></h3>
-								<form action="/" method="GET">
+								<h3 class="carousel-header-font text-center results-count-head"><b>{{ $results->total() }} result(s) found</b></h3>
+								<form action="/" method="GET" class="d-none d-md-block">
 									<div class="input-group mb-3">
 										<input type="text" class="form-control search-page-autocomplete" placeholder="Search" name="s" value="{{ request()->s }}">
 										<div class="input-group-append">
@@ -149,8 +149,8 @@
 		@if(count($products) > 0)
 		
 		<div class="row">
-			<div class="d-none d-xl-block col-1">&nbsp;</div>
-			<div class="d-none col-lg-3 col-xl-2 d-lg-block">
+			<div class="d-none {{ request()->s == '' ? '' : 'd-xl-block' }} col-1">&nbsp;</div>
+			<div class="d-none col-lg-3 col-xl-2 {{ request()->s == '' ? '' : 'd-lg-block' }}">
 				<!--sidebar-->
 				<div class="col-12 checkersxx">
 					<div class="d-flex justify-content-between align-items-center he1" style="font-weight: 500 !important"><b>Filter Results</b>
@@ -212,32 +212,115 @@
 				<!--sidebar-->
 			</div>
 			
-			<div class="col-lg-9 col-xl-8">
+			<div class="col-lg-9 col-xl-8 {{ request()->s == '' ? 'mx-auto' : '' }}">
 				<div class="row">
 				@if (count($recently_added_arr) > 0)
 					<div class="col-12 text-center">
 						<h4 class="mt-4 mb-3 fw-light bestsellinghead fumacoFont1 animated animatedFadeInUp fadeInUp results-head" style="color:#000000 !important;">RECENTLY ADDED PRODUCT(S)</h4>
 					</div>
 					@foreach ($recently_added_arr as $item)
-					<div class="col-4 animated animatedFadeInUp fadeInUp equal-height-columns">
+					<!-- Mobile view Start -->
+					<div class="d-block d-md-none animated animatedFadeInUp fadeInUp">
+						<div class="card">
+							<div class="pt-2" style="position: absolute; top: 0; left: 0; z-index: 10;">
+								<div class="col-12">
+									@if ($item['is_discounted'])
+										<div class="col-12">
+											<span class="text-center" style="background-color: #FF0000; font-size: 9pt; border-radius: 0 20px 20px 0; color: #fff; min-width: 80px; padding: 2px">
+												&nbsp;<b>{{ $item['discount'] }}% OFF</b>&nbsp;
+											</span>
+										</div>
+									@elseif ($item['is_discounted_from_sale'] == 1)
+										<div class="col-12">
+											<span class="text-center" style="background-color: #FF0000; font-size: 9pt; border-radius: 0 20px 20px 0; color: #fff; min-width: 80px; padding: 2px">
+												@if ($item['sale_discount_type'] == 'By Percentage')
+													&nbsp;<b>{{ $item['sale_discount_rate'] }}% OFF</b>&nbsp;
+												@else
+													&nbsp;<b>₱ {{ number_format($item['sale_discount_rate'], 2, '.', ',') }} OFF</b>&nbsp;
+												@endif
+											</span>
+										</div>
+									@endif
+								</div>
+							</div>
+							<div class="card-body">
+								<div class="row">
+									<div class="col-4">
+										@php
+											$image = ($item['image']) ? '/storage/item_images/'.$item['item_code'].'/gallery/preview/'.$item['image'] : '/storage/no-photo-available.png';
+											$image_webp = ($item['image']) ? '/storage/item_images/'.$item['item_code'].'/gallery/preview/'.explode(".", $item['image'])[0] .'.webp' : '/storage/no-photo-available.png';
+										@endphp              
+										<picture>
+											<source srcset="{{ asset($image_webp) }}" type="image/webp" class="card-img-top">
+											<source srcset="{{ asset($image) }}" type="image/jpeg" class="card-img-top"> 
+											<img src="{{ asset($image) }}" alt="{{ $item['item_code'] }}" class="card-img-top hover">
+										</picture>
+									</div>
+									<div class="col-8">
+										<div class="text ellipsis mb-1">
+											<a href="/product/{{ $item['slug'] ? $item['slug'] : $item['item_code'] }}" class="card-text mob-prod-text-concat" style="text-transform: none !important; text-decoration: none !important; color:#0062A5 !important; font-weight: 500 !important">{{ $item['item_name'] }}</a>
+										</div>
+										<p class="card-text fumacoFont_card_price" style="color:#000000 !important; font-size: 7pt">
+											@if($item['is_discounted'])
+												₱ {{ number_format(str_replace(",","",$item['new_price']), 2) }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$item['orig_price']), 2) }}</s>
+											@elseif($item['is_discounted_from_sale'] == 1)
+												₱ {{ number_format(str_replace(",","",$item['sale_discounted_price']), 2) }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$item['orig_price']), 2) }}</s>
+											@else
+											₱ {{ number_format(str_replace(",","",$item['orig_price']), 2) }}
+											@endif
+										</p>
+										<div class="d-flex justify-content-between align-items-center">
+											<div class="btn-group stylecap">
+												@php
+													$total_reviews = collect($item['product_reviews'])->count();
+													$total_rating = collect($item['product_reviews'])->sum('rating');
+													$overall_rating = ($total_reviews > 0) ? ($total_rating / $total_reviews) : 0;
+												@endphp
+								
+												@for ($i = 0; $i < 5; $i++)
+													@if ($overall_rating <= $i)
+														<span class="fa fa-star starcolorgrey"></span>
+													@else
+														<span class="fa fa-star" style="color: #FFD600;"></span>
+													@endif
+												@endfor
+											</div>
+											<small class="text-muted stylecap" style="color:#c4cad0 !important; font-weight:100 !important;">( {{ $total_reviews }} Reviews )</small>
+										</div>
+										<br/>
+										@if ($item['on_stock'] == 1)
+											<a href="#" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto add-to-cart" role="button" style="width: 100% !important;" data-item-code="{{ $item['item_code'] }}"><i class="fas fa-shopping-cart d-inline-block" style="margin-right: 3%;"></i> Add to Cart</a>
+										@else
+											<a href="/login" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto {{ Auth::check() ? 'add-to-wishlist' : '' }}" role="button" style="width: 100% !important;" data-item-code="{{ $item['item_code'] }}"><i class="far fa-heart d-inline-block" style="margin-right: 3%;"></i> Add to Wishlist</a>
+										@endif
+									</div>
+								</div>								
+							</div>
+						</div>
+					</div>
+					<!-- Mobile view end -->
+
+					<!-- Desktop/Tablet view start -->
+					<div class="d-none d-md-block col-4 animated animatedFadeInUp fadeInUp equal-height-columns">
 						<div class="card mb-4">
 							<div class="equal-column-content">
 								<div class="hover-container product-card" style="position: relative;">
 									<div class="pt-2" style="position: absolute; top: 0; right: 0; z-index: 10;">
 										<div class="col-12 mb-2 {{ $item['is_new_item'] == 1 ? '' : 'd-none' }}">
-										<span class="p-1 text-center" style="background-color: #438539; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
-										&nbsp;<b>New</b>&nbsp;
-										</span>
-									</div><br class="{{ $item['is_new_item'] == 1 ? '' : 'd-none' }}"/>
+											<span class="p-1 text-center" style="background-color: #438539; font-size: 9pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
+											&nbsp;<b>New</b>&nbsp;
+											</span>
+										</div>
+										<br class="{{ $item['is_new_item'] == 1 ? '' : 'd-none' }}"/>
 										@if ($item['is_discounted'])
 											<div class="col-12">
-												<span class="p-1 text-center" style="background-color: #FF0000; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
+												<span class="p-1 text-center" style="background-color: #FF0000; font-size: 9pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
 													&nbsp;<b>{{ $item['discount'] }}% OFF</b>&nbsp;
 												</span>
 											</div>
 										@elseif ($item['is_discounted_from_sale'] == 1)
 											<div class="col-12">
-												<span class="p-1 text-center" style="background-color: #FF0000; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
+												<span class="p-1 text-center" style="background-color: #FF0000; font-size: 9pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
 													@if ($item['sale_discount_type'] == 'By Percentage')
 														&nbsp;<b>{{ $item['sale_discount_rate'] }}% OFF</b>&nbsp;
 													@else
@@ -303,6 +386,7 @@
 							@endif
 						</div>
 					</div>
+					<!-- Desktop/Tablet view end -->
 					@endforeach
 				@endif
 
@@ -310,7 +394,92 @@
 					<h4 class="mt-4 mb-3 fw-light bestsellinghead fumacoFont1 animated animatedFadeInUp fadeInUp results-head" style="color:#000000 !important;">{{ request()->s == null ? 'FEATURED PRODUCT(S)' : 'PRODUCT(S)' }}</h4>
 				</div>
 				@foreach ($products as $product)
-					<div class="col-4 animated animatedFadeInUp fadeInUp equal-height-columns">
+					<!-- Mobile view start -->
+					<div class="d-block d-md-none animated animatedFadeInUp fadeInUp mb-2">
+						<div class="card">
+							<div class="pt-2" style="position: absolute; top: 0; left: 0; z-index: 10;">
+								<div class="col-12 mb-1 {{ $product['is_new_item'] == 1 ? '' : 'd-none' }}">
+									<span class="text-center" style="background-color: #438539; font-size: 9pt; border-radius: 0 20px 20px 0; color: #fff; min-width: 80px !important; padding: 2px">
+									&nbsp;<b>New</b>&nbsp;
+									</span>
+								</div>
+								@if ($product['is_discounted'])
+									<div class="col-12">
+										<span class="text-center" style="background-color: #FF0000; font-size: 9pt; border-radius: 0 20px 20px 0; color: #fff; min-width: 80px !important; padding: 2px">
+											&nbsp;<b>{{ $product['discount_percent'] }}% OFF</b>&nbsp;
+										</span>
+									</div>
+								@elseif ($product['is_discounted_from_sale'] == 1)
+									<div class="col-12">
+										<span class="text-center" style="background-color: #FF0000; font-size: 9pt; border-radius: 0 20px 20px 0; color: #fff; min-width: 80px !important; padding: 2px">
+											@if ($product['sale_discount_type'] == 'By Percentage')
+												&nbsp;<b>{{ $product['sale_discount_rate'] }}% OFF</b>&nbsp;
+											@else
+												&nbsp;<b>₱ {{ number_format($product['sale_discount_rate'], 2, '.', ',') }} OFF</b>&nbsp;
+											@endif
+										</span>
+									</div>
+								@endif
+							</div>
+							<div class="card-body">
+								<div class="row">
+									<div class="col-4">
+										@php
+											$image = ($product['image']) ? '/storage/item_images/'.$product['item_code'].'/gallery/preview/'.$product['image'] : '/storage/no-photo-available.png';
+											$image_webp = ($product['image']) ? '/storage/item_images/'.$product['item_code'].'/gallery/preview/'.explode(".", $product['image'])[0] .'.webp' : '/storage/no-photo-available.png';
+										@endphp              
+										<picture>
+											<source srcset="{{ asset($image_webp) }}" type="image/webp" class="card-img-top">
+											<source srcset="{{ asset($image) }}" type="image/jpeg" class="card-img-top"> 
+											<img src="{{ asset($image) }}" alt="{{ $product['item_code'] }}" class="card-img-top hover">
+										</picture>
+									</div>
+									<div class="col-8">
+										<div class="text ellipsis mb-1">
+											<a href="/product/{{ $product['slug'] ? $product['slug'] : $product['item_code'] }}" class="card-text mob-prod-text-concat" style="text-transform: none !important; text-decoration: none !important; color:#0062A5 !important; font-weight: 500 !important">{{ $product['item_name'] }}</a>
+										</div>
+										<p class="card-text fumacoFont_card_price" style="color:#000000 !important; font-size: 7pt">
+											@if($product['is_discounted'])
+												₱ {{ number_format(str_replace(",","",$product['discounted_price']), 2) }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$product['original_price']), 2) }}</s>
+											@elseif($product['is_discounted_from_sale'] == 1)
+												₱ {{ number_format(str_replace(",","",$product['sale_discounted_price']), 2) }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$product['original_price']), 2) }}</s>
+											@else
+											₱ {{ number_format(str_replace(",","",$product['original_price']), 2) }}
+											@endif
+										</p>
+										<div class="d-flex justify-content-between align-items-center">
+											<div class="btn-group stylecap">
+												@php
+													$total_reviews = collect($product['product_reviews'])->count();
+													$total_rating = collect($product['product_reviews'])->sum('rating');
+													$overall_rating = ($total_reviews > 0) ? ($total_rating / $total_reviews) : 0;
+												@endphp
+								
+												@for ($i = 0; $i < 5; $i++)
+													@if ($overall_rating <= $i)
+														<span class="fa fa-star starcolorgrey"></span>
+													@else
+														<span class="fa fa-star" style="color: #FFD600;"></span>
+													@endif
+												@endfor
+											</div>
+											<small class="text-muted stylecap" style="color:#c4cad0 !important; font-weight:100 !important;">( {{ $total_reviews }} Reviews )</small>
+										</div>
+										<br/>
+										@if ($product['on_stock'] == 1)
+											<a href="#" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto add-to-cart" role="button" style="width: 100% !important;" data-item-code="{{ $product['item_code'] }}"><i class="fas fa-shopping-cart d-inline-block" style="margin-right: 3%;"></i> Add to Cart</a>
+										@else
+											<a href="/login" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto {{ Auth::check() ? 'add-to-wishlist' : '' }}" role="button" style="width: 100% !important;" data-item-code="{{ $product['item_code'] }}"><i class="far fa-heart d-inline-block" style="margin-right: 3%;"></i> Add to Wishlist</a>
+										@endif
+									</div>
+								</div>								
+							</div>
+						</div>
+					</div>
+					<!-- Mobile view end --> 
+
+					<!-- Desktop/Tablet view start -->
+					<div class="d-none d-md-inline col-4 animated animatedFadeInUp fadeInUp equal-height-columns">
 						<div class="card mb-4">
 							<div class="equal-column-content">
 								<div class="hover-container product-card" style="position: relative;">
@@ -395,6 +564,7 @@
 							@endif
 						</div>
 					</div>
+					<!-- Desktop/Tablet view end -->
 				@endforeach
 				</div>
 			</div>
@@ -471,6 +641,15 @@
 		line-height: 1.5em;
 		text-align: left;
 		font-size: 16px !important;
+	}
+	
+	.mob-prod-text-concat {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		display: -webkit-box;
+		-webkit-line-clamp: 2; /* number of lines to show */
+				line-clamp: 2; 
+		-webkit-box-orient: vertical;
 	}
 
 	.blog-text-concat {
@@ -611,6 +790,10 @@
 		border-bottom-color: #eeeeee;
 		background-color: #fafafa;
 	}
+
+	.results-banner{
+		height: 17rem !important;
+	}
 	@media (max-width: 575.98px) {
 		.results-count{
 			text-align: center !important;
@@ -618,6 +801,13 @@
 		.results-head{
 			font-size: 14pt !important;
 		}
+		.results-count-head{
+			font-size: 15pt !important;
+		}
+		.results-banner{
+			height: 13rem !important; 
+		}
+
 	}
   	@media (max-width: 767.98px) {
 		.results-count{
@@ -625,6 +815,12 @@
 		}
 		.results-head{
 			font-size: 14pt !important;
+		}
+		.results-count-head{
+			font-size: 15pt !important;
+		}
+		.results-banner{
+			height: 13rem !important; 
 		}
 	}
 

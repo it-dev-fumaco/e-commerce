@@ -20,11 +20,11 @@
                                 <picture>
                                     <source srcset="{{ asset($image_webp) }}" type="image/webp">
                                     <source srcset="{{ asset($image) }}" type="image/jpeg">
-                                    <img src="{{ asset($image) }}" alt="{{ Str::slug(explode(".", $item['image'])[0], '-') }}" width="70%">
+                                    <img src="{{ asset($image) }}" alt="{{ Str::slug(explode(".", $item['image'])[0], '-') }}" class="autocomplete-image">
                                 </picture>
                             </div>
                             <div class="col-{{ $item['screen'] == 'desktop' ? '10' : '9' }} product-desc">
-                                <p style="font-size: 11pt">{{ $item['name'] }}</p>
+                                <p class="search-name">{{ $item['name'] }}</p>
                             </div>
                         </div>
                     </a>
@@ -41,7 +41,7 @@
                     <a href="/blog/{{ $item['slug'] ? $item['slug'] : $item['id'] }}" class="search-link">
                         <div class="row search-row">
                             <div class="blogs col-12">
-                                <p style="font-size: 11pt">{{ $item['name'] }}</p>
+                                <p class="search-name">{{ $item['name'] }}</p>
                             </div>
                         </div>
                     </a>
@@ -69,4 +69,27 @@
     .search-row:hover .product-desc, .search-row:hover .blogs{
         text-decoration: underline !important;
     }
+    .search-name{
+        font-size: 11pt !important;
+    }
+    .autocomplete-image{
+        width: 70% !important;
+    }
+    @media (max-width: 575.98px) {
+        .search-name{
+            font-size: 10pt !important;
+        }
+        .autocomplete-image{
+            width: 100% !important;
+        }
+    }
+  	@media (max-width: 767.98px) {
+        .search-name{
+            font-size: 10pt !important;
+        }
+        .autocomplete-image{
+            width: 100% !important;
+        }
+    }
+
 </style>
