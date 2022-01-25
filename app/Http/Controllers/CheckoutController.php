@@ -14,8 +14,11 @@ use App\Models\ShippingService;
 use App\Models\ShippingZoneRate;
 use App\Models\ShippingCondition;
 
+use App\Http\Traits\ProductTrait;
+
 class CheckoutController extends Controller
 {
+	use ProductTrait;
 	public function billingForm() {
 		$order_no = session()->get('fumOrderNo');
         if(Auth::check()) {
@@ -367,59 +370,37 @@ class CheckoutController extends Controller
 			$shipping_details = session()->get('fumShipDet');
 			$billing_details = session()->get('fumBillDet');
 
-			 // set sale price
-			 $sale = DB::table('fumaco_on_sale')
+			 // get sitewide sale
+			$sale = DB::table('fumaco_on_sale')
 				->whereDate('start_date', '<=', Carbon::now()->toDateString())
 				->whereDate('end_date', '>=', Carbon::today()->toDateString())
-				->where('status', 1)->first();
+				->where('status', 1)->where('apply_discount_to', 'All Items')->first();
 			
 			$cart_arr = [];
 			foreach ($cart_items as $n => $item) {
-				$discount = 0;
-				$price = $item->f_original_price;
-				$item_image = DB::table('fumaco_items_image_v1')
-					->where('idcode', $item->f_idcode)->first();
-
-				if (!$item->f_onsale) {
-					if ($sale) {
-						if ($sale->apply_discount_to == 'All Items') {
-							if ($sale->discount_type == 'By Percentage') {
-								$discount = ($item->f_original_price * ($sale->discount_rate/100));
-								$discount = ($discount > $sale->capped_amount) ? $sale->capped_amount : $discount;
-							} else {
-								$discount = $sale->discount_rate;
-							}
-						} else {
-							$sale_per_category = DB::table('fumaco_on_sale as sale')->join('fumaco_on_sale_categories as cat_sale', 'sale.id', 'cat_sale.sale_id')
-								->whereDate('sale.start_date', '<=', Carbon::now())->whereDate('sale.end_date', '>=', Carbon::now())
-								->where('status', 1)->where('cat_sale.category_id', $item->f_cat_id)
-								->select('cat_sale.*')->first();
-							if ($sale_per_category) {
-								if ($sale_per_category->discount_type == 'By Percentage') {
-									$discount = ($item->f_original_price * ($sale_per_category->discount_rate/100));
-									$discount = ($discount > $sale_per_category->capped_amount) ? $sale_per_category->capped_amount : $discount;
-								} else {
-									$discount = $sale_per_category->discount_rate;
-								}
-							}
-						}
+				$image = DB::table('fumaco_items_image_v1')->where('idcode', $item->f_idcode)->first();
+				$item_price = $item->f_default_price;
+				$item_on_sale = $item->f_onsale;
+				
+				$is_new_item = 0;
+				if($item->f_new_item == 1){
+					if($item->f_new_item_start <= Carbon::now() and $item->f_new_item_end >= Carbon::now()){
+						$is_new_item = 1;
 					}
-				} else {
-					$price = $item->f_price;
 				}
-	
-				$price = ($discount > $price) ? $price : ($price - $discount);
+				// get item price, discounted price and discount rate
+				$item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $item->f_cat_id, $sale, $item_price, $item->f_idcode, $item->f_discount_type, $item->f_discount_rate);
 
 				$cart_arr[] = [
 					'item_code' => $item->f_idcode,
 					'item_description' => $item->f_name_name,
-					'price' => $price,
-					'subtotal' => ($price * $item->qty),
-					'original_price' => $item->f_original_price,
-					'discount' => $item->f_onsale,
+					'price' => $item_price_data['discounted_price'],
+					'subtotal' => ($item_price_data['discounted_price'] * $item->qty),
+					'original_price' => $item_price_data['item_price'],
+					'discount' => $item_price_data['is_on_sale'],
 					'quantity' => $item->qty,
 					'stock_qty' => $item->f_qty,
-					'item_image' => ($item_image) ? $item_image->imgprimayx : 'test.jpg'
+					'item_image' => ($image) ? $image->imgprimayx : null
 				];
 			}
 
@@ -517,50 +498,26 @@ class CheckoutController extends Controller
 					->where('user_type', 'guest')->where('transaction_id', $order_no)->get();
 			}
 
-			  // set sale price
-			$sale = DB::table('fumaco_on_sale')
+			 // get sitewide sale
+			 $sale = DB::table('fumaco_on_sale')
 				->whereDate('start_date', '<=', Carbon::now()->toDateString())
 				->whereDate('end_date', '>=', Carbon::today()->toDateString())
-				->where('status', 1)->first();
-			
+				->where('status', 1)->where('apply_discount_to', 'All Items')->first();
+ 
 			$cart_arr = [];
 			foreach ($cart_items as $n => $item) {
-				$discount = 0;
-				$price = $item->f_original_price;
+				$item_price = $item->f_default_price;
+				$item_on_sale = $item->f_onsale;
+
+				// get item price, discounted price and discount rate
+				$item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $item->f_cat_id, $sale, $item_price, $item->f_idcode, $item->f_discount_type, $item->f_discount_rate);
+			
+				$price = $item_price_data['discounted_price'];
 				$item_image = DB::table('fumaco_items_image_v1')
 					->where('idcode', $item->f_idcode)->first();
 
-				if (!$item->f_onsale) {
-					if ($sale) {
-						if ($sale->apply_discount_to == 'All Items') {
-							if ($sale->discount_type == 'By Percentage') {
-								$discount = ($item->f_original_price * ($sale->discount_rate/100));
-								$discount = ($discount > $sale->capped_amount) ? $sale->capped_amount : $discount;
-							} else {
-								$discount = $sale->discount_rate;
-							}
-						} else {
-							$sale_per_category = DB::table('fumaco_on_sale as sale')->join('fumaco_on_sale_categories as cat_sale', 'sale.id', 'cat_sale.sale_id')
-								->whereDate('sale.start_date', '<=', Carbon::now())->whereDate('sale.end_date', '>=', Carbon::now())
-								->where('status', 1)->where('cat_sale.category_id', $item->f_cat_id)
-								->select('cat_sale.*')->first();
-							if ($sale_per_category) {
-								if ($sale_per_category->discount_type == 'By Percentage') {
-									$discount = ($item->f_original_price * ($sale_per_category->discount_rate/100));
-									$discount = ($discount > $sale_per_category->capped_amount) ? $sale_per_category->capped_amount : $discount;
-								} else {
-									$discount = $sale_per_category->discount_rate;
-								}
-							}
-						}
-					}
-				} else {
-					$price = $item->f_price;
-				}
-	
-				$price = ($discount > $price) ? $price : ($price - $discount);
 				$total_amount = $price * $item->qty;
-				$item_discount = $item->f_discount_percent;
+				$item_discount = $item_price_data['discount_rate'];
 
 				$existing_order_item = DB::table('fumaco_order_items')->where('order_number', $order_no)
 						->where('item_code', $item->f_idcode)->exists();
@@ -571,7 +528,7 @@ class CheckoutController extends Controller
 						->where('item_code', $item->f_idcode)->update([
 							'item_name' => $item->f_name_name,
 							'item_discount' => $item_discount,
-							'item_original_price' => $item->f_original_price,
+							'item_original_price' => $item->f_default_price,
 							'item_qty' => $item->qty,
 							'item_price' => $price,	
 							'item_total_price' => $total_amount,
@@ -582,7 +539,7 @@ class CheckoutController extends Controller
 						'item_code' => $item->f_idcode,
 						'item_name' => $item->f_name_name,
 						'item_discount' => $item_discount,
-						'item_original_price' => $item->f_original_price,
+						'item_original_price' => $item->f_default_price,
 						'item_qty' => $item->qty,
 						'item_price' => $price,
 						'item_status' => 2,
@@ -1088,9 +1045,28 @@ class CheckoutController extends Controller
 		$total_amount = 0;
 		$total_weight_of_items = 0;
 		$total_cubic_cm = 0;
+
+		// get sitewide sale
+		$sale = DB::table('fumaco_on_sale')
+			->whereDate('start_date', '<=', Carbon::now()->toDateString())
+			->whereDate('end_date', '>=', Carbon::today()->toDateString())
+			->where('status', 1)->where('apply_discount_to', 'All Items')->first();
+			
         foreach ($order_items as $row) {
+			$item_price = $row->f_default_price;
+			$item_on_sale = $row->f_onsale;
+			
+			$is_new_item = 0;
+			if($row->f_new_item == 1){
+				if($row->f_new_item_start <= Carbon::now() and $row->f_new_item_end >= Carbon::now()){
+					$is_new_item = 1;
+				}
+			}
+			// get item price, discounted price and discount rate
+			$item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $row->f_cat_id, $sale, $item_price, $row->f_idcode, $row->f_discount_type, $row->f_discount_rate);
+
 			$item_qty = $row->qty;
-			$price = ($row->f_price > 0) ? $row->f_price : $row->f_original_price;
+			$price = $item_price_data['discounted_price'];
 			$total_amount += ($price * $item_qty);
             $cubic_cm = ($row->f_package_length * $row->f_package_width * $row->f_package_height);
             $cubic_cm = $cubic_cm * $item_qty;

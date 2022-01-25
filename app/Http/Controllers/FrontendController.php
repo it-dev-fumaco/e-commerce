@@ -15,10 +15,13 @@ use App\Models\UserVerify;
 use Illuminate\Support\Str;
 use Adrianorosa\GeoLocation\GeoLocation;
 
+use App\Http\Traits\ProductTrait;
+
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class FrontendController extends Controller
 {   
+    use ProductTrait;
     public function signupForm() {
         return view('frontend.register');
     }
@@ -37,6 +40,12 @@ class FrontendController extends Controller
                 $sortby = 'f_order_by';
                 break;
         }
+        
+        // get sitewide sale
+        $sale = DB::table('fumaco_on_sale')
+            ->whereDate('start_date', '<=', Carbon::now()->toDateString())
+            ->whereDate('end_date', '>=', Carbon::today()->toDateString())
+            ->where('status', 1)->where('apply_discount_to', 'All Items')->first();
 
         if ($request->has('s')) {
             $orderby = ($request->order) ? $request->order : 'asc';
@@ -124,36 +133,34 @@ class FrontendController extends Controller
             } 
 
             $results = [];
-            foreach($product_list as $item){
-                $image = DB::table('fumaco_items_image_v1')->where('idcode', $item->f_idcode)->first();
-
+            foreach($product_list as $row){
+                $image = DB::table('fumaco_items_image_v1')->where('idcode', $row->f_idcode)->first();
+                
                 $is_new_item = 0;
-                if($item->f_new_item == 1){
-                    if($item->f_new_item_start <= Carbon::now() and $item->f_new_item_end >= Carbon::now()){
+                if($row->f_new_item == 1){
+                    if($row->f_new_item_start <= Carbon::now() and $row->f_new_item_end >= Carbon::now()){
                         $is_new_item = 1;
                     }
                 }
 
                 $results[] = [
-                    'id' => $item->id,
-                    'item_code' => $item->f_idcode,
-                    'item_name' => $item->f_name_name,
-                    'category' => $item->f_category,
-                    'category_id' => $item->f_cat_id,
-                    'original_price' => $item->f_original_price,
-                    'is_discounted' => $item->f_discount_trigger,
-                    'discounted_price' => $item->f_price,
-                    'on_sale' => $item->f_onsale,
-                    'discount_percent' => $item->f_discount_percent,
+                    'id' => $row->id,
+                    'item_code' => $row->f_idcode,
+                    'item_name' => $row->f_name_name,
+                    'category' => $row->f_category,
+                    'category_id' => $row->f_cat_id,
+                    'default_price' => $row->f_default_price,
+                    'is_discounted' => $row->f_onsale,
+                    'discount_rate' => $row->f_discount_rate,
+                    'discount_type' => $row->f_discount_type,
                     'image' => ($image) ? $image->imgprimayx : null,
                     'comment_count' => null,
                     'publish_date' => null,
                     'title' => null,
                     'type' => null,
                     'caption' => null,
-                    'slug' => $item->slug,
-                    'f_qty' => $item->f_qty,
-                    'f_reserved_qty' => $item->f_reserved_qty,
+                    'slug' => $row->slug,
+                    'on_stock' => ($row->f_qty - $row->f_reserved_qty) > 0 ? 1 : 0,
                     'is_new_item' => $is_new_item
                 ];
             }
@@ -161,16 +168,17 @@ class FrontendController extends Controller
             foreach($blogs as $blog){
                 $blog_comment = DB::table('fumaco_comments')->where('blog_id', $blog->id)->where('blog_status', 1)->count();
                 $results[] = [
+                    'id' => $blog->id,
                     'item_code' => null,
                     'item_name' => null,
-                    'original_price' => 0,
+                    'category' => null,
+                    'category_id' => null,
+                    'default_price' => 0,
                     'is_discounted' => 0,
-                    'discounted_price' => 0,
-                    'on_sale' => 0,
-                    'discount_percent' => 0,
-                    'id' => $blog->id,
-                    'comment_count' => $blog_comment,
+                    'discount_rate' => 0,
+                    'discount_type' => null,
                     'image' => $blog->{'blogprimayimage-journal'},
+                    'comment_count' => $blog_comment,
                     'publish_date' => $blog->datepublish,
                     'title' => $blog->blogtitle,
                     'type' => $blog->blogtype,
@@ -199,68 +207,31 @@ class FrontendController extends Controller
 
             $products = [];
             $blogs = [];
-
-            $all_item_discount = DB::table('fumaco_on_sale')->whereDate('start_date', '<=', Carbon::now()->toDateString())->whereDate('end_date', '>=', Carbon::now()->toDateString())->where('status', 1)->where('apply_discount_to', 'All Items')->first();
             
             foreach ($results as $result) {
                 if($result['item_code'] != null) {
-                    $on_stock = ($result['f_qty'] - $result['f_reserved_qty']) > 0 ? 1 : 0;
-
-                    $category_discount = DB::table('fumaco_on_sale as sale')->join('fumaco_on_sale_categories as cat_sale', 'sale.id', 'cat_sale.sale_id')->whereDate('sale.start_date', '<=', Carbon::now())->whereDate('sale.end_date', '>=', Carbon::now())->where('status', 1)->where('cat_sale.category_id', $result['category_id'])->first();
-
-                    $product_price = $result['original_price'];
-                    $discount_from_sale = 0;
-                    $sale_discount_rate = null;
-                    $sale_discount_type = null;
-                    if($all_item_discount){
-                        $discount_from_sale = 1;
-                        $sale_discount_rate = $all_item_discount->discount_rate;
-                        $sale_discount_type = $all_item_discount->discount_type;
-                        if($all_item_discount->discount_type == 'By Percentage'){
-                            $product_price = $result['original_price'] - ($result['original_price'] * ($all_item_discount->discount_rate/100));
-                        }else if($all_item_discount->discount_type == 'Fixed Amount'){
-                            $discount_from_sale = 0;
-                            if($result['original_price'] > $all_item_discount->discount_rate){
-                                $discount_from_sale = 1;
-                                $product_price = $result['original_price'] - $all_item_discount->discount_rate;
-                            }
-                        }
-                    }else if($category_discount){
-                        $discount_from_sale = 1;
-                        $sale_discount_rate = $category_discount->discount_rate;
-                        $sale_discount_type = $category_discount->discount_type;
-                        if($category_discount->discount_type == 'By Percentage'){
-                            $product_price = $result['original_price'] - ($result['original_price'] * ($category_discount->discount_rate/100));
-                        }else if($category_discount->discount_type == 'Fixed Amount'){
-                            $discount_from_sale = 0;
-                            if($result['original_price'] > $category_discount->discount_rate){
-                                $discount_from_sale = 1;
-                                $product_price = $result['original_price'] - $category_discount->discount_rate;
-                            }
-                        }
-                    }
-
-                    $product_review_per_code = DB::table('fumaco_product_review')
-                        ->where('status', '!=', 'pending')->where('item_code', $result['item_code'])->get();
+                    $item_price = $result['default_price'];
+                    $item_on_sale = $result['is_discounted'];
+                
+                    // get item price, discounted price and discount rate
+                    $item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $result['category_id'], $sale, $item_price, $result['item_code'], $result['discount_type'], $result['discount_rate']);
+                    // get product reviews
+                    $product_reviews = $this->getProductRating($result['item_code']);
 
                     $products[] = [
                         'id' => $result['id'],
                         'item_code' => $result['item_code'],
                         'item_name' => $result['item_name'],
-                        'original_price' => $result['original_price'],
-                        'is_discounted' => $result['is_discounted'],
-                        'is_discounted_from_sale' => $discount_from_sale,
-                        'sale_discounted_price' => $product_price,
-                        'sale_discount_rate' => $sale_discount_rate,
-                        'sale_discount_type' => $sale_discount_type,
-                        'discounted_price' => $result['discounted_price'],
-                        'on_sale' => $result['on_sale'],
-                        'discount_percent' => $result['discount_percent'],
+                        'default_price' => '₱ ' . number_format($item_price_data['item_price'], 2, '.', ','),
+                        'is_discounted' => $item_price_data['is_on_sale'],
+                        'on_stock' => $result['on_stock'],
+                        'discounted_price' => '₱ ' . number_format($item_price_data['discounted_price'], 2, '.', ','),
+                        'discount_display' => $item_price_data['discount_display'],
                         'image' => $result['image'],
                         'slug' => $result['slug'],
                         'is_new_item' => $result['is_new_item'],
-                        'on_stock' => $on_stock,
-                        'product_reviews' => $product_review_per_code
+                        'overall_rating' => $product_reviews['overall_rating'],
+                        'total_reviews' => $product_reviews['total_reviews'],
                     ];
                 } else {
                     $blogs[] = [
@@ -426,119 +397,80 @@ class FrontendController extends Controller
         }
 
         $carousel_data = DB::table('fumaco_header')->where('fumaco_status', 1)->orderBy('fumaco_active', 'desc')->get();
-        $onsale_carousel_data = DB::table('fumaco_on_sale')->where('status', 1)->where('banner_image', '!=', null)->where('start_date', '<=', Carbon::now())->where('end_date', '>=', Carbon::now())->get();
-        // return $onsale_carousel_data;
+        $onsale_carousel_data = DB::table('fumaco_on_sale')->where('status', 1)
+            ->where('banner_image', '!=', null)->where('start_date', '<=', Carbon::now())
+            ->where('end_date', '>=', Carbon::now())->get();
 
         $blogs = DB::table('fumaco_blog')->where('blog_featured', 1)
             ->where('blog_enable', 1)->take(3)->get();
-        $best_selling = DB::table('fumaco_items')->where('f_status', 1)->where('f_featured', 1)->get();
-        $on_sale = DB::table('fumaco_items')->where('f_status', 1)->where('f_onsale', 1)->get();
-        $best_selling_arr = [];
-        $on_sale_arr = [];
-
-        $bs_all_item_discount = DB::table('fumaco_on_sale')->whereDate('start_date', '<=', Carbon::now()->toDateString())->whereDate('end_date', '>=', Carbon::today()->toDateString())->where('status', 1)->where('apply_discount_to', 'All Items')->first();
-
-        foreach($best_selling as $bs){
-            $bs_img = DB::table('fumaco_items_image_v1')->where('idcode', $bs->f_idcode)->first();
-
+    
+        // get best selling items
+        $best_selling_query = DB::table('fumaco_items')->where('f_status', 1)->where('f_featured', 1)->get();
+        $best_selling_items = [];
+        foreach($best_selling_query as $row){
+            $image = DB::table('fumaco_items_image_v1')->where('idcode', $row->f_idcode)->first();
+            $item_price = $row->f_default_price;
+            $item_on_sale = $row->f_onsale;
+            
             $is_new_item = 0;
-            if($bs->f_new_item == 1){
-                if($bs->f_new_item_start <= Carbon::now() and $bs->f_new_item_end >= Carbon::now()){
+            if($row->f_new_item == 1){
+                if($row->f_new_item_start <= Carbon::now() and $row->f_new_item_end >= Carbon::now()){
                     $is_new_item = 1;
                 }
             }
-
-            $bs_all_item_discount = DB::table('fumaco_on_sale')->whereDate('start_date', '<=', Carbon::now()->toDateString())->whereDate('end_date', '>=', Carbon::today()->toDateString())->where('status', 1)->where('apply_discount_to', 'All Items')->first();
-            $bs_category_discount = DB::table('fumaco_on_sale as sale')->join('fumaco_on_sale_categories as cat_sale', 'sale.id', 'cat_sale.sale_id')->whereDate('sale.start_date', '<=', Carbon::now())->whereDate('sale.end_date', '>=', Carbon::now())->where('status', 1)->where('cat_sale.category_id', $bs->f_cat_id)->first();
-
-            $bs_product_price = null;
-            $discount_from_sale = 0;
-            $bs_sale_discount_rate = null;
-            $bs_sale_discount_type = null;
-            if($bs_all_item_discount){
-                $discount_from_sale = 1;
-                $bs_sale_discount_rate = $bs_all_item_discount->discount_rate;
-                $bs_sale_discount_type = $bs_all_item_discount->discount_type;
-                if($bs_all_item_discount->discount_type == 'By Percentage'){
-                    $bs_product_price = $bs->f_original_price - ($bs->f_original_price * ($bs_all_item_discount->discount_rate/100));
-                }else if($bs_all_item_discount->discount_type == 'Fixed Amount'){
-                    $discount_from_sale = 0;
-                    if($bs->f_original_price > $bs_all_item_discount->discount_rate){
-                        $discount_from_sale = 1;
-                        $bs_product_price = $bs->f_original_price - $bs_all_item_discount->discount_rate;
-                    }
-                }
-            }else if($bs_category_discount){
-                $discount_from_sale = 1;
-                $bs_sale_discount_rate = $bs_category_discount->discount_rate;
-                $bs_sale_discount_type = $bs_category_discount->discount_type;
-                if($bs_category_discount->discount_type == 'By Percentage'){
-                    $bs_product_price = $bs->f_original_price - ($bs->f_original_price * ($bs_category_discount->discount_rate/100));
-                }else if($bs_category_discount->discount_type == 'Fixed Amount'){
-                    $discount_from_sale = 0;
-                    if($bs->f_original_price > $bs_category_discount->discount_rate){
-                        $discount_from_sale = 1;
-                        $bs_product_price = $bs->f_original_price - $bs_category_discount->discount_rate;
-                    }
-                }
-            }
-
-            $bs_item_name = $bs->f_name_name;
-
-            $on_stock = ($bs->f_qty - $bs->f_reserved_qty) > 0 ? 1 : 0;
-
+            // get item price, discounted price and discount rate
+            $item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $row->f_cat_id, $sale, $item_price, $row->f_idcode, $row->f_discount_type, $row->f_discount_rate);
             // get product reviews
-            $product_reviews = DB::table('fumaco_product_review')
-                ->where('status', '!=', 'pending')->where('item_code', $bs->f_idcode)->get();
+            $product_reviews = $this->getProductRating($row->f_idcode);
+        
             $best_selling_arr[] = [
-                'id' => $bs->id,
-                'item_code' => $bs->f_idcode,
-                'item_name' => $bs_item_name,
-                'orig_price' => $bs->f_original_price,
-                'sale_discounted_price' => $bs_product_price,
-                'sale_discount_rate' => $bs_sale_discount_rate,
-                'sale_discount_type' => $bs_sale_discount_type,
-                'is_discounted' => $bs->f_discount_trigger,
-                'is_discounted_from_sale' => $discount_from_sale,
-                'on_stock' => $on_stock,
-                'new_price' => $bs->f_price,
-                'discount' => $bs->f_discount_percent,
-                'bs_img' => ($bs_img) ? $bs_img->imgprimayx : null,
-                'slug' => $bs->slug,
+                'id' => $row->id,
+                'item_code' => $row->f_idcode,
+                'item_name' => $row->f_name_name,
+                'default_price' => '₱ ' . number_format($item_price_data['item_price'], 2, '.', ','),
+                'is_discounted' => $item_price_data['is_on_sale'],
+                'on_stock' => ($row->f_qty - $row->f_reserved_qty) > 0 ? 1 : 0,
+                'discounted_price' => '₱ ' . number_format($item_price_data['discounted_price'], 2, '.', ','),
+                'discount_display' => $item_price_data['discount_display'],
+                'image' => ($image) ? $image->imgprimayx : null,
+                'slug' => $row->slug,
                 'is_new_item' => $is_new_item,
-                'product_reviews' => $product_reviews
+                'overall_rating' => $product_reviews['overall_rating'],
+                'total_reviews' => $product_reviews['total_reviews']
             ];
         }
 
-        foreach($on_sale as $os){
-            $os_img = DB::table('fumaco_items_image_v1')->where('idcode', $os->f_idcode)->first();
-
+        $on_sale = DB::table('fumaco_items')->where('f_status', 1)->where('f_onsale', 1)->get();
+        $on_sale_arr = [];
+        foreach($on_sale as $row){
+            $image = DB::table('fumaco_items_image_v1')->where('idcode', $row->f_idcode)->first();
+            $item_price = $row->f_default_price;
+            $item_on_sale = $row->f_onsale;
+            
             $is_new_item = 0;
-            if($os->f_new_item == 1){
-                if($os->f_new_item_start <= Carbon::now() and $os->f_new_item_end >= Carbon::now()){
+            if($row->f_new_item == 1){
+                if($row->f_new_item_start <= Carbon::now() and $row->f_new_item_end >= Carbon::now()){
                     $is_new_item = 1;
                 }
             }
-
-            $os_item_name = $os->f_name_name;
-            $on_stock = ($os->f_qty - $os->f_reserved_qty) > 0 ? 1 : 0;
-
+            // get item price, discounted price and discount rate
+            $item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $row->f_cat_id, $sale, $item_price, $row->f_idcode, $row->f_discount_type, $row->f_discount_rate);
             // get product reviews
-            $product_reviews = DB::table('fumaco_product_review')
-                ->where('status', '!=', 'pending')->where('item_code', $os->f_idcode)->get();
+            $product_reviews = $this->getProductRating($row->f_idcode);
             $on_sale_arr[] = [
-                'id' => $os->id,
-                'item_code' => $os->f_idcode,
-                'item_name' => $os_item_name,
-                'orig_price' => $os->f_original_price,
-                'is_discounted' => $os->f_discount_trigger,
-                'new_price' => $os->f_price,
-                'on_stock' => $on_stock,
-                'os_img' => ($os_img) ? $os_img->imgprimayx : null,
-                'discount_percent' => $os->f_discount_percent,
-                'slug' => $os->slug,
+                'id' => $row->id,
+                'item_code' => $row->f_idcode,
+                'item_name' => $row->f_name_name,
+                'default_price' => '₱ ' . number_format($item_price_data['item_price'], 2, '.', ','),
+                'is_discounted' => $item_price_data['is_on_sale'],
+                'on_stock' => ($row->f_qty - $row->f_reserved_qty) > 0 ? 1 : 0,
+                'discounted_price' => '₱ ' . number_format($item_price_data['discounted_price'], 2, '.', ','),
+                'discount_display' => $item_price_data['discount_display'],
+                'image' => ($image) ? $image->imgprimayx : null,
+                'slug' => $row->slug,
                 'is_new_item' => $is_new_item,
-                'product_reviews' => $product_reviews
+                'overall_rating' => $product_reviews['overall_rating'],
+                'total_reviews' => $product_reviews['total_reviews']
             ];
         }
 
@@ -688,7 +620,6 @@ class FrontendController extends Controller
 
         return view('frontend.policy_page', compact('pages'));
     }
-
 
     // get website settings
     public function websiteSettings() {
@@ -1128,71 +1059,47 @@ class FrontendController extends Controller
             })
             ->where('f_status', 1)->orderBy($sortby, $orderby)->paginate(15);
 
-        $all_item_discount = DB::table('fumaco_on_sale')->whereDate('start_date', '<=', Carbon::now()->toDateString())->whereDate('end_date', '>=', Carbon::now()->toDateString())->where('status', 1)->where('apply_discount_to', 'All Items')->first();
-
-        $category_discount = DB::table('fumaco_on_sale as sale')->join('fumaco_on_sale_categories as cat_sale', 'sale.id', 'cat_sale.sale_id')->whereDate('sale.start_date', '<=', Carbon::now())->whereDate('sale.end_date', '>=', Carbon::now())->where('status', 1)->where('cat_sale.category_id', $product_category->id)->first();
+         // get sitewide sale
+         $sale = DB::table('fumaco_on_sale')
+            ->whereDate('start_date', '<=', Carbon::now()->toDateString())
+            ->whereDate('end_date', '>=', Carbon::today()->toDateString())
+            ->where('status', 1)->where('apply_discount_to', 'All Items')->first();
 
         $products_arr = [];
         foreach ($products as $product) {
-            $item_image = DB::table('fumaco_items_image_v1')->where('idcode', $product->f_idcode)->first();
-
-            $product_price = $product->f_original_price;
-            $discount_from_sale = 0;
-            $sale_discount_rate = null;
-            $sale_discount_type = null;
-            if($all_item_discount){
-                $discount_from_sale = 1;
-                $sale_discount_rate = $all_item_discount->discount_rate;
-                $sale_discount_type = $all_item_discount->discount_type;
-                if($all_item_discount->discount_type == 'By Percentage'){
-                    $product_price = $product->f_original_price - ($product->f_original_price * ($all_item_discount->discount_rate/100));
-                }else if($all_item_discount->discount_type == 'Fixed Amount'){
-                    $discount_from_sale = 0;
-                    if($product->f_original_price > $all_item_discount->discount_rate){
-                        $discount_from_sale = 1;
-                        $product_price = $product->f_original_price - $all_item_discount->discount_rate;
-                    }
-                }
-            }else if($category_discount){
-                $discount_from_sale = 1;
-                $sale_discount_rate = $category_discount->discount_rate;
-                $sale_discount_type = $category_discount->discount_type;
-                if($category_discount->discount_type == 'By Percentage'){
-                    $product_price = $product->f_original_price - ($product->f_original_price * ($category_discount->discount_rate/100));
-                }else if($category_discount->discount_type == 'Fixed Amount'){
-                    $discount_from_sale = 0;
-                    if($product->f_original_price > $category_discount->discount_rate){
-                        $discount_from_sale = 1;
-                        $product_price = $product->f_original_price - $category_discount->discount_rate;
-                    }
+            $image = DB::table('fumaco_items_image_v1')->where('idcode', $product->f_idcode)->first();
+            $item_price = $product->f_default_price;
+            $item_on_sale = $product->f_onsale;
+            
+            $is_new_item = 0;
+            if($product->f_new_item == 1){
+                if($product->f_new_item_start <= Carbon::now() and $product->f_new_item_end >= Carbon::now()){
+                    $is_new_item = 1;
                 }
             }
-
-            $item_name = strip_tags($product->f_name_name);
-            $on_stock = ($product->f_qty - $product->f_reserved_qty) > 0 ? 1 : 0;
-            $product_review_per_code = DB::table('fumaco_product_review')
-                ->where('status', '!=', 'pending')->where('item_code', $product->f_idcode)->get();
+            // get item price, discounted price and discount rate
+            $item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $product->f_cat_id, $sale, $item_price, $product->f_idcode, $product->f_discount_type, $product->f_discount_rate);
+            // get product reviews
+            $product_reviews = $this->getProductRating($product->f_idcode);
+          
             $products_arr[] = [
                 'id' => $product->id,
                 'item_code' => $product->f_idcode,
-                'item_name' => $item_name,
-                'image' => ($item_image) ? $item_image->imgprimayx : null,
-                'price' => $product->f_original_price,
-                'discounted_price' => $product->f_discount_trigger == 1 ? number_format(str_replace(",","",$product->f_price), 2) : $product_price,
-                'is_discounted' => $product->f_discount_trigger,
-                'is_discounted_from_sale' => $discount_from_sale,
-                'sale_discount_rate' => $sale_discount_rate,
-                'sale_discount_type' => $sale_discount_type,
-                'on_sale' => $product->f_onsale,
-                'on_stock' => $on_stock,
-                'discount_percent' => $product->f_discount_percent,
+                'item_name' => $product->f_name_name,
+                'default_price' => '₱ ' . number_format($item_price_data['item_price'], 2, '.', ','),
+                'is_discounted' => $item_price_data['is_on_sale'],
+                'on_stock' => ($product->f_qty - $product->f_reserved_qty) > 0 ? 1 : 0,
+                'discounted_price' => '₱ ' . number_format($item_price_data['discounted_price'], 2, '.', ','),
+                'discount_display' => $item_price_data['discount_display'],
+                'image' => ($image) ? $image->imgprimayx : null,
                 'slug' => $product->slug,
-                'is_new_item' => $product->f_new_item,
-                'product_reviews' => $product_review_per_code
+                'is_new_item' => $is_new_item,
+                'overall_rating' => $product_reviews['overall_rating'],
+                'total_reviews' => $product_reviews['total_reviews']
             ];
         }
 
-        return view('frontend.product_list', compact('product_category', 'products_arr', 'products', 'filters', 'image_for_sharing', 'category_discount'));
+        return view('frontend.product_list', compact('product_category', 'products_arr', 'products', 'filters', 'image_for_sharing'));
     }
 
     private function getProductCardDetails($item_code){
@@ -1321,41 +1228,40 @@ class FrontendController extends Controller
             }
         }
 
-        $all_item_discount = DB::table('fumaco_on_sale')->whereDate('start_date', '<=', Carbon::now()->toDateString())->whereDate('end_date', '>=', Carbon::now()->toDateString())->where('status', 1)->where('apply_discount_to', 'All Items')->first();
+        // get sitewide sale
+        $sale = DB::table('fumaco_on_sale')
+            ->whereDate('start_date', '<=', Carbon::now()->toDateString())
+            ->whereDate('end_date', '>=', Carbon::today()->toDateString())
+            ->where('status', 1)->where('apply_discount_to', 'All Items')->first();
 
-        $category_discount = DB::table('fumaco_on_sale as sale')->join('fumaco_on_sale_categories as cat_sale', 'sale.id', 'cat_sale.sale_id')->whereDate('sale.start_date', '<=', Carbon::now())->whereDate('sale.end_date', '>=', Carbon::now())->where('status', 1)->where('cat_sale.category_id', $product_details->f_cat_id)->first();
-
-        $product_price = $product_details->f_original_price;
-        $discount_from_sale = 0;
-        $sale_discount_rate = null;
-        $sale_discount_type = null;
-        if($all_item_discount){
-            $discount_from_sale = 1;
-            $sale_discount_rate = $all_item_discount->discount_rate;
-            $sale_discount_type = $all_item_discount->discount_type;
-            if($all_item_discount->discount_type == 'By Percentage'){
-                $product_price = $product_details->f_original_price - ($product_details->f_original_price * ($all_item_discount->discount_rate/100));
-            }else if($all_item_discount->discount_type == 'Fixed Amount'){
-                $discount_from_sale = 0;
-                if($product_details->f_original_price > $all_item_discount->discount_rate){
-                    $discount_from_sale = 1;
-                    $product_price = $product_details->f_original_price - $all_item_discount->discount_rate;
-                }
-            }
-        }else if($category_discount){
-            $discount_from_sale = 1;
-            $sale_discount_rate = $category_discount->discount_rate;
-            $sale_discount_type = $category_discount->discount_type;
-            if($category_discount->discount_type == 'By Percentage'){
-                $product_price = $product_details->f_original_price - ($product_details->f_original_price * ($category_discount->discount_rate/100));
-            }else if($category_discount->discount_type == 'Fixed Amount'){
-                $discount_from_sale = 0;
-                if($product_details->f_original_price > $category_discount->discount_rate){
-                    $discount_from_sale = 1;
-                    $product_price = $product_details->f_original_price - $category_discount->discount_rate;
-                }
+        $item_price = $product_details->f_default_price;
+        $item_on_sale = $product_details->f_onsale;
+        
+        $is_new_item = 0;
+        if($product_details->f_new_item == 1){
+            if($product_details->f_new_item_start <= Carbon::now() and $product_details->f_new_item_end >= Carbon::now()){
+                $is_new_item = 1;
             }
         }
+        // get item price, discounted price and discount rate
+        $item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $product_details->f_cat_id, $sale, $item_price, $product_details->f_idcode, $product_details->f_discount_type, $product_details->f_discount_rate);
+        // get product reviews
+        $product_reviews = $this->getProductRating($product_details->f_idcode);
+
+        $product_details_array = [
+            'id' => $product_details->id,
+            'item_code' => $product_details->f_idcode,
+            'item_name' => $product_details->f_name_name,
+            'default_price' => '₱ ' . number_format($item_price_data['item_price'], 2, '.', ','),
+            'is_discounted' => $item_price_data['is_on_sale'],
+            'on_stock' => ($product_details->f_qty - $product_details->f_reserved_qty) > 0 ? 1 : 0,
+            'discounted_price' => '₱ ' . number_format($item_price_data['discounted_price'], 2, '.', ','),
+            'discount_display' => $item_price_data['discount_display'],
+            'slug' => $product_details->slug,
+            'is_new_item' => $is_new_item,
+            'overall_rating' => $product_reviews['overall_rating'],
+            'total_reviews' => $product_reviews['total_reviews']
+        ];
 
         $compare_arr = [];
         $variant_attr_array = [];
@@ -1383,54 +1289,39 @@ class FrontendController extends Controller
             $products_clone = Clone $compare_query;
             $products_to_compare = $products_clone->groupBy('compare_attrib.item_code')->select('compare_attrib.item_code')->get();
             foreach($products_to_compare as $compare){
-                $image = DB::table('fumaco_items_image_v1')->where('idcode', $compare->item_code)->first();
                 $item_details = DB::table('fumaco_items')->where('f_idcode', $compare->item_code)->first();
-                $compare_product_price = $item_details->f_original_price;
-                $compare_discount_from_sale = 0;
-                $compare_sale_discount_rate = null;
-                $compare_sale_discount_type = null;
-                if($all_item_discount){
-                    $compare_discount_from_sale = 1;
-                    $compare_sale_discount_rate = $all_item_discount->discount_rate;
-                    $compare_sale_discount_type = $all_item_discount->discount_type;
-                    if($all_item_discount->discount_type == 'By Percentage'){
-                        $compare_product_price = $item_details->f_original_price - ($item_details->f_original_price * ($all_item_discount->discount_rate/100));
-                    }else if($all_item_discount->discount_type == 'Fixed Amount'){
-                        $compare_discount_from_sale = 0;
-                        if($item_details->f_original_price > $all_item_discount->discount_rate){
-                            $compare_discount_from_sale = 1;
-                            $compare_product_price = $item_details->f_original_price - $all_item_discount->discount_rate;
+                if ($item_details) {
+                    $image = DB::table('fumaco_items_image_v1')->where('idcode', $item_details->f_idcode)->first();
+                    $item_price = $item_details->f_default_price;
+                    $item_on_sale = $item_details->f_onsale;
+                    
+                    $is_new_item = 0;
+                    if($item_details->f_new_item == 1){
+                        if($item_details->f_new_item_start <= Carbon::now() and $item_details->f_new_item_end >= Carbon::now()){
+                            $is_new_item = 1;
                         }
                     }
-                }else if($category_discount){
-                    $compare_discount_from_sale = 1;
-                    $compare_sale_discount_rate = $category_discount->discount_rate;
-                    $compare_sale_discount_type = $category_discount->discount_type;
-                    if($category_discount->discount_type == 'By Percentage'){
-                        $compare_product_price = $item_details->f_original_price - ($item_details->f_original_price * ($category_discount->discount_rate/100));
-                    }else if($category_discount->discount_type == 'Fixed Amount'){
-                        $compare_discount_from_sale = 0;
-                        if($item_details->f_original_price > $category_discount->discount_rate){
-                            $compare_discount_from_sale = 1;
-                            $compare_product_price = $item_details->f_original_price - $category_discount->discount_rate;
-                        }
-                    }
+                    // get item price, discounted price and discount rate
+                    $item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $item_details->f_cat_id, $sale, $item_price, $item_details->f_idcode, $item_details->f_discount_type, $item_details->f_discount_rate);
+                    // get product reviews
+                    $product_reviews = $this->getProductRating($item_details->f_idcode);
+                
+                    $compare_arr[] = [
+                        'id' => $item_details->id,
+                        'item_code' => $item_details->f_idcode,
+                        'item_name' => $item_details->f_name_name,
+                        'default_price' => '₱ ' . number_format($item_price_data['item_price'], 2, '.', ','),
+                        'is_discounted' => $item_price_data['is_on_sale'],
+                        'on_stock' => ($item_details->f_qty - $item_details->f_reserved_qty) > 0 ? 1 : 0,
+                        'discounted_price' => '₱ ' . number_format($item_price_data['discounted_price'], 2, '.', ','),
+                        'discount_display' => $item_price_data['discount_display'],
+                        'image' => ($image) ? $image->imgprimayx : null,
+                        'slug' => $item_details->slug,
+                        'is_new_item' => $is_new_item,
+                        'overall_rating' => $product_reviews['overall_rating'],
+                        'total_reviews' => $product_reviews['total_reviews']
+                    ];
                 }
-
-                $compare_arr[] = [
-                    'item_code' => $compare->item_code,
-                    'item_image' => $image->imgoriginalx,
-                    'original_price' => $item_details->f_original_price,
-                    'individual_discount_rate' => $item_details->f_discount_percent,
-                    'price' =>  $item_details->f_onsale == 1 ? $item_details->f_price : $compare_product_price,
-                    'slug' => $item_details->slug,
-                    'product_name' => $item_details->f_name_name,
-                    'discounted_from_item' => $item_details->f_discount_trigger,
-                    'discounted_from_sale' => $compare_discount_from_sale,
-                    'sale_discount_rate' => $compare_sale_discount_rate,
-                    'sale_discount_type' => $compare_sale_discount_type,
-                    'on_stock' => $item_details->f_qty > 0 ? 1 : 0
-                ];
             }
         }
 
@@ -1479,85 +1370,47 @@ class FrontendController extends Controller
         $related_products_query = DB::table('fumaco_items as a')
             ->join('fumaco_items_relation as b', 'a.f_idcode', 'b.related_item_code')
             ->where('b.item_code', $product_details->f_idcode)->where('a.f_status', 1)
-            ->select('a.id', 'a.f_idcode', 'a.f_original_price', 'a.f_discount_trigger', 'a.f_price', 'a.f_name_name', 'a.slug', 'a.f_qty', 'a.f_reserved_qty', 'a.f_onsale', 'a.f_new_item', 'a.f_new_item_start', 'a.f_new_item_end', 'a.f_discount_percent', 'a.f_category', 'a.f_cat_id')
+            ->select('a.id', 'a.f_idcode', 'a.f_default_price', 'a.f_onsale', 'a.f_name_name', 'a.slug', 'a.f_qty', 'a.f_reserved_qty', 'a.f_new_item', 'a.f_new_item_start', 'a.f_new_item_end', 'a.f_discount_rate', 'a.f_category', 'a.f_cat_id', 'a.f_discount_type')
             ->get();
-
-        $rp_all_item_discount = DB::table('fumaco_on_sale')->whereDate('start_date', '<=', Carbon::now()->toDateString())->whereDate('end_date', '>=', Carbon::now()->toDateString())->where('status', 1)->where('apply_discount_to', 'All Items')->first();
 
         $related_products = [];
         foreach($related_products_query as $row) {
             $image = DB::table('fumaco_items_image_v1')->where('idcode', $row->f_idcode)->first();
-
+            $item_price = $row->f_default_price;
+            $item_on_sale = $row->f_onsale;
+            
             $is_new_item = 0;
             if($row->f_new_item == 1){
                 if($row->f_new_item_start <= Carbon::now() and $row->f_new_item_end >= Carbon::now()){
                     $is_new_item = 1;
                 }
             }
-
-            $rp_category = DB::table('fumaco_categories')->where('name', $row->f_category)->select('id')->first();
-            $rp_category_discount = DB::table('fumaco_on_sale as sale')->join('fumaco_on_sale_categories as cat_sale', 'sale.id', 'cat_sale.sale_id')->whereDate('sale.start_date', '<=', Carbon::now())->whereDate('sale.end_date', '>=', Carbon::now())->where('status', 1)->where('cat_sale.category_id', $row->f_cat_id)->first();
-
-            $rp_product_price = null;
-            $rp_discount_from_sale = 0;
-            $rp_sale_discount_rate = null;
-            $rp_sale_discount_type = null;
-            if($all_item_discount){
-                $rp_discount_from_sale = 1;
-                $rp_sale_discount_rate = $all_item_discount->discount_rate;
-                $rp_sale_discount_type = $all_item_discount->discount_type;
-                if($all_item_discount->discount_type == 'By Percentage'){
-                    $rp_product_price = $row->f_original_price - ($row->f_original_price * ($all_item_discount->discount_rate/100));
-                }else if($all_item_discount->discount_type == 'Fixed Amount'){
-                    $rp_discount_from_sale = 0;
-                    if($row->f_original_price > $all_item_discount->discount_rate){
-                        $rp_discount_from_sale = 1;
-                        $rp_product_price = $row->f_original_price - $all_item_discount->discount_rate;
-                    }
-                }
-            }else if($rp_category_discount){
-                $rp_discount_from_sale = 1;
-                $rp_sale_discount_rate = $rp_category_discount->discount_rate;
-                $rp_sale_discount_type = $rp_category_discount->discount_type;
-                if($rp_category_discount->discount_type == 'By Percentage'){
-                    $rp_product_price = $row->f_original_price - ($row->f_original_price * ($rp_category_discount->discount_rate/100));
-                }else if($category_discount->discount_type == 'Fixed Amount'){
-                    $rp_discount_from_sale = 0;
-                    if($row->f_original_price > $rp_category_discount->discount_rate){
-                        $rp_discount_from_sale = 1;
-                        $rp_product_price = $row->f_original_price - $rp_category_discount->discount_rate;
-                    }
-                }
-            }
-
-            $on_stock = ($row->f_qty - $row->f_reserved_qty) > 0 ? 1 : 0;
-
-                 // get product reviews
-            $product_review_per_code = DB::table('fumaco_product_review')
-                ->where('status', '!=', 'pending')->where('item_code', $row->f_idcode)->get();
+            // get item price, discounted price and discount rate
+            $item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $row->f_cat_id, $sale, $item_price, $row->f_idcode, $row->f_discount_type, $row->f_discount_rate);
+            // get product reviews
+            $product_reviews = $this->getProductRating($row->f_idcode);
+        
             $related_products[] = [
                 'id' => $row->id,
                 'item_code' => $row->f_idcode,
                 'item_name' => $row->f_name_name,
-                'orig_price' => $row->f_original_price,
-                'sale_discounted_price' => $rp_product_price,
-                'sale_discount_rate' => $rp_sale_discount_rate,
-                'sale_discount_type' => $rp_sale_discount_type,
-                'is_discounted' => $row->f_discount_trigger,
-                'is_discounted_from_sale' => $rp_discount_from_sale,
-                'discount_percent' => $row->f_discount_percent,
-                'new_price' => $row->f_price,
-                'on_stock' => $on_stock,
+                'default_price' => '₱ ' . number_format($item_price_data['item_price'], 2, '.', ','),
+                'is_discounted' => $item_price_data['is_on_sale'],
+                'on_stock' => ($row->f_qty - $row->f_reserved_qty) > 0 ? 1 : 0,
+                'discounted_price' => '₱ ' . number_format($item_price_data['discounted_price'], 2, '.', ','),
+                'discount_display' => $item_price_data['discount_display'],
                 'image' => ($image) ? $image->imgprimayx : null,
                 'slug' => $row->slug,
                 'is_new_item' => $is_new_item,
-                'product_reviews' => $product_review_per_code
+                'overall_rating' => $product_reviews['overall_rating'],
+                'total_reviews' => $product_reviews['total_reviews']
             ];
         }
 
         // get product reviews
         $product_reviews = DB::table('fumaco_product_review as a')->join('fumaco_users as b', 'a.user_id', 'b.id')
             ->where('status', '!=', 'pending')->where('item_code', $product_details->f_idcode)->select('a.*', 'b.f_name', 'b.f_lname')->orderBy('a.created_at', 'desc')->paginate(5);
+
         // get total rating
         $total_rating = DB::table('fumaco_product_review as a')->join('fumaco_users as b', 'a.user_id', 'b.id')
             ->where('status', '!=', 'pending')->where('item_code', $product_details->f_idcode)->sum('a.rating');

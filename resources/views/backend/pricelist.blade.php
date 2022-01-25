@@ -24,7 +24,7 @@
 		<section class="content">
 			<div class="container-fluid">
 				<div class="row">
-					<div class="col-md-8">
+					<div class="col-md-9">
 						<div class="card">
 							<div class="card-body">
 								@if(session()->has('success'))
@@ -66,15 +66,17 @@
                                 <table class="table table-bordered table-hover">
                                     <thead>
                                         <th class="text-center" style="width: 8%;">ID</th>
-                                        <th class="text-center" style="width: 30%;">Price List</th>
+                                        <th class="text-center" style="width: 15%;">Customer Group</th>
+                                        <th class="text-center" style="width: 20%;">Price List</th>
                                         <th class="text-center" style="width: 20%;">Created by</th>
                                         <th class="text-center" style="width: 20%;">Date</th>
-                                        <th class="text-center" style="width: 22%;">Action</th>
+                                        <th class="text-center" style="width: 17%;">Action</th>
                                     </thead>
                                     <tbody>
                                         @forelse ($price_list as $row)
                                         <tr>
                                             <td class="text-center">{{ $row->id }}</td>
+                                            <td class="text-center">{{ $row->customer_group_name }}</td>
                                             <td class="text-center">{{ $row->price_list_name }}</td>
                                             <td class="text-center">{{ $row->last_modified_by }}</td>
                                             <td class="text-center">{{ \Carbon\Carbon::parse($row->last_modified_at)->format('M d, Y - h:i A') }}</td>
@@ -137,7 +139,16 @@
                     </button>
                 </div>
                 <div class="modal-body">
+                    <div class="form-group">
+                        <label for="customer-group">Select Customer Group</label>
+                        <select name="customer_group" class="form-control" id="customer-group">
+                            @foreach ($customer_groups as $customer_group)
+                            <option value="{{ $customer_group->id }}">{{ $customer_group->customer_group_name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
 					<div class="form-group">
+                        <label for="customer-group">Select Price List</label>
 						<select name="pricelist" id="search-price-list" class="form-control select2 w-100" required></select>
 					</div>
                 </div>

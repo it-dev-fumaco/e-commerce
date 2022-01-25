@@ -759,9 +759,10 @@ class ProductController extends Controller
             ->when($request->is_featured, function($c) use ($request) {
                 $c->where('f_featured', $request->is_featured);
             })
-            ->when($request->on_sale, function($c) use ($request) {
-                $c->where('f_onsale', $request->on_sale);
-            })
+            // ->when($request->on_sale, function($c) use ($request) {
+            //     $on_sale_items = DB::table('fumaco_product_prices')->where('on_sale', 1)->pluck('item_code');
+            //     $c->whereIn('f_idcode', $on_sale_items);
+            // })
             ->when($q_string, function ($query) use ($search_str, $q_string) {
                 return $query->where(function($q) use ($search_str, $q_string) {
                     foreach ($search_str as $str) {
@@ -769,13 +770,15 @@ class ProductController extends Controller
                     }
 
                     $q->orWhere('f_idcode', 'LIKE', "%".$q_string."%")
-                        ->orWhere('f_item_classification', 'LIKE', "%".$q_string."%");
+                        ->orWhere('f_item_classification', 'LIKE', "%".$q_string."%")->orWhere('slug', 'LIKE', "%".$q_string."%");
                 });
             })
             ->orderBy('f_date', 'desc')->paginate(15);
 
         $brands = DB::table('fumaco_items')->select('f_brand')->orderBy('f_brand', 'asc')->groupBy('f_brand')->get();
         $categories = DB::table('fumaco_categories')->get();
+
+        $customer_groups = DB::table('fumaco_customer_group')->get();
 
         $list = [];
         foreach ($product_list as $product) {
@@ -790,6 +793,10 @@ class ProductController extends Controller
                 }
             }
 
+            $pricelist = DB::table('fumaco_product_prices as a')->join('fumaco_price_list as b', 'a.price_list_id', 'b.id')
+                ->join('fumaco_customer_group as c', 'b.customer_group_id', 'c.id')
+                ->where('item_code', $product->f_idcode)->select('a.id as item_price_id', 'a.*', 'b.price_list_name', 'c.customer_group_name')->get();
+
             $item_name = strip_tags($product->f_name_name);
             $list[] = [
                 'id' => $product->id,
@@ -798,9 +805,9 @@ class ProductController extends Controller
                 'product_name' => $product->f_name_name,
                 'item_name' => $item_name,
                 'image' => $image,
-                'price' => $product->f_original_price,
-                'new_price' => $product->f_price,
-                'discount_percentage' => $product->f_discount_percent,
+                'price' => $product->f_default_price,
+                // 'new_price' => $product->f_price,
+                // 'discount_percentage' => $product->f_discount_percent,
                 'qty' => $product->f_qty,
                 'reserved_qty' => $product->f_reserved_qty,
                 'product_category' => $product->f_category,
@@ -809,11 +816,14 @@ class ProductController extends Controller
                 'erp_stock' => $product->stock_source,
                 'status' => $product->f_status,
                 'featured' => $product->f_featured,
-                'is_new_item' => $is_new_item
+                'is_new_item' => $is_new_item,
+                'pricelist' => $pricelist,
+                'discount_type' => $product->f_discount_type,
+                'discount_rate' => $product->f_discount_rate,
             ];
         }
 
-        return view('backend.products.list', compact('list', 'product_list', 'brands', 'categories'));
+        return view('backend.products.list', compact('list', 'product_list', 'brands', 'categories', 'customer_groups'));
     }
 
     public function viewProduct($id) {
@@ -848,7 +858,7 @@ class ProductController extends Controller
                 'item_code' => $row->related_item_code,
                 'item_description' => $row->f_name_name,
                 'image' => ($image) ? $image->imgprimayx : null,
-                'original_price' => $row->f_original_price,
+                'original_price' => $row->f_default_price,
             ];
         }
 
@@ -1994,8 +2004,6 @@ class ProductController extends Controller
     public function setProductOnSale($item_code, Request $request) {
         DB::beginTransaction();
         try {
-            // return $request->all();
-
             $discount_percentage = $request->discount_percentage;
             if (!$discount_percentage && $discount_percentage <= 0) {
                 return redirect()->back()->with('error', 'Discount percentage cannot be less than or equal to zero.');
@@ -2006,16 +2014,28 @@ class ProductController extends Controller
                 return redirect()->back()->with('error', 'Product not found.');
             }
 
-            $discounted_price = $item->f_original_price - ($item->f_original_price * $discount_percentage / 100);
-
-            DB::table('fumaco_items')->where('f_idcode', $item_code)->update([
-                'f_price' => $discounted_price,
-                'f_onsale' => 1,
-                'f_discount_percent' => $discount_percentage,
-                'f_discount_trigger' => 1,
-                'last_modified_by' => Auth::user()->username
-            ]);
-
+            $discount_rate = $request->discount_rate;
+            if (!$discount_rate && $discount_rate <= 0) {
+                return redirect()->back()->with('error', 'Discount rate cannot be less than or equal to zero.');
+            }
+            
+            $customer_group = DB::table('fumaco_customer_group')->where('id', $request->customer_group)->first()->customer_group_name;
+            if ($customer_group == 'Individual') {
+                DB::table('fumaco_items')->where('f_idcode', $item_code)->update([
+                    'f_discount_type' => $request->discount_type,
+                    'f_onsale' => 1,
+                    'f_discount_rate' => $discount_rate,
+                    'last_modified_by' => Auth::user()->username,
+                ]);
+            } else {
+                DB::table('fumaco_product_prices')->where('id', $request->price_list_id)->update([
+                    'discount_type' => $request->discount_type,
+                    'on_sale' => 1,
+                    'discount_rate' => $discount_rate,
+                    'last_modified_by' => Auth::user()->username,
+                ]);
+            }
+            
             $success_msg = 'Product has been set "On Sale".';
 
             $subscribers = DB::table('fumaco_subscribe')->where('status', 1)->select('email')->pluck('email');
@@ -2057,7 +2077,7 @@ class ProductController extends Controller
 
             DB::commit();
 
-            return redirect()->back()->with('success', $success_msg);
+            return redirect()->back()->with('success', 'Product has been set "On Sale".');
         } catch (Exception $e) {
             DB::rollback();
 
@@ -2065,10 +2085,31 @@ class ProductController extends Controller
         }
     }
 
-    public function disableProductOnSale($item_code) {
+    public function disableProductOnSale($item_code, Request $request) {
         DB::beginTransaction();
         try {
-            DB::table('fumaco_items')->where('f_idcode', $item_code)->update(['f_onsale' => 0, 'f_discount_trigger' => 0, 'last_modified_by' => Auth::user()->username]);
+            $selected_pricelists = $request->price_list;
+            if (in_array('Website Price List', $selected_pricelists)) {
+                DB::table('fumaco_items')->where('f_idcode', $item_code)->update([
+                    'f_onsale' => 0,
+                    'f_discount_rate' => 0,
+                    'f_discount_type' => null,
+                    'last_modified_by' => Auth::user()->username
+                ]);
+            }
+
+            if (($key = array_search("Website Price List", $selected_pricelists)) !== false) {
+                unset($selected_pricelists[$key]);
+            }
+    
+            foreach ($selected_pricelists as $price_list_id) {
+                DB::table('fumaco_product_prices')->where('id', $price_list_id)->update([
+                    'on_sale' => 0,
+                    'discount_rate' => 0,
+                    'discount_type' => null,
+                    'last_modified_by' => Auth::user()->username
+                ]);
+            }
 
             DB::commit();
 

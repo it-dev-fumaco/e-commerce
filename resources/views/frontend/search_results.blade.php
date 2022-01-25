@@ -211,7 +211,7 @@
 				</div>
 				<!--sidebar-->
 			</div>
-			
+		
 			<div class="col-lg-9 col-xl-8 {{ request()->s == '' ? 'mx-auto' : '' }}">
 				<div class="row">
 				@if (count($recently_added_arr) > 0)
