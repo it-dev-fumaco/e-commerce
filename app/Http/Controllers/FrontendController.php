@@ -1271,14 +1271,17 @@ class FrontendController extends Controller
             return redirect('/');
         }
 
-        $is_ordered = DB::table('fumaco_order as a')->join('fumaco_order_items as b', 'a.order_number', 'b.order_number')
-            ->where('user_email', Auth::user()->username)
-            ->where('b.item_code', $product_details->f_idcode)
-            ->where(function($q) {
-                $q->orWhere('order_status', 'LIKE', "%completed%")
-                    ->orWhere('order_status', 'LIKE', "%delivered%");
-            })
-            ->count();
+        $is_ordered = 0;
+        if (Auth::check()) {
+            $is_ordered = DB::table('fumaco_order as a')->join('fumaco_order_items as b', 'a.order_number', 'b.order_number')
+                ->where('user_email', Auth::user()->username)
+                ->where('b.item_code', $product_details->f_idcode)
+                ->where(function($q) {
+                    $q->orWhere('order_status', 'LIKE', "%completed%")
+                        ->orWhere('order_status', 'LIKE', "%delivered%");
+                })
+                ->count();
+        }
 
         // get items with the same parent item code
         $variant_items = DB::table('fumaco_items')
