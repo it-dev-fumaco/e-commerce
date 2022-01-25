@@ -11,13 +11,17 @@ use DB;
 class PriceListController extends Controller
 {
     public function viewPriceList(Request $request) {
-        $price_list = DB::table('fumaco_price_list')
+        $price_list = DB::table('fumaco_price_list as a')
+            ->join('fumaco_customer_group as b', 'a.customer_group_id', 'b.id')
             ->when($request->q, function ($query) use ($request) {
                 return $query->where('price_list_name', 'LIKE', "%".$request->q."%");
             })
+            ->select('a.*', 'b.customer_group_name')
             ->paginate(10);
 
-        return view('backend.pricelist', compact('price_list'));
+        $customer_groups = DB::table('fumaco_customer_group')->get();
+
+        return view('backend.pricelist', compact('price_list', 'customer_groups'));
     }
 
     public function getErpPriceList(Request $request) {
@@ -26,7 +30,7 @@ class PriceListController extends Controller
             return response()->json(['status' => 0, 'ERP API not configured.']);
         }
 
-        $params = '?filters=[["name","LIKE","%25' . $request->q . '%25"],["selling","=","1"],["enabled","=","1"]]';
+        $params = '?filters=[["name","LIKE","%25' . $request->q . '%25"],["selling","=","1"],["enabled","=","1"],["name","!=","Website Price List"]]';
 
         $response = Http::withHeaders([
             'Content-Type' => 'application/json',
@@ -58,11 +62,19 @@ class PriceListController extends Controller
             }
 
             $this->validate($request, [
-                'pricelist' => 'required|unique:fumaco_price_list,price_list_name',
+                'pricelist' => 'required',
             ]);
+
+            $existing = DB::table('fumaco_price_list')->where('customer_group_id', $request->customer_group)
+                ->where('price_list_name', $request->pricelist)->exists();
+
+            if ($existing) {
+                return redirect()->back()->with('error', 'Record already exists.');
+            }
 
             $id = DB::table('fumaco_price_list')->insertGetId([
                 'price_list_name' => $request->pricelist,
+                'customer_group_id' => $request->customer_group,
                 'created_by' => Auth::user()->username,
                 'last_modified_by' => Auth::user()->username,
             ]);
