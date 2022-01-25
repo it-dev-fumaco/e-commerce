@@ -5,7 +5,7 @@
 
 @section('meta')
     @php
-        $b_tags = implode(",", $tags);
+        $b_tags = $tags ? implode(",", $tags) : null;
         $image = ($blog->blogprimaryimage) ? '/storage/journals/'.$blog->blogprimaryimage : '/storage/no-photo-available.png';
 
         if (Str::startsWith($current = url()->current(), 'https://www')) {

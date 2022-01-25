@@ -28,7 +28,7 @@
 	<section class="content">
 		<div class="container-fluid">
 			<div class="row">
-            <form action="/admin/product/{{ $details->id }}/update" method="POST">
+            <form action="/admin/product/{{ $details->id }}/update" method="POST" enctype="multipart/form-data">
                @csrf
                <!-- left column -->
                <div class="col-md-12">
@@ -236,7 +236,32 @@
                            <textarea class="form-control" rows="6" id="website-caption" name="website_caption">{{ old('website_caption') }}{{ $details->f_caption }}</textarea>
                         </div>
                         <div class="form-group">
-                           <label for="full-detail">Full Detail</label>
+                           <label for="featured-image"><input type="checkbox" name="add_featured" id="add-featured" {{ $details->f_featured_image ? 'checked' : null }}> Featured Image (Optional)</label>
+                           <div class="row">
+                              @if ($details->f_featured_image)
+                                 <div class="col-1">
+                                    @php
+                                       $img = $details->f_featured_image ? '/storage/item_images/'. $details->f_idcode .'/gallery/featured/'. $details->f_featured_image : '/storage/no-photo-available.png';
+                                       $img_webp = $details->f_featured_image ? '/storage/item_images/'. $details->f_idcode .'/gallery/featured/'. explode(".", $details->f_featured_image)[0] .'.webp' : '/storage/no-photo-available.png';
+                                    @endphp
+                                    <picture>
+                                       <source srcset="{{ asset($img_webp) }}" type="image/webp" class="img-responsive" style="width: 100% !important;">
+                                       <source srcset="{{ asset($img) }}" type="image/jpeg" class="img-responsive" style="width: 100% !important;">
+                                       <img src="{{ asset($img) }}" alt="{{ Str::slug(explode(".", $details->f_featured_image)[0], '-') }}" class="img-responsive" style="width: 100% !important;">
+                                    </picture>
+                                 </div>
+                              @endif
+                              <div class="col-{{ $details->f_featured_image ? '11' : '12' }}">
+                                 <div class="custom-file mb-3">
+                                    <input type="file" class="custom-file-input" id="customFile" name="featured_image">
+                                    <label class="custom-file-label" for="customFile">Choose File</label>
+                                 </div>
+                                 <label for="featured">Selected Image: {{ $details->f_featured_image }}</label>
+                              </div>
+                           </div>
+                        </div>
+                        <div class="form-group">
+                           <label for="full-detail">Full Details</label>
                            <textarea class="form-control" rows="6" id="full-detail" name="full_detail">{{ old('website_caption') }}{{ $details->f_full_description }}</textarea>
                         </div>
                         <h5>Product Specifications / Attributes</h5>
@@ -447,6 +472,7 @@
 <script>
    (function() {
       setAsNewItem();
+      addFeatured();
       $('.select-cross-sell').select2();
 
       $('#set_as_new_item').click(function(){
@@ -524,6 +550,24 @@
             startDate: start ? start : moment(),
             endDate: end ? end : moment().add(7, 'days'),
       });
+
+      // Add the following code if you want the name of the file appear on select
+      $(".custom-file-input").change(function() {
+         var fileName = $(this).val().split("\\").pop();
+         $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+      });
+
+      $('#add-featured').click(function(){
+         addFeatured();
+      });
+
+      function addFeatured(){
+         if($('#add-featured').is(':checked')){
+            $("#customFile").prop('disabled', false);
+         }else{
+            $("#customFile").prop('disabled', true);
+         }
+      }
    })();
 </script>
 @endsection

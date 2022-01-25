@@ -13,6 +13,7 @@ use Auth;
 use App\Models\User;
 use App\Models\UserVerify;
 use Illuminate\Support\Str;
+use Adrianorosa\GeoLocation\GeoLocation;
 
 use App\Http\Traits\ProductTrait;
 
@@ -53,6 +54,22 @@ class FrontendController extends Controller
 
             $product_list = [];
             $blogs = [];
+
+            $request_data = $request->except(['page', 'sel_attr', 'sortby', 'brand', 'order', 'fbclid', 's']);
+            $search_string = $request->s;
+            $attribute_name_filter = array_keys($request_data);
+            $attribute_value_filter = [];
+            $brand_filter = $request->brand ? $request->brand : [];
+            foreach($request_data as $data) {
+                foreach (explode('+', $data) as $value) {
+                    $attribute_value_filter[] = $value;
+                }
+            }
+
+            // get items based on filters
+            $filtered_items = [];
+            $filtered_item_codes = [];
+
             if ($request->s == null) {
                 if (in_array($search_by, ['products', 'all', ''])) {
                     $product_list = DB::table('fumaco_items')->where('f_status', 1)->where('f_featured', 1)->get();
@@ -63,11 +80,13 @@ class FrontendController extends Controller
                         ->where('blog_enable', 1)->get();
                 }
             } else {
+                
                 if (in_array($search_by, ['products', 'all', ''])) {
                     $product_list = DB::table('fumaco_items')
                         ->where('f_brand', 'LIKE', "%".$search_str."%")
                         ->orWhere('f_parent_code', 'LIKE', "%".$search_str."%")
                         ->orWhere('f_category', 'LIKE', "%".$search_str."%")
+                        ->orWhere('f_name_name', 'LIKE', "%".$search_str."%")
                         ->orWhere(function($q) use ($search_str) {
                             $search_strs = explode(" ", $search_str);
                             foreach ($search_strs as $str) {
@@ -80,6 +99,23 @@ class FrontendController extends Controller
                         })
                         ->where('f_status', 1)->where('f_status', 1)
                         ->orderBy($sortby, $orderby)->get();
+
+                    if(count($request_data) > 0 or count($brand_filter) > 0){
+                        $filtered_items = DB::table('fumaco_items as a')
+                            ->join('fumaco_items_attributes as b', 'a.f_idcode', 'b.idcode')
+                            ->join('fumaco_attributes_per_category as c', 'c.id', 'b.attribute_name_id')
+                            ->when(count($brand_filter) > 0, function($c) use ($brand_filter) {
+                                $c->whereIn('a.f_brand', $brand_filter);
+                            })
+                            ->when(count($request_data) > 0, function($c) use ($attribute_name_filter, $attribute_value_filter) {
+                                $c->whereIn('c.slug', $attribute_name_filter)->whereIn('b.attribute_value', $attribute_value_filter);
+                            })
+                            ->where('a.f_status', 1)->select('c.slug', 'b.attribute_value', 'a.f_idcode', 'a.f_brand')->get();
+
+                        $filtered_item_codes = collect($filtered_items)->pluck('f_idcode');
+
+                        $product_list = $product_list->whereIn('f_idcode', $filtered_item_codes);
+                    }
                 }
 
                 if (in_array($search_by, ['blogs', 'all', ''])) {
@@ -147,10 +183,13 @@ class FrontendController extends Controller
                     'title' => $blog->blogtitle,
                     'type' => $blog->blogtype,
                     'caption' => $blog->blog_caption,
-                    'slug' => $blog->slug,
-                    'is_new_item' => 0
+                    'blog_slug' => $blog->slug,
+                    'f_qty' => 0,
+                    'f_reserved_qty' => 0
                 ];
             }
+
+            $searched_item_codes = collect($results)->whereNotNull('item_code')->pluck('item_code');
 
             // Get current page form url e.x. &page=1
             $currentPage = LengthAwarePaginator::resolveCurrentPage();
@@ -199,6 +238,7 @@ class FrontendController extends Controller
                         'id' => $result['id'],
                         'comment_count' => $result['comment_count'],
                         'image' => $result['image'],
+                        'blog_slug' => $result['blog_slug'],
                         'publish_date' => $result['publish_date'],
                         'title' => $result['title'],
                         'type' => $result['type'],
@@ -206,15 +246,31 @@ class FrontendController extends Controller
                     ];
                 }
             }
+            $recently_added_arr = [];
+            $item_code_array = [];
+            $blog_id_array = [];
+            $prod_results = null;
+            $blog_results = null;
+            $test = 0;
 
             if($request->s != ''){// Save search terms
-                $search_check = DB::table('fumaco_search_terms')->where('search_term', $request->s)->first();
+                $test = 1;
+                $loc = GeoLocation::lookup($request->ip());
 
                 $search_data = [
                     'search_term' => $request->s,
                     'ip' => $request->ip(),
-                    'frequency' => $search_check ? $search_check->frequency + 1 : 1,
+                    'city' => $loc->getCity(),
+                    'region' => $loc->getRegion(),
+                    'country' => $loc->getCountry(),
+                    'latitude' => $loc->getLatitude(),
+                    'longtitude' => $loc->getLongitude(),
                     'date_last_searched' => Carbon::now()
+                ];
+
+                $search_results_data = [
+                    'search_term' => $request->s,
+                    'date_searched' => Carbon::now()
                 ];
 
                 if($products){
@@ -222,10 +278,11 @@ class FrontendController extends Controller
                         return $result['item_code'];
                     });
 
-                    $item_codes = collect($item_code_array);
+                    $item_codes = $item_code_array->sort()->values()->all();
+                    $prod_results = collect($item_codes)->implode(',');
 
                     $search_data['prod_results_count'] = count($products);
-                    $search_data['prod_results'] = $item_codes->implode(',');
+                    $search_results_data['prod_results'] = $prod_results;
                 }
                 
                 if($blogs){
@@ -233,20 +290,110 @@ class FrontendController extends Controller
                         return $result['id'];
                     });
 
-                    $blog_ids = collect($blog_id_array);
+                    $blog_ids = $blog_id_array->sort()->values()->all();
+                    $blog_results = collect($blog_ids)->implode(',');
 
                     $search_data['blog_results_count'] = count($blogs);
-                    $search_data['blog_results'] = $blog_ids->implode(',');
+                    $search_results_data['blog_results'] = $blog_results;
                 }
 
-                if($search_check){
-                    DB::table('fumaco_search_terms')->where('id', $search_check->id)->update($search_data);
-                }else{
-                    DB::table('fumaco_search_terms')->insert($search_data);
+                DB::table('fumaco_search_terms')->insert($search_data);
+
+                $search_id = DB::table('fumaco_search_terms')->orderBy('id', 'desc')->pluck('id')->first();
+
+                $search_results_data['search_id'] = $search_id;
+                $checker = DB::table('fumaco_search_results')->where('search_term', $search_data['search_term'])->where('prod_results', $prod_results)->where('blog_results', $blog_results)->get();
+
+                if(count($checker) == 0){
+                    DB::table('fumaco_search_results')->insert($search_results_data);
+                }
+
+                $recently_added_items = DB::table('fumaco_items')->whereNotIn('f_idcode', $searched_item_codes)->where('f_status', 1)->where('f_new_item', 1)->whereDate('f_new_item_start', '<=', Carbon::now())->whereDate('f_new_item_end', '>=', Carbon::now())->get();
+
+                $recently_added_arr = [];
+                foreach($recently_added_items as $recent){
+                    $image = DB::table('fumaco_items_image_v1')->where('idcode', $recent->f_idcode)->pluck('imgprimayx')->first();
+                    $product_reviews = DB::table('fumaco_product_review')->where('status', '!=', 'pending')->where('item_code', $recent->f_idcode)->get();
+
+                    $recent_category_discount = DB::table('fumaco_on_sale as sale')->join('fumaco_on_sale_categories as cat_sale', 'sale.id', 'cat_sale.sale_id')->whereDate('sale.start_date', '<=', Carbon::now())->whereDate('sale.end_date', '>=', Carbon::now())->where('status', 1)->where('cat_sale.category_id', $recent->f_cat_id)->first();
+
+                    $recent_product_price = null;
+                    $recent_discount_from_sale = 0;
+                    $recent_sale_discount_rate = null;
+                    $recent_sale_discount_type = null;
+                    if($all_item_discount){
+                        $recent_discount_from_sale = 1;
+                        $recent_sale_discount_rate = $all_item_discount->discount_rate;
+                        $recent_sale_discount_type = $all_item_discount->discount_type;
+                        if($all_item_discount->discount_type == 'By Percentage'){
+                            $recent_product_price = $recent->f_original_price - ($recent->f_original_price * ($all_item_discount->discount_rate/100));
+                        }else if($all_item_discount->discount_type == 'Fixed Amount'){
+                            $recent_discount_from_sale = 0;
+                            if($recent->f_original_price > $all_item_discount->discount_rate){
+                                $recent_discount_from_sale = 1;
+                                $recent_product_price = $recent->f_original_price - $all_item_discount->discount_rate;
+                            }
+                        }
+                    }else if($recent_category_discount){
+                        $recent_discount_from_sale = 1;
+                        $recent_sale_discount_rate = $recent_category_discount->discount_rate;
+                        $recent_sale_discount_type = $recent_category_discount->discount_type;
+                        if($recent_category_discount->discount_type == 'By Percentage'){
+                            $recent_product_price = $recent->f_original_price - ($recent->f_original_price * ($recent_category_discount->discount_rate/100));
+                        }else if($recent_category_discount->discount_type == 'Fixed Amount'){
+                            $recent_discount_from_sale = 0;
+                            if($recent->f_original_price > $recent_category_discount->discount_rate){
+                                $recent_discount_from_sale = 1;
+                                $recent_product_price = $recent->f_original_price - $recent_category_discount->discount_rate;
+                            }
+                        }
+                    }
+
+                    $recently_added_arr[] = [
+                        'id' => $recent->id,
+                        'item_code' => $recent->f_idcode,
+                        'item_name' => $recent->f_name_name,
+                        'orig_price' => $recent->f_original_price,
+                        'sale_discounted_price' => $recent_product_price,
+                        'sale_discount_rate' => $recent_sale_discount_rate,
+                        'sale_discount_type' => $recent_sale_discount_type,
+                        'is_discounted' => $recent->f_discount_trigger,
+                        'is_discounted_from_sale' => $recent_discount_from_sale,
+                        'on_stock' => $recent->f_qty - $recent->f_reserved_qty > 0 ? 1 : 0,
+                        'new_price' => $recent->f_price,
+                        'discount' => $recent->f_discount_percent,
+                        'image' => $image,
+                        'slug' => $recent->slug,
+                        'is_new_item' => $recent->f_new_item,
+                        'product_reviews' => $product_reviews
+                    ];
                 }
             }
-            
-            return view('frontend.search_results', compact('results', 'blogs', 'products'));
+
+            // Filters
+            $filters = DB::table('fumaco_items as a')
+                ->join('fumaco_items_attributes as b', 'a.f_idcode', 'b.idcode')
+                ->join('fumaco_attributes_per_category as c', 'c.id', 'b.attribute_name_id')
+                ->when(count($item_code_array) > 0, function($c) use ($item_code_array) {
+                    $c->whereIn('a.f_idcode', $item_code_array);
+                })
+                ->where('a.f_status', 1)
+                ->where('c.status', 1)->select('c.attribute_name', 'b.attribute_value')
+                ->groupBy('c.attribute_name', 'b.attribute_value')->get();
+
+            $filters = collect($filters)->groupBy('attribute_name')->map(function($r, $d){
+                return array_unique(array_column($r->toArray(), 'attribute_value'));
+            });
+
+            $brands = DB::table('fumaco_items')
+                ->when(count($request_data) > 1, function($c) use ($filtered_item_codes) {
+                    $c->whereIn('f_idcode', $filtered_item_codes);
+                })
+                ->where('f_status', 1)->whereNotNull('f_brand')->distinct('f_brand')->pluck('f_brand');
+
+            $filters['Brand'] = $brands;
+
+            return view('frontend.search_results', compact('results', 'blogs', 'products', 'recently_added_arr' ,'filters', 'test'));
         }
 
         $carousel_data = DB::table('fumaco_header')->where('fumaco_status', 1)->orderBy('fumaco_active', 'desc')->get();
@@ -337,6 +484,56 @@ class FrontendController extends Controller
         $page_meta = DB::table('fumaco_pages')->where('is_homepage', 1)->first();
 
         return view('frontend.homepage', compact('carousel_data', 'onsale_carousel_data', 'blogs', 'best_selling_arr', 'on_sale_arr', 'page_meta', 'image_for_sharing'));
+    }
+
+    public function getAutoCompleteData(Request $request){
+        if($request->ajax() and $request->search_term){
+            $search_str = $request->search_term;
+            $item_keywords = DB::table('fumaco_items')
+                ->where('f_name_name', 'LIKE', '%'.$search_str.'%')
+                ->where('f_status', 1)->select('f_name_name', 'f_idcode', 'slug')->limit($request->type == 'desktop' ? 8 : 4)->get();
+
+            if(count($item_keywords) == 0){
+                $item_keywords = $item_keywords->where('keywords', 'LIKE', '%'.$search_str.'%');
+            }
+
+            $search_arr = [];
+            foreach($item_keywords as $item){
+                $image = DB::table('fumaco_items_image_v1')->where('idcode', $item->f_idcode)->pluck('imgprimayx')->first();
+                $search_arr[] = [
+                    'type' => 'Products',
+                    'id' => $item->f_idcode,
+                    'name' => $item->f_name_name,
+                    'image' => $image,
+                    'slug' => $item->slug,
+                    'screen' => $request->type
+                ];
+            }
+
+            $blogs = DB::table('fumaco_blog')->where('blog_enable', 1)
+                ->where(function($q) use ($search_str) {
+                    $search_strs = explode(" ", $search_str);
+                    foreach ($search_strs as $str) {
+                        $q->where('blogtitle', 'LIKE', "%".$str."%")
+                            ->orWhere('blog_caption', 'LIKE', "%".$str."%")
+                            ->orWhere('blogcontent', 'LIKE', "%".$str."%");
+                    }
+                })
+                ->get();
+
+            foreach($blogs as $blog){
+                $search_arr[] = [
+                    'type' => 'Blogs',
+                    'id' => $blog->id,
+                    'name' => $blog->blogtitle,
+                    'image' => $blog->blogprimaryimage,
+                    'slug' => $blog->slug,
+                    'screen' => $request->type
+                ];
+            }
+            
+            return view('frontend.search_autocomplete', compact('search_arr'));
+        }
     }
 
     public function newsletterSubscription(Request $request){
@@ -905,10 +1102,96 @@ class FrontendController extends Controller
         return view('frontend.product_list', compact('product_category', 'products_arr', 'products', 'filters', 'image_for_sharing'));
     }
 
+    private function getProductCardDetails($item_code){
+        $item = DB::table('fumaco_items as item')->where('f_idcode', $item_code)->first();
+        $image = DB::table('fumaco_items_image_v1')->where('idcode', $item_code)->first();
+        $is_new = 0;
+
+        if($item->f_new_item == 1){
+            if($item->f_new_item_start <= Carbon::now() and $item->f_new_item_end >= Carbon::now()){
+                $is_new = 1;
+            }
+        }
+
+        $all_item_discount = DB::table('fumaco_on_sale')->whereDate('start_date', '<=', Carbon::now()->toDateString())->whereDate('end_date', '>=', Carbon::now()->toDateString())->where('status', 1)->where('apply_discount_to', 'All Items')->first();
+
+        $category_discount = DB::table('fumaco_on_sale as sale')->join('fumaco_on_sale_categories as cat_sale', 'sale.id', 'cat_sale.sale_id')->whereDate('sale.start_date', '<=', Carbon::now())->whereDate('sale.end_date', '>=', Carbon::now())->where('status', 1)->where('cat_sale.category_id', $item->f_cat_id)->first();
+
+        $product_price = $item->f_original_price;
+        $discount_from_sale = 0;
+        $discount_rate = null;
+        $discount_type = null;
+        if($all_item_discount){
+            $discount_from_sale = 1;
+            $discount_rate = $all_item_discount->discount_rate;
+            $discount_type = $all_item_discount->discount_type;
+            if($all_item_discount->discount_type == 'By Percentage'){
+                $product_price = $item->f_original_price - ($item->f_original_price * ($all_item_discount->discount_rate/100));
+            }else if($all_item_discount->discount_type == 'Fixed Amount'){
+                $discount_from_sale = 0;
+                if($item->f_original_price > $all_item_discount->discount_rate){
+                    $discount_from_sale = 1;
+                    $product_price = $item->f_original_price - $all_item_discount->discount_rate;
+                }
+            }
+        }else if($category_discount){
+            $discount_from_sale = 1;
+            $discount_rate = $category_discount->discount_rate;
+            $discount_type = $category_discount->discount_type;
+            if($category_discount->discount_type == 'By Percentage'){
+                $product_price = $item->f_original_price - ($item->f_original_price * ($category_discount->discount_rate/100));
+            }else if($category_discount->discount_type == 'Fixed Amount'){
+                $discount_from_sale = 0;
+                if($item->f_original_price > $category_discount->discount_rate){
+                    $discount_from_sale = 1;
+                    $product_price = $item->f_original_price - $category_discount->discount_rate;
+                }
+            }
+        }
+
+        $on_stock = ($item->f_qty - $item->f_reserved_qty) > 0 ? 1 : 0;
+
+        // get product reviews
+        $product_review_per_code = DB::table('fumaco_product_review')->where('status', '!=', 'pending')->where('item_code', $item->f_idcode)->get();
+
+        $product_card_data = [
+            'id' => $item->id,
+            'item_code' => $item->f_idcode,
+            'item_name' => $item->f_name_name,
+            'orig_price' => $item->f_original_price,
+            'sale_discounted_price' => $product_price,
+            'sale_discount_rate' => $discount_rate,
+            'sale_discount_type' => $discount_type,
+            'is_discounted' => $item->f_discount_trigger,
+            'is_discounted_from_sale' => $discount_from_sale,
+            'discount_percent' => $item->f_discount_percent,
+            'new_price' => $item->f_price,
+            'on_stock' => $on_stock,
+            'primary_image' => ($image) ? $image->imgprimayx : null,
+            'original_image' => ($image) ? $image->imgoriginalx : null,
+            'slug' => $item->slug,
+            'is_new_item' => $is_new,
+            'product_reviews' => $product_review_per_code
+        ];
+        return $product_card_data;
+    }
+
     public function viewProduct($slug) { // Product Page
         $product_details = DB::table('fumaco_items')->where('slug', $slug)->orWhere('f_idcode', $slug)->first();
         if (!$product_details) {
             return redirect('/');
+        }
+
+        $is_ordered = 0;
+        if (Auth::check()) {
+            $is_ordered = DB::table('fumaco_order as a')->join('fumaco_order_items as b', 'a.order_number', 'b.order_number')
+                ->where('user_email', Auth::user()->username)
+                ->where('b.item_code', $product_details->f_idcode)
+                ->where(function($q) {
+                    $q->orWhere('order_status', 'LIKE', "%completed%")
+                        ->orWhere('order_status', 'LIKE', "%delivered%");
+                })
+                ->count();
         }
 
         // get items with the same parent item code
@@ -1042,6 +1325,46 @@ class FrontendController extends Controller
             }
         }
 
+        // Recommended Items
+        if(!session()->has('recommended_item_codes')){
+            session()->put('recommended_item_codes', []);
+        }
+
+        $recommended_item_codes = session()->get('recommended_item_codes');
+        if(!in_array($product_details->f_idcode, $recommended_item_codes)){
+            session()->push('recommended_item_codes', $product_details->f_idcode);
+        }
+        // session()->forget('recommended_item_codes');
+        $recommended_items = [];
+        foreach($recommended_item_codes as $item_code){
+            if($item_code == $product_details->f_idcode){
+                continue;
+            }
+            
+            $this->getProductCardDetails($item_code);
+
+            $product_card_data = $this->getProductCardDetails($item_code);
+
+            $recommended_items[] = [
+                'id' => $product_card_data['id'],
+                'item_code' => $product_card_data['item_code'],
+                'item_name' => $product_card_data['item_name'],
+                'orig_price' => $product_card_data['orig_price'],
+                'sale_discounted_price' => $product_card_data['sale_discounted_price'],
+                'sale_discount_rate' => $product_card_data['sale_discount_rate'],
+                'sale_discount_type' => $product_card_data['sale_discount_type'],
+                'is_discounted' => $product_card_data['is_discounted'],
+                'is_discounted_from_sale' => $product_card_data['is_discounted_from_sale'],
+                'discount_percent' => $product_card_data['discount_percent'],
+                'new_price' => $product_card_data['new_price'],
+                'on_stock' => $product_card_data['on_stock'],
+                'image' => $product_card_data['primary_image'],
+                'slug' => $product_card_data['slug'],
+                'is_new_item' => $product_card_data['is_new_item'],
+                'product_reviews' => $product_card_data['product_reviews']
+            ];
+        }
+
         $product_images = DB::table('fumaco_items_image_v1')->where('idcode', $product_details->f_idcode)->get();
 
         $related_products_query = DB::table('fumaco_items as a')
@@ -1087,8 +1410,12 @@ class FrontendController extends Controller
         // get product reviews
         $product_reviews = DB::table('fumaco_product_review as a')->join('fumaco_users as b', 'a.user_id', 'b.id')
             ->where('status', '!=', 'pending')->where('item_code', $product_details->f_idcode)->select('a.*', 'b.f_name', 'b.f_lname')->orderBy('a.created_at', 'desc')->paginate(5);
-    
-        return view('frontend.product_page', compact('product_details', 'product_images', 'attributes', 'variant_attr_arr', 'related_products', 'filtered_attributes', 'products_to_compare', 'variant_attributes_to_compare', 'compare_arr', 'attributes_to_compare', 'variant_attr_array', 'attribute_names', 'product_reviews', 'product_details_array'));
+
+        // get total rating
+        $total_rating = DB::table('fumaco_product_review as a')->join('fumaco_users as b', 'a.user_id', 'b.id')
+            ->where('status', '!=', 'pending')->where('item_code', $product_details->f_idcode)->sum('a.rating');
+        
+        return view('frontend.product_page', compact('product_details', 'product_images', 'attributes', 'variant_attr_arr', 'related_products', 'filtered_attributes', 'discount_from_sale', 'sale_discount_type', 'sale_discount_rate', 'product_price', 'products_to_compare', 'variant_attributes_to_compare', 'compare_arr', 'attributes_to_compare', 'variant_attr_array', 'attribute_names', 'product_reviews', 'total_rating', 'recommended_items'));
     }
 
     public function viewWishlist() {
@@ -1127,18 +1454,17 @@ class FrontendController extends Controller
     }
 
     public function viewOrders() {
-        $orders = DB::table('fumaco_order')->where('order_account', Auth::user()->id)
-            ->where('order_status', '!=', 'Order Placed')
-            ->where('order_status', '!=', 'Order Confirmed')
-            ->where('order_status', '!=', 'Out for Delivery')
+        $completed_statuses = DB::table('order_status')->where('update_stocks', 1)->select('status')->get();
+        $active_order_statuses = array('Order Placed', 'Order Confirmed', 'Out for Delivery');
+
+        $orders = DB::table('fumaco_order')->where('user_email', Auth::user()->username)
+            ->whereNotIn('order_status', $active_order_statuses)
             ->orderBy('id', 'desc')->paginate(10);
 
-        $new_orders = DB::table('fumaco_order')->where('order_account', Auth::user()->id)
-        ->where('order_status', '!=', 'Delivered')
-        ->where('order_status', '!=', 'Order Delivered')
-        ->where('order_status', '!=', 'Order Completed')
-        ->where('order_status', '!=', 'Cancelled')
-        ->orderBy('id', 'desc')->paginate(10);
+        $new_orders = DB::table('fumaco_order')->where('user_email', Auth::user()->username)
+            ->whereNotIn('order_status', collect($completed_statuses)->pluck('status'))
+            ->where('order_status', '!=', 'Cancelled')
+            ->orderBy('id', 'desc')->paginate(10);
 
 
         $orders_arr = [];
@@ -1223,7 +1549,6 @@ class FrontendController extends Controller
                 'discount_amount' => $new_order->discount_amount,
             ];
         }
-        // return $new_orders_arr;
 
         return view('frontend.orders', compact('orders', 'orders_arr', 'new_orders', 'new_orders_arr'));
     }

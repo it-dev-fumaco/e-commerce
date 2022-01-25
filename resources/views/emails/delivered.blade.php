@@ -10,8 +10,7 @@
 	}
 </style>
 
-
-<table border="0" width="50%" bgcolor="#ffffff" cellpadding="0" cellspacing="0" style="margin: 0 auto 0 auto;">
+  <table class="table" bgcolor="#ffffff" style="margin: 0 auto 0 auto;">
   <tr>
     <td class="h2" style="padding: 5% 0 0 5%;">Your order has been delivered!</td>
   </tr>

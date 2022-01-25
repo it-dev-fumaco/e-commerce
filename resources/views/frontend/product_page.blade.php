@@ -239,6 +239,19 @@
 									</h2>
 								</div>
 								<div id="collapseTwo" class="collapse show" aria-labelledby="headingTwo" data-parent="#accordionExample">
+									@if ($product_details->f_featured_image)
+										<div class="card-body prod_standard">
+											@php
+												$f_img = $product_details->f_featured_image ? '/storage/item_images/'. $product_details->f_idcode .'/gallery/featured/'. $product_details->f_featured_image : '/storage/no-photo-available.png';
+												$f_img_webp = $product_details->f_featured_image ? '/storage/item_images/'. $product_details->f_idcode .'/gallery/featured/'. explode(".", $product_details->f_featured_image)[0] .'.webp' : '/storage/no-photo-available.png';
+											@endphp
+											<picture>
+												<source srcset="{{ asset($f_img_webp) }}" type="image/webp" class="img-responsive" style="width: 100% !important;">
+												<source srcset="{{ asset($f_img) }}" type="image/jpeg" class="img-responsive" style="width: 100% !important;">
+												<img src="{{ asset($f_img) }}" alt="{{ Str::slug(explode(".", $product_details->f_featured_image)[0], '-') }}" class="img-responsive" style="width: 100% !important;">
+											</picture>
+										</div>
+									@endif
 									<div class="card-body prod_standard">
 										<p class="card-text">{!! $product_details->f_full_description !!}</p>
 									</div>
@@ -270,8 +283,9 @@
 													@endif
 													@endfor
 												</div>
-												<div class="d-block text-center p-2">{{ $product_details_array['total_reviews'] . ' Review(s)' }}</div>
-												@if (Auth::check())
+												<div class="d-block text-center p-2">{{ $total_reviews . ' Review(s)' }}</div>
+												@if (Auth::check() && $is_ordered > 0)
+
 												<form action="/submit_review" method="POST" id="review-form">
 													@csrf
 													<input type="hidden" name="item_code" value="{{ $product_details->f_idcode }}">
@@ -452,7 +466,7 @@
 										@endforeach
 									</section>
 								</div>
-							@endif
+							@endif							
 
                     @if (count($related_products) > 0)
 							<section class="py-5 text-center container" style="padding-bottom: 0rem !important;">
@@ -534,6 +548,112 @@
 												<a href="#" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto add-to-cart" role="button" style="width: 90% !important; margin-bottom: 20px" data-item-code="{{ $rp['item_code'] }}"><i class="fas fa-shopping-cart d-inline-block" style="margin-right: 3%;"></i> Add to Cart</a>
 												@else
 												<a href="/login" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto {{ Auth::check() ? 'add-to-wishlist' : '' }}" role="button" style="width: 90% !important; margin-bottom: 20px" data-item-code="{{ $rp['item_code'] }}"><i class="far fa-heart d-inline-block" style="margin-right: 3%;"></i> Add to Wishlist</a>
+												@endif
+											</div>
+										</div>
+										@endforeach
+										</section>
+								</div>
+							</div>
+						@endif
+
+						@if (count($recommended_items) > 0)
+							<section class="py-5 text-center container" style="padding-bottom: 0rem !important;">
+								<div class="row py-lg-5">
+									<div class="col-lg-6 col-md-8 mx-auto">
+										<h4 class="fw-light bestsellinghead fumacoFont1 animated animatedFadeInUp fadeInUp" style="color:#000000 !important; text-transform: uppercase">Recommended For you</h4>
+									</div>
+								</div>
+							</section>
+							
+							<div class="album py-5" style="position: relative">
+								<div class="container related-prod">
+										<section class="regular slider">
+											@foreach ($recommended_items as $recommended_item)
+										<div class="col-md-4 col-lg-3 animated animatedFadeInUp fadeInUp equal-height-columns mb-3 related-products-card">
+											<div class="card shadow-sm border" style="border: 1px solid  #d5dbdb !important; background-color: #fff;">
+												<div class="equal-column-content">
+
+													@php
+														$img = ($recommended_item['image']) ? '/storage/item_images/'. $recommended_item['item_code'] .'/gallery/preview/'. $recommended_item['image'] : '/storage/no-photo-available.png';
+														$img_webp = ($recommended_item['image']) ? '/storage/item_images/'. $recommended_item['item_code'] .'/gallery/preview/'. explode(".", $recommended_item['image'])[0] .'.webp' : '/storage/no-photo-available.png';
+													@endphp
+
+													<div class="hover-container product-card" style="position: relative">
+														<div class="pt-2" style="position: absolute; top: 0; right: 0; z-index: 10;">
+															<div class="col-12 mb-2 {{ $recommended_item['is_new_item'] == 1 ? '' : 'd-none' }}">
+																<span class="p-1 text-center" style="background-color: #438539; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
+																&nbsp;<b>New</b>&nbsp;
+																</span>
+															</div><br class="{{ $recommended_item['is_new_item'] == 1 ? '' : 'd-none' }}"/>
+															@if ($recommended_item['is_discounted'] == 1)
+																<div class="col-12">
+																	<span class="p-1 text-center" style="background-color: #FF0000; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
+																		&nbsp;<b>{{ $recommended_item['discount_percent'] }}% OFF</b>&nbsp;
+																	</span>
+																</div>
+															@elseif ($recommended_item['is_discounted_from_sale'] == 1)
+																<div class="col-12">
+																	<span class="p-1 text-center" style="background-color: #FF0000; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
+																		@if ($recommended_item['sale_discount_type'] == 'By Percentage')
+																			&nbsp;<b>{{ $recommended_item['sale_discount_rate'] }}% OFF</b>&nbsp;
+																		@else
+																			&nbsp;<b>₱ {{ number_format($recommended_item['sale_discount_rate'], 2, '.', ',') }} OFF</b>&nbsp;
+																		@endif
+																	</span>
+																</div>
+															@endif
+														</div>
+														<div class="overlay-bg"></div>
+
+														<div class="btn-container">
+															<a href="/product/{{ ($recommended_item['slug']) ? $recommended_item['slug'] : $recommended_item['item_code'] }}" class="view-products-btn btn" role="button"><i class="fas fa-search"></i>&nbsp;View Product</a>
+														</div>
+
+														<picture>
+															<source srcset="{{ asset($img_webp) }}" type="image/webp" class="img-responsive" style="width: 100% !important;">
+															<source srcset="{{ asset($img) }}" type="image/jpeg" class="img-responsive" style="width: 100% !important;">
+															<img src="{{ asset($img) }}" alt="{{ Str::slug(explode(".", $recommended_item['image'])[0], '-') }}" class="img-responsive hover" style="width: 100% !important;">
+														</picture>
+													</div>
+													<div class="card-body d-flex flex-column">
+														<div class="text ellipsis">
+															<a href="/product/{{ ($recommended_item['slug']) ? $recommended_item['slug'] : $recommended_item['item_code'] }}" class="card-text product-head fumacoFont_card_title text-concat prod_desc" style="text-decoration: none !important; text-transform: none !important; color:#0062A5 !important;  min-height: 100px;">{{ $recommended_item['item_name'] }}</a>
+														</div>
+
+														<p class="card-text fumacoFont_card_price d-sm-block d-md-none d-lg-block" style="color:#000000 !important; ">
+															@if ($recommended_item['is_discounted'] == 1)
+															<span style="white-space: nowrap !important">₱ {{ number_format(str_replace(",","",$recommended_item['new_price']), 2) }}</span>&nbsp;<br class="d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$recommended_item['orig_price']), 2) }}</s>
+															@elseif($recommended_item['is_discounted_from_sale'] == 1)
+																₱ {{ number_format(str_replace(",","",$recommended_item['sale_discounted_price']), 2) }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$recommended_item['orig_price']), 2) }}</s>
+															@else
+															₱ {{ number_format(str_replace(",","",$recommended_item['orig_price']), 2) }}
+															@endif
+														</p>
+														@php
+															$total_reviews = collect($recommended_item['product_reviews'])->count();
+															$total_rating = collect($recommended_item['product_reviews'])->sum('rating');
+															$overall_rating = ($total_reviews > 0) ? ($total_rating / $total_reviews) : 0;
+														@endphp
+														<div class="d-flex justify-content-between align-items-center">
+															<div class="btn-group stylecap">
+																@for ($i = 0; $i < 5; $i++)
+																@if ($overall_rating <= $i)
+																<span class="fa fa-star starcolorgrey"></span>
+																@else
+																<span class="fa fa-star" style="color: #FFD600;"></span>
+																@endif
+																@endfor
+															</div>
+															<small class="text-muted stylecap" style="color:#c4cad0 !important; font-weight:100 !important;">( {{ $total_reviews }} Reviews )</small>
+														</div>
+														<br>
+													</div>
+												</div><br/>&nbsp;
+												@if ($recommended_item['on_stock'] == 1)
+												<a href="#" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto add-to-cart" role="button" style="width: 90% !important; margin-bottom: 20px" data-item-code="{{ $recommended_item['item_code'] }}"><i class="fas fa-shopping-cart d-inline-block" style="margin-right: 3%;"></i> Add to Cart</a>
+												@else
+												<a href="/login" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto {{ Auth::check() ? 'add-to-wishlist' : '' }}" role="button" style="width: 90% !important; margin-bottom: 20px" data-item-code="{{ $recommended_item['item_code'] }}"><i class="far fa-heart d-inline-block" style="margin-right: 3%;"></i> Add to Wishlist</a>
 												@endif
 											</div>
 										</div>

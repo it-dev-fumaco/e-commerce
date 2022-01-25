@@ -76,22 +76,27 @@
                                         <a href="#" class="quantity-left-minus btn btn-number" style="background-color: #ccc !important; height: 100% !important; border-radius: 0px !important;"> - </a>
                                     </span>
                                     <div>&nbsp;</div>
-                                    <input type="text" name="res_quantity[]" class="form-control input-number " value="{{ $cart['quantity'] }}" min="1" max="{{ $cart['stock_qty'] }}" style="width: 5px !important; text-align: center !important;" data-id="{{ $cart['item_code'] }}">
+                                    <input type="text" name="res_quantity[]" class="form-control input-number mobile-quantity" value="{{ $cart['quantity'] }}" min="1" max="{{ $cart['stock_qty'] }}" style="width: 5px !important; text-align: center !important;" data-id="{{ $cart['item_code'] }}" onkeypress="return /[0-9a-zA-Z]/i.test(event.key)">
                                     <div>&nbsp;</div>
                                     <span class="input-group-btn">
                                         <a href="#" class="quantity-right-plus btn btn-number" style="background-color: #ccc !important; height: 100% !important; border-radius: 0px !important;"> + </a>
                                     </span>
+                                    @if ($cart['insufficient_stock'])
+                                        <small class="text-danger d-block m-2 stock-status">Insufficient Stock</small>
+                                    @else
+                                        <small class="text-success d-block m-2 stock-status">Available :  {{ $cart['stock_qty'] }}</small>
+                                    @endif
                                 </div>
                             </span>{{-- for mobile --}}
                             </td>
-                            <td class="tbls d-none d-sm-table-cell"><p style="white-space: nowrap !important;">P <span class="formatted-price">{{ number_format($cart['price'], 2, '.', ',') }}</span></p><span class="price d-none">{{ $cart['price'] }}</span></td>
+                            <td class="tbls d-none d-sm-table-cell"><p style="white-space: nowrap !important;">₱ <span class="formatted-price">{{ number_format($cart['price'], 2, '.', ',') }}</span></p><span class="price d-none">{{ $cart['price'] }}</span></td>
                             <td class="tbls d-none d-sm-table-cell text-center">
                                 <div class="input-group">
                                     <span class="input-group-btn">
                                         <a href="#" class="quantity-left-minus btn btn-number" style="background-color: #ccc !important; height: 100% !important; border-radius: 0px !important;"> - </a>
                                     </span>
                                     <div>&nbsp;</div>
-                                    <input type="text" name="quantity[]" class="form-control input-number " value="{{ $cart['quantity'] }}" min="1" max="{{ $cart['stock_qty'] }}" style="width: 4px !important; text-align: center !important;" data-id="{{ $cart['item_code'] }}">
+                                    <input type="text" name="quantity[]" class="form-control input-number " value="{{ $cart['quantity'] }}" min="1" max="{{ $cart['stock_qty'] }}" style="width: 4px !important; text-align: center !important;" data-id="{{ $cart['item_code'] }}" onkeypress="return /[0-9a-zA-Z]/i.test(event.key)">
                                     <div>&nbsp;</div>
                                     <span class="input-group-btn">
                                         <a href="#" class="quantity-right-plus btn btn-number" style="background-color: #ccc !important; height: 100% !important; border-radius: 0px !important;"> + </a>
@@ -120,9 +125,9 @@
                 </table>
                 <table class="table">
                     <tr>
-                        <td class="col-md-8">&nbsp</td>
+                        <td class="col-md-8">&nbsp;</td>
                         <td class="col-md-2">Total</td>
-                        <td><small class="text-muted stylecap he1x" id="cart-subtotal">P {{ number_format(collect($cart_arr)->sum('amount'), 2, '.', ',') }}</small></td>
+                        <td><small class="text-muted stylecap he1x" id="cart-subtotal">₱ {{ number_format(collect($cart_arr)->sum('amount'), 2, '.', ',') }}</small></td>
                     </tr>
                 </table>
                 <br/>
@@ -163,7 +168,7 @@
                 <br><br><br>
                 @if($cross_sell_arr)
                     <div class="container mb-3">
-                        <h4>You May Want To Try It With...</h4>
+                        <h4>Frequently Bought Together</h4>
                         <br/>
                         <div class="row regular" style="min-height: 300px">
                             @foreach($cross_sell_arr as $cs)
@@ -197,7 +202,7 @@
                                                     <div class="btn-container">
                                                         <a href="/product/{{ ($cs['slug']) ? $cs['slug'] : $cs['item_code'] }}" class="view-products-btn btn" role="button"><i class="fas fa-search"></i>&nbsp;View Product</a>
                                                     </div>
-                                
+
                                                     <picture>
                                                         <source srcset="{{ asset($img_webp) }}" type="image/webp" class="img-responsive" style="width: 100% !important;">
                                                         <source srcset="{{ asset($img) }}" type="image/jpeg" class="img-responsive" style="width: 100% !important;">
@@ -263,10 +268,22 @@
 	<br/>
 	Loading...
 </div>
-
-<style>
-	
-</style>
+  <!-- Modal -->
+<div class="modal fade" id="stockLimitModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel"><i class="fas fa-exclamation-circle"></i> Notice</h5>
+            <button type="button" class="close clear-btn" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body text-center">
+            <p>Desired quantity exceeds available stocks.</p>
+        </div>
+      </div>
+    </div>
+</div>
 @endsection
 
 @section('style')
@@ -295,7 +312,7 @@
     transition: all ease-in-out .3s;
     opacity: .2;
   }
-  
+
   .slick-active {
     opacity: .5;
   }
@@ -340,11 +357,11 @@
 
   .btn-container{
     width: 100%;
-    position: absolute; 
-    top: 50%; 
-    left: 0; 
-    z-index: 9; 
-    display: none; 
+    position: absolute;
+    top: 50%;
+    left: 0;
+    z-index: 9;
+    display: none;
     text-align: center;
   }
 
@@ -364,11 +381,11 @@
 	.view-products-btn:hover{
 		/* color: #fff;
 		background-color: #000; */
-    background-color: #f8b878; 
+    background-color: #f8b878;
     color: black;
 	}
 
-	.product-card:hover .overlay-bg{ 
+	.product-card:hover .overlay-bg{
 		transition:all .15s ease-in !important;
 		opacity: 1 !important;
 	}
@@ -376,7 +393,7 @@
 	.hover-container:hover img{
 		-ms-transform: scale(0.95); /* IE 9 */
       	-webkit-transform: scale(0.95); /* Safari 3-8 */
-      	transform: scale(0.95); 
+      	transform: scale(0.95);
 	}
 
     .hover{
@@ -386,7 +403,7 @@
     .hover:hover {
       -ms-transform: scale(0.95); /* IE 9 */
       -webkit-transform: scale(0.95); /* Safari 3-8 */
-      transform: scale(0.95); 
+      transform: scale(0.95);
     }
 
     .products-head {
@@ -477,6 +494,10 @@
 		border-right-color: transparent;
 		border-radius: 50%;
 	}
+    .clear-btn{
+        border: none;
+        background-color: rgba(0,0,0,0);
+    }
 	@keyframes rotate {
 		0% {
 			transform: rotate(0deg);
@@ -610,6 +631,46 @@
             window.location.href = "{{ $action }}";
         });
 
+        $('input[name="quantity[]"]').change(function(){
+            var row = $(this).closest('tr');
+            var input_name = row.find('input[name="quantity[]"]').eq(0);
+            var id = input_name.data('id');
+            var max = input_name.attr('max');
+
+            var current_qty = input_name.val();
+            var type = 'desk';
+
+            if(parseInt($(this).val()) <= parseInt(max)){
+                $('#checkout-btn').prop('disabled', false);
+                updateAmount(row);
+                updateCart('manual', id, current_qty);
+            }else if(parseInt($(this).val()) > parseInt(max)){
+                $('#checkout-btn').prop('disabled', true);
+                $('#stockLimitModal').modal('show');
+            }
+        });
+
+        $('.mobile-quantity').change(function(){
+            console.log($(this).val());
+            var row = $(this).closest('tr');
+            var input_name = row.find('.mobile-quantity').eq(0);
+            var id = input_name.data('id');
+            var max = input_name.attr('max');
+
+            var current_qty = $(this).val();
+            var type = 'mobile'
+
+            if(parseInt($(this).val()) <= parseInt(max)){
+                $('#checkout-btn').prop('disabled', false);
+                updateAmount(row, type);
+                updateCart('manual', id, current_qty);
+            }else if(parseInt($(this).val()) > parseInt(max)){
+                $('#checkout-btn').prop('disabled', true);
+                $('#stockLimitModal').modal('show');
+            }
+        });
+
+
         function updateTotal() {
             var subtotal = 0;
             $('#cart-items tbody tr').each(function(){
@@ -627,10 +688,15 @@
             $('#grand-total').text('P ' + total.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,"));
         }
 
-        function updateAmount(row) {
+        function updateAmount(row, type) {
             var price = row.find('.price').eq(0).text();
-            var qty = row.find('input[name="quantity[]"]').eq(0).val();
+            if(type == 'mobile'){
+                var qty = row.find('input[name="res_quantity[]"]').eq(0).val();
+            }else{
+                var qty = row.find('input[name="quantity[]"]').eq(0).val();
+            }
             var amount = (price * qty).toFixed(2);
+
             row.find('.amount').eq(0).text(amount);
             row.find('.formatted-amount').eq(0).text(parseFloat(amount).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,"));
             updateTotal();

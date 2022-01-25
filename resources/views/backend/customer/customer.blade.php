@@ -46,7 +46,7 @@
                                                 <th class="text-center">Customer Name</th>
                                                 <th class="text-center">Email Address</th>
                                                 <th class="text-center">Customer Group</th>
-                                                <th class="text-center">Date Registered</th>
+                                                <th class="text-center">Last Login Date</th>
                                                 <th class="text-center">Action</th>
                                             </tr>
                                         </thead>

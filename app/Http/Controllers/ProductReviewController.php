@@ -13,29 +13,38 @@ class ProductReviewController extends Controller
     public function submitProductReview(Request $request) {
         DB::beginTransaction();
         try {
-            $data = [
-                'item_code' => $request->item_code,
-                'message' => $request->message,
-                'rating' => ($request->rating) ? $request->rating : 0,
-                'user_email' => Auth::user()->username,
-                'user_id' => Auth::user()->id,
-                'firstname' => Auth::user()->f_name,
-                'lastname' => Auth::user()->f_lname,
-                'ip' => $request->ip(),
-            ];
-
-            DB::table('fumaco_product_review')->insert($data);
-
-            $email_recipient = DB::table('email_config')->first();
-            $email_recipient = ($email_recipient) ? explode(",", $email_recipient->email_recipients) : [];
-            if (count(array_filter($email_recipient)) > 0) {
-                Mail::send('emails.new_product_review', ['data' => $data], function($message) use ($email_recipient) {
-                    $message->to($email_recipient);
-                    $message->subject('New Product Review - FUMACO');
-                });
-            }
+            $itemDetails = DB::table('fumaco_items')->where('f_idcode', $request->item_code)->first();
+            if ($itemDetails) {
+                $data = [
+                    'item_code' => $request->item_code,
+                    'message' => $request->message,
+                    'rating' => ($request->rating) ? $request->rating : 0,
+                    'user_email' => Auth::user()->username,
+                    'user_id' => Auth::user()->id,
+                    'firstname' => Auth::user()->f_name,
+                    'lastname' => Auth::user()->f_lname,
+                    'ip' => $request->ip(),
+                ];
     
-            DB::commit();
+                DB::table('fumaco_product_review')->insert($data);
+
+                $image = DB::table('fumaco_items_image_v1')->where('idcode', $itemDetails->f_idcode)->first();
+                $image = ($image) ? $image->imgoriginalx : null;
+
+                $data['image'] = $image;
+                $data['item_description'] = $itemDetails->f_name_name;
+    
+                $email_recipient = DB::table('email_config')->first();
+                $email_recipient = ($email_recipient) ? explode(",", $email_recipient->email_recipients) : [];
+                if (count(array_filter($email_recipient)) > 0) {
+                    Mail::send('emails.new_product_review', ['data' => $data], function($message) use ($email_recipient) {
+                        $message->to($email_recipient);
+                        $message->subject('New Product Review - FUMACO');
+                    });
+                }
+        
+                DB::commit();
+            }
 
             return redirect()->back();
         } catch (Exception $e) {

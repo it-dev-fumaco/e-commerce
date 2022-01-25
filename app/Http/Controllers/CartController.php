@@ -112,6 +112,7 @@ class CartController extends Controller
                     'user_email' => (Auth::check()) ? Auth::user()->username : null,
                     'item_description' => $product_details->f_name_name,
                     'item_code' => $product_details->f_idcode,
+                    'category_id' => $product_details->f_cat_id,
                     'qty' => $data['quantity'],
                     'ip' => $data['ip'],
                     'city' => $loc->getCity(),
@@ -189,6 +190,7 @@ class CartController extends Controller
                 'user_email' => (Auth::check()) ? Auth::user()->username : null,
                 'item_description' => $product_details->f_name_name,
                 'item_code' => $product_details->f_idcode,
+                'category_id' => $product_details->f_cat_id,
                 'qty' => $data['quantity'],
                 'ip' => $data['ip'],
                 'city' => $loc->getCity(),
@@ -287,6 +289,27 @@ class CartController extends Controller
                 ];
             }
 
+            $product_review_per_code = DB::table('fumaco_product_review')->where('status', '!=', 'pending')->where('item_code', $item_details->f_idcode)->get();
+            
+            $cross_sell_arr[] = [
+                'item_code' => $cs->item_code,
+                'category' => $item_details->f_category,
+                'cross_sell_item_code' => $cs->item_code_cross_sell,
+                'cross_sell_image' => $item_details->imgprimayx,
+                'cross_sell_description' => $item_details->f_name_name,
+                'cross_sell_original_price' => $item_details->f_original_price,
+                'cross_sell_sale_price' => $cross_sell_price,
+                'cross_sell_price' => $item_details->f_price,
+                'discount' => $item_details->f_discount_percent,
+                'is_discounted' => $item_details->f_discount_trigger,
+                'discounted_from_sale' => $discount_from_sale,
+                'discount_rate' => $sale_discount_rate,
+                'discount_type' => $sale_discount_type,
+                'on_stock' => ($item_details->f_qty - $item_details->f_reserved_qty) > 0 ? 1 : 0,
+                'slug' => $item_details->slug,
+                'product_reviews' => $product_review_per_code,
+                'is_new_item' => $is_new_item
+            ];
         }
 
         // return $cross_sell_arr;
@@ -324,12 +347,17 @@ class CartController extends Controller
                 $existing_cart = DB::table('fumaco_cart')->where('transaction_id', $order_no)
                     ->where('item_code', $product_details->f_idcode)->first();
                 if ($existing_cart) {
-                    $plus_qty = $existing_cart->qty + 1;
-                    $minus_qty = $existing_cart->qty - 1;
+                    if($request->type == 'increment'){
+                        $new_qty = $existing_cart->qty + 1;
+                    }else if($request->type == 'decrement'){
+                        $new_qty = $existing_cart->qty - 1;
+                    }else{
+                        $new_qty = $request->quantity;
+                    }
                     DB::table('fumaco_cart')->where('id', $existing_cart->id)->update([
                         'user_type' => (Auth::check()) ? 'member' : 'guest',
                         'user_email' => (Auth::check()) ? Auth::user()->username : null,
-                        'qty' => ($request->type == 'increment') ? $plus_qty : $minus_qty,
+                        'qty' => $new_qty,
                         'ip' => $request->ip(),
                         'city' => $loc->getCity(),
                         'region' => $loc->getRegion(),
@@ -394,6 +422,7 @@ class CartController extends Controller
                     [
                         'userid' => Auth::user()->id,
                         'item_code' => $id,
+                        'category_id' => $product_details->f_cat_id,
                         'item_name' => $product_details->f_name_name,
                         'item_price' => ($product_details->f_price > 0) ? $product_details->f_price : $product_details->f_original_price
                     ]

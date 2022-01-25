@@ -69,7 +69,7 @@ Route::post('/user_register', 'FrontendController@userRegistration');
 Route::get('/about', 'FrontendController@viewAboutPage');
 Route::get('/journals', 'FrontendController@viewJournalsPage');
 Route::get('/terms_condition', 'FrontendController@viewTermsPage');
-Route::get('/blog/{slug}', 'FrontendController@viewBlogPage');
+Route::get('/blog/{slug}', 'FrontendController@viewBlogPage')->name('blogs');
 Route::post('/add_comment', 'BlogController@addComment');
 Route::get('/contact', 'FrontendController@viewContactPage')->name('contact');
 Route::post('/add_contact', 'FrontendController@addContact');
@@ -82,6 +82,7 @@ Route::get('/website_settings', 'FrontendController@websiteSettings');
 Route::post('/getvariantcode', 'FrontendController@getVariantItemCode');
 Route::post('/subscribe', 'FrontendController@newsletterSubscription');
 Route::get('/thankyou', 'FrontendController@subscribeThankyou');
+Route::get('/search', 'FrontendController@getAutoCompleteData');
 
 Route::get('/policy_pages', 'FrontendController@pagesList');
 Route::get('/pages/{slug}', 'FrontendController@viewPage')->name('pages');
@@ -155,6 +156,7 @@ Route::prefix('admin')->group(function () {
 
     Route::group(['middleware' => 'auth:admin'], function(){
         Route::get('/dashboard', 'DashboardController@index');
+        Route::get('/send_abandoned_cart_email/{transaction_id}', 'DashboardController@sendAbandonedCartEmail');
 
         Route::get('/pages/home', 'HomeCRUDController@home_crud');
         Route::post('/add_carousel', 'HomeCRUDController@add_header_carousel');

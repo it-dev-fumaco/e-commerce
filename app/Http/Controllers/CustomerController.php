@@ -24,7 +24,7 @@ class CustomerController extends Controller
     public function viewCustomerProfile($id){
         $customer = DB::table('fumaco_users')->where('id', $id)->first();
 
-        $total_sales = DB::table('fumaco_order')->where('order_status', '!=', 'Cancelled')->sum('amount_paid');
+        $total_sales = DB::table('fumaco_order')->where('order_status', '!=', 'Cancelled')->where('order_email', $customer->username)->sum('amount_paid');
 
         $pricelist = DB::table('fumaco_price_list')->get();
 

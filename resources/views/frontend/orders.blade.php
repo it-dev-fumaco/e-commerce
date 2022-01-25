@@ -193,8 +193,8 @@
 															@foreach ($order['ship_status'] as $key => $name)
 																@php
 																	$date = '';
-																	if(trim(collect($order['order_tracker'])->where('track_status', $name->status)->pluck('track_date_update'), '[""]') != null){
-																		$date = date('M d, Y H:i A', strtotime(trim(collect($order['order_tracker'])->where('track_status', $name->status)->pluck('track_date_update'), '[""]')));
+																	if(collect($order['order_tracker'])->where('track_status', $name->status)->pluck('track_date_update')->first()){
+																		$date = date('M d, Y H:i A', strtotime(collect($order['order_tracker'])->where('track_status', $name->status)->pluck('track_date_update')->first()));
 																	}
 																	
 																	$icon = '';

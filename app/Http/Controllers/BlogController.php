@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use Auth;
 use DB;
 use Webp;
+use Mail;
 use Illuminate\Support\Str;
 
 class BlogController extends Controller
@@ -139,6 +140,21 @@ class BlogController extends Controller
         DB::beginTransaction();
         try {
             DB::table('fumaco_blog')->where('id', $request->blog_id)->update(['blog_enable' => $request->publish]);
+
+            if($request->publish == 1){
+                $blog = DB::table('fumaco_blog')->where('id', $request->blog_id)->first();
+
+                $subscribers = DB::table('fumaco_subscribe')->where('status', 1)->get();
+                $blog_title = $blog->blogtitle;
+    
+                foreach($subscribers as $subscriber){
+                    Mail::send('emails.new_blog', ['blog_title' => $blog_title, 'image' => $blog->blogprimaryimage, 'caption' => $blog->blog_caption, 'slug' => Str::slug($blog->slug, '-')], function($message) use($subscriber, $blog_title){
+                        $message->to(trim($subscriber->email));
+                        $message->subject($blog_title . ' - FUMACO');
+                    });
+                }
+            }
+
             DB::commit();
             return response()->json(['status' => 1]);
         } catch (Exception $e) {
