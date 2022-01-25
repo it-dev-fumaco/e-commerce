@@ -45,6 +45,22 @@ class FrontendController extends Controller
 
             $product_list = [];
             $blogs = [];
+
+            $request_data = $request->except(['page', 'sel_attr', 'sortby', 'brand', 'order', 'fbclid', 's']);
+            $search_string = $request->s;
+            $attribute_name_filter = array_keys($request_data);
+            $attribute_value_filter = [];
+            $brand_filter = $request->brand ? $request->brand : [];
+            foreach($request_data as $data) {
+                foreach (explode('+', $data) as $value) {
+                    $attribute_value_filter[] = $value;
+                }
+            }
+
+            // get items based on filters
+            $filtered_items = [];
+            $filtered_item_codes = [];
+
             if ($request->s == null) {
                 if (in_array($search_by, ['products', 'all', ''])) {
                     $product_list = DB::table('fumaco_items')->where('f_status', 1)->where('f_featured', 1)->get();
@@ -55,21 +71,7 @@ class FrontendController extends Controller
                         ->where('blog_enable', 1)->get();
                 }
             } else {
-                $request_data = $request->except(['page', 'sel_attr', 'sortby', 'brand', 'order', 'fbclid', 's']);
-                $search_string = $request->s;
-                $attribute_name_filter = array_keys($request_data);
-                $attribute_value_filter = [];
-                $brand_filter = $request->brand ? $request->brand : [];
-                foreach($request_data as $data) {
-                    foreach (explode('+', $data) as $value) {
-                        $attribute_value_filter[] = $value;
-                    }
-                }
-
-                // get items based on filters
-                $filtered_items = [];
-                $filtered_item_codes = [];
-
+                
                 if (in_array($search_by, ['products', 'all', ''])) {
                     $product_list = DB::table('fumaco_items')
                         ->where('f_brand', 'LIKE', "%".$search_str."%")
@@ -274,7 +276,14 @@ class FrontendController extends Controller
                 }
             }
             $recently_added_arr = [];
+            $item_code_array = [];
+            $blog_id_array = [];
+            $prod_results = null;
+            $blog_results = null;
+            $test = 0;
+
             if($request->s != ''){// Save search terms
+                $test = 1;
                 $loc = GeoLocation::lookup($request->ip());
 
                 $search_data = [
@@ -292,11 +301,6 @@ class FrontendController extends Controller
                     'search_term' => $request->s,
                     'date_searched' => Carbon::now()
                 ];
-
-                $item_code_array = [];
-                $blog_id_array = [];
-                $prod_results = null;
-                $blog_results = null;
 
                 if($products){
                     $item_code_array = collect($products)->map(function($result){
@@ -418,7 +422,7 @@ class FrontendController extends Controller
 
             $filters['Brand'] = $brands;
 
-            return view('frontend.search_results', compact('results', 'blogs', 'products', 'recently_added_arr' ,'filters'));
+            return view('frontend.search_results', compact('results', 'blogs', 'products', 'recently_added_arr' ,'filters', 'test'));
         }
 
         $carousel_data = DB::table('fumaco_header')->where('fumaco_status', 1)->orderBy('fumaco_active', 'desc')->get();
@@ -1430,21 +1434,27 @@ class FrontendController extends Controller
             }
         }
 
-        $most_searched_items = DB::table('fumaco_search_results')->whereNotNull('prod_results')->select('search_term', 'prod_results')->groupBy('search_term', 'prod_results')->get();
+        // Recommended Items
+        if(!session()->has('recommended_item_codes')){
+            session()->put('recommended_item_codes', []);
+        }
 
-        $item_code_results_arr = [];
-
-        $searched_item_codes = collect($most_searched_items)->pluck('prod_results')->implode(',');
-        $searched_item_code_array = array_count_values(explode(',', $searched_item_codes));
-        arsort($searched_item_code_array, SORT_NUMERIC);
-
-        $most_searched = [];
-        foreach(collect($searched_item_code_array)->keys() as $item_code){
+        $recommended_item_codes = session()->get('recommended_item_codes');
+        if(!in_array($product_details->f_idcode, $recommended_item_codes)){
+            session()->push('recommended_item_codes', $product_details->f_idcode);
+        }
+        // session()->forget('recommended_item_codes');
+        $recommended_items = [];
+        foreach($recommended_item_codes as $item_code){
+            if($item_code == $product_details->f_idcode){
+                continue;
+            }
+            
             $this->getProductCardDetails($item_code);
 
             $product_card_data = $this->getProductCardDetails($item_code);
-             
-            $most_searched[] = [
+
+            $recommended_items[] = [
                 'id' => $product_card_data['id'],
                 'item_code' => $product_card_data['item_code'],
                 'item_name' => $product_card_data['item_name'],
@@ -1552,7 +1562,7 @@ class FrontendController extends Controller
         $total_rating = DB::table('fumaco_product_review as a')->join('fumaco_users as b', 'a.user_id', 'b.id')
             ->where('status', '!=', 'pending')->where('item_code', $product_details->f_idcode)->sum('a.rating');
         
-        return view('frontend.product_page', compact('product_details', 'product_images', 'attributes', 'variant_attr_arr', 'related_products', 'filtered_attributes', 'discount_from_sale', 'sale_discount_type', 'sale_discount_rate', 'product_price', 'products_to_compare', 'variant_attributes_to_compare', 'compare_arr', 'attributes_to_compare', 'variant_attr_array', 'attribute_names', 'product_reviews', 'total_rating', 'most_searched', 'is_ordered'));
+        return view('frontend.product_page', compact('product_details', 'product_images', 'attributes', 'variant_attr_arr', 'related_products', 'filtered_attributes', 'discount_from_sale', 'sale_discount_type', 'sale_discount_rate', 'product_price', 'products_to_compare', 'variant_attributes_to_compare', 'compare_arr', 'attributes_to_compare', 'variant_attr_array', 'attribute_names', 'product_reviews', 'total_rating', 'recommended_items'));
     }
 
     public function viewWishlist() {
