@@ -289,7 +289,7 @@
 													@endfor
 												</div>
 												<div class="d-block text-center p-2">{{ $total_reviews . ' Review(s)' }}</div>
-												@if (Auth::check())
+												@if (Auth::check() && $is_ordered > 0)
 												<form action="/submit_review" method="POST" id="review-form">
 													@csrf
 													<input type="hidden" name="item_code" value="{{ $product_details->f_idcode }}">
