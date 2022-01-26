@@ -290,29 +290,7 @@ class CartController extends Controller
             }
 
             $product_review_per_code = DB::table('fumaco_product_review')->where('status', '!=', 'pending')->where('item_code', $item_details->f_idcode)->get();
-            
-            $cross_sell_arr[] = [
-                'item_code' => $cs->item_code,
-                'category' => $item_details->f_category,
-                'cross_sell_item_code' => $cs->item_code_cross_sell,
-                'cross_sell_image' => $item_details->imgprimayx,
-                'cross_sell_description' => $item_details->f_name_name,
-                'cross_sell_original_price' => $item_details->f_original_price,
-                'cross_sell_sale_price' => $cross_sell_price,
-                'cross_sell_price' => $item_details->f_price,
-                'discount' => $item_details->f_discount_percent,
-                'is_discounted' => $item_details->f_discount_trigger,
-                'discounted_from_sale' => $discount_from_sale,
-                'discount_rate' => $sale_discount_rate,
-                'discount_type' => $sale_discount_type,
-                'on_stock' => ($item_details->f_qty - $item_details->f_reserved_qty) > 0 ? 1 : 0,
-                'slug' => $item_details->slug,
-                'product_reviews' => $product_review_per_code,
-                'is_new_item' => $is_new_item
-            ];
         }
-
-        // return $cross_sell_arr;
 
         $bill_address = "";
 		$ship_address = "";

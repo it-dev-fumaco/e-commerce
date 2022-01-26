@@ -90,28 +90,21 @@
 										</div>
 									</div>
 									<div>
-										@if ($product_details->f_onsale)
-										@php
-											$discounted_price = ($product_details->f_discount_type == 'percentage') ? $product_details->f_default_price - ($product_details->f_default_price * ($product_details->f_discount_rate/100)) : $product_details->f_default_price - $product_details->f_discount_rate;
-										@endphp
-										<span class="product_price fumacoFont_item_price">₱ {{ number_format(str_replace(",","",$discounted_price), 2) }}</span>
-										<s class="product_discount">
-											<span style='color:black; '>₱ {{ number_format(str_replace(",","",$product_details->f_default_price), 2) }}<span>
-										</s>
-										@elseif($discount_from_sale == 1)
-											<span class="product_price fumacoFont_item_price">₱ {{ number_format(str_replace(",","",$product_price), 2) }}</span>
-											<s class="product_discount">
-												<span style='color:black; '>₱ {{ number_format(str_replace(",","",$product_details->f_default_price), 2) }}<span>
-											</s>
-											@if ($sale_discount_type == 'By Percentage')
-												<span class="badge badge-danger" style="margin-left: 8px; vertical-align: middle;background-color: red; display: inline !important;">{{ $sale_discount_rate }}% OFF</span>
-											@elseif($sale_discount_type == 'Fixed Amount')
-												<span class="badge badge-danger" style="margin-left: 8px; vertical-align: middle;background-color: red; display: inline !important;">₱ {{ number_format(str_replace(",","",$sale_discount_rate), 2) }} OFF</span>
-											@endif
+										
+										
+										  @if($product_details_array['is_discounted'] == 1)
+										  <span class="product_price fumacoFont_item_price">{{ $product_details_array['discounted_price'] }}</span>
+										  <s class="product_discount">
+											  <span style='color:black;'>{{ $product_details_array['default_price'] }}<span>
+										  </s>
 										@else
-										<span class="product_price fumacoFont_item_price">₱ {{ number_format(str_replace(",","",$product_details->f_default_price), 2) }}</span>
+										<span class="product_price fumacoFont_item_price">{{ $product_details_array['default_price'] }}</span>
 										@endif
-										<span class="badge badge-danger" style="margin-left: 8px; vertical-align: middle;background-color: red; display: {{ ($product_details->f_onsale) ? 'inline' : 'none' }} !important;">{{ $product_details->f_discount_rate }}% OFF</span>
+										@if ($product_details_array['is_discounted'])
+										<span class="badge badge-danger" style="margin-left: 8px; vertical-align: middle;background-color: red;">{{ $product_details_array['discount_display'] }}</span>
+										
+										@endif
+										
 									</div>
 									<br class="d-md-none"/>
 									<div><span class="prod-font-size">{!! $product_details->f_caption !!}</span>
@@ -283,7 +276,7 @@
 													@endif
 													@endfor
 												</div>
-												<div class="d-block text-center p-2">{{ $total_reviews . ' Review(s)' }}</div>
+												<div class="d-block text-center p-2">{{ $product_details_array['total_reviews'] . ' Review(s)' }}</div>
 												@if (Auth::check() && $is_ordered > 0)
 
 												<form action="/submit_review" method="POST" id="review-form">

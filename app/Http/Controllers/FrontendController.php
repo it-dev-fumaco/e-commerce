@@ -1411,11 +1411,7 @@ class FrontendController extends Controller
         $product_reviews = DB::table('fumaco_product_review as a')->join('fumaco_users as b', 'a.user_id', 'b.id')
             ->where('status', '!=', 'pending')->where('item_code', $product_details->f_idcode)->select('a.*', 'b.f_name', 'b.f_lname')->orderBy('a.created_at', 'desc')->paginate(5);
 
-        // get total rating
-        $total_rating = DB::table('fumaco_product_review as a')->join('fumaco_users as b', 'a.user_id', 'b.id')
-            ->where('status', '!=', 'pending')->where('item_code', $product_details->f_idcode)->sum('a.rating');
-        
-        return view('frontend.product_page', compact('product_details', 'product_images', 'attributes', 'variant_attr_arr', 'related_products', 'filtered_attributes', 'discount_from_sale', 'sale_discount_type', 'sale_discount_rate', 'product_price', 'products_to_compare', 'variant_attributes_to_compare', 'compare_arr', 'attributes_to_compare', 'variant_attr_array', 'attribute_names', 'product_reviews', 'total_rating', 'recommended_items'));
+        return view('frontend.product_page', compact('product_details', 'product_images', 'attributes', 'variant_attr_arr', 'related_products', 'filtered_attributes', 'products_to_compare', 'variant_attributes_to_compare', 'compare_arr', 'attributes_to_compare', 'variant_attr_array', 'attribute_names', 'product_reviews', 'recommended_items', 'product_details_array', 'is_ordered'));
     }
 
     public function viewWishlist() {
