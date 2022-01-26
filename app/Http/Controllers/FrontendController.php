@@ -1334,34 +1334,47 @@ class FrontendController extends Controller
         if(!in_array($product_details->f_idcode, $recommended_item_codes)){
             session()->push('recommended_item_codes', $product_details->f_idcode);
         }
-        // session()->forget('recommended_item_codes');
+        
+        $recommended_item_codes = DB::table('fumaco_items')->whereIn('f_idcode', $recommended_item_codes)->get();
+
         $recommended_items = [];
-        foreach($recommended_item_codes as $item_code){
-            if($item_code == $product_details->f_idcode){
+        foreach($recommended_item_codes as $row){
+            if($row->f_idcode == $product_details->f_idcode){
                 continue;
             }
+
+            $is_new_item = 0;
+            if($row->f_new_item == 1){
+                if($row->f_new_item_start <= Carbon::now() and $row->f_new_item_end >= Carbon::now()){
+                    $is_new_item = 1;
+                }
+            }
             
-            $this->getProductCardDetails($item_code);
+            $item_price = $row->f_default_price;
+            $item_on_sale = $row->f_onsale;
+            $item_code = $row->f_idcode;
 
-            $product_card_data = $this->getProductCardDetails($item_code);
-
+            $image = DB::table('fumaco_items_image_v1')->where('idcode', $item_code)->first();
+            
+            // get item price, discounted price and discount rate
+            $item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $row->f_cat_id, $sale, $item_price, $item_code, $row->f_discount_type, $row->f_discount_rate);
+            // get product reviews
+            $product_reviews = $this->getProductRating($item_code);
+            
             $recommended_items[] = [
-                'id' => $product_card_data['id'],
-                'item_code' => $product_card_data['item_code'],
-                'item_name' => $product_card_data['item_name'],
-                'orig_price' => $product_card_data['orig_price'],
-                'sale_discounted_price' => $product_card_data['sale_discounted_price'],
-                'sale_discount_rate' => $product_card_data['sale_discount_rate'],
-                'sale_discount_type' => $product_card_data['sale_discount_type'],
-                'is_discounted' => $product_card_data['is_discounted'],
-                'is_discounted_from_sale' => $product_card_data['is_discounted_from_sale'],
-                'discount_percent' => $product_card_data['discount_percent'],
-                'new_price' => $product_card_data['new_price'],
-                'on_stock' => $product_card_data['on_stock'],
-                'image' => $product_card_data['primary_image'],
-                'slug' => $product_card_data['slug'],
-                'is_new_item' => $product_card_data['is_new_item'],
-                'product_reviews' => $product_card_data['product_reviews']
+                'id' => $row->id,
+                'item_code' => $row->f_idcode,
+                'item_name' => $row->f_name_name,
+                'default_price' => '₱ ' . number_format($item_price_data['item_price'], 2, '.', ','),
+                'is_discounted' => $item_price_data['is_on_sale'],
+                'on_stock' => ($row->f_qty - $row->f_reserved_qty) > 0 ? 1 : 0,
+                'discounted_price' => '₱ ' . number_format($item_price_data['discounted_price'], 2, '.', ','),
+                'discount_display' => $item_price_data['discount_display'],
+                'image' => ($image) ? $image->imgprimayx : null,
+                'slug' => $row->slug,
+                'is_new_item' => $is_new_item,
+                'overall_rating' => $product_reviews['overall_rating'],
+                'total_reviews' => $product_reviews['total_reviews'],
             ];
         }
 
@@ -1409,7 +1422,8 @@ class FrontendController extends Controller
 
         // get product reviews
         $product_reviews = DB::table('fumaco_product_review as a')->join('fumaco_users as b', 'a.user_id', 'b.id')
-            ->where('status', '!=', 'pending')->where('item_code', $product_details->f_idcode)->select('a.*', 'b.f_name', 'b.f_lname')->orderBy('a.created_at', 'desc')->paginate(5);
+            ->where('status', '!=', 'pending')->where('item_code', $product_details->f_idcode)->select('a.*', 'b.f_name', 'b.f_lname')
+            ->orderBy('a.created_at', 'desc')->paginate(5);
 
         return view('frontend.product_page', compact('product_details', 'product_images', 'attributes', 'variant_attr_arr', 'related_products', 'filtered_attributes', 'products_to_compare', 'variant_attributes_to_compare', 'compare_arr', 'attributes_to_compare', 'variant_attr_array', 'attribute_names', 'product_reviews', 'recommended_items', 'product_details_array', 'is_ordered'));
     }
