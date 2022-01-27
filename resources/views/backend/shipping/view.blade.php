@@ -94,13 +94,13 @@
 											</div>
 										</div>
 										<div class="col-md-6">
-											<div class="form-group {{ ($details->shipping_calculation == 'Flat Rate') ? 'd-none' : ''  }}">
+											<div class="form-group {{ ($details->shipping_calculation == 'Flat Rate' || $details->shipping_service_name == 'Store Pickup') ? 'd-none' : ''  }}">
 												<label for="min-charge-amount" class="form-label">* Min. Charge Amount</label>
 												<input type="text" class="form-control" id="min-charge-amount" name="min_charge_amount" placeholder="0.00" value="{{ $details->min_charge_amount }}" >
 											</div>
 										</div>
 										<div class="col-md-6">
-											<div class="form-group {{ ($details->shipping_calculation == 'Flat Rate') ? 'd-none' : ''  }}">
+											<div class="form-group {{ ($details->shipping_calculation == 'Flat Rate' || $details->shipping_service_name == 'Store Pickup') ? 'd-none' : ''  }}">
 												<label for="max-charge-amount" class="form-label">* Max. Charge Amount</label>
 												<input type="text" class="form-control" id="max-charge-amount" name="max_charge_amount" placeholder="0.00" value="{{ $details->max_charge_amount }}" >
 											</div>
@@ -118,8 +118,9 @@
 									<table class="table table-bordered" id="stores-table">
 										 <thead>
 											  <tr>
-													<th style="width: 85%;" scope="col" class="text-center">Store Location</th>
-													<th style="width: 15%;">Action</th>
+													<th style="width: 50%;" scope="col" class="text-center">Store Location</th>
+													<th style="width: 35%;" scope="col" class="text-center">Allowance before pickup (in Hours)</th>
+													<th style="width: 15%;"></th>
 											  </tr>
 										 </thead>
 										 <tbody>
@@ -133,6 +134,9 @@
 															<option value="{{ $store->store_id }}" {{ ($store->store_id == $row->store_id) ? 'selected' : ''  }}>{{ $store->store_name }}</option>
 															@endforeach
 													  </select>
+												 </td>
+												 <td class="p-2">
+													<input type="text" name="allowed_hours[]" class="form-control" placeholder="0.00" value="{{ $row->allowance_in_hours }}" required>
 												 </td>
 												 <td class="text-center">
 													  <button class="btn btn-outline-danger btn-sm remove-td-row">Remove</button>
@@ -434,6 +438,9 @@
 			var row = '<tr>' +
 				'<td class="p-2">' + 
 					'<select name="store[]" class="form-control w-100" style="width: 100%;" required>' + clone_select + '</select>' +
+				'</td>' +
+				'<td class="p-2"">' +
+					'<input type="text" name="allowed_hours[]" class="form-control" placeholder="0.00" required>' +
 				'</td>' +
 				'<td class="text-center">' +
 					'<button class="btn btn-outline-danger btn-sm remove-td-row">Remove</button>' +

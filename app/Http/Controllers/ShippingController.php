@@ -283,6 +283,7 @@ class ShippingController extends Controller
                         $stores[] = [
                             'shipping_service_id' => $shipping_service->shipping_service_id,
                             'store_location_id' => $request->store[$e],
+                            'allowance_in_hours' => $request->allowed_hours[$e],
                             'created_by' => Auth::user()->username,
                             'last_modified_by' => Auth::user()->username,
                         ];
@@ -480,6 +481,7 @@ class ShippingController extends Controller
                         if(isset($request->shipping_service_store_id[$e])){
                             $values = [
                                 'store_location_id' => $request->store[$e],
+                                'allowance_in_hours' => $request->allowed_hours[$e],
                             ];
 
                             DB::table('fumaco_shipping_service_store')->where('shipping_service_store_id', $request->shipping_service_store_id[$e])->update($values);
@@ -487,6 +489,7 @@ class ShippingController extends Controller
                             $stores[] = [
                                 'shipping_service_id' => $shipping_service->shipping_service_id,
                                 'store_location_id' => $request->store[$e],
+                                'allowance_in_hours' => $request->allowed_hours[$e],
                             ];
                         }
                     }

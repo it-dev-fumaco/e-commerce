@@ -114,8 +114,9 @@
 									<table class="table table-bordered" id="stores-table">
 										 <thead>
 											  <tr>
-													<th style="width: 85%;" scope="col" class="text-center">Store Location</th>
-													<th style="width: 15%;">Action</th>
+													<th style="width: 50%;" scope="col" class="text-center">Store Location</th>
+													<th style="width: 35%;" scope="col" class="text-center">Allowance before pickup (in Hours)</th>
+													<th style="width: 15%;"></th>
 											  </tr>
 										 </thead>
 										 <tbody></tbody>
@@ -351,6 +352,9 @@
 			var row = '<tr>' +
 				'<td class="p-2">' + 
 					'<select name="store[]" class="form-control w-100" style="width: 100%;" required>' + clone_select + '</select>' +
+				'</td>' +
+				'<td class="p-2"">' +
+					'<input type="text" name="allowed_hours[]" class="form-control" placeholder="0.00" required>' +
 				'</td>' +
 				'<td class="text-center">' +
 					'<button class="btn btn-outline-danger btn-sm remove-td-row">Remove</button>' +
