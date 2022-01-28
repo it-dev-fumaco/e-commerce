@@ -189,7 +189,7 @@ class FrontendController extends Controller
                 ];
             }
 
-            $searched_item_codes = collect($results)->whereNotNull('item_code')->pluck('item_code');
+            $recently_added_items = collect($results)->whereNotNull('item_code')->where('is_new_item', 1)->pluck('item_code');
 
             // Get current page form url e.x. &page=1
             $currentPage = LengthAwarePaginator::resolveCurrentPage();
@@ -210,6 +210,10 @@ class FrontendController extends Controller
             
             foreach ($results as $result) {
                 if($result['item_code'] != null) {
+                    if(in_array($result['item_code'], collect($recently_added_items)->toArray())){
+                        continue; // if an item is already displayed on recently added, it will not show in search results
+                    }
+
                     $item_price = $result['default_price'];
                     $item_on_sale = $result['is_discounted'];
                 
@@ -308,37 +312,30 @@ class FrontendController extends Controller
                     DB::table('fumaco_search_results')->insert($search_results_data);
                 }
 
-                $recently_added_items = DB::table('fumaco_items')
-                    ->whereNotIn('f_idcode', $searched_item_codes)
-                    ->where('f_status', 1)->where('f_new_item', 1)
-                    ->whereDate('f_new_item_start', '<=', Carbon::now())
-                    ->whereDate('f_new_item_end', '>=', Carbon::now())
-                    ->get();
-
-                $recently_added_arr = [];
-                foreach($recently_added_items as $recent){
-                    $image = DB::table('fumaco_items_image_v1')->where('idcode', $recent->f_idcode)->first();
-                    $item_price = $recent->f_default_price;
-                    $item_on_sale = $recent->f_onsale;
+                foreach($recently_added_items as $item_code){
+                    $item_details = DB::table('fumaco_items')->where('f_idcode', $item_code)->first();
+                    $image = DB::table('fumaco_items_image_v1')->where('idcode', $item_code)->first();
+                    $item_price = $item_details->f_default_price;
+                    $item_on_sale = $item_details->f_onsale;
                     
                     $is_new_item = 1;
           
                     // get item price, discounted price and discount rate
-                    $item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $recent->f_cat_id, $sale, $item_price, $recent->f_idcode, $recent->f_discount_type, $recent->f_discount_rate);
+                    $item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $item_details->f_cat_id, $sale, $item_price, $item_code, $item_details->f_discount_type, $item_details->f_discount_rate);
                     // get product reviews
-                    $product_reviews = $this->getProductRating($recent->f_idcode);
+                    $product_reviews = $this->getProductRating($item_code);
 
                     $recently_added_arr[] = [
-                        'id' => $recent->id,
-                        'item_code' => $recent->f_idcode,
-                        'item_name' => $recent->f_name_name,
+                        'id' => $item_details->id,
+                        'item_code' => $item_code,
+                        'item_name' => $item_details->f_name_name,
                         'image' => ($image) ? $image->imgprimayx : null,
                         'default_price' => '₱ ' . number_format($item_price_data['item_price'], 2, '.', ','),
                         'is_discounted' => $item_price_data['is_on_sale'],
-                        'on_stock' => ($recent->f_qty - $recent->f_reserved_qty) > 0 ? 1 : 0,
+                        'on_stock' => ($item_details->f_qty - $item_details->f_reserved_qty) > 0 ? 1 : 0,
                         'discounted_price' => '₱ ' . number_format($item_price_data['discounted_price'], 2, '.', ','),
                         'discount_display' => $item_price_data['discount_display'],
-                        'slug' => $recent->slug,
+                        'slug' => $item_details->slug,
                         'is_new_item' => $is_new_item,
                         'overall_rating' => $product_reviews['overall_rating'],
                         'total_reviews' => $product_reviews['total_reviews'],

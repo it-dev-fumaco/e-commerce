@@ -539,10 +539,9 @@ class ProductController extends Controller
                         $featured_image->move($destinationPath, $featured_image_name);
                     }
                 }
-            }else{
+            }else if($detail->f_featured_image){
                 $featured = storage_path('/app/public/item_images/'.$detail->f_idcode.'/gallery/featured/'.$detail->f_featured_image);
                 $featured_webp = storage_path('/app/public/item_images/'.$detail->f_idcode.'/gallery/featured/'.explode('.', $detail->f_featured_image)[0].'.webp');
-
                 if (file_exists($featured)) {
                     unlink($featured);
                 }
