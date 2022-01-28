@@ -139,4 +139,61 @@ class PriceListController extends Controller
 
         return view('backend.item_pricelist', compact('details', 'list'));
     }
+
+    public function syncItemPrices() {
+        $erp_api = DB::table('api_setup')->where('type', 'erp_api')->first();
+        if ($erp_api) {
+            // get registered price list in website database
+            $pricelists = DB::table('fumaco_price_list')->pluck('price_list_name', 'id');
+            $items = DB::table('fumaco_items')->pluck('f_idcode');
+            foreach ($pricelists as $id => $pricelist) {
+                foreach ($items as $item) {
+                    $fields = '?fields=["price_list_rate","price_list","item_code"]';
+                    $filter = '&filters=[["price_list","=","' . $pricelist . '"],["item_code","=","'. $item .'"]]';
+                    $params = $fields . $filter;
+    
+                    $response = Http::withHeaders([
+                        'Content-Type' => 'application/json',
+                        'Authorization' => 'token '. $erp_api->api_key. ':' . $erp_api->api_secret_key . '',
+                        'Accept-Language' => 'en'
+                    ])->get($erp_api->base_url . '/api/resource/Item Price' . ($params));
+    
+                    if ($response->successful()) {
+                        if (count($response['data']) > 0) {
+                            $existing_item_price = DB::table('fumaco_product_prices')->where('item_code', $item)->where('price_list_id', $id)->first();
+                            if ($existing_item_price) {
+                                DB::table('fumaco_product_prices')->where('id', $existing_item_price->id)->update(['price' => $response['data'][0]['price_list_rate']]);
+                            } else {
+                                DB::table('fumaco_product_prices')->insert([
+                                    'item_code' => $item,
+                                    'price' => $response['data'][0]['price_list_rate'],
+                                    'price_list_id' => $id
+                                ]);
+                            }
+                        }
+                    }
+                }
+            }
+
+            foreach ($items as $item) {
+                $fields = '?fields=["price_list_rate","price_list","item_code"]';
+                $filter = '&filters=[["price_list","=","Website Price List"],["item_code","=","'. $item .'"]]';
+                $params = $fields . $filter;
+
+                $response = Http::withHeaders([
+                    'Content-Type' => 'application/json',
+                    'Authorization' => 'token '. $erp_api->api_key. ':' . $erp_api->api_secret_key . '',
+                    'Accept-Language' => 'en'
+                ])->get($erp_api->base_url . '/api/resource/Item Price' . ($params));
+
+                if ($response->successful()) {
+                    if (count($response['data']) > 0) {
+                        DB::table('fumaco_items')->where('f_idcode', $item)->update(['f_default_price' => $response['data'][0]['price_list_rate']]);
+                    }
+                }
+            }
+        }
+
+        return response()->json(['status' => 1, 'message' => 'Item prices updated.']);
+    }
 }

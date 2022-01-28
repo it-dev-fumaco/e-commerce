@@ -197,6 +197,7 @@ Route::prefix('admin')->group(function () {
         Route::get('/get_price_list', 'PriceListController@getErpPriceList');
         Route::delete('/price_list/delete/{id}', 'PriceListController@deletePriceList');
         Route::get('/item_prices/{pricelist_id}', 'PriceListController@viewItemPrices');
+        Route::get('/sync_price_list', 'PriceListController@syncItemPrices');
         
         Route::get('/select_related_products/{category_id}', 'ProductController@selectProductsRelated');
         Route::post('/product/{parent_code}/save_related_products', 'ProductController@saveRelatedProducts');
