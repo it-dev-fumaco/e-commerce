@@ -308,64 +308,40 @@ class FrontendController extends Controller
                     DB::table('fumaco_search_results')->insert($search_results_data);
                 }
 
-                $recently_added_items = DB::table('fumaco_items')->whereNotIn('f_idcode', $searched_item_codes)->where('f_status', 1)->where('f_new_item', 1)->whereDate('f_new_item_start', '<=', Carbon::now())->whereDate('f_new_item_end', '>=', Carbon::now())->get();
+                $recently_added_items = DB::table('fumaco_items')
+                    ->whereNotIn('f_idcode', $searched_item_codes)
+                    ->where('f_status', 1)->where('f_new_item', 1)
+                    ->whereDate('f_new_item_start', '<=', Carbon::now())
+                    ->whereDate('f_new_item_end', '>=', Carbon::now())
+                    ->get();
 
                 $recently_added_arr = [];
                 foreach($recently_added_items as $recent){
-                    $image = DB::table('fumaco_items_image_v1')->where('idcode', $recent->f_idcode)->pluck('imgprimayx')->first();
-                    $product_reviews = DB::table('fumaco_product_review')->where('status', '!=', 'pending')->where('item_code', $recent->f_idcode)->get();
-
-                    $recent_category_discount = DB::table('fumaco_on_sale as sale')->join('fumaco_on_sale_categories as cat_sale', 'sale.id', 'cat_sale.sale_id')->whereDate('sale.start_date', '<=', Carbon::now())->whereDate('sale.end_date', '>=', Carbon::now())->where('status', 1)->where('cat_sale.category_id', $recent->f_cat_id)->first();
-
-                    $recent_product_price = null;
-                    $recent_discount_from_sale = 0;
-                    $recent_sale_discount_rate = null;
-                    $recent_sale_discount_type = null;
-                    if($all_item_discount){
-                        $recent_discount_from_sale = 1;
-                        $recent_sale_discount_rate = $all_item_discount->discount_rate;
-                        $recent_sale_discount_type = $all_item_discount->discount_type;
-                        if($all_item_discount->discount_type == 'By Percentage'){
-                            $recent_product_price = $recent->f_original_price - ($recent->f_original_price * ($all_item_discount->discount_rate/100));
-                        }else if($all_item_discount->discount_type == 'Fixed Amount'){
-                            $recent_discount_from_sale = 0;
-                            if($recent->f_original_price > $all_item_discount->discount_rate){
-                                $recent_discount_from_sale = 1;
-                                $recent_product_price = $recent->f_original_price - $all_item_discount->discount_rate;
-                            }
-                        }
-                    }else if($recent_category_discount){
-                        $recent_discount_from_sale = 1;
-                        $recent_sale_discount_rate = $recent_category_discount->discount_rate;
-                        $recent_sale_discount_type = $recent_category_discount->discount_type;
-                        if($recent_category_discount->discount_type == 'By Percentage'){
-                            $recent_product_price = $recent->f_original_price - ($recent->f_original_price * ($recent_category_discount->discount_rate/100));
-                        }else if($recent_category_discount->discount_type == 'Fixed Amount'){
-                            $recent_discount_from_sale = 0;
-                            if($recent->f_original_price > $recent_category_discount->discount_rate){
-                                $recent_discount_from_sale = 1;
-                                $recent_product_price = $recent->f_original_price - $recent_category_discount->discount_rate;
-                            }
-                        }
-                    }
+                    $image = DB::table('fumaco_items_image_v1')->where('idcode', $recent->f_idcode)->first();
+                    $item_price = $recent->f_default_price;
+                    $item_on_sale = $recent->f_onsale;
+                    
+                    $is_new_item = 1;
+          
+                    // get item price, discounted price and discount rate
+                    $item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $recent->f_cat_id, $sale, $item_price, $recent->f_idcode, $recent->f_discount_type, $recent->f_discount_rate);
+                    // get product reviews
+                    $product_reviews = $this->getProductRating($recent->f_idcode);
 
                     $recently_added_arr[] = [
                         'id' => $recent->id,
                         'item_code' => $recent->f_idcode,
                         'item_name' => $recent->f_name_name,
-                        'orig_price' => $recent->f_original_price,
-                        'sale_discounted_price' => $recent_product_price,
-                        'sale_discount_rate' => $recent_sale_discount_rate,
-                        'sale_discount_type' => $recent_sale_discount_type,
-                        'is_discounted' => $recent->f_discount_trigger,
-                        'is_discounted_from_sale' => $recent_discount_from_sale,
-                        'on_stock' => $recent->f_qty - $recent->f_reserved_qty > 0 ? 1 : 0,
-                        'new_price' => $recent->f_price,
-                        'discount' => $recent->f_discount_percent,
-                        'image' => $image,
+                        'image' => ($image) ? $image->imgprimayx : null,
+                        'default_price' => '₱ ' . number_format($item_price_data['item_price'], 2, '.', ','),
+                        'is_discounted' => $item_price_data['is_on_sale'],
+                        'on_stock' => ($recent->f_qty - $recent->f_reserved_qty) > 0 ? 1 : 0,
+                        'discounted_price' => '₱ ' . number_format($item_price_data['discounted_price'], 2, '.', ','),
+                        'discount_display' => $item_price_data['discount_display'],
                         'slug' => $recent->slug,
-                        'is_new_item' => $recent->f_new_item,
-                        'product_reviews' => $product_reviews
+                        'is_new_item' => $is_new_item,
+                        'overall_rating' => $product_reviews['overall_rating'],
+                        'total_reviews' => $product_reviews['total_reviews'],
                     ];
                 }
             }

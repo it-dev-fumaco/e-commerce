@@ -227,17 +227,7 @@
 									@if ($item['is_discounted'])
 										<div class="col-12">
 											<span class="text-center" style="background-color: #FF0000; font-size: 9pt; border-radius: 0 20px 20px 0; color: #fff; min-width: 80px; padding: 2px">
-												&nbsp;<b>{{ $item['discount'] }}% OFF</b>&nbsp;
-											</span>
-										</div>
-									@elseif ($item['is_discounted_from_sale'] == 1)
-										<div class="col-12">
-											<span class="text-center" style="background-color: #FF0000; font-size: 9pt; border-radius: 0 20px 20px 0; color: #fff; min-width: 80px; padding: 2px">
-												@if ($item['sale_discount_type'] == 'By Percentage')
-													&nbsp;<b>{{ $item['sale_discount_rate'] }}% OFF</b>&nbsp;
-												@else
-													&nbsp;<b>₱ {{ number_format($item['sale_discount_rate'], 2, '.', ',') }} OFF</b>&nbsp;
-												@endif
+												&nbsp;<b>{{ $item['discount_display'] }}</b>&nbsp;
 											</span>
 										</div>
 									@endif
@@ -262,30 +252,22 @@
 										</div>
 										<p class="card-text fumacoFont_card_price" style="color:#000000 !important; font-size: 7pt">
 											@if($item['is_discounted'])
-												₱ {{ number_format(str_replace(",","",$item['new_price']), 2) }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$item['orig_price']), 2) }}</s>
-											@elseif($item['is_discounted_from_sale'] == 1)
-												₱ {{ number_format(str_replace(",","",$item['sale_discounted_price']), 2) }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$item['orig_price']), 2) }}</s>
+												{{ $item['discounted_price'] }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">{{ $item['default_price'] }}</s>
 											@else
-											₱ {{ number_format(str_replace(",","",$item['orig_price']), 2) }}
+											{{ $item['default_price'] }}
 											@endif
 										</p>
 										<div class="d-flex justify-content-between align-items-center">
 											<div class="btn-group stylecap">
-												@php
-													$total_reviews = collect($item['product_reviews'])->count();
-													$total_rating = collect($item['product_reviews'])->sum('rating');
-													$overall_rating = ($total_reviews > 0) ? ($total_rating / $total_reviews) : 0;
-												@endphp
-								
 												@for ($i = 0; $i < 5; $i++)
-													@if ($overall_rating <= $i)
+													@if ($item['overall_rating'] <= $i)
 														<span class="fa fa-star starcolorgrey"></span>
 													@else
 														<span class="fa fa-star" style="color: #FFD600;"></span>
 													@endif
 												@endfor
 											</div>
-											<small class="text-muted stylecap" style="color:#c4cad0 !important; font-weight:100 !important;">( {{ $total_reviews }} Reviews )</small>
+											<small class="text-muted stylecap" style="color:#c4cad0 !important; font-weight:100 !important;">( {{ $item['total_reviews'] }} Reviews )</small>
 										</div>
 										<br/>
 										@if ($item['on_stock'] == 1)
@@ -306,26 +288,19 @@
 							<div class="equal-column-content">
 								<div class="hover-container product-card" style="position: relative;">
 									<div class="pt-2" style="position: absolute; top: 0; right: 0; z-index: 10;">
-										<div class="col-12 mb-2 {{ $item['is_new_item'] == 1 ? '' : 'd-none' }}">
+										@if ($item['is_new_item'])
+										<div class="col-12 mb-2">
 											<span class="p-1 text-center" style="background-color: #438539; font-size: 9pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
 											&nbsp;<b>New</b>&nbsp;
 											</span>
 										</div>
-										<br class="{{ $item['is_new_item'] == 1 ? '' : 'd-none' }}"/>
+										<br />
+										@endif
+										
 										@if ($item['is_discounted'])
 											<div class="col-12">
 												<span class="p-1 text-center" style="background-color: #FF0000; font-size: 9pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
-													&nbsp;<b>{{ $item['discount'] }}% OFF</b>&nbsp;
-												</span>
-											</div>
-										@elseif ($item['is_discounted_from_sale'] == 1)
-											<div class="col-12">
-												<span class="p-1 text-center" style="background-color: #FF0000; font-size: 9pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
-													@if ($item['sale_discount_type'] == 'By Percentage')
-														&nbsp;<b>{{ $item['sale_discount_rate'] }}% OFF</b>&nbsp;
-													@else
-														&nbsp;<b>₱ {{ number_format($item['sale_discount_rate'], 2, '.', ',') }} OFF</b>&nbsp;
-													@endif
+													&nbsp;<b>{{ $item['discount_display'] }}</b>&nbsp;
 												</span>
 											</div>
 										@endif
@@ -351,30 +326,22 @@
 									</div>
 									<p class="card-text fumacoFont_card_price" style="color:#000000 !important;">
 										@if($item['is_discounted'])
-											₱ {{ number_format(str_replace(",","",$item['new_price']), 2) }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$item['orig_price']), 2) }}</s>
-										@elseif($item['is_discounted_from_sale'] == 1)
-											₱ {{ number_format(str_replace(",","",$item['sale_discounted_price']), 2) }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$item['orig_price']), 2) }}</s>
+											{{ $item['discounted_price'] }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">{{ $item['default_price'] }}</s>
 										@else
-										₱ {{ number_format(str_replace(",","",$item['orig_price']), 2) }}
+										{{ $item['default_price'] }}
 										@endif
 									</p>
 									<div class="d-flex justify-content-between align-items-center">
 										<div class="btn-group stylecap">
-											@php
-												$total_reviews = collect($item['product_reviews'])->count();
-												$total_rating = collect($item['product_reviews'])->sum('rating');
-												$overall_rating = ($total_reviews > 0) ? ($total_rating / $total_reviews) : 0;
-											@endphp
-							
 											@for ($i = 0; $i < 5; $i++)
-												@if ($overall_rating <= $i)
+												@if ($item['overall_rating'] <= $i)
 													<span class="fa fa-star starcolorgrey"></span>
 												@else
 													<span class="fa fa-star" style="color: #FFD600;"></span>
 												@endif
 											@endfor
 										</div>
-										<small class="text-muted stylecap" style="color:#c4cad0 !important; font-weight:100 !important;">( {{ $total_reviews }} Reviews )</small>
+										<small class="text-muted stylecap" style="color:#c4cad0 !important; font-weight:100 !important;">( {{ $item['total_reviews'] }} Reviews )</small>
 									</div>
 								</div>
 							</div>
