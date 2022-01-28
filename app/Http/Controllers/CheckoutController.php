@@ -1294,24 +1294,9 @@ class CheckoutController extends Controller
 				}
 			}
 
-			if($voucher_details->coupon_type == 'Exclusive Voucher') {
-				if(Auth::check()) {
-					// check if voucher is applicable for loggedin user
-					$not_existing_voucher_customer = DB::table('fumaco_voucher_customers as a')
-						->join('fumaco_users as b', 'a.customer_id', 'b.id')->where('a.voucher_id', $voucher_details->id)
-						->where('b.username', Auth::user()->username)->doesntExist();
-					if ($not_existing_voucher_customer) {
-						return response()->json(['status' => 0, 'message' => 'Please enter a valid coupon code.']);
-					}
-					// count consumed voucher for loggedin user
-					$consumed_voucher = DB::table('fumaco_order')->where('user_email', Auth::user()->username)
-						->where('voucher_code', $voucher_details->code)->count();
-					if ($consumed_voucher >= $voucher_details->allowed_usage) {
-						return response()->json(['status' => 0, 'message' => 'Coupon is already expired.']);
-					}
-				} else {
-					return response()->json(['status' => 0, 'message' => 'Please sign in to avail this coupon code.']);
-				}
+			$voucher_items = [];
+			if($voucher_details->coupon_type == 'Per Item') {
+				$voucher_items = DB::table('fumaco_voucher_exclusive_to')->where('voucher_type', 'Per Item')->distinct()->pluck('exclusive_to');
 			}
 
 			$order_no = session()->get('fumOrderNo');
@@ -1323,29 +1308,64 @@ class CheckoutController extends Controller
 					->where('user_type', 'guest')->where('transaction_id', $order_no)->get();
 			}
 
+			// get sitewide sale
+			$sale = DB::table('fumaco_on_sale')
+				->whereDate('start_date', '<=', Carbon::now()->toDateString())
+				->whereDate('end_date', '>=', Carbon::today()->toDateString())
+				->where('status', 1)->where('apply_discount_to', 'All Items')->first();
+
 			$subtotal = 0;
+			$discount = 0;
 			foreach ($cart_items as $item) {
-				$price = ($item->f_onsale) ? $item->f_price : $item->f_original_price;
-				$subtotal += $price * $item->qty;
+				// get item price, discounted price and discount rate
+				$item_price_data = $this->getItemPriceAndDiscount($item->f_onsale, $item->f_cat_id, $sale, $item->f_default_price, $item->f_idcode, $item->f_discount_type, $item->f_discount_rate);
+
+				$price = ( $item_price_data['is_on_sale']) ? $item_price_data['discounted_price'] : $item_price_data['item_price'];
+				$item_total = $price * $item->qty;
+				if (in_array($item->f_idcode, $voucher_items->toArray())) {
+					$discount_per_item = 0;
+					if($voucher_details->minimum_spend > 0) {
+						if($item_total > $voucher_details->minimum_spend) {
+							if($voucher_details->discount_type == 'By Percentage') {
+								$discount_per_item = ($voucher_details->discount_rate/100) * $item_total;
+								if($voucher_details->capped_amount > 0) {
+									if ($discount_per_item > $voucher_details->capped_amount) {
+										$discount_per_item = $voucher_details->capped_amount;
+									}
+								}
+							}
+				
+							if($voucher_details->discount_type == 'Fixed Amount') {
+								$discount_per_item = $voucher_details->discount_rate;
+							}
+						}
+					}
+				
+					$item_total -= $discount_per_item;
+				}
+
+				$subtotal += $item_total;
 			}
 
-			if($voucher_details->minimum_spend > 0) {
-				if($subtotal < $voucher_details->minimum_spend) {
-					return response()->json(['status' => 0, 'message' => 'Required total amount ₱ ' . number_format(str_replace(",","",$voucher_details->minimum_spend), 2)]);
-				}
-			}
-			
-			if($voucher_details->discount_type == 'By Percentage') {
-				$discount = ($voucher_details->discount_rate/100) * $subtotal;
-				if($voucher_details->capped_amount > 0) {
-					if ($discount > $voucher_details->capped_amount) {
-						$discount = $voucher_details->capped_amount;
+			if($voucher_details->coupon_type == 'Promotional') {
+				if($voucher_details->minimum_spend > 0) {
+					if($subtotal < $voucher_details->minimum_spend) {
+						return response()->json(['status' => 0, 'message' => 'Required total amount ₱ ' . number_format(str_replace(",","",$voucher_details->minimum_spend), 2)]);
 					}
 				}
-			}
-
-			if($voucher_details->discount_type == 'Fixed Amount') {
-				$discount = $voucher_details->discount_rate;
+				
+				if($voucher_details->discount_type == 'By Percentage') {
+					$discount = ($voucher_details->discount_rate/100) * $subtotal;
+					if($voucher_details->capped_amount > 0) {
+						if ($discount > $voucher_details->capped_amount) {
+							$discount = $voucher_details->capped_amount;
+						}
+					}
+				}
+	
+				if($voucher_details->discount_type == 'Fixed Amount') {
+					$discount = $voucher_details->discount_rate;
+				}	
 			}
 
 			$free_delivery = [];
