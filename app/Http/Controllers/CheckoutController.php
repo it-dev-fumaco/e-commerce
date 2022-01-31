@@ -473,6 +473,7 @@ class CheckoutController extends Controller
 				'estimated_delivery_date' => $request->estimated_del,
 				'xstore_location' => ($request->s_name == 'Store Pickup') ? $request->storeloc : null,
 				'xpickup_date' => ($request->s_name == 'Store Pickup') ? Carbon::parse($request->picktime)->format('Y-m-d') : null,
+				'xpickup_time' => ($request->s_name == 'Store Pickup') ? $request->timeslot : null,
 				'voucher_code' => strtoupper($voucher_code)
 			];
 
@@ -871,6 +872,7 @@ class CheckoutController extends Controller
 					'billing_tin' => $temp->xtin_no,
 					'store_location' => $temp->xstore_location,
 					'pickup_date' => $temp->xpickup_date,
+					'pickup_time' => $temp->xpickup_time,
 					'voucher_code' => ($is_voucher_valid) ? $temp->voucher_code : null,
 					'discount_amount' => $discount
 				]);
@@ -1222,7 +1224,7 @@ class CheckoutController extends Controller
 		foreach($store_pickup_query as $row){
 			$stores = DB::table('fumaco_store')
 				->join('fumaco_shipping_service_store', 'fumaco_shipping_service_store.store_location_id', 'fumaco_store.store_id')
-				->where('shipping_service_id', $row->shipping_service_id)->select('store_name', 'available_from', 'available_to', 'address')->get();
+				->where('shipping_service_id', $row->shipping_service_id)->select('store_name', 'available_from', 'available_to', 'address', 'allowance_in_hours')->get();
 
 			$max_leadtime = DB::table('fumaco_shipping_product_category')
 				->whereIn('category_id', array_column($order_items->toArray(), 'f_cat_id'))
