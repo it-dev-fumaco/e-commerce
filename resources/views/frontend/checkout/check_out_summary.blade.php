@@ -282,7 +282,7 @@
 									<div class="form-group">
 										<label for="pickup-timeslot">Pickup Time</label>
 										<select class="form-control no-click-outline" style="text-align: center;" id="pickup-timeslot">
-											<option value="">Select a time slot</option>
+											<option value="">PLease select store</option>
 										</select>
 									</div>
 								</div>
@@ -1366,8 +1366,15 @@
 				$('#for-store-pickup').removeClass('d-none');
 				$('#store-selection').val('');
 				$('#store-selection').attr('required', true);
-				$('#pickup-time').attr('required', true);
-				$('#pickup-timeslot').attr('required', true);
+				$('#pickup-time').attr({
+					'required': true,
+					'placeholder': 'Please select store',
+					'disabled': true
+				});
+				$('#pickup-timeslot').attr({
+					'required': true,
+					'disabled': true
+				});
 			}else{
 				$('#for-store-pickup').addClass('d-none');
 				$('#store-selection').removeAttr('required');
@@ -1738,6 +1745,15 @@
 
 		$('#store-selection').on('change', function(e){
 			$('#pickup-timeslot').empty();
+			$('#pickup-time').attr({
+					'required': true,
+					'placeholder': 'Choose a date',
+					'disabled': false
+				});
+				$('#pickup-timeslot').attr({
+					'required': true,
+					'disabled': false
+				});
 
 			var leadtime = $('#store-selection option:selected').data('leadtime');
 
@@ -1778,7 +1794,7 @@
 				var pm_max = Math.max.apply(Math, pm) + ':00 PM';
 				
 				var timeslots = [am_min + ' - ' + am_max, pm_min + ' - ' + pm_max];
-				var opt = '<option value="">Select a time slot</option>';
+				var opt = '<option value="">Select timeslot</option>';
 				$.each(timeslots, function(i, d){
 					opt += '<option value="' + d + '">' + d + '</option>';
 				});
