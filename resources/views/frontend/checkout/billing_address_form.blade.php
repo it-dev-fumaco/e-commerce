@@ -334,14 +334,12 @@
 										<a href="{{ route('google.login') }}" class="btn text-dark login-with-google-btn mt-2">
 											<img src="{{ asset('assets/google.svg') }}" width="23" class="m-1"> Sign in with Google
 										</a>
+										<a href="{{ route('linkedin.login') }}" class="btn text-white btn-linkedin mt-2 mb-2">
+											<i class="fab fa-linkedin mr-3" style="font-size: 1.3rem;"></i> Sign in with LinkedIn
+										</a>
 									</div>
 								</div>
 							</div>
-							{{-- <div class="modal-footer">
-								<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-								<input type="checkbox" name="summary" readonly checked hidden>
-								<button type="submit" class="btn btn-primary">Login</button>
-							</div> --}}
 						</div>
 					</form>
 				</div>
@@ -358,6 +356,17 @@
 @endsection
 @section('style')
 <style>
+	  .btn-linkedin {
+	  background: #0E76A8;
+	  width: 100% !important;
+	}
+	.btn-linkedin:link, .btn-linkedin:visited {
+	  color: #fff;
+	}
+	.btn-linkedin:active, .btn-linkedin:hover {
+	  background: #084461;
+	  color: #fff;
+	}
 
 	.login-with-google-btn {
 		display: block;

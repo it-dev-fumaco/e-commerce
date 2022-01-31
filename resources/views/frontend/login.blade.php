@@ -77,6 +77,9 @@
                             <a href="{{ route('google.login') }}" class="btn text-dark login-with-google-btn mt-2">
                               <img src="{{ asset('assets/google.svg') }}" width="23" class="m-1"> Sign in with Google
                           </a>
+                          <a href="{{ route('linkedin.login') }}" class="btn text-white btn-linkedin mt-2">
+                            <i class="fab fa-linkedin mr-3" style="font-size: 1.3rem;"></i> Sign in with LinkedIn
+                        </a>
                           <label for="InputPassword" class="status-1"></label>
                       </div>
                       </center>
@@ -216,6 +219,16 @@
       border:1px solid red;
   }
 
+  .btn-linkedin {
+	  background: #0E76A8;
+	}
+	.btn-linkedin:link, .btn-linkedin:visited {
+	  color: #fff;
+	}
+	.btn-linkedin:active, .btn-linkedin:hover {
+	  background: #084461;
+	  color: #fff;
+	}
 
   #logreg-forms button[type="submit"]{ margin-top:10px; }
 

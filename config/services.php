@@ -46,7 +46,6 @@ return [
         'client_id' => 'id',
         'client_secret' => 'secret',
         'redirect' => 'https://fumaco.com/auth/linkedin/callback'
-
     ],
 
 ];
