@@ -131,10 +131,10 @@ class PriceListController extends Controller
         }
 
         $list = DB::table('fumaco_product_prices as a')->join('fumaco_items as b', 'a.item_code', 'b.f_idcode')
+            ->where('a.price_list_id', $pricelist_id)
             ->when($request->q, function ($query) use ($request) {
                 return $query->where('a.item_code', 'LIKE', "%".$request->q."%")->orWhere('f_name_name', 'like', "%".$request->q."%");
             })
-            ->where('a.price_list_id', $pricelist_id)
             ->orderBy('a.last_modified_at', 'asc')->paginate(20);
 
         return view('backend.item_pricelist', compact('details', 'list'));
