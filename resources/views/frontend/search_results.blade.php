@@ -16,7 +16,7 @@
 								<h3 class="carousel-header-font text-center results-count-head"><b>{{ $results->total() }} result(s) found</b></h3>
 								<form action="/" method="GET" class="d-none d-md-block">
 									<div class="input-group mb-3">
-										<input type="text" class="form-control search-page-autocomplete" placeholder="Search" name="s" value="{{ request()->s }}">
+										<input type="text" class="form-control search-page-autocomplete" id="search-page-form-input" placeholder="Search" name="s" value="{{ request()->s }}">
 										<div class="input-group-append">
 											<button class="btn btn-outline-secondary btn-light rounded-right" type="submit"><i class="fas fa-search"></i></button>
 										</div>

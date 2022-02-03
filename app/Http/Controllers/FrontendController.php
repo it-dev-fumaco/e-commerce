@@ -462,24 +462,44 @@ class FrontendController extends Controller
     public function getAutoCompleteData(Request $request){
         if($request->ajax() and $request->search_term){
             $search_str = $request->search_term;
-            $item_keywords = DB::table('fumaco_items')
-                ->where('f_name_name', 'LIKE', '%'.$search_str.'%')
-                ->where('f_status', 1)->select('f_name_name', 'f_idcode', 'slug')->limit($request->type == 'desktop' ? 8 : 4)->get();
+            $item_keywords = DB::table('fumaco_items as item')
+                ->join('fumaco_categories as cat', 'item.f_cat_id', 'cat.id')
+                ->where('item.f_name_name', 'LIKE', '%'.$search_str.'%')
+                ->where('item.f_status', 1)->limit($request->type == 'desktop' ? 8 : 4)->get();
 
             if(count($item_keywords) == 0){
-                $item_keywords = $item_keywords->where('keywords', 'LIKE', '%'.$search_str.'%');
+                $item_keywords = $item_keywords->where('item.keywords', 'LIKE', '%'.$search_str.'%');
             }
 
+            // get sitewide sale
+            $sale = DB::table('fumaco_on_sale')
+                ->whereDate('start_date', '<=', Carbon::now()->toDateString())
+                ->whereDate('end_date', '>=', Carbon::today()->toDateString())
+                ->where('status', 1)->where('apply_discount_to', 'All Items')->first();
+
             $search_arr = [];
+            $search_arr['screen'] = $request->type;
+            $search_arr['results_count'] = count($item_keywords);
+
             foreach($item_keywords as $item){
                 $image = DB::table('fumaco_items_image_v1')->where('idcode', $item->f_idcode)->pluck('imgprimayx')->first();
+                $item_price = $item->f_default_price;
+                $item_on_sale = $item->f_onsale;
+
+                // get item price, discounted price and discount rate
+                $item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $item->f_cat_id, $sale, $item_price, $item->f_idcode, $item->f_discount_type, $item->f_discount_rate);
+
                 $search_arr[] = [
                     'type' => 'Products',
                     'id' => $item->f_idcode,
                     'name' => $item->f_name_name,
                     'image' => $image,
                     'slug' => $item->slug,
-                    'screen' => $request->type
+                    'category' => $item->name,
+                    'default_price' => '₱ ' . number_format($item_price_data['item_price'], 2, '.', ','),
+                    'is_discounted' => $item_price_data['is_on_sale'],
+                    'discounted_price' => '₱ ' . number_format($item_price_data['discounted_price'], 2, '.', ','),
+                    'discount_display' => $item_price_data['discount_display'],
                 ];
             }
 
@@ -501,10 +521,9 @@ class FrontendController extends Controller
                     'name' => $blog->blogtitle,
                     'image' => $blog->blogprimaryimage,
                     'slug' => $blog->slug,
-                    'screen' => $request->type
                 ];
             }
-            
+
             return view('frontend.search_autocomplete', compact('search_arr'));
         }
     }

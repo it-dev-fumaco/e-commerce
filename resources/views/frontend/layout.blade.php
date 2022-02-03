@@ -552,9 +552,9 @@
                 <a class="nav-link" href="/contact">CONTACT</a>
               </li>
             </ul>
-            <form class="d-none d-lg-block search-bar" action="/" method="GET">
+            <form class="d-none d-lg-block search-bar" id="desk-search-bar-form" action="/" method="GET">
               <div class="input-group mb-0 searchbar search-bar">
-                <input type="text" placeholder="Search" name="s" value="{{ request()->s }}" class="form-control searchstyle autocomplete-search" aria-label="Text input with dropdown button">
+                <input type="text" placeholder="Search" name="s" value="{{ request()->s }}" id="desk-search-form-input" class="form-control searchstyle autocomplete-search" aria-label="Text input with dropdown button">
                 <button class="btn btn-outline-secondary searchstyle" type="submit"><i class="fas fa-search"></i></button>
                 <div id="desk-search-container" class="container mx-auto"></div>
               </div>
@@ -617,8 +617,8 @@
           {{-- Cart Icon --}}
           <div class="d-md-block d-lg-none mob-srch" style="width: 100% !important">
             <div class="col-md-12">
-              <form action="/" method="GET">
-                <div class="input-group mb-0 searchbar" style="width: 100% !important;">
+              <form action="/" id="mob-search-bar-form" method="GET">
+                <div class="input-group mb-0 searchbar" id="mob-search-bar-form" style="width: 100% !important;">
                   <input type="text" id='mob-autocomplete-search' placeholder="Search" name="s" value="{{ request()->s }}" class="form-control searchstyle" aria-label="Text input with dropdown button">
                     <button class="btn btn-outline-secondary searchstyle" type="submit"><i class="fas fa-search"></i></button>
                     {{-- <div id="mob-search-container" class="border border-danger"></div> --}}
@@ -863,7 +863,6 @@
           'search_term': $(this).val(),
           'type': 'desktop'
         }
-        
         $.ajax({
           type:'GET',
           data: data,
