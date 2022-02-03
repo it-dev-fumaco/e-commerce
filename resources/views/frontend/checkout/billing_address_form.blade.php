@@ -148,7 +148,7 @@
 								<label for="ship_tin" class="formslabelfnt">TIN Number :</label>
 								<input type="text" class="form-control formslabelfnt" id="ship_tin" name="ship_tin"><br class="d-lg-none d-xl-none"/>
 							</div>
-							<br>&nbsp;
+							<br class="d-none d-md-block">&nbsp;
 						</div>
 						<div class="row">
 							<div class="col-md-4">
@@ -356,7 +356,7 @@
 @endsection
 @section('style')
 <style>
-	  .btn-linkedin {
+	.btn-linkedin {
 	  background: #0E76A8;
 	  width: 100% !important;
 	}
@@ -390,8 +390,7 @@
 	   outline: none;
 	   box-shadow: 0 -1px 0 rgba(0, 0, 0, 0.04), 0 2px 4px rgba(0, 0, 0, 0.25), 0 0 0 3px #c8dafc;
 	 }
-	</style>
-<style>
+
 	.products-head {
 		margin-top: 10px !important;
 		padding-left: 40px !important;
@@ -484,6 +483,20 @@
 			font-weight: 500;
 		}
 	}
+
+	/* select2 white block space issue */
+	#ship_province1_1,
+	#ship_City_Municipality1_1,
+	#ship_Barangay1_1,
+	#province1_1,
+	#City_Municipality1_1,
+	#Barangay1_1 {
+		box-sizing: border-box !important;
+		display: inline-block !important;
+		margin: 0 !important;
+		position: relative !important;
+		vertical-align: middle !important;
+	}
 </style>
 @endsection
 
@@ -494,7 +507,6 @@
 	$(document).ready(function() {
 		$('input[type="checkbox"]').prop("checked", true);
 		$('#ship_province1_1').empty();
-
 		var str = "{{ implode(',', $shipping_zones) }}";
 		var res = str.split(",");
 		var provinces = [];
@@ -584,7 +596,6 @@
 			});
 		});
 
-		// $('#ship_province1_1').val(null).trigger('change');
 		$('#ship_City_Municipality1_1').val(null).trigger('change');
 		$('#ship_Barangay1_1').val(null).trigger('change');
 
@@ -740,7 +751,6 @@
 			});
 		});
 
-		// $('#province1_1').val(null).trigger('change');
 		$('#City_Municipality1_1').val(null).trigger('change');
 		$('#Barangay1_1').val(null).trigger('change');
 

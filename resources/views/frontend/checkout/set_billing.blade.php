@@ -167,6 +167,17 @@
 			.select2-selection__arrow {
 				height: 35px !important;
 			}
+
+			/* select2 white block space issue */
+		#province1_1,
+		#City_Municipality1_1,
+		#Barangay1_1 {
+			box-sizing: border-box !important;
+			display: inline-block !important;
+			margin: 0 !important;
+			position: relative !important;
+			vertical-align: middle !important;
+		}
 	</style>
 @endsection
 
