@@ -102,7 +102,7 @@
                                     </div>
                                     <div class="form-group">
                                        <label for="product-price">Product Price</label>
-                                       <input type="text" class="form-control" id="product-price" value="{{ $details->f_original_price }}" readonly>
+                                       <input type="text" class="form-control" id="product-price" value="{{ $details->f_default_price }}" readonly>
                                     </div>
                                  </div>
                                  <div class="col-md-6">

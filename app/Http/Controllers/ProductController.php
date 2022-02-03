@@ -384,7 +384,7 @@ class ProductController extends Controller
                 'f_status' => 1,
                 'f_by' => Auth::user()->username,
                 'f_ip' => $request->ip(),
-                'f_original_price' => $item['item_price'],
+                'f_default_price' => $item['item_price'],
                 'keywords' => $request->keywords,
                 'url_title' => $request->url_title,
                 'meta_description' => $request->meta_description,

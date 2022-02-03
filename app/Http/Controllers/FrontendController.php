@@ -1209,6 +1209,11 @@ class FrontendController extends Controller
             $filtered_attributes = $attrib->where('a.attribute_value', 'NOT LIKE', '%n/a%')->orderBy('idx', 'asc')->pluck('a.attribute_value', 'c.attribute_name');
         }
 
+        $bundle_items = [];
+        if (count($filtered_attributes) <= 0) {
+            $bundle_items = DB::table('fumaco_product_bundle_item')->where('parent_item_code', $product_details->f_idcode)->orderBy('idx', 'asc')->get();
+        }
+
         $variant_attr_arr = [];
         if (count($variant_items) > 1) {
             foreach ($variant_attributes as $attr => $value) {
@@ -1252,7 +1257,8 @@ class FrontendController extends Controller
             'slug' => $product_details->slug,
             'is_new_item' => $is_new_item,
             'overall_rating' => $product_reviews['overall_rating'],
-            'total_reviews' => $product_reviews['total_reviews']
+            'total_reviews' => $product_reviews['total_reviews'],
+            'bundle_items' => $bundle_items
         ];
 
         $compare_arr = [];
