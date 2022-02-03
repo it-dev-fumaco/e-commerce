@@ -1281,7 +1281,7 @@ class CheckoutController extends Controller
 				}
 			}
 
-			if($voucher_details->coupon_type == 'Promotional') {
+			if(in_array($voucher_details->coupon_type, ['Promotional', 'Per Customer Group'])) {
 				if($voucher_details->require_signin) {
 					if (!Auth::check()) {
 						return response()->json(['status' => 0, 'message' => 'Please sign in to avail this coupon code.']);
@@ -1298,7 +1298,7 @@ class CheckoutController extends Controller
 
 			$voucher_items = [];
 			if($voucher_details->coupon_type == 'Per Item') {
-				$voucher_items = DB::table('fumaco_voucher_exclusive_to')->where('voucher_type', 'Per Item')->distinct()->pluck('exclusive_to');
+				$voucher_items = DB::table('fumaco_voucher_exclusive_to')->where('voucher_type', 'Per Item')->distinct()->pluck('exclusive_to')->toArray();
 			}
 
 			$order_no = session()->get('fumOrderNo');
@@ -1324,7 +1324,7 @@ class CheckoutController extends Controller
 
 				$price = ( $item_price_data['is_on_sale']) ? $item_price_data['discounted_price'] : $item_price_data['item_price'];
 				$item_total = $price * $item->qty;
-				if (in_array($item->f_idcode, $voucher_items->toArray())) {
+				if (in_array($item->f_idcode, $voucher_items)) {
 					$discount_per_item = 0;
 					if($voucher_details->minimum_spend > 0) {
 						if($item_total > $voucher_details->minimum_spend) {
@@ -1349,13 +1349,13 @@ class CheckoutController extends Controller
 				$subtotal += $item_total;
 			}
 
-			if($voucher_details->coupon_type == 'Promotional') {
+			if(in_array($voucher_details->coupon_type, ['Promotional', 'Per Customer Group'])) {
 				if($voucher_details->minimum_spend > 0) {
 					if($subtotal < $voucher_details->minimum_spend) {
 						return response()->json(['status' => 0, 'message' => 'Required total amount ₱ ' . number_format(str_replace(",","",$voucher_details->minimum_spend), 2)]);
 					}
 				}
-				
+
 				if($voucher_details->discount_type == 'By Percentage') {
 					$discount = ($voucher_details->discount_rate/100) * $subtotal;
 					if($voucher_details->capped_amount > 0) {
@@ -1368,6 +1368,16 @@ class CheckoutController extends Controller
 				if($voucher_details->discount_type == 'Fixed Amount') {
 					$discount = $voucher_details->discount_rate;
 				}	
+
+				if ($voucher_details->coupon_type == 'Per Customer Group') {
+					$customer_group = DB::table('fumaco_voucher_exclusive_to as a')
+						->join('fumaco_customer_group as b', 'a.exclusive_to', 'b.id')
+						->where('voucher_id', $voucher_details->id)->pluck('customer_group_name')->toArray();
+
+					if (Auth::check() && !in_array(Auth::user()->customer_group, $customer_group)) {
+						$discount = 0;
+					}
+				}
 			}
 
 			$free_delivery = [];
