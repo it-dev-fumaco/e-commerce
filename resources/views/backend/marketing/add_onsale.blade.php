@@ -54,18 +54,6 @@
                                                 <label>Set Sale Duration</label>
                                                 <input type="text" class="form-control set_duration" id="daterange" name="sale_duration" required/>
                                             </div>
-                                            {{-- <div class="col-4">
-                                                @php
-                                                    $discount_for = array('General', 'Member', 'Guest');
-                                                @endphp
-                                                <label>Discount For *</label>
-                                                <select class="form-control" name="discount_for" required>
-                                                    <option disabled selected value="">Discount For</option>
-                                                    @foreach ($discount_for as $for)
-                                                        <option value="{{ $for }}">{{ $for }}</option>
-                                                    @endforeach
-                                                </select>
-                                            </div> --}}
                                         </div>
                                         <br/>
                                         <div class="row">
@@ -73,6 +61,7 @@
                                                 <label>Apply Discount To *</label>
                                                 <select class="form-control" name="apply_discount_to" id="apply_discount_to" required>
                                                     <option disabled selected value="">Apply Discount To</option>
+                                                    <option value="Per Customer Group">Per Customer Group</option>
                                                     <option value="Per Category">Per Category</option>
                                                     <option value="All Items">All Items</option>
                                                 </select>
@@ -137,6 +126,41 @@
                                                                     <th style="width: 25%;" scope="col" class="text-center">Amount/Rate</th>
                                                                     <th style="width: 25%;" scope="col" class="text-center capped_amount">Capped Amount</th>
                                                                     <th class="text-center" style="width: 10%;"><button class="btn btn-outline-primary btn-sm" id="add-categories-btn">Add</button></th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+    
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row" id="customer-groups">
+                                            <div class="col-12">
+                                                <div class="row">
+                                                    <select class="d-none form-control" id="customer-group-select">
+                                                        <option disabled selected value="">Select Customer Group</option>
+                                                        @foreach ($customer_groups as $cg)
+                                                            <option value="{{ $cg->id }}">{{ $cg->customer_group_name }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                    <select class="d-none form-control" name="discount_type_select" id="discount_type_select">
+                                                        <option disabled selected value="">Select Discount Type</option>
+                                                        @foreach ($discount_type as $discount)
+                                                            <option value="{{ $discount }}">{{ $discount }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                    <div class="col-8 mx-auto">
+                                                        <br/>
+                                                        <table class="table table-bordered" id="customer-group-table">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th style="width: 20%;" scope="col" class="text-center">Customer Group</th>
+                                                                    <th style="width: 20%;" scope="col" class="text-center">Discount Type</th>
+                                                                    <th style="width: 25%;" scope="col" class="text-center">Amount/Rate</th>
+                                                                    <th style="width: 25%;" scope="col" class="text-center capped_amount">Capped Amount</th>
+                                                                    <th class="text-center" style="width: 10%;"><button class="btn btn-outline-primary btn-sm" id="add-customer-group-btn">Add</button></th>
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
@@ -221,17 +245,27 @@
         function applyDiscountTo(){
             if($('#apply_discount_to').val() == 'All Items'){
                 $('#for_all_items').slideDown();
+                $('#customer-groups').slideUp();
                 $('#categories').slideUp();
                 $('#discount_type').prop('required', true);
             }else if($('#apply_discount_to').val() == 'Per Category'){
                 $('#for_all_items').slideUp();
+                $('#customer-groups').slideUp();
                 $('#categories').slideDown();
+                $('#discount_type').prop('required', false);
+                $('#discount_rate').prop('required', false);
+                $('#capped_amount').prop('required', false);
+            }else if($('#apply_discount_to').val() == 'Per Customer Group'){
+                $('#for_all_items').slideUp();
+                $('#categories').slideUp();
+                $('#customer-groups').slideDown();
                 $('#discount_type').prop('required', false);
                 $('#discount_rate').prop('required', false);
                 $('#capped_amount').prop('required', false);
             }else{
                 $('#for_all_items').slideUp();
                 $('#categories').slideUp();
+                $('#customer-groups').slideUp();
                 $('#discount_type').prop('required', false);
                 $('#discount_rate').prop('required', false);
                 $('#capped_amount').prop('required', false);
@@ -245,6 +279,32 @@
             }else{
                 $(this).closest('td').next('td').next('td').find('input').prop('readonly', false);
             }
+		});
+
+        $('#add-customer-group-btn').click(function(e){
+			e.preventDefault();
+
+			var clone_select = $('#customer-group-select').html();
+            var clone_discount_type = $('#discount_type_select').html();
+			var row = '<tr>' +
+				'<td class="p-2">' +
+					'<select name="selected_customer_group[]" class="form-control w-100" style="width: 100%;" required>' + clone_select + '</select>' +
+				'</td>' +
+				'<td class="p-2">' +
+					'<select name="selected_discount_type[]" class="form-control w-100 category_discount_type" style="width: 100%;" required>' + clone_discount_type + '</select>' +
+				'</td>' +
+                '<td class="p-2">' +
+					'<input type="number" name="customer_group_discount_rate[]" class="form-control" placeholder="Amount/Rate" required>' +
+				'</td>' +
+                '<td class="p-2">' +
+					'<input type="number" name="customer_group_capped_amount[]" class="form-control cap_amount" value="0" placeholder="Capped Amount">' +
+				'</td>' +
+				'<td class="text-center">' +
+					'<button type="button" class="btn btn-outline-danger btn-sm remove-td-row">Remove</button>' +
+				'</td>' +
+			'</tr>';
+
+			$('#customer-group-table tbody').append(row);
 		});
 
         $('#add-categories-btn').click(function(e){

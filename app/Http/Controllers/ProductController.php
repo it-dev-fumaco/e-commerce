@@ -927,6 +927,23 @@ class ProductController extends Controller
                 }
             }
 
+            $customer_group_arr = [];
+            if($sale->apply_discount_to == 'Per Customer Group'){
+                $sale_customer_group = DB::table('fumaco_on_sale_customer_group as sc')->join('fumaco_customer_group as c', 'sc.customer_group_id', 'c.id')->where('sc.sale_id', $sale->id)
+                    ->select('c.id', 'c.customer_group_name', 'sc.discount_type', 'sc.discount_rate', 'sc.capped_amount', 'sc.sale_id')->get();
+                
+                foreach($sale_customer_group as $cg){
+                    $customer_group_arr[] = [
+                        'sale_id' => $cg->sale_id,
+                        'customer_group_id' => $cg->id,
+                        'customer_group_name' => $cg->customer_group_name,
+                        'discount_type' => $cg->discount_type,
+                        'discount_rate' => $cg->discount_rate,
+                        'capped_amount' => $cg->capped_amount
+                    ];
+                }
+            }
+
             $sale_duration = null;
 
             if($sale->start_date and $sale->end_date){
@@ -944,11 +961,10 @@ class ProductController extends Controller
                 'apply_discount_to' => $sale->apply_discount_to,
                 'categories' => $categories_arr,
                 'sale_duration' => $sale_duration,
-                'status' => $sale->status
+                'status' => $sale->status,
+                'customer_group' => $customer_group_arr
             ];
         }
-
-        // return $sale_arr;
 
         return view('backend.marketing.list_sale', compact('on_sale', 'sale_arr'));
     }
@@ -956,7 +972,9 @@ class ProductController extends Controller
     public function addOnsaleForm(){
         $categories = DB::table('fumaco_categories')->where('publish', 1)->where('external_link', null)->get();
 
-        return view('backend.marketing.add_onsale', compact('categories'));
+        $customer_groups = DB::table('fumaco_customer_group')->get();
+
+        return view('backend.marketing.add_onsale', compact('categories', 'customer_groups'));
     }
 
     public function editOnsaleForm($id){
@@ -964,10 +982,21 @@ class ProductController extends Controller
 
         $categories = DB::table('fumaco_categories')->where('publish', 1)->where('external_link', null)->get();
 
-        $discounted_categories = DB::table('fumaco_on_sale_categories as sc')->join('fumaco_categories as c', 'sc.category_id', 'c.id')->where('sc.sale_id', $id)
-            ->select('c.id', 'c.name', 'sc.discount_type', 'sc.discount_rate', 'sc.capped_amount', 'sc.sale_id')->get();
+        $discounted_categories = [];
+        if ($on_sale && $on_sale->apply_discount_to == 'Per Category') {
+            $discounted_categories = DB::table('fumaco_on_sale_categories as sc')->join('fumaco_categories as c', 'sc.category_id', 'c.id')->where('sc.sale_id', $id)
+                ->select('c.id', 'c.name', 'sc.discount_type', 'sc.discount_rate', 'sc.capped_amount', 'sc.sale_id')->get();
+        }
 
-        return view('backend.marketing.edit_onsale', compact('on_sale', 'categories', 'discounted_categories'));
+        $discounted_customer_group = [];
+        if ($on_sale && $on_sale->apply_discount_to == 'Per Customer Group') {
+            $discounted_customer_group = DB::table('fumaco_on_sale_customer_group as sc')->join('fumaco_customer_group as c', 'sc.customer_group_id', 'c.id')->where('sc.sale_id', $id)
+                ->select('c.id', 'c.customer_group_name', 'sc.discount_type', 'sc.discount_rate', 'sc.capped_amount', 'sc.sale_id')->get();
+        }
+
+        $customer_groups = DB::table('fumaco_customer_group')->get();
+
+        return view('backend.marketing.edit_onsale', compact('on_sale', 'categories', 'discounted_categories', 'customer_groups', 'discounted_customer_group'));
     }
 
     public function setOnSaleStatus(Request $request){
@@ -995,17 +1024,17 @@ class ProductController extends Controller
                     $type = null;
 
                     if($categories){
-                        $cart_check = DB::table('fumaco_cart as cart')->join('fumaco_items as items', 'items.f_idcode', 'cart.item_code')->where('items.f_discount_trigger', 0)->whereIn('cart.category_id', collect($categories)->pluck('category_id'))->where('cart.user_email', $subscriber)->exists();
-                        $wish_check = DB::table('datawishlist as wish')->join('fumaco_items as items', 'items.f_idcode', 'wish.item_code')->where('items.f_discount_trigger', 0)->whereIn('wish.category_id', collect($categories)->pluck('category_id'))->where('userid', $customer->id)->exists();
+                        $cart_check = DB::table('fumaco_cart as cart')->join('fumaco_items as items', 'items.f_idcode', 'cart.item_code')->where('items.f_onsale', 0)->whereIn('cart.category_id', collect($categories)->pluck('category_id'))->where('cart.user_email', $subscriber)->exists();
+                        $wish_check = DB::table('datawishlist as wish')->join('fumaco_items as items', 'items.f_idcode', 'wish.item_code')->where('items.f_onsale', 0)->whereIn('wish.category_id', collect($categories)->pluck('category_id'))->where('userid', $customer->id)->exists();
                     }else{
-                        $cart_check = DB::table('fumaco_cart as cart')->join('fumaco_items as items', 'items.f_idcode', 'cart.item_code')->where('f_discount_trigger', 0)->where('cart.user_email', $subscriber)->exists();
-                        $wish_check = DB::table('datawishlist as wish')->join('fumaco_items as items', 'items.f_idcode', 'wish.item_code')->where('items.f_discount_trigger', 0)->where('wish.userid', $customer->id)->exists();
+                        $cart_check = DB::table('fumaco_cart as cart')->join('fumaco_items as items', 'items.f_idcode', 'cart.item_code')->where('f_onsale', 0)->where('cart.user_email', $subscriber)->exists();
+                        $wish_check = DB::table('datawishlist as wish')->join('fumaco_items as items', 'items.f_idcode', 'wish.item_code')->where('items.f_onsale', 0)->where('wish.userid', $customer->id)->exists();
                     }
 
                     if($cart_check){
                         $type = 'cart';
                         if($sale_check->apply_discount_to == 'Per Category'){
-                            $cart_items = DB::table('fumaco_cart as cart')->join('fumaco_items as items', 'cart.item_code', 'items.f_idcode')->where('cart.user_email', $subscriber)->where('items.f_discount_trigger', 0)->whereIn('items.f_cat_id', collect($categories)->pluck('category_id'))->select('cart.*', 'items.f_original_price', 'items.f_price', 'items.f_name_name')->get();
+                            $cart_items = DB::table('fumaco_cart as cart')->join('fumaco_items as items', 'cart.item_code', 'items.f_idcode')->where('cart.user_email', $subscriber)->where('items.f_onsale', 0)->whereIn('items.f_cat_id', collect($categories)->pluck('category_id'))->select('cart.*', 'items.f_original_price', 'items.f_price', 'items.f_name_name')->get();
     
                             foreach($cart_items as $item){
                                 $price = $item->f_original_price;
@@ -1037,7 +1066,7 @@ class ProductController extends Controller
                                 ];
                             }
                         }else{
-                            $cart_items = DB::table('fumaco_cart as cart')->join('fumaco_items as items', 'cart.item_code', 'items.f_idcode')->where('cart.user_email', $subscriber)->where('items.f_discount_trigger', 0)->select('cart.*', 'items.f_original_price', 'items.f_price')->get();
+                            $cart_items = DB::table('fumaco_cart as cart')->join('fumaco_items as items', 'cart.item_code', 'items.f_idcode')->where('cart.user_email', $subscriber)->where('items.f_onsale', 0)->select('cart.*', 'items.f_original_price', 'items.f_price')->get();
     
                             foreach($cart_items as $item){
                                 $price = $item->f_original_price;
@@ -1070,7 +1099,7 @@ class ProductController extends Controller
                     }else if($wish_check){
                         $type = 'wishlist';
                         if($sale_check->apply_discount_to == 'Per Category'){
-                            $wish_items = DB::table('datawishlist as wish')->join('fumaco_items as items', 'wish.item_code', 'items.f_idcode')->where('wish.userid', $customer->id)->where('items.f_discount_trigger', 0)->select('wish.*', 'items.f_name_name', 'items.f_original_price', 'items.f_price')->get();
+                            $wish_items = DB::table('datawishlist as wish')->join('fumaco_items as items', 'wish.item_code', 'items.f_idcode')->where('wish.userid', $customer->id)->where('items.f_onsale', 0)->select('wish.*', 'items.f_name_name', 'items.f_original_price', 'items.f_price')->get();
 
                             foreach($wish_items as $item){
                                 $price = $item->f_original_price;
@@ -1100,7 +1129,7 @@ class ProductController extends Controller
                                 ];
                             }
                         }else{
-                            $wish_items = DB::table('datawishlist as wish')->join('fumaco_items as items', 'wish.item_code', 'items.f_idcode')->where('wish.userid', $customer->id)->where('items.f_discount_trigger', 0)->select('wish.*', 'items.f_name_name', 'items.f_original_price', 'items.f_price')->get();
+                            $wish_items = DB::table('datawishlist as wish')->join('fumaco_items as items', 'wish.item_code', 'items.f_idcode')->where('wish.userid', $customer->id)->where('items.f_onsale', 0)->select('wish.*', 'items.f_name_name', 'items.f_original_price', 'items.f_price')->get();
 
                             foreach($wish_items as $item){
                                 $price = $item->f_original_price;
@@ -1157,15 +1186,15 @@ class ProductController extends Controller
                                 ];
                             }
 
-                            Mail::send('emails.sale_per_category', ['categories' => $category_arr, 'user_account' => $subscriber, 'customer_name' => $customer->f_name.' '.$customer->f_lname], function($message) use($subscriber){
-                                $message->to(trim($subscriber));
-                                $message->subject("Hurry or you might miss out - FUMACO");
-                            });
+                            // Mail::send('emails.sale_per_category', ['categories' => $category_arr, 'user_account' => $subscriber, 'customer_name' => $customer->f_name.' '.$customer->f_lname], function($message) use($subscriber){
+                            //     $message->to(trim($subscriber));
+                            //     $message->subject("Hurry or you might miss out - FUMACO");
+                            // });
                         }else{
-                            Mail::send('emails.sitewide_sale', ['discount_rate' => $sale_check->discount_rate, 'discount_type' => $sale_check->discount_type, 'user_account' => $subscriber, 'customer_name' => $customer->f_name.' '.$customer->f_lname], function($message) use($subscriber){
-                                $message->to(trim($subscriber));
-                                $message->subject("Hurry or you might miss out - FUMACO");
-                            });
+                            // Mail::send('emails.sitewide_sale', ['discount_rate' => $sale_check->discount_rate, 'discount_type' => $sale_check->discount_type, 'user_account' => $subscriber, 'customer_name' => $customer->f_name.' '.$customer->f_lname], function($message) use($subscriber){
+                            //     $message->to(trim($subscriber));
+                            //     $message->subject("Hurry or you might miss out - FUMACO");
+                            // });
                         }
                     }
                 }
@@ -1507,6 +1536,30 @@ class ProductController extends Controller
                 }
             }
 
+            if($request->apply_discount_to == 'Per Customer Group'){
+                $sale_id = DB::table('fumaco_on_sale')->orderBy('id', 'desc')->first();
+                foreach($request->selected_customer_group as $key => $customer_group){
+                    $customer_group_discount_rate = 0;
+                    $customer_group_capped_amount = 0;
+
+                    if($request->selected_discount_type[$key] == 'By Percentage'){
+                        $customer_group_discount_rate = $request->customer_group_discount_rate[$key];
+                        $customer_group_capped_amount = $request->customer_group_capped_amount[$key];
+                    }else if($request->selected_discount_type[$key] == 'Fixed Amount'){
+                        $customer_group_discount_rate = $request->customer_group_discount_rate[$key];
+                    }
+
+                    DB::table('fumaco_on_sale_customer_group')->insert([
+                        'sale_id' => $sale_id->id,
+                        'customer_group_id' => $customer_group,
+                        'discount_type' => $request->selected_discount_type[$key],
+                        'discount_rate' => $customer_group_discount_rate,
+                        'capped_amount' => $customer_group_capped_amount,
+                        'created_by' => Auth::user()->username
+                    ]);
+                }
+            }
+
             DB::commit();
             return redirect('/admin/marketing/on_sale/list')->with('success', 'On Sale Added.');
         } catch (Exception $e) {
@@ -1636,7 +1689,40 @@ class ProductController extends Controller
                     ]);
                 }
             }
+
+            if($request->apply_discount_to == 'Per Customer Group'){
+                $last_modified_by = null;
+                $checker = DB::table('fumaco_on_sale_customer_group')->where('sale_id', $id)->count();
+
+                if($checker > 0){
+                    $last_modified_by = Auth::user()->username;
+                }
+                DB::table('fumaco_on_sale_customer_group')->where('sale_id', $id)->delete();
+                foreach($request->selected_customer_group as $key => $customer_group){
+                    $customer_group_discount_rate = 0;
+                    $customer_group_capped_amount = 0;
+
+                    if($request->selected_discount_type[$key] == 'By Percentage'){
+                        $customer_group_discount_rate = $request->customer_group_discount_rate[$key];
+                        $customer_group_capped_amount = $request->customer_group_capped_amount[$key];
+                    }else if($request->selected_discount_type[$key] == 'Fixed Amount'){
+                        $customer_group_discount_rate = $request->customer_group_discount_rate[$key];
+                    }
+
+                    DB::table('fumaco_on_sale_customer_group')->insert([
+                        'sale_id' => $id,
+                        'customer_group_id' => $customer_group,
+                        'discount_type' => $request->selected_discount_type[$key],
+                        'discount_rate' => $customer_group_discount_rate,
+                        'capped_amount' => $customer_group_capped_amount,
+                        'created_by' => Auth::user()->username,
+                        'last_modified_by' => $last_modified_by
+                    ]);
+                }
+            }
+
             DB::commit();
+
             return redirect('/admin/marketing/on_sale/list')->with('success', 'On Sale Added.');
         } catch (Exception $e) {
             DB::rollback();

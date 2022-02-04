@@ -20,6 +20,19 @@ trait ProductTrait {
                     ->where('status', 1)->where('cat_sale.category_id', $category)->first();
             }
 
+            if (Auth::check()) {
+                $customer_group_sale = DB::table('fumaco_on_sale')
+                    ->join('fumaco_on_sale_customer_group', 'fumaco_on_sale.id', 'fumaco_on_sale_customer_group.sale_id')
+                    ->join('fumaco_customer_group', 'fumaco_customer_group.id', 'fumaco_on_sale_customer_group.customer_group_id')
+                    ->whereDate('fumaco_on_sale.start_date', '<=', Carbon::now())->whereDate('fumaco_on_sale.end_date', '>=', Carbon::now())
+                    ->where('fumaco_on_sale.status', 1)->where('fumaco_customer_group.customer_group_name', Auth::user()->customer_group)
+                    ->first();
+
+                if ($customer_group_sale) {
+                    $sale = $customer_group_sale;
+                }
+            }
+
             if ($sale) {
                 $item_on_sale = 1;
                 if($sale->discount_type == 'By Percentage'){
@@ -43,7 +56,7 @@ trait ProductTrait {
             $item_price = ($exclusive_pl) ? $exclusive_pl->price : $item_price;
             if ($exclusive_pl) {
                 $item_on_sale = $exclusive_pl->on_sale;
-                $discount_rate = $exclusive_pl->discount_rate;
+                $discount_rate += $exclusive_pl->discount_rate;
 
                 $discount = ($exclusive_pl->discount_type == 'percentage') ? ($exclusive_pl->price * ($exclusive_pl->discount_rate/100)) : $exclusive_pl->discount_rate;
             }
