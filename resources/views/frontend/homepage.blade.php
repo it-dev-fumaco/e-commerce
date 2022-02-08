@@ -25,9 +25,6 @@
         @for ($i = 0; $i < $carousel_count; $i++)
           <li data-bs-target="#myCarousel" data-bs-slide-to="{{$i}}" class="{{ $i == 0 ? "active" : "" }}"></li>
         @endfor
-        {{-- @foreach($carousel_data as $key => $carousel)
-          <li data-bs-target="#myCarousel" data-bs-slide-to="{{$key}}" class="{{ $loop->first ? "active" : "" }}"></li>
-        @endforeach --}}
       </ol>
 
       <div class="carousel-inner">
@@ -38,16 +35,6 @@
                 <source srcset="{{ asset('/assets/site-img/'. $onsale->banner_image) }}" type="image/jpeg" style="object-fit: cover;opacity: 1;">
                 <img src="{{ asset('/assets/site-img/'. $onsale->banner_image) }}" alt="{{ Str::slug(explode(".", $onsale->banner_image)[0], '-') }}" style="object-fit: cover;opacity: 1;">
               </picture>
-
-              {{-- <div class="container">
-                <div class="carousel-caption text-start">
-                  <h3 class="carousel-header-font fumacoFont1">{{ $carousel->fumaco_title }}</h3>
-                  <div class="text ellipsis">
-                    <p class="carousel-caption-font fumacoFont2 carousel-text-concat" style="text-align: left; text-justify: left; letter-spacing: 1px;">{{ $string }}</p>
-                  </div>
-                  <p><a class="btn btn-lg btn-primary btn-fumaco fumacoFont_btn" href="{{ $carousel->fumaco_url }}"role="button">{{ $carousel->fumaco_btn_name }}</a></p>
-                </div>
-              </div> --}}
             </div>
             @empty
           @endforelse
@@ -120,6 +107,7 @@
       </div>
     </div>
   </main>
+  @if(count($best_selling_arr) > 0)
   <div class="container marketing" style=" position: relative !important">
     <section class="py-5 text-center container" style="padding-bottom: 0rem !important;">
       <div class="row py-lg-5">
@@ -209,6 +197,8 @@
         </div>
       </div>
   </div>
+  @endif
+  @if(count($on_sale_arr) > 0)
   <div class="container marketing" style="position: relative">
     <section class="py-5 text-center container" style="padding-bottom: 0rem !important;">
       <div class="row py-lg-5">
@@ -300,6 +290,7 @@
       </div>
     </div>
   </div>
+  @endif
 
 @endsection
 @section('style')

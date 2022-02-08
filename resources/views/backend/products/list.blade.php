@@ -506,7 +506,7 @@
 									 </tr>
 									@empty
 									<tr>
-										<td colspan="10" class="text-center">No products found.</td>
+										<td colspan="12" class="text-center">No products found.</td>
 									</tr>
 									@endforelse
 								</tbody>

@@ -402,7 +402,7 @@ class CartController extends Controller
                         'item_code' => $id,
                         'category_id' => $product_details->f_cat_id,
                         'item_name' => $product_details->f_name_name,
-                        'item_price' => ($product_details->f_price > 0) ? $product_details->f_price : $product_details->f_original_price
+                        'item_price' => $product_details->f_default_price
                     ]
                 );
     

@@ -325,7 +325,7 @@
                               </tr>
                               @empty
                               <tr>
-                                 <td colspan="4" class="text-center text-muted">No products found.</td>
+                                 <td colspan="5" class="text-center text-muted">No products found.</td>
                               </tr>
                               @endforelse
                            </tbody>

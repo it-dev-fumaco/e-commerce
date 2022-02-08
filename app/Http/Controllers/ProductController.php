@@ -58,23 +58,25 @@ class ProductController extends Controller
     }
 
     // function to get item details from ERP via API
-    public function getItemDetails($item_code, $item_type) {
+    public function getItemDetails($item_code, $item_type, $uom_conversion = null) {
         try {
             $erp_api = DB::table('api_setup')->where('type', 'erp_api')->first();
             if (!$erp_api) {
                 return response()->json(['status' => 0, 'message' => 'ERP API not configured.']);
             }
-            
-            $fields = '?fields=["item_name","website_warehouse","web_long_description","item_code","description","name","custom_show_in_website","weight_per_unit","weight_uom","website_warehouse","variant_of","brand","is_stock_item","stock_uom","item_classification","item_group","package_weight","package_length","package_width","package_height","package_dimension_uom","weight_uom","product_name"]';
+
+            $api_header = [
+                'Content-Type' => 'application/json',
+                'Authorization' => 'token '. $erp_api->api_key. ':' . $erp_api->api_secret_key . '',
+                'Accept-Language' => 'en'
+            ];
+
+            $fields = '?fields=["item_name","web_long_description","item_code","description","name","custom_show_in_website","weight_per_unit","weight_uom","website_warehouse","variant_of","brand","is_stock_item","stock_uom","item_classification","item_group","package_weight","package_length","package_width","package_height","package_dimension_uom","weight_uom","product_name"]';
             $filter = '&filters=[["item_code","=","' . $item_code . '"]]';
     
             $params = $fields . '' . $filter;
             
-            $response = Http::withHeaders([
-                'Content-Type' => 'application/json',
-                'Authorization' => 'token '. $erp_api->api_key. ':' . $erp_api->api_secret_key . '',
-                'Accept-Language' => 'en'
-            ])->get($erp_api->base_url . '/api/resource/Item' . $params);
+            $response = Http::withHeaders($api_header)->get($erp_api->base_url . '/api/resource/Item' . $params);
 
             if ($response->failed()) {
                 return response()->json(['status' => 0, 'message' => 'An error occured. Please try again.']);
@@ -90,11 +92,7 @@ class ProductController extends Controller
 
             $params = $fields . '' . $filter;
             
-            $variant_of = Http::withHeaders([
-                'Content-Type' => 'application/json',
-                'Authorization' => 'token '. $erp_api->api_key. ':' . $erp_api->api_secret_key . '',
-                'Accept-Language' => 'en'
-            ])->get($erp_api->base_url . '/api/resource/Item' . $params);
+            $variant_of = Http::withHeaders($api_header)->get($erp_api->base_url . '/api/resource/Item' . $params);
             
             $parent_item_name = (isset($variant_of['data'][0])) ? $variant_of['data'][0]['item_name'] : null;
 
@@ -119,17 +117,63 @@ class ProductController extends Controller
                 'package_weight' => floatval($response['data'][0]['package_weight']),
             ];
 
+            // get item prices
+            $fields = '?fields=["item_code","price_list","price_list_rate","currency","uom"]';
+            if ($uom_conversion) {
+                $filter = '&filters=[["item_code","=","' . $item_code . '"],["price_list","=","Website Price List"],["uom","=","' . $uom_conversion . '"]]';
+            } else {
+                $filter = '&filters=[["item_code","=","' . $item_code . '"],["price_list","=","Website Price List"]]';
+            }
+
+            $params = $fields . '' . $filter;
+            
+            $response = Http::withHeaders($api_header)->get($erp_api->base_url . '/api/resource/Item Price' . $params);
+
+            if ($response->failed()) {
+                return response()->json(['status' => 0, 'message' => 'An error occured. Please try again.']);
+            }
+
+            if (count($response['data']) <= 0 && isset($response['data'])) {
+                $result['item_price'] = [];
+            } else{
+                $result['item_price'] = $response['data'];
+            }
+
+            // get uom conversion factor
+            $fields = '?fields=["parent","uom","conversion_factor"]';
+            $filter = '&filters=[["parent","=","' . $item_code . '"]]&order_by=idx';
+    
+            $params = $fields . '' . $filter;
+            
+            $response = Http::withHeaders($api_header)->get($erp_api->base_url . '/api/resource/UOM Conversion Detail' . $params);
+
+            $item_uoms = [];
+            if ($response->failed()) {
+                return response()->json(['status' => 0, 'message' => 'An error occured. Please try again.']);
+            }
+
+            $uom_conversion_response = $response['data'];
+            if (count($uom_conversion_response) > 0) {
+                foreach($uom_conversion_response as $uom) {
+                    $uom_item_price = collect($result['item_price'])->where('uom', $uom['uom'])->first();
+                    $item_uoms[] = [
+                        'uom' => $uom['uom'],
+                        'conversion' => '1 ' . $uom['uom'] . ' = ' . $uom['conversion_factor'] . ' ' . $result['stock_uom'],
+                        'conversion_factor' => $uom['conversion_factor'],
+                        'price' => ($uom_item_price) ? $uom_item_price['price_list_rate'] : 0
+                    ];
+                }
+            }
+
+            $result['uom_conversion'] = $item_uoms;
+
             // get stock quantity of selected item code
             $fields = '?fields=["item_code","warehouse","actual_qty","website_reserved_qty"]';
             $filter = '&filters=[["item_code","=","' . $item_code . '"],["warehouse","=","' .$result['warehouse'] .'"]]';
     
             $params = $fields . '' . $filter;
             
-            $response = Http::withHeaders([
-                'Content-Type' => 'application/json',
-                'Authorization' => 'token '. $erp_api->api_key. ':' . $erp_api->api_secret_key . '',
-                'Accept-Language' => 'en'
-            ])->get($erp_api->base_url . '/api/resource/Bin' . $params);
+            $response = Http::withHeaders($api_header)->get($erp_api->base_url . '/api/resource/Bin' . $params);
 
             if ($response->failed()) {
                 return response()->json(['status' => 0, 'message' => 'An error occured. Please try again.']);
@@ -141,39 +185,13 @@ class ProductController extends Controller
                 $result['stock_qty'] = $response['data'][0]['website_reserved_qty'];
             }
 
-            // get item price
-            $fields = '?fields=["item_code","price_list","price_list_rate","currency"]';
-            $filter = '&filters=[["item_code","=","' . $item_code . '"],["price_list","=","Website Price List"]]';
-
-            $params = $fields . '' . $filter;
-            
-            $response = Http::withHeaders([
-                'Content-Type' => 'application/json',
-                'Authorization' => 'token '. $erp_api->api_key. ':' . $erp_api->api_secret_key . '',
-                'Accept-Language' => 'en'
-            ])->get($erp_api->base_url . '/api/resource/Item Price' . $params);
-
-            if ($response->failed()) {
-                return response()->json(['status' => 0, 'message' => 'An error occured. Please try again.']);
-            }
-
-            if (count($response['data']) <= 0 && isset($response['data'])) {
-                $result['item_price'] = 0;
-            } else{
-                $result['item_price'] = $response['data'][0]['price_list_rate'];
-            }
-
             // get item attribute / specification
             $fields = '?fields=["parent","attribute","idx","attribute_value"]';
             $filter = '&filters=[["parent","=","' . $item_code . '"]]&limit_page_length=50&order_by=idx';
 
             $params = $fields . '' . $filter;
             
-            $response = Http::withHeaders([
-                'Content-Type' => 'application/json',
-                'Authorization' => 'token '. $erp_api->api_key. ':' . $erp_api->api_secret_key . '',
-                'Accept-Language' => 'en'
-            ])->get($erp_api->base_url . '/api/resource/Item Variant Attribute' . $params);
+            $response = Http::withHeaders($api_header)->get($erp_api->base_url . '/api/resource/Item Variant Attribute' . $params);
 
             if ($response->failed()) {
                 return response()->json(['status' => 0, 'message' => 'An error occured. Please try again.']);
@@ -193,11 +211,7 @@ class ProductController extends Controller
 
                 $params = $fields . '' . $filter;
                 
-                $response = Http::withHeaders([
-                    'Content-Type' => 'application/json',
-                    'Authorization' => 'token '. $erp_api->api_key. ':' . $erp_api->api_secret_key . '',
-                    'Accept-Language' => 'en'
-                ])->get($erp_api->base_url . '/api/resource/Product Bundle Item' . $params);
+                $response = Http::withHeaders($api_header)->get($erp_api->base_url . '/api/resource/Product Bundle Item' . $params);
 
                 if ($response->failed()) {
                     return response()->json(['status' => 0, 'message' => 'An error occured. Please try again.']);
@@ -219,13 +233,20 @@ class ProductController extends Controller
     public function saveItem(Request $request) {
         DB::beginTransaction();
         try {
-            // return $request->all();
-            $existing_item = DB::table('fumaco_items')->where('f_idcode', $request->item_code)->exists();
-            if ($existing_item) {
-                return redirect()->back()->withInput($request->all())->with('error', 'Product code <b>' . $request->item_code . '</b> already exists.');
+            if ($request->uom_conversion != $request->stock_uom) {
+                $existing_item_uom = DB::table('fumaco_items')->where('f_idcode', 'like', $request->item_code . '%')
+                    ->where('f_stock_uom', $request->uom_conversion)->exists();
+                if ($existing_item_uom) {
+                    return redirect()->back()->withInput($request->all())->with('error', 'Product code <b>' . $request->item_code . '</b> with <b>' . $request->uom_conversion . '</b> already exists.');
+                }
+            } else {
+                $existing_item = DB::table('fumaco_items')->where('f_idcode', $request->item_code)->exists();
+                if ($existing_item) {
+                    return redirect()->back()->withInput($request->all())->with('error', 'Product code <b>' . $request->item_code . '</b> already exists.');
+                }
             }
 
-            $item = $this->getItemDetails($request->item_code, $request->item_type);
+            $item = $this->getItemDetails($request->item_code, $request->item_type, $request->uom_conversion);
 
             if($request->item_type == 'product_bundle') {
                 $request->validate(
@@ -267,6 +288,7 @@ class ProductController extends Controller
                         'brand' => 'required',
                         'item_classification' => 'required',
                         'stock_uom' => 'required',
+                        'uom_conversion' => 'required',
                         'weight_per_unit' => 'required',
                         'weight_uom' => 'required',
                         'package_dimension_uom' => 'required',
@@ -288,11 +310,14 @@ class ProductController extends Controller
 
             // validate if item attributes matches the current attributes registered in database based on parent item code
             if($item['attributes'] != 0) {
-                $mismatch_attr_query = DB::table('fumaco_items as a')
-                    ->join('fumaco_items_attributes as b', 'a.f_idcode', 'b.idcode')
+                $child_items = DB::table('fumaco_items')->where('f_parent_code', $item['parent_item_code'])->pluck('f_idcode');
+                $child_items = collect($child_items)->map(function($i){
+                    return explode("-", $i)[0];
+                })->toArray();
+   
+                $mismatch_attr_query = DB::table('fumaco_items_attributes as b', 'a.f_idcode', 'b.idcode')
                     ->join('fumaco_attributes_per_category as c', 'c.id', 'b.attribute_name_id')
-                    ->where('a.f_parent_code', $item['parent_item_code'])
-                    ->whereNotIn('attribute_name', array_column($item['attributes'], 'attribute'))
+                    ->whereIn('b.idcode', $child_items)->whereNotIn('attribute_name', array_column($item['attributes'], 'attribute'))
                     ->distinct()->count();
 
                 if ($mismatch_attr_query > 0) {
@@ -305,6 +330,7 @@ class ProductController extends Controller
             if(!$item_category) {
                 return redirect()->back()->withInput($request->all())->with('error', 'Please select product category.');
             }
+            
             if($request->slug){
                 $rules = array(
                     'slug' => 'required|unique:fumaco_items,slug'
@@ -320,6 +346,20 @@ class ProductController extends Controller
                 $stock_qty = $request->stock_qty;
             } else {
                 $stock_qty = ($request->is_manual) ? $request->stock_qty : $item['stock_qty'];
+            }
+
+            $item_code_suffix = '';
+            if ($request->uom_conversion != $request->stock_uom) {
+                $existing_same_code = DB::table('fumaco_items')
+                    ->where('f_idcode', 'like', $request->item_code . '%')
+                    ->pluck('f_idcode');
+
+                $existing_same_code = collect($existing_same_code)->map(function($i){
+                    return isset(explode("-", $i)[1]) ? explode("-", $i)[1] : null;
+                })->toArray();
+
+                $existing_same_code = array_filter($existing_same_code);
+                $item_code_suffix = '-'.array_values(array_diff(range('A', 'Z'), $existing_same_code))[0];
             }
 
             // Image upload
@@ -354,8 +394,10 @@ class ProductController extends Controller
                 }
             } 
 
+            $stock_uom = ($request->item_type != 'product_bundle') ? $request->uom_conversion : $item['stock_uom'];
+
             $id = DB::table('fumaco_items')->insertGetId([
-                'f_idcode' => $item['item_code'],
+                'f_idcode' => $item['item_code'] . $item_code_suffix,
                 'f_parent_code' => $item['parent_item_code'],
                 'f_parent_item_name' => $item['parent_item_name'],
                 'f_name' => $item['item_code'],
@@ -365,7 +407,7 @@ class ProductController extends Controller
                 'f_category' => $item_category,
                 'f_brand' => $item['brand'],
                 'f_item_classification' => $item['item_classification'],
-                'f_stock_uom' => $item['stock_uom'],
+                'f_stock_uom' => $stock_uom,
                 'f_weight_per_unit' => $item['weight_per_unit'],
                 'f_weight_uom' => (!$item['weight_uom']) ? $request->weight_uom : $item['weight_uom'],
                 'f_package_d_uom' => $item['package_dimension_uom'],
@@ -384,7 +426,7 @@ class ProductController extends Controller
                 'f_status' => 1,
                 'f_by' => Auth::user()->username,
                 'f_ip' => $request->ip(),
-                'f_default_price' => $item['item_price'],
+                'f_default_price' => $request->price,
                 'keywords' => $request->keywords,
                 'url_title' => $request->url_title,
                 'meta_description' => $request->meta_description,
@@ -393,6 +435,17 @@ class ProductController extends Controller
                 'created_by' => Auth::user()->username,
                 'last_modified_by' => Auth::user()->username,
             ]);
+
+            $uom_conversion_factor = collect($item['uom_conversion'])->where('uom', $stock_uom)->first();
+            DB::table('fumaco_item_uom_conversion')->updateOrInsert([
+                    'item_code' => $item['item_code'],
+                    'uom' => $stock_uom,
+                ],
+                [
+                    'conversion_factor' => ($uom_conversion_factor['conversion_factor']) ? $uom_conversion_factor['conversion_factor'] : 1,
+                    'created_by' => Auth::user()->username,
+                ]
+            );
 
             if($item['attributes'] != 0) {
                 // insert item attributes
@@ -419,14 +472,19 @@ class ProductController extends Controller
                         $attribute_value = strtoupper($attribute_value);
                     }
 
-                    $item_attr[] = [
-                        'idx' => $attr['idx'],
-                        'idcode' => $attr['parent'],
-                        'attribute_name_id' => $attr_name_id,
-                        'attribute_value' => $attribute_value,
-                        'created_by' => Auth::user()->username,
-                        'last_modified_by' => Auth::user()->username,
-                    ];
+                    $existing_item_attribute = DB::table('fumaco_items_attributes')
+                        ->where('idcode', $item['item_code'])->where('attribute_name_id', $attr_name_id)->exists();
+
+                    if (!$existing_item_attribute) {
+                        $item_attr[] = [
+                            'idx' => $attr['idx'],
+                            'idcode' => $attr['parent'],
+                            'attribute_name_id' => $attr_name_id,
+                            'attribute_value' => $attribute_value,
+                            'created_by' => Auth::user()->username,
+                            'last_modified_by' => Auth::user()->username,
+                        ];
+                    }
                 }
 
                 DB::table('fumaco_items_attributes')->insert($item_attr);
@@ -644,6 +702,14 @@ class ProductController extends Controller
             if ($has_existing_transaction) {
                 return redirect()->back()->with('error', 'Cannot delete product with transactions.');
             }
+                
+            // do not delete item attributes if item code exists
+            $existing_item = DB::table('fumaco_items')->where('f_idcode', 'like', '%'.$item_code.'%')->exists();
+            if (!$existing_item) {
+                DB::table('fumaco_items_attributes')->where('idcode', $item_code)->delete();
+            }
+
+            DB::table('fumaco_item_uom_conversion')->where('item_code', $item_code)->delete();
 
             DB::table('fumaco_items')->where('f_idcode', $item_code)->delete();
 
@@ -835,9 +901,11 @@ class ProductController extends Controller
 
         $item_image = ($item_image) ? $item_image->imgoriginalx : null;
 
+        $exploded_item_code = explode("-", $details->f_idcode)[0];
+
         $attributes = DB::table('fumaco_items_attributes as a')
             ->join('fumaco_attributes_per_category as b', 'a.attribute_name_id', 'b.id')
-            ->where('a.idcode', $details->f_idcode)->orderBy('a.idx', 'asc')->get();
+            ->where('a.idcode', $exploded_item_code)->orderBy('a.idx', 'asc')->get();
 
         $related_products_query = DB::table('fumaco_items as a')
             ->join('fumaco_items_relation as b', 'a.f_idcode', 'b.related_item_code')
