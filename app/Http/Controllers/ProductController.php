@@ -2090,6 +2090,7 @@ class ProductController extends Controller
 
             $query = DB::table('fumaco_items')->where('f_cat_id', $category_id)
                 ->whereNotIn('f_idcode', $existing_related_products)
+                ->where('f_idcode', 'not like', $request->parent .'%')
                 ->orderBy('f_order_by', 'asc')->get();
 
             $list = [];
@@ -2100,7 +2101,7 @@ class ProductController extends Controller
                     'item_code' => $row->f_idcode,
                     'item_description' => $row->f_name_name,
                     'image' => ($item_image) ? $item_image->imgprimayx : null,
-                    'original_price' => $row->f_original_price,
+                    'original_price' => $row->f_default_price,
                 ];
             }
 
