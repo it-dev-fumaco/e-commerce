@@ -239,6 +239,7 @@ class CartController extends Controller
 
             $cart_arr[] = [
                 'item_code' => $item->f_idcode,
+                'slug' => $item->slug,
                 'item_description' => $item->f_name_name,
                 'price' => $item_price_data['discounted_price'],
                 'amount' => ($item_price_data['discounted_price'] * $item->qty),

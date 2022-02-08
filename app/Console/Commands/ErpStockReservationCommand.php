@@ -69,6 +69,19 @@ class ErpStockReservationCommand extends Command
                 ->select('a.item_code', 'c.id', 'a.item_name', 'b.f_warehouse', 'a.item_qty', 'c.order_number', 'b.f_stock_uom')
                 ->get();
 
+            $simple_product_orders_item_codes = array_column($simple_product_orders->toArray(), 'item_code');
+            $simple_product_orders_item_codes = collect($simple_product_orders_item_codes)->map(function($i){
+                return isset(explode("-", $i)[0]) ? explode("-", $i)[0] : null;
+            })->toArray();
+
+            $item_uom_conversion = DB::table('fumaco_item_uom_conversion')
+                ->whereIn('item_code', $simple_product_orders_item_codes)
+                ->pluck('conversion_factor', DB::raw('CONCAT(item_code, "-", uom)'))
+                ->toArray();
+
+            $item_default_uom = DB::table('fumaco_items')->whereIn('f_idcode', $simple_product_orders_item_codes)
+                ->pluck('f_stock_uom', 'f_idcode')->toArray();
+
             if (count($product_bundle_orders) > 0) {
                 foreach ($product_bundle_orders as $order) {
                     $new_stock_reservations = [
@@ -91,25 +104,34 @@ class ErpStockReservationCommand extends Command
                     }
                 }
             }
-       
+
             if (count($simple_product_orders) > 0) {
                 foreach ($simple_product_orders as $order) {
+                    $default_stock_uom = $item_default_uom[explode("-", $order->item_code)[0]];
+
+                    $conversion_factor = 1;
+                    if (array_key_exists(explode("-", $order->item_code)[0] . '-' . $order->f_stock_uom, $item_uom_conversion)) {
+                        $conversion_factor = $item_uom_conversion[explode("-", $order->item_code)[0] . '-' . $order->f_stock_uom];
+                    }
+                    
                     $new_stock_reservations = [
                         'type' => 'Website Stocks',
-                        'item_code' => $order->item_code,
+                        'item_code' => explode("-", $order->item_code)[0],
                         'description' => $order->item_name,
                         'warehouse' => $order->f_warehouse,
-                        'reserve_qty' => $order->item_qty,
+                        'reserve_qty' => ($order->item_qty * $conversion_factor),
                         'reference_no' => $order->order_number,
-                        'stock_uom' => $order->f_stock_uom
+                        'stock_uom' => $default_stock_uom
                     ];
-                    // reserve stocks in erp
+
+                    //  reserve stocks in erp
                     $insert_response = Http::withHeaders($headers)
                         ->post($erp_api->base_url . '/api/resource/Stock Reservation', ($new_stock_reservations));
 
                     if ($insert_response->successful()) {
                         DB::table('fumaco_order')->where('id', $order->id)->update(['stock_reserve_status' => 1]);
                         info('success (simple product)');
+                        info($new_stock_reservations);
                     }
                 }
             }
