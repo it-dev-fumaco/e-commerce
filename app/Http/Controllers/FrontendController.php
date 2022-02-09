@@ -473,7 +473,9 @@ class FrontendController extends Controller
             $item_keywords = DB::table('fumaco_items as item')
                 ->join('fumaco_categories as cat', 'item.f_cat_id', 'cat.id')
                 ->where('item.f_name_name', 'LIKE', '%'.$search_str.'%')
-                ->where('item.f_status', 1)->limit($request->type == 'desktop' ? 8 : 4)->get();
+                ->where('item.f_status', 1)
+                ->select('item.f_idcode', 'item.f_name_name', 'item.f_discount_type', 'item.f_discount_rate', 'item.f_default_price', 'item.f_onsale', 'item.f_cat_id', 'item.slug as item_slug', 'cat.*')
+                ->limit($request->type == 'desktop' ? 8 : 4)->get();
 
             if(count($item_keywords) == 0){
                 $item_keywords = $item_keywords->where('item.keywords', 'LIKE', '%'.$search_str.'%');
@@ -502,7 +504,7 @@ class FrontendController extends Controller
                     'id' => $item->f_idcode,
                     'name' => $item->f_name_name,
                     'image' => $image,
-                    'slug' => $item->slug,
+                    'slug' => $item->item_slug,
                     'category' => $item->name,
                     'default_price' => '₱ ' . number_format($item_price_data['item_price'], 2, '.', ','),
                     'is_discounted' => $item_price_data['is_on_sale'],
@@ -531,6 +533,7 @@ class FrontendController extends Controller
                     'slug' => $blog->slug,
                 ];
             }
+
 
             return view('frontend.search_autocomplete', compact('search_arr'));
         }
@@ -1215,7 +1218,7 @@ class FrontendController extends Controller
 
         $attrib = DB::table('fumaco_items_attributes as a')
             ->join('fumaco_attributes_per_category as c', 'c.id', 'a.attribute_name_id')
-            ->where('idcode', $product_details->f_idcode);
+            ->where('idcode', explode('-', $product_details->f_idcode)[0]);
         
         $na_check = DB::table('fumaco_categories')->where('id', $product_details->f_cat_id)->first();
      
