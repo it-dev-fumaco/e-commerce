@@ -975,6 +975,14 @@ class FrontendController extends Controller
 
         $filtered_items = array_keys(array_filter($filtered_items->toArray()));
 
+        $include_bulk_item_codes = DB::table('fumaco_items')->where(function($q) use ($filtered_items){
+            foreach($filtered_items as $items){
+                $q->orWhere('f_idcode', 'like', '%'.$items.'%');
+            }
+        })->pluck('f_idcode');
+        
+        $filtered_items = collect($include_bulk_item_codes);
+
         // get item attributes based on item category (sidebar)
         $filters = DB::table('fumaco_items as a')
             ->join('fumaco_items_attributes as b', 'a.f_idcode', 'b.idcode')
