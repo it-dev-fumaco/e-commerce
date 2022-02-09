@@ -330,14 +330,13 @@ class ProductController extends Controller
             if(!$item_category) {
                 return redirect()->back()->withInput($request->all())->with('error', 'Please select product category.');
             }
-            
-            if($request->slug){
-                $rules = array(
-                    'slug' => 'required|unique:fumaco_items,slug'
-                );
 
-                $validation = Validator::make($request->all(), $rules);
-                if($validation->fails()){
+            if($request->slug){
+                $slug = preg_replace('/[^A-Za-z0-9\-]/', '', str_replace(' ', '-', $request->slug)); // Removes special chars.
+                $slug = Str::slug($slug, '-');
+
+                $existing_slug = DB::table('fumaco_items')->where('slug', $slug)->exists();
+                if ($existing_slug) {
                     return redirect()->back()->with('error', 'Slug must be unique');
                 }
             }
@@ -430,7 +429,7 @@ class ProductController extends Controller
                 'keywords' => $request->keywords,
                 'url_title' => $request->url_title,
                 'meta_description' => $request->meta_description,
-                'slug' => strtolower($request->slug),
+                'slug' => $slug,
                 'f_item_type' => $request->item_type,
                 'created_by' => Auth::user()->username,
                 'last_modified_by' => Auth::user()->username,
@@ -547,10 +546,14 @@ class ProductController extends Controller
 
             $item_category = DB::table('fumaco_categories')->where('id', $request->product_category)->first();
             $item_category = ($item_category) ? $item_category->name : null;
+
             if($request->slug){
-                $slug_check = DB::table('fumaco_items')->where('id', '!=', $id)->where('slug', $request->slug)->count();
-                if($slug_check > 0){
-                    return redirect()->back()->with('error', 'Slug must be unique.');
+                $slug = preg_replace('/[^A-Za-z0-9\-]/', '', str_replace(' ', '-', $request->slug)); // Removes special chars.
+                $slug = Str::slug($slug, '-');
+
+                $existing_slug = DB::table('fumaco_items')->where('slug', $slug)->where('id', '!=', $id)->exists();
+                if ($existing_slug) {
+                    return redirect()->back()->with('error', 'Slug must be unique');
                 }
             }
 
@@ -623,7 +626,7 @@ class ProductController extends Controller
                 'keywords' => $request->keywords,
                 'url_title' => $request->url_title,
                 'meta_description' => $request->meta_description,
-                'slug' => strtolower($request->slug),
+                'slug' => $slug,
                 'f_new_item' => $is_new,
                 'f_new_item_start' => $start_date,
                 'f_new_item_end' => $end_date,
