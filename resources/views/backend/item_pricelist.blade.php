@@ -45,7 +45,8 @@
                                 <table class="table table-bordered table-hover">
                                     <thead>
                                         <th class="text-center" style="width: 10%;">ID</th>
-                                        <th class="text-center" style="width: 70%;">Item Descrption</th>
+                                        <th class="text-center" style="width: 50%;">Item Descrption</th>
+                                        <th class="text-center" style="width: 20%;">UoM</th>
                                         <th class="text-center" style="width: 20%;">Price</th>
                                     </thead>
                                     <tbody>
@@ -53,6 +54,7 @@
                                         <tr>
                                             <td class="text-center">{{ $row->id }}</td>
                                             <td class="text-left"><b>{{ $row->item_code }}</b> - {{ $row->f_name_name }}</td>
+                                            <td class="text-center">{{ $row->uom }}</td>
                                             <td class="text-center">₱ {{ number_format(str_replace(",","",$row->price), 2) }}</td>
                                         </tr>
                                         @empty

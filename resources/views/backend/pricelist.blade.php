@@ -65,9 +65,6 @@
                                         </div>
                                     </div>
                                 </form>
-                                <div class="loading-overlay" id="page-preloader">
-                                    <span class="fas fa-spinner fa-3x fa-spin"></span>
-                                </div>
                                 <table class="table table-bordered table-hover">
                                     <thead>
                                         <th class="text-center" style="width: 8%;">ID</th>
@@ -166,23 +163,47 @@
     </form>
 </div>
 
-<style>
-    .loading-overlay {
-        display: none;
-        background: rgba(255, 255, 255, 0.7);
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        top: 0;
-        z-index: 9998;
-        align-items: center;
-        justify-content: center;
-    }
-    .loading-overlay.is-active {
-        display: flex;
-    }
-</style>
+
+<div id="custom-overlay" style="display: none;">
+    <div class="custom-spinner"></div>
+    <br/>
+    Syncing...
+  </div>
+  
+  <style>
+    #custom-overlay {
+    background: #ffffff;
+    color: #666666;
+    position: fixed;
+    height: 100%;
+    width: 100%;
+    z-index: 5000;
+    top: 0;
+    left: 0;
+    float: left;
+    text-align: center;
+    padding-top: 25%;
+    opacity: .80;
+  }
+  
+  .custom-spinner {
+      margin: 0 auto;
+      height: 64px;
+      width: 64px;
+      animation: rotate 0.8s infinite linear;
+      border: 5px solid firebrick;
+      border-right-color: transparent;
+      border-radius: 50%;
+  }
+  @keyframes rotate {
+      0% {
+          transform: rotate(0deg);
+      }
+      100% {
+          transform: rotate(360deg);
+      }
+  }
+  </style>
 @endsection
 @section('script')
 <script>
@@ -213,16 +234,16 @@
 
         $('#sync-prices-btn').click(function(e){
             e.preventDefault();
-            $('#page-preloader').addClass('is-active');
+            $('#custom-overlay').fadeIn();
             $.ajax({
                 url: '/admin/sync_price_list',
                 type:"GET",
                 success: function(response) {
-                    $('#page-preloader').removeClass('is-active');
+                    $('#custom-overlay').fadeOut();
                     $('#alert-box').removeClass('d-none').addClass('alert-success').text(response.message);
                 },
                 error : function(data) {
-                    $('#page-preloader').removeClass('is-active');
+                    $('#custom-overlay').fadeOut();
                     $('#alert-box').removeClass('d-none').addClass('alert-danger').text('An error occured. Please try again.');
                 }
             });
