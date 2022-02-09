@@ -114,6 +114,14 @@ class FrontendController extends Controller
 
                         $filtered_item_codes = collect($filtered_items)->pluck('f_idcode');
 
+                        $include_bulk_item_codes = DB::table('fumaco_items')->where(function($q) use ($filtered_item_codes){
+                            foreach($filtered_item_codes as $items){
+                                $q->orWhere('f_idcode', 'like', '%'.$items.'%');
+                            }
+                        })->pluck('f_idcode');
+
+                        $filtered_item_codes = collect($include_bulk_item_codes);
+
                         $product_list = $product_list->whereIn('f_idcode', $filtered_item_codes);
                     }
                 }
