@@ -139,6 +139,10 @@ class ProductController extends Controller
                 $result['item_price'] = $response['data'];
             }
 
+            if($item_type == 'product_bundle') {
+                $result['item_price'] = $response['data'][0]['price_list_rate'];
+            }
+
             // get uom conversion factor
             $fields = '?fields=["parent","uom","conversion_factor"]';
             $filter = '&filters=[["parent","=","' . $item_code . '"]]&order_by=idx';
