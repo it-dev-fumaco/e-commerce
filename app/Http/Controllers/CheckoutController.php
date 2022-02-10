@@ -1298,7 +1298,8 @@ class CheckoutController extends Controller
 
 			$voucher_items = [];
 			if($voucher_details->coupon_type == 'Per Item') {
-				$voucher_items = DB::table('fumaco_voucher_exclusive_to')->where('voucher_type', 'Per Item')->distinct()->pluck('exclusive_to')->toArray();
+				$voucher_items = DB::table('fumaco_voucher_exclusive_to')->where('voucher_id', $voucher_details->id)
+					->where('voucher_type', 'Per Item')->distinct()->pluck('exclusive_to')->toArray();
 			}
 
 			$order_no = session()->get('fumOrderNo');
@@ -1318,6 +1319,8 @@ class CheckoutController extends Controller
 
 			$subtotal = 0;
 			$discount = 0;
+
+			$item_applied_discount = [];
 			foreach ($cart_items as $item) {
 				// get item price, discounted price and discount rate
 				$item_price_data = $this->getItemPriceAndDiscount($item->f_onsale, $item->f_cat_id, $sale, $item->f_default_price, $item->f_idcode, $item->f_discount_type, $item->f_discount_rate);
@@ -1328,6 +1331,7 @@ class CheckoutController extends Controller
 					$discount_per_item = 0;
 					if($voucher_details->minimum_spend > 0) {
 						if($item_total > $voucher_details->minimum_spend) {
+							array_push($item_applied_discount, $item->f_idcode);
 							if($voucher_details->discount_type == 'By Percentage') {
 								$discount_per_item = ($voucher_details->discount_rate/100) * $item_total;
 								if($voucher_details->capped_amount > 0) {
@@ -1342,6 +1346,8 @@ class CheckoutController extends Controller
 							}
 						}
 					}
+
+					$discount += $discount_per_item;
 				
 					$item_total -= $discount_per_item;
 				}
@@ -1415,6 +1421,7 @@ class CheckoutController extends Controller
 				'discount' => $discount,
 				'total' => $discounted_subtotal,
 				'shipping' => $free_delivery,
+				'item_applied_discount' => $item_applied_discount
 			]);
 		}
 	}

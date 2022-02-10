@@ -216,6 +216,7 @@
 										</td>
 										<td>
 											<span class="d-block">{{ $cart['item_description'] }}</span>
+											<span id="voucherApp{{ $cart['item_code'] }}" class="text-white d-none voucher-item-code" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833;">Discount Applied</span>
 										</td>
 										<td style="text-align: center;">{{ $cart['quantity'] }}</td>
 										<td class="col-md-2" style="text-align: right;">
@@ -1177,6 +1178,7 @@
 					success: function (response) {
 						if (response.status == 0) {
 							$('#coupon-alert').removeClass('d-none').text(response.message);
+							$('.voucher-item-code').addClass('d-none');
 							$('#voucher-code').addClass('d-none').text('');
 							$('#discount-amount').text('0.00');
 							$('#voucher-free').empty();
@@ -1189,6 +1191,13 @@
 							$('#coupon-code').removeClass('is-invalid');
 							$('#coupon-alert').addClass('d-none');
 
+							if(response.item_applied_discount.length > 0) {
+								$.each(response.item_applied_discount, function(d, a){
+									$('#voucherApp' + a).removeClass('d-none');
+								});
+							} else {
+								$('.voucher-item-code').addClass('d-none');
+							}
 							var existing_fd = $("input:radio[name='shipping_fee'][data-sname='Free Delivery']").length;
 							if (existing_fd <= 0) {
 								if(response.shipping && response.shipping.length != 0) {
