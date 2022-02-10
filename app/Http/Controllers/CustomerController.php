@@ -39,11 +39,14 @@ class CustomerController extends Controller
         DB::beginTransaction();
 		try{
             $price_detail = DB::table('fumaco_price_list')->where('id', $request->pricelist)->first();
+            $customer_groups = DB::table('fumaco_customer_group')->pluck('customer_group_name', 'id');
+            $customer_group = (array_key_exists($request->customer_group, $customer_groups->toArray())) ? $customer_groups[$request->customer_group] : null;
+
             DB::table('fumaco_users')->where('id', $id)->update([
                 'customer_group' => $request->customer_group,
-                'business_name' => ($request->customer_group == 'Business') ? $request->business_name : null,
-                'pricelist_id' => ($request->customer_group == 'Business') ? ($request->pricelist ? $request->pricelist : null) : null,
-                'pricelist' => ($request->customer_group == 'Business') ? (($price_detail) ? $price_detail->price_list_name : null) : null
+                'business_name' => ($customer_group == 'Business') ? $request->business_name : null,
+                'pricelist_id' => ($customer_group == 'Business') ? ($request->pricelist ? $request->pricelist : null) : null,
+                'pricelist' => ($customer_group == 'Business') ? (($price_detail) ? $price_detail->price_list_name : null) : null
             ]);
 
             DB::commit();
