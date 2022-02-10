@@ -18,7 +18,9 @@ class CustomerController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
-        return view('backend.customer.customer', compact('users'));
+        $customer_groups = DB::table('fumaco_customer_group')->pluck('customer_group_name', 'id');
+
+        return view('backend.customer.customer', compact('users', 'customer_groups'));
     }
 
     public function viewCustomerProfile($id){

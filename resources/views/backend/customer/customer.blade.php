@@ -56,7 +56,8 @@
                                                 <td class="text-center">{{ $user->id }}</td>
                                                 <td class="text-left">{{ $user->f_name . ' ' . $user->f_lname }}</td>
                                                 <td class="text-center">{{ $user->username }}</td>
-                                                <td class="text-center">{{ $user->customer_group }}</td>
+                                                <td class="text-center">
+                                                    {{ (array_key_exists($user->customer_group, $customer_groups->toArray())) ? $customer_groups[$user->customer_group] : null; }}</td>
                                                 <td class="text-center">{{ \Carbon\Carbon::parse($user->created_at)->format('M d, Y - h:i A') }}</td>
                                                 <td class="text-center">
                                                     <a href="/admin/customer/profile/{{ $user->id }}" class="btn btn-sm btn-primary">View Profile</a>
