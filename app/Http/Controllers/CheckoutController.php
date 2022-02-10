@@ -1372,7 +1372,7 @@ class CheckoutController extends Controller
 				if ($voucher_details->coupon_type == 'Per Customer Group') {
 					$customer_group = DB::table('fumaco_voucher_exclusive_to as a')
 						->join('fumaco_customer_group as b', 'a.exclusive_to', 'b.id')
-						->where('voucher_id', $voucher_details->id)->pluck('customer_group_name')->toArray();
+						->where('voucher_id', $voucher_details->id)->pluck('b.id')->toArray();
 
 					if (Auth::check() && !in_array(Auth::user()->customer_group, $customer_group)) {
 						$discount = 0;
