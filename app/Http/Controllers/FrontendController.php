@@ -542,6 +542,26 @@ class FrontendController extends Controller
     public function newsletterSubscription(Request $request){
         DB::beginTransaction();
         try{
+            $request->validate([
+                'email' => ['required', 'string', 'email', 'max:255'],
+                'g-recaptcha-response' => ['required',function ($attribute, $value, $fail) {
+                    $secret_key = config('recaptcha.api_secret_key');
+                    $response = $value;
+                    $userIP = $_SERVER['REMOTE_ADDR'];
+                    $url = "https://www.google.com/recaptcha/api/siteverify?secret=$secret_key&response=$response&remoteip=$userIP";
+                    $response = \file_get_contents($url);
+                    $response = json_decode($response);
+                    if (!$response->success) {
+                        $fail('ReCaptcha failed.');
+                    }
+                }],
+            ],
+            [
+                'g-recaptcha-response' => [
+                    'required' => 'Please check ReCaptcha.'
+                ]
+            ]);
+
             $checker = DB::table('fumaco_subscribe')->where('email', $request->email)->count();
 
             if($checker > 0){

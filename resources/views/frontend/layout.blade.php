@@ -132,6 +132,9 @@
       * {
         -webkit-overflow-scrolling: touch !important;
       }
+      .grecaptcha-badge { 
+        visibility: hidden;
+      }
       html,body{
         width: 100% !important;
         height: 100% !important;
@@ -671,6 +674,7 @@
               <form action="/subscribe" method="POST">
                 @csrf
                 <div class="input-group mb-3">
+                  <input type="hidden" name="g-recaptcha-response" id="recaptcha_v3-subscribe">
                   <input type="email" class="form-control" name="email" placeholder="Email Address" aria-label="Recipient's username" aria-describedby="basic-addon2" required>
                   <button class="input-group-text" id="basic-addon2">Subscribe</button>
                 </div>
@@ -709,6 +713,17 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   @if($activePage == 'contact')
   <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+  @else
+  <script src="https://www.google.com/recaptcha/api.js?render={{ config('recaptcha.api_site_key') }}"></script>
+  <script> 
+    grecaptcha.ready(function() {
+      grecaptcha.execute("{{ config('recaptcha.api_site_key') }}", {action: 'homepage'}).then(function(token) {
+        if(token) {
+          $("#recaptcha_v3-subscribe").val(token); 
+        } 
+      });
+    });
+  </script> 
   @endif
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
   <script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.4/Chart.bundle.min.js'></script>
