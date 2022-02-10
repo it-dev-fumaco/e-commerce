@@ -62,7 +62,7 @@
 						<td class="text-center" style="padding: 3px;">
 							<img src="{{ asset($src) }}" class="img-responsive" alt="" width="50" height="50">
 						</td>
-						<td style="padding: 8px;">{{ $item['item_name'] }}</td>
+						<td style="padding: 8px;">{!! $item['item_name'] !!}</td>
 						<td class="text-center" style="padding: 8px; white-space: nowrap">{{ $item['qty'] }}</td>
 						@if ($sum_discount > 0)
 						<td class="text-center" style="padding: 8px;">{{ $item['discount'] . '%' }}</td>

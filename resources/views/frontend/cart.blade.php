@@ -117,7 +117,7 @@
                         @empty
                         <tr>
                             <td style="border-bottom: 0; padding: 10px 0;" colspan="7">
-                                <div class="alert alert-danger alert-dismissible fade show" role="alert">Your cart is empty!</div>
+                                <div class="alert alert-danger alert-dismissible fade show font-responsive" role="alert">Your cart is empty!</div>
                             </td>
                         </tr>
                         @endforelse
@@ -517,6 +517,9 @@
             font-size: 8pt !important;
             font-weight: 500;
         }
+        .font-responsive{
+            font-size: 10pt !important;
+        }
     }
 
     @media (max-width: 767.98px) {
@@ -529,6 +532,9 @@
         .breadcrumb{
             font-size: 8pt !important;
             font-weight: 500;
+        }
+        .font-responsive{
+            font-size: 10pt !important;
         }
     }
 </style>
