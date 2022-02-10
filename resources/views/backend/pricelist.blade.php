@@ -240,11 +240,11 @@
                 type:"GET",
                 success: function(response) {
                     $('#custom-overlay').fadeOut();
-                    $('#alert-box').removeClass('d-none').addClass('alert-success').text(response.message);
+                    $('#alert-box').removeClass('d-none alert-danger').addClass('alert-success').text(response.message);
                 },
                 error : function(data) {
                     $('#custom-overlay').fadeOut();
-                    $('#alert-box').removeClass('d-none').addClass('alert-danger').text('An error occured. Please try again.');
+                    $('#alert-box').removeClass('d-none alert-success').addClass('alert-danger').text('An error occured. Please try again.');
                 }
             });
         });
