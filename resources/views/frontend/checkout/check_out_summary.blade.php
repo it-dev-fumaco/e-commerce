@@ -215,12 +215,11 @@
 											</center>
 										</td>
 										<td>
-											<span class="d-block">{{ $cart['item_description'] }}</span>
-											<span id="voucherApp{{ $cart['item_code'] }}" class="text-white d-none voucher-item-code" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833;">Discount Applied</span>
+											<span class="d-block">{!! $cart['item_description'] !!}</span>
 										</td>
 										<td style="text-align: center;">{{ $cart['quantity'] }}</td>
 										<td class="col-md-2" style="text-align: right;">
-											<span class="d-block" id="{{ $cart['item_code'] }}">₱ {{ number_format($cart['subtotal'], 2, '.', ',') }}</span>
+											<span class="d-block" id="{{ $cart['item_code'] }}" style="white-space: nowrap !important">₱ {{ number_format($cart['subtotal'], 2, '.', ',') }}</span>
 											<span class="amount d-none">{{ $cart['subtotal'] }}</span>
 										</td>
 									</tr>
