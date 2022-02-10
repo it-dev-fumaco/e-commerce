@@ -48,7 +48,8 @@
 										<b>Total no. of visits:</b> <span class="badge badge-primary float-right">{{ $customer->no_of_visits }}</span>
 									</li>
 									<li class="list-group-item">
-										<b>Customer Group:</b> <a class="float-right">{{ $customer->customer_group }}</a>
+										<b>Customer Group:</b> <a class="float-right">
+											{{ (array_key_exists($customer->customer_group, $customer_groups->toArray())) ? $customer_groups[$customer->customer_group] : null }}</a>
 									</li>
 									<li class="list-group-item">
 										<b>Business Name:</b> <a class="float-right">{{ $customer->business_name }}</a>
@@ -166,13 +167,10 @@
 					<div class="modal-body">
 						<div class="form-group">
 							<label for="">Customer Group:</label>
-							@php
-								$customer_group = array('Personal', 'Business');
-							@endphp
 							<select class="form-control" name="customer_group" required id="customer-group">
 								<option disabled value="">Select Customer Group</option>
-								@foreach ($customer_group as $group)
-								<option value="{{ $group }}" {{ $group == $customer->customer_group ? 'selected' : '' }}>{{ $group }}</option>
+								@foreach ($customer_groups as $id => $group)
+								<option value="{{ $id }}" {{ $id == $customer->customer_group ? 'selected' : '' }} data-val="{{ $group }}">{{ $group }}</option>
 								@endforeach
 							</select>
 						</div>
@@ -318,7 +316,7 @@
 			});
 
 			function customerGroup(){
-				if($('#customer-group').val() == 'Business'){
+				if($('#customer-group option:selected').data('val') == 'Business'){
 					$('#pricelist').parent().slideDown();
 					$('input[name="business_name"]').parent().slideDown();
 					$('#pricelist').prop('required', true);

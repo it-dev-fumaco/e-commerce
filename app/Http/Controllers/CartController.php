@@ -278,7 +278,7 @@ class CartController extends Controller
                     'item_code' => $item_details->f_idcode,
                     'item_name' => $item_details->f_name_name,
                     'default_price' => '₱ ' . number_format($item_price_data['item_price'], 2, '.', ','),
-                    'is_discounted' => $item_price_data['is_on_sale'],
+                    'is_discounted' => ($item_price_data['discount_rate'] > 0) ? $item_price_data['is_on_sale'] : 0,
                     'on_stock' => ($item_details->f_qty - $item_details->f_reserved_qty) > 0 ? 1 : 0,
                     'discounted_price' => '₱ ' . number_format($item_price_data['discounted_price'], 2, '.', ','),
                     'discount_display' => $item_price_data['discount_display'],

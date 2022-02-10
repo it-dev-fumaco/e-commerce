@@ -28,9 +28,11 @@ class CustomerController extends Controller
 
         $pricelist = DB::table('fumaco_price_list')->get();
 
+        $customer_groups = DB::table('fumaco_customer_group')->pluck('customer_group_name', 'id');
+
         $cart_items = DB::table('fumaco_cart')->where('user_email', $customer->username)->paginate(10);
 
-        return view('backend.customer.customer_profile', compact('customer', 'cart_items', 'total_sales', 'pricelist'));
+        return view('backend.customer.customer_profile', compact('customer', 'cart_items', 'total_sales', 'pricelist', 'customer_groups'));
     }
 
     public function changeCustomerGroup($id, Request $request){

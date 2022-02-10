@@ -397,7 +397,7 @@ class CheckoutController extends Controller
 					'price' => $item_price_data['discounted_price'],
 					'subtotal' => ($item_price_data['discounted_price'] * $item->qty),
 					'original_price' => $item_price_data['item_price'],
-					'discount' => $item_price_data['is_on_sale'],
+					'discount' => ($item_price_data['discount_rate'] > 0) ? $item_price_data['is_on_sale'] : 0,
 					'quantity' => $item->qty,
 					'stock_qty' => $item->f_qty,
 					'item_image' => ($image) ? $image->imgprimayx : null

@@ -25,7 +25,7 @@ trait ProductTrait {
                     ->join('fumaco_on_sale_customer_group', 'fumaco_on_sale.id', 'fumaco_on_sale_customer_group.sale_id')
                     ->join('fumaco_customer_group', 'fumaco_customer_group.id', 'fumaco_on_sale_customer_group.customer_group_id')
                     ->whereDate('fumaco_on_sale.start_date', '<=', Carbon::now())->whereDate('fumaco_on_sale.end_date', '>=', Carbon::now())
-                    ->where('fumaco_on_sale.status', 1)->where('fumaco_customer_group.customer_group_name', Auth::user()->customer_group)
+                    ->where('fumaco_on_sale.status', 1)->where('fumaco_customer_group.id', Auth::user()->customer_group)
                     ->first();
 
                 if ($customer_group_sale) {
