@@ -187,7 +187,6 @@ Route::prefix('admin')->group(function () {
         Route::get('/product/{id}/edit', 'ProductController@viewProduct');
         Route::get('/product/{id}/edit_bundle', 'ProductController@viewProduct');
         Route::get('/product/images/{id}', 'ProductController@uploadImagesForm');
-        Route::get('/product/{item_code}/{item_type}', 'ProductController@getItemDetails');
         Route::post('/add_product_images', 'ProductController@uploadImages');
         Route::get('/delete_product_image/{id}/{social?}', 'ProductController@deleteProductImage');
 
@@ -211,6 +210,7 @@ Route::prefix('admin')->group(function () {
         Route::get('/is_new_item/{id}', 'ProductController@isNewItem');
         Route::post('/product/{item_code}/enable_on_sale', 'ProductController@setProductOnSale');
         Route::post('/product/{item_code}/disable_on_sale', 'ProductController@disableProductOnSale');
+        Route::get('/product/{item_code}/{item_type}', 'ProductController@getItemDetails');
         Route::get('/products/compare/list', 'ProductController@viewProductsToCompare');
         Route::get('/products/compare/add', 'ProductController@addProductsToCompare');
         Route::get('/products/compare/{compare_id}/edit', 'ProductController@editProductsToCompare');

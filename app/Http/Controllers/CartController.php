@@ -296,11 +296,9 @@ class CartController extends Controller
         $bill_address = "";
 		$ship_address = "";
 		if(Auth::check()){
-			$user_id = DB::table('fumaco_users')->where('username', Auth::user()->username)->first();
+			$bill_address = DB::table('fumaco_user_add')->where('xdefault', 1)->where('user_idx', Auth::user()->id)->where('address_class', 'Billing')->count();
 
-			$bill_address = DB::table('fumaco_user_add')->where('xdefault', 1)->where('user_idx', $user_id->id)->where('address_class', 'Billing')->count();
-
-			$ship_address = DB::table('fumaco_user_add')->where('xdefault', 1)->where('user_idx', $user_id->id)->where('address_class', 'Delivery')->count();
+			$ship_address = DB::table('fumaco_user_add')->where('xdefault', 1)->where('user_idx', Auth::user()->id)->where('address_class', 'Delivery')->count();
 		}
 
         if ($request->ajax()) {

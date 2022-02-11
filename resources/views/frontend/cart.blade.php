@@ -543,7 +543,14 @@
 @section('script')
 <script src="{{ asset('/slick/slick.js') }}" type="text/javascript" charset="utf-8"></script>
 <script>
+        window.onpageshow = function(event) {
+            if (event.persisted) {
+                window.location.reload();
+            }
+        };
     $(document).ready(function() {
+     
+
         updateTotal();
         $(document).on('click', '.quantity-left-minus', function(e){
             e.preventDefault();

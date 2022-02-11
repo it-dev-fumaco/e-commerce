@@ -232,7 +232,7 @@
 							<div class="d-flex justify-content-between align-items-center">
 								Total Amount <small class="text-muted stylecap he1x">₱ {{ number_format(collect($cart_arr)->sum('subtotal'), 2, '.', ',') }}</small>
 							</div>
-							<div class="d-flex justify-content-between align-items-center">
+							<div class="d-flex justify-content-between align-items-center d-none" id="discount-div">
 								<p class="m-0">Discount <span id="voucher-code" class="text-white d-none" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833;">Voucher Applied</span></p>
 								 <small class="text-danger stylecap he1x">- ₱ <span id="discount-amount">0.00</span></small>
 							</div>
@@ -248,10 +248,23 @@
 								<label class="form-check-label" for="shipradio">&nbsp;</label>
 							</div>
 							<div id="voucher-free" class="d-none"></div>
+							@php
+								$sd_exists = false;
+								if (in_array('Standard Delivery', array_column($shipping_rates, 'shipping_service_name'))) {
+									$sd_exists = true;
+								}
+							@endphp
 							@forelse ($shipping_rates as $l => $srate)
+							@php
+								if ($sd_exists) {
+									$defaul_selected = ($srate['shipping_service_name'] == 'Standard Delivery') ? 'checked' : '';
+								} else {
+									$defaul_selected = ($loop->first) ? 'checked' : '';
+								}
+							@endphp
 							<div class="d-flex justify-content-between align-items-center">
 								<div class="form-check">
-									<input class="form-check-input" type="radio" name="shipping_fee" id="{{ 'sr' . $l }}" value="{{ $srate['shipping_cost'] }}" data-sname="{{ $srate['shipping_service_name'] }}" data-est="{{ $srate['expected_delivery_date'] }}" data-pickup="{{ $srate['pickup'] }}" required {{ $loop->first ? 'checked' : '' }} data-lead="{{ $srate['max_lead_time'] }}">
+									<input class="form-check-input" type="radio" name="shipping_fee" id="{{ 'sr' . $l }}" value="{{ $srate['shipping_cost'] }}" data-sname="{{ $srate['shipping_service_name'] }}" data-est="{{ $srate['expected_delivery_date'] }}" data-pickup="{{ $srate['pickup'] }}" required {{ $defaul_selected }} data-lead="{{ $srate['max_lead_time'] }}">
 									<label class="form-check-label" for="{{ 'sr' . $l }}">{{ $srate['shipping_service_name'] }} <br class="d-xl-none"/>
 										@if (count($srate['stores']) <= 0)<small class="fst-italic">({{ $srate['min_lead_time'] . " - ". $srate['max_lead_time'] . " Days" }})</small>@endif</label>
 								</div>
@@ -261,7 +274,7 @@
 							<div class="row d-none" id="for-store-pickup">
 								<div class="col-md-6 offset-md-3">
 									<div class="form-group">
-										<label for="store-selection">Select Store</label>
+										<label for="store-selection">Select Store *</label>
 										<select id="store-selection" class="form-control no-click-outline formslabelfnt" style="text-align: center;">
 											<option value="">Select Store</option>
 											@foreach ($srate['stores'] as $store)
@@ -282,7 +295,7 @@
 									<div class="form-group">
 										<label for="pickup-timeslot">Pickup Time</label>
 										<select class="form-control no-click-outline" style="text-align: center;" id="pickup-timeslot">
-											<option value="">PLease select store</option>
+											<option value="">Please select store</option>
 										</select>
 									</div>
 								</div>
@@ -1179,6 +1192,7 @@
 							$('#coupon-alert').removeClass('d-none').text(response.message);
 							$('.voucher-item-code').addClass('d-none');
 							$('#voucher-code').addClass('d-none').text('');
+							$('#discount-div').addClass('d-none');
 							$('#discount-amount').text('0.00');
 							$('#voucher-free').empty();
 
@@ -1186,6 +1200,7 @@
 						} else {
 							var discount = (isNaN(response.discount)) ? 0 : response.discount;
 							$('#voucher-code').removeClass('d-none').text(response.voucher_code);
+							$('#discount-div').removeClass('d-none');
 							$('#discount-amount').text(discount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,"));
 							$('#coupon-code').removeClass('is-invalid');
 							$('#coupon-alert').addClass('d-none');

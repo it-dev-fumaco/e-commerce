@@ -20,7 +20,6 @@
     <link rel="icon" type="image/png" href="{{ asset('/assets/icon/favicon-16x16.png') }}" sizes="16x16">
     <link rel="icon" type="image/png" href="{{ asset('/assets/icon/favicon-32x32.png') }}" sizes="32x32">
     @if (!in_array($activePage, ['homepage']))
-        
     <!-- Select2 -->
   <link rel="stylesheet" href="{{ asset('/assets/admin/plugins/select2/css/select2.min.css') }}">
   <link rel="stylesheet" href="{{ asset('/assets/admin/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css') }}">
@@ -36,13 +35,14 @@
     <link rel="stylesheet" href="https://resources/demos/style.css">
     @if ($activePage != 'error_page')
     <!-- Google Tag Manager -->
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-        })(window,document,'script','dataLayer','GTM-NZJWSRR');</script>
-        <!-- End Google Tag Manager -->
-
+    <script>
+      (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+      new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+      })(window,document,'script','dataLayer','GTM-NZJWSRR');
+    </script>
+    <!-- End Google Tag Manager -->
     @endif
     <script id="mcjs">!function(c,h,i,m,p){m=c.createElement(h),p=c.getElementsByTagName(h)[0],m.async=1,m.src=i,p.parentNode.insertBefore(m,p)}(document,"script","https://chimpstatic.com/mcjs-connected/js/users/06324f99c542d92175851a098/05784f2333237fc2fda7515b8.js");</script>
             <!-- Messenger Chat Plugin Code -->
@@ -72,7 +72,7 @@
       }(document, 'script', 'facebook-jssdk'));
     </script>
 
-    @if ($activePage == 'login')
+    @if (in_array($activePage, ['login','checkout_customer_form']))
     <script>
       function statusChangeCallback(response) {  // Called with the results from FB.getLoginStatus().
         if (response.status === 'connected') {   // Logged into your webpage and Facebook.

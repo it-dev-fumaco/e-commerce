@@ -3,7 +3,7 @@
         <span class="lighter-text">My Cart</span>
     </div>
 </div> <!--end shopping-cart-header -->
-<ul class="shopping-cart-items">
+<ul class="shopping-cart-items" style="min-height: 150px;">
     @forelse ($cart_arr as $cart)
     <li class="clearfix">
         @php
@@ -26,7 +26,7 @@
         @endif
     </li>
     @empty
-    <li class="clearfix text-center">
+    <li class="clearfix text-center m-2">
         <span class="text-muted">Cart is empty</span>
     </li>
     @endforelse
@@ -58,10 +58,7 @@
 @endphp
 <div class="d-flex flex-row justify-content-between">
     <div class="p-1 col">
-        <a href="/cart" class="btn btn-outline-primary fumacoFont_card_readmore btn-sm mx-auto" role="button" style="width: 100% !important; background-color:  #85929e "><i class="fas fa-shopping-cart"></i> View Cart</a>
-    </div>
-    <div class="p-1 col">
-        <a href="{{ $action }}" class="co-btn btn btn-outline-primary btn-sm fumacoFont_card_readmore mx-auto" role="button" style="width: 100% !important;" {{ (count($cart_arr) > 0) ? '' : 'disabled' }} {{ $disabled_co }}>Checkout <i class="fa fa-chevron-right"></i></a>
+        <a href="/cart" class="btn btn-outline-primary fumacoFont_card_readmore btn-sm mx-auto" role="button" style="width: 100% !important; padding: 5px 15px;"><i class="fas fa-shopping-cart"></i> Checkout</a>
     </div>
 </div>
 @if (Auth::check())

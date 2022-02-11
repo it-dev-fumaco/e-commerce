@@ -51,23 +51,25 @@
                                     <table class="table table-bordered table-hover">
                                         <thead>
                                             <tr>
-                                                <th style="font-size: 10pt;">Blog</th>
-                                                <th style="font-size: 10pt;">Author</th>
-                                                <th style="font-size: 10pt;">Comment</th>
-                                                <th style="font-size: 10pt;">Date</th>
-                                                <th style="font-size: 10pt;">Approve</th>
-                                                <th style="font-size: 10pt;">Action</th>
+                                                {{-- <th style="font-size: 10pt;">Blog</th> --}}
+                                                <th>Author</th>
+                                                <th style="width: 20%">Blog Title</th>
+                                                <th>Comment</th>
+                                                <th>Date</th>
+                                                <th>Approve</th>
+                                                <th>Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             @forelse($comments_arr as $c)
                                                 <tr>
-                                                    <td>{{ $c['blog_id'] }}</td>
+                                                    {{-- <td>{{ $c['blog_id'] }}</td> --}}
                                                     <td>
                                                         {{ $c['blog_name'] }}<br/>
                                                         {{ $c['blog_email'] }}<br/>
                                                         {{ $c['blog_ip'] }}
                                                     </td>
+                                                    <td>{{ $c['blog_title'] }}</td>
                                                     <td>
                                                         {{ $c['blog_comments'] }}
                                                     </td>
@@ -233,6 +235,10 @@
     
         .slider.round:before {
             border-radius: 50%;
+        }
+
+        .table{
+            font-size: 11.5pt !important;
         }
     </style>
 @endsection

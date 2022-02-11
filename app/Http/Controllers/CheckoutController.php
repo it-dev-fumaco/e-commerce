@@ -124,10 +124,7 @@ class CheckoutController extends Controller
 					session()->put('fumShipDet', $shipping_session);
 				}
 			
-				$o_email = Auth::user()->username;
-
-				$user = DB::table('fumaco_users')->where('username', $o_email)->first();
-				$user_id = $user->id;
+				$user_id = Auth::user()->id;
 	
 				$bill_address = DB::table('fumaco_user_add')->where('xdefault', 1)->where('user_idx', $user_id)->where('address_class', 'Billing')->get();
 				$ship_address = DB::table('fumaco_user_add')->where('xdefault', 1)->where('user_idx', $user_id)->where('address_class', 'Delivery')->get();
@@ -490,6 +487,8 @@ class CheckoutController extends Controller
 					'voucher_code' => ($voucher_code) ? strtoupper($voucher_code) : null
 				]);
 			}
+
+			DB::table('fumaco_order_items')->where('order_number', $order_no)->delete();
 
 			if(Auth::check()) {
 				$cart_items = DB::table('fumaco_items as a')->join('fumaco_cart as b', 'a.f_idcode', 'b.item_code')
