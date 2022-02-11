@@ -140,7 +140,7 @@ class ProductController extends Controller
             }
 
             if($item_type == 'product_bundle') {
-                $result['item_price'] = $response['data'][0]['price_list_rate'];
+                $result['item_price'] = count($response['data']) > 0 ? $response['data'][0]['price_list_rate'] : 0;
             }
 
             // get uom conversion factor
