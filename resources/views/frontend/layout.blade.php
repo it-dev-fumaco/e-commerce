@@ -555,9 +555,10 @@
                 <a class="nav-link" href="/contact">CONTACT</a>
               </li>
             </ul>
-            <form class="d-none d-lg-block search-bar" id="desk-search-bar-form" action="/" method="GET">
+            <form class="d-none d-lg-block search-bar" id="desk-search-bar-form" action="/" method="GET" autocomplete="off">
               <div class="input-group mb-0 searchbar search-bar">
                 <input type="text" placeholder="Search" name="s" value="{{ request()->s }}" id="desk-search-form-input" class="form-control searchstyle autocomplete-search" aria-label="Text input with dropdown button">
+                <input type="text" name="name" style="display: none;">
                 <button class="btn btn-outline-secondary searchstyle" type="submit"><i class="fas fa-search"></i></button>
                 <div id="desk-search-container" class="container mx-auto"></div>
               </div>

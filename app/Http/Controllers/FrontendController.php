@@ -311,15 +311,19 @@ class FrontendController extends Controller
                     $search_results_data['blog_results'] = $blog_results;
                 }
 
-                DB::table('fumaco_search_terms')->insert($search_data);
+                if(empty($request->name)) {
+                    DB::table('fumaco_search_terms')->insert($search_data);
+                }
 
                 $search_id = DB::table('fumaco_search_terms')->orderBy('id', 'desc')->pluck('id')->first();
 
                 $search_results_data['search_id'] = $search_id;
-                $checker = DB::table('fumaco_search_results')->where('search_term', $search_data['search_term'])->where('prod_results', $prod_results)->where('blog_results', $blog_results)->get();
+                if(empty($request->name)) {
+                    $checker = DB::table('fumaco_search_results')->where('search_term', $search_data['search_term'])->where('prod_results', $prod_results)->where('blog_results', $blog_results)->get();
 
-                if(count($checker) == 0){
-                    DB::table('fumaco_search_results')->insert($search_results_data);
+                    if(count($checker) == 0){
+                        DB::table('fumaco_search_results')->insert($search_results_data);
+                    }
                 }
 
                 foreach($recently_added_items as $item_code){
