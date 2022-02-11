@@ -211,7 +211,7 @@
 												<tbody style="border-style: inset !important;">
 													@foreach ($product_details_array['bundle_items'] as $bundle)
 													<tr>
-														<td style="width: 60%;">{{ $bundle->item_description }}</td>
+														<td style="width: 60%;">{!! $bundle->item_description !!}</td>
 														<td class="text-center" style="width: 40%;">{{ $bundle->qty . ' ' . $bundle->uom }}</td>
 													</tr>
 													@endforeach

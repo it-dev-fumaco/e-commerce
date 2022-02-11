@@ -1250,7 +1250,7 @@ class FrontendController extends Controller
 
         $bundle_items = [];
         if (count($filtered_attributes) <= 0) {
-            $bundle_items = DB::table('fumaco_product_bundle_item')->where('parent_item_code', $product_details->f_idcode)->orderBy('idx', 'asc')->get();
+            $bundle_items = DB::table('fumaco_product_bundle_item')->where('parent_item_code', explode("-", $product_details->f_idcode)[0])->orderBy('idx', 'asc')->get();
         }
 
         $variant_attr_arr = [];
