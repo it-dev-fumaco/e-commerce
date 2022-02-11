@@ -709,20 +709,18 @@ class ProductController extends Controller
             if ($has_existing_transaction) {
                 return redirect()->back()->with('error', 'Cannot delete product with transactions.');
             }
-                
-            // do not delete item attributes if item code exists
-            $existing_item = DB::table('fumaco_items')->where('f_idcode', 'like', '%'.$item_code.'%')->exists();
-            if (!$existing_item) {
-                DB::table('fumaco_items_attributes')->where('idcode', $item_code)->delete();
-            }
-
-            DB::table('fumaco_item_uom_conversion')->where('item_code', $item_code)->delete();
 
             DB::table('fumaco_items')->where('f_idcode', $item_code)->delete();
+                
+            // do not delete item attributes if item code exists
+            $existing_item = DB::table('fumaco_items')->where('f_idcode', $item_code)->exists();
+            if (!$existing_item) {
+                DB::table('fumaco_items_attributes')->where('idcode', explode("-", $item_code)[0])->delete();
+            }
 
-            DB::table('fumaco_items_attributes')->where('idcode', $item_code)->delete();
+            DB::table('fumaco_item_uom_conversion')->where('item_code', explode("-", $item_code)[0])->delete();
 
-            DB::table('fumaco_product_bundle_item')->where('parent_item_code', $item_code)->delete();
+            DB::table('fumaco_product_bundle_item')->where('parent_item_code', explode("-", $item_code)[0])->delete();
 
             DB::table('fumaco_items_image_v1')->where('idcode', $item_code)->delete();
 
@@ -922,7 +920,7 @@ class ProductController extends Controller
         $selected_for_cross_sell = DB::table('fumaco_items_cross_sell')->where('item_code', $details->f_idcode)->get();
         $products_for_cross_sell = DB::table('fumaco_items')->where('f_idcode', '!=', $details->f_idcode)->whereNotIn('f_idcode', collect($selected_for_cross_sell)->pluck('item_code_cross_sell'))->get();
 
-        $bundle_items = DB::table('fumaco_product_bundle_item')->where('parent_item_code', $details->f_idcode)->orderBy('idx', 'asc')->get();
+        $bundle_items = DB::table('fumaco_product_bundle_item')->where('parent_item_code', explode("-", $details->f_idcode)[0])->orderBy('idx', 'asc')->get();
         $related_products = [];
         foreach($related_products_query as $row) {
             $image = DB::table('fumaco_items_image_v1')->where('idcode', $row->related_item_code)->first();
