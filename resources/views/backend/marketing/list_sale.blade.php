@@ -116,6 +116,54 @@
                                                             </div>
                                                             </div>
                                                         </div>
+                                                        @elseif ($sale['apply_discount_to'] == 'Per Customer Group')
+                                                          <!-- Modal -->
+                                                          <div class="modal fade" id="sale{{ $sale['id'] }}Modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                            <div class="modal-dialog modal-xl" role="document">
+                                                            <div class="modal-content">
+                                                                <div class="modal-header">
+                                                                    <h5 class="modal-title">Customer Group</h5>
+                                                                </div>
+                                                                <div class="modal-body">
+                                                                    <center>
+                                                                        @if ($sale['banner'])
+                                                                            <div class="col-4 mx-auto">
+                                                                                <img class="img-thumbnail" src="{{ asset('/assets/site-img/'.$sale['banner']) }}" alt="" style="width: 100%">
+                                                                            </div>
+                                                                            <br/>
+                                                                        @endif
+                                                                        <table class="table-hover table-bordered">
+                                                                            <tr>
+                                                                                <th class="text-center">ID</th>
+                                                                                <th class="text-center">Customer Group Name</th>
+                                                                                <th class="text-center">Discount Type</th>
+                                                                                <th class="text-center">Discount Amount/Rate</th>
+                                                                                <th class="text-center">Capped Amount</th>
+                                                                            </tr>
+                                                                            @foreach ($sale['customer_group'] as $cg)
+                                                                                <tr>
+                                                                                    <td class="text-center">{{ $cg['customer_group_id'] }}</td>
+                                                                                    <td class="text-center">{{ $cg['customer_group_name'] }}</td>
+                                                                                    <td class="text-center">{{ $cg['discount_type'] }}</td>
+                                                                                    <td class="text-center">
+                                                                                        @if ($cg['discount_type'] == 'Fixed Amount')
+                                                                                            ₱ {{ number_format($cg['discount_rate'], 2, '.', ',') }}
+                                                                                        @elseif($cg['discount_type'] == 'By Percentage')
+                                                                                            {{ $cg['discount_rate'] }}%
+                                                                                        @endif
+                                                                                    </td>
+                                                                                    <td class="text-center">{{ $cg['capped_amount'] ? '₱ '.number_format($cg['capped_amount'], 2, '.', ',') : 0 }}</td>
+                                                                                </tr>
+                                                                            @endforeach
+                                                                        </table>
+                                                                    </center>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                                </div>
+                                                            </div>
+                                                            </div>
+                                                        </div>
                                                     @else                                                      
                                                         <!-- Modal -->
                                                         <div class="modal fade" id="sale{{ $sale['id'] }}Modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">

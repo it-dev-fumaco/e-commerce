@@ -69,7 +69,7 @@ Route::post('/user_register', 'FrontendController@userRegistration');
 Route::get('/about', 'FrontendController@viewAboutPage');
 Route::get('/journals', 'FrontendController@viewJournalsPage');
 Route::get('/terms_condition', 'FrontendController@viewTermsPage');
-Route::get('/blog/{slug}', 'FrontendController@viewBlogPage');
+Route::get('/blog/{slug}', 'FrontendController@viewBlogPage')->name('blogs');
 Route::post('/add_comment', 'BlogController@addComment');
 Route::get('/contact', 'FrontendController@viewContactPage')->name('contact');
 Route::post('/add_contact', 'FrontendController@addContact');
@@ -82,7 +82,7 @@ Route::get('/website_settings', 'FrontendController@websiteSettings');
 Route::post('/getvariantcode', 'FrontendController@getVariantItemCode');
 Route::post('/subscribe', 'FrontendController@newsletterSubscription');
 Route::get('/thankyou', 'FrontendController@subscribeThankyou');
-Route::get('/testing', 'FrontendController@testing');
+Route::get('/search', 'FrontendController@getAutoCompleteData');
 
 Route::get('/policy_pages', 'FrontendController@pagesList');
 Route::get('/pages/{slug}', 'FrontendController@viewPage')->name('pages');
@@ -136,6 +136,9 @@ Route::get('/checkout/failed', 'CheckoutController@orderFailed');
 Route::post('/checkout/failed', 'CheckoutController@orderFailed');
 Route::post('/checkout/callback', 'CheckoutController@paymentCallback');
 
+// product reviews
+Route::post('/submit_review', 'ProductReviewController@submitProductReview');
+
 Route::get('/verify_email/{token}', 'FrontendController@verifyAccount')->name('account.verify');
 Route::get('/resend_verification/{email}', 'FrontendController@resendVerification');
 
@@ -153,6 +156,7 @@ Route::prefix('admin')->group(function () {
 
     Route::group(['middleware' => 'auth:admin'], function(){
         Route::get('/dashboard', 'DashboardController@index');
+        Route::get('/send_abandoned_cart_email/{transaction_id}', 'DashboardController@sendAbandonedCartEmail');
 
         Route::get('/pages/home', 'HomeCRUDController@home_crud');
         Route::post('/add_carousel', 'HomeCRUDController@add_header_carousel');
@@ -176,6 +180,8 @@ Route::prefix('admin')->group(function () {
         Route::get('/product/list', 'ProductController@viewList');
         Route::get('/product/add/{type}', 'ProductController@viewAddForm');
         Route::post('/product/save', 'ProductController@saveItem');
+        Route::get('/product/reviews', 'ProductReviewController@viewList');
+        Route::get('/product/toggle/{id}', 'ProductReviewController@toggleStatus');
 
         Route::get('/product/search', 'ProductController@searchItem');
         Route::get('/product/{id}/edit', 'ProductController@viewProduct');
@@ -184,6 +190,14 @@ Route::prefix('admin')->group(function () {
         Route::post('/add_product_images', 'ProductController@uploadImages');
         Route::get('/delete_product_image/{id}/{social?}', 'ProductController@deleteProductImage');
 
+        // Price list routes
+        Route::get('/price_list', 'PriceListController@viewPriceList');
+        Route::post('/price_list/create', 'PriceListController@savePriceList');
+        Route::get('/get_price_list', 'PriceListController@getErpPriceList');
+        Route::delete('/price_list/delete/{id}', 'PriceListController@deletePriceList');
+        Route::get('/item_prices/{pricelist_id}', 'PriceListController@viewItemPrices');
+        Route::get('/sync_price_list', 'PriceListController@syncItemPrices');
+        
         Route::get('/select_related_products/{category_id}', 'ProductController@selectProductsRelated');
         Route::post('/product/{parent_code}/save_related_products', 'ProductController@saveRelatedProducts');
         Route::delete('/product/remove_related/{id}', 'ProductController@removeRelatedProduct');
@@ -238,11 +252,20 @@ Route::prefix('admin')->group(function () {
         Route::get('/order/sequence_list/{shipping}/delete', 'OrderController@deleteSequence');
 
         Route::get('/items_on_cart', 'OrderController@viewItemOnCart');
+        Route::get('/items_on_cart_by_location', 'OrderController@viewItemOnCartByLocation');
+        Route::get('/items_on_cart_by_item', 'OrderController@viewItemOnCartByItem');
+        Route::get('/abandoned_items_on_cart', 'OrderController@viewAbandonedItemOnCart');
 
         Route::get('/order/payment_status', 'OrderController@checkPaymentStatus');
         Route::post('/order/payment_status', 'OrderController@checkPaymentStatus');
         
         Route::get('/customer/list', 'CustomerController@viewCustomers');
+        Route::get('/customer/profile/{id}', 'CustomerController@viewCustomerProfile');
+        Route::get('/customer/address/{address_type}/{user_id}', 'CustomerController@getCustomerAddress');
+        Route::get('/customer/orders/{user_id}', 'CustomerController@getCustomerOrders');
+        Route::get('/customer/order/{id}', 'CustomerController@viewOrderDetails');
+
+        Route::post('/customer/profile/{id}/change_customer_group', 'CustomerController@changeCustomerGroup');
 
         Route::get('/blog/list', 'BlogController@viewBlogs');
         Route::get('/blog/new', 'BlogController@newBlog');

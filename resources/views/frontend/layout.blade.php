@@ -21,8 +21,8 @@
     <link rel="icon" type="image/png" href="{{ asset('/assets/icon/favicon-32x32.png') }}" sizes="32x32">
     @if (!in_array($activePage, ['homepage']))
     <!-- Select2 -->
-    <link rel="stylesheet" href="{{ asset('/assets/admin/plugins/select2/css/select2.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('/assets/admin/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css') }}">
+  <link rel="stylesheet" href="{{ asset('/assets/admin/plugins/select2/css/select2.min.css') }}">
+  <link rel="stylesheet" href="{{ asset('/assets/admin/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css') }}">
     @endif
     <link href="{{ asset('/assets/dist/css/bootstrap.min.css') }}" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -31,6 +31,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
     <link href="{{ asset('/assets/fumaco.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="https://resources/demos/style.css">
     @if ($activePage != 'error_page')
     <!-- Google Tag Manager -->
     <script>
@@ -42,6 +44,7 @@
     </script>
     <!-- End Google Tag Manager -->
     @endif
+    <script id="mcjs">!function(c,h,i,m,p){m=c.createElement(h),p=c.getElementsByTagName(h)[0],m.async=1,m.src=i,p.parentNode.insertBefore(m,p)}(document,"script","https://chimpstatic.com/mcjs-connected/js/users/06324f99c542d92175851a098/05784f2333237fc2fda7515b8.js");</script>
             <!-- Messenger Chat Plugin Code -->
 <div id="fb-root"></div>
 <!-- Your Chat Plugin code -->
@@ -128,6 +131,9 @@
     <style>
       * {
         -webkit-overflow-scrolling: touch !important;
+      }
+      .grecaptcha-badge { 
+        visibility: hidden;
       }
       html,body{
         width: 100% !important;
@@ -305,59 +311,7 @@
         background-color: #fff !important;
         border-radius: 7px;
       }
-      @media (max-width: 575.98px) {
-        header{
-          min-height: 50px;
-        }
-      }
-
-      @media (max-width: 767.98px) {
-        header{
-          min-height: 50px;
-        }
-      }
-
-      @media (max-width: 1199.98px) {/* tablet */
-        .nav-item, .searchstyle, .welcome-msg {
-          font-size: 12px !important;
-          margin: 0 !important;
-        }
-        .user-icon{
-          font-size: 20px !important;
-        }
-        .nav-a{
-          padding: 0 !important;
-        }
-        .search-bar{
-          width: auto !important;
-        }
-      }
-
-      @media only screen and (min-device-width : 768px) and (max-device-width : 1024px) and (orientation : portrait) {/* portrait tablet */
-        /* Product List Page */
-     .mob-srch{
-          display: inline-block !important;
-        }
-        .pc-cart, .search-bar{
-          display: none !important;
-        }
-        .mb-cart{
-          display: inline-block !important;
-        }
-      }
-
-      @media only screen and (min-device-height : 427.98px) and (max-device-height : 767.98px) and (orientation : landscape) {/* landscape mobile */
-        /* Product List Page */
-       .mob-srch{
-          display: inline-block !important;
-        }
-        .pc-cart, .search-bar{
-          display: none !important;
-        }
-        .mb-cart{
-          display: inline-block !important;
-        }
-      }
+      
 
       #shopping-cart {
         background: white;
@@ -458,6 +412,89 @@
         box-shadow: none !important;
         border: none !important;
       }
+
+      .search-image{
+        width: 50px !important;
+        height: 50px !important;
+        float: left !important;
+        margin-right: 5px !important;
+      }
+      #desk-search-container{
+        position: absolute !important;
+        background-color: #fff;
+        z-index: 9999;
+        top: 40px;
+        right: 0;
+        width: 280%;
+      }
+      #mob-search-container{
+        position: absolute !important;
+        background-color: #fff;
+        z-index: 9999;
+        width: 80%;
+      }
+
+      @media (max-width: 575.98px) {
+        header{
+          min-height: 50px;
+        }
+        #mob-search-container{
+          max-height: 500px !important;
+          overflow: auto !important;
+        }
+      }
+
+      @media (max-width: 767.98px) {
+        header{
+          min-height: 50px;
+        }
+        #mob-search-container{
+          max-height: 500px !important;
+          overflow: auto !important;
+        }
+      }
+
+      @media (max-width: 1199.98px) {/* tablet */
+        .nav-item, .searchstyle, .welcome-msg {
+          font-size: 12px !important;
+          margin: 0 !important;
+        }
+        .user-icon{
+          font-size: 20px !important;
+        }
+        .nav-a{
+          padding: 0 !important;
+        }
+        .search-bar{
+          width: auto !important;
+        }
+      }
+
+      @media only screen and (min-device-width : 768px) and (max-device-width : 1024px) and (orientation : portrait) {/* portrait tablet */
+        /* Product List Page */
+     .mob-srch{
+          display: inline-block !important;
+        }
+        .pc-cart, .search-bar{
+          display: none !important;
+        }
+        .mb-cart{
+          display: inline-block !important;
+        }
+      }
+
+      @media only screen and (min-device-height : 427.98px) and (max-device-height : 767.98px) and (orientation : landscape) {/* landscape mobile */
+        /* Product List Page */
+       .mob-srch{
+          display: inline-block !important;
+        }
+        .pc-cart, .search-bar{
+          display: none !important;
+        }
+        .mb-cart{
+          display: inline-block !important;
+        }
+      }
     </style>
     @yield('style')
     @if($activePage == 'contact')
@@ -518,10 +555,11 @@
                 <a class="nav-link" href="/contact">CONTACT</a>
               </li>
             </ul>
-            <form class="d-none d-lg-block search-bar" action="/" method="GET">
+            <form class="d-none d-lg-block search-bar" id="desk-search-bar-form" action="/" method="GET">
               <div class="input-group mb-0 searchbar search-bar">
-                <input type="text" placeholder="Search" name="s" value="{{ request()->s }}" class="form-control searchstyle" aria-label="Text input with dropdown button">
-                  <button class="btn btn-outline-secondary searchstyle" type="submit"><i class="fas fa-search"></i></button>
+                <input type="text" placeholder="Search" name="s" value="{{ request()->s }}" id="desk-search-form-input" class="form-control searchstyle autocomplete-search" aria-label="Text input with dropdown button">
+                <button class="btn btn-outline-secondary searchstyle" type="submit"><i class="fas fa-search"></i></button>
+                <div id="desk-search-container" class="container mx-auto"></div>
               </div>
             </form>
             <ul class="navbar-nav d-lg-inline-block">
@@ -582,19 +620,22 @@
           {{-- Cart Icon --}}
           <div class="d-md-block d-lg-none mob-srch" style="width: 100% !important">
             <div class="col-md-12">
-              <form action="/" method="GET">
-                <div class="input-group mb-0 searchbar" style="width: 100% !important;">
-                  <input type="text" placeholder="Search" name="s" value="{{ request()->s }}" class="form-control searchstyle" aria-label="Text input with dropdown button">
+              <form action="/" id="mob-search-bar-form" method="GET">
+                <div class="input-group mb-0 searchbar" id="mob-search-bar-form" style="width: 100% !important;">
+                  <input type="text" id='mob-autocomplete-search' placeholder="Search" name="s" value="{{ request()->s }}" class="form-control searchstyle" aria-label="Text input with dropdown button">
                     <button class="btn btn-outline-secondary searchstyle" type="submit"><i class="fas fa-search"></i></button>
+                    {{-- <div id="mob-search-container" class="border border-danger"></div> --}}
                 </div>
-              </form><br/>
+              <div id="mob-search-container" class="container"></div>
+              <div class="col-12">&nbsp;</div>
+            </form>
             </div>
           </div>
 
-        </div>
+        </div><br/>
 
       </nav>
-    </header>
+      </header>
 
   @yield('content')
   <footer>
@@ -633,6 +674,7 @@
               <form action="/subscribe" method="POST">
                 @csrf
                 <div class="input-group mb-3">
+                  <input type="hidden" name="g-recaptcha-response" id="recaptcha_v3-subscribe">
                   <input type="email" class="form-control" name="email" placeholder="Email Address" aria-label="Recipient's username" aria-describedby="basic-addon2" required>
                   <button class="input-group-text" id="basic-addon2">Subscribe</button>
                 </div>
@@ -671,14 +713,27 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   @if($activePage == 'contact')
   <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+  @else
+  <script src="https://www.google.com/recaptcha/api.js?render={{ config('recaptcha.api_site_key') }}"></script>
+  <script> 
+    grecaptcha.ready(function() {
+      grecaptcha.execute("{{ config('recaptcha.api_site_key') }}", {action: 'homepage'}).then(function(token) {
+        if(token) {
+          $("#recaptcha_v3-subscribe").val(token); 
+        } 
+      });
+    });
+  </script> 
   @endif
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
   <script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.4/Chart.bundle.min.js'></script>
-
   <script src="{{ asset('/assets/dist/js/bootstrap.bundle.min.js') }}"></script>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+  <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.js"></script>
   <script>
     $(document).ready(function() {
-
+      // $('.autocomplete-search').select2();
 
       $(document).on('click', '.remove-cart-btn', function(e){
             e.preventDefault();
@@ -726,7 +781,7 @@
         }
       });
 
-      @if (in_array($activePage, ['homepage', 'product_page', 'search_result', 'product_list']))
+      @if (in_array($activePage, ['homepage', 'product_page', 'search_result', 'product_list', 'cart']))
         $(document).on('click', '.add-to-cart', function(e){
           e.preventDefault();
           var btn = $(this);
@@ -818,7 +873,67 @@
         });
       }
 
-      // set product category dropdown in navbar and links in footer
+      $('.autocomplete-search').keyup(function(){
+        var data = {
+          'search_term': $(this).val(),
+          'type': 'desktop'
+        }
+        $.ajax({
+          type:'GET',
+          data: data,
+          url:'/search',
+          success: function (autocomplete_data) {
+            if(autocomplete_data){
+              $("#desk-search-container").show();
+              $("#desk-search-container").addClass('border border-secondary');
+              $('#desk-search-container').html(autocomplete_data);
+            }
+          }
+        });
+      });
+
+      $(document).mouseup(function(e) 
+      {
+          var desk_container = $("#desk-search-container");
+          var mobile_container = $("#mob-search-container");
+
+          // if the target of the click isn't the container nor a descendant of the container
+          if (!desk_container.is(e.target) && desk_container.has(e.target).length === 0) 
+          {
+              desk_container.hide();
+          }
+
+          if (!mobile_container.is(e.target) && mobile_container.has(e.target).length === 0) 
+          {
+              mobile_container.hide();
+          }
+      });
+
+      $('body').on('scroll', function (e){
+        $("#desk-search-container").hide();
+        $("#mob-search-container").hide();
+      });
+
+      $('#mob-autocomplete-search').keyup(function(){
+        var data = {
+          'search_term': $(this).val(),
+          'type': 'mobile'
+        }
+        $.ajax({
+          type:'GET',
+          data: data,
+          url:'/search',
+          success: function (autocomplete_data) {
+            if(autocomplete_data){
+              $("#mob-search-container").show();
+              $("#mob-search-container").addClass('border border-secondary');
+              $('#mob-search-container').html(autocomplete_data);
+            }
+          }
+        });
+      });
+
+      // set product category dropdown in navbar and links in dooter
       function productCategories() {
         $('#product-category-dropdown').empty();
         $('#product-category-footer').empty();

@@ -28,7 +28,7 @@
 	<section class="content">
 		<div class="container-fluid">
 			<div class="row">
-            <form action="/admin/product/{{ $details->id }}/update" method="POST">
+            <form action="/admin/product/{{ $details->id }}/update" method="POST" enctype="multipart/form-data">
                @csrf
                <!-- left column -->
                <div class="col-md-12">
@@ -106,7 +106,7 @@
                                     </div>
                                     <div class="form-group">
                                        <label for="product-price">Product Price</label>
-                                       <input type="text" class="form-control" id="product-price" value="{{ $details->f_original_price }}" readonly>
+                                       <input type="text" class="form-control" id="product-price" value="{{ $details->f_default_price }}" readonly>
                                     </div>
                                  </div>
                                  <div class="col-md-6">
@@ -126,16 +126,6 @@
                                     </div>
                                  </div>
                               </div>
-                              {{-- <div class="row">
-                                 <div class="col-12">
-                                    <div class="form-group">
-                                       <label><input type="checkbox" id="set_as_new_item" name="is_new_item" {{ $details->f_new_item == 1 ? 'checked' : '' }}> New on this duration</label>
-                                       <div class="col-6">
-                                          <input type="text" class="form-control" id="new_item_date" name="new_item_duration" disabled/>
-                                       </div>
-                                    </div>
-                                 </div>
-                              </div> --}}
                            </div>
                         </div>
                         <h5>Product Weight & Dimensions</h5>
@@ -246,7 +236,32 @@
                            <textarea class="form-control" rows="6" id="website-caption" name="website_caption">{{ old('website_caption') }}{{ $details->f_caption }}</textarea>
                         </div>
                         <div class="form-group">
-                           <label for="full-detail">Full Detail</label>
+                           <label for="featured-image"><input type="checkbox" name="add_featured" id="add-featured" {{ $details->f_featured_image ? 'checked' : null }}> Featured Image (Optional)</label>
+                           <div class="row">
+                              @if ($details->f_featured_image)
+                                 <div class="col-1">
+                                    @php
+                                       $img = $details->f_featured_image ? '/storage/item_images/'. $details->f_idcode .'/gallery/featured/'. $details->f_featured_image : '/storage/no-photo-available.png';
+                                       $img_webp = $details->f_featured_image ? '/storage/item_images/'. $details->f_idcode .'/gallery/featured/'. explode(".", $details->f_featured_image)[0] .'.webp' : '/storage/no-photo-available.png';
+                                    @endphp
+                                    <picture>
+                                       <source srcset="{{ asset($img_webp) }}" type="image/webp" class="img-responsive" style="width: 100% !important;">
+                                       <source srcset="{{ asset($img) }}" type="image/jpeg" class="img-responsive" style="width: 100% !important;">
+                                       <img src="{{ asset($img) }}" alt="{{ Str::slug(explode(".", $details->f_featured_image)[0], '-') }}" class="img-responsive" style="width: 100% !important;">
+                                    </picture>
+                                 </div>
+                              @endif
+                              <div class="col-{{ $details->f_featured_image ? '11' : '12' }}">
+                                 <div class="custom-file mb-3">
+                                    <input type="file" class="custom-file-input" id="customFile" name="featured_image">
+                                    <label class="custom-file-label" for="customFile">Choose File</label>
+                                 </div>
+                                 <label for="featured">Selected Image: {{ $details->f_featured_image }}</label>
+                              </div>
+                           </div>
+                        </div>
+                        <div class="form-group">
+                           <label for="full-detail">Full Details</label>
                            <textarea class="form-control" rows="6" id="full-detail" name="full_detail">{{ old('website_caption') }}{{ $details->f_full_description }}</textarea>
                         </div>
                         <h5>Product Specifications / Attributes</h5>
@@ -301,18 +316,32 @@
                                     <img src="{{ asset($image_r) }}" class="img-responsive rounded img-thumbnail d-inline-block" width="70" height="70">
                                  </td>
                                  <td><span class="d-block font-weight-bold">{{ $related_product['item_code'] }}</span>{{ $related_product['item_description'] }}</td>
-                                 <td class="text-center align-middle">P {{ number_format($related_product['original_price'], 2) }}</td>
+                                 <td class="text-center align-middle">
+                                    ₱ {{ number_format(str_replace(",","",$related_product['original_price']), 2) }}
+                                 </td>
                                  <td class="text-center align-middle">
                                     <button class="btn btn-danger btn-sm remove-rel" data-id="{{ $related_product['id'] }}">Remove</button>
                                  </td>
                               </tr>
                               @empty
                               <tr>
-                                 <td colspan="4" class="text-center text-muted">No products found.</td>
+                                 <td colspan="5" class="text-center text-muted">No products found.</td>
                               </tr>
                               @endforelse
                            </tbody>
                         </table>
+                        <h5 class="mt-3">Product(s) for Cross-sell</h5>
+                        <hr>
+                        <div class="col-12 mx-auto">
+                           <select class="select-cross-sell w-100" name="selected_for_cross_sell[]" multiple="multiple">
+                              @foreach ($cross_sell_arr as $cross_sell)
+                                 <option selected value="{{ $cross_sell['cross_sell_item_code'] }}">{{$cross_sell['cross_sell_item_code'].' - '.$cross_sell['cross_sell_description'] }}</option>
+                              @endforeach
+                              @foreach ($products_for_cross_sell as $cs)
+                                 <option value="{{ $cs->f_idcode }}">{{ $cs->f_idcode.' - '.$cs->f_name_name }}</option>
+                              @endforeach
+                           </select>
+                        </div>
                         <br>
                         <h5 class="mt-3">Search Engine Optimization (SEO)</h5>
                         <hr>
@@ -443,6 +472,8 @@
 <script>
    (function() {
       setAsNewItem();
+      addFeatured();
+      $('.select-cross-sell').select2();
 
       $('#set_as_new_item').click(function(){
          setAsNewItem();
@@ -519,6 +550,24 @@
             startDate: start ? start : moment(),
             endDate: end ? end : moment().add(7, 'days'),
       });
+
+      // Add the following code if you want the name of the file appear on select
+      $(".custom-file-input").change(function() {
+         var fileName = $(this).val().split("\\").pop();
+         $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+      });
+
+      $('#add-featured').click(function(){
+         addFeatured();
+      });
+
+      function addFeatured(){
+         if($('#add-featured').is(':checked')){
+            $("#customFile").prop('disabled', false);
+         }else{
+            $("#customFile").prop('disabled', true);
+         }
+      }
    })();
 </script>
 @endsection

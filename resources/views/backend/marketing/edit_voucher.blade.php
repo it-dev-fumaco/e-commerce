@@ -124,7 +124,7 @@
                                                     <div class="col-8 mx-auto">
                                                         <label>Coupon Type *</label>
                                                         @php
-                                                            $coupon_type = array('Promotional', 'Exclusive Voucher')
+                                                            $coupon_type = array('Promotional', 'Per Category', 'Per Item', 'Per Customer Group');
                                                         @endphp
                                                         <select class="form-control" name="coupon_type" id="coupon_type" required>
                                                             <option disabled value="">Coupon Type</option>
@@ -140,44 +140,93 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div id="customers" class="row">
-                                            <select class="d-none form-control" name="customer_select" id="customer_select">
-                                                <option disabled selected value="">Select Customer</option>
-                                                @foreach ($customer_list as $customer)
-                                                    <option value="{{ $customer->id }}">{{ $customer->f_name.' '.$customer->f_lname }}</option>
+                                        <div id="categories" class="row">
+                                            <select class="d-none form-control" name="categories_select" id="categories_select">
+                                                <option disabled selected value="">Select a Category</option>
+                                                @foreach ($categories_list as $category)
+                                                    <option value="{{ $category->id }}">{{ $category->name }}</option>
                                                 @endforeach
                                             </select>
                                             <div class="col-6 mx-auto">
                                                 <br/>
-                                                <table class="table table-bordered" id="customers-table">
-                                                     <thead>
-                                                          <tr>
-                                                                <th style="width: 40%;" scope="col" class="text-center">Customer Name</th>
-                                                                {{-- <th style="width: 25%;" scope="col" class="text-center">Allowed Usage</th> --}}
-                                                                <th class="text-center" style="width: 10%;"><button class="btn btn-outline-primary btn-sm" id="add-customers-btn">Add</button></th>
-                                                          </tr>
-                                                     </thead>
-                                                     <tbody>
-                                                        @foreach($gift_card_customers as $gift_customers) 
+                                                <table class="table table-bordered" id="categories-table">
+                                                    <thead>
                                                         <tr>
-                                                           <td class="p-2">
-                                                            <select class="form-control" name="selected_customer[]" id="customer_select">
-                                                                <option disabled value="">Select Customer</option>
-                                                                @foreach ($customer_list as $customer)
-                                                                    <option value="{{ $customer->id }}" {{ $customer->id == $gift_customers->customer_id ? 'selected' : '' }}>{{ $customer->f_name.' '.$customer->f_lname }}</option>
-                                                                @endforeach
-                                                            </select>
-                                                            </td>
-                                                            {{-- <td class="p-2">
-                                                                <input type="text" name="customer_allowed_usage[]" value="{{ $gift_customers->allowed_usage }}" class="form-control" placeholder="Allowed Usage">
-                                                            </td> --}}
-                                                            <td class="text-center">
-                                                                <button class="btn btn-outline-danger btn-sm remove-td-row">Remove</button>
-                                                            </td>
-                                                       </tr>
+                                                            <th style="width: 40%;" scope="col" class="text-center">Category</th>
+                                                            <th class="text-center" style="width: 10%;"><button class="btn btn-outline-primary btn-sm" id="add-categories-btn">Add</button></th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach($selected_categories as $selected_category) 
+                                                            <tr>
+                                                                <td class="p-2">
+                                                                    <select class="form-control" name="selected_category[]" id="categories_select">
+                                                                        <option disabled value="">Select a Category</option>
+                                                                        @foreach ($categories_list as $category)
+                                                                            <option value="{{ $category->id }}" {{ $category->id == $selected_category->exclusive_to ? 'selected' : '' }}>{{ $category->name }}</option>
+                                                                        @endforeach
+                                                                    </select>
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <button class="btn btn-outline-danger btn-sm remove-td-row">Remove</button>
+                                                                </td>
+                                                            </tr>
                                                         @endforeach
-                                                     </tbody>
+                                                    </tbody>
                                                 </table>
+                                            </div>
+                                        </div>
+                                        <div id="items" class="row">
+                                            <div class="col-4 mx-auto">
+                                                <br/>
+                                                <select class="coupon_per_item w-100" name="selected_item[]" id="items_select" multiple="multiple">
+                                                    @foreach ($selected_items as $selected_item)
+                                                        @php
+                                                            $product_name = collect($item_list)->where('f_idcode', $selected_item->exclusive_to)->pluck('f_name_name')->first();
+                                                        @endphp
+                                                        <option value="{{ $selected_item->exclusive_to }}" selected>{{ $selected_item->exclusive_to.' - '.$product_name }}</option>
+                                                    @endforeach
+                                                    @foreach ($item_list as $item)
+                                                        <option value="{{ $item->f_idcode }}">{{ $item->f_idcode.' - '.$item->f_name_name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div id="customer-group" class="row">
+                                            <div class="col-6 mx-auto">
+                                                <select class="d-none w-100" id="customer_group_select">
+                                                    @foreach ($customer_groups as $group)
+                                                        <option value="{{ $group->customer_group_name }}">{{ $group->customer_group_name }}</option>
+                                                    @endforeach
+                                                </select>
+                                                <div class="col-6 mx-auto">
+                                                    <br/>
+                                                    <table class="table table-bordered" id="customer-group-table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th scope="col" class="text-center">Customer Group</th>
+                                                                <th class="text-center" style="width: 10%;"><button class="btn btn-outline-primary btn-sm" id="add-customer-group-btn">Add</button></th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @foreach($selected_customer_groups as $selected_customer_group) 
+                                                                <tr>
+                                                                    <td class="p-2">
+                                                                        <select class="form-control" name="selected_customer_group[]" id="customer_group_select">
+                                                                            <option disabled value="">Select a Category</option>
+                                                                            @foreach ($customer_groups as $customer_group)
+                                                                                <option value="{{ $customer_group->id }}" {{ $customer_group->id == $selected_customer_group->exclusive_to ? 'selected' : '' }}>{{ $customer_group->customer_group_name }}</option>
+                                                                            @endforeach
+                                                                        </select>
+                                                                    </td>
+                                                                    <td class="text-center">
+                                                                        <button class="btn btn-outline-danger btn-sm remove-td-row">Remove</button>
+                                                                    </td>
+                                                                </tr>
+                                                            @endforeach
+                                                        </tbody>
+                                                    </table>
+                                                </div>
                                             </div>
                                         </div>
                                         <div id="for_promotional" class="row">
@@ -211,6 +260,7 @@
 @section('script')
 <script>
     $(document).ready(function(){
+        $('.coupon_per_item').select2({placeholder: 'Select Item(s)'});
         allotment();
         validityDate();
         discountType();
@@ -236,7 +286,6 @@
         $('#coupon_type').click(function(){
             couponType();
         });
-
 
         function allotment(){
             if($('#unlimited_allotment').is(':checked')){
@@ -289,12 +338,26 @@
         }
 
         function couponType(){
-            if($('#coupon_type').val() == 'Exclusive Voucher'){
-                $('#customers').slideDown();
+            if($('#coupon_type').val() == 'Per Category'){
+                $('#categories').slideDown();
+                $('#for_promotional').slideUp();
+                $('#items').slideUp();
+                $('#customer-group').slideUp();
+            }else if($('#coupon_type').val() == 'Per Item'){
+                $('#items').slideDown();
+                $('#categories').slideUp();
+                $('#for_promotional').slideUp();
+                $('#customer-group').slideUp();
+            }else if($('#coupon_type').val() == 'Per Customer Group'){
+                $('#customer-group').slideDown();
+                $('#items').slideUp();
+                $('#categories').slideUp();
                 $('#for_promotional').slideUp();
             }else{
-                $('#customers').slideUp();
                 $('#for_promotional').slideDown();
+                $('#categories').slideUp();
+                $('#items').slideUp();
+                $('#customer-group').slideUp();
             }
         }
 
@@ -314,23 +377,36 @@
             height: "500px",
         });
 
-        $('#add-customers-btn').click(function(e){
+        $('#add-categories-btn').click(function(e){
 			e.preventDefault();
 
-			var clone_select = $('#customer_select').html();
+			var clone_select = $('#categories_select').html();
 			var row = '<tr>' +
 				'<td class="p-2">' +
-					'<select name="selected_customer[]" class="form-control w-100" style="width: 100%;" required>' + clone_select + '</select>' +
+					'<select name="selected_category[]" class="form-control w-100" style="width: 100%;" required>' + clone_select + '</select>' +
 				'</td>' +
-				// '<td class="p-2">' +
-				// 	'<input type="text" name="customer_allowed_usage[]" class="form-control" placeholder="Allowed Usage">' +
-				// '</td>' +
 				'<td class="text-center">' +
 					'<button type="button" class="btn btn-outline-danger btn-sm remove-td-row">Remove</button>' +
 				'</td>' +
 			'</tr>';
 
-			$('#customers-table tbody').append(row);
+			$('#categories-table tbody').append(row);
+		});
+
+        $('#add-customer-group-btn').click(function(e){
+			e.preventDefault();
+
+			var clone_select = $('#customer_group_select').html();
+			var row = '<tr>' +
+				'<td class="p-2">' +
+					'<select name="selected_customer_group[]" class="form-control w-100" style="width: 100%;" required>' + clone_select + '</select>' +
+				'</td>' +
+				'<td class="text-center">' +
+					'<button type="button" class="btn btn-outline-danger btn-sm remove-td-row">Remove</button>' +
+				'</td>' +
+			'</tr>';
+
+			$('#customer-group-table tbody').append(row);
 		});
 
         $(document).on('click', '.remove-td-row', function(e){

@@ -28,7 +28,7 @@
 	<section class="content">
 		<div class="container-fluid">
 			<div class="row">
-        <form action="/admin/product/save" method="POST">
+        <form action="/admin/product/save" method="POST" enctype="multipart/form-data">
           @csrf
           <!-- left column -->
           <div class="col-md-12">
@@ -94,7 +94,9 @@
                         </div>
                         <div class="form-group">
                           <label for="stock-uom">Stock UoM</label>
-                          <input type="text" class="form-control" id="stock-uom" name="stock_uom" value="{{ old('stock_uom') }}" readonly required>
+                          <select class="form-control" name="uom_conversion" id="uom-conversion" required></select>
+                          <input type="hidden" class="form-control" id="stock-uom" name="stock_uom" value="{{ old('stock_uom') }}" readonly required>
+                          <small id="stock-uom-help" class="form-text text-muted">-</small>
                         </div>
                       </div>
                     </div>
@@ -204,11 +206,19 @@
                   </div>
                 </div>
 
-
                 <div class="form-group">
                   <label for="website-caption">* Website Caption (more information section)</label>
                   <textarea class="form-control" rows="6" id="website-caption" name="website_caption">{{ old('website_caption') }}</textarea>
                 </div>
+
+                <div class="form-group">
+                  <label for="featured-image">Featured Image</label>
+                  <div class="custom-file mb-3">
+                    <input type="file" class="custom-file-input" id="customFile" name="featured_image">
+                    <label class="custom-file-label" for="customFile">Choose File</label>
+                  </div>
+                </div>
+
                 <div class="form-group">
                   <label for="full-detail">* Full Detail</label>
                   <textarea class="form-control" rows="6" id="full-detail" name="full_detail">{{ old('full_detail') }}</textarea>
@@ -341,6 +351,7 @@
       var data = e.params.data;
       $('#custom-overlay').fadeIn();
       $('#attributes-table tbody').empty();
+      $('#uom-conversion').empty();
       $.ajax({
         type:"GET",
         url:"/admin/product/" + data.id + '/' + $('#item-type').val(),
@@ -360,7 +371,7 @@
             $('#item-description').text(response.item_description);
             $('#item-description-text').text(response.item_description);
             $('#stock-qty').val(response.stock_qty);
-            $('#product-price').val(response.item_price);
+            $('#product-price').val(0);
             $('#weight-uom').val(response.weight_uom);
             $('#weight-per-unit').val(response.weight_per_unit);
             $('#package-weight').val(response.package_weight);
@@ -376,12 +387,24 @@
               tbl_row += '<tr><td class="text-center">' + d.idx + '</td><td>' + d.attribute + '</td><td>' + d.attribute_value + '</td></tr>';
             });
 
+            var opt = '<option value="">Select UoM</option>';
+            $(response.uom_conversion).each(function(i, d) {
+              opt += '<option value="' + d.uom + '" data-desc="' + d.conversion + '" data-rate="' + d.price + '">' + d.uom + '</option>';
+            });
+
+            $('#uom-conversion').append(opt);
+
             $('#attributes-table tbody').append(tbl_row);
           }
 
           $('#custom-overlay').fadeOut();
         }
       });
+    });
+
+    $('#uom-conversion').change(function(){
+      $('#product-price').val($(this).find(":selected").data('rate'));
+      $('#stock-uom-help').text($(this).find(":selected").data('desc'));
     });
 
     $("#website-caption").summernote({
@@ -395,6 +418,12 @@
 			dialogsFade: true,
 			height: "200px",
 		});
+
+    // Add the following code if you want the name of the file appear on select
+    $(".custom-file-input").change(function() {
+        var fileName = $(this).val().split("\\").pop();
+        $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+    });
   })();
 
 </script>

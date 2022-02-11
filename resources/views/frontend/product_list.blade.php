@@ -150,17 +150,10 @@
 								  </div>
 								<div class="row mb-2">
 									<div class="col-md-6 pr-1" style="text-align: right;">
-										{{-- <a class="btn d-sm-block d-md-none" data-toggle="modal" data-target="#filterModal2" style="font-size: 0.75rem !important; float: left !important">
-											<i class="fas fa-filter"></i>&nbsp; Filters
-										</a> --}}
-										{{-- <label class="mt-1 mb-1 mr-0" style="font-size: 0.75rem;">Sort By</label> --}}
+									
 									</div>
 									<div class="col-md-6" style="padding: 0; float: right !important; min-width: 120px !important; padding-right: 5%;">
-										{{-- <select name="sortby" class="form-control form-control-sm" style="font-size: 0.75rem; display: inline-block;">
-											<option value="Position" data-loc="{{ request()->fullUrlWithQuery(['sortby' => 'Position']) }}" {{ (request()->sortby == 'Position') ? 'selected' : '' }}>Recommended</option>
-											<option value="Product Name" data-loc="{{ request()->fullUrlWithQuery(['sortby' => 'Product Name']) }}" {{ (request()->sortby == 'Product Name') ? 'selected' : '' }}>Product Name</option>
-											<option value="Price" data-loc="{{ request()->fullUrlWithQuery(['sortby' => 'Price']) }}" {{ (request()->sortby == 'Price') ? 'selected' : '' }}>Price</option>
-										</select> --}}
+									
 									</div>
 									<div class="col-md-3 d-sm-block d-md-none filter-slide">
 										<div class="modal fade" id="filterModal2" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel2" aria-hidden="true">
@@ -242,7 +235,6 @@
 						<div class="row animated animatedFade1InUp fadeInUp mx-auto">
 							@forelse ($products_arr as $product)
 							<div class="col-md-4 mb-3 btmp mb-pad">
-								{{-- <div class="col-md-4 btmp animated animatedFadeInUp fadeInUp equal-height-columns"> --}}
 								<div class="card">
 									<div class="equal-column-content">
 										@php
@@ -252,29 +244,21 @@
 
 										<div class="hover-container product-card" style="position: relative">
 											<div class="pt-2" style="position: absolute; top: 0; right: 0; z-index: 10;">
-												<div class="col-12 mb-2 {{ $product['is_new_item'] == 1 ? '' : 'd-none' }}">
+												@if ($product['is_new_item'])
+												<div class="col-12 mb-2">
 													<span class="p-1 text-center" style="background-color: #438539; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
 													&nbsp;<b>New</b>&nbsp;
 													</span>
-												</div><br class="{{ $product['is_new_item'] == 1 ? '' : 'd-none' }}"/>
-												@if ($product['is_discounted'])
-													<div class="col-12">
-														<span class="p-1 text-center" style="background-color: #FF0000; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
-															&nbsp;<b>{{ $product['discount_percent'] }}% OFF</b>&nbsp;
-														</span>
-													</div>
-												@elseif ($product['is_discounted_from_sale'] == 1)
-													<div class="col-12">
-														<span class="p-1 text-center" style="background-color: #FF0000; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
-															@if ($product['sale_discount_type'] == 'By Percentage')
-																&nbsp;<b>{{ $product['sale_discount_rate'] }}% OFF</b>&nbsp;
-															@else
-																&nbsp;<b>₱ {{ number_format($product['sale_discount_rate'], 2, '.', ',') }} OFF</b>&nbsp;
-															@endif
-														</span>
-													</div>
+												</div><br />	
 												@endif
-											  
+												
+												@if ($product['is_discounted'])
+												<div class="col-12">
+													<span class="p-1 text-center" style="background-color: #FF0000; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
+														&nbsp;<b>{{ $product['discount_display'] }}</b>&nbsp;
+													</span>
+												</div>
+												@endif
 											</div>
 
 											<div class="btn-container">
@@ -295,22 +279,22 @@
 											</div>
 											<p class="card-text fumacoFont_card_price" style="color:#000000 !important;">
 												@if($product['is_discounted'] == 1)
-												₱ {{ number_format(str_replace(",","",$product['discounted_price']), 2) }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$product['price']), 2) }}</s>
-												@elseif($product['is_discounted_from_sale'] == 1)
-													₱ {{ number_format(str_replace(",","",$product['discounted_price']), 2) }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">₱ {{ number_format(str_replace(",","",$product['price']), 2) }}</s>
+												{{ $product['discounted_price'] }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">{{ $product['default_price'] }}</s>
 												@else
-												₱ {{ number_format(str_replace(",","",$product['price']), 2) }}
+												{{ $product['default_price'] }}
 												@endif
 											</p>
 											<div class="d-flex justify-content-between align-items-center">
 												<div class="btn-group stylecap">
+													@for ($i = 0; $i < 5; $i++)
+													@if ($product['overall_rating'] <= $i)
 													<span class="fa fa-star starcolorgrey"></span>
-													<span class="fa fa-star starcolorgrey"></span>
-													<span class="fa fa-star starcolorgrey"></span>
-													<span class="fa fa-star starcolorgrey"></span>
-													<span class="fa fa-star starcolorgrey"></span>
+													@else
+													<span class="fa fa-star" style="color: #FFD600;"></span>
+													@endif
+													@endfor
 												</div>
-												<small class="text-muted stylecap" style="color:#c4cad0 !important; font-weight:100 !important;">( 0 Reviews )</small>
+												<small class="text-muted stylecap" style="color:#c4cad0 !important; font-weight:100 !important;">( {{ $product['total_reviews'] }} Reviews )</small>
 											</div>
 										</div>
 									</div>

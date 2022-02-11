@@ -29,7 +29,7 @@
                                 <div class="card-body">
                                     <div class="col-md-12">
                                         <div class="float-right">
-                                            <form action="/admin/marketing/search/list" class="text-center" method="GET">
+                                            <form action="/admin/search/list" class="text-center" method="GET">
                                                 <div class="form-group row">
                                                     <div class="col-sm-9">
                                                         <input type="text" class="form-control" id="search-box" name="q" placeholder="Search" value="{{request()->get('q')}}">
@@ -49,7 +49,7 @@
                                             <th class="text-center">Frequency</th>
                                             <th class="text-center">No. of Results</th>
                                             <th class="text-center">Results</th>
-                                            <th class="text-center">Date</th>
+                                            <th class="text-center">Location</th>
                                         </tr>
                                         @forelse ($search_arr as $terms)
                                             <tr>
@@ -58,16 +58,20 @@
                                                 <td class="text-center">{{ $terms['frequency'] }}</td>
                                                 <td class="text-center">{{ $terms['results_count'] }}</td>
                                                 <td class="text-center">
-                                                    <a href="#" data-toggle="modal" data-target="#search{{ $terms['id'] }}Modal">
-                                                        View Results
-                                                    </a>
+                                                    @if (!$terms['product_results'] and !$terms['blog_results'])
+                                                        <p class="text-muted">No Result(s)</p>
+                                                    @else
+                                                        <a href="#" data-toggle="modal" data-target="#search{{ $terms['id'] }}Modal">
+                                                            View Results
+                                                        </a>
+                                                    @endif
                                                     
                                                     <!-- Modal -->
                                                     <div class="modal fade" id="search{{ $terms['id'] }}Modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                                         <div class="modal-dialog modal-xl" role="document">
                                                             <div class="modal-content">
                                                             <div class="modal-header">
-                                                                <h5 class="modal-title" id="exampleModalLabel">Search Results</h5>
+                                                                <h5 class="modal-title" id="exampleModalLabel">Search Term: {{ $terms['search_term'] }}</h5>
                                                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                                                 <span aria-hidden="true">&times;</span>
                                                                 </button>
@@ -122,7 +126,42 @@
                                                         </div>
                                                     </div>
                                                 </td>
-                                                <td class="text-center">{{ $terms['last_search_date'] ? date('M d, Y H:i A', strtotime($terms['last_search_date'])) : '' }}</td>
+                                                <td class="text-center">
+                                                    <a href="#" data-toggle="modal" data-target="#location{{ $terms['id'] }}Modal">
+                                                        View Location(s)
+                                                    </a>
+                                                    <div class="modal fade" id="location{{ $terms['id'] }}Modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                        <div class="modal-dialog" role="document">
+                                                            <div class="modal-content">
+                                                                <div class="modal-header">
+                                                                    <h5 class="modal-title" id="exampleModalLabel">{{ $terms['search_term'] }}</h5>
+                                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                        <span aria-hidden="true">&times;</span>
+                                                                    </button>
+                                                                </div>
+                                                                <div class="modal-body">
+                                                                    <table class="table table-hover table-bordered">
+                                                                        <tr>
+                                                                            <th class="text-center">Location</th>
+                                                                            <th class="text-center">Frequency</th>
+                                                                        </tr>
+                                                                        @foreach ($terms['location'] as $location)
+                                                                            <tr>
+                                                                                <td class="text-center">
+                                                                                    {{ $location->city ? $location->city : '-' }}
+                                                                                </td>
+                                                                                <td class="text-center">{{ $location->count }}</td>
+                                                                            </tr>
+                                                                        @endforeach
+                                                                    </table>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </td>
                                             </tr>
                                         @empty
                                             <tr>

@@ -7,9 +7,12 @@ use DB;
 use Auth;
 use Carbon\Carbon;
 use Adrianorosa\GeoLocation\GeoLocation;
+use App\Http\Traits\ProductTrait;
 
 class CartController extends Controller
 {
+    use ProductTrait;
+
     public function productActions(Request $request) {
         $data = $request->all();
         $data['is_ajax'] = ($request->ajax());
@@ -109,6 +112,7 @@ class CartController extends Controller
                     'user_email' => (Auth::check()) ? Auth::user()->username : null,
                     'item_description' => $product_details->f_name_name,
                     'item_code' => $product_details->f_idcode,
+                    'category_id' => $product_details->f_cat_id,
                     'qty' => $data['quantity'],
                     'ip' => $data['ip'],
                     'city' => $loc->getCity(),
@@ -186,6 +190,7 @@ class CartController extends Controller
                 'user_email' => (Auth::check()) ? Auth::user()->username : null,
                 'item_description' => $product_details->f_name_name,
                 'item_code' => $product_details->f_idcode,
+                'category_id' => $product_details->f_cat_id,
                 'qty' => $data['quantity'],
                 'ip' => $data['ip'],
                 'city' => $loc->getCity(),
@@ -209,64 +214,83 @@ class CartController extends Controller
                 ->where('user_type', 'guest')->where('transaction_id', $order_no)->get();
         }
 
-        // set sale price
+        // get sitewide sale
         $sale = DB::table('fumaco_on_sale')
             ->whereDate('start_date', '<=', Carbon::now()->toDateString())
             ->whereDate('end_date', '>=', Carbon::today()->toDateString())
-            ->where('status', 1)->first();
+            ->where('status', 1)->where('apply_discount_to', 'All Items')->first();
 
         $cart_arr = [];
         foreach ($cart_items as $n => $item) {
-            $discount = 0;
-            $price = $item->f_original_price;
-            $is_discounted = 0;
-            $item_image = DB::table('fumaco_items_image_v1')
-                ->where('idcode', $item->f_idcode)->first();
-
-            if (!$item->f_onsale) {
-                if ($sale) {
-                    $is_discounted = 1;
-                    if ($sale->apply_discount_to == 'All Items') {
-                        if ($sale->discount_type == 'By Percentage') {
-                            $discount = ($item->f_original_price * ($sale->discount_rate/100));
-                            $discount = ($discount > $sale->capped_amount) ? $sale->capped_amount : $discount;
-                        } else {
-                            $discount = $sale->discount_rate;
-                        }
-                    } else {
-                        $sale_per_category = DB::table('fumaco_on_sale as sale')->join('fumaco_on_sale_categories as cat_sale', 'sale.id', 'cat_sale.sale_id')
-                            ->whereDate('sale.start_date', '<=', Carbon::now())->whereDate('sale.end_date', '>=', Carbon::now())
-                            ->where('status', 1)->where('cat_sale.category_id', $item->f_cat_id)
-                            ->select('cat_sale.*')->first();
-                        if ($sale_per_category) {
-                            if ($sale_per_category->discount_type == 'By Percentage') {
-                                $discount = ($item->f_original_price * ($sale_per_category->discount_rate/100));
-                                $discount = ($discount > $sale_per_category->capped_amount) ? $sale_per_category->capped_amount : $discount;
-                            } else {
-                                $discount = $sale_per_category->discount_rate;
-                            }
-                        }
-                    }
+            $image = DB::table('fumaco_items_image_v1')->where('idcode', $item->f_idcode)->first();
+            $item_price = $item->f_default_price;
+            $item_on_sale = $item->f_onsale;
+            
+            $is_new_item = 0;
+            if($item->f_new_item == 1){
+                if($item->f_new_item_start <= Carbon::now() and $item->f_new_item_end >= Carbon::now()){
+                    $is_new_item = 1;
                 }
-            } else {
-                $price = $item->f_price;
-                $is_discounted = 1;
             }
+            // get item price, discounted price and discount rate
+            $item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $item->f_cat_id, $sale, $item_price, $item->f_idcode, $item->f_discount_type, $item->f_discount_rate, $item->f_stock_uom);
+            // get product reviews
+            $product_reviews = $this->getProductRating($item->f_idcode);
 
-            $price = ($discount > $price) ? $price : ($price - $discount);
             $cart_arr[] = [
                 'item_code' => $item->f_idcode,
+                'slug' => $item->slug,
                 'item_description' => $item->f_name_name,
-                'original_price' => $item->f_original_price,
-                'price' => $price,
-                'is_discounted' => $is_discounted,
-                'amount' => ($price * $item->qty),
+                'price' => $item_price_data['discounted_price'],
+                'amount' => ($item_price_data['discounted_price'] * $item->qty),
                 'quantity' => $item->qty,
                 'stock_qty' => $item->f_qty - $item->f_reserved_qty,
                 'stock_uom' => $item->f_stock_uom,
-                'item_image' => ($item_image) ? $item_image->imgprimayx : null,
+                'item_image' => ($image) ? $image->imgprimayx : null,
                 'insufficient_stock' => ($item->qty > $item->f_qty) ? 1 : 0
             ];
+        }
+
+        $cross_sell_products = DB::table('fumaco_items_cross_sell')->whereIn('item_code', collect($cart_items)->pluck('f_idcode'))->whereNotIn('item_code_cross_sell', collect($cart_items)->pluck('f_idcode'))->get();
+        
+        $all_item_discount = DB::table('fumaco_on_sale')->whereDate('start_date', '<=', Carbon::now()->toDateString())->whereDate('end_date', '>=', Carbon::now()->toDateString())->where('status', 1)->where('apply_discount_to', 'All Items')->first();
+
+        $cross_sell_arr = [];
+        foreach($cross_sell_products as $cs){
+            $item_details = DB::table('fumaco_items as item')->join('fumaco_items_image_v1 as img', 'item.f_idcode', 'img.idcode')->where('item.f_idcode', $cs->item_code_cross_sell)->first();
+            if ($item_details) {
+                $image = DB::table('fumaco_items_image_v1')->where('idcode', $item_details->f_idcode)->first();
+                $item_price = $item_details->f_default_price;
+                $item_on_sale = $item_details->f_onsale;
+                
+                $is_new_item = 0;
+                if($item_details->f_new_item == 1){
+                    if($item_details->f_new_item_start <= Carbon::now() and $item_details->f_new_item_end >= Carbon::now()){
+                        $is_new_item = 1;
+                    }
+                }
+                // get item price, discounted price and discount rate
+                $item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $item_details->f_cat_id, $sale, $item_price, $item_details->f_idcode, $item_details->f_discount_type, $item_details->f_discount_rate, $item_details->f_stock_uom);
+                // get product reviews
+                $product_reviews = $this->getProductRating($item_details->f_idcode);
+               
+                $cross_sell_arr[] = [
+                    'item_code' => $item_details->f_idcode,
+                    'item_name' => $item_details->f_name_name,
+                    'default_price' => '₱ ' . number_format($item_price_data['item_price'], 2, '.', ','),
+                    'is_discounted' => ($item_price_data['discount_rate'] > 0) ? $item_price_data['is_on_sale'] : 0,
+                    'on_stock' => ($item_details->f_qty - $item_details->f_reserved_qty) > 0 ? 1 : 0,
+                    'discounted_price' => '₱ ' . number_format($item_price_data['discounted_price'], 2, '.', ','),
+                    'discount_display' => $item_price_data['discount_display'],
+                    'image' => ($image) ? $image->imgprimayx : null,
+                    'slug' => $item_details->slug,
+                    'is_new_item' => $is_new_item,
+                    'overall_rating' => $product_reviews['overall_rating'],
+                    'total_reviews' => $product_reviews['total_reviews']
+                ];
+            }
+
+            $product_review_per_code = DB::table('fumaco_product_review')->where('status', '!=', 'pending')->where('item_code', $item_details->f_idcode)->get();
         }
 
         $bill_address = "";
@@ -281,7 +305,7 @@ class CartController extends Controller
             return view('frontend.cart_preview', compact('cart_arr', 'bill_address', 'ship_address'));
         }
 
-        return view('frontend.cart', compact('cart_arr', 'bill_address', 'ship_address'));
+        return view('frontend.cart', compact('cart_arr', 'bill_address', 'ship_address', 'cross_sell_arr'));
     }
 
     public function updateCart(Request $request) {
@@ -300,12 +324,17 @@ class CartController extends Controller
                 $existing_cart = DB::table('fumaco_cart')->where('transaction_id', $order_no)
                     ->where('item_code', $product_details->f_idcode)->first();
                 if ($existing_cart) {
-                    $plus_qty = $existing_cart->qty + 1;
-                    $minus_qty = $existing_cart->qty - 1;
+                    if($request->type == 'increment'){
+                        $new_qty = $existing_cart->qty + 1;
+                    }else if($request->type == 'decrement'){
+                        $new_qty = $existing_cart->qty - 1;
+                    }else{
+                        $new_qty = $request->quantity;
+                    }
                     DB::table('fumaco_cart')->where('id', $existing_cart->id)->update([
                         'user_type' => (Auth::check()) ? 'member' : 'guest',
                         'user_email' => (Auth::check()) ? Auth::user()->username : null,
-                        'qty' => ($request->type == 'increment') ? $plus_qty : $minus_qty,
+                        'qty' => $new_qty,
                         'ip' => $request->ip(),
                         'city' => $loc->getCity(),
                         'region' => $loc->getRegion(),
@@ -370,8 +399,9 @@ class CartController extends Controller
                     [
                         'userid' => Auth::user()->id,
                         'item_code' => $id,
+                        'category_id' => $product_details->f_cat_id,
                         'item_name' => $product_details->f_name_name,
-                        'item_price' => ($product_details->f_price > 0) ? $product_details->f_price : $product_details->f_original_price
+                        'item_price' => $product_details->f_default_price
                     ]
                 );
     

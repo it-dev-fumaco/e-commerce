@@ -27,108 +27,40 @@
                         <div class="col-md-12">
                             <div class="card card-primary">
                                 <div class="card-body">
-                                    <div class="col-md-12">
-                                        <div class="float-right">
-                                            <form action="" method="GET">
-                                                <div class="form-group row">
-                                                    <div class="col-sm-9">
-                                                        <input type="text" class="form-control" id="search-box" name="q" placeholder="Search" value="{{request()->get('q')}}">
-                                                    </div>
-                                                        
-                                                    <div class="col-sm-2">
-                                                        <button type="submit" class="btn btn-primary">Search</button>
-                                                    </div>
+                                    <form action="/admin/customer/list" method="GET">
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                <div class="input-group mb-3">
+                                                    <input type="text" class="form-control" id="search-box" name="q" placeholder="Search" value="{{request()->get('q')}}">
                                                 </div>
-                                            </form>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <button type="submit" class="btn btn-secondary">Search</button>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <table class="table table-hover table-bordered">
-                                        <tr>
-                                            <th>First name</th>
-                                            <th>Last Name</th>
-                                            <th>Email</th>
-                                            <th>Date Registered</th>
-                                            <th>Total No. of Visits</th>
-                                            <th>Last login</th>
-                                            <th>Action</th>
-                                        </tr>
-                                        @forelse ($user_arr as $user)
+                                    </form>
+                                    <table class="table table-hover table-bordered" style="font-size: 11pt;">
+                                        <thead>
                                             <tr>
-                                                <td>{{ $user['first_name'] }}</td>
-                                                <td>{{ $user['last_name'] }}</td>
-                                                <td>{{ $user['email'] }}</td>
-                                                <td>{{ $user['created_at'] }}</td>
-                                                <td>{{ $user['no_of_visits'] }}</td>
-                                                <td>{{ $user['last_login'] }}</td>
-                                                <td class="col-sm-3">
-                                                    <button type="button" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#ship-{{ $user['id'] }}">
-                                                        Shipping Address
-                                                    </button>
-                                                    <button type="button" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#bill-{{ $user['id'] }}">
-                                                        Billing Address
-                                                    </button>
-
-                                                    <!-- Shipping Modal -->
-                                                    <div class="modal fade" id="ship-{{ $user['id'] }}" tabindex="-1" role="dialog" aria-labelledby="ship-{{ $user['id'] }}Label" aria-hidden="true">
-                                                        <div class="modal-dialog" role="document">
-                                                            <div class="modal-content">
-                                                                <div class="modal-header">
-                                                                    <h5 class="modal-title" id="ship-{{ $user['id'] }}Label">Shipping Address</h5>
-                                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                                        <span aria-hidden="true">&times;</span>
-                                                                    </button>
-                                                                </div>
-                                                                <div class="modal-body">
-                                                                    @if($user['shipping_address'] == 1)
-                                                                        <p>Address Type: {{ $user['ship_address1'] }}</p>
-                                                                        <p>Address 1: {{ $user['ship_address2'] }}</p>
-                                                                        <p>Address 2: {{ $user['ship_province'] }}</p>
-                                                                        <p>Province: {{ $user['ship_city'] }}</p>
-                                                                        <p>City: {{ $user['ship_brgy'] }}</p>
-                                                                        <p>Barangay: {{ $user['ship_postal'] }}</p>
-                                                                        <p>Postal Code: {{ $user['ship_country'] }}</p>
-                                                                        <p>Country: {{ $user['ship_type'] }}</p>
-                                                                    @else
-                                                                        <p>No Listed Address</p>
-                                                                    @endif
-                                                                </div>
-                                                                <div class="modal-footer">
-                                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                    <!-- Billing Modal -->
-                                                    <div class="modal fade" id="bill-{{ $user['id'] }}" tabindex="-1" role="dialog" aria-labelledby="bill-{{ $user['id'] }}Label" aria-hidden="true">
-                                                        <div class="modal-dialog" role="document">
-                                                            <div class="modal-content">
-                                                                <div class="modal-header">
-                                                                    <h5 class="modal-title" id="bill-{{ $user['id'] }}Label">Billing Address</h5>
-                                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                                        <span aria-hidden="true">&times;</span>
-                                                                    </button>
-                                                                </div>
-                                                                <div class="modal-body">
-                                                                    @if($user['billing_address'] == 1)
-                                                                        <p>Address Type: {{ $user['bill_address1'] }}</p>
-                                                                        <p>Address 1: {{ $user['bill_address2'] }}</p>
-                                                                        <p>Address 2: {{ $user['bill_province'] }}</p>
-                                                                        <p>Province: {{ $user['bill_city'] }}</p>
-                                                                        <p>City: {{ $user['bill_brgy'] }}</p>
-                                                                        <p>Barangay: {{ $user['bill_postal'] }}</p>
-                                                                        <p>Postal Code: {{ $user['bill_country'] }}</p>
-                                                                        <p>Country: {{ $user['bill_type'] }}</p>
-                                                                    @else
-                                                                        <p>No Listed Address</p>
-                                                                    @endif
-                                                                </div>
-                                                                <div class="modal-footer">
-                                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
+                                                <th class="text-center">ID</th>
+                                                <th class="text-center">Customer Name</th>
+                                                <th class="text-center">Email Address</th>
+                                                <th class="text-center">Customer Group</th>
+                                                <th class="text-center">Last Login Date</th>
+                                                <th class="text-center">Action</th>
+                                            </tr>
+                                        </thead>
+                                        
+                                        @forelse ($users as $user)
+                                            <tr>
+                                                <td class="text-center">{{ $user->id }}</td>
+                                                <td class="text-left">{{ $user->f_name . ' ' . $user->f_lname }}</td>
+                                                <td class="text-center">{{ $user->username }}</td>
+                                                <td class="text-center">
+                                                    {{ (array_key_exists($user->customer_group, $customer_groups->toArray())) ? $customer_groups[$user->customer_group] : null; }}</td>
+                                                <td class="text-center">{{ \Carbon\Carbon::parse($user->created_at)->format('M d, Y - h:i A') }}</td>
+                                                <td class="text-center">
+                                                    <a href="/admin/customer/profile/{{ $user->id }}" class="btn btn-sm btn-primary">View Profile</a>
                                                 </td>
                                             </tr>
                                         @empty
@@ -138,7 +70,7 @@
                                         @endforelse
                                     </table>
                                     <div class="float-right mt-4">
-                                        {{ $user_info->withQueryString()->links('pagination::bootstrap-4') }}
+                                        {{ $users->withQueryString()->links('pagination::bootstrap-4') }}
                                     </div>
                                 </div>
                             </div>

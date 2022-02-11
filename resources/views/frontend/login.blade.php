@@ -70,18 +70,20 @@
                             </p>
                             <hr>
                             <small class="text-muted"> or sign in with</small>
-                           
-                            <button class="btn mt-2 text-white align-middle" style="display: block; width: 100%; background-color:  #115cf3;" onclick="triggerLogin();" type="button">
-                              <i class="fab fa-facebook mr-3" style="font-size: 1.3rem;"></i> <span style="font-size: 14px;">Sign in with Facebook</span> 
-                            </button>
-                            <a href="{{ route('google.login') }}" class="btn text-dark login-with-google-btn mt-2">
-                              <img src="{{ asset('assets/google.svg') }}" width="23" class="m-1"> Sign in with Google
-                          </a>
-                          <label for="InputPassword" class="status-1"></label>
-                      </div>
+                            <div class="effect">
+                              <div class="buttons">
+                                <a href="#" class="fb" title="Sign in with Facebook" onclick="triggerLogin();"><i class="fa fa-facebook" aria-hidden="true"></i></a>
+                                <a href="{{ route('google.login') }}" class="g-plus" title="Sign in with Google">
+                                  <img src="{{ asset('assets/google.svg') }}" width="25">
+                                </a>
+                                <a href="{{ route('linkedin.login') }}" class="in" title="Sign in with Linked In"><i class="fa fa-linkedin" aria-hidden="true"></i></a>
+                                <a href="#" class="tw" title="Sign in with Apple"><i class="fab fa-apple" aria-hidden="true"></i></a>
+                              </div>
+                            </div>
+                            <label for="InputPassword" class="status-1"></label>
+                          </div>
                       </center>
                   </form>
-
                   <form action="/reset/password/" class="form-reset" style="border-color: #efefef; border-style: solid; border-width: 1px; border-top: 8px solid #186eaa; ">
                       <input type="email" id="resetEmail" class="form-control" placeholder="Email address" required="" autofocus="">
                       <button class="btn btn-primary btn-block" type="submit">Reset Password</button>
@@ -119,31 +121,46 @@
 </main>
 
 <style>
-
-.login-with-google-btn {
-   display: block;
-   width: 100%;
-  transition: background-color 0.3s, box-shadow 0.3s;
-  border: none;
-  border-radius: 3px;
-  box-shadow: 0 -1px 0 rgba(0, 0, 0, 0.04), 0 1px 1px rgba(0, 0, 0, 0.25);
-  color: #757575;
-  font-size: 14px;
-  font-weight: 500;
-  background-color: white;
+.effect {
+  width: 100%;
 }
-.login-with-google-btn:hover {
-  box-shadow: 0 -1px 0 rgba(0, 0, 0, 0.04), 0 2px 4px rgba(0, 0, 0, 0.25);
+.effect .buttons {
+  display: flex;
+  justify-content: center;
 }
-.login-with-google-btn:active {
-  background-color: #eeeeee;
+.effect a {
+  text-align: center;
+  margin: 3px 8px;
+  text-decoration: none !important;
+  color: white !important;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  font-size: 20px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 0 7px 0 #404040;
 }
-.login-with-google-btn:focus {
-  outline: none;
-  box-shadow: 0 -1px 0 rgba(0, 0, 0, 0.04), 0 2px 4px rgba(0, 0, 0, 0.25), 0 0 0 3px #c8dafc;
+.effect a i {
+  position: relative;
+  z-index: 3;
+}
+.effect a.fb {
+  background-color: #3b5998;
+}
+.effect a.tw {
+  background-color: #aeb5c5;
+}
+.effect a.g-plus {
+  background-color: #fff;
+}
+.effect a.in {
+  background-color: #007bb6;
 }
 </style>
-
 @endsection
 
 @section('script')
@@ -216,6 +233,16 @@
       border:1px solid red;
   }
 
+  .btn-linkedin {
+	  background: #0E76A8;
+	}
+	.btn-linkedin:link, .btn-linkedin:visited {
+	  color: #fff;
+	}
+	.btn-linkedin:active, .btn-linkedin:hover {
+	  background: #084461;
+	  color: #fff;
+	}
 
   #logreg-forms button[type="submit"]{ margin-top:10px; }
 

@@ -28,7 +28,7 @@
                         <br>
                         <p class="card-text">Thank you for subscribing to our newsletter. You'll receive updates straight to your inbox!</p>
                         <br/>
-                        <p class="card-text">You may I also Like and follow us on our social media accounts</p>
+                        <p class="card-text">You may also like and follow us on our social media accounts.</p>
                         <br>
                         <i class="fa fa-twitter" aria-hidden="true" style="font-size: 20pt !important"></i>&nbsp;&nbsp;<i class="fa fa-facebook-square" aria-hidden="true" style="font-size: 20pt !important"></i>&nbsp;&nbsp;<i class="fa fa-instagram" aria-hidden="true" style="font-size: 20pt !important"></i>
                         <br>

@@ -215,11 +215,11 @@
 											</center>
 										</td>
 										<td>
-											<span class="d-block">{{ $cart['item_description'] }}</span>
+											<span class="d-block">{!! $cart['item_description'] !!}</span>
 										</td>
 										<td style="text-align: center;">{{ $cart['quantity'] }}</td>
 										<td class="col-md-2" style="text-align: right;">
-											<span class="d-block" id="{{ $cart['item_code'] }}">₱ {{ number_format($cart['subtotal'], 2, '.', ',') }}</span>
+											<span class="d-block" id="{{ $cart['item_code'] }}" style="white-space: nowrap !important">₱ {{ number_format($cart['subtotal'], 2, '.', ',') }}</span>
 											<span class="amount d-none">{{ $cart['subtotal'] }}</span>
 										</td>
 									</tr>
@@ -278,7 +278,7 @@
 										<select id="store-selection" class="form-control no-click-outline formslabelfnt" style="text-align: center;">
 											<option value="">Select Store</option>
 											@foreach ($srate['stores'] as $store)
-											<option value="{{ $store->store_name }}" data-address="{{ $store->address }}" data-available-time="Available Time: <br>{{ date("h:i A", strtotime($store->available_from)) . ' - ' . date("h:i A", strtotime($store->available_to)) }}">{{ $store->store_name }}</option>
+											<option value="{{ $store->store_name }}" data-address="{{ $store->address }}" data-available-time="Available Time: <br>{{ date("h:i A", strtotime($store->available_from)) . ' - ' . date("h:i A", strtotime($store->available_to)) }}" data-start="{{ $store->available_from }}" data-end="{{ $store->available_to }}" data-leadtime="{{ $store->allowance_in_hours }}">{{ $store->store_name }}</option>
 											@endforeach
 										</select>
 										<div class="m-1 text-left" id="store-address"></div>
@@ -287,8 +287,16 @@
 								</div>
 								<div class="col-md-6 offset-md-3 bootstrap-timepicker">
 									<div class="form-group">
-										<label for="pickup-time">Pickup by *</label>
-										<input type="text" class="form-control no-click-outline" id="pickup-time" style="text-align: center;">
+										<label for="pickup-time">Pickup by</label>
+										<input type="text" class="form-control no-click-outline" id="pickup-time" style="text-align: center;" placeholder="Choose a date">
+									</div>
+								</div>
+								<div class="col-md-6 offset-md-3">
+									<div class="form-group">
+										<label for="pickup-timeslot">Pickup Time</label>
+										<select class="form-control no-click-outline" style="text-align: center;" id="pickup-timeslot">
+											<option value="">Please select store</option>
+										</select>
 									</div>
 								</div>
 							</div>
@@ -1182,6 +1190,7 @@
 					success: function (response) {
 						if (response.status == 0) {
 							$('#coupon-alert').removeClass('d-none').text(response.message);
+							$('.voucher-item-code').addClass('d-none');
 							$('#voucher-code').addClass('d-none').text('');
 							$('#discount-div').addClass('d-none');
 							$('#discount-amount').text('0.00');
@@ -1196,6 +1205,13 @@
 							$('#coupon-code').removeClass('is-invalid');
 							$('#coupon-alert').addClass('d-none');
 
+							if(response.item_applied_discount.length > 0) {
+								$.each(response.item_applied_discount, function(d, a){
+									$('#voucherApp' + a).removeClass('d-none');
+								});
+							} else {
+								$('.voucher-item-code').addClass('d-none');
+							}
 							var existing_fd = $("input:radio[name='shipping_fee'][data-sname='Free Delivery']").length;
 							if (existing_fd <= 0) {
 								if(response.shipping && response.shipping.length != 0) {
@@ -1317,14 +1333,15 @@
 
 			var ispick = $("input[name='shipping_fee']:checked").data('pickup');
 			var picktime = $('#pickup-time').val();
+			var timeslot = $('#pickup-timeslot').val();
 			var storeloc = $("#store-selection").val();
 			
 			var data = {
-				estimated_del, s_name, s_amount, _token: '{{ csrf_token() }}', storeloc, picktime
+				estimated_del, s_name, s_amount, _token: '{{ csrf_token() }}', storeloc, picktime, timeslot
 			}
 
-			if(ispick && (!storeloc || !picktime)) {
-				$('#alert-box').removeClass('d-none').text('Please select store and pickup date');
+			if(ispick && (!storeloc || !picktime || !timeslot)) {
+				$('#alert-box').removeClass('d-none').text('Please select store and pickup date & time');
 			} else {
 				$('#custom-overlay').fadeIn();
 
@@ -1372,19 +1389,20 @@
 				$('#for-store-pickup').removeClass('d-none');
 				$('#store-selection').val('');
 				$('#store-selection').attr('required', true);
-
-				var l = $("input[name='shipping_fee']:checked").data('lead');
-
-				$("#pickup-time").datepicker({
-					showInputs: false,
-					startDate: '+'+ l +'d',
-					format: 'D, M. dd, yyyy',
-					autoclose: true,
-					daysOfWeekDisabled: [0]
+				$('#pickup-time').attr({
+					'required': true,
+					'placeholder': 'Please select store',
+					'disabled': true
+				});
+				$('#pickup-timeslot').attr({
+					'required': true,
+					'disabled': true
 				});
 			}else{
 				$('#for-store-pickup').addClass('d-none');
 				$('#store-selection').removeAttr('required');
+				$('#pickup-time').removeAttr('required');
+				$('#pickup-timeslot').removeAttr('required');
 				$('#available-time').text('');
 				$('#store-address').text('');
 			}
@@ -1395,7 +1413,7 @@
 
 			$("#total_amount").val($('#grand-total').text());
 		}
-		
+
 		var provinces_edit = [];
 		// Edit Shipping Address
 		$('.shipping').click(function(){ 
@@ -1490,7 +1508,6 @@
 		// Edit Billing Address
 		$('.billing').click(function(){
 			var bill_key = $(this).attr('class').split(' ').pop();
-			console.log(bill_key);
 			$('.bill_type').change(function(){
 				if($(this).val() == "Business Address"){
 					$("#bill_for_business_"+bill_key).slideDown();
@@ -1580,7 +1597,6 @@
 		// Edit Billing Address
 
 		// Add Address
-
 		var str = "{{ implode(',', $shipping_zones) }}";
 		var res = str.split(",");
 		var provinces = [];
@@ -1751,6 +1767,65 @@
 		});
 
 		$('#store-selection').on('change', function(e){
+			$('#pickup-timeslot').empty();
+			$('#pickup-time').attr({
+					'required': true,
+					'placeholder': 'Choose a date',
+					'disabled': false
+				});
+				$('#pickup-timeslot').attr({
+					'required': true,
+					'disabled': false
+				});
+
+			var leadtime = $('#store-selection option:selected').data('leadtime');
+
+			$('#pickup-time').datepicker('update', '');
+			$('#pickup-time').datepicker('remove', 'startDate');
+
+			$("#pickup-time").datepicker({
+				showInputs: false,
+				startDate: '+'+ (leadtime/24) +'d',
+				format: 'D, M. dd, yyyy',
+				autoclose: true,
+				daysOfWeekDisabled: [0],
+			}).on('changeDate', function(e) {
+				var s1 = $('#store-selection option:selected').data('start');
+				var s2 = $('#store-selection option:selected').data('end');
+
+				var start = new Date(new Date(e.date).toLocaleDateString() + ' ' + s1);
+				var end = new Date(new Date(e.date).toLocaleDateString() + ' ' + s2);
+
+				var startHour = start.getHours();
+				var endHour = end.getHours();
+
+				var am = [];
+				var pm = [];
+				var p = 1;
+				for (let i = (startHour + 1); i <= endHour; i++) {
+					if (i <= 12) {
+						am.push(i);
+					} else {
+						pm.push(p);
+						p++;
+					}
+				}
+
+				var am_min = Math.min.apply(Math, am) + ':00 AM';
+				var am_max = Math.max.apply(Math, am) + ((Math.max.apply(Math, am) == 12) ? ':00 NN' : ':00 AM');
+				var pm_min = Math.min.apply(Math, pm) + ':00 PM';
+				var pm_max = Math.max.apply(Math, pm) + ':00 PM';
+				
+				var timeslots = [am_min + ' - ' + am_max, pm_min + ' - ' + pm_max];
+				var opt = '<option value="">Select timeslot</option>';
+				$.each(timeslots, function(i, d){
+					opt += '<option value="' + d + '">' + d + '</option>';
+				});
+
+				$('#pickup-timeslot').empty();
+				$('#pickup-timeslot').append(opt);
+			});
+
 			if ($(this).val()) {
 				var available_time = $(this).find(':selected').data('available-time');
 				$('#available-time').html(available_time);

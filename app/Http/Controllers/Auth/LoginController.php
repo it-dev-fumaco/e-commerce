@@ -10,6 +10,7 @@ use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Laravel\Socialite\Facades\Socialite;
 use App\Models\User;
+use Carbon\Carbon;
 
 class LoginController extends Controller
 {
@@ -59,6 +60,9 @@ class LoginController extends Controller
 
             $this->updateCartItemOwner();
 
+            // save last login and no of visits
+            $this->saveLoginDetails();
+
             if ($request->has('summary')){
                 return redirect('/checkout/summary');
             }
@@ -68,6 +72,21 @@ class LoginController extends Controller
 
         return redirect()->back()->withInput()
             ->with('error', 'Your email address or password is incorrect, please try again');
+    }
+
+    private function saveLoginDetails(){
+        DB::beginTransaction();
+        try {
+            $checker = DB::table('fumaco_users')->where('id', Auth::user()->id)->first();
+            DB::table('fumaco_users')->where('id', Auth::user()->id)->update([
+                'last_login' => Carbon::now(),
+                'no_of_visits' => $checker->no_of_visits ? $checker->no_of_visits + 1 : 1
+            ]);
+            DB::commit();
+        } catch (Exception $e) {
+            DB::rollback();
+            return redirect()->back()->with('error', 'An error occured. Please try again.');
+        }
     }
 
     public function logout(){

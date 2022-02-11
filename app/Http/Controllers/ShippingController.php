@@ -67,22 +67,18 @@ class ShippingController extends Controller
         return view('backend.shipping.add_holiday');
     }
 
-    private function adjustOrderDates($new_holiday){
+    private function adjustOrderDates($new_holiday){ // check and update existing estimated delivery/pickup dates
         $excluded_statuses = DB::table('order_status')->where('update_stocks', 1)->select('status')->get();
+            
         $estimated_delivery_dates = DB::table('fumaco_order')->whereNotIn('order_status', collect($excluded_statuses)->pluck('status'))->where('order_status', '!=', 'Cancelled')->select('id', 'order_number', 'order_status', 'estimated_delivery_date', 'pickup_date', 'order_shipping')->get();
 
         $update_leadtime = 0;
         $update_pickup_date = 0;
 
         foreach($estimated_delivery_dates as $edd){
-            $update_leadtime = 0;
-            $update_pickup_date = 0;
-
-            $date = $edd->estimated_delivery_date ? explode(' - ', $edd->estimated_delivery_date) : [];
+            $date = $edd->estimated_delivery_date ? explode(' - ', $edd->estimated_delivery_date) : null;
             $year = $edd->estimated_delivery_date ? explode(', ', $edd->estimated_delivery_date) : null;
             $month = $edd->estimated_delivery_date ? explode(' ', $edd->estimated_delivery_date) : null;
-
-            $date_count = count($date);
 
             $min_leadtime = null;
             $max_leadtime = null;
@@ -96,26 +92,25 @@ class ShippingController extends Controller
 
             if($edd->order_shipping != 'Store Pickup'){
                 $update_pickup_date = 0;
-                if($date_count == 2){
-                    if(DateTime::createFromFormat('M d, Y', $date[0])){ // check and convert min leadtime to proper date format
-                        $min_leadtime = $date[0];
-                    }else{
-                        $min_leadtime = $date[0].', '.$year[1];
-                    }
-    
-                    if(DateTime::createFromFormat('M d, Y', $date[1])){ // check and convert max leadtime to proper date format
-                        $max_leadtime = $date[1];
-                    }else{
-                        $max_leadtime = $month[0].' '.$date[1];
-                    }
-    
+                if(DateTime::createFromFormat('M d, Y', $date[0])){ // check and convert min leadtime to proper date format
+                    $min_leadtime = $date[0];
+                }else{
+                    $min_leadtime = $date[0].', '.$year[1];
+                }
+
+                if(DateTime::createFromFormat('M d, Y', $date[1])){ // check and convert max leadtime to proper date format
+                    $max_leadtime = $date[1];
+                }else{
+                    $max_leadtime = $month[0].' '.$date[1];
+                }
+
+                if(Carbon::parse($min_leadtime)->format('Y') == Carbon::parse($new_holiday)->format('Y') and Carbon::parse($max_leadtime)->format('Y') == Carbon::parse($new_holiday)->format('Y')){
                     if($min_leadtime == $new_holiday){
                         $update_leadtime = 1;
                         $new_min_leadtime = Carbon::parse($min_leadtime)->addDays(1);
                         $new_max_leadtime = Carbon::parse($max_leadtime)->addDays(1);
-                    }else if($new_holiday > $min_leadtime and $new_holiday <= $max_leadtime){
+                    }else if($min_leadtime <= $new_holiday and $max_leadtime >= $new_holiday){
                         $update_leadtime = 1;
-                        $new_min_leadtime = $min_leadtime;
                         $new_max_leadtime = Carbon::parse($max_leadtime)->addDays(1);
                     }
                 }
@@ -133,14 +128,6 @@ class ShippingController extends Controller
                         $new_leadtime = Carbon::parse($new_min_leadtime)->format('M d, Y'). ' - ' .Carbon::parse($new_max_leadtime)->format('M d, Y');
                     }
                 }
-
-                if($date_count == 1){ // those with only one estimated date arrival
-                    $update_leadtime = 0;
-                    if($date[0] == $new_holiday){
-                        $update_leadtime = 1;
-                        $new_leadtime = Carbon::parse($date[0])->addDays(1)->format('M d, Y');
-                    }
-                }
             }else{
                 $update_leadtime = 0;
                 $pickup_date = $edd->pickup_date;
@@ -150,7 +137,7 @@ class ShippingController extends Controller
                     $new_pickup_date = Carbon::parse($pickup_date)->addDays(1);
                 }
             }
-            
+
             if($update_leadtime == 1){
                 DB::table('fumaco_order')->where('id', $edd->id)->update([
                     'estimated_delivery_date' => $new_leadtime
@@ -162,33 +149,18 @@ class ShippingController extends Controller
                     'pickup_date' => $new_pickup_date
                 ]);
             }
-
-            // $test[] = [
-            //     'date_count' => $date ? count($date) : null,
-            //     'order_number' => $edd->order_number,
-            //     'estimated_delivery_date' => $edd->estimated_delivery_date,
-            //     'date2' => $date_count == 2 ? $date[1] : null, 
-            //     'new_holiday' => $new_holiday,
-            //     'min_leadtime' => $min_leadtime,
-            //     'max_leadtime' => $max_leadtime,
-            //     'new_min_leadtime' => $new_min_leadtime,
-            //     'new_max_leadtime' => $new_max_leadtime,
-            //     'new_leadtime' => $new_leadtime,
-            //     'update_leadtime' => $update_leadtime,
-            //     'pickup_date' => $edd->pickup_date,
-            //     'new_pickup_date' => $new_pickup_date
-            // ];
         }
     }
 
     public function addHoliday(Request $request){
         DB::beginTransaction();
         try {
-            $checker = DB::table('fumaco_holiday')->where('holiday_id', '!=', $request->id)->whereDate('holiday_date', Carbon::parse($request->date)->format('Y-m-d'))->exists();
+            $checker = DB::table('fumaco_holiday')->whereDate('holiday_date', Carbon::parse($request->date)->format('Y-m-d'))->exists();
             
             if($checker){
                 return redirect()->bacK()->with('error', 'Holiday Date Exists.');
             }
+
             $insert = [
                 'holiday_date' => $request->date,
                 'holiday_name' => $request->name,
@@ -199,7 +171,7 @@ class ShippingController extends Controller
             DB::table('fumaco_holiday')->insert($insert);
 
             $this->adjustOrderDates($new_holiday = Carbon::parse($request->date)->format('M d, Y'));
-            
+
             DB::commit();
             return redirect('/admin/holiday/list')->with('success', 'Holiday Added.');
         } catch (Exception $e) {
@@ -216,6 +188,7 @@ class ShippingController extends Controller
             if($checker){
                 return redirect()->bacK()->with('error', 'Holiday Date Exists.');
             }
+
             $update = [
                 'holiday_date' => $request->date,
                 'holiday_name' => $request->name,
@@ -310,6 +283,7 @@ class ShippingController extends Controller
                         $stores[] = [
                             'shipping_service_id' => $shipping_service->shipping_service_id,
                             'store_location_id' => $request->store[$e],
+                            'allowance_in_hours' => $request->allowed_hours[$e],
                             'created_by' => Auth::user()->username,
                             'last_modified_by' => Auth::user()->username,
                         ];
@@ -509,6 +483,7 @@ class ShippingController extends Controller
                         if(isset($request->shipping_service_store_id[$e])){
                             $values = [
                                 'store_location_id' => $request->store[$e],
+                                'allowance_in_hours' => $request->allowed_hours[$e],
                             ];
 
                             DB::table('fumaco_shipping_service_store')->where('shipping_service_store_id', $request->shipping_service_store_id[$e])->update($values);
@@ -516,6 +491,7 @@ class ShippingController extends Controller
                             $stores[] = [
                                 'shipping_service_id' => $shipping_service->shipping_service_id,
                                 'store_location_id' => $request->store[$e],
+                                'allowance_in_hours' => $request->allowed_hours[$e],
                             ];
                         }
                     }

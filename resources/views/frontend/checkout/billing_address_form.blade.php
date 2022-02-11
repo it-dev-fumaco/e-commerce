@@ -148,7 +148,7 @@
 								<label for="ship_tin" class="formslabelfnt">TIN Number :</label>
 								<input type="text" class="form-control formslabelfnt" id="ship_tin" name="ship_tin"><br class="d-lg-none d-xl-none"/>
 							</div>
-							<br>&nbsp;
+							<br class="d-none d-md-block">&nbsp;
 						</div>
 						<div class="row">
 							<div class="col-md-4">
@@ -307,7 +307,7 @@
 									<span aria-hidden="true"><i class="fas fa-times"></i></span>
 								</a>
 							</div>
-							<div class="modal-body" style="min-height: 500px;">
+							<div class="modal-body" style="min-height: 450px;">
 								<div class="row justify-content-center">
 									<div class="col-md-10">
 										<div class="form-group">
@@ -328,20 +328,19 @@
 										</p>
 										<hr>
 										<small class="text-muted"> or sign in with</small>
-										<button class="btn mt-2 text-white align-middle" style="display: block; width: 100%; background-color:  #115cf3;" onclick="triggerLogin();" type="button">
-											<i class="fab fa-facebook mr-3" style="font-size: 1.3rem;"></i> <span style="font-size: 14px;">Sign in with Facebook</span> 
-										  </button>
-										<a href="{{ route('google.login') }}" class="btn text-dark login-with-google-btn mt-2">
-											<img src="{{ asset('assets/google.svg') }}" width="23" class="m-1"> Sign in with Google
-										</a>
+										<div class="effect">
+											<div class="buttons">
+											  <a href="#" class="fb" title="Sign in with Facebook" onclick="triggerLogin();"><i class="fa fa-facebook" aria-hidden="true"></i></a>
+											  <a href="{{ route('google.login') }}" class="g-plus" title="Sign in with Google">
+												<img src="{{ asset('assets/google.svg') }}" width="25">
+											  </a>
+											  <a href="{{ route('linkedin.login') }}" class="in" title="Sign in with Linked In"><i class="fa fa-linkedin" aria-hidden="true"></i></a>
+											  <a href="#" class="tw" title="Sign in with Apple"><i class="fab fa-apple" aria-hidden="true"></i></a>
+											</div>
+										</div>
 									</div>
 								</div>
 							</div>
-							{{-- <div class="modal-footer">
-								<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-								<input type="checkbox" name="summary" readonly checked hidden>
-								<button type="submit" class="btn btn-primary">Login</button>
-							</div> --}}
 						</div>
 					</form>
 				</div>
@@ -358,31 +357,46 @@
 @endsection
 @section('style')
 <style>
-
-	.login-with-google-btn {
-		display: block;
+	.effect {
 		width: 100%;
-	   transition: background-color 0.3s, box-shadow 0.3s;
-	   border: none;
-	   border-radius: 3px;
-	   box-shadow: 0 -1px 0 rgba(0, 0, 0, 0.04), 0 1px 1px rgba(0, 0, 0, 0.25);
-	   color: #757575;
-	   font-size: 14px;
-	   font-weight: 500;
-	   background-color: white;
-	 }
-	 .login-with-google-btn:hover {
-	   box-shadow: 0 -1px 0 rgba(0, 0, 0, 0.04), 0 2px 4px rgba(0, 0, 0, 0.25);
-	 }
-	 .login-with-google-btn:active {
-	   background-color: #eeeeee;
-	 }
-	 .login-with-google-btn:focus {
-	   outline: none;
-	   box-shadow: 0 -1px 0 rgba(0, 0, 0, 0.04), 0 2px 4px rgba(0, 0, 0, 0.25), 0 0 0 3px #c8dafc;
-	 }
-	</style>
-<style>
+	}
+	.effect .buttons {
+		display: flex;
+		justify-content: center;
+	}
+	.effect a {
+		text-align: center;
+		margin: 3px 8px;
+		text-decoration: none !important;
+		color: white !important;
+		width: 50px;
+		height: 50px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: 10px;
+		font-size: 20px;
+		overflow: hidden;
+		position: relative;
+		box-shadow: 0 0 7px 0 #404040;
+	}
+	.effect a i {
+		position: relative;
+		z-index: 3;
+	}
+	.effect a.fb {
+		background-color: #3b5998;
+	}
+	.effect a.tw {
+		background-color: #aeb5c5;
+	}
+	.effect a.g-plus {
+		background-color: #fff;
+	}
+	.effect a.in {
+		background-color: #007bb6;
+	}
+
 	.products-head {
 		margin-top: 10px !important;
 		padding-left: 40px !important;
@@ -475,6 +489,20 @@
 			font-weight: 500;
 		}
 	}
+
+	/* select2 white block space issue */
+	#ship_province1_1,
+	#ship_City_Municipality1_1,
+	#ship_Barangay1_1,
+	#province1_1,
+	#City_Municipality1_1,
+	#Barangay1_1 {
+		box-sizing: border-box !important;
+		display: inline-block !important;
+		margin: 0 !important;
+		position: relative !important;
+		vertical-align: middle !important;
+	}
 </style>
 @endsection
 
@@ -485,7 +513,6 @@
 	$(document).ready(function() {
 		$('input[type="checkbox"]').prop("checked", true);
 		$('#ship_province1_1').empty();
-
 		var str = "{{ implode(',', $shipping_zones) }}";
 		var res = str.split(",");
 		var provinces = [];
@@ -575,7 +602,6 @@
 			});
 		});
 
-		// $('#ship_province1_1').val(null).trigger('change');
 		$('#ship_City_Municipality1_1').val(null).trigger('change');
 		$('#ship_Barangay1_1').val(null).trigger('change');
 
@@ -731,7 +757,6 @@
 			});
 		});
 
-		// $('#province1_1').val(null).trigger('change');
 		$('#City_Municipality1_1').val(null).trigger('change');
 		$('#Barangay1_1').val(null).trigger('change');
 

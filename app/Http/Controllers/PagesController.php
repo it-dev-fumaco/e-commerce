@@ -412,43 +412,56 @@ class PagesController extends Controller
     }
 
     public function searchList(Request $request){
-        $search_list = DB::table('fumaco_search_terms')->where('search_term', 'LIKE', '%'.$request->q.'%')->orderBy('date_last_searched', 'desc')->orderBy('frequency', 'desc')->paginate(10);
+        $search_list = DB::table(DB::raw('(SELECT search_term, COUNT(*) as count FROM fumaco_search_terms where search_term LIKE "%'.$request->q.'%" GROUP BY search_term) AS subquery'))
+            ->select('search_term', 'count')
+            ->orderBy('count', 'desc')
+            ->paginate(10);
         $search_arr = [];
 
-        foreach($search_list as $search){
+        foreach($search_list as $key => $search){
             $product_results = [];
             $blog_results = [];
-            if($search->prod_results){
-                $products = explode(',', $search->prod_results);
+            $location = DB::table(DB::raw('(SELECT search_term, city, region, country, COUNT(*) as count FROM fumaco_search_terms where search_term = "'.$search->search_term.'" GROUP BY search_term, city, region, country ) AS subquery'))
+				->select('search_term', 'city', 'region', 'country', 'count')
+				->orderBy('count', 'desc')
+				->get();
+
+            $search_results = DB::table('fumaco_search_results')->where('search_term', $search->search_term)->orderBy('date_searched', 'desc')->first();
+            
+            $products = $search_results ? explode(',', $search_results->prod_results) : [];
+            $blogs = $search_results ? explode(',', $search_results->blog_results) : [];
+            $products_count = count($products);
+            $blogs_count = count($blogs);
+ 
+            if($products){
                 foreach($products as $product){
                     $image = DB::table('fumaco_items_image_v1 as img')->where('idcode', $product)->first();
                     $details = DB::table('fumaco_items')->where('f_idcode', $product)->first();
                     $product_results[] = [
-                        'image' => $image->imgprimayx,
-                        'product_name' => $details->f_name_name,
+                        'image' => $image ? $image->imgprimayx : null,
+                        'product_name' => $details ? $details->f_name_name : null,
                         'item_code' => $product
                     ];
                 }
             }
 
-            if($search->blog_results){
-                $blogs = explode(',', $search->blog_results);
+            if($blogs){
                 foreach($blogs as $blog){
-                    $blog = DB::table('fumaco_blog')->where('id', $blog)->first();
+                    $blog_details = DB::table('fumaco_blog')->where('id', $blog)->first();
                     $blog_results[] = [
-                        'title' => $blog->blogtitle
+                        'title' => $blog_details ? $blog_details->blogtitle : null
                     ];
                 }
             }
             
             $search_arr[] = [
-                'id' => $search->id,
+                'id' => $key + 1,
                 'search_term' => $search->search_term,
-                'frequency' => $search->frequency,
-                'results_count' => $search->prod_results_count + $search->blog_results_count,
+                'frequency' => $search->count,
+                'location' => $location,
                 'product_results' => $product_results,
                 'blog_results' => $blog_results,
-                'last_search_date' => $search->date_last_searched
+                'results_count' => $products_count + $blogs_count,
             ];
         }
 

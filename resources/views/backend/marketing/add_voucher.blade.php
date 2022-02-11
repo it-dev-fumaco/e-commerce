@@ -72,7 +72,7 @@
                                             </div>
 
                                             <div class="col-6">
-                                                <label>Minimum Spend</label>
+                                                <label>Minimum Spend *</label>
                                                 <input type="text" class="form-control" name="minimum_spend" placeholder="Minimum Spend" required>
                                             </div>
                                         </div>
@@ -122,12 +122,16 @@
                                         <div class="row">
                                             <div class="col-6 mx-auto">
                                                 <div class="row">
+                                                    @php
+                                                        $coupon_type = array('Promotional', 'Per Category', 'Per Item', 'Per Customer Group');
+                                                    @endphp
                                                     <div class="col-8 mx-auto">
                                                         <label>Coupon Type *</label>
                                                         <select class="form-control" name="coupon_type" id="coupon_type" required>
                                                             <option disabled value="">Coupon Type</option>
-                                                            <option value="Promotional" selected>Promotional</option>
-                                                            <option value="Exclusive Voucher">Exclusive Voucher</option>
+                                                            @foreach ($coupon_type as $coupon)
+                                                                <option value="{{ $coupon }}" {{ $coupon == 'Promotional' ? 'selected' : '' }}>{{ $coupon }}</option>
+                                                            @endforeach
                                                         </select>
                                                     </div>
                                                     <div class="col-4">
@@ -136,27 +140,26 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            
                                         </div>
-                                        <div id="customers" class="row">
-                                            <select class="d-none form-control" name="customer_select" id="customer_select">
-                                                <option disabled selected value="">Select Customer</option>
-                                                @foreach ($customer_list as $customer)
-                                                    <option value="{{ $customer->id }}">{{ $customer->f_name.' '.$customer->f_lname }}</option>
+                                        <div id="categories" class="row">
+                                            <select class="d-none form-control" name="category_select" id="category_select">
+                                                <option disabled selected value="">Select a Category</option>
+                                                @foreach ($category_list as $category)
+                                                    <option value="{{ $category->id }}">{{ $category->name }}</option>
                                                 @endforeach
                                             </select>
                                             <div class="col-6 mx-auto">
                                                 <br/>
-                                                <table class="table table-bordered" id="customers-table">
-                                                     <thead>
-                                                          <tr>
-                                                                <th scope="col" class="text-center">Customer Name</th>
-                                                                <th class="text-center" style="width: 10%;"><button class="btn btn-outline-primary btn-sm" id="add-customers-btn">Add</button></th>
-                                                          </tr>
-                                                     </thead>
-                                                     <tbody>
+                                                <table class="table table-bordered" id="categories-table">
+                                                    <thead>
+                                                        <tr>
+                                                            <th scope="col" class="text-center">Category</th>
+                                                            <th class="text-center" style="width: 10%;"><button class="btn btn-outline-primary btn-sm" id="add-categories-btn">Add</button></th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
 
-                                                     </tbody>
+                                                    </tbody>
                                                 </table>
                                             </div>
                                         </div>
@@ -164,6 +167,39 @@
                                             <div class="col-6 mx-auto">
                                                 <br/>
                                                 <label><input type="checkbox" name="require_signin" id="require_signin"> Require Sign in</label>
+                                            </div>
+                                        </div>
+                                        <div id="items" class="row">
+                                            <div class="col-4 mx-auto">
+                                                <br/>
+                                                <select class="coupon_per_item w-100" name="selected_item[]" id="items_select" multiple="multiple">
+                                                    @foreach ($item_list as $item)
+                                                        <option value="{{ $item->f_idcode }}">{{ $item->f_idcode.' - '.$item->f_name_name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div id="customer-group" class="row">
+                                            <div class="col-6 mx-auto">
+                                                <select class="d-none w-100" id="customer_group_select">
+                                                    @foreach ($customer_group as $group)
+                                                        <option value="{{ $group->id }}">{{ $group->customer_group_name }}</option>
+                                                    @endforeach
+                                                </select>
+                                                <div class="col-6 mx-auto">
+                                                    <br/>
+                                                    <table class="table table-bordered" id="customer-group-table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th scope="col" class="text-center">Customer Group</th>
+                                                                <th class="text-center" style="width: 10%;"><button class="btn btn-outline-primary btn-sm" id="add-customer-group-btn">Add</button></th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+    
+                                                        </tbody>
+                                                    </table>
+                                                </div>
                                             </div>
                                         </div>
                                         <br/>
@@ -186,6 +222,7 @@
 @section('script')
 <script>
     $(document).ready(function(){
+        $('.coupon_per_item').select2({placeholder: 'Select Item(s)'});
         allotment();
         validityDate();
         discountType();
@@ -262,12 +299,26 @@
         }
 
         function couponType(){
-            if($('#coupon_type').val() == 'Exclusive Voucher'){
-                $('#customers').slideDown();
+            if($('#coupon_type').val() == 'Per Category'){
+                $('#categories').slideDown();
+                $('#for_promotional').slideUp();
+                $('#items').slideUp();
+                $('#customer-group').slideUp();
+            }else if($('#coupon_type').val() == 'Per Item'){
+                $('#items').slideDown();
+                $('#categories').slideUp();
+                $('#for_promotional').slideUp();
+                $('#customer-group').slideUp();
+            }else if($('#coupon_type').val() == 'Per Customer Group'){
+                $('#customer-group').slideDown();
+                $('#items').slideUp();
+                $('#categories').slideUp();
                 $('#for_promotional').slideUp();
             }else{
-                $('#customers').slideUp();
                 $('#for_promotional').slideDown();
+                $('#categories').slideUp();
+                $('#items').slideUp();
+                $('#customer-group').slideUp();
             }
         }
 
@@ -283,29 +334,43 @@
             height: "300px",
         });
 
-        $('#add-customers-btn').click(function(e){
+        $('#add-categories-btn').click(function(e){
 			e.preventDefault();
 
-			var clone_select = $('#customer_select').html();
+			var clone_select = $('#category_select').html();
 			var row = '<tr>' +
 				'<td class="p-2">' +
-					'<select name="selected_customer[]" class="form-control w-100" style="width: 100%;" required>' + clone_select + '</select>' +
+					'<select name="selected_category[]" class="form-control w-100" style="width: 100%;" required>' + clone_select + '</select>' +
 				'</td>' +
-				// '<td class="p-2">' +
-				// 	'<input type="text" name="customer_allowed_usage[]" class="form-control" placeholder="Allowed Usage">' +
-				// '</td>' +
 				'<td class="text-center">' +
 					'<button type="button" class="btn btn-outline-danger btn-sm remove-td-row">Remove</button>' +
 				'</td>' +
 			'</tr>';
 
-			$('#customers-table tbody').append(row);
+			$('#categories-table tbody').append(row);
+		});
+
+        $('#add-customer-group-btn').click(function(e){
+			e.preventDefault();
+
+			var clone_select = $('#customer_group_select').html();
+			var row = '<tr>' +
+				'<td class="p-2">' +
+					'<select name="selected_customer_group[]" class="form-control w-100" style="width: 100%;" required>' + clone_select + '</select>' +
+				'</td>' +
+				'<td class="text-center">' +
+					'<button type="button" class="btn btn-outline-danger btn-sm remove-td-row">Remove</button>' +
+				'</td>' +
+			'</tr>';
+
+			$('#customer-group-table tbody').append(row);
 		});
 
         $(document).on('click', '.remove-td-row', function(e){
 			e.preventDefault();
 			$(this).closest("tr").remove();
 		});
+
     });
     </script>
 @endsection
