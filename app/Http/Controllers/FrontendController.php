@@ -169,7 +169,8 @@ class FrontendController extends Controller
                     'caption' => null,
                     'slug' => $row->slug,
                     'on_stock' => ($row->f_qty - $row->f_reserved_qty) > 0 ? 1 : 0,
-                    'is_new_item' => $is_new_item
+                    'is_new_item' => $is_new_item,
+                    'stock_uom' => $row->f_stock_uom
                 ];
             }
 
@@ -193,7 +194,8 @@ class FrontendController extends Controller
                     'caption' => $blog->blog_caption,
                     'blog_slug' => $blog->slug,
                     'f_qty' => 0,
-                    'f_reserved_qty' => 0
+                    'f_reserved_qty' => 0,
+                    'stock_uom' => null
                 ];
             }
 
@@ -226,7 +228,7 @@ class FrontendController extends Controller
                     $item_on_sale = $result['is_discounted'];
                 
                     // get item price, discounted price and discount rate
-                    $item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $result['category_id'], $sale, $item_price, $result['item_code'], $result['discount_type'], $result['discount_rate']);
+                    $item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $result['category_id'], $sale, $item_price, $result['item_code'], $result['discount_type'], $result['discount_rate'], $result['stock_uom']);
                     // get product reviews
                     $product_reviews = $this->getProductRating($result['item_code']);
 
@@ -329,7 +331,7 @@ class FrontendController extends Controller
                     $is_new_item = 1;
           
                     // get item price, discounted price and discount rate
-                    $item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $item_details->f_cat_id, $sale, $item_price, $item_code, $item_details->f_discount_type, $item_details->f_discount_rate);
+                    $item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $item_details->f_cat_id, $sale, $item_price, $item_code, $item_details->f_discount_type, $item_details->f_discount_rate, $item_details->f_stock_uom);
                     // get product reviews
                     $product_reviews = $this->getProductRating($item_code);
 
@@ -400,7 +402,7 @@ class FrontendController extends Controller
                 }
             }
             // get item price, discounted price and discount rate
-            $item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $row->f_cat_id, $sale, $item_price, $row->f_idcode, $row->f_discount_type, $row->f_discount_rate);
+            $item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $row->f_cat_id, $sale, $item_price, $row->f_idcode, $row->f_discount_type, $row->f_discount_rate, $row->f_stock_uom);
             // get product reviews
             $product_reviews = $this->getProductRating($row->f_idcode);
         
@@ -435,7 +437,7 @@ class FrontendController extends Controller
                 }
             }
             // get item price, discounted price and discount rate
-            $item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $row->f_cat_id, $sale, $item_price, $row->f_idcode, $row->f_discount_type, $row->f_discount_rate);
+            $item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $row->f_cat_id, $sale, $item_price, $row->f_idcode, $row->f_discount_type, $row->f_discount_rate, $row->f_stock_uom);
             // get product reviews
             $product_reviews = $this->getProductRating($row->f_idcode);
             $on_sale_arr[] = [
@@ -497,7 +499,7 @@ class FrontendController extends Controller
                 $item_on_sale = $item->f_onsale;
 
                 // get item price, discounted price and discount rate
-                $item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $item->f_cat_id, $sale, $item_price, $item->f_idcode, $item->f_discount_type, $item->f_discount_rate);
+                $item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $item->f_cat_id, $sale, $item_price, $item->f_idcode, $item->f_discount_type, $item->f_discount_rate, $item->f_stock_uom);
 
                 $search_arr[] = [
                     'type' => 'Products',
@@ -1109,7 +1111,7 @@ class FrontendController extends Controller
                 }
             }
             // get item price, discounted price and discount rate
-            $item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $product->f_cat_id, $sale, $item_price, $product->f_idcode, $product->f_discount_type, $product->f_discount_rate);
+            $item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $product->f_cat_id, $sale, $item_price, $product->f_idcode, $product->f_discount_type, $product->f_discount_rate, $product->f_stock_uom);
             // get product reviews
             $product_reviews = $this->getProductRating($product->f_idcode);
           
@@ -1280,7 +1282,7 @@ class FrontendController extends Controller
             }
         }
         // get item price, discounted price and discount rate
-        $item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $product_details->f_cat_id, $sale, $item_price, $product_details->f_idcode, $product_details->f_discount_type, $product_details->f_discount_rate);
+        $item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $product_details->f_cat_id, $sale, $item_price, $product_details->f_idcode, $product_details->f_discount_type, $product_details->f_discount_rate, $product_details->f_stock_uom);
         // get product reviews
         $product_reviews = $this->getProductRating($product_details->f_idcode);
 
@@ -1339,7 +1341,7 @@ class FrontendController extends Controller
                         }
                     }
                     // get item price, discounted price and discount rate
-                    $item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $item_details->f_cat_id, $sale, $item_price, $item_details->f_idcode, $item_details->f_discount_type, $item_details->f_discount_rate);
+                    $item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $item_details->f_cat_id, $sale, $item_price, $item_details->f_idcode, $item_details->f_discount_type, $item_details->f_discount_rate, $item_details->f_stock_uom);
                     // get product reviews
                     $product_reviews = $this->getProductRating($item_details->f_idcode);
                 
@@ -1394,7 +1396,7 @@ class FrontendController extends Controller
             $image = DB::table('fumaco_items_image_v1')->where('idcode', $item_code)->first();
             
             // get item price, discounted price and discount rate
-            $item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $row->f_cat_id, $sale, $item_price, $item_code, $row->f_discount_type, $row->f_discount_rate);
+            $item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $row->f_cat_id, $sale, $item_price, $item_code, $row->f_discount_type, $row->f_discount_rate, $row->f_stock_uom);
             // get product reviews
             $product_reviews = $this->getProductRating($item_code);
             
@@ -1420,7 +1422,7 @@ class FrontendController extends Controller
         $related_products_query = DB::table('fumaco_items as a')
             ->join('fumaco_items_relation as b', 'a.f_idcode', 'b.related_item_code')
             ->where('b.item_code', $product_details->f_idcode)->where('a.f_status', 1)
-            ->select('a.id', 'a.f_idcode', 'a.f_default_price', 'a.f_onsale', 'a.f_name_name', 'a.slug', 'a.f_qty', 'a.f_reserved_qty', 'a.f_new_item', 'a.f_new_item_start', 'a.f_new_item_end', 'a.f_discount_rate', 'a.f_category', 'a.f_cat_id', 'a.f_discount_type')
+            ->select('a.id', 'a.f_idcode', 'a.f_default_price','a.f_stock_uom', 'a.f_onsale', 'a.f_name_name', 'a.slug', 'a.f_qty', 'a.f_reserved_qty', 'a.f_new_item', 'a.f_new_item_start', 'a.f_new_item_end', 'a.f_discount_rate', 'a.f_category', 'a.f_cat_id', 'a.f_discount_type')
             ->get();
 
         $related_products = [];
@@ -1436,7 +1438,7 @@ class FrontendController extends Controller
                 }
             }
             // get item price, discounted price and discount rate
-            $item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $row->f_cat_id, $sale, $item_price, $row->f_idcode, $row->f_discount_type, $row->f_discount_rate);
+            $item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $row->f_cat_id, $sale, $item_price, $row->f_idcode, $row->f_discount_type, $row->f_discount_rate, $row->f_stock_uom);
             // get product reviews
             $product_reviews = $this->getProductRating($row->f_idcode);
         

@@ -389,7 +389,7 @@ class CheckoutController extends Controller
 					}
 				}
 				// get item price, discounted price and discount rate
-				$item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $item->f_cat_id, $sale, $item_price, $item->f_idcode, $item->f_discount_type, $item->f_discount_rate);
+				$item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $item->f_cat_id, $sale, $item_price, $item->f_idcode, $item->f_discount_type, $item->f_discount_rate, $item->f_stock_uom);
 
 				$cart_arr[] = [
 					'item_code' => $item->f_idcode,
@@ -511,7 +511,7 @@ class CheckoutController extends Controller
 				$item_on_sale = $item->f_onsale;
 
 				// get item price, discounted price and discount rate
-				$item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $item->f_cat_id, $sale, $item_price, $item->f_idcode, $item->f_discount_type, $item->f_discount_rate);
+				$item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $item->f_cat_id, $sale, $item_price, $item->f_idcode, $item->f_discount_type, $item->f_discount_rate, $item->f_stock_uom);
 			
 				$price = $item_price_data['discounted_price'];
 				$item_image = DB::table('fumaco_items_image_v1')
@@ -1065,7 +1065,7 @@ class CheckoutController extends Controller
 				}
 			}
 			// get item price, discounted price and discount rate
-			$item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $row->f_cat_id, $sale, $item_price, $row->f_idcode, $row->f_discount_type, $row->f_discount_rate);
+			$item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $row->f_cat_id, $sale, $item_price, $row->f_idcode, $row->f_discount_type, $row->f_discount_rate, $row->f_stock_uom);
 
 			$item_qty = $row->qty;
 			$price = $item_price_data['discounted_price'];
@@ -1323,7 +1323,7 @@ class CheckoutController extends Controller
 			$item_applied_discount = [];
 			foreach ($cart_items as $item) {
 				// get item price, discounted price and discount rate
-				$item_price_data = $this->getItemPriceAndDiscount($item->f_onsale, $item->f_cat_id, $sale, $item->f_default_price, $item->f_idcode, $item->f_discount_type, $item->f_discount_rate);
+				$item_price_data = $this->getItemPriceAndDiscount($item->f_onsale, $item->f_cat_id, $sale, $item->f_default_price, $item->f_idcode, $item->f_discount_type, $item->f_discount_rate, $item->f_stock_uom);
 
 				$price = ( $item_price_data['is_on_sale']) ? $item_price_data['discounted_price'] : $item_price_data['item_price'];
 				$item_total = $price * $item->qty;

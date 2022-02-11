@@ -233,7 +233,7 @@ class CartController extends Controller
                 }
             }
             // get item price, discounted price and discount rate
-            $item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $item->f_cat_id, $sale, $item_price, $item->f_idcode, $item->f_discount_type, $item->f_discount_rate);
+            $item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $item->f_cat_id, $sale, $item_price, $item->f_idcode, $item->f_discount_type, $item->f_discount_rate, $item->f_stock_uom);
             // get product reviews
             $product_reviews = $this->getProductRating($item->f_idcode);
 
@@ -270,7 +270,7 @@ class CartController extends Controller
                     }
                 }
                 // get item price, discounted price and discount rate
-                $item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $item_details->f_cat_id, $sale, $item_price, $item_details->f_idcode, $item_details->f_discount_type, $item_details->f_discount_rate);
+                $item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $item_details->f_cat_id, $sale, $item_price, $item_details->f_idcode, $item_details->f_discount_type, $item_details->f_discount_rate, $item_details->f_stock_uom);
                 // get product reviews
                 $product_reviews = $this->getProductRating($item_details->f_idcode);
                

@@ -7,7 +7,7 @@ use DB;
 use Carbon\Carbon;
 
 trait ProductTrait {
-    public function getItemPriceAndDiscount($item_on_sale, $category, $sale, $item_price, $item_code, $discount_type, $discount_rate) {
+    public function getItemPriceAndDiscount($item_on_sale, $category, $sale, $item_price, $item_code, $discount_type, $discount_rate, $uom) {
         // set discounted price based on sale details
         $discount_display = ($discount_type == 'percentage') ? ($discount_rate . '% OFF') : '₱' . number_format($discount_rate, 2, '.', ',') . ' OFF';
         $discount = ($discount_type == 'percentage') ? ($item_price * ($discount_rate/100)) : $discount_rate;
@@ -51,8 +51,8 @@ trait ProductTrait {
         }
         // get prices based on price list assigned for logged in user
         if (Auth::check()) {
-            $exclusive_pl = DB::table('fumaco_product_prices')->where('price_list_id', Auth::user()->pricelist_id)->where('item_code', $item_code)->first();
-
+            $exclusive_pl = DB::table('fumaco_product_prices')->where('price_list_id', Auth::user()->pricelist_id)
+                ->where('item_code', explode("-", $item_code)[0])->where('uom', $uom)->first();
             $item_price = ($exclusive_pl) ? $exclusive_pl->price : $item_price;
             if ($exclusive_pl) {
                 $item_on_sale = $exclusive_pl->on_sale;
