@@ -272,7 +272,7 @@ class FrontendController extends Controller
                 $loc = GeoLocation::lookup($request->ip());
 
                 $search_data = [
-                    'search_term' => $request->s,
+                    'search_term' => str_replace('"', "'", $request->s),
                     'ip' => $request->ip(),
                     'city' => $loc->getCity(),
                     'region' => $loc->getRegion(),
