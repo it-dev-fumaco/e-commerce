@@ -480,7 +480,7 @@ class FrontendController extends Controller
                 ->join('fumaco_categories as cat', 'item.f_cat_id', 'cat.id')
                 ->where('item.f_name_name', 'LIKE', '%'.$search_str.'%')
                 ->where('item.f_status', 1)
-                ->select('item.f_idcode', 'item.f_name_name', 'item.f_discount_type', 'item.f_discount_rate', 'item.f_default_price', 'item.f_onsale', 'item.f_cat_id', 'item.slug as item_slug', 'cat.*')
+                ->select('item.f_idcode', 'item.f_name_name', 'item.f_discount_type', 'item.f_discount_rate', 'item.f_default_price', 'item.f_onsale', 'item.f_cat_id', 'item.slug as item_slug', 'item.f_stock_uom', 'cat.*')
                 ->limit($request->type == 'desktop' ? 8 : 4)->get();
 
             if(count($item_keywords) == 0){

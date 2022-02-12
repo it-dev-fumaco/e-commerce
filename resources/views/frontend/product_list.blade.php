@@ -155,79 +155,76 @@
 									<div class="col-md-6" style="padding: 0; float: right !important; min-width: 120px !important; padding-right: 5%;">
 									
 									</div>
-									<div class="col-md-3 d-sm-block d-md-none filter-slide">
-										<div class="modal fade" id="filterModal2" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel2" aria-hidden="true">
-											<div class="modal-dialog modal-dialog-slideout modal-sm" role="document">
-											  <div class="modal-content">
-												<div class="modal-body">
-													<div class="d-flex justify-content-between align-items-center" style="font-weight: 500 !important;  margin: 20px !important"><b>Filter Results</b>
-														<a href="/products/{{ $product_category->slug }}" style="text-decoration: none;">
-															<small class="stylecap he2 text-dark" style="font-weight:400 !important; padding-right: 10px;">Clear All</small>
-														</a>
-													</div>
-													<hr>
-													<form action="/products/{{ $product_category->slug }}" method="POST" id="filter-form">
-														@csrf
-														@php
-															$a = 0;
-														@endphp
-														@if (count($filters['Brand']) > 1)
-														<div class="card mb-3 m-3" style="width: 85% !important">
-															<div class="card-header text-white font-weight-bold" style="font-size: 0.75rem; background-color: rgb(0, 98, 165);">BRAND</div>
-															<div class="card-body">
-																@foreach ($filters['Brand'] as $brand)
-																@php
-																	$a++;
-																	$filter_attr = Str::slug('brand', '-');
-																	$filter_values = explode('+', request()->brand);
-																	$status = (in_array($brand, $filter_values)) ? 'checked' : '';
-																@endphp
-																<div class="form-check">
-																	<input type="checkbox" class="form-check-input product-cb-filter" id="{{ 'cbb' . $a }}" name="{{ 'attr[' .$filter_attr.'][]' }}" value="{{ $brand }}" data-attrname="{{ $filter_attr }}" {{ $status }}>
-																	<label class="form-check-label" for="{{ 'cbb' . $a }}" style="font-size: 0.8rem;">{{ $brand }}</label>
-																</div>
-															@endforeach
-															</div>
-														</div>
-														@endif
-														@php
-															$x = 0;
-														@endphp
-														@foreach ($filters as $id => $row)
-														@php
-															$filter_attr = Str::slug($id, '-');
-														@endphp
-														@if ($id != 'Brand')
-														@if (count($row) > 1 || request()->$filter_attr)
-														<div class="card mb-3 m-3" style="width: 85% !important">
-															<div class="card-header text-white font-weight-bold" style="font-size: 0.75rem; background-color: rgb(0, 98, 165);">{{ strtoupper($id) }}</div>
-															<div class="card-body">
-																@foreach ($row as $attr_val)
-																@php
-																	$x++;
-																	$filter_values = explode('+', request()->$filter_attr);
-																	$status = (in_array($attr_val, $filter_values)) ? 'checked' : '';
-																@endphp
-																<div class="form-check">
-																	<input type="checkbox" class="form-check-input product-cb-filter" id="{{ 'cb' . $x }}" name="{{ 'attr[' .$filter_attr.'][]' }}" value="{{ $attr_val }}" data-attrname="{{ $filter_attr }}" {{ $status }}>
-																	<label class="form-check-label" for="{{ 'cb' . $x }}" style="font-size: 0.8rem;">{{ $attr_val }}</label>
-																</div>
-																@endforeach
-															</div>
-														</div>
-														@endif
-														@endif
-								
-														@endforeach
-														<input type="hidden" name="sortby" value="{{ request()->sortby }}">
-														<input type="hidden" name="sel_attr" value="{{ request()->sel_attr }}">
-													</form>
+									<div class="modal right fade" id="filterModal2" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel2" aria-hidden="true">
+										<div class="modal-dialog modal-dialog-slideout modal-sm" role="document">
+											<div class="modal-content">
+											<div class="modal-body">
+												<div class="d-flex justify-content-between align-items-center" style="font-weight: 500 !important;  margin: 20px !important"><b>Filter Results</b>
+													<a href="/products/{{ $product_category->slug }}" style="text-decoration: none;">
+														<small class="stylecap he2 text-dark" style="font-weight:400 !important; padding-right: 10px;">Clear All</small>
+													</a>
 												</div>
-											  </div>
+												<hr>
+												<form action="/products/{{ $product_category->slug }}" method="POST" id="filter-form">
+													@csrf
+													@php
+														$a = 0;
+													@endphp
+													@if (count($filters['Brand']) > 1)
+													<div class="card mb-3 m-3" style="width: 85% !important">
+														<div class="card-header text-white font-weight-bold" style="font-size: 0.75rem; background-color: rgb(0, 98, 165);">BRAND</div>
+														<div class="card-body">
+															@foreach ($filters['Brand'] as $brand)
+															@php
+																$a++;
+																$filter_attr = Str::slug('brand', '-');
+																$filter_values = explode('+', request()->brand);
+																$status = (in_array($brand, $filter_values)) ? 'checked' : '';
+															@endphp
+															<div class="form-check">
+																<input type="checkbox" class="form-check-input product-cb-filter" id="{{ 'cbb' . $a }}" name="{{ 'attr[' .$filter_attr.'][]' }}" value="{{ $brand }}" data-attrname="{{ $filter_attr }}" {{ $status }}>
+																<label class="form-check-label" for="{{ 'cbb' . $a }}" style="font-size: 0.8rem;">{{ $brand }}</label>
+															</div>
+														@endforeach
+														</div>
+													</div>
+													@endif
+													@php
+														$x = 0;
+													@endphp
+													@foreach ($filters as $id => $row)
+													@php
+														$filter_attr = Str::slug($id, '-');
+													@endphp
+													@if ($id != 'Brand')
+													@if (count($row) > 1 || request()->$filter_attr)
+													<div class="card mb-3 m-3" style="width: 85% !important">
+														<div class="card-header text-white font-weight-bold" style="font-size: 0.75rem; background-color: rgb(0, 98, 165);">{{ strtoupper($id) }}</div>
+														<div class="card-body">
+															@foreach ($row as $attr_val)
+															@php
+																$x++;
+																$filter_values = explode('+', request()->$filter_attr);
+																$status = (in_array($attr_val, $filter_values)) ? 'checked' : '';
+															@endphp
+															<div class="form-check">
+																<input type="checkbox" class="form-check-input product-cb-filter" id="{{ 'cb' . $x }}" name="{{ 'attr[' .$filter_attr.'][]' }}" value="{{ $attr_val }}" data-attrname="{{ $filter_attr }}" {{ $status }}>
+																<label class="form-check-label" for="{{ 'cb' . $x }}" style="font-size: 0.8rem;">{{ $attr_val }}</label>
+															</div>
+															@endforeach
+														</div>
+													</div>
+													@endif
+													@endif
+							
+													@endforeach
+													<input type="hidden" name="sortby" value="{{ request()->sortby }}">
+													<input type="hidden" name="sel_attr" value="{{ request()->sel_attr }}">
+												</form>
 											</div>
-										  </div>
+											</div>
+										</div>
 									</div>
-
 								</div>
 							</div>
 						</form>
@@ -434,13 +431,38 @@
       transform: scale(0.95); 
     }
 
-	/*Required*/
-@media (max-width: 576px){.modal-dialog.modal-dialog-slideout {width: 80%}}
-.modal-dialog-slideout {min-height: 100%; margin: 0 0 0 auto ;background: #fff;}
-/* .modal.fade .modal-dialog.modal-dialog-slideout {-webkit-transform: translate(-100%,0);transform: translate(-100%,0);} */
-.modal.fade .modal-dialog.modal-dialog-slideout {-webkit-transform: translate(100%, 0);transform: translate(100%, 0);}
-.modal.fade.show .modal-dialog.modal-dialog-slideout {-webkit-transform: translate(0,0);transform: translate(0,0);flex-flow: column;}
-.modal-dialog-slideout .modal-content{border: 0;}
+	.modal .modal-dialog {
+		position: fixed;
+		margin: auto;
+		width: 80%;
+		height: 100%;
+		transform: translate3d(0%, 0, 0);
+	}
+	.modal .modal-content {
+		height: 100%;
+		overflow-y: auto;
+	}
+	.modal .modal-body {
+		padding: 15px 15px 80px;
+	}
+	.modal.right.fade .modal-dialog {
+		right: -320px;
+		transition: opacity 0.1s linear, right 0.1s ease-out;
+	}
+	.modal.right.fade.show .modal-dialog {
+		right: 0;
+	}
+
+	/* ----- MODAL STYLE ----- */
+	.modal-content {
+		border-radius: 0;
+		border: none;
+	}
+	.modal-header {
+		border-bottom-color: #eeeeee;
+		background-color: #fafafa;
+	}
+
 
 @media (max-width: 575.98px) {
 	.sort-by{
