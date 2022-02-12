@@ -55,9 +55,8 @@
                             <th class="he1x"></th>
                             <th class="he1x d-none d-sm-table-cell">Price</th>
                             <th class="he1x d-none d-sm-table-cell">Quantity</th>
-                            <th class="he1x d-none d-sm-table-cell"></th>
                             <th class="he1x d-none d-sm-table-cell">Total</th>
-                            <th class="he1x"></th>
+                            <th class="he1x" style="width: 5px !important"></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -66,7 +65,7 @@
                             <td class="tbl-qtr">
                                 <img src="{{ asset('/storage/item_images/'.$cart['item_code'].'/gallery/preview/'.$cart['item_image']) }}" class="img-responsive" alt="{{ Str::slug(explode(".", $cart['item_image'])[0], '-') }}" width="55" height="55">
                             </td>
-                            <td class="tbls tbl-half" style="width:40% !important;"><a href="/product/{{ $cart['slug'] }}" style="text-decoration: none !important; color: #000;">{{ $cart['item_description'] }}</a>
+                            <td class="tbls tbl-half" style="width:37% !important;"><a href="/product/{{ $cart['slug'] }}" style="text-decoration: none !important; color: #000;">{{ $cart['item_description'] }}</a>
                                 <br/>{{-- for mobile --}}
                             <span class="formatted-price d-md-none d-lg-none d-xl-none"><br/><b>₱ {{ number_format($cart['price'], 2, '.', ',') }}</b></span>
                             <br/><br/>
@@ -108,7 +107,6 @@
                                 <small class="text-success d-block m-2 stock-status">Available :  {{ $cart['stock_qty'] }}</small>
                                 @endif
                             </td>
-                            <td class="tbls d-none d-sm-table-cell">&nbsp;</td>
                             <td class="tbls d-none d-sm-table-cell"><p style="white-space: nowrap !important;">₱ <span class="formatted-amount">{{ number_format($cart['amount'], 2, '.', ',') }}</span></p><span class="amount d-none">{{ $cart['amount'] }}</span></td>
                             <td class="tbls tbl-qtr">
                                 <a class="btn btn-sm btn-outline-primary remove-from-cart-btn" href="#" role="button" data-id="{{ $cart['item_code'] }}">&#x2715;</a>

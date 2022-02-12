@@ -43,7 +43,7 @@
 					</center>
 				</div>
 				@if($track_order_details and $order_details)
-				<div class="col-md-8 offset-md-2">
+				<div class="col-md-8 mx-auto">
 					<div class="row mb-2">
 						<div class="col-md-6 mt-4">Order No. : <b>{{ request()->id }}</b>
 							@if($order_details->order_status == "Cancelled")
@@ -51,9 +51,9 @@
 							@endif
 						</div>
 						@if($order_details->order_shipping != 'Store Pickup')
-							<div class="col-md-6 mt-4 track-order-eta" style="text-align: right;">Estimated Delivery Date : <br class="d-lg-none d-xl-none"/><b>{{ $order_details->estimated_delivery_date }}</b></div>
+							<div class="col-md-6 mt-4 track-order-eta" style="text-align: right;">Estimated Delivery Date : <br class="d-lg-none"/><b>{{ $order_details->estimated_delivery_date }}</b></div>
 						@else
-							<div class="col-md-6 mt-4 track-order-eta" style="text-align: right;">Pickup Date : <br class="d-lg-none d-xl-none"/><b>{{ $order_details->pickup_date }}</b></div>
+							<div class="col-md-6 mt-4 track-order-eta" style="text-align: right;">Pickup Date : <br class="d-lg-none"/><b>{{ $order_details->pickup_date }}</b></div>
 						@endif
 					</div>
 				</div>
@@ -96,25 +96,12 @@
 								</div>
 							</div>
 							
-							{{-- <div class="track">
-								<div class="step {{ $status >= 1 ? 'active' : '' }}"> <span class="icon"> <i class="fa fa-check"></i> </span> <span class="text">Order placed</span> </div>
-								<div class="step {{ $status >= 2 ? 'active' : '' }}"> <span class="icon"> <i class="fa fa-check"></i> </span> <span class="text">Order confirmed</span> </div>
-								@if($order_details->order_shipping == 'Store Pickup')
-									<div class="step {{ $status >= 4 ? 'active' : '' }}"> <span class="icon"> <i class="fa fa-user"></i> </span> <span class="text">Ready for Pickup</span> </div>
-								@else
-									<div class="step {{ $status >= 4 ? 'active' : '' }}"> <span class="icon"> <i class="fa fa-truck"></i> </span> <span class="text">Out for Delivery</span> </div>
-								@endif
-								
-								<div class="step {{ $status >= 5 ? 'active' : '' }}"> <span class="icon"> <i class="fa fa-box"></i> </span> <span class="text">Delivered</span> </div>
-							</div> --}}
-							{{-- <hr> <a href="#TrackItemsData" data-toggle="modal" class="btn btn-warning" data-abc="true">View Order Details</a> --}}
 						</div>
-						<div class="card-body">
+						<div class="card-body p-1">
 							<table class="table" style="border-top: 1px solid #000">
 								<thead>
-									<tr style="font-size: 16px;">
-										<th></th>
-										<th class="text-center">ITEM DESCRIPTION</th>
+									<tr class="tr-font">
+										<th colspan=2 class="text-center">ITEM DESCRIPTION</th>
 										<th class="text-center">QTY</th>
 										<th class="text-center">PRICE</th>
 										<th class="text-center">TOTAL</th>
@@ -124,12 +111,12 @@
 									@forelse ($items as $item)
 									<tr style="font-size: 11pt;">
 										<td class="text-center">
-											<img src="{{ asset('/storage/item_images/'. $item['item_code'] .'/gallery/preview/'.$item['image']) }}" class="img-responsive" alt="" width="55" height="55">
+											<img src="{{ asset('/storage/item_images/'. $item['item_code'] .'/gallery/preview/'.$item['image']) }}" class="img-responsive" alt="" width="50" height="50">
 										</td>
 										<td>{{ $item['item_name'] }}</td>
 										<td class="text-center">{{ $item['quantity'] }}</td>
-										<td class="text-center">{{ 'P ' . number_format($item['price'], 2) }}</td>
-										<td class="text-center">{{ 'P ' . number_format($item['amount'], 2) }}</td>
+										<td class="text-center" style="white-space: nowrap !important;">{{ '₱ ' . number_format($item['price'], 2) }}</td>
+										<td class="text-center" style="white-space: nowrap !important;">{{ '₱ ' . number_format($item['amount'], 2) }}</td>
 									</tr>
 									@empty
 									<tr>
@@ -167,45 +154,6 @@
 						</div>
 					</div>
 				</div>
-
-				{{-- <div class="col-lg-10 mx-auto">
-					<table class="table">
-						<thead>
-							<tr>
-								<th>Date</th>
-								<th>Details</th>
-								<th class="d-none d-sm-table-cell">Description</th>
-								<th class="d-none d-sm-table-cell">Status</th>
-							</tr>
-						</thead>
-						<tbody>
-						@foreach ($track_order_details as $order)
-						<tr>
-							@php
-								if($order->track_status == "Order Placed"){
-									$badge = '#ffc107';
-								}else if($order->track_status == "Cancelled"){
-									$badge = '#6c757d';
-								}else if($order->track_status == "Delivered"){
-									$badge = '#fd6300';
-								}else if($order->track_status == "Out for Delivery"){
-									$badge = '#28a745';
-								}else{
-									$badge = '#007bff';
-								}
-							@endphp
-							<td>{{ date('M d, Y - h:m: A', strtotime($order->track_date)) }}</td>
-							<td><a href="#TrackItemsData" data-toggle="modal">{{ $order->track_item }}</a>
-								<br/><span class="d-lg-none d-xl-none">{{ $order->track_description }}</span>
-								<br/><span class="badge d-lg-none d-xl-none" style="background-color: {{ $badge }}; font-size: 0.9rem;">{{ $order->track_status }}</span>
-							</td>
-							<td class="d-none d-sm-table-cell">{{ $order->track_description }}</td>
-							<td class="d-none d-sm-table-cell"><span class="badge" style="background-color: {{ $badge }}; font-size: 0.9rem;">{{ $order->track_status }}</span></td>
-						</tr>
-						@endforeach
-						</tbody>
-					</table>
-				</div> --}}
 				@else
 					@if(request()->get('id'))
 					<div class="col-md-6 offset-md-3">
@@ -481,6 +429,10 @@ p {
 	.track-container{
 		min-height: 120px;
 	}
+
+	.tr-font{
+		font-size: 16px;
+	}
 @media (max-width: 575.98px) {
 		.products-head{
 			padding-left: 0 !important;
@@ -494,6 +446,9 @@ p {
 		}
 		.track-container{
 			min-height: 200px
+		}
+		.tr-font{
+			font-size: 10pt !important;
 		}
     }
 
@@ -511,10 +466,16 @@ p {
 		.track-container{
 			min-height: 200px
 		}
+		.tr-font{
+			font-size: 10pt !important;
+		}
     }
 	@media (max-width: 1199.98px) {
 		.track-container{
 			min-height: 200px
+		}
+		.tr-font{
+			font-size: 10pt !important;
 		}
 	}
 </style>
