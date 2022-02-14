@@ -95,8 +95,8 @@
             </div>
         </div>
 
-        <div class="row">
-            <div class="col-lg-12 animated animatedFadeInUp fadeInUp">
+        <div class="row blog-content">
+            <div class="col-lg-12 animated animatedFadeInUp fadeInUp content-container">
                 {!! $blog->blogcontent !!}
             </div>
         </div>
@@ -361,6 +361,10 @@
 
     .MsoNormal{
         font-family: 'poppins', sans-serif !important;
+    }
+
+    .blog-content .content-container img{
+        width: 100% !important;
     }
 </style>
 @endsection
