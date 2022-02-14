@@ -1310,6 +1310,13 @@ class CheckoutController extends Controller
 					->where('user_type', 'guest')->where('transaction_id', $order_no)->get();
 			}
 
+			$voucher_category = [];
+			$vouched_item_category_price = 0;
+			if($voucher_details->coupon_type == 'Per Category') {
+				$voucher_category = DB::table('fumaco_voucher_exclusive_to')->where('voucher_id', $voucher_details->id)
+					->where('voucher_type', 'Per Category')->distinct()->pluck('exclusive_to')->toArray();
+			}
+
 			// get sitewide sale
 			$sale = DB::table('fumaco_on_sale')
 				->whereDate('start_date', '<=', Carbon::now()->toDateString())
@@ -1318,8 +1325,9 @@ class CheckoutController extends Controller
 
 			$subtotal = 0;
 			$discount = 0;
-
+			$item_total_amount = 0;
 			$item_applied_discount = [];
+			$below_min_spend_category = [];
 			foreach ($cart_items as $item) {
 				// get item price, discounted price and discount rate
 				$item_price_data = $this->getItemPriceAndDiscount($item->f_onsale, $item->f_cat_id, $sale, $item->f_default_price, $item->f_idcode, $item->f_discount_type, $item->f_discount_rate, $item->f_stock_uom);
@@ -1328,7 +1336,7 @@ class CheckoutController extends Controller
 				$item_total = $price * $item->qty;
 				if (in_array($item->f_idcode, $voucher_items)) {
 					$discount_per_item = 0;
-					if($voucher_details->minimum_spend > 0) {
+					if($voucher_details->minimum_spend >= 0) {
 						if($item_total > $voucher_details->minimum_spend) {
 							array_push($item_applied_discount, $item->f_idcode);
 							if($voucher_details->discount_type == 'By Percentage') {
@@ -1350,8 +1358,54 @@ class CheckoutController extends Controller
 				
 					$item_total -= $discount_per_item;
 				}
+			
+				if (in_array($item->f_cat_id, $voucher_category)) {
+					$vouched_item_category_price += $item_total;
+					if (!array_key_exists($item->f_cat_id, $below_min_spend_category)) {
+						$below_min_spend_category[$item->f_cat_id] = 0;
+					} 
+					
+					$below_min_spend_category[$item->f_cat_id] += $item_total;
+				}
 
 				$subtotal += $item_total;
+			}
+
+			if($voucher_details->coupon_type == 'Per Category') {
+				$discount_per_category = 0;
+				if($voucher_details->minimum_spend > 0) {
+					if($vouched_item_category_price > $voucher_details->minimum_spend) {
+						$voucher_category_item_code = collect($cart_items)->map(function($k) use ($voucher_category) {
+							return (in_array($k->f_cat_id, $voucher_category)) ? $k->f_idcode : null;
+						})->toArray();
+						
+						$item_applied_discount = array_merge($item_applied_discount, $voucher_category_item_code);
+						if($voucher_details->discount_type == 'By Percentage') {
+							$discount_per_category = ($voucher_details->discount_rate/100) * $vouched_item_category_price;
+							if($voucher_details->capped_amount > 0) {
+								if ($discount_per_category > $voucher_details->capped_amount) {
+									$discount_per_category = $voucher_details->capped_amount;
+								}
+							}
+						}
+			
+						if($voucher_details->discount_type == 'Fixed Amount') {
+							$discount_per_category = $voucher_details->discount_rate;
+						}
+					}
+				}
+				$discount += $discount_per_category;
+				if($vouched_item_category_price < $voucher_details->minimum_spend) {
+					$below_min_spend_category = array_filter($below_min_spend_category, function ($var) use ($voucher_details) {
+						return ($var < $voucher_details->minimum_spend);
+					});
+		
+					$below_min_spend_category = array_keys($below_min_spend_category);
+
+					$item_categories = DB::table('fumaco_categories')
+						->whereIn('id', $voucher_category)->pluck('name', 'id')->toArray();
+					return response()->json(['status' => 0, 'message' => 'Required total amount ₱ ' . number_format(str_replace(",","",$voucher_details->minimum_spend), 2) . ' for ' . $item_categories[$below_min_spend_category[0]]]);
+				}
 			}
 
 			if(in_array($voucher_details->coupon_type, ['Promotional', 'Per Customer Group'])) {
