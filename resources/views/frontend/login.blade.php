@@ -77,7 +77,7 @@
                                   <img src="{{ asset('assets/google.svg') }}" width="25">
                                 </a>
                                 <a href="{{ route('linkedin.login') }}" class="in" title="Sign in with Linked In"><i class="fa fa-linkedin" aria-hidden="true"></i></a>
-                                <a href="#" class="tw" title="Sign in with Apple"><i class="fab fa-apple" aria-hidden="true"></i></a>
+                                {{-- <a href="#" class="tw" title="Sign in with Apple"><i class="fab fa-apple" aria-hidden="true"></i></a> --}}
                               </div>
                             </div>
                             <label for="InputPassword" class="status-1"></label>

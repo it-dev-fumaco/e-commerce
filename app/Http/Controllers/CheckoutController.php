@@ -1394,8 +1394,9 @@ class CheckoutController extends Controller
 						}
 					}
 				}
+
 				$discount += $discount_per_category;
-				if($vouched_item_category_price < $voucher_details->minimum_spend) {
+				if($vouched_item_category_price < $voucher_details->minimum_spend && count($item_applied_discount) > 0) {
 					$below_min_spend_category = array_filter($below_min_spend_category, function ($var) use ($voucher_details) {
 						return ($var < $voucher_details->minimum_spend);
 					});
