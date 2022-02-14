@@ -70,7 +70,8 @@ class DashboardController extends Controller
 		}
 
 		// items on cart
-		$cart_transactions = DB::table('fumaco_cart')->select('transaction_id', 'user_email', 'user_type')->groupBy('transaction_id', 'user_email', 'user_type')->orderBy('last_modified_at', 'desc')->get();
+		$cart_transactions = DB::table('fumaco_cart')->select('transaction_id', 'user_email', 'user_type')
+			->orderBy('last_modified_at', 'desc')->groupBy('transaction_id', 'user_email', 'user_type')->get();
 		$cart_arr = [];
 
 		foreach($cart_transactions as $cart){
