@@ -104,8 +104,8 @@
 										<th class="text-center align-middle" rowspan="2">Image</th>
 										<th class="text-center align-middle" rowspan="2">Item Name</th>
 										<th class="text-center align-middle" rowspan="2">Parent</th>
-										{{-- <th class="text-center align-middle" rowspan="2">Price</th> --}}
 										<th class="text-center p-1" colspan="3">Inventory</th>
+										<th class="text-center align-middle" rowspan="2">UoM</th>
 										<th class="text-center align-middle" rowspan="2">Category</th>
 										<th class="text-center align-middle" rowspan="2">Brand</th>
 										<th class="text-center align-middle" rowspan="2">Featured</th>
@@ -146,6 +146,9 @@
 										</td>
 										<td class="text-center">{{ number_format($item['reserved_qty']) }}</td>
 										<td class="text-center font-weight-bold" style="font-size: 1.2rem;">{{ number_format($item['qty'] - $item['reserved_qty']) }}</td>
+										<td class="text-center">
+											<span class="d-block">{{ $item['stock_uom'] }}</span>
+										</td>
 										<td class="text-center">{{ $item['product_category'] }}</td>
 										<td class="text-center">{{ $item['brand'] }}</td>
 										<td class="text-center" style="font-size: 1.2rem;">
