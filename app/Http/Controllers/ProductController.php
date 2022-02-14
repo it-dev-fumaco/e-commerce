@@ -2018,6 +2018,14 @@ class ProductController extends Controller
             $allowed_extensions = array('jpg', 'png', 'jpeg', 'gif');
             $extension_error = "Sorry, only JPG, JPEG, PNG and GIF files are allowed.";
 
+            if(!Storage::disk('public')->exists('/item_images/'.$item_code.'/gallery/original/')){
+                Storage::disk('public')->makeDirectory('/item_images/'.$item_code.'/gallery/original/');
+            }
+
+            if(!Storage::disk('public')->exists('/item_images/'.$item_code.'/gallery/preview/')){
+                Storage::disk('public')->makeDirectory('/item_images/'.$item_code.'/gallery/preview/');
+            }
+
             $origImgPath = storage_path('/app/public/item_images/'.$item_code.'/gallery/original/'); // on sale
             $prevImgPath = storage_path('/app/public/item_images/'.$item_code.'/gallery/preview/'); // on sale
 
