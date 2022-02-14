@@ -8,7 +8,7 @@ Instructions using GUI and Commands - For Development Site
     Type copy .env.example .env
     Setup database connections in .env file
         DB_CONNECTION=mysql
-        DB_HOST=10.0.48.125
+        DB_HOST=10.0.49.72
         DB_PORT=3306
         DB_DATABASE=fumacoco_db
         DB_USERNAME=web
