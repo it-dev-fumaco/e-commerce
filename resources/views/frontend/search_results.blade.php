@@ -147,8 +147,8 @@
 			<h4 class="text-center text-muted mt-5 text-uppercase">No search result(s) found</h4>
 		@endif
 		@if(count($products) > 0)
-		
 		<div class="row">
+			@if ($filter_count > 0 or count($filters['Brand']) > 1)
 			<div class="d-none {{ request()->s == '' ? '' : 'd-xl-block' }} col-1">&nbsp;</div>
 			<div class="d-none col-lg-3 col-xl-2 {{ request()->s == '' ? '' : 'd-lg-block' }}">
 				<!--sidebar-->
@@ -211,8 +211,15 @@
 				</div>
 				<!--sidebar-->
 			</div>
-		
-			<div class="col-lg-9 col-xl-8 {{ request()->s == '' ? 'mx-auto' : '' }}">
+			@endif
+
+			@php
+				$mx_auto = '';
+				if($filter_count == 0 and count($filters['Brand']) < 2){
+					$mx_auto = 'mx-auto';
+				}
+			@endphp
+			<div class="col-lg-9 col-xl-8 {{ $mx_auto }}">
 				<div class="row">
 				@if (count($recently_added_arr) > 0)
 					<div class="col-12 text-center">
