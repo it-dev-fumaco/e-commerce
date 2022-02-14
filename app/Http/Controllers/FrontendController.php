@@ -112,6 +112,10 @@ class FrontendController extends Controller
                             })
                             ->where('a.f_status', 1)->select('c.slug', 'b.attribute_value', 'a.f_idcode', 'a.f_brand')->get();
 
+                        if(count($brand_filter) > 0 and count($filtered_items) == 0){ // double check for item codes with "-A"
+                            $filtered_items = DB::table('fumaco_items')->whereIn('f_brand', $brand_filter)->select('f_idcode', 'f_brand')->get();
+                        }
+
                         $filtered_item_codes = collect($filtered_items)->pluck('f_idcode');
 
                         $include_bulk_item_codes = DB::table('fumaco_items')->where(function($q) use ($filtered_item_codes){
@@ -372,11 +376,16 @@ class FrontendController extends Controller
                 ->when(count($request_data) > 1, function($c) use ($filtered_item_codes) {
                     $c->whereIn('f_idcode', $filtered_item_codes);
                 })
+                ->when(count($request_data) < 1, function($c) use ($products){
+                    $c->whereIn('f_idcode', collect($products)->pluck('item_code'));
+                })
                 ->where('f_status', 1)->whereNotNull('f_brand')->distinct('f_brand')->pluck('f_brand');
 
-            $filters['Brand'] = $brands;
+            $filter_count = count($filters);
 
-            return view('frontend.search_results', compact('results', 'blogs', 'products', 'recently_added_arr' ,'filters', 'test'));
+            $filters['Brand'] = $brands;
+            
+            return view('frontend.search_results', compact('results', 'blogs', 'products', 'recently_added_arr' ,'filters', 'filter_count'));
         }
 
         $carousel_data = DB::table('fumaco_header')->where('fumaco_status', 1)->orderBy('fumaco_active', 'desc')->get();
