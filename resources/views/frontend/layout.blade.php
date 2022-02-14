@@ -647,7 +647,7 @@
         <section class="py-5 text-center container" style="padding-top: 0rem !important; padding-bottom: 3rem !important;">
         </section>
         <div class="row">
-          <div class="col-lg-3" style="text-align: left !important;">
+          <div class="col-6 col-lg-3" style="text-align: left !important;">
             <h6 class="footer1st" style="color:#ffffff !important;">ABOUT FUMACO</h6>
             <table class="table" style="border-style: unset !important;">
               <tbody style="font-size: 12px; color: #ffffff; border-style: unset !important;">
@@ -663,7 +663,7 @@
               </tbody>
             </table>
           </div>
-          <div class="col-lg-5" style="text-align: left !important;">
+          <div class="col-6 col-lg-5" style="text-align: left !important;">
             <h6 class="footer1st" style="color:#ffffff !important;">PRODUCTS</h6>
             <table class="table" style="border-style: unset !important;">
               <tbody style="font-size: 12px; color: #ffffff; border-style: unset !important;" id="product-category-footer"></tbody>
