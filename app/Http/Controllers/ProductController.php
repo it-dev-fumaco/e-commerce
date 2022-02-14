@@ -1501,6 +1501,12 @@ class ProductController extends Controller
     public function addOnSale(Request $request){
         DB::beginTransaction();
         try {
+            if($request->selected_customer_group and count($request->selected_customer_group) !== count(array_unique($request->selected_customer_group))){
+				return redirect()->back()->with('error', "Cannot select the same customer group twice.");
+            }else if($request->selected_category and count($request->selected_category) !== count(array_unique($request->selected_category))){
+				return redirect()->back()->with('error', "Cannot select the same category twice.");
+            }
+
             $from = null;
             $to = null;
             $discount_rate = null;
@@ -1514,13 +1520,28 @@ class ProductController extends Controller
 
             // check if date overlaps with other "On Sale"
             $date_check = DB::table('fumaco_on_sale')->where('start_date', '!=', '')->where('end_date', '!=', '')->get();
+            $customer_group_date = DB::table('fumaco_customer_group as customer_group')->join('fumaco_on_sale_customer_group as on_sale', 'customer_group.id', 'on_sale.customer_group_id')->get();
+            $customer_grp_check = collect($customer_group_date)->groupBy('sale_id');
+
             foreach($date_check as $date){
                 if($from >= $date->start_date and $from <= $date->end_date){
-                    return redirect()->back()->with('error', 'On Sale dates cannot overlap');
+                    if($request->apply_discount_to != 'Per Customer Group'){
+                        return redirect()->back()->with('error', 'On Sale dates cannot overlap');
+                    }else{ // for customer group sale date
+                        if(isset($customer_grp_check[$date->id]) and in_array($customer_grp_check[$date->id][0]->customer_group_id, $request->selected_customer_group)){
+                            return redirect()->back()->with('error', 'On Sale dates cannot overlap');
+                        }
+                    }
                 }
 
                 if($to >= $date->start_date and $to <= $date->end_date){
-                    return redirect()->back()->with('error', 'On Sale dates cannot overlap');
+                    if($request->apply_discount_to != 'Per Customer Group'){
+                        return redirect()->back()->with('error', 'On Sale dates cannot overlap');
+                    }else{ // for customer group sale date
+                        if(isset($customer_grp_check[$date->id]) and in_array($customer_grp_check[$date->id][0]->customer_group_id, $request->selected_customer_group)){
+                            return redirect()->back()->with('error', 'On Sale dates cannot overlap');
+                        }
+                    }
                 }
             }
 
@@ -1647,6 +1668,12 @@ class ProductController extends Controller
     public function editOnSale($id, Request $request){
         DB::beginTransaction();
         try {
+            if($request->selected_customer_group and count($request->selected_customer_group) !== count(array_unique($request->selected_customer_group))){
+				return redirect()->back()->with('error', "Cannot select the same customer group twice.");
+            }else if($request->selected_category and count($request->selected_category) !== count(array_unique($request->selected_category))){
+				return redirect()->back()->with('error', "Cannot select the same category twice.");
+            }
+
             $from = null;
             $to = null;
             $discount_rate = null;
@@ -1660,13 +1687,30 @@ class ProductController extends Controller
 
             // check if date overlaps with other "On Sale"
             $date_check = DB::table('fumaco_on_sale')->where('id', '!=', $id)->where('start_date', '!=', '')->where('end_date', '!=', '')->get();
+            $customer_group_date = DB::table('fumaco_customer_group as customer_group')->join('fumaco_on_sale_customer_group as on_sale', 'customer_group.id', 'on_sale.customer_group_id')->get();
+            $customer_grp_check = collect($customer_group_date)->groupBy('sale_id');
+
             foreach($date_check as $date){
                 if($from >= $date->start_date and $from <= $date->end_date){
-                    return redirect()->back()->with('error', 'On Sale dates cannot overlap');
+                    // return redirect()->back()->with('error', 'On Sale dates cannot overlap');
+                    if($request->apply_discount_to != 'Per Customer Group'){
+                        return redirect()->back()->with('error', 'On Sale dates cannot overlap');
+                    }else{ // for customer group sale date
+                        if(isset($customer_grp_check[$date->id]) and in_array($customer_grp_check[$date->id][0]->customer_group_id, $request->selected_customer_group)){
+                            return redirect()->back()->with('error', 'On Sale dates cannot overlap');
+                        }
+                    }
                 }
 
                 if($to >= $date->start_date and $to <= $date->end_date){
-                    return redirect()->back()->with('error', 'On Sale dates cannot overlap');
+                    // return redirect()->back()->with('error', 'On Sale dates cannot overlap');
+                    if($request->apply_discount_to != 'Per Customer Group'){
+                        return redirect()->back()->with('error', 'On Sale dates cannot overlap');
+                    }else{ // for customer group sale date
+                        if(isset($customer_grp_check[$date->id]) and in_array($customer_grp_check[$date->id][0]->customer_group_id, $request->selected_customer_group)){
+                            return redirect()->back()->with('error', 'On Sale dates cannot overlap');
+                        }
+                    }
                 }
             }
 
