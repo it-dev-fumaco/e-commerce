@@ -384,8 +384,8 @@
 									@foreach ($compare_arr as $compare_product)
 									<div class="col-md-{{ 12/count($compare_arr) }} equal-height-columns p-1">
 										@php
-											$compare_img = ($compare_product['image']) ? '/storage/item_images/'. $compare_product['item_code'] .'/gallery/original/'. $compare_product['image'] : '/storage/no-photo-available.png';
-											$compare_img_webp = ($compare_product['image']) ? '/storage/item_images/'. $compare_product['item_code'] .'/gallery/original/'. explode(".", $compare_product['image'])[0] .'.webp' : '/storage/no-photo-available.png';
+											$compare_img = ($compare_product['image']) ? '/storage/item_images/'. $compare_product['item_code'] .'/gallery/preview/'. $compare_product['image'] : '/storage/no-photo-available.png';
+											$compare_img_webp = ($compare_product['image']) ? '/storage/item_images/'. $compare_product['item_code'] .'/gallery/preview/'. explode(".", $compare_product['image'])[0] .'.webp' : '/storage/no-photo-available.png';
 										@endphp
 										<div class="hover-container product-card" style="position: relative;">
 											<div class="pt-2" style="position: absolute; top: 0; right: 0; z-index: 10;">
@@ -409,41 +409,43 @@
 										</div>
 										<span class="comparison-description d-block mb-3">{{ $compare_product['item_name'] }}</span>
 										<center>
-										@if ($compare_product['is_discounted'] == 1)
-											<span class="comparison-price" style="white-space: nowrap !important">{{ $compare_product['discounted_price'] }}</span>&nbsp;<s style="color: #c5c5c5;">{{ $compare_product['default_price'] }}</s>
-										@else
-											{{ $compare_product['default_price'] }}
-										@endif
-										@if($compare_product['on_stock'] == 1)
-											<button class="btn btn-pill btn-outline-primary btn-sm add-to-cart comparison-add-to-cart mt-3 mb-5" type="button" data-toggle="toast" data-item-code="{{ $compare_product['item_code'] }}"><i class="fas fa-shopping-cart d-inline-block"></i>&nbsp;Add to Cart</button>
-										@else
-											<a href="/login" class="btn btn-pill btn-outline-primary btn-sm mt-3 {{ Auth::check() ? 'add-to-wishlist' : '' }} comparison-add-to-cart" type="button" data-toggle="toast" data-item-code="{{ $compare_product['item_code'] }}"><i class="fas fa-heart d-inline-block"></i>&nbsp;Add to Wishlist</a>
-										@endif
-										<br/>
-										@foreach ($attribute_names as $attrib)
-											<div class="col-12 mb-5">
-												<span class="comparison-description d-block">
-													@php
-														$attr_val = $variant_attr_array[$attrib->attribute_name][$compare_product['item_code']];
-														$str = explode(' ', $variant_attr_array[$attrib->attribute_name][$compare_product['item_code']]);
-														if (strtolower($str[0]) == 'and') {
-															$attr_val = Str::ucfirst(Str::replaceFirst('and ', '', $attr_val));
-														}
-													@endphp
-													@if (Str::contains(strtolower($attrib->attribute_name), 'color temperature'))
-													@if (Str::contains(strtolower($attr_val), 'warm white'))
-													<i class="fas fa-circle shadow" style="color: rgb(253, 244, 220); font-size: 18pt; border-radius: 50%;"></i>
-													@elseif(Str::contains(strtolower($attr_val), 'cool white'))
-													<i class="fas fa-circle shadow" style="color: rgb(244, 253, 255); font-size: 18pt; border-radius: 50%;"></i>
-													@elseif(Str::contains(strtolower($attr_val), 'daylight'))
-													<i class="fas fa-circle shadow" style="color: rgb(255, 255, 251); font-size: 18pt; border-radius: 50%;"></i>
-													@endif
-													&nbsp;&nbsp;
-													@endif
-													{{ $attr_val }}</span>
-												<span style="font-size: 11pt" class="text-muted">{{ $attrib->attribute_name }}</span>
+											<div style="clear: both;">
+												@if ($compare_product['is_discounted'] == 1)
+													<span class="comparison-price" style="white-space: nowrap !important">{{ $compare_product['discounted_price'] }}</span>&nbsp;<s style="color: #c5c5c5;">{{ $compare_product['default_price'] }}</s>
+												@else
+													{{ $compare_product['default_price'] }}
+												@endif
 											</div>
-										@endforeach
+											@if($compare_product['on_stock'] == 1)
+												<button class="btn btn-pill btn-outline-primary btn-sm add-to-cart comparison-add-to-cart mt-3 mb-5" type="button" data-toggle="toast" data-item-code="{{ $compare_product['item_code'] }}"><i class="fas fa-shopping-cart d-inline-block"></i>&nbsp;Add to Cart</button>
+											@else
+												<a href="/login" class="btn btn-pill btn-outline-primary btn-sm mt-3 {{ Auth::check() ? 'add-to-wishlist' : '' }} comparison-add-to-cart" type="button" data-toggle="toast" data-item-code="{{ $compare_product['item_code'] }}"><i class="fas fa-heart d-inline-block"></i>&nbsp;Add to Wishlist</a>
+											@endif
+											<br/>
+											@foreach ($attribute_names as $attrib)
+												<div class="col-12 mb-5">
+													<span class="comparison-description d-block">
+														@php
+															$attr_val = $variant_attr_array[$attrib->attribute_name][$compare_product['item_code']];
+															$str = explode(' ', $variant_attr_array[$attrib->attribute_name][$compare_product['item_code']]);
+															if (strtolower($str[0]) == 'and') {
+																$attr_val = Str::ucfirst(Str::replaceFirst('and ', '', $attr_val));
+															}
+														@endphp
+														@if (Str::contains(strtolower($attrib->attribute_name), 'color temperature'))
+														@if (Str::contains(strtolower($attr_val), 'warm white'))
+														<i class="fas fa-circle shadow" style="color: rgb(253, 244, 220); font-size: 18pt; border-radius: 50%;"></i>
+														@elseif(Str::contains(strtolower($attr_val), 'cool white'))
+														<i class="fas fa-circle shadow" style="color: rgb(244, 253, 255); font-size: 18pt; border-radius: 50%;"></i>
+														@elseif(Str::contains(strtolower($attr_val), 'daylight'))
+														<i class="fas fa-circle shadow" style="color: rgb(255, 255, 251); font-size: 18pt; border-radius: 50%;"></i>
+														@endif
+														&nbsp;&nbsp;
+														@endif
+														{{ $attr_val }}</span>
+													<span style="font-size: 11pt" class="text-muted">{{ $attrib->attribute_name }}</span>
+												</div>
+											@endforeach
 										</center>
 									</div>
 									@endforeach
