@@ -482,15 +482,24 @@ class FrontendController extends Controller
         if($request->ajax() and $request->search_term){
             $search_str = $request->search_term;
             $item_keywords = DB::table('fumaco_items as item')
-                ->join('fumaco_categories as cat', 'item.f_cat_id', 'cat.id')
-                ->where('item.f_name_name', 'LIKE', '%'.$search_str.'%')
-                ->where('item.f_status', 1)
-                ->select('item.f_idcode', 'item.f_name_name', 'item.f_discount_type', 'item.f_discount_rate', 'item.f_default_price', 'item.f_onsale', 'item.f_cat_id', 'item.slug as item_slug', 'item.f_stock_uom', 'cat.*')
-                ->limit($request->type == 'desktop' ? 8 : 4)->get();
+                ->where('f_brand', 'LIKE', "%".$search_str."%")
+                ->orWhere('f_parent_code', 'LIKE', "%".$search_str."%")
+                ->orWhere('f_name_name', 'LIKE', "%".$search_str."%")
+                ->orWhere(function($q) use ($search_str) {
+                    $search_strs = explode(" ", $search_str);
+                    foreach ($search_strs as $str) {
+                        $q->where('f_description', 'LIKE', "%".$str."%");
+                    }
 
-            if(count($item_keywords) == 0){
-                $item_keywords = $item_keywords->where('item.keywords', 'LIKE', '%'.$search_str.'%');
-            }
+                    $q->orWhere('f_idcode', 'LIKE', "%".$search_str."%")
+                        ->orWhere('f_item_classification', 'LIKE', "%".$search_str."%")
+                        ->orWhere('keywords', 'LIKE', '%'.$search_str.'%');
+                })
+                ->orWhere('f_category', 'LIKE', "%".$search_str."%")
+                ->where('f_status', 1)->where('f_status', 1)
+                ->where('item.f_status', 1)
+                ->select('item.f_idcode', 'item.f_name_name', 'item.f_discount_type', 'item.f_discount_rate', 'item.f_default_price', 'item.f_onsale', 'item.f_cat_id', 'item.slug as item_slug', 'item.f_stock_uom')->orderBy('f_order_by', 'asc')
+                ->limit($request->type == 'desktop' ? 8 : 4)->get();
 
             // get sitewide sale
             $sale = DB::table('fumaco_on_sale')
@@ -502,6 +511,9 @@ class FrontendController extends Controller
             $search_arr['screen'] = $request->type;
             $search_arr['results_count'] = count($item_keywords);
 
+            $categories = DB::table('fumaco_categories')->get();
+            $category = collect($categories)->groupBy('id');
+
             foreach($item_keywords as $item){
                 $image = DB::table('fumaco_items_image_v1')->where('idcode', $item->f_idcode)->pluck('imgprimayx')->first();
                 $item_price = $item->f_default_price;
@@ -510,13 +522,15 @@ class FrontendController extends Controller
                 // get item price, discounted price and discount rate
                 $item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $item->f_cat_id, $sale, $item_price, $item->f_idcode, $item->f_discount_type, $item->f_discount_rate, $item->f_stock_uom);
 
+                $category_name = isset($category[$item->f_cat_id]) ? $category[$item->f_cat_id][0]->name : null;
+
                 $search_arr[] = [
                     'type' => 'Products',
                     'id' => $item->f_idcode,
                     'name' => $item->f_name_name,
                     'image' => $image,
                     'slug' => $item->item_slug,
-                    'category' => $item->name,
+                    'category' => $category_name,
                     'default_price' => '₱ ' . number_format($item_price_data['item_price'], 2, '.', ','),
                     'is_discounted' => ($item_price_data['discount_rate'] > 0) ? $item_price_data['is_on_sale'] : 0,
                     'discounted_price' => '₱ ' . number_format($item_price_data['discounted_price'], 2, '.', ','),
@@ -544,7 +558,6 @@ class FrontendController extends Controller
                     'slug' => $blog->slug,
                 ];
             }
-
 
             return view('frontend.search_autocomplete', compact('search_arr'));
         }
