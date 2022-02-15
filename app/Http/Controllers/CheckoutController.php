@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use Auth;
 use DB;
 
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\OrderSuccess;
 
@@ -916,6 +917,40 @@ class CheckoutController extends Controller
 			$emails = array_filter(array_unique([trim($order_details->order_bill_email), trim($order_details->order_email), trim($temp->xusernamex)]));
 			Mail::to($emails)
 				->queue(new OrderSuccess($order));
+
+			$phone = $temp->xmobile[0] == '0' ? '63'.substr($temp->xmobile, 1) : $temp->xmobile;
+
+			$ordered_items = DB::table('fumaco_order_items as ordered')->where('order_number', $temp->xlogs)->pluck('item_code');
+        
+			$leadtime_arr = [];
+			foreach($ordered_items as $item){
+				$category_id = DB::table('fumaco_items')->where('f_idcode', $item)->pluck('f_cat_id')->first();
+				$shipping = DB::table('fumaco_shipping_service as shipping_service')
+					->join('fumaco_shipping_zone_rate as zone_rate', 'shipping_service.shipping_service_id', 'zone_rate.shipping_service_id')
+					->where('shipping_service.shipping_service_name', $temp->shipping_name)
+					->where('zone_rate.province_name', $temp->xshiprov)
+					->first();
+
+				$lead_time_per_category = DB::table('fumaco_shipping_product_category')->where('shipping_service_id', $shipping->shipping_service_id)->where('category_id', $category_id)->select('min_leadtime', 'max_leadtime')->first();
+
+				$leadtime_arr[] = [
+					'min_leadtime' => $lead_time_per_category ? $lead_time_per_category->min_leadtime : $shipping->min_leadtime,
+					'max_leadtime' => $lead_time_per_category ? $lead_time_per_category->max_leadtime : $shipping->max_leadtime
+				];
+			}
+
+			$min_leadtime = collect($leadtime_arr)->pluck('min_leadtime')->max();
+			$max_leadtime = collect($leadtime_arr)->pluck('max_leadtime')->max();
+
+			Http::asForm()->withHeaders([
+				'Accept' => 'application/json',
+				'Content-Type' => 'application/x-www-form-urlencoded',
+			])->post('https://api.movider.co/v1/sms', [
+				'api_key' => "24wezX69kvuWfnqZazxUhsiifcd",
+				'api_secret' => "Dd1PnbBIUgf7RFVKSaZEGzBsDDrjKDffimF9dVLH",
+				'to' => preg_replace("/[^0-9]/", "", $phone),
+				'text' => 'Hi '.$temp->xfname.' '.$temp->xlname.'!, your order '.$temp->xlogs.' with an amount of '.$request->Amount.' has been received, please allow '.$min_leadtime.'-'.$max_leadtime.' business days to process your order. We will send another text once your order is shipped out.'
+			]);
 
 			// send email to fumaco staff
 			$email_recipient = DB::table('email_config')->first();

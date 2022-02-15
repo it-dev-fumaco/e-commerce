@@ -15,7 +15,6 @@ use Illuminate\Pagination\LengthAwarePaginator;
 class OrderController extends Controller
 {
     public function orderList(Request $request){
-
         $search_id = ($request->search) ? $request->search : '';
         $order_status = ($request->order_status) ? $request->order_status : '';
 
@@ -168,12 +167,8 @@ class OrderController extends Controller
     public function deliveredOrders(Request $request){
         $search_id = ($request->search) ? $request->search : '';
         $orders = DB::table('fumaco_order')->where('order_number', 'LIKE', '%'.$search_id.'%')
-        ->where('order_status', '!=', 'Order Placed')
-        ->where('order_status', '!=', 'Order Confirmed')
-        ->where('order_status', '!=', 'Out for Delivery')
-        ->where('order_status', '!=', 'Ready for Pickup')
-        ->where('order_status', '!=', 'Cancelled')
-        ->orderBy('id', 'desc')->paginate(10);
+            ->whereNotIn('order_status', ['Order Placed', 'Order Confirmed', 'Out for Delivery', 'Ready for Pickup', 'Cancelled'])
+            ->orderBy('id', 'desc')->paginate(10);
 
         $orders_arr = [];
 
@@ -237,6 +232,7 @@ class OrderController extends Controller
             $status = $request->status;
             $delivery_date = "";
             $date_cancelled = "";
+            $sms_message = null;
 
             if($status) {
                 $order_status_check = DB::table('order_status')->where('status', $status)->first();
@@ -320,21 +316,44 @@ class OrderController extends Controller
                     ];
                 }
 
+                $order_details = DB::table('fumaco_order')->where('order_number', $request->order_number)->first();
+
+                $total_amount = $order_details->amount_paid;
+
+                $sms = [
+                    'api_key' => "24wezX69kvuWfnqZazxUhsiifcd",
+                    'api_secret' => "Dd1PnbBIUgf7RFVKSaZEGzBsDDrjKDffimF9dVLH",
+                    'to' => $order_details->order_bill_contact[0] == '0' ? '63'.substr($order_details->order_bill_contact, 1) : $order_details->order_bill_contact
+                ];
+
                 if ($status == 'Out for Delivery') {
-                    $order_details = DB::table('fumaco_order')->where('order_number', $request->order_number)->first();
                     Mail::send('emails.out_for_delivery', ['order_details' => $order_details, 'status' => $status, 'items' => $items], function($message) use($order_details, $status){
                         $message->to(trim($order_details->order_email));
                         $message->subject($status . ' - FUMACO');
                     });
+
+                    $sms['text'] = 'Hi '.$order_details->order_name . ' ' . $order_details->order_lastname.'!, your order '.$request->order_number.' with an amount of '.$total_amount.' is now shipped out, check out our website to track your order.';
                 }
 
                 if ($status == 'Order Delivered') {
-                    $order_details = DB::table('fumaco_order')->where('order_number', $request->order_number)->first();
                     $customer_name = $order_details->order_name . ' ' . $order_details->order_lastname;
                     Mail::send('emails.delivered', ['id' => $order_details->order_number, 'customer_name' => $customer_name], function($message) use($order_details, $status){
                         $message->to(trim($order_details->order_email));
                         $message->subject('Order Delivered - FUMACO');
                     });
+
+                    $sms['text'] = 'Hi '.$order_details->order_name . ' ' . $order_details->order_lastname.'!, your order '.$request->order_number.' with an amount of '.$total_amount.' has been delivered.';
+                }
+
+                if($status == 'Ready for Pickup'){
+                    $sms['text'] = 'Hi '.$order_details->order_name . ' ' . $order_details->order_lastname.'!, your order '.$request->order_number.' with an amount of '.$total_amount.' is now ready for pickup.';
+                }
+
+                if(in_array($status, ['Out for Delivery', 'Order Delivered', 'Ready for Pickup'])){
+                    Http::asForm()->withHeaders([
+                        'Accept' => 'application/json',
+                        'Content-Type' => 'application/x-www-form-urlencoded',
+                    ])->post('https://api.movider.co/v1/sms', $sms);
                 }
 
                 DB::table('fumaco_order')->where('order_number', $request->order_number)->update($orders_arr);
