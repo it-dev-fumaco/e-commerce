@@ -68,7 +68,7 @@
         <div class="container p-2">
             <center>
                 <a href="{{ $search_arr['results_count'] == 0 ? '/?s=' : '#' }}" class="see-all-btn" id="{{ $search_arr['results_count'] == 0 ? '' : 'FUMACO-form-submit' }}" style="color: #0062A5">
-                    See All Products
+                    See All Search Results
                 </a>
             </center>
         </div>
