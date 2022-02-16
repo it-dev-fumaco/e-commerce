@@ -90,7 +90,8 @@
         @foreach($blogs as $b)
           <div class="col-lg-4 pr-md-1 animated animatedFadeInUp fadeInUp equal-height-columns" style="text-align: left !important; position: relative !important">
             <div class="equal-column-content">
-              @php
+              <div class="hover-container">
+                @php
                 $image = $b->{'blogprimayimage-home'} ? '/storage/journals/'.$b->{'blogprimayimage-home'} : '/storage/no-photo-available.png';
                 $image_webp = $b->{'blogprimayimage-home'} ? '/storage/journals/'.explode(".", $b->{'blogprimayimage-home'})[0] .'.webp' : '/storage/no-photo-available.png';
               @endphp
@@ -98,8 +99,10 @@
               <picture>
                 <source srcset="{{ asset($image_webp) }}" type="image/webp" class="card-img-top">
                 <source srcset="{{ asset($image) }}" type="image/jpeg" class="card-img-top">
-                <img src="{{ asset($image) }}" alt="{{ Str::slug(explode(".", $b->{'blogprimayimage-home'})[0], '-') }}" class="card-img-top">
+                <img src="{{ asset($image) }}" alt="{{ Str::slug(explode(".", $b->{'blogprimayimage-home'})[0], '-') }}" class="card-img-top hover">
               </picture>
+              </div>
+              
               <br><br>
               <h5 class="font-style-thin fumacoFont_card_title article-title" style="font-family: 'poppins', sans-serif !important; color:#ffffff !important; line-height: 26px !important; font-size: 18px !important;">{{ $b->blogtitle }}</h5>
               <p class="abt_standard align-bottom" style="font-size: 14px; margin-left: 0rem !important; color:#ffffff !important; font-weight: 300">
