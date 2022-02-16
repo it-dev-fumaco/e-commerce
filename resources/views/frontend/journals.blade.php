@@ -36,7 +36,7 @@
                   <picture>
                     <source srcset="{{ asset($image_webp) }}" type="image/webp" style="object-fit: cover; opacity: 0.6;">
                     <source srcset="{{ asset($image) }}" type="image/jpeg" style="object-fit: cover; opacity: 0.6;">
-                    <img src="{{ asset($image) }}" alt="{{ Str::slug(explode(".", $carousel->blogprimaryimage)[0], '-') }}" style="object-fit: cover; opacity: 0.6;">
+                    <img src="{{ asset($image) }}" alt="{{ Str::slug(explode(".", $carousel->blogprimaryimage)[0], '-') }}" style="object-fit: cover; opacity: 0.6; width: 100%; height: 100% !important">
                    </picture>
                    
                     <div class="container">
