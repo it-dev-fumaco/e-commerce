@@ -72,21 +72,21 @@
                 <a href="journals" style="color:#373b3e !important; font-weight: 400 !important; font-size:14px !important; text-decoration: none !important;">
                   All Blog Posts</a>
                 <span style="color:#b2b2b2 !important;">
-                    {{ $blog_count->count() }}
+                    {{ $blog_counts['all'] }}
                 </span>
               </li>
               <li class="list-group-item" style="border: 0px !important; ">
                 <a href="journals?type=In Applications" style="color:#373b3e !important; font-weight: 400 !important; font-size:14px !important; text-decoration: none !important;">Applications</a>
                 <span style="color:#b2b2b2 !important;">
-                    {{ $app_count->count() }}
+                    {{ $blog_counts['applications'] }}
                 </span></li>
               <li class="list-group-item" style="border: 0px !important; "><a href="journals?type=Solutions" style="color:#373b3e !important; font-weight: 400 !important; font-size:14px !important; text-decoration: none !important;">Solutions</a>
                 <span style="color:#b2b2b2 !important;">
-                    {{ $soln_count->count() }}
+                    {{ $blog_counts['solutions'] }}
                 </span></li>
               <li class="list-group-item" style="border: 0px !important; "><a href="journals?type=Products" style="color:#373b3e !important; font-weight: 400 !important; font-size:14px !important; text-decoration: none !important;">Products</a>
                 <span style="color:#b2b2b2 !important;">
-                    {{ $prod_count->count() }}
+                    {{ $blog_counts['products'] }}
                 </span></li>
             </ul>
           </center>
