@@ -44,7 +44,7 @@ class HomeCRUDController extends Controller
 
 			$filename = pathinfo($img->getClientOriginalName(), PATHINFO_FILENAME);
 			$extension = pathinfo($img->getClientOriginalName(), PATHINFO_EXTENSION);
-			$request->file('fileToUpload')->store('/assets/site-img');
+			// $request->file('fileToUpload')->store('/assets/site-img');
 
 			$filename = Str::slug($filename, '-');
 
@@ -89,9 +89,9 @@ class HomeCRUDController extends Controller
 
 			$webp = Webp::make($request->file('fileToUpload'));
 
-			if ($webp->save(public_path('/assets/site-img/'.$filename.'.webp'))) {
+			if ($webp->save(storage_path('/app/public/journals/'.$filename.'.webp'))) {
 				// File is saved successfully
-				$destinationPath = public_path('/assets/site-img');
+				$destinationPath = storage_path('/app/public/journals/');
 				$img->move($destinationPath, $img->getClientOriginalName());
 			}
 
