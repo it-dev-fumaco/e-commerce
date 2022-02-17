@@ -179,7 +179,6 @@ return [
         Buglinjo\LaravelWebp\WebpServiceProvider::class,
         App\Providers\MailConfigServiceProvider::class,
         App\Providers\GoogleApiServiceProvider::class,
-        Shivella\Bitly\BitlyServiceProvider::class,
     ],
 
     /*
@@ -235,7 +234,6 @@ return [
         'View' => Illuminate\Support\Facades\View::class,
         'GoogleMaps' => GoogleMaps\Facade\GoogleMapsFacade::class,
         'Webp' => Buglinjo\LaravelWebp\Facades\Webp::class,
-        'Bitly' => Shivella\Bitly\Facade\Bitly::class,
     ],
 
 ];

@@ -22,34 +22,30 @@
 		<div class="container-fluid">
 			<div class="row">
 				<div class="col-lg-8 offset-lg-2 mx-auto {{ $order_details ? 'd-none' : '' }}" >
-					@if(session()->has('error'))
-						<div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
-							{!! session()->get('error') !!}
-						</div>
-					@endif
 					<br><br>
 					<center><h3>Order Tracking</h3></center>
 					<br>
 					<center><h4>Please enter your order reference number</h4></center>
 					<br>
 					<center>
-						{{-- <form action="/track_order" class="form-inline p-0" method="GET"> --}}
+						<form action="/track_order" class="form-inline p-0" method="GET">
 							<div class="form-group col-md-6 d-inline-block m-2">
 								<label class="sr-only" for="email">Code:</label>
-								<input type="text" class="order-number form-control m-1" id="text" placeholder="Enter Code" name="id" value="{{ request()->get('id') }}" required style="width: 100%;">
+								<input type="text" class="form-control m-1" id="text" placeholder="Enter Code"  name="id" value="{{ request()->get('id') }}" required style="width: 100%;">
 							</div>
 							<br/>
 							<div class="form-group d-inline-block p-0" style="padding: 0; margin: 0">
-								{{-- <input type="submit" class="btn btn-success" value="Search" style="color: #fff; background-color: #1a6ea9 !important; border-color: #1a6ea9 !important; border-radius: 0rem; margin: 0;"> --}}
-								<button class="search-btn btn btn-primary" style="color: #fff; background-color: #1a6ea9 !important; border-color: #1a6ea9 !important; border-radius: 0rem; margin: 0;">Search</button>
+								<input type="submit" class="btn btn-success" value="Search" style="color: #fff; background-color: #1a6ea9 !important; border-color: #1a6ea9 !important; border-radius: 0rem; margin: 0;">
+
 							</div>
-						{{-- </form> --}}
+
+						</form>
 					</center>
 				</div>
 				@if($track_order_details and $order_details)
 				<div class="col-md-8 mx-auto">
 					<div class="row mb-2">
-						<div class="col-md-6 mt-4">Order No. : <b>{{ $order_details->order_number }}</b>
+						<div class="col-md-6 mt-4">Order No. : <b>{{ request()->id }}</b>
 							@if($order_details->order_status == "Cancelled")
 								<span class="badge" style="background-color: #DC3545; font-size: 0.9rem;">{{ $order_details->order_status }}</span>
 							@endif
@@ -483,16 +479,4 @@ p {
 		}
 	}
 </style>
-@endsection
-
-@section('script')
-	<script>
-		$(document).ready(function(){
-			$('.search-btn').click(function(){
-				var order_number = $('.order-number').val();
-				window.location.href = "/track_order/" + order_number;
-				// console.log(order_number);
-			});
-		});
-	</script>
 @endsection

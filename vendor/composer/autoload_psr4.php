@@ -50,7 +50,6 @@ return array(
     'Spatie\\Crawler\\' => array($vendorDir . '/spatie/crawler/src'),
     'Spatie\\CookieConsent\\' => array($vendorDir . '/spatie/laravel-cookie-consent/src'),
     'Spatie\\Browsershot\\' => array($vendorDir . '/spatie/browsershot/src'),
-    'Shivella\\Bitly\\' => array($vendorDir . '/shivella/laravel-bitly/src'),
     'Ramsey\\Uuid\\' => array($vendorDir . '/ramsey/uuid/src'),
     'Ramsey\\Collection\\' => array($vendorDir . '/ramsey/collection/src'),
     'Psy\\' => array($vendorDir . '/psy/psysh/src'),
