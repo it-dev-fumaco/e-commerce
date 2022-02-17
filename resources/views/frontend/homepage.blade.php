@@ -28,12 +28,12 @@
       </ol>
 
       <div class="carousel-inner">
-          @forelse($onsale_carousel_data as $onsale)
+          @forelse($onsale_carousel_data as $banner_image)
             <div class="carousel-item {{ $loop->first ? "active" : ""}}" style="background: black;">
               <picture>
-                <source srcset="{{ asset('/assets/site-img/'. explode(".", $onsale->banner_image)[0] .'.webp') }}" type="image/webp" style="object-fit: cover;opacity: 1;">
-                <source srcset="{{ asset('/assets/site-img/'. $onsale->banner_image) }}" type="image/jpeg" style="object-fit: cover;opacity: 1;">
-                <img src="{{ asset('/assets/site-img/'. $onsale->banner_image) }}" alt="{{ Str::slug(explode(".", $onsale->banner_image)[0], '-') }}" style="object-fit: cover;opacity: 1;">
+                <source srcset="{{ asset('/assets/site-img/'. explode(".", $banner_image)[0] .'.webp') }}" type="image/webp" style="object-fit: cover;opacity: 1;">
+                <source srcset="{{ asset('/assets/site-img/'. $banner_image) }}" type="image/jpeg" style="object-fit: cover;opacity: 1;">
+                <img src="{{ asset('/assets/site-img/'. $banner_image) }}" alt="{{ Str::slug(explode(".", $banner_image)[0], '-') }}" style="object-fit: cover;opacity: 1;">
               </picture>
             </div>
             @empty
@@ -60,9 +60,9 @@
           @endphp
           <div class="carousel-item {{ $active }}" style="background: black;">
             <picture>
-              <source srcset="{{ asset('/assets/site-img/'. explode(".", $carousel->fumaco_image1)[0] .'.webp') }}" type="image/webp" style="object-fit: cover;opacity: 0.6;">
-              <source srcset="{{ asset('/assets/site-img/'. $carousel->fumaco_image1) }}" type="image/jpeg" style="object-fit: cover;opacity: 0.6;">
-              <img src="{{ asset('/assets/site-img/'. $carousel->fumaco_image1) }}" alt="{{ Str::slug(explode(".", $carousel->fumaco_image1)[0], '-') }}" style="object-fit: cover;opacity: 0.6;">
+              <source srcset="{{ asset('/storage/journals/'. explode(".", $carousel->fumaco_image1)[0] .'.webp') }}" type="image/webp" style="object-fit: cover;opacity: 0.6;">
+              <source srcset="{{ asset('/storage/journals/'. $carousel->fumaco_image1) }}" type="image/jpeg" style="object-fit: cover;opacity: 0.6;">
+              <img src="{{ asset('/storage/journals/'. $carousel->fumaco_image1) }}" alt="{{ Str::slug(explode(".", $carousel->fumaco_image1)[0], '-') }}" style="object-fit: cover;opacity: 0.6;">
             </picture>
 
             <div class="container">
@@ -90,11 +90,19 @@
         @foreach($blogs as $b)
           <div class="col-lg-4 pr-md-1 animated animatedFadeInUp fadeInUp equal-height-columns" style="text-align: left !important; position: relative !important">
             <div class="equal-column-content">
+              <div class="hover-container">
+                @php
+                $image = $b->{'blogprimayimage-home'} ? '/storage/journals/'.$b->{'blogprimayimage-home'} : '/storage/no-photo-available.png';
+                $image_webp = $b->{'blogprimayimage-home'} ? '/storage/journals/'.explode(".", $b->{'blogprimayimage-home'})[0] .'.webp' : '/storage/no-photo-available.png';
+              @endphp
+            
               <picture>
-                <source srcset="{!!  asset('/storage/journals/'. explode(".", $b->{'blogprimayimage-home'})[0] .'.webp') !!}" type="image/webp" class="img-responsive card-img-top" style="width: 100% !important;">
-                <source srcset="{!!  asset('/storage/journals/'. $b->{'blogprimayimage-home'}) !!}" type="image/jpeg" class="img-responsive card-img-top" style="width: 100% !important;">
-                <div class="hover-container"><img src="{!!  asset('/storage/journals/'. $b->{'blogprimayimage-home'}) !!}" alt="{{ Str::slug(explode(".", $b->{'blogprimayimage-home'})[0], '-') }}" class="img-responsive card-img-top hover" style="width: 100% !important;"></div>
+                <source srcset="{{ asset($image_webp) }}" type="image/webp" class="card-img-top">
+                <source srcset="{{ asset($image) }}" type="image/jpeg" class="card-img-top">
+                <img src="{{ asset($image) }}" alt="{{ Str::slug(explode(".", $b->{'blogprimayimage-home'})[0], '-') }}" class="card-img-top hover">
               </picture>
+              </div>
+              
               <br><br>
               <h5 class="font-style-thin fumacoFont_card_title article-title" style="font-family: 'poppins', sans-serif !important; color:#ffffff !important; line-height: 26px !important; font-size: 18px !important;">{{ $b->blogtitle }}</h5>
               <p class="abt_standard align-bottom" style="font-size: 14px; margin-left: 0rem !important; color:#ffffff !important; font-weight: 300">

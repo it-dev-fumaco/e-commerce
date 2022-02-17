@@ -377,10 +377,18 @@ class BlogController extends Controller
             $delete_img = DB::table('fumaco_blog')->where('id', $id)->select($image)->first();
             $image_name = explode('.', $delete_img->$image);
 
-            unlink(storage_path('app/public/journals/'.$delete_img->$image));
-            unlink(storage_path('app/public/journals/'.$image_name[0].'.webp'));
+            $jpg_path = storage_path('app/public/journals/'.$delete_img->$image);
+            $webp_path = storage_path('app/public/journals/'.$image_name[0].'.webp');
 
-            DB::table('fumaco_blog')->where('id', $id)->update([$image => null, 'blog_status' => 0, 'blog_enable' => 0, 'blog_featured' => 0]);
+            if (file_exists($jpg_path)) {
+                unlink($jpg_path);
+            }
+
+            if (file_exists($webp_path)) {
+                unlink($webp_path);
+            }
+
+            DB::table('fumaco_blog')->where('id', $id)->update([$image => null, 'blog_status' => 0, 'blog_enable' => 0, 'blog_featured' => 0, 'blog_active' => 0]);
             DB::commit();
             return redirect()->back()->with('success', 'Image Deleted.');
         } catch (Exception $e) {
