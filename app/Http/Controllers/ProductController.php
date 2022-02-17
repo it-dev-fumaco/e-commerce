@@ -1107,10 +1107,10 @@ class ProductController extends Controller
                         if($cart_check){
                             $type = 'cart';
                             if($sale_check->apply_discount_to == 'Per Category'){
-                                $cart_items = DB::table('fumaco_cart as cart')->join('fumaco_items as items', 'cart.item_code', 'items.f_idcode')->where('cart.user_email', $subscriber)->where('items.f_onsale', 0)->whereIn('items.f_cat_id', collect($categories)->pluck('category_id'))->select('cart.*', 'items.f_original_price', 'items.f_price', 'items.f_name_name')->get();
+                                $cart_items = DB::table('fumaco_cart as cart')->join('fumaco_items as items', 'cart.item_code', 'items.f_idcode')->where('cart.user_email', $subscriber)->where('items.f_onsale', 0)->whereIn('items.f_cat_id', collect($categories)->pluck('category_id'))->select('cart.*', 'items.f_default_price', 'items.f_name_name')->get();
         
                                 foreach($cart_items as $item){
-                                    $price = $item->f_original_price;
+                                    $price = $item->f_default_price;
                                     
                                     $image = DB::table('fumaco_items_image_v1')->where('idcode', $item->item_code)->pluck('imgprimayx')->first();
                                     $cat_id = DB::table('fumaco_items')->where('f_idcode', $item->item_code)->pluck('f_cat_id')->first();
@@ -1119,10 +1119,10 @@ class ProductController extends Controller
                                     $discount_rate = collect($categories)->where('category_id', $cat_id)->pluck('discount_rate')->first();
     
                                     if($discount_type == 'By Percentage'){
-                                        $price = $item->f_original_price - ($item->f_original_price * ($discount_rate/100));
+                                        $price = $item->f_default_price - ($item->f_default_price * ($discount_rate/100));
                                     }else if ($discount_type == 'Fixed Amount'){
                                         if($discount_rate < $price){
-                                            $price = $item->f_original_price - $discount_rate;
+                                            $price = $item->f_default_price - $discount_rate;
                                         }else{
                                             $type = 'general';
                                         }
@@ -1132,27 +1132,27 @@ class ProductController extends Controller
                                         'item_code' => $item->item_code,
                                         'name' => $item->f_name_name,
                                         'image' => $image,
-                                        'original_price' => $item->f_original_price,
+                                        'original_price' => $item->f_default_price,
                                         'discount_type' => $discount_type,
                                         'discount_rate' => $discount_rate,
                                         'discounted_price' => $price
                                     ];
                                 }
                             }else{
-                                $cart_items = DB::table('fumaco_cart as cart')->join('fumaco_items as items', 'cart.item_code', 'items.f_idcode')->where('cart.user_email', $subscriber)->where('items.f_onsale', 0)->select('cart.*', 'items.f_original_price', 'items.f_price')->get();
+                                $cart_items = DB::table('fumaco_cart as cart')->join('fumaco_items as items', 'cart.item_code', 'items.f_idcode')->where('cart.user_email', $subscriber)->where('items.f_onsale', 0)->select('cart.*', 'items.f_default_price')->get();
         
                                 foreach($cart_items as $item){
-                                    $price = $item->f_original_price;
+                                    $price = $item->f_default_price;
                                     $image = DB::table('fumaco_items_image_v1')->where('idcode', $item->item_code)->pluck('imgprimayx')->first();
         
                                     $discount_type = $sale_check->discount_type;
                                     $discount_rate = $sale_check->discount_rate;
     
                                     if($discount_type == 'By Percentage'){
-                                        $price = $item->f_original_price - ($item->f_original_price * ($discount_rate/100));
+                                        $price = $item->f_default_price - ($item->f_default_price * ($discount_rate/100));
                                     }else if ($sale_check->discount_type == 'Fixed Amount'){
                                         if($discount_rate < $price){
-                                            $price = $item->f_original_price - $discount_rate;
+                                            $price = $item->f_default_price - $discount_rate;
                                         }else{
                                             $type = 'general';
                                         }
@@ -1162,7 +1162,7 @@ class ProductController extends Controller
                                         'item_code' => $item->item_code,
                                         'name' => $item->item_description,
                                         'image' => $image,
-                                        'original_price' => $item->f_original_price,
+                                        'original_price' => $item->f_default_price,
                                         'discount_type' => $discount_type,
                                         'discount_rate' => $discount_rate,
                                         'discounted_price' => $price
@@ -1172,20 +1172,20 @@ class ProductController extends Controller
                         }else if($wish_check){
                             $type = 'wishlist';
                             if($sale_check->apply_discount_to == 'Per Category'){
-                                $wish_items = DB::table('datawishlist as wish')->join('fumaco_items as items', 'wish.item_code', 'items.f_idcode')->where('wish.userid', $customer->id)->where('items.f_onsale', 0)->select('wish.*', 'items.f_name_name', 'items.f_original_price', 'items.f_price')->get();
+                                $wish_items = DB::table('datawishlist as wish')->join('fumaco_items as items', 'wish.item_code', 'items.f_idcode')->where('wish.userid', $customer->id)->where('items.f_onsale', 0)->select('wish.*', 'items.f_name_name', 'items.f_default_price')->get();
     
                                 foreach($wish_items as $item){
-                                    $price = $item->f_original_price;
+                                    $price = $item->f_default_price;
                                     $image = DB::table('fumaco_items_image_v1')->where('idcode', $item->item_code)->pluck('imgprimayx')->first();
                                     $cat_id = DB::table('fumaco_items')->where('f_idcode', $item->item_code)->pluck('f_cat_id')->first();
         
                                     $discount_type = collect($categories)->where('category_id', $cat_id)->pluck('discount_type')->first();
                                     $discount_rate = collect($categories)->where('category_id', $cat_id)->pluck('discount_rate')->first();
                                     if($discount_type == 'By Percentage'){
-                                        $price = $item->f_original_price - ($item->f_original_price * ($discount_rate/100));
+                                        $price = $item->f_default_price - ($item->f_default_price * ($discount_rate/100));
                                     }else if ($discount_type == 'Fixed Amount'){
                                         if($discount_rate < $price){
-                                            $price = $item->f_original_price - $discount_rate;
+                                            $price = $item->f_default_price - $discount_rate;
                                         }else{
                                             $type = 'general';
                                         }
@@ -1195,27 +1195,27 @@ class ProductController extends Controller
                                         'item_code' => $item->item_code,
                                         'name' => $item->f_name_name,
                                         'image' => $image,
-                                        'original_price' => $item->f_original_price,
+                                        'original_price' => $item->f_default_price,
                                         'discount_type' => $discount_type,
                                         'discount_rate' => $discount_rate,
                                         'discounted_price' => $price
                                     ];
                                 }
                             }else{
-                                $wish_items = DB::table('datawishlist as wish')->join('fumaco_items as items', 'wish.item_code', 'items.f_idcode')->where('wish.userid', $customer->id)->where('items.f_onsale', 0)->select('wish.*', 'items.f_name_name', 'items.f_original_price', 'items.f_price')->get();
+                                $wish_items = DB::table('datawishlist as wish')->join('fumaco_items as items', 'wish.item_code', 'items.f_idcode')->where('wish.userid', $customer->id)->where('items.f_onsale', 0)->select('wish.*', 'items.f_name_name', 'items.f_default_price')->get();
     
                                 foreach($wish_items as $item){
-                                    $price = $item->f_original_price;
+                                    $price = $item->f_default_price;
                                     $image = DB::table('fumaco_items_image_v1')->where('idcode', $item->item_code)->pluck('imgprimayx')->first();
         
                                     $discount_type = $sale_check->discount_type;
                                     $discount_rate = $sale_check->discount_rate;
     
                                     if($discount_type == 'By Percentage'){
-                                        $price = $item->f_original_price - ($item->f_original_price * ($discount_rate/100));
+                                        $price = $item->f_default_price - ($item->f_default_price * ($discount_rate/100));
                                     }else if ($sale_check->discount_type == 'Fixed Amount'){
                                         if($discount_rate < $price){
-                                            $price = $item->f_original_price - $discount_rate;
+                                            $price = $item->f_default_price - $discount_rate;
                                         }else{
                                             $type = 'general';
                                         }
@@ -1225,7 +1225,7 @@ class ProductController extends Controller
                                         'item_code' => $item->item_code,
                                         'name' => $item->f_name_name,
                                         'image' => $image,
-                                        'original_price' => $item->f_original_price,
+                                        'original_price' => $item->f_default_price,
                                         'discount_type' => $discount_type,
                                         'discount_rate' => $discount_rate,
                                         'discounted_price' => $price

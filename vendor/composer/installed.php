@@ -5,7 +5,7 @@
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
-        'reference' => 'f25cf87b7e29c702f59013f6a659f7fdd9d49c11',
+        'reference' => '838e11324790328d851b7916aab8a7e47ff733a6',
         'name' => 'laravel/laravel',
         'dev' => true,
     ),
@@ -454,7 +454,7 @@
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
-            'reference' => 'f25cf87b7e29c702f59013f6a659f7fdd9d49c11',
+            'reference' => '838e11324790328d851b7916aab8a7e47ff733a6',
             'dev_requirement' => false,
         ),
         'laravel/sail' => array(
@@ -1030,6 +1030,15 @@
             'aliases' => array(),
             'reference' => 'c6c1022351a901512170118436c764e473f6de8c',
             'dev_requirement' => true,
+        ),
+        'shivella/laravel-bitly' => array(
+            'pretty_version' => '1.1.11',
+            'version' => '1.1.11.0',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../shivella/laravel-bitly',
+            'aliases' => array(),
+            'reference' => 'e57d08cf371d7166507d6d5ff4f5a10d0baffd5e',
+            'dev_requirement' => false,
         ),
         'spatie/browsershot' => array(
             'pretty_version' => '3.40.2',

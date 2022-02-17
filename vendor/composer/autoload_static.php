@@ -101,6 +101,7 @@ class ComposerStaticInit0f1e38f3feaf9a00f758a56db0972401
             'Spatie\\Crawler\\' => 15,
             'Spatie\\CookieConsent\\' => 21,
             'Spatie\\Browsershot\\' => 19,
+            'Shivella\\Bitly\\' => 15,
         ),
         'R' => 
         array (
@@ -382,6 +383,10 @@ class ComposerStaticInit0f1e38f3feaf9a00f758a56db0972401
         'Spatie\\Browsershot\\' => 
         array (
             0 => __DIR__ . '/..' . '/spatie/browsershot/src',
+        ),
+        'Shivella\\Bitly\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/shivella/laravel-bitly/src',
         ),
         'Ramsey\\Uuid\\' => 
         array (
@@ -4844,6 +4849,12 @@ class ComposerStaticInit0f1e38f3feaf9a00f758a56db0972401
         'SebastianBergmann\\Type\\UnknownType' => __DIR__ . '/..' . '/sebastian/type/src/UnknownType.php',
         'SebastianBergmann\\Type\\VoidType' => __DIR__ . '/..' . '/sebastian/type/src/VoidType.php',
         'SebastianBergmann\\Version' => __DIR__ . '/..' . '/sebastian/version/src/Version.php',
+        'Shivella\\Bitly\\BitlyServiceProvider' => __DIR__ . '/..' . '/shivella/laravel-bitly/src/BitlyServiceProvider.php',
+        'Shivella\\Bitly\\Client\\BitlyClient' => __DIR__ . '/..' . '/shivella/laravel-bitly/src/Client/BitlyClient.php',
+        'Shivella\\Bitly\\Exceptions\\AccessDeniedException' => __DIR__ . '/..' . '/shivella/laravel-bitly/src/Exceptions/AccessDeniedException.php',
+        'Shivella\\Bitly\\Exceptions\\InvalidResponseException' => __DIR__ . '/..' . '/shivella/laravel-bitly/src/Exceptions/InvalidResponseException.php',
+        'Shivella\\Bitly\\Facade\\Bitly' => __DIR__ . '/..' . '/shivella/laravel-bitly/src/Facade/Bitly.php',
+        'Shivella\\Bitly\\Testing\\BitlyClientFake' => __DIR__ . '/..' . '/shivella/laravel-bitly/src/Testing/BitlyClientFake.php',
         'Spatie\\Browsershot\\Browsershot' => __DIR__ . '/..' . '/spatie/browsershot/src/Browsershot.php',
         'Spatie\\Browsershot\\Exceptions\\CouldNotTakeBrowsershot' => __DIR__ . '/..' . '/spatie/browsershot/src/Exceptions/CouldNotTakeBrowsershot.php',
         'Spatie\\Browsershot\\Exceptions\\ElementNotFound' => __DIR__ . '/..' . '/spatie/browsershot/src/Exceptions/ElementNotFound.php',

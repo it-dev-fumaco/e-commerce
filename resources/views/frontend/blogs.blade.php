@@ -72,7 +72,7 @@
 
         <div class="row">
             <div class="col-lg-12 animated animatedFadeInUp fadeInUp">
-                <p style="font-family: 'poppins', sans-serif !important; font-size: 10pt"  class="blog-font-a">{{ $blog->datepublish }} | {{ $comment_count->count() }} Comment(s)</p>
+                <p style="font-family: 'poppins', sans-serif !important; font-size: 10pt"  class="blog-font-a">{{ $blog->datepublish }} | {{ $comment_count }} Comment(s)</p>
             </div>
         </div>
 

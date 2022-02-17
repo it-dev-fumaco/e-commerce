@@ -28,12 +28,12 @@
       </ol>
 
       <div class="carousel-inner">
-          @forelse($onsale_carousel_data as $onsale)
+          @forelse($onsale_carousel_data as $banner_image)
             <div class="carousel-item {{ $loop->first ? "active" : ""}}" style="background: black;">
               <picture>
-                <source srcset="{{ asset('/assets/site-img/'. explode(".", $onsale->banner_image)[0] .'.webp') }}" type="image/webp" style="object-fit: cover;opacity: 1;">
-                <source srcset="{{ asset('/assets/site-img/'. $onsale->banner_image) }}" type="image/jpeg" style="object-fit: cover;opacity: 1;">
-                <img src="{{ asset('/assets/site-img/'. $onsale->banner_image) }}" alt="{{ Str::slug(explode(".", $onsale->banner_image)[0], '-') }}" style="object-fit: cover;opacity: 1;">
+                <source srcset="{{ asset('/assets/site-img/'. explode(".", $banner_image)[0] .'.webp') }}" type="image/webp" style="object-fit: cover;opacity: 1;">
+                <source srcset="{{ asset('/assets/site-img/'. $banner_image) }}" type="image/jpeg" style="object-fit: cover;opacity: 1;">
+                <img src="{{ asset('/assets/site-img/'. $banner_image) }}" alt="{{ Str::slug(explode(".", $banner_image)[0], '-') }}" style="object-fit: cover;opacity: 1;">
               </picture>
             </div>
             @empty

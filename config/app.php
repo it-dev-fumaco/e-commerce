@@ -55,7 +55,7 @@ return [
     // 'url' => env('APP_URL', 'http://localhost'),
     'url' => 'https://www.fumaco.com',
 
-    'asset_url' => env('ASSET_URL', 'https://www.fumaco.com'),
+    'asset_url' => env('ASSET_URL', null),
 
     /*
     |--------------------------------------------------------------------------
@@ -179,6 +179,7 @@ return [
         Buglinjo\LaravelWebp\WebpServiceProvider::class,
         App\Providers\MailConfigServiceProvider::class,
         App\Providers\GoogleApiServiceProvider::class,
+        Shivella\Bitly\BitlyServiceProvider::class,
     ],
 
     /*
@@ -234,6 +235,7 @@ return [
         'View' => Illuminate\Support\Facades\View::class,
         'GoogleMaps' => GoogleMaps\Facade\GoogleMapsFacade::class,
         'Webp' => Buglinjo\LaravelWebp\Facades\Webp::class,
+        'Bitly' => Shivella\Bitly\Facade\Bitly::class,
     ],
 
 ];
