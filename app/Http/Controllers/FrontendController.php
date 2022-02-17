@@ -18,6 +18,7 @@ use Adrianorosa\GeoLocation\GeoLocation;
 use App\Http\Traits\ProductTrait;
 
 use Illuminate\Pagination\LengthAwarePaginator;
+use Bitly;
 
 class FrontendController extends Controller
 {   
@@ -1987,12 +1988,12 @@ class FrontendController extends Controller
         }
     }
 
-    public function viewOrderTracking(Request $request) {
-        $order_details = DB::table('fumaco_order')->where('order_number', $request->id)->first();
+    public function viewOrderTracking($order_number = null) {
+        $order_details = DB::table('fumaco_order')->where('order_number', $order_number)->first();
 
-        $track_order_details = DB::table('track_order')->where('track_code', $request->id)->get();
+        $track_order_details = DB::table('track_order')->where('track_code', $order_number)->get();
 
-        $ordered_items = DB::table('fumaco_order_items')->where('order_number', $request->id)->get();
+        $ordered_items = DB::table('fumaco_order_items')->where('order_number', $order_number)->get();
         $order_status = '';
         if($order_details){
             $order_status = DB::table('order_status as s')
@@ -2002,7 +2003,6 @@ class FrontendController extends Controller
                 ->orderBy('order_sequence', 'asc')
                 ->get();
         }
-        
 
         $items = [];
         foreach ($ordered_items as $item) {
@@ -2020,7 +2020,11 @@ class FrontendController extends Controller
             ];
         }
 
-        // return $track_order_details;
+        if($order_number != null and !$order_details){
+            return redirect()->back()->with('error', 'Order Number not found!');
+        }
+
+        // return $track_order_details; 
 
         return view('frontend.track_order', compact('order_details', 'items', 'track_order_details', 'order_status'));
     }

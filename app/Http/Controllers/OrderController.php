@@ -11,6 +11,7 @@ use Mail;
 use Auth;
 use Carbon\Carbon;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Bitly;
 
 class OrderController extends Controller
 {
@@ -319,6 +320,7 @@ class OrderController extends Controller
                 $order_details = DB::table('fumaco_order')->where('order_number', $request->order_number)->first();
 
                 $total_amount = $order_details->amount_paid;
+                $url = Bitly::getUrl($request->root().'/track_order/'.$request->order_number);
 
                 $sms = [
                     'api_key' => "24wezX69kvuWfnqZazxUhsiifcd",
@@ -333,7 +335,7 @@ class OrderController extends Controller
                         $message->subject($status . ' - FUMACO');
                     });
 
-                    $sms['text'] = 'Hi '.$order_details->order_name . ' ' . $order_details->order_lastname.'!, your order '.$request->order_number.' with an amount of '.$total_amount.' is now shipped out, check out our website to track your order.';
+                    $sms['text'] = 'Hi '.$order_details->order_name . ' ' . $order_details->order_lastname.'!, your order '.$request->order_number.' with an amount of '.number_format($total_amount, 2).' is now shipped out. Click '.$url.' to track your order.';
                 }
 
                 if ($status == 'Order Delivered') {
@@ -343,11 +345,11 @@ class OrderController extends Controller
                         $message->subject('Order Delivered - FUMACO');
                     });
 
-                    $sms['text'] = 'Hi '.$order_details->order_name . ' ' . $order_details->order_lastname.'!, your order '.$request->order_number.' with an amount of '.$total_amount.' has been delivered.';
+                    $sms['text'] = 'Hi '.$order_details->order_name . ' ' . $order_details->order_lastname.'!, your order '.$request->order_number.' with an amount of '.number_format($total_amount, 2).' has been delivered. Click '.$url.' to track your order.';
                 }
 
                 if($status == 'Ready for Pickup'){
-                    $sms['text'] = 'Hi '.$order_details->order_name . ' ' . $order_details->order_lastname.'!, your order '.$request->order_number.' with an amount of '.$total_amount.' is now ready for pickup.';
+                    $sms['text'] = 'Hi '.$order_details->order_name . ' ' . $order_details->order_lastname.'!, your order '.$request->order_number.' with an amount of '.number_format($total_amount, 2).' is now ready for pickup. Click '.$url.' to track your order.';
                 }
 
                 if(in_array($status, ['Out for Delivery', 'Order Delivered', 'Ready for Pickup'])){

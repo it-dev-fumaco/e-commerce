@@ -16,6 +16,7 @@ use App\Models\ShippingZoneRate;
 use App\Models\ShippingCondition;
 
 use App\Http\Traits\ProductTrait;
+use Bitly;
 
 class CheckoutController extends Controller
 {
@@ -922,16 +923,29 @@ class CheckoutController extends Controller
 
 			$ordered_items = DB::table('fumaco_order_items as ordered')->where('order_number', $temp->xlogs)->pluck('item_code');
         
+			$shipping_name = $temp->shipping_name;
+			$province = $temp->xshiprov;
 			$leadtime_arr = [];
 			foreach($ordered_items as $item){
 				$category_id = DB::table('fumaco_items')->where('f_idcode', $item)->pluck('f_cat_id')->first();
-				$shipping = DB::table('fumaco_shipping_service as shipping_service')
-					->join('fumaco_shipping_zone_rate as zone_rate', 'shipping_service.shipping_service_id', 'zone_rate.shipping_service_id')
-					->where('shipping_service.shipping_service_name', $temp->shipping_name)
-					->where('zone_rate.province_name', $temp->xshiprov)
+
+				$lead_time_per_category = DB::table('fumaco_shipping_service as shipping_service')
+					->join('fumaco_shipping_product_category as shipping_category', 'shipping_service.shipping_service_id', 'shipping_category.shipping_service_id')
+					->where('shipping_service.shipping_service_name', $shipping_name)
+					->where('shipping_category.category_id', $category_id)
 					->first();
 
-				$lead_time_per_category = DB::table('fumaco_shipping_product_category')->where('shipping_service_id', $shipping->shipping_service_id)->where('category_id', $category_id)->select('min_leadtime', 'max_leadtime')->first();
+				$shipping = DB::table('fumaco_shipping_service as shipping_service')
+					->when($shipping_name == 'Store Pickup', function($c) use ($shipping_name) {
+						$c->join('fumaco_shipping_service_store as store', 'shipping_service.shipping_service_id', 'store.shipping_service_id')
+							->where('shipping_service.shipping_service_name', $shipping_name);
+					})
+					->when($shipping_name != 'Store Pickup', function($c) use ($shipping_name, $province){
+						$c->join('fumaco_shipping_zone_rate as zone_rate', 'shipping_service.shipping_service_id', 'zone_rate.shipping_service_id')
+							->where('shipping_service.shipping_service_name', $shipping_name)
+							->where('zone_rate.province_name', $province);
+					})
+					->first();
 
 				$leadtime_arr[] = [
 					'min_leadtime' => $lead_time_per_category ? $lead_time_per_category->min_leadtime : $shipping->min_leadtime,
@@ -942,6 +956,8 @@ class CheckoutController extends Controller
 			$min_leadtime = collect($leadtime_arr)->pluck('min_leadtime')->max();
 			$max_leadtime = collect($leadtime_arr)->pluck('max_leadtime')->max();
 
+			$url = Bitly::getUrl($request->root().'/track_order/'.$temp->xlogs);
+
 			Http::asForm()->withHeaders([
 				'Accept' => 'application/json',
 				'Content-Type' => 'application/x-www-form-urlencoded',
@@ -950,7 +966,7 @@ class CheckoutController extends Controller
 				'api_secret' => "Dd1PnbBIUgf7RFVKSaZEGzBsDDrjKDffimF9dVLH",
 				'from' => 'FUMACO',
 				'to' => preg_replace("/[^0-9]/", "", $phone),
-				'text' => 'Hi '.$temp->xfname.' '.$temp->xlname.'!, your order '.$temp->xlogs.' with an amount of '.$request->Amount.' has been received, please allow '.$min_leadtime.'-'.$max_leadtime.' business days to process your order. We will send another notification once your order is shipped out.'
+				'text' => 'Hi '.$temp->xfname.' '.$temp->xlname.'!, your order '.$temp->xlogs.' with an amount of '.number_format($request->Amount, 2).' has been received, please allow '.$min_leadtime.'-'.$max_leadtime.' business days to process your order. We will send another notification once your order is shipped out. Click '.$url.' to track your order.'
 			]);
 
 			// send email to fumaco staff
