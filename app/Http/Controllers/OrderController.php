@@ -323,6 +323,7 @@ class OrderController extends Controller
                 $sms = [
                     'api_key' => "24wezX69kvuWfnqZazxUhsiifcd",
                     'api_secret' => "Dd1PnbBIUgf7RFVKSaZEGzBsDDrjKDffimF9dVLH",
+                    'from' => 'FUMACO',
                     'to' => $order_details->order_bill_contact[0] == '0' ? '63'.substr($order_details->order_bill_contact, 1) : $order_details->order_bill_contact
                 ];
 

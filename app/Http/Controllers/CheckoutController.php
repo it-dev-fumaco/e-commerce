@@ -948,6 +948,7 @@ class CheckoutController extends Controller
 			])->post('https://api.movider.co/v1/sms', [
 				'api_key' => "24wezX69kvuWfnqZazxUhsiifcd",
 				'api_secret' => "Dd1PnbBIUgf7RFVKSaZEGzBsDDrjKDffimF9dVLH",
+				'from' => 'FUMACO',
 				'to' => preg_replace("/[^0-9]/", "", $phone),
 				'text' => 'Hi '.$temp->xfname.' '.$temp->xlname.'!, your order '.$temp->xlogs.' with an amount of '.$request->Amount.' has been received, please allow '.$min_leadtime.'-'.$max_leadtime.' business days to process your order. We will send another text once your order is shipped out.'
 			]);
