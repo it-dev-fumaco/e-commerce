@@ -44,7 +44,6 @@ class HomeCRUDController extends Controller
 
 			$filename = pathinfo($img->getClientOriginalName(), PATHINFO_FILENAME);
 			$extension = pathinfo($img->getClientOriginalName(), PATHINFO_EXTENSION);
-			// $request->file('fileToUpload')->store('/assets/site-img');
 
 			$filename = Str::slug($filename, '-');
 
