@@ -43,8 +43,8 @@ return [
     ],
 
     'linkedin' => [
-        'client_id' => '7860f649xojwle',
-        'client_secret' => 'TPdkxz3brTw8c5yx',
+        'client_id' => '86qae63bbvyy22',
+        'client_secret' => '5bC4dey0d7vAqwgH',
         'redirect' => 'https://test301.fumaco.com/auth/linkedin/callback'
     ],
 
