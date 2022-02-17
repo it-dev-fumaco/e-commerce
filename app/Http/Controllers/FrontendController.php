@@ -1799,6 +1799,7 @@ class FrontendController extends Controller
         $order_item_codes = array_column($order_items->toArray(), 'item_code');
         $item_images = DB::table('fumaco_items_image_v1')->whereIn('idcode', $order_item_codes)
             ->select('imgprimayx', 'idcode')->get();
+        $item_images = collect($item_images)->groupBy('idcode')->toArray();
 
         $order_items = collect($order_items)->groupBy('order_number')->toArray();
         $orders_arr = [];
@@ -1852,6 +1853,7 @@ class FrontendController extends Controller
         $order_item_codes = array_column($order_items->toArray(), 'item_code');
         $item_images = DB::table('fumaco_items_image_v1')->whereIn('idcode', $order_item_codes)
             ->select('imgprimayx', 'idcode')->get();
+        $item_images = collect($item_images)->groupBy('idcode')->toArray();
 
         $order_items = collect($order_items)->groupBy('order_number')->toArray();
 
