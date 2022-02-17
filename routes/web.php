@@ -64,8 +64,6 @@ Route::namespace('Auth')->group(function(){
      });
 });
 
-Route::get('/testing', 'FrontendController@testing');
-
 Route::get('/signup', 'FrontendController@signupForm');
 Route::post('/user_register', 'FrontendController@userRegistration');
 Route::get('/about', 'FrontendController@viewAboutPage');
@@ -78,7 +76,7 @@ Route::post('/add_contact', 'FrontendController@addContact');
 Route::get('/products/{slug}', 'FrontendController@viewProducts');
 Route::post('/products/{slug}', 'FrontendController@viewProducts');
 Route::get('/product/{slug}', 'FrontendController@viewProduct');
-Route::get('/track_order/{order_number?}', 'FrontendController@viewOrderTracking')->name('track_order');
+Route::get('/track_order', 'FrontendController@viewOrderTracking')->name('track_order');
 Route::get('/categories', 'FrontendController@getProductCategories');
 Route::get('/website_settings', 'FrontendController@websiteSettings');
 Route::post('/getvariantcode', 'FrontendController@getVariantItemCode');
