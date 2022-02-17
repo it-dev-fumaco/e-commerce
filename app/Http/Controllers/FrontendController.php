@@ -1795,19 +1795,18 @@ class FrontendController extends Controller
 
         $order_numbers = array_column($orders->items(), 'order_number');
         $order_items = DB::table('fumaco_order_items')->whereIn('order_number', $order_numbers)
-            ->select('item_code', 'item_name', 'item_qty', 'item_discount', 'item_original_price', 'item_price')->get();
+            ->select('item_code', 'item_name', 'item_qty', 'item_discount', 'item_original_price', 'item_price', 'order_number')->get();
         $order_item_codes = array_column($order_items->toArray(), 'item_code');
         $item_images = DB::table('fumaco_items_image_v1')->whereIn('idcode', $order_item_codes)
             ->select('imgprimayx', 'idcode')->get();
 
-        $order_items = collect($order_items)->groupBy('order_number');
-
+        $order_items = collect($order_items)->groupBy('order_number')->toArray();
         $orders_arr = [];
         foreach($orders as $order){
             $items_arr = [];
 
-            $order_items = array_key_exists($order->order_number, $order_items) ? $order_items[$order->order_number] : [];
-            foreach($order_items as $item){
+            $order_item_list = array_key_exists($order->order_number, $order_items) ? $order_items[$order->order_number] : [];
+            foreach($order_item_list as $item){
                 $image = null;
                 if (array_key_exists($item->item_code, $item_images)) {
                     $image = $item_images[$item->item_code][0]->imgprimayx;
@@ -1849,12 +1848,12 @@ class FrontendController extends Controller
 
         $order_numbers = array_column($new_orders->items(), 'order_number');
         $order_items = DB::table('fumaco_order_items')->whereIn('order_number', $order_numbers)
-            ->select('item_code', 'item_name', 'item_qty', 'item_discount', 'item_original_price', 'item_price')->get();
+            ->select('item_code', 'item_name', 'item_qty', 'item_discount', 'item_original_price', 'item_price', 'order_number')->get();
         $order_item_codes = array_column($order_items->toArray(), 'item_code');
         $item_images = DB::table('fumaco_items_image_v1')->whereIn('idcode', $order_item_codes)
             ->select('imgprimayx', 'idcode')->get();
 
-        $order_items = collect($order_items)->groupBy('order_number');
+        $order_items = collect($order_items)->groupBy('order_number')->toArray();
 
         $track_order_detail_query = DB::table('track_order')->whereIn('track_code', $order_numbers)->where('track_active', 1)->select('track_status', 'track_date_update')->get();
         $track_order_arr = collect($track_order_detail_query)->groupBy('track_code');
@@ -1872,11 +1871,11 @@ class FrontendController extends Controller
         foreach($new_orders as $key => $new_order){
             $items_arr = [];
 
-            $order_items = array_key_exists($new_order->order_number, $order_items) ? $order_items[$new_order->order_number] : [];
+            $order_item_list = array_key_exists($new_order->order_number, $order_items) ? $order_items[$new_order->order_number] : [];
 
             $track_order_details = array_key_exists($new_order->order_number, $track_order_arr) ? $track_order_arr[$new_order->order_number] : [];
 
-            foreach($order_items as $item){
+            foreach($order_item_list as $item){
                 $image = null;
                 if (array_key_exists($item->item_code, $item_images)) {
                     $image = $item_images[$item->item_code][0]->imgprimayx;
