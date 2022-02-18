@@ -69,8 +69,8 @@
 						<br>
 						<div class="row">
 							<div class="col">
-								<label for="contact_no" class="myprofile-font-form">Contact Number : <span class="text-danger">*</span></label>
-								<input type="text" class="form-control caption_1" id="contact_no" name="contact_no" value="{{ old('contact_no') }}" required>
+								<label for="contact_no" class="myprofile-font-form">Telephone Number : </label>
+								<input type="text" class="form-control caption_1" id="contact_no" name="contact_no" value="{{ old('contact_no') }}">
 							</div>
 
 							<div class="col">

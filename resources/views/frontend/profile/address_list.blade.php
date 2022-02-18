@@ -85,23 +85,7 @@
 								<button type="button" class="btn btn-danger btn-xs" data-toggle="modal" data-target="#shipping-del{{ $shipping_address->id }}">
 									<i class="fas fa-trash-alt"></i>
 								</button>
-								{{-- @if($shipping_address->xdefault)
-								<div id="shipping-del{{ $shipping_address->id }}" class="modal fade" role="dialog">
-									<div class="modal-dialog">
-										<div class="modal-content">
-											<div class="modal-header">
-												<h4 class="modal-title">Warning!</h4>
-											</div>
-											<div class="modal-body">
-												<p class="text-center">Cannot delete default shipping address.</p>
-											</div>
-											<div class="modal-footer">
-												<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-											</div>
-										</div>
-									</div>
-								</div>
-								@else --}}
+
 								<div id="shipping-del{{ $shipping_address->id }}" class="modal fade" role="dialog">
 									<form action="/myprofile/address/{{ $shipping_address->id }}/shipping/delete" method="POST">
 										@csrf
@@ -212,13 +196,13 @@
 														<label for="Address_type1_1" class="formslabelfnt">Address Type : <span class="text-danger">*</span></label>
 														<select class="form-control formslabelfnt ship_type" id="ship_Address_type1_1" name="Address_type1_1">
 															<option value="">Choose...</option>
-															<option value="Business Address" {{ old('ship_Address_type1_1') == 'Business Address' ? 'selected' : '' }}>Business Address</option>
-															<option value="Home Address" {{ old('ship_Address_type1_1') == 'Home Address' ? 'selected' : '' }}>Home Address</option>
+															<option value="Business Address" {{ $shipping_address->add_type == 'Business Address' ? 'selected' : '' }}>Business Address</option>
+															<option value="Home Address" {{ $shipping_address->add_type == 'Home Address' ? 'selected' : '' }}>Home Address</option>
 														</select>
 													</div>
 												</div>
 												<br/>
-												<div class="row" class="ship_for_business" id="ship_for_business_{{ $key }}" style="display: none">
+												<div class="row" class="ship_for_business" id="ship_for_business_{{ $key }}" {!! $shipping_address->add_type != 'Business Address' ? 'style="display: none"' : '' !!}>
 													<div class="col-md-6">
 														<label for="business_name" class="formslabelfnt">Business Name : <span class="text-danger">*</span></label>
 														<input type="text" class="form-control formslabelfnt" id="ship_business_name_{{ $key }}" name="business_name"><br class="d-lg-none d-xl-none"/>
@@ -370,13 +354,13 @@
 														<label for="Address_type1_1" class="formslabelfnt">Address Type : <span class="text-danger">*</span></label>
 														<select class="form-control formslabelfnt bill_type" id="bill_Address_type1_1" name="Address_type1_1" required>
 															<option value="">Choose...</option>
-															<option value="Business Address" {{ old('ship_Address_type1_1') == 'Business Address' ? 'selected' : '' }}>Business Address</option>
-															<option value="Home Address" {{ old('ship_Address_type1_1') == 'Home Address' ? 'selected' : '' }}>Home Address</option>
+															<option value="Business Address" {{ $billing_address->add_type == 'Business Address' ? 'selected' : '' }}>Business Address</option>
+															<option value="Home Address" {{ $billing_address->add_type == 'Home Address' ? 'selected' : '' }}>Home Address</option>
 														</select>
 													</div>
 												</div>
 												<br/>
-												<div class="row" id="bill_for_business_{{ $key }}" style="display: none">
+												<div class="row" id="bill_for_business_{{ $key }}" {!! $billing_address->add_type != 'Business Address' ? 'style="display: none"' : '' !!}>
 													<div class="col-md-6">
 														<label for="business_name" class="formslabelfnt">Business Name : <span class="text-danger">*</span></label>
 														<input type="text" class="form-control formslabelfnt" id="bill_business_name_{{ $key }}" name="business_name"><br class="d-lg-none d-xl-none"/>
@@ -399,23 +383,7 @@
 								<button type="button" class="btn btn-danger btn-xs" data-toggle="modal" data-target="#myDelete{{ $billing_address->id }}">
 									<i class="fas fa-trash-alt"></i>
 								</button>
-								{{-- @if ($billing_address->xdefault)
-								<div id="myDelete{{ $billing_address->id }}" class="modal fade" role="dialog">
-									<div class="modal-dialog">
-											<div class="modal-content">
-												<div class="modal-header">
-													<h4 class="modal-title">Warning!</h4>
-												</div>
-												<div class="modal-body">
-													<p class="text-center">Cannot delete fefault billing address.</p>
-												</div>
-												<div class="modal-footer">
-													<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-												</div>
-											</div>
-									</div>
-								</div>
-								@else --}}
+
 								<div id="myDelete{{ $billing_address->id }}" class="modal fade" role="dialog">
 									<form action="/myprofile/address/{{ $billing_address->id }}/billing/delete" method="POST">
 										@csrf
