@@ -209,6 +209,8 @@
 								<th>Cart Status</th>
 								<th>Last Online</th>
 								<th>Products</th>
+								<th>Total Qty</th>
+								<th>Amount</th>
 								<th>Action</th>
 							</tr>
 							@foreach ($cart_collection as $cart)
@@ -230,6 +232,11 @@
 										@foreach ($cart['items'] as $item)
 											<a href="/product/{{ $item['slug'] ? $item['slug'] : $item['item_code'] }}" class="badge badge-primary" target="_blank">{{ $item['item_code'] }}</a>
 										@endforeach
+									</td>
+									<td class="text-center">
+										{{ $cart['total_qty'] }}
+									</td>
+									<td class="text-center">{{ isset($cart['grand_total']) ? '₱ '.number_format($cart['grand_total'], 2) : null }}</td>
 									<td class="text-center">
 										@if($cart['status'] == 'Converted')
 											<a href="#" data-toggle="modal" data-target="#view{{ $cart['transaction_id'] }}Modal">

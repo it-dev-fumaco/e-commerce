@@ -100,6 +100,7 @@ class DashboardController extends Controller
 				'transaction_id' => $cart->transaction_id,
 				'owner' => $cart->user_email,
 				'user_type' => $cart->user_type,
+				'total_qty' => collect($items_arr)->sum('qty'),
 				'items' => $items_arr,
 				'last_online' => $last_online,
 				'status' => $status
@@ -151,6 +152,7 @@ class DashboardController extends Controller
 				'email' => $order_details->order_email,
 				'contact' => $order_details->order_contact == 0 ? '' : $order_details->order_contact ,
 				'date' => Carbon::parse($order_details->order_update)->format('M d, Y - h:m A'),
+				'total_qty' => collect($orders_arr)->sum('qty'),
 				'ordered_items' => $items_arr,
 				'order_tracker_code' => $order_details->tracker_code,
 				'payment_method' => $order_details->order_payment_method,
@@ -192,8 +194,6 @@ class DashboardController extends Controller
 		}
 		$merged = collect($cart_arr)->merge($converted_orders);
 		$cart_collection = $merged->sortBy('last_online', SORT_REGULAR, true)->values()->all();
-
-		// return $converted_orders;
 
 		// Get current page form url e.x. &page=1
 		$currentPage = LengthAwarePaginator::resolveCurrentPage();
