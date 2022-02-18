@@ -25,9 +25,9 @@
 				<div class="col-lg-2">
 					<p class="caption_2" style="color:#186EA9 !important; font-weight:400 !important;"><i class="fas fa-angle-double-right"></i> <span style="margin-left: 8px;">Account Details</span></p>
 					<hr>
-					<p class="caption_2"><a href="/myprofile/change_password" style="text-decoration: none; color: #000000;">Change Password</a></p>
-					<hr>
 					<p class="caption_2"><a href="/myprofile/address" style="text-decoration: none; color: #000000;">Address</a></p>
+					<hr>
+					<p class="caption_2"><a href="/myprofile/change_password" style="text-decoration: none; color: #000000;">Change Password</a></p>
 					<hr>
 					<p class="caption_2"><a href="/logout" style="text-decoration: none; color: #000000;">Sign Out</a></p>
 					<hr>
@@ -80,10 +80,9 @@
 						<div class="row">
 							<div class="col">
 								<label for="ebusinessname" class="myprofile-font-form">Business Name / Employer:</label>
-								<input type="text" class="form-control caption_1"  name="business_name" value="{{ Auth::user()->f_business }}">
+								<input type="text" class="form-control caption_1" name="business_name" value="{{ Auth::user()->f_business }}">
 							</div>
 						</div>
-						@endif
 						<br>
 						<div class="row">
 							<div class="col">
@@ -95,6 +94,7 @@
 								<input type="text" class="form-control caption_1" name="job_position" value="{{ Auth::user()->f_job_position }}">
 							</div>
 						</div>
+						@endif
 						<br>
 						<button type="submit" class="btn btn-primary mt-3 caption_1">UPDATE</button>
 					</form>

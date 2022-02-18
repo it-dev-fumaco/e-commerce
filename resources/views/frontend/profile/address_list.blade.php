@@ -25,9 +25,9 @@
 			<div class="col-lg-2">
 				<p class="caption_2"><a href="/myprofile/account_details" style="text-decoration: none; color: #000000;">Account Details</a></p>
 				<hr>
-				<p class="caption_2"><a href="/myprofile/change_password" style="text-decoration: none; color: #000000;">Change Password</a></p>
-				<hr>
 				<p class="caption_2" style="color:#186EA9 !important; font-weight:400 !important;"><i class="fas fa-angle-double-right"></i> <span style="margin-left: 8px;">Address</span></p>
+				<hr>
+				<p class="caption_2"><a href="/myprofile/change_password" style="text-decoration: none; color: #000000;">Change Password</a></p>
 				<hr>
 				<p class="caption_2"><a href="/logout" style="text-decoration: none; color: #000000;">Sign Out</a></p>
 				<hr>
@@ -517,26 +517,70 @@
 				}
 			});
 
+			var provinces_shipping = [];
 			$.getJSON("{{ asset('/json/provinces.json') }}", function(obj){
 				$.each(obj.results, function(e, i) {
-					provinces.push({
+					provinces_shipping.push({
 						id: i.text,
 						code: i.provCode,
 						text: i.text
 					});
 				});
 
+				var province = $('#province1_1_'+ship_key).val();
+				var city = $('#City_Municipality1_1_'+ship_key).val();
+
 				$('#province1_1_'+ship_key).select2({
 					placeholder: 'Select Province',
-					data: provinces
+					data: provinces_shipping
 				});
 
-				$('#City_Municipality1_1_'+ship_key).select2({
-					placeholder: 'Select City',
+				var provCodeShipping = provinces_shipping.filter(function(obj) {
+					return (obj.id === province);
 				});
 
-				$('#Barangay1_1_'+ship_key).select2({
-					placeholder: 'Select Barangay',
+				var cities_shipping = [];
+				$.getJSON("{{ asset('/json/cities.json') }}", function(obj){
+					var filtered_cities = $.grep(obj.results, function(v) {
+						return v.provCode === provCodeShipping[0].code;
+					});
+
+					$.each(filtered_cities, function(e, i) {
+						cities_shipping.push({
+							id: i.text,
+							code: i.citymunCode,
+							text: i.text,
+							
+						});
+					});
+
+					$('#City_Municipality1_1_'+ship_key).select2({
+						placeholder: 'Select City',
+						data: cities_shipping
+					});
+
+					var cityCodeShipping = cities_shipping.filter(function(obj) {
+						return (obj.id === city);
+					});
+
+					var brgy_shipping = [];
+					$.getJSON("{{ asset('/json/brgy.json') }}", function(obj){
+						var filtered = $.grep(obj.results, function(v) {
+							return v.citymunCode === cityCodeShipping[0].code;
+						});
+
+						$.each(filtered, function(e, i) {
+							brgy_shipping.push({
+								id: i.brgyDesc,
+								text: i.brgyDesc
+							});
+						});
+
+						$('#Barangay1_1_'+ship_key).select2({
+							placeholder: 'Select Barangay',
+							data: brgy_shipping
+						});
+					});
 				});
 			});
 
@@ -606,30 +650,73 @@
 					$("#bill_business_name_"+bill_key).prop('required',false);
 				}
 			});
-			var provinces_bill = [];
+			var provinces_billing = [];
 			$.getJSON("{{ asset('/json/provinces.json') }}", function(obj){
 				$.each(obj.results, function(e, i) {
-					provinces_bill.push({
+					provinces_billing.push({
 						id: i.text,
 						code: i.provCode,
 						text: i.text
 					});
 				});
 
+				var province = $('#bill_province1_1_'+bill_key).val();
+				var city = $('#bill_City_Municipality1_1_'+bill_key).val();
+
 				$('#bill_province1_1_'+bill_key).select2({
 					placeholder: 'Select Province',
-					data: provinces_bill
+					data: provinces_billing
 				});
 
-				$('#bill_City_Municipality1_1_'+bill_key).select2({
-					placeholder: 'Select City',
+				var provCode = provinces_billing.filter(function(obj) {
+					return (obj.id === province);
 				});
 
-				$('#bill_Barangay1_1_'+bill_key).select2({
-					placeholder: 'Select Barangay',
+				var cityCode = [];
+				var cities_billing = [];
+				$.getJSON("{{ asset('/json/cities.json') }}", function(obj){
+					var filtered_cities = $.grep(obj.results, function(v) {
+						return v.provCode === provCode[0].code;
+					});
+
+					$.each(filtered_cities, function(e, i) {
+						cities_billing.push({
+							id: i.text,
+							code: i.citymunCode,
+							text: i.text,
+							
+						});
+					});
+
+					$('#bill_City_Municipality1_1_'+bill_key).select2({
+						placeholder: 'Select City',
+						data: cities_billing
+					});
+
+					var cityCode = cities_billing.filter(function(obj) {
+						return (obj.id === city);
+					});
+
+					var brgy_billing = [];
+					$.getJSON("{{ asset('/json/brgy.json') }}", function(obj){
+						var filtered = $.grep(obj.results, function(v) {
+							return v.citymunCode === cityCode[0].code;
+						});
+
+						$.each(filtered, function(e, i) {
+							brgy_billing.push({
+								id: i.brgyDesc,
+								text: i.brgyDesc
+							});
+						});
+
+						$('#bill_Barangay1_1_'+bill_key).select2({
+							placeholder: 'Select Barangay',
+							data: brgy_billing
+						});
+					});
 				});
 			});
-
 			$(document).on('select2:select', '#bill_province1_1_'+bill_key, function(e){
 				var data = e.params.data;
 				var select_el = $('#bill_City_Municipality1_1_'+bill_key);
