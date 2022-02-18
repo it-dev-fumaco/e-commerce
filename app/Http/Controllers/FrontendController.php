@@ -365,11 +365,9 @@ class FrontendController extends Controller
                         DB::table('fumaco_search_results')->insert($search_results_data);
                     }
                 }
-                $recently_added_items_query = [];
+                $recently_added_items_query = DB::table('fumaco_items')->whereIn('f_idcode', $recently_added_items)
+                    ->select('f_idcode', 'f_default_price', 'f_onsale', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'f_qty', 'f_reserved_qty', 'slug', 'f_name_name')->get();
                 if(count($recently_added_items) > 0) {
-                    $recently_added_items_query = DB::table('fumaco_items')->whereIn('f_idcode', $recently_added_items)
-                        ->select('f_idcode', 'f_default_price', 'f_onsale', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'f_qty', 'f_reserved_qty', 'slug', 'f_name_name')->get();
-
                     $recently_added_items_images = DB::table('fumaco_items_image_v1')->whereIn('idcode', $recently_added_items)
                         ->select('imgprimayx', 'idcode')->get();
                     $recently_added_items_images = collect($recently_added_items_images)->groupBy('idcode')->toArray();
