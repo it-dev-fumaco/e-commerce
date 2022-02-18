@@ -203,7 +203,7 @@ class FrontendController extends Controller
                 ];
             }
 
-            $recently_added_items = collect($results)->whereNotNull('item_code')->where('is_new_item', 1)->pluck('item_code');
+           $recently_added_items = collect($product_list)->where('f_new_item', 1)->pluck('f_idcode');
 
             // Get current page form url e.x. &page=1
             $currentPage = LengthAwarePaginator::resolveCurrentPage();
@@ -258,8 +258,8 @@ class FrontendController extends Controller
                     }
 
                     $image = null;
-                    if (array_key_exists($row->f_idcode, $product_list_images)) {
-                        $image = $product_list_images[$row->f_idcode][0]->imgprimayx;
+                    if (array_key_exists($result['item_code'], $product_list_images)) {
+                        $image = $product_list_images[$result['item_code']][0]->imgprimayx;
                     }
 
                     $item_price = $result['default_price'];
@@ -300,6 +300,7 @@ class FrontendController extends Controller
                     ];
                 }
             }
+
             $recently_added_arr = [];
             $item_code_array = [];
             $blog_id_array = [];
@@ -367,14 +368,11 @@ class FrontendController extends Controller
                 }
 
                 $recently_added_items_query = DB::table('fumaco_items')->whereIn('f_idcode', $recently_added_item_codes)
-                ->select('f_idcode', 'f_default_price', 'f_onsale', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'f_qty', 'f_reserved_qty', 'slug', 'f_name_name')->get();
+                    ->select('f_idcode', 'f_default_price', 'f_onsale', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'f_qty', 'f_reserved_qty', 'slug', 'f_name_name')->get();
            
-       
-                   
-                    $recently_added_items_images = DB::table('fumaco_items_image_v1')->whereIn('idcode', $recently_added_item_codes)
-                        ->select('imgprimayx', 'idcode')->get();
-                    $recently_added_items_images = collect($recently_added_items_images)->groupBy('idcode')->toArray();
-                
+                $recently_added_items_images = DB::table('fumaco_items_image_v1')->whereIn('idcode', $recently_added_item_codes)
+                    ->select('imgprimayx', 'idcode')->get();
+                $recently_added_items_images = collect($recently_added_items_images)->groupBy('idcode')->toArray();
                 
                 $sale_per_category = [];
                 if (!$sale && !Auth::check()) {
@@ -388,7 +386,7 @@ class FrontendController extends Controller
     
                 foreach($recently_added_items_query as $item_details){
                     $item_code = $item_details->f_idcode;
-                    
+                
                     $image = null;
                     if (array_key_exists($item_code, $recently_added_items_images)) {
                         $image = $recently_added_items_images[$item_code][0]->imgprimayx;
