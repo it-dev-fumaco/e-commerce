@@ -1611,7 +1611,7 @@ class FrontendController extends Controller
         $recommended_item_codes_query = DB::table('fumaco_items')->whereIn('f_idcode', $recommended_item_codes)
             ->select('f_idcode', 'f_default_price', 'f_onsale', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'f_qty', 'f_reserved_qty', 'slug', 'f_name_name', 'id')->get();
 
-        $recommended_item_codes = array_column($recommended_item_codes_query->toArray(), 'item_code'); 
+        $recommended_item_codes = array_column($recommended_item_codes_query->toArray(), 'f_idcode'); 
 
         $recommended_item_images = DB::table('fumaco_items_image_v1')->whereIn('idcode', $recommended_item_codes)
             ->select('imgprimayx', 'idcode')->get();
