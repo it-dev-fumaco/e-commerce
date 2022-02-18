@@ -27,12 +27,12 @@
 						<a href="/myprofile/account_details" style="text-decoration: none; color: #000000;">Account Details</a>
 					</p>
 					<hr>
-					<p class="caption_2">
-						<a href="/myprofile/change_password" style="text-decoration: none; color: #000000;">Change Password</a>
-					</p>
-					<hr>
 					<p class="caption_2" style="color:#186EA9 !important; font-weight:400 !important;">
 						<a href="/myprofile/address" style="text-decoration: none;"><i class="fas fa-angle-double-right"></i> <span style="margin-left: 8px;">Address</span></a>
+					</p>
+					<hr>
+					<p class="caption_2">
+						<a href="/myprofile/change_password" style="text-decoration: none; color: #000000;">Change Password</a>
 					</p>
 					<hr>
 					<p class="caption_2">

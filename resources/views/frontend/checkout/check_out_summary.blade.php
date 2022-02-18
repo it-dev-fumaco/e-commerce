@@ -386,23 +386,6 @@
 									<button type="button" class="btn btn-danger btn-xs" data-toggle="modal" data-target="#shipping-del{{ $shipping_address->id }}">
 										<i class="fas fa-trash-alt"></i>
 									</button>
-									{{-- @if($shipping_address->xdefault)
-									<div id="shipping-del{{ $shipping_address->id }}" class="modal fade" role="dialog">
-										<div class="modal-dialog">
-											<div class="modal-content">
-												<div class="modal-header">
-													<h4 class="modal-title">Warning!</h4>
-												</div>
-												<div class="modal-body">
-													<p class="text-center">Cannot delete default shipping address.</p>
-												</div>
-												<div class="modal-footer">
-													<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-												</div>
-											</div>
-										</div>
-									</div>
-									@else --}}
 									<div id="shipping-del{{ $shipping_address->id }}" class="modal fade" role="dialog">
 										<form action="/myprofile/address/{{ $shipping_address->id }}/shipping/delete" method="POST">
 											@csrf
@@ -423,7 +406,6 @@
 											</div>
 										</form>
 									</div>
-									{{-- @endif --}}
 									<div id="shipping-view{{ $shipping_address->id }}" class="modal fade" role="dialog">
 										<div class="modal-dialog" style="max-width: 80% !important;">
 											<div class="modal-content">
@@ -488,15 +470,15 @@
 													<div class="row">
 														<div class="col-md-4">
 															<label class="myprofile-font-form">Province : <span class="text-danger">*</span></label>
-															<input type="text" name="province" id="province1_1_{{ $key }}" class="form-control caption_1" required>
+															<input type="text" name="province" id="province1_1_{{ $key }}" class="form-control caption_1" required value="{{ $shipping_address->xprov }}">
 														</div>
 														<div class="col-md-4">
 															<label class="myprofile-font-form">City / Municipality : <span class="text-danger">*</span></label>
-															<input type="text" name="city" id="City_Municipality1_1_{{ $key }}" class="form-control caption_1" required>
+															<input type="text" name="city" id="City_Municipality1_1_{{ $key }}" class="form-control caption_1" required value="{{ $shipping_address->xcity }}">
 														</div>
 														<div class="col-md-4">
 															<label class="myprofile-font-form">Barangay : <span class="text-danger">*</span></label>
-															<input type="text" name="brgy" id="Barangay1_1_{{ $key }}" class="form-control caption_1" required>
+															<input type="text" name="brgy" id="Barangay1_1_{{ $key }}" class="form-control caption_1" required value="{{ $shipping_address->xbrgy }}">
 														</div>
 													</div>
 													<br>
@@ -539,7 +521,7 @@
 										</div>
 									</div>
 								</td>
-								</tr>
+							</tr>
 							@empty
 							<tr>
 								<td colspan="5" class="text-center">No shipping address found.</td>
@@ -655,15 +637,15 @@
 												<div class="row">
 													<div class="col">
 														<label class="myprofile-font-form">Province : <span class="text-danger">*</span></label>
-														<input type="text" name="province" id="bill_province1_1_{{ $key }}" class="form-control caption_1" required>
+														<input type="text" name="province" id="bill_province1_1_{{ $key }}" class="form-control caption_1" required value="{{ $billing_address->xprov }}">
 													</div>
 													<div class="col">
 														<label class="myprofile-font-form">City / Municipality : <span class="text-danger">*</span></label>
-														<input type="text" name="city" id="bill_City_Municipality1_1_{{ $key }}" class="form-control caption_1"  required>
+														<input type="text" name="city" id="bill_City_Municipality1_1_{{ $key }}" class="form-control caption_1" required value="{{ $billing_address->xcity }}">
 													</div>
 													<div class="col">
 														<label class="myprofile-font-form">Barangay : <span class="text-danger">*</span></label>
-														<input type="text" name="brgy" id="bill_Barangay1_1_{{ $key }}" class="form-control caption_1" required>
+														<input type="text" name="brgy" id="bill_Barangay1_1_{{ $key }}" class="form-control caption_1" required value="{{ $billing_address->xbrgy }}">
 													</div>
 												</div>
 												<br>
@@ -1412,26 +1394,70 @@
 				}
 			});
 
+			var provinces_shipping = [];
 			$.getJSON("{{ asset('/json/provinces.json') }}", function(obj){
 				$.each(obj.results, function(e, i) {
-					provinces.push({
+					provinces_shipping.push({
 						id: i.text,
 						code: i.provCode,
 						text: i.text
 					});
 				});
 
+				var province = $('#province1_1_'+ship_key).val();
+				var city = $('#City_Municipality1_1_'+ship_key).val();
+
 				$('#province1_1_'+ship_key).select2({
 					placeholder: 'Select Province',
-					data: provinces
+					data: provinces_shipping
 				});
 
-				$('#City_Municipality1_1_'+ship_key).select2({
-					placeholder: 'Select City',
+				var provCodeShipping = provinces_shipping.filter(function(obj) {
+					return (obj.id === province);
 				});
 
-				$('#Barangay1_1_'+ship_key).select2({
-					placeholder: 'Select Barangay',
+				var cities_shipping = [];
+				$.getJSON("{{ asset('/json/cities.json') }}", function(obj){
+					var filtered_cities = $.grep(obj.results, function(v) {
+						return v.provCode === provCodeShipping[0].code;
+					});
+
+					$.each(filtered_cities, function(e, i) {
+						cities_shipping.push({
+							id: i.text,
+							code: i.citymunCode,
+							text: i.text,
+							
+						});
+					});
+
+					$('#City_Municipality1_1_'+ship_key).select2({
+						placeholder: 'Select City',
+						data: cities_shipping
+					});
+
+					var cityCodeShipping = cities_shipping.filter(function(obj) {
+						return (obj.id === city);
+					});
+
+					var brgy_shipping = [];
+					$.getJSON("{{ asset('/json/brgy.json') }}", function(obj){
+						var filtered = $.grep(obj.results, function(v) {
+							return v.citymunCode === cityCodeShipping[0].code;
+						});
+
+						$.each(filtered, function(e, i) {
+							brgy_shipping.push({
+								id: i.brgyDesc,
+								text: i.brgyDesc
+							});
+						});
+
+						$('#Barangay1_1_'+ship_key).select2({
+							placeholder: 'Select Barangay',
+							data: brgy_shipping
+						});
+					});
 				});
 			});
 
@@ -1501,27 +1527,71 @@
 				}
 			});
 
-			var provinces_bill = [];
+			var provinces_billing = [];
 			$.getJSON("{{ asset('/json/provinces.json') }}", function(obj){
 				$.each(obj.results, function(e, i) {
-					provinces_bill.push({
+					provinces_billing.push({
 						id: i.text,
 						code: i.provCode,
 						text: i.text
 					});
 				});
 
+				var province = $('#bill_province1_1_'+bill_key).val();
+				var city = $('#bill_City_Municipality1_1_'+bill_key).val();
+
 				$('#bill_province1_1_'+bill_key).select2({
 					placeholder: 'Select Province',
-					data: provinces_bill
+					data: provinces_billing
 				});
 
-				$('#bill_City_Municipality1_1_'+bill_key).select2({
-					placeholder: 'Select City',
+				var provCode = provinces_billing.filter(function(obj) {
+					return (obj.id === province);
 				});
 
-				$('#bill_Barangay1_1_'+bill_key).select2({
-					placeholder: 'Select Barangay',
+				var cityCode = [];
+				var cities_billing = [];
+				$.getJSON("{{ asset('/json/cities.json') }}", function(obj){
+					var filtered_cities = $.grep(obj.results, function(v) {
+						return v.provCode === provCode[0].code;
+					});
+
+					$.each(filtered_cities, function(e, i) {
+						cities_billing.push({
+							id: i.text,
+							code: i.citymunCode,
+							text: i.text,
+							
+						});
+					});
+
+					$('#bill_City_Municipality1_1_'+bill_key).select2({
+						placeholder: 'Select City',
+						data: cities_billing
+					});
+
+					var cityCode = cities_billing.filter(function(obj) {
+						return (obj.id === city);
+					});
+
+					var brgy_billing = [];
+					$.getJSON("{{ asset('/json/brgy.json') }}", function(obj){
+						var filtered = $.grep(obj.results, function(v) {
+							return v.citymunCode === cityCode[0].code;
+						});
+
+						$.each(filtered, function(e, i) {
+							brgy_billing.push({
+								id: i.brgyDesc,
+								text: i.brgyDesc
+							});
+						});
+
+						$('#bill_Barangay1_1_'+bill_key).select2({
+							placeholder: 'Select Barangay',
+							data: brgy_billing
+						});
+					});
 				});
 			});
 

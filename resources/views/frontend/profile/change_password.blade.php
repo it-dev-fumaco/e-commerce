@@ -24,9 +24,9 @@
                 <div class="col-lg-2">
                     <p class="caption_2"><a href="/myprofile/account_details" style="text-decoration: none; color: #000000;">Account Details</a></p>
                     <hr>
-                    <p class="caption_2" style="color:#186EA9 !important; font-weight:400 !important;"><i class="fas fa-angle-double-right"></i> <span style="margin-left: 8px;">Change Password</span></p>
-                    <hr>
                     <p class="caption_2"><a href="/myprofile/address" style="text-decoration: none; color: #000000;">Address</a></p>
+                    <hr>
+                    <p class="caption_2" style="color:#186EA9 !important; font-weight:400 !important;"><i class="fas fa-angle-double-right"></i> <span style="margin-left: 8px;">Change Password</span></p>
                     <hr>
                     <p class="caption_2"><a href="/logout" style="text-decoration: none; color: #000000;">Sign Out</a></p>
                     <hr>
