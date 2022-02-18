@@ -149,6 +149,10 @@
         -webkit-box-shadow: none !important;
         box-shadow: none !important;
       }
+      a:hover, button:hover{
+        outline: none !important;
+        border: rgba(0, 0, 0, 0);
+      }
       .fumacoFont1 {
           font-family: 'poppins', sans-serif !important; font-weight:400 !important; font-size: 1.75rem!important;
       }
