@@ -135,11 +135,10 @@
 														<input type="text" name="last_name" class="form-control caption_1" value="{{ $shipping_address->xcontactlastname1 }}" required>
 													</div>
 												</div>
-												<div class="row"><br></div>
-												<div class="row">
+												<div class="row mt-3">
 													<div class="col-md-4">
 														<label for="Address1_1" class="myprofile-font-form">Contact Number : </label>
-														<input type="text" name="contact" class="form-control caption_1" value="{{ ($shipping_address->xcontactnumber1 != 0) ? $shipping_address->xcontactnumber1 : '' }}">
+														<input type="text" name="contact" class="form-control caption_1" value="{{ $shipping_address->xcontactnumber1 }}">
 													</div>
 													<div class="col-md-4">
 														<label for="Address2_1" class="myprofile-font-form">Mobile Number : <span class="text-danger">*</span></label>
@@ -293,11 +292,10 @@
 														<input type="text" class="form-control caption_1" name="last_name" value="{{ $billing_address->xcontactlastname1 }}" required>
 													</div>
 												</div>
-												<div class="row"><br></div>
-												<div class="row">
+												<div class="row mt-3">
 													<div class="col-md-4">
 														<label for="Address1_1" class="myprofile-font-form">Contact Number : </label>
-														<input type="text" class="form-control caption_1" name="contact" value="{{ $billing_address->xcontactnumber1 != 0 ? $billing_address->xcontactnumber1 : '' }}">
+														<input type="text" class="form-control caption_1" name="contact" value="{{ $billing_address->xcontactnumber1 }}">
 													</div>
 													<div class="col-md-4">
 														<label for="Address1_1" class="myprofile-font-form">Mobile Number : <span class="text-danger">*</span></label>
