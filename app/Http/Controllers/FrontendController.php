@@ -1939,7 +1939,8 @@ class FrontendController extends Controller
     }
 
     public function viewAccountDetails() {
-        return view('frontend.profile.account_details');
+        $customer_group = DB::table('fumaco_customer_group')->where('id', Auth::user()->customer_group)->pluck('customer_group_name')->first();
+        return view('frontend.profile.account_details', compact('customer_group'));
     }
 
     public function updateAccountDetails($id, Request $request) {

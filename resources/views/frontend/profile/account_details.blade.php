@@ -53,6 +53,7 @@
 					@endif
 					<form action="/myprofile/account_details/{{ Auth::user()->id }}/update" method="POST">
 						@csrf
+						<h6><i class="fas fa-user-tie"></i> {{ $customer_group }} Account</h6>
 						<div class="row">
 							<div class="col">
 								<label for="fname" class="myprofile-font-form">First Name :</label>
@@ -67,13 +68,14 @@
 						<div class="row">
 							<div class="col">
 								<label for="eaddname" class="myprofile-font-form">E-Mail Address :</label>
-								<input type="email" class="form-control caption_1" name="email_address" value="{{ Auth::user()->username }}" required>
+								<input type="email" class="form-control caption_1" name="email_address" value="{{ Auth::user()->username }}" required readonly>
 							</div>
 							<div class="col">
 								<label for="mobilename" class="myprofile-font-form">Mobile Number :</label>
 								<input type="text" class="form-control caption_1" name="mobile_no" value="{{ Auth::user()->f_mobilenumber }}" required>
 							</div>
 						</div>
+						@if ($customer_group == 'Business')
 						<br>
 						<div class="row">
 							<div class="col">
@@ -81,6 +83,7 @@
 								<input type="text" class="form-control caption_1"  name="business_name" value="{{ Auth::user()->f_business }}">
 							</div>
 						</div>
+						@endif
 						<br>
 						<div class="row">
 							<div class="col">
