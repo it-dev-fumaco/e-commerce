@@ -367,9 +367,6 @@ class CheckoutController extends Controller
 				}
 			}
 
-			$shipping_details = session()->get('fumShipDet');
-			$billing_details = session()->get('fumBillDet');
-
 			 // get sitewide sale
 			$sale = DB::table('fumaco_on_sale')
 				->whereDate('start_date', '<=', Carbon::now()->toDateString())
@@ -427,13 +424,60 @@ class CheckoutController extends Controller
 			}
 
 			$shipping_rates = $this->getShippingRates();
+			
+			$shipping_details = session()->get('fumShipDet');
+			$billing_details = session()->get('fumBillDet');
 
 			$shipping_add = $billing_add = [];
 			if (Auth::check()) {
 				$shipping_add = DB::table('fumaco_user_add')->where('user_idx', Auth::user()->id)->where('address_class','Delivery')
-					->select('id', 'xdefault', 'xadd1', 'xadd2', 'xprov', 'xcontactlastname1', 'xcontactname1', 'add_type', 'xcontactnumber1', 'xmobile_number', 'xcontactemail1', 'xpostal', 'xcountry', 'xbusiness_name', 'xtin_no')->get();
+					->select('id', 'xdefault', 'xadd1', 'xadd2', 'xprov', 'xcontactlastname1', 'xcontactname1', 'add_type', 'xcontactnumber1', 'xmobile_number', 'xcontactemail1', 'xpostal', 'xcountry', 'xbusiness_name', 'xtin_no', 'xcity', 'xpostal', 'xbrgy')->get();
+				
+				$shipping_address = collect($shipping_add)->where('xdefault', 1)->first();
+				$shipping_address = collect($shipping_address)->toArray();
+
+				$shipping_details = [
+					'fname' => $shipping_address['xcontactname1'],
+					'lname' => $shipping_address['xcontactlastname1'],
+					'address_line1' => $shipping_address['xadd1'],
+					'address_line2' => $shipping_address['xadd2'],
+					'province' => $shipping_address['xprov'],
+					'city' => $shipping_address['xcity'],
+					'brgy' => $shipping_address['xbrgy'],
+					'postal_code' => $shipping_address['xpostal'],
+					'country' => $shipping_address['xcountry'],
+					'address_type' => $shipping_address['add_type'],
+					'business_name' => $shipping_address['xbusiness_name'],
+					'tin' => $shipping_address['xtin_no'],
+					'email_address' => $shipping_address['xcontactemail1'],
+					'mobile_no' => $shipping_address['xmobile_number'],
+					'contact_no' => $shipping_address['xcontactnumber1'],
+					'same_as_billing' => $shipping_details['same_as_billing']
+				];
+
 				$billing_add = DB::table('fumaco_user_add')->where('user_idx', Auth::user()->id)->where('address_class','Billing')
-					->select('id', 'xdefault', 'xadd1', 'xadd2', 'xprov', 'xcontactlastname1', 'xcontactname1', 'add_type', 'xcontactnumber1', 'xmobile_number', 'xcontactemail1', 'xpostal', 'xcountry', 'xbusiness_name', 'xtin_no')->get();
+					->select('id', 'xdefault', 'xadd1', 'xadd2', 'xprov', 'xcontactlastname1', 'xcontactname1', 'add_type', 'xcontactnumber1', 'xmobile_number', 'xcontactemail1', 'xpostal', 'xcountry', 'xbusiness_name', 'xtin_no', 'xcity', 'xpostal', 'xbrgy')->get();
+
+				$billing_address = collect($billing_add)->where('xdefault', 1)->first();
+				$billing_address = collect($billing_address)->toArray();
+
+				$billing_details = [
+					'fname' => $billing_address['xcontactname1'],
+					'lname' => $billing_address['xcontactlastname1'],
+					'address_line1' => $billing_address['xadd1'],
+					'address_line2' => $billing_address['xadd2'],
+					'province' => $billing_address['xprov'],
+					'city' => $billing_address['xcity'],
+					'brgy' => $billing_address['xbrgy'],
+					'postal_code' => $billing_address['xpostal'],
+					'country' => $billing_address['xcountry'],
+					'address_type' => $billing_address['add_type'],
+					'business_name' => $billing_address['xbusiness_name'],
+					'tin' => $billing_address['xtin_no'],
+					'email_address' => $billing_address['xcontactemail1'],
+					'mobile_no' => $billing_address['xmobile_number'],
+					'contact_no' => $billing_address['xcontactnumber1'],
+				];
 			}
 
 			$shipping_zones = DB::table('fumaco_shipping_zone_rate')->distinct()->pluck('province_name')->toArray();
