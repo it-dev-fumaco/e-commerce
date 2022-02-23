@@ -2217,11 +2217,6 @@ class ProductController extends Controller
     public function setProductOnSale($item_code, Request $request) {
         DB::beginTransaction();
         try {
-            $discount_percentage = $request->discount_percentage;
-            if (!$discount_percentage && $discount_percentage <= 0) {
-                return redirect()->back()->with('error', 'Discount percentage cannot be less than or equal to zero.');
-            }
-            
             $item = DB::table('fumaco_items')->where('f_idcode', $item_code)->first();
             if (!$item) {
                 return redirect()->back()->with('error', 'Product not found.');
@@ -2249,44 +2244,44 @@ class ProductController extends Controller
                 ]);
             }
             
-            $success_msg = 'Product has been set "On Sale".';
+            // $success_msg = 'Product has been set "On Sale".';
 
-            $subscribers = DB::table('fumaco_subscribe')->where('status', 1)->select('email')->pluck('email');
+            // $subscribers = DB::table('fumaco_subscribe')->where('status', 1)->select('email')->pluck('email');
 
-            foreach($subscribers as $subscriber){
-                $customer = DB::table('fumaco_users')->where('username', $subscriber)->select('id', 'f_name', 'f_lname')->first();
-                $image = DB::table('fumaco_items_image_v1')->where('idcode', $item_code)->pluck('imgprimayx')->first();
+            // foreach($subscribers as $subscriber){
+            //     $customer = DB::table('fumaco_users')->where('username', $subscriber)->select('id', 'f_name', 'f_lname')->first();
+            //     $image = DB::table('fumaco_items_image_v1')->where('idcode', $item_code)->pluck('imgprimayx')->first();
 
-                $cart_check = DB::table('fumaco_cart')->where('user_email', $subscriber)->where('item_code', $item_code)->first();
-                $wish_check = DB::table('datawishlist')->where('userid', $customer->id)->where('item_code', $item_code)->first();
+            //     $cart_check = DB::table('fumaco_cart')->where('user_email', $subscriber)->where('item_code', $item_code)->first();
+            //     $wish_check = DB::table('datawishlist')->where('userid', $customer->id)->where('item_code', $item_code)->first();
 
-                $name = $customer->f_name.' '.$customer->f_lname;
+            //     $name = $customer->f_name.' '.$customer->f_lname;
 
-                $sale_details = [
-                    'item_code' => $item_code,
-                    'image' => $image,
-                    'percentage' => $request->discount_percentage,
-                    'customer_name' => $name,
-                    'item_details' => $item->f_name_name,
-                    'original_price' => $item->f_original_price,
-                    'discounted_price' => $discounted_price,
-                    'email' => $subscriber,
-                    'type' => $cart_check ? 'cart' : 'wishlist',
-                    'multiple_items' => 0
-                ];
+            //     $sale_details = [
+            //         'item_code' => $item_code,
+            //         'image' => $image,
+            //         'percentage' => $request->discount_percentage,
+            //         'customer_name' => $name,
+            //         'item_details' => $item->f_name_name,
+            //         'original_price' => $item->f_original_price,
+            //         'discounted_price' => $discounted_price,
+            //         'email' => $subscriber,
+            //         'type' => $cart_check ? 'cart' : 'wishlist',
+            //         'multiple_items' => 0
+            //     ];
 
-                if($cart_check or $wish_check){
-                    Mail::send('emails.items_on_cart_sale', $sale_details, function($message) use($subscriber){
-                        $message->to(trim($subscriber));
-                        $message->subject("Hurry or you might miss out - FUMACO");
-                    });
-                }else{ // Subscriber does not have items listed on cart and wishlist
-                    Mail::send('emails.sale_per_item', $sale_details, function($message) use($subscriber){
-                        $message->to(trim($subscriber));
-                        $message->subject("Hurry or you might miss out - FUMACO");
-                    });
-                }
-            }
+            //     if($cart_check or $wish_check){
+            //         Mail::send('emails.items_on_cart_sale', $sale_details, function($message) use($subscriber){
+            //             $message->to(trim($subscriber));
+            //             $message->subject("Hurry or you might miss out - FUMACO");
+            //         });
+            //     }else{ // Subscriber does not have items listed on cart and wishlist
+            //         Mail::send('emails.sale_per_item', $sale_details, function($message) use($subscriber){
+            //             $message->to(trim($subscriber));
+            //             $message->subject("Hurry or you might miss out - FUMACO");
+            //         });
+            //     }
+            // }
 
             DB::commit();
 

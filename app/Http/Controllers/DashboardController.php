@@ -9,9 +9,11 @@ use Auth;
 use DB;
 use Mail;
 use DateTime;
+use App\Http\Traits\ProductTrait;
 
 class DashboardController extends Controller
 {
+	use ProductTrait;
 	public function index(Request $request) {
 		$users = DB::table('fumaco_users')->where('is_email_verified', 1)->count();
 
@@ -221,10 +223,20 @@ class DashboardController extends Controller
 			$customer_name = $user->f_name.' '.$user->f_lname;
 
 			$cart_arr = [];
+
+			$sale = $this->getSalePerCustomerGroup($user->customer_group);
+			$sale_per_category = [];
 			foreach($cart_details as $cart){
 				$item_details = DB::table('fumaco_items')->where('f_idcode', $cart->item_code)->first();
 				$item_image = DB::table('fumaco_items_image_v1')->where('idcode', $cart->item_code)->first();
-				$price = $item_details->f_discount_trigger == 1 ? $item_details->f_price : $item_details->f_original_price;
+				// $price = $item_details->f_discount_trigger == 1 ? $item_details->f_price : $item_details->f_original_price;
+
+				$item_price = $item_details->f_default_price;
+            	$item_on_sale = $item_details->f_onsale;
+
+				$item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $item_details->f_cat_id, $sale, $item_price, $item_details->f_idcode, $item_details->f_discount_type, $item_details->f_discount_rate, $item_details->f_stock_uom, $sale_per_category);
+
+				$price = $item_price_data['is_on_sale'] == 1 ? $item_price_data['discounted_price'] : $item_price_data['item_price'];
 
 				$cart_arr[] = [
 					'item_code' => $cart->item_code,

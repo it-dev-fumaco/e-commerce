@@ -46,7 +46,13 @@
             </table>
         </td>
      </tr>
-
+     <tr>
+       <td>
+        <div class="button" style="padding-top: 30px;">
+          <a href="{{ route('cart') }}" style="background: #e05443; padding: 2% 5%;">Check your cart</a>
+        </div>
+       </td>
+     </tr>
      <tr>
     <td class="innerpadding bodycopy">
       If you did not initiate this request, please contact us immediately at <a href="mailto:support@fumaco.com">support@fumaco.com</a>
