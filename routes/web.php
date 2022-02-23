@@ -107,7 +107,7 @@ Route::group(['middleware' => 'auth'], function(){
 });
 
 // SHOPPING CART ROUTES
-Route::get('/cart', 'CartController@viewCart');
+Route::get('/cart', 'CartController@viewCart')->name('cart');
 Route::post('/product_actions', 'CartController@productActions');
 Route::patch('/updatecart', 'CartController@updateCart');
 Route::delete('/removefromcart', 'CartController@removeFromCart');
