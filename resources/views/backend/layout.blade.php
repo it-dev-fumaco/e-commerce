@@ -458,7 +458,7 @@
 
           <li class="nav-header {{ Auth::user()->user_type != 'System Admin' ? 'd-none' : ''  }}">SYSTEM SETTINGS</li>
           @php
-            $settings_pages = ['erp_api_setup', 'payment_api_setup', 'google_api_setup'];
+            $settings_pages = ['erp_api_setup', 'payment_api_setup', 'google_api_setup', 'sms_api_setup'];
           @endphp
           <li class="nav-item {{ Auth::user()->user_type != 'System Admin' ? 'd-none' : ''  }} {{ (in_array($activePage, $settings_pages) ? 'menu-open' : '') }}">
             <a href="#" class="nav-link {{ (in_array($activePage, $settings_pages) ? 'active' : '') }}">
@@ -488,6 +488,12 @@
                 <a href=" " class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Social Media API</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="/admin/api_setup/sms" class="nav-link {{ $activePage == 'sms_api_setup' ? 'active' : '' }}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>SMS Gateway API</p>
                 </a>
               </li>
             </ul>

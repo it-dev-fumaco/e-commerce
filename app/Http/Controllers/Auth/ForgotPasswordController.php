@@ -75,9 +75,9 @@ class ForgotPasswordController extends Controller
                 Http::asForm()->withHeaders([
                     'Accept' => 'application/json',
                     'Content-Type' => 'application/x-www-form-urlencoded',
-                ])->post('https://api.movider.co/v1/sms', [
-                    'api_key' => "24wezX69kvuWfnqZazxUhsiifcd",
-                    'api_secret' => "Dd1PnbBIUgf7RFVKSaZEGzBsDDrjKDffimF9dVLH",
+                ])->post($sms_api->base_url, [
+                    'api_key' => $sms_api->api_key,
+                    'api_secret' => $sms_api->api_secret_key,
                     'from' => 'FUMACO',
                     'to' => preg_replace("/[^0-9]/", "", $phone),
                     'text' => $message

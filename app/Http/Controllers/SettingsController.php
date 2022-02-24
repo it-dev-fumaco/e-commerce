@@ -17,6 +17,12 @@ class SettingsController extends Controller
 		return view('backend.settings.erp_api_setup', compact('api_details'));
 	}
 
+    public function smsApiSetup(){
+        $sms_details = DB::table('api_setup')->where('type', 'sms_gateway_api')->first();
+
+        return view('backend.settings.sms_gateway', compact('sms_details'));
+    }
+
     public function paymentApiSetup() {
         $api_details = DB::table('api_setup')->where('type', 'payment_api')->first();
 

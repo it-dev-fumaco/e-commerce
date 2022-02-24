@@ -322,9 +322,11 @@ class OrderController extends Controller
                 $total_amount = $order_details->amount_paid;
                 $url = Bitly::getUrl($request->root().'/track_order/'.$request->order_number);
 
+                $sms_api = DB::table('api_setup')->where('type', 'sms_gateway_api')->first();
+
                 $sms = [
-                    'api_key' => "24wezX69kvuWfnqZazxUhsiifcd",
-                    'api_secret' => "Dd1PnbBIUgf7RFVKSaZEGzBsDDrjKDffimF9dVLH",
+                    'api_key' => $sms_api->api_key,
+                    'api_secret' => $sms_api->api_secret_key,
                     'from' => 'FUMACO',
                     'to' => $order_details->order_bill_contact[0] == '0' ? '63'.substr($order_details->order_bill_contact, 1) : $order_details->order_bill_contact
                 ];
@@ -356,7 +358,7 @@ class OrderController extends Controller
                     Http::asForm()->withHeaders([
                         'Accept' => 'application/json',
                         'Content-Type' => 'application/x-www-form-urlencoded',
-                    ])->post('https://api.movider.co/v1/sms', $sms);
+                    ])->post($sms_api->base_url, $sms);
                 }
 
                 DB::table('fumaco_order')->where('order_number', $request->order_number)->update($orders_arr);

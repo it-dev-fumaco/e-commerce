@@ -1026,12 +1026,14 @@ class CheckoutController extends Controller
 			$max_leadtime = collect($leadtime_arr)->pluck('max_leadtime')->max();
 			$url = Bitly::getUrl($request->root().'/track_order/'.$temp->xlogs);
 
+			$sms_api = DB::table('api_setup')->where('type', 'sms_gateway_api')->first();
+
 			Http::asForm()->withHeaders([
 				'Accept' => 'application/json',
 				'Content-Type' => 'application/x-www-form-urlencoded',
-			])->post('https://api.movider.co/v1/sms', [
-				'api_key' => "24wezX69kvuWfnqZazxUhsiifcd",
-				'api_secret' => "Dd1PnbBIUgf7RFVKSaZEGzBsDDrjKDffimF9dVLH",
+			])->post($sms_api->base_url, [
+				'api_key' => $sms_api->api_key,
+				'api_secret' => $sms_api->api_secret_key,
 				'from' => 'FUMACO',
 				'to' => preg_replace("/[^0-9]/", "", $phone),
 				'text' => 'Hi '.$temp->xfname.' '.$temp->xlname.'!, your order '.$temp->xlogs.' with an amount of '.$request->Amount.' has been received, please allow '.$min_leadtime.'-'.$max_leadtime.' business days to process your order. We will send another notification once your order is shipped out. Click '.$url.' to track your order.'
