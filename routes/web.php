@@ -41,7 +41,10 @@ Route::namespace('Auth')->group(function(){
 
     //Forgot Password Routes
     Route::get('/password/reset','ForgotPasswordController@showLinkRequestForm')->name('password.request');
+    Route::get('/password/request_reset','ForgotPasswordController@resetOptions')->name('password.reset_options');
     Route::post('/password/email','ForgotPasswordController@sendResetLinkEmail')->name('password.email');
+    Route::get('/password/otp_form','ForgotPasswordController@OTPform')->name('password.otp_form');
+    Route::post('/password/verify_otp','ForgotPasswordController@verifyOTP');
 
     //Reset Password Routes
     Route::get('/password/reset/{token}','ResetPasswordController@showResetForm')->name('password.reset');
