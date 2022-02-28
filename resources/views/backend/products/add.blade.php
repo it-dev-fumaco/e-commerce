@@ -220,7 +220,7 @@
                 </div>
 
                 <div class="form-group">
-                  <label for="full-detail">* Full Detail</label>
+                  <label for="full-detail">Full Detail</label>
                   <textarea class="form-control" rows="6" id="full-detail" name="full_detail">{{ old('full_detail') }}</textarea>
                 </div>
                 <h5>Product Specifications / Attributes</h5>

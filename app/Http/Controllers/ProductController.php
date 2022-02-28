@@ -275,7 +275,6 @@ class ProductController extends Controller
                         'alert_qty' => 'required|integer',
                         'item_description' => 'required',
                         'website_caption' => 'required',
-                        'full_detail' => 'required',
                         'price' => 'required|numeric',
                         'slug' => 'required'
                     ]
@@ -305,7 +304,6 @@ class ProductController extends Controller
                         'alert_qty' => 'required|integer',
                         'item_description' => 'required',
                         'website_caption' => 'required',
-                        'full_detail' => 'required',
                         'price' => 'required|numeric',
                         'slug' => 'required'
                     ]
@@ -544,7 +542,6 @@ class ProductController extends Controller
                     'product_category' => 'required',
                     'alert_qty' => 'required|integer',
                     'website_caption' => 'required',
-                    'full_detail' => 'required',
                 ]
             );
 
