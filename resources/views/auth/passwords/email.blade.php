@@ -13,7 +13,7 @@
           <div class="carousel-caption text-start"
             style="bottom: 1rem !important; right: 25% !important; left: 25%; !important;">
             <center>
-              <h3 class="carousel-header-font">FORGOT PASSWORD</h3>
+              <h3 class="carousel-header-font" style="text-transform: uppercase;">Choose Verification Method</h3>
             </center>
           </div>
         </div>
