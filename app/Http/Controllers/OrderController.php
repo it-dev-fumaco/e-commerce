@@ -838,6 +838,14 @@ class OrderController extends Controller
                         'store_address' => $store_address
                     ];
 
+                    if ($details->order_bill_email) {
+                        $customer_email = $details->order_bill_email;
+                        Mail::send('emails.cancelled_order_customer', $order, function($message) use ($customer_email) {
+                            $message->to($customer_email);
+                            $message->subject('Cancelled Order - FUMACO');
+                        });
+                    }
+
                     if (count(array_filter($email_recipient)) > 0) {
                         Mail::send('emails.cancelled_order_admin', $order, function($message) use ($email_recipient) {
                             $message->to($email_recipient);
