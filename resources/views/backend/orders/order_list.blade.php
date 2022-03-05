@@ -68,7 +68,7 @@
 									</div>
 								</form>
 								<table class="table table-bordered table-hover">
-									<thead>
+									<thead class="text-center">
 										<tr>
 											<th>Order Date</th>
 											<th>Order ID</th>
@@ -84,13 +84,13 @@
 									<tbody>
 										@forelse($orders_arr as $order)
 										<tr>
-											<td>{{ $order['date'] }}</td>
-											<td>{{ $order['order_no'] }}</td>
-											<td>{{ $order['first_name'] .' '. $order['last_name'] }}</td>
-											<td>{{ $order['estimated_delivery_date'] }}</td>
-											<td>{{ $order['shipping_name'] }}</td>
-											<td>{{ $order['payment_method'] }}</td>
-											<td>₱ {{ $order['grand_total'] }}</td>
+											<td class="text-center">{{ $order['date'] }}</td>
+											<td class="text-center">{{ $order['order_no'] }}</td>
+											<td class="text-center">{{ $order['first_name'] .' '. $order['last_name'] }}</td>
+											<td class="text-center">{{ $order['estimated_delivery_date'] }}</td>
+											<td class="text-center">{{ $order['shipping_name'] }}</td>
+											<td class="text-center">{{ $order['payment_method'] }}</td>
+											<td class="text-center">₱ {{ number_format(str_replace(",","",$order['grand_total']), 2) }}</td>
 											@php
 												if($order['status'] == 'Order Placed'){
 													$badge = 'warning';
@@ -104,9 +104,11 @@
 													$badge = "";
 												}
 											@endphp
-											<td><span class="badge badge-{{ $badge }}" style="font-size: 11pt; {{ ($order['status'] == 'Delivered') ? "background-color: #fd6300 !important; color: #fff;" : '' }}">{{ $order['status'] }}</span></td>
+											<td class="text-center"><span class="badge badge-{{ $badge }}" style="font-size: 11pt; {{ ($order['status'] == 'Delivered') ? "background-color: #fd6300 !important; color: #fff;" : '' }}">{{ $order['status'] }}</span></td>
 											<td>
-												<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#order-{{ $order['order_no']}}">View Orders</button>
+												<div class="text-center">
+													<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#order-{{ $order['order_no']}}">View Orders</button>
+												</div>
 												<div class="modal fade" id="order-{{ $order['order_no'] }}" role="dialog">
 													<div class="modal-dialog modal-xl" style="min-width: 70%;">
 														<div class="modal-content">
@@ -142,7 +144,6 @@
 																				@foreach($order['order_status'] as $status)
 																					<option value="{{ $status->status }}" {{ $order['status'] == $status->status ? 'selected disabled' : '' }}>{{ $status->status }}</option>
 																				@endforeach
-																				<option value="Cancelled">Cancel Order</option>
 																			</select>
 																			<input type="text" value="{{ $order['order_no'] }}" name="order_number" hidden readonly/>
 																			<input type="checkbox" name="member" {{ $order['order_type'] == 'Member' ? 'checked' : '' }} readonly hidden/>
@@ -257,82 +258,95 @@
 																			<dd class="col-sm-2 text-right">₱ {{ number_format(str_replace(",","",$order['grand_total']), 2) }}</dd>
 																		</dl>
 																	</div>
-
-
-</div>
-
-
-<div class="modal-footer d-print-none">
-	{{-- <a class="print_order btn btn-sm btn-primary {{ $order['order_no'] }}">Print</a> --}}
-	<a href="/admin/order/print/{{ $order['order_no'] }}" class="print_order btn btn-sm btn-primary" target="_blank">Print</a>
-
-<button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#tracker-{{ $order['order_no'] }}">
-Add Tracker Code
-</button>
-
-<div class="modal fade confirm-modal" id="tracker-{{ $order['order_no'] }}" tabindex="-1" role="dialog" aria-labelledby="tracker-{{ $order['order_no'] }}" aria-hidden="true">
-<div class="modal-dialog" role="document">
-<div class="modal-content">
-<div class="modal-header">
-<h5 class="modal-title">Add Tracker Code</h5>
-<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-<span aria-hidden="true">&times;</span>
-</button>
-</div>
-<div class="modal-body">
-<div class="col">
-<form action="" method="post">
-<label for="tracker">Tracker Code: </label>
-<input type="text" class="form-control" id="tracker" name="tracker" required>
-</form>
-</div>
-</div>
-<div class="modal-footer">
-<a href="" class="btn btn-primary">YES</a>
-<button type="button" class="btn btn-secondary" data-dismiss="cmodal">NO</button>
-</div>
-</div>
-</div>
-</div>
-
-</div>
-</div>
-
-</div>
-</div>
-</td>
-</tr>
-
-
-
-@empty
-<tr><td colspan=8 class="text-center"><b>No Orders</b></td></tr>
-@endforelse
-</tbody>
-</table>
-</div>
-<div class="float-right mt-4">
-{{ $orders->withQueryString()->links('pagination::bootstrap-4') }}
-</div>
-</div>
-</div>
-</div>
-</div>
-</section>
-</div>
-</div>
-<style>
-.confirm-modal{
-background: rgba(0, 0, 0, .7);
-}
-
-.stat-label {
-	height: 100%;
-	padding: 0 10px;
-	white-space: normal;
-	word-break: break-word;
-	display: flex;
-	align-items: center;
-}
-</style>
+																</div>
+																<div class="modal-footer d-print-none">
+																	@php
+																		$dt = \Carbon\Carbon::now();
+																		$dt2 = \Carbon\Carbon::parse($order['order_date']);
+																		$is_same_day = ($dt->isSameDay($dt2));
+																	@endphp	
+																	<button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#cancel-order-{{ $order['order_no'] }}" {{ !$is_same_day ? 'disabled' : '' }}>Cancel Order</button>
+																	<a href="/admin/order/print/{{ $order['order_no'] }}" class="print_order btn btn-sm btn-primary" target="_blank">Print</a>
+																	<button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#tracker-{{ $order['order_no'] }}">Add Tracker Code</button>
+																</div>
+															</div>
+														</div>
+													</div>
+													<div class="modal fade confirm-modal" id="tracker-{{ $order['order_no'] }}" tabindex="-1" role="dialog" aria-labelledby="tracker-{{ $order['order_no'] }}" aria-hidden="true">
+														<div class="modal-dialog" role="document">
+															<div class="modal-content">
+																<div class="modal-header">
+																	<h5 class="modal-title">Add Tracker Code</h5>
+																	<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+																		<span aria-hidden="true">&times;</span>
+																	</button>
+																</div>
+																<div class="modal-body">
+																	<div class="col">
+																		<form action="" method="post">
+																			<label for="tracker">Tracker Code: </label>
+																			<input type="text" class="form-control" id="tracker" name="tracker" required>
+																		</form>
+																	</div>
+																</div>
+																<div class="modal-footer">
+																	<a href="" class="btn btn-primary">YES</a>
+																	<button type="button" class="btn btn-secondary" data-dismiss="cmodal">NO</button>
+																</div>
+															</div>
+														</div>
+													</div>
+													<div class="modal fade confirm-modal" id="cancel-order-{{ $order['order_no'] }}" tabindex="-1" role="dialog" aria-labelledby="cancel-order-{{ $order['order_no'] }}" aria-hidden="true">
+														<div class="modal-dialog" role="document">
+															<form action="/admin/order/cancel/{{ $order['order_id'] }}" method="POST" autocomplete="off">
+																@csrf
+																<div class="modal-content">
+																	<div class="modal-header">
+																		<h5 class="modal-title">Cancel Order</h5>
+																		<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+																			<span aria-hidden="true">&times;</span>
+																		</button>
+																	</div>
+																	<div class="modal-body">
+																		<p class="text-center">Cancel order <b>{{ $order['order_no'] }}</b> ?</p>
+																	</div>
+																	<div class="modal-footer">
+																		<button type="submit" class="btn btn-primary">Confirm</button>
+																		<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+																	</div>
+																</div>
+															</form>
+														</div>
+													</div>
+												</td>
+											</tr>
+											@empty
+											<tr><td colspan="9" class="text-center"><b>No Orders</b></td></tr>
+											@endforelse
+										</tbody>
+									</table>
+								</div>
+								<div class="float-right mt-4">
+									{{ $orders->withQueryString()->links('pagination::bootstrap-4') }}
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+	</div>
+	<style>
+	.confirm-modal{
+		background: rgba(0, 0, 0, .7);
+	}
+	.stat-label {
+		height: 100%;
+		padding: 0 10px;
+		white-space: normal;
+		word-break: break-word;
+		display: flex;
+		align-items: center;
+	}
+	</style>
 @endsection

@@ -54,6 +54,8 @@ class OrderController extends Controller
             ->get();
 
             $orders_arr[] = [
+                'order_id' => $o->id,
+                'order_date' => $o->order_date,
                 'order_no' => $o->order_number,
                 'first_name' => $o->order_name,
                 'last_name' => $o->order_lastname,
@@ -261,16 +263,6 @@ class OrderController extends Controller
 
                 if($status == 'Order Delivered' or $status == 'Order Completed'){
                     $delivery_date = Carbon::now()->toDateTimeString();
-                }
-
-                if($status == 'Cancelled'){
-                    $date_cancelled = Carbon::now()->toDateTimeString();
-                    foreach($ordered_items as $orders){
-                        $items = DB::table('fumaco_items')->select('f_reserved_qty', 'f_qty')->where('f_idcode', $orders->item_code)->first();
-                        $r_qty = $items->f_reserved_qty - $orders->item_qty;
-
-                        DB::table('fumaco_items')->where('f_idcode', $orders->item_code)->update(['f_reserved_qty' => $r_qty, 'last_modified_by' => Auth::user()->username]);
-                    }
                 }
 
                 $orders_arr = [
@@ -733,6 +725,94 @@ class OrderController extends Controller
                 ->orderBy('last_modified_at', 'desc')->paginate(10);
 
             return view('backend.item_on_cart.abandoned_cart_items', compact('abandoned_cart'));
+        }
+    }
+
+    public function cancelOrder($id) {
+        DB::beginTransaction();
+        try {
+            $output = [];
+            if ($id) {
+                $api = DB::table('api_setup')->where('type', 'payment_api')->first();
+
+                $details = DB::table('fumaco_order')->where('id', $id)->first();
+
+                if(!$details) {
+                    return back()->with('error', 'Order ID <b>' . $id . '</b> not found.');
+                }
+
+                $dt = Carbon::now();
+                $dt2 = Carbon::parse($details->order_date);
+                $is_same_day = ($dt->isSameDay($dt2));
+
+                if (!$is_same_day) {
+                    return back()->with('error', 'Cannot cancel order <b>' . $details->order_number . '</b>. Order can only be cancelled for the transaction within the same day as the order date.');
+                }
+
+                $amount_paid = number_format($details->amount_paid, 2, ".", "");
+
+                $string = $api->password . $api->service_id . $details->payment_id . $amount_paid . 'PHP';
+                $hash = hash('sha256', $string);
+
+                switch ($details->order_payment_method) {
+                    case 'Credit Card':
+                        $payment_method = 'CC';
+                        break;
+                    case 'Credit Card (MOTO)':
+                        $payment_method = 'MO';
+                        break;
+                    case 'Direct Debit':
+                        $payment_method = 'DD';
+                        break;
+                    case 'e-Wallet':
+                        $payment_method = 'WA';
+                        break;
+                    default:
+                        $payment_method = 'ANY';
+                        break;
+                }
+
+                $data = [
+                    'TransactionType' => 'RSALE',
+                    'PymtMethod' => $payment_method,
+                    'ServiceID' => $api->service_id,
+                    'PaymentID'=> $details->payment_id,
+                    'Amount' => $amount_paid,
+                    'CurrencyCode' => 'PHP',
+                    'HashValue' => $hash
+                ];
+
+                $response = Http::asForm()->post($api->base_url, $data);
+
+                parse_str($response, $output);
+
+                if ($output['TxnStatus'] > 0) {
+                    return redirect()->back()->with('error', 'Failed to cancel order <b>'.$details->order_number.'</b>.');
+                }
+
+                if ($output['TxnStatus'] == 0) {
+                    $date_cancelled = Carbon::now()->toDateTimeString();
+                    $order_items = DB::table('fumaco_order_items as foi')->join('fumaco_items as fi', 'foi.item_code', 'fi.f_idcode')
+                        ->where('foi.order_number', $details->order_number)->select('foi.item_qty', 'foi.item_code', 'fi.f_reserved_qty')->get();
+
+                    foreach($order_items as $row){
+                        $r_qty = $row->f_reserved_qty - $row->item_qty;
+                        DB::table('fumaco_items')->where('f_idcode', $row->item_code)
+                            ->update(['f_reserved_qty' => $r_qty, 'last_modified_by' => Auth::user()->username]);
+                    }
+
+                    DB::table('fumaco_order')->where('id', $id)
+                        ->update(['order_status' => 'Cancelled', 'last_modified_by' => Auth::user()->username, 'date_cancelled' => $date_cancelled]);
+
+                    DB::commit();
+
+                    return redirect()->back()->with('success', 'Order <b>'.$details->order_number.'</b> has been cancelled.');
+                }
+            }
+        } catch (Exception $e) {
+            DB::rollback();
+
+            return redirect()->back()->with('error', 'An error occured. Please try again.');
         }
     }
 }

@@ -179,7 +179,7 @@ Route::prefix('admin')->group(function () {
 
         Route::get('/product/settings', 'ProductController@viewCategoryAttr');
         Route::post('/attribute_status/{cat_id}/update', 'ProductController@updateCategoryAttr');
-        
+    
 
         Route::get('/product/list', 'ProductController@viewList');
         Route::get('/product/add/{type}', 'ProductController@viewAddForm');
@@ -249,6 +249,7 @@ Route::prefix('admin')->group(function () {
         Route::get('/order/status/{id}/edit_form', 'OrderController@editStatusForm');
         Route::post('/order/status/{id}/edit', 'OrderController@editStatus');
         Route::get('/order/status/{id}/delete', 'OrderController@deleteStatus');
+        Route::post('/order/cancel/{id}', 'OrderController@cancelOrder');
 
         Route::get('/order/sequence_list', 'OrderController@sequenceList');
         Route::get('/order/sequence_list/add_form', 'OrderController@addSequenceForm');
