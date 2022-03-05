@@ -728,7 +728,7 @@ class OrderController extends Controller
         }
     }
 
-    public function cancelOrder($id) {
+    public function cancelOrder($id, Request $request) {
         DB::beginTransaction();
         try {
             $output = [];
@@ -739,6 +739,12 @@ class OrderController extends Controller
 
                 if(!$details) {
                     return back()->with('error', 'Order ID <b>' . $id . '</b> not found.');
+                }
+
+                if(!$request->is_admin) {
+                    if (Auth::user()->username != $details->order_bill_email) {
+                        return back()->with('error', 'Invalid transaction.');
+                    }
                 }
 
                 $dt = Carbon::now();

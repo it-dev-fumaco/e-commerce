@@ -35,197 +35,258 @@
 				  
 					<!-- Tab panes -->
 					<div class="tab-content"> 
-						<div id="current" class="container tab-pane active">
-							<br>
-							<br>
-							<div id="accordion">
-								@forelse ($new_orders_arr as $order)
-									@php
-										if($order['status'] == "Order Placed"){
-											$badge = '#ffc107';
-										}else if($order['status'] == "Delivered" or $order['status'] == 'Order Completed'){
-											$badge = '#fd6300';
-										}else if($order['status'] == "Out for Delivery" or $order['status'] == 'Ready for Pickup'){
-											$badge = '#28a745';
-										}else{
-											$badge = '#007bff';
-										}
-									@endphp
-									<div class="card">
-										<div class="card-header" id="headingOne">
-											<h5 class="mb-0">
-												<a class="btn" data-toggle="collapse" data-target="#{{ $order['order_number'] }}-details" aria-expanded="true" aria-controls="collapseOne" style="width: 100%;">
-													<div class="row">
-														<div class="col-md-8" style="text-align: left !important">
-															<span class="table-text"><b>{{ $order['order_number'] }}</b></span>&nbsp;<span class="badge text-dark" style="background-color: {{ $badge }}; font-size: 0.9rem; color: #fff !important;">{{ $order['status'] }}</span>
-														</div>
-														<div class="col-md-4" style="text-align: left !important">
-															@if($order['shipping_name'] != 'Store Pickup' )
-																<span class="table-text"><b>Estimated Delivery Date:</b> <br class="d-md-none"/>{{ $order['edd'] }}</span>
-															@else
-																<span class="table-text"><b>Pickup Date:</b> <br class="d-md-none"/>{{ date('M d, Y', strtotime($order['pickup_date'])) }}</span>
-															@endif
-														</div>
-													</div>
-												</a>
-											</h5>
-										</div>
-									
-										<div id="{{ $order['order_number'] }}-details" class="collapse {{ $loop->first ? 'show' : 'hide' }}" aria-labelledby="headingOne" data-parent="#accordion">
-											<div class="card-body">
-												<table class="table" style="width: 100% !important;">
-													<tr>
-														<th class="col-sm-1"></th>
-														<th class="col-sm-3 table-text">Item Name</th>
-														<th class="col-sm-2 table-text">
-															<span class="d-none d-md-block">Quantity</span>
-															<span class="d-md-none">Qty</span>
-														</th>
-														<th class="col-sm-2 table-text">Price</th>
-													</tr>
-													@foreach ($order['items'] as $item)
-														<tr>
-															<td>
-																<img src="{{ asset('/storage/item_images/'.$item['item_code'].'/gallery/preview/'.$item['image']) }}" class="img-responsive" alt="" width="55" height="55">
-															</td>
-															<td class="table-text">{{ $item['item_name'] }}</td>
-															<td class="table-text">{{ $item['qty'] }}</td>
-															@php
-																$orig_price = number_format($item['orig_price'], 2);
-																$price = number_format($item['price'], 2);
-															@endphp
-															<td class="table-text">
-																@if($item['discount'] > 0)
-																	<p><span style="text-decoration: line-through; font-size: 9pt;">₱ {{ $orig_price }}</span><br/><b>₱ {{ $price }}</b></p>
-																@else
-																	<p>₱ {{ $price }}</p>
-																@endif
-															</td>
-														</tr>
-													@endforeach
-													<tr class="d-lg-none d-xl-none" style="border-bottom: rgba(0,0,0,0) !important">
-														<td></td>
-														<td colspan=2 class="table-text" style="text-align: right;">Subtotal: </td>
-														<td class="table-text" style="text-align: left; white-space: nowrap !important">₱ {{ number_format($order['subtotal'], 2) }}</td>
-													</tr>
-													@if ($order['voucher_code'])
-													<tr class="d-lg-none d-xl-none" style="border-bottom: rgba(0,0,0,0) !important">
-														<td></td>
-														<td colspan=2 class="table-text" style="text-align: right;">Discount: <span class="text-white" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833;">{{ $order['voucher_code'] }}</span>
-															</td>
-														<td class="table-text" style="text-align: left; white-space: nowrap !important">₱ {{ number_format($order['discount_amount'], 2) }}</td>
-													</tr>
-
-													@endif
-													<tr class="d-lg-none d-xl-none" style="border-bottom: rgba(0,0,0,0) !important">
-														<td></td>
-														<td colspan=2 class="table-text" style="text-align: right;">{{ $order['shipping_name'] }}: </td>
-														<td class="table-text" style="text-align: left; white-space: nowrap !important">₱ {{ number_format($order['shipping_fee'], 2) }}</td>
-													</tr>
-													<tr class="d-lg-none d-xl-none" style="border-bottom: rgba(0,0,0,0) !important; font-weight: 700 !important">
-														<td></td>
-														<td colspan=2 class="table-text" style="text-align: right;">Grand Total: </td>
-														<td class="table-text" style="text-align: left; white-space: nowrap !important">₱ {{ number_format($order['grand_total'], 2) }}</td>
-													</tr>
-												</table>
-												<div class="d-none d-xl-block">
-													<div class="row m-1">
-														<div class="col-md-10 p-0" style="text-align: right;">
-															<span>Subtotal: </span>
-														</div>
-														<div class="col-md-2" style="text-align: right;">
-															<span>₱ {{ number_format($order['subtotal'], 2) }}</span>
-														</div>
-													</div>
-													@if ($order['voucher_code'])
-													<div class="row m-1">
-														<div class="col-md-10" style="text-align: right;">
-															<span>Discount:  <span class="text-white" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833;">{{ $order['voucher_code'] }}</span>
-															</span>
-														</div>
-														<div class="col-md-2" style="text-align: right;">
-															<span>₱ {{ number_format($order['discount_amount'], 2) }}</span>
-														</div>
-													</div>
-													@endif
-													<div class="row m-1">
-														<div class="col-md-10" style="text-align: right;">
-															<span>{{ $order['shipping_name'] }}: </span>
-														</div>
-														<div class="col-md-2" style="text-align: right;">
-															<span>₱ {{ number_format($order['shipping_fee'], 2) }}</span>
-														</div>
-													</div>
-													<div class="row m-1">
-														<div class="col-md-10" style="text-align: right;">
-															<span style="font-weight: 700">Grand Total: </span>
-														</div>
-														<div class="col-md-2" style="text-align: right;">
-															<span style="font-weight: 700">₱ {{ number_format($order['grand_total'], 2) }}</span>
-														</div>
-													</div>
-												</div>
-												<button href="#" class="btn btn-primary table-text" data-toggle="modal" data-target="#{{ $order['order_number'] }}-Modal">Track Order</button>
+						<div id="current" class="container tab-pane active" style="padding: 8px 0 0 0;">
+							@if(session()->has('success'))
+									<div class="row">
+										<div class="col">
+											<div class="alert alert-success alert-dismissible fade show text-center" role="alert">
+												{!! session()->get('success') !!}
 											</div>
 										</div>
 									</div>
+								@endif
+								@if(session()->has('error'))
+									<div class="row">
+										<div class="col">
+											<div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
+												{!! session()->get('error') !!}
+											</div>
+										</div>
+									</div>
+								@endif
+							<div class="accordion" id="orderAccordion">
+								@forelse ($new_orders_arr as $i => $order)
+								@php
+									if($order['status'] == "Order Placed"){
+										$badge = '#ffc107';
+									}else if($order['status'] == "Delivered" or $order['status'] == 'Order Completed'){
+										$badge = '#fd6300';
+									}else if($order['status'] == "Out for Delivery" or $order['status'] == 'Ready for Pickup'){
+										$badge = '#28a745';
+									}else{
+										$badge = '#007bff';
+									}
+								@endphp
+								<div class="accordion-item border-bottom">
+									<h2 class="accordion-header" id="heading{{ $i }}">
+										<button class="accordion-button {{ !$loop->first ? 'collapsed' : '' }}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ $i }}" aria-expanded="true" aria-controls="collapse{{ $i }}">
+											<div class="w-100">
+												<div class="row">
+													<div class="col-md-6" style="text-align: left !important; padding: 5px 0 5px 5px !important;">
+														<span class="d-inline-block table-text text-dark" style="margin-right: 5px;"><b>{{ $order['order_number'] }}</b></span>
+														<span class="d-inline-block badge text-white m-0" style="background-color: {{ $badge }}; font-size: 0.9rem;">{{ $order['status'] }}</span>
+													</div>
+													<div class="col-md-6 p-1 text-dark text-center" style="padding: 8px 0 5px 5px !important;">
+														<p class="d-block d-lg-none m-0" style="text-align: left;">
+															@if($order['shipping_name'] != 'Store Pickup' )
+															<span class="table-text"><b>Estimated Delivery Date:</b> <br class="d-md-none"/>{{ $order['edd'] }}</span>
+														@else
+															<span class="table-text"><b>Pickup Date:</b> <br class="d-md-none"/>{{ date('M d, Y', strtotime($order['pickup_date'])) }}</span>
+														@endif
+														</p>
+														<p class="d-none d-lg-block text-center m-0">
+															@if($order['shipping_name'] != 'Store Pickup' )
+															<span class="table-text"><b>Estimated Delivery Date:</b> <br class="d-md-none"/>{{ $order['edd'] }}</span>
+														@else
+															<span class="table-text"><b>Pickup Date:</b> <br class="d-md-none"/>{{ date('M d, Y', strtotime($order['pickup_date'])) }}</span>
+														@endif
+														</p>
+													</div>
+												</div>
+											</div>
+										</button>
+									</h2>
+									<div id="collapse{{ $i }}" class="accordion-collapse collapse {{ $loop->first ? 'show' : 'hide' }}" aria-labelledby="heading{{ $i }}" data-bs-parent="#orderAccordion">
+									  	<div class="accordion-body p-1">
+											<table class="table" style="width: 100% !important;">
+												<tr>
+													<th style="width: 10%;"></th>
+													<th style="width: 50%;" class="table-text">Item Name</th>
+													<th style="width: 20%;" class="table-text text-center">
+														<span class="d-none d-md-block">Quantity</span>
+														<span class="d-md-none">Qty</span>
+													</th>
+													<th style="width: 20%;" class="table-text text-center">Price</th>
+												</tr>
+												@foreach ($order['items'] as $item)
+												<tr>
+													<td class="text-center">
+														<img src="{{ asset('/storage/item_images/'.$item['item_code'].'/gallery/preview/'.$item['image']) }}" class="img-responsive" alt="" width="55" height="55">
+													</td>
+													<td class="table-text">{{ $item['item_name'] }}</td>
+													<td class="table-text text-center">{{ $item['qty'] }}</td>
+													@php
+														$orig_price = number_format($item['orig_price'], 2);
+														$price = number_format($item['price'], 2);
+													@endphp
+													<td class="table-text">
+														<p class="d-block d-lg-none" style="text-align: right; padding-right: 10px;">
+															@if($item['discount'] > 0)
+																<span style="text-decoration: line-through; font-size: 9pt;">₱ {{ $orig_price }}</span><br/><b>₱ {{ $price }}</b>
+															@else
+																₱ {{ $price }}
+															@endif
+														</p>
+														<p class="d-none d-lg-block" style="text-align: right; padding-right: 20px;">
+															@if($item['discount'] > 0)
+																<span style="text-decoration: line-through; font-size: 9pt;">₱ {{ $orig_price }}</span><br/><b>₱ {{ $price }}</b>
+															@else
+																₱ {{ $price }}
+															@endif
+														</p>
+													</td>
+												</tr>
+												@endforeach
+												<tr class="d-lg-none d-xl-none" style="border-bottom: rgba(0,0,0,0) !important;">
+													<td colspan="3" class="table-text" style="text-align: right;">Subtotal:</td>
+													<td class="table-text" style="text-align: right; white-space: nowrap !important; padding-right: 20px;">₱ {{ number_format($order['subtotal'], 2) }}</td>
+												</tr>
+												@if ($order['voucher_code'])
+												<tr class="d-lg-none d-xl-none" style="border-bottom: rgba(0,0,0,0) !important">
+													<td colspan="3" class="table-text" style="text-align: right;">
+														Discount: <span class="text-white" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833;">{{ $order['voucher_code'] }}</span>
+													</td>
+													<td class="table-text" style="text-align: right; white-space: nowrap !important; padding-right: 20px;">₱ {{ number_format($order['discount_amount'], 2) }}</td>
+												</tr>
+												@endif
+												<tr class="d-lg-none d-xl-none" style="border-bottom: rgba(0,0,0,0) !important">
+													<td colspan="3" class="table-text" style="text-align: right;">{{ $order['shipping_name'] }}: </td>
+													<td class="table-text" style="text-align: right; white-space: nowrap !important; padding-right: 20px;">₱ {{ number_format($order['shipping_fee'], 2) }}</td>
+												</tr>
+												<tr class="d-lg-none d-xl-none" style="border-bottom: rgba(0,0,0,0) !important; font-weight: 700 !important">
+													<td colspan="3" class="table-text" style="text-align: right;">Grand Total: </td>
+													<td class="table-text" style="text-align: right; white-space: nowrap !important; padding-right: 20px;">₱ {{ number_format($order['grand_total'], 2) }}</td>
+												</tr>
+											</table>
+											<div class="d-none d-lg-block d-xl-block">
+												<div class="row m-1">
+													<div class="col-md-10 p-0" style="text-align: right;">
+														<span>Subtotal:</span>
+													</div>
+													<div class="col-md-2" style="text-align: right; padding-right: 25px;">
+														<span>₱ {{ number_format($order['subtotal'], 2) }}</span>
+													</div>
+												</div>
+												@if ($order['voucher_code'])
+												<div class="row m-1">
+													<div class="col-md-10 p-0" style="text-align: right;">
+														<span>Discount:  <span class="text-white" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833;">{{ $order['voucher_code'] }}</span>
+														</span>
+													</div>
+													<div class="col-md-2" style="text-align: right; padding-right: 25px;">
+														<span>₱ {{ number_format($order['discount_amount'], 2) }}</span>
+													</div>
+												</div>
+												@endif
+												<div class="row m-1">
+													<div class="col-md-10 p-0" style="text-align: right;">
+														<span>{{ $order['shipping_name'] }}:</span>
+													</div>
+													<div class="col-md-2" style="text-align: right; padding-right: 25px;">
+														<span>₱ {{ number_format($order['shipping_fee'], 2) }}</span>
+													</div>
+												</div>
+												<div class="row m-1">
+													<div class="col-md-10 p-0" style="text-align: right;">
+														<span style="font-weight: 700">Grand Total:</span>
+													</div>
+													<div class="col-md-2" style="text-align: right; padding-right: 25px;">
+														<span style="font-weight: 700">₱ {{ number_format($order['grand_total'], 2) }}</span>
+													</div>
+												</div>
+											</div>
+											<div class="m-3">
+												<button class="btn btn-primary table-text" data-toggle="modal" data-target="#{{ $order['order_number'] }}-Modal">Track Order</button>
+												@php
+													$dt = \Carbon\Carbon::now();
+													$dt2 = \Carbon\Carbon::parse($order['order_date']);
+													$is_same_day = ($dt->isSameDay($dt2));
+												@endphp	
+												<button class="btn btn-danger table-text" data-toggle="modal" data-target="#cancel-order{{ $i }}-modal" {{ !$is_same_day ? 'disabled' : '' }} {{ ($order['status'] != "Order Placed") ? 'disabled' : '' }}>Cancel Order</button>
+											</div>
+									  	</div>
+									</div>
+								</div>
 
-									<div class="modal fade" id="{{ $order['order_number'] }}-Modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-										<div class="modal-dialog modal-xl" role="document">
+								@if ($order['status'] == "Order Placed")
+								<div class="modal fade" id="cancel-order{{ $i }}-modal" tabindex="-1" role="dialog" aria-labelledby="cancel-order{{ $i }}-modal" aria-hidden="true">
+									<div class="modal-dialog" role="document">
+										<form action="/myorder/cancel/{{ $order['order_id'] }}" method="POST" autocomplete="off">
+											@csrf
 											<div class="modal-content">
 												<div class="modal-header">
-													<h5 class="modal-title" id="exampleModalLabel">Track {{ $order['order_number'] }}</h5>
+													<h5 class="modal-title">Cancel Order</h5>
 													<button type="button" class="close clear-bg" data-dismiss="modal" aria-label="Close">
 														<span aria-hidden="true">&times;</span>
 													</button>
 												</div>
 												<div class="modal-body">
-													<div class="track-container">
-														<div class="track">
-															@php
-																$step = trim(collect($order['ship_status'])->where('status', $order['status'] )->pluck('order_sequence'), '[""]');
-															@endphp
-															<div class="step active">
-																<span class="icon {{ $step > 0 ? 'inactive' : '' }}"><i class="fa fa-check {{ $step > 0 ? 'd-none' : '' }}"></i></span>
-																<span class="text status-text">Order Placed</span>
-																<span class="text status-text" style="font-size: 9pt; color: #a39f9f !important; font-style: italic !important">{{ $order['date'] }}</span>
-															</div>
-															@foreach ($order['ship_status'] as $key => $name)
-																@php
-																	$date = '';
-																	if(collect($order['order_tracker'])->where('track_status', $name->status)->pluck('track_date_update')->first()){
-																		$date = date('M d, Y H:i A', strtotime(collect($order['order_tracker'])->where('track_status', $name->status)->pluck('track_date_update')->first()));
-																	}
-																	
-																	$icon = '';
-																	if($name->status == "Order Confirmed"){
-																		$icon = 'user';
-																	}else if($name->status == "Out for Delivery" or $name->status == "Ready for Pickup" ){
-																		$icon = 'truck';
-																	}else if($name->status == "Order Delivered" or $name->status == "Order Completed"){
-																		$icon = 'shopping-bag';
-																	}
-																@endphp
-																<div class="step {{ collect($order['order_tracker'])->contains('track_status', $name->status) ? 'active' : '' }}">
-																	<span class="icon {{ $step != $key + 1 ? 'inactive' : '' }}"><i class="fa fa-{{ $icon }} {{ $step != $key + 1 ? 'd-none' : '' }}"></i></span>
-																	<span class="text status-text">{{ $name->status }}</span>
-																	<span class="text status-text" style="font-size: 9pt; color: #a39f9f !important; font-style: italic !important">{{ $date }}</span>
-																	<span class="text status-text {{ $step != $key + 1 ? 'd-none' : '' }}" style="font-size: 9pt; color: #a39f9f !important; font-style: italic !important">{{ $name->status_description }}</span>
-																</div>
-															@endforeach
-														</div>
-													</div>
+													<p class="text-center">Cancel order <b>{{ $order['order_number'] }}</b> ?</p>
 												</div>
 												<div class="modal-footer">
+													<button type="submit" class="btn btn-primary">Confirm</button>
 													<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
 												</div>
 											</div>
+										</form>
+									</div>
+								</div>
+								@endif
+
+								<div class="modal fade" id="{{ $order['order_number'] }}-Modal" tabindex="-1" role="dialog" aria-labelledby="order-details" aria-hidden="true">
+									<div class="modal-dialog modal-xl" role="document">
+										<div class="modal-content">
+											<div class="modal-header">
+												<h5 class="modal-title">Track {{ $order['order_number'] }}</h5>
+												<button type="button" class="close clear-bg" data-dismiss="modal" aria-label="Close">
+													<span aria-hidden="true">&times;</span>
+												</button>
+											</div>
+											<div class="modal-body">
+												<div class="track-container">
+													<div class="track">
+														@php
+															$step = trim(collect($order['ship_status'])->where('status', $order['status'] )->pluck('order_sequence'), '[""]');
+														@endphp
+														<div class="step active">
+															<span class="icon {{ $step > 0 ? 'inactive' : '' }}"><i class="fa fa-check {{ $step > 0 ? 'd-none' : '' }}"></i></span>
+															<span class="text status-text">Order Placed</span>
+															<span class="text status-text" style="font-size: 9pt; color: #a39f9f !important; font-style: italic !important">{{ $order['date'] }}</span>
+														</div>
+														@foreach ($order['ship_status'] as $key => $name)
+															@php
+																$date = '';
+																if(collect($order['order_tracker'])->where('track_status', $name->status)->pluck('track_date_update')->first()){
+																	$date = date('M d, Y H:i A', strtotime(collect($order['order_tracker'])->where('track_status', $name->status)->pluck('track_date_update')->first()));
+																}
+																
+																$icon = '';
+																if($name->status == "Order Confirmed"){
+																	$icon = 'user';
+																}else if($name->status == "Out for Delivery" or $name->status == "Ready for Pickup" ){
+																	$icon = 'truck';
+																}else if($name->status == "Order Delivered" or $name->status == "Order Completed"){
+																	$icon = 'shopping-bag';
+																}
+															@endphp
+															<div class="step {{ collect($order['order_tracker'])->contains('track_status', $name->status) ? 'active' : '' }}">
+																<span class="icon {{ $step != $key + 1 ? 'inactive' : '' }}"><i class="fa fa-{{ $icon }} {{ $step != $key + 1 ? 'd-none' : '' }}"></i></span>
+																<span class="text status-text">{{ $name->status }}</span>
+																<span class="text status-text" style="font-size: 9pt; color: #a39f9f !important; font-style: italic !important">{{ $date }}</span>
+																<span class="text status-text {{ $step != $key + 1 ? 'd-none' : '' }}" style="font-size: 9pt; color: #a39f9f !important; font-style: italic !important">{{ $name->status_description }}</span>
+															</div>
+														@endforeach
+													</div>
+												</div>
+											</div>
+											<div class="modal-footer">
+												<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+											</div>
 										</div>
 									</div>
+								</div>
 								@empty
-									<tr>
-										<td class="text-center p-3" colspan="6">No transactions found.</td>
-									</tr>
+								<h5 class="font-weight-bold text-center p-3">No transactions found.</h5>
 								@endforelse
 							</div>
 						</div>
@@ -427,292 +488,6 @@
 					</div>
 				  </div>
 			</div>
-			{{-- <div class="row d-none">
-				<div class="col-md-6">
-					<br>
-					<center><h3 class="h3">Current Orders</h3></center>
-					<br><br/>
-					<table class="table">
-						<thead>
-							<tr>
-								<th class="text-center d-none d-sm-table-cell">Order No.</th>
-								<th class="text-center table-text">Date</th>
-								<th class="text-center table-text">Details</th>
-								<th class="text-center d-none d-sm-table-cell">Shipping</th>
-								<th class="d-none d-sm-table-cell">Estimated Delivery Date</th>
-								<th class="text-center d-none d-sm-table-cell">Status</th>
-							</tr>
-						</thead>
-						<tbody>
-							@forelse ($new_orders_arr as $order)
-							@php
-								if($order['status'] == "Order Placed"){
-									$badge = '#ffc107';
-								}else if($order['status'] == "Delivered"){
-									$badge = '#fd6300';
-								}else if($order['status'] == "Out for Delivery"){
-									$badge = '#28a745';
-								}else{
-									$badge = '#007bff';
-								}
-							@endphp
-							<tr>
-								<td class="text-center align-middle d-none d-sm-table-cell">{{ $order['order_number'] }}</td>
-								<td class="text-center align-middle">{{ $order['date'] }}</td>
-								<td class="text-center align-middle">
-									<a href="#" data-toggle="modal" data-target="#{{ $order['order_number'] }}-Modal">Item Purchase</a>
-
-									<div class="modal fade" id="{{ $order['order_number'] }}-Modal" tabindex="-1" role="dialog" aria-labelledby="{{ $order['order_number'] }}-ModalLabel" aria-hidden="true">
-										<div class="modal-dialog modal-xl" style="min-width: 70%;">
-											<div class="modal-content">
-												<div class="modal-header">
-													<h5 class="modal-title">{{ $order['order_number'] }}</h5>
-													<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-														<span aria-hidden="true">&times;</span>
-													</button>
-												</div>
-												<div class="modal-body">
-													<table class="table" style="width: 100% !important;">
-														<tr>
-															<th class="col-sm-1"></th>
-															<th class="col-sm-3">Item Name</th>
-															<th class="col-sm-2">Quantity</th>
-															<th class="col-sm-2">Price</th>
-														</tr>
-														@foreach ($order['items'] as $item)
-															<tr>
-																<td>
-																	<img src="{{ asset('/storage/item_images/'.$item['item_code'].'/gallery/preview/'.$item['image']) }}" class="img-responsive" alt="" width="55" height="55">
-																</td>
-																<td>{{ $item['item_name'] }}</td>
-																<td>{{ $item['qty'] }}</td>
-																@php
-																	$orig_price = number_format($item['orig_price'], 2);
-																	$price = number_format($item['price'], 2);
-																@endphp
-																<td>
-																	@if($item['discount'] > 0)
-																		<p><span style="text-decoration: line-through; font-size: 9pt;">₱ {{ $orig_price }}</span><br/><b>₱ {{ $price }}</b></p>
-																	@else
-																		<p>₱ {{ $price }}</p>
-																	@endif
-																</td>
-															</tr>
-														@endforeach
-														<tr class="d-lg-none d-xl-none" style="border-bottom: rgba(0,0,0,0) !important">
-															<td></td>
-															<td colspan=2 style="text-align: right;">Subtotal: </td>
-															<td style="text-align: left; white-space: nowrap !important">₱ {{ number_format($order['subtotal'], 2) }}</td>
-														</tr>
-														<tr class="d-lg-none d-xl-none" style="border-bottom: rgba(0,0,0,0) !important">
-															<td></td>
-															<td colspan=2 style="text-align: right;">Shipping Fee: </td>
-															<td style="text-align: left; white-space: nowrap !important">₱ {{ number_format($order['shipping_fee'], 2) }}</td>
-														</tr>
-														<tr class="d-lg-none d-xl-none" style="border-bottom: rgba(0,0,0,0) !important; font-weight: 700 !important">
-															<td></td>
-															<td colspan=2 style="text-align: right;">Grand Total: </td>
-															<td style="text-align: left; white-space: nowrap !important">₱ {{ number_format($order['grand_total'], 2) }}</td>
-														</tr>
-													</table>
-													<div class="d-none d-xl-block">
-														<div class="row">
-															<div class="col-md-10" style="text-align: right;">
-																<span>Subtotal: </span>
-															</div>
-															<div class="col-md-2" style="text-align: left;">
-																<span>₱ {{ number_format($order['subtotal'], 2) }}</span>
-															</div><br/>&nbsp;
-														</div>
-														<div class="row">
-															<div class="col-md-10" style="text-align: right;">
-																<span>Shipping Fee: </span>
-															</div>
-															<div class="col-md-2" style="text-align: left;">
-																<span>₱ {{ number_format($order['shipping_fee'], 2) }}</span>
-															</div><br/>&nbsp;
-														</div>
-														<div class="row">
-															<div class="col-md-10" style="text-align: right;">
-																<span style="font-weight: 700">Grand Total: </span>
-															</div>
-															<div class="col-md-2" style="text-align: left;">
-																<span style="font-weight: 700">₱ {{ number_format($order['grand_total'], 2) }}</span>
-															</div><br/>&nbsp;
-														</div>
-													</div>
-												</div>
-												<div class="modal-footer">
-													<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-												</div>
-											</div>
-										</div>
-									</div>
-									<div class="d-md-none" style="text-align: left;">
-										<br/>
-										<b>Shipping Name:</b> {{ $order['shipping_name'] }}<br/><br/>
-										<b>Est. Delivery Date:</b> {{ $order['edd'] }}<br/>
-										<span class="badge text-dark" style="background-color: {{ $badge }}; font-size: 0.9rem; color: #fff !important;">{{ $order['status'] }}</span>
-									</div>
-								</td>
-								<td class="text-center align-middle d-none d-sm-table-cell">{{ $order['shipping_name'] }}</td>
-								<td class="text-center align-middle d-none d-sm-table-cell">{{ $order['edd'] }}</td>
-								<td class="text-center align-middle d-none d-sm-table-cell"><span class="badge text-dark" style="background-color: {{ $badge }}; font-size: 0.9rem; color: #fff !important;">{{ $order['status'] }}</span></td>
-							</tr>
-							@empty
-								<tr>
-									<td class="text-center p-3" colspan="6">No transactions found.</td>
-								</tr>
-							@endforelse
-						</tbody>
-					</table>
-				</div>
-				<div class="col-md-6">
-					<center><h3>Order History</h3></center>
-					<br><br/>
-					<table class="table">
-						<thead>
-							<tr>
-								<th class="text-center d-none d-sm-table-cell">Order No.</th>
-								<th class="text-center">Date</th>
-								<th class="text-center">Details</th>
-								<th class="text-center d-none d-sm-table-cell">Shipping</th>
-								<th class="d-none d-sm-table-cell">Estimated Delivery Date</th>
-								<th class="text-center d-none d-sm-table-cell">Status</th>
-							</tr>
-						</thead>
-						<tbody>
-							@forelse ($orders_arr as $order)
-							@php
-								if($order['status'] == "Order Placed"){
-									$badge = '#ffc107';
-								}else if($order['status'] == "Cancelled"){
-									$badge = '#6c757d';
-								}else if($order['status'] == "Delivered"){
-									$badge = '#fd6300';
-								}else if($order['status'] == "Out for Delivery"){
-									$badge = '#28a745';
-								}else{
-									$badge = '#007bff';
-								}
-							@endphp
-							<tr>
-								<td class="text-center align-middle d-none d-sm-table-cell">{{ $order['order_number'] }}</td>
-								<td class="text-center align-middle">{{ $order['date'] }}</td>
-								<td class="text-center align-middle">
-									<a href="#" data-toggle="modal" data-target="#{{ $order['order_number'] }}-Modal">Item Purchase</a>
-
-									<!-- Modal -->
-									<div class="modal fade" id="{{ $order['order_number'] }}-Modal" tabindex="-1" role="dialog" aria-labelledby="{{ $order['order_number'] }}-ModalLabel" aria-hidden="true">
-										<div class="modal-dialog modal-xl" style="min-width: 70%;">
-											<div class="modal-content">
-												<div class="modal-header">
-													<h5 class="modal-title">{{ $order['order_number'] }}</h5>
-													<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-														<span aria-hidden="true">&times;</span>
-													</button>
-												</div>
-												<div class="modal-body">
-													<table class="table" style="width: 100% !important;">
-														<tr>
-															<th class="col-sm-1"></th>
-															<th class="col-sm-3">Item Name</th>
-															<th class="col-sm-2">Quantity</th>
-															<th class="col-sm-2">Price</th>
-														</tr>
-														@foreach ($order['items'] as $item)
-															<tr>
-																<td>
-																	<img src="{{ asset('/storage/item_images/'.$item['item_code'].'/gallery/preview/'.$item['image']) }}" class="img-responsive" alt="" width="55" height="55">
-																</td>
-																<td>{{ $item['item_name'] }}</td>
-																<td>{{ $item['qty'] }}</td>
-																@php
-																	$orig_price = number_format($item['orig_price'], 2);
-																	$price = number_format($item['price'], 2);
-																@endphp
-																<td>
-																	@if($item['discount'] > 0)
-																		<p><span style="text-decoration: line-through; font-size: 9pt;">₱ {{ $orig_price }}</span><br/><b>₱ {{ $price }}</b></p>
-																	@else
-																		<p>₱ {{ $price }}</p>
-																	@endif
-																</td>
-															</tr>
-														@endforeach
-														<tr class="d-lg-none d-xl-none" style="border-bottom: rgba(0,0,0,0) !important">
-															<td></td>
-															<td colspan=2 style="text-align: right;">Subtotal: </td>
-															<td style="text-align: left; white-space: nowrap !important">₱ {{ number_format($order['subtotal'], 2) }}</td>
-														</tr>
-														<tr class="d-lg-none d-xl-none" style="border-bottom: rgba(0,0,0,0) !important">
-															<td></td>
-															<td colspan=2 style="text-align: right;">Shipping Fee: </td>
-															<td style="text-align: left; white-space: nowrap !important">₱ {{ number_format($order['shipping_fee'], 2) }}</td>
-														</tr>
-														<tr class="d-lg-none d-xl-none" style="border-bottom: rgba(0,0,0,0) !important; font-weight: 700 !important">
-															<td></td>
-															<td colspan=2 style="text-align: right;">Grand Total: </td>
-															<td style="text-align: left; white-space: nowrap !important">₱ {{ number_format($order['grand_total'], 2) }}</td>
-														</tr>
-													</table>
-													<div class="d-none d-xl-block">
-														<div class="row">
-															<div class="col-md-10" style="text-align: right;">
-																<span>Subtotal: </span>
-															</div>
-															<div class="col-md-2" style="text-align: left;">
-																<span>₱ {{ number_format($order['subtotal'], 2) }}</span>
-															</div><br/>&nbsp;
-														</div>
-														<div class="row">
-															<div class="col-md-10" style="text-align: right;">
-																<span>Shipping Fee: </span>
-															</div>
-															<div class="col-md-2" style="text-align: left;">
-																<span>₱ {{ number_format($order['shipping_fee'], 2) }}</span>
-															</div><br/>&nbsp;
-														</div>
-														<div class="row">
-															<div class="col-md-10" style="text-align: right;">
-																<span style="font-weight: 700">Grand Total: </span>
-															</div>
-															<div class="col-md-2" style="text-align: left;">
-																<span style="font-weight: 700">₱ {{ number_format($order['grand_total'], 2) }}</span>
-															</div><br/>&nbsp;
-														</div>
-													</div>
-												</div>
-												<div class="modal-footer">
-													<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-												</div>
-											</div>
-										</div>
-									</div>
-									<div class="d-md-none" style="text-align: left;">
-										<br/>
-										<b>Shipping Name:</b> {{ $order['shipping_name'] }}<br/><br/>
-										<b>Est. Delivery Date:</b> {{ $order['edd'] }}<br/>
-										<span class="badge text-dark" style="background-color: {{ $badge }}; font-size: 0.9rem; color: #fff !important;">{{ $order['status'] }}</span>
-									</div>
-								</td>
-								<td class="text-center align-middle d-none d-sm-table-cell">{{ $order['shipping_name'] }}</td>
-								<td class="text-center align-middle d-none d-sm-table-cell">{{ $order['edd'] }}</td>
-								<td class="text-center align-middle d-none d-sm-table-cell"><span class="badge text-dark" style="background-color: {{ $badge }}; font-size: 0.9rem; color: #fff !important;">{{ $order['status'] }}</span></td>
-							</tr>
-							@empty
-								<tr>
-									<td class="text-center p-3" colspan="6">No transactions found.</td>
-								</tr>
-							@endforelse
-						</tbody>
-					</table>
-					<div style="float: right;">
-						{{ $orders->links('pagination::bootstrap-4') }}
-					</div>
-
-				</div>
-			</div> --}}
 		</div>
 		<br/>&nbsp;
 	</main>

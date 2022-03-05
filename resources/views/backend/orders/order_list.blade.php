@@ -300,6 +300,7 @@
 														<div class="modal-dialog" role="document">
 															<form action="/admin/order/cancel/{{ $order['order_id'] }}" method="POST" autocomplete="off">
 																@csrf
+																<input type="hidden" name="is_admin" value="1">
 																<div class="modal-content">
 																	<div class="modal-header">
 																		<h5 class="modal-title">Cancel Order</h5>

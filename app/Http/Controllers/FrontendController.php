@@ -1789,7 +1789,7 @@ class FrontendController extends Controller
 
         $orders = DB::table('fumaco_order')->where('user_email', Auth::user()->username)
             ->whereNotIn('order_status', $active_order_statuses)
-            ->select('order_number', 'order_date', 'order_status', 'estimated_delivery_date', 'date_delivered', 'order_subtotal', 'order_shipping', 'order_shipping_amount', 'discount_amount', 'voucher_code')
+            ->select('id', 'order_number', 'order_date', 'order_status', 'estimated_delivery_date', 'date_delivered', 'order_subtotal', 'order_shipping', 'order_shipping_amount', 'discount_amount', 'voucher_code')
             ->orderBy('id', 'desc')->paginate(10);
 
         $order_numbers = array_column($orders->items(), 'order_number');
@@ -1824,6 +1824,7 @@ class FrontendController extends Controller
             }
 
             $orders_arr[] = [
+                'order_id' => $order->id,
                 'order_number' => $order->order_number,
                 'date' => date('M d, Y - h:i A', strtotime($order->order_date)),
                 'status' => $order->order_status,
@@ -1843,7 +1844,7 @@ class FrontendController extends Controller
         $new_orders = DB::table('fumaco_order')->where('user_email', Auth::user()->username)
             ->whereNotIn('order_status', collect($completed_statuses)->pluck('status'))
             ->where('order_status', '!=', 'Cancelled')
-            ->select('pickup_date', 'order_number', 'order_date', 'order_status', 'estimated_delivery_date', 'date_delivered', 'order_subtotal', 'order_shipping', 'order_shipping_amount', 'discount_amount', 'voucher_code')
+            ->select('id', 'pickup_date', 'order_number', 'order_date', 'order_status', 'estimated_delivery_date', 'date_delivered', 'order_subtotal', 'order_shipping', 'order_shipping_amount', 'discount_amount', 'voucher_code')
             ->orderBy('id', 'desc')->paginate(10);
 
         $order_numbers = array_column($new_orders->items(), 'order_number');
@@ -1896,7 +1897,9 @@ class FrontendController extends Controller
             $order_status = array_key_exists($new_order->order_shipping, $order_statuses) ? $order_statuses[$new_order->order_shipping] : [];
 
             $new_orders_arr[] = [
+                'order_id' => $new_order->id,
                 'order_number' => $new_order->order_number,
+                'order_date' => $new_order->order_date,
                 'date' => date('M d, Y - h:i A', strtotime($new_order->order_date)),
                 'status' => $new_order->order_status,
                 'edd' => $new_order->estimated_delivery_date,

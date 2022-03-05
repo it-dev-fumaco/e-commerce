@@ -97,6 +97,7 @@ Route::group(['middleware' => 'auth'], function(){
     Route::delete('/mywishlist/{id}/delete', 'FrontendController@deleteWishlist');
     Route::get('/myorders', 'FrontendController@viewOrders');
     Route::get('/myorder/{order_id}', 'FrontendController@viewOrder');
+    Route::post('/myorder/cancel/{id}', 'OrderController@cancelOrder');
     Route::get('/myprofile/account_details', 'FrontendController@viewAccountDetails');
     Route::post('/myprofile/account_details/{id}/update', 'FrontendController@updateAccountDetails');
     Route::get('/myprofile/change_password', 'FrontendController@viewChangePassword');
