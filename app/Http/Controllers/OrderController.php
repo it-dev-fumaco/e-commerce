@@ -799,18 +799,51 @@ class OrderController extends Controller
                 if ($output['TxnStatus'] == 0) {
                     $date_cancelled = Carbon::now()->toDateTimeString();
                     $order_items = DB::table('fumaco_order_items as foi')->join('fumaco_items as fi', 'foi.item_code', 'fi.f_idcode')
-                        ->where('foi.order_number', $details->order_number)->select('foi.item_qty', 'foi.item_code', 'fi.f_reserved_qty')->get();
+                        ->where('foi.order_number', $details->order_number)->select('foi.item_qty', 'foi.item_code', 'fi.f_reserved_qty', 'foi.item_name', 'foi.item_price', 'foi.item_discount', 'foi.item_total_price')->get();
 
+                    $items = [];
                     foreach($order_items as $row){
                         $r_qty = $row->f_reserved_qty - $row->item_qty;
                         DB::table('fumaco_items')->where('f_idcode', $row->item_code)
                             ->update(['f_reserved_qty' => $r_qty, 'last_modified_by' => Auth::user()->username]);
+
+                        $image = DB::table('fumaco_items_image_v1')->where('idcode', $row->item_code)->first();
+                        $items[] = [
+                            'item_code' => $row->item_code,
+                            'item_name' => $row->item_name,
+                            'price' => $row->item_price,
+                            'discount' => $row->item_discount,
+                            'qty' => $row->item_qty,
+                            'amount' => $row->item_total_price,
+                            'image' => ($image) ? $image->imgprimayx : null
+                        ];
                     }
 
                     DB::table('fumaco_order')->where('id', $id)
                         ->update(['order_status' => 'Cancelled', 'last_modified_by' => Auth::user()->username, 'date_cancelled' => $date_cancelled]);
 
                     DB::commit();
+
+                    $store_address = null;
+                    if($details->order_shipping == 'Store Pickup') {
+                        $store = DB::table('fumaco_store')->where('store_name', $details->store_location)->first();
+                        $store_address = ($store) ? $store->address : null;
+                    }
+
+                    $email_recipient = DB::table('email_config')->first();
+                    $email_recipient = ($email_recipient) ? explode(",", $email_recipient->email_recipients) : [];
+                    $order = [
+                        'order_details' => $details,
+                        'items' => $items,
+                        'store_address' => $store_address
+                    ];
+
+                    if (count(array_filter($email_recipient)) > 0) {
+                        Mail::send('emails.cancelled_order_admin', $order, function($message) use ($email_recipient) {
+                            $message->to($email_recipient);
+                            $message->subject('Cancelled Order - FUMACO');
+                        });
+                    }
 
                     return redirect()->back()->with('success', 'Order <b>'.$details->order_number.'</b> has been cancelled.');
                 }
