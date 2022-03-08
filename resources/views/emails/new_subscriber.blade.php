@@ -44,12 +44,12 @@
                         </div>
                         <p style="margin: 1%; color:#0062A5 !important; font-size: 12px !important; font-weight: 500 !important; text-align: left; min-height: 70px;">{{ $item['item_name'] }}</p>
                         <p style="color:#000000 !important;  min-height: 70px; margin: 1%; font-size: 13px; text-align: left;">
-                            @if ($item['is_discounted'])
-                            <span style="white-space: nowrap">₱ {{ number_format(str_replace(",","",$item['new_price']), 2) }}</span>&nbsp;&nbsp;<small><s style="color: #c5c5c5; white-space: nowrap">₱ {{ number_format(str_replace(",","",$item['orig_price']), 2) }}</s></small>&nbsp;&nbsp;&nbsp;<span class="badge badge-danger" style="vertical-align: middle; white-space: nowrap">{{ $item['discount'] }}% OFF</span>
+                            @if ($item['is_discounted'] != 0)
+                                <span style="white-space: nowrap">₱ {{ $item['discounted_price'] }}</span>&nbsp;&nbsp;<small><s style="color: #c5c5c5; white-space: nowrap">₱ {{ $item['default_price'] }}</s></small>&nbsp;&nbsp;&nbsp;<span class="badge badge-danger" style="vertical-align: middle; white-space: nowrap">{{ $item['discount_display'] }}</span>
                             @else
-                            <span style="white-space: nowrap">₱ {{ number_format(str_replace(",","",$item['orig_price']), 2) }}</span><br>&nbsp;
+                                <span style="white-space: nowrap">₱ {{ $item['default_price'] }}</span><br>&nbsp;
                             @endif
-                            </p>
+                        </p>
                     </div>
                 </td>
                 @endforeach

@@ -739,22 +739,78 @@ class FrontendController extends Controller
 
             DB::table('fumaco_subscribe')->insert($insert);
 
-         
+            if(Newsletter::isSubscribed($request->email) == 0){
+                Newsletter::subscribeOrUpdate($request->email);
+            }else{
+                Newsletter::subscribe($request->email);
+            }
+
             $featured_items = DB::table('fumaco_items')->where('f_status', 1)->where('f_featured', 1)->limit(4)->get();
             $featured = [];
 
+            $featured_item_codes = collect($featured_items)->pluck('f_idcode');
+
+            $sale = DB::table('fumaco_on_sale')
+                ->whereDate('start_date', '<=', Carbon::now()->toDateString())
+                ->whereDate('end_date', '>=', Carbon::today()->toDateString())
+                ->where('status', 1)->where('apply_discount_to', 'All Items')
+                ->select('discount_type', 'discount_rate')->first();
+
+            $product_reviews = $this->getProductRating($featured_item_codes);
+
+            $item_images = DB::table('fumaco_items_image_v1')->whereIn('idcode', $featured_item_codes)
+            ->select('imgprimayx', 'idcode')->get();
+            $item_images = collect($item_images)->groupBy('idcode')->toArray();
+
+            $sale_per_category = [];
+            if (!$sale && !Auth::check()) {
+                $item_categories = array_column($featured_items->toArray(), 'f_cat_id');
+                $sale_per_category = $this->getSalePerItemCategory($item_categories);
+            }
+
+            if (Auth::check()) {
+                $sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
+            }
+
             foreach($featured_items as $row){
-                $bs_img = DB::table('fumaco_items_image_v1')->where('idcode', $row->f_idcode)->first();
+                $image = null;
+                if (array_key_exists($row->f_idcode, $item_images)) {
+                    $image = $item_images[$row->f_idcode][0]->imgprimayx;
+                }
 
                 $bs_item_name = $row->f_name_name;
+
+                $item_price = $row->f_default_price;
+                $item_on_sale = $row->f_onsale;
+                $item_code = $row->f_idcode;
+
+                $is_new_item = 0;
+                if($row->f_new_item == 1){
+                    if($row->f_new_item_start <= Carbon::now() and $row->f_new_item_end >= Carbon::now()){
+                        $is_new_item = 1;
+                    }
+                }
+
+                // get item price, discounted price and discount rate
+                $item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $row->f_cat_id, $sale, $item_price, $item_code, $row->f_discount_type, $row->f_discount_rate, $row->f_stock_uom, $sale_per_category);
+                // get product reviews
+                $total_reviews = array_key_exists($item_code, $product_reviews) ? $product_reviews[$item_code]['total_reviews'] : 0;
+                $overall_rating = array_key_exists($item_code, $product_reviews) ? $product_reviews[$item_code]['overall_rating'] : 0;
+
                 $featured[] = [
+                    'id' => $row->id,
                     'item_code' => $row->f_idcode,
-                    'item_name' => $bs_item_name,
-                    'orig_price' => $row->f_original_price,
-                    'is_discounted' => $row->f_discount_trigger,
-                    'new_price' => $row->f_price,
-                    'discount' => $row->f_discount_percent,
-                    'image' => ($bs_img) ? $bs_img->imgprimayx : null
+                    'item_name' => $row->f_name_name,
+                    'default_price' => '₱ ' . number_format($item_price_data['item_price'], 2, '.', ','),
+                    'is_discounted' => ($item_price_data['discount_rate'] > 0) ? $item_price_data['is_on_sale'] : 0,
+                    'on_stock' => ($row->f_qty - $row->f_reserved_qty) > 0 ? 1 : 0,
+                    'discounted_price' => '₱ ' . number_format($item_price_data['discounted_price'], 2, '.', ','),
+                    'discount_display' => $item_price_data['discount_display'],
+                    'image' => $image,
+                    'slug' => $row->slug,
+                    'is_new_item' => $is_new_item,
+                    'overall_rating' => $overall_rating,
+                    'total_reviews' => $total_reviews,
                 ];
             }
 
