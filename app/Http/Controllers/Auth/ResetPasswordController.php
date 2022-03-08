@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use DB;
+use Mail; 
 use Hash;
 
 class ResetPasswordController extends Controller
@@ -36,6 +37,11 @@ class ResetPasswordController extends Controller
             DB::table('password_resets')->where(['email'=> $request->username])->delete();
 
             DB::commit();
+
+            Mail::send('emails.change_password_success', ['username' => $request->username], function($message) use($request){
+                $message->to(trim($request->username));
+                $message->subject('Your password has been changed - FUMACO');
+            });
             
             return redirect('/login')->with('success', 'Your password has been changed!');
         } catch (Exception $e) {
