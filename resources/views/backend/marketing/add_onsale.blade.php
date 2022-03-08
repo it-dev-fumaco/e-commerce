@@ -46,13 +46,17 @@
                                             </div>
                                         </div>
                                         <div class="row">
-                                            <div class="col-6">
+                                            <div class="col-4">
                                                 <label>Sale Name *</label>
                                                 <input type="text" class="form-control" name="sale_name" placeholder="Sale Name" required>
                                             </div>
-                                            <div class="col-6">
+                                            <div class="col-4">
                                                 <label>Set Sale Duration</label>
                                                 <input type="text" class="form-control set_duration" id="daterange" name="sale_duration" required/>
+                                            </div>
+                                            <div class="col-4">
+                                                <label>Email Notification Schedule</label>
+                                                <input type="text" class="form-control" id="notif-schedule" name="notif_schedule" required/>
                                             </div>
                                         </div>
                                         <br/>
@@ -189,10 +193,20 @@
         requireCoupon();
 
         $(function() {
+            var year = new Date().getFullYear();
+
             $('#daterange').daterangepicker({
                 opens: 'left',
                 placeholder: 'Select Date Range',
                 startDate: moment(), endDate: moment().add(7, 'days'),
+            });
+
+            $('#notif-schedule').daterangepicker({
+                placeholder: 'Select Date',
+                singleDatePicker: true,
+                showDropdowns: true,
+                minYear: year,
+                maxYear: parseInt(year) + 10
             });
         });
 

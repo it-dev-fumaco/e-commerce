@@ -46,21 +46,27 @@
                                             </div>
                                         </div>
                                         <div class="row">
-                                            <div class="col-6">
+                                            <div class="col-4">
                                                 <label>Sale Name</label>
                                                 <input type="text" class="form-control" name="sale_name" placeholder="Sale Name" value="{{ $on_sale->sale_name }}" required>
                                             </div>
-                                            <div class="col-6">
+                                            <div class="col-4">
                                                 <label>Set Sale Duration</label>
                                                 <input type="text" class="form-control set_duration" id="daterange" name="sale_duration"/>
+                                            </div>
+                                            <div class="col-4">
+                                                <label>Email Notification Schedule</label>
+                                                <input type="text" class="form-control" id="notif-schedule" name="notif_schedule"/>
                                             </div>
                                         </div>
                                         <br/>
                                         <div class="row">
-                                            <div class="col-1">
-                                                <img class="img-thumbnail" src="{{ asset('/assets/site-img/'.$on_sale->banner_image) }}" alt="" style="width: 100%">
-                                            </div>
-                                            <div class="col-5">
+                                            @if ($on_sale->banner_image)
+                                                <div class="col-1">
+                                                    <img class="img-thumbnail" src="{{ asset('/assets/site-img/'.$on_sale->banner_image) }}" alt="" style="width: 100%">
+                                                </div>
+                                            @endif
+                                            <div class="col-{{ $on_sale->banner_image ? '5' : '6' }}">
                                                 <label>Banner Image</label>
                                                 <div class="custom-file mb-3">
                                                     <input type="file" class="custom-file-input" id="customFile" name="banner_img">
@@ -269,12 +275,24 @@
 
         var start = "{{ $on_sale->start_date ? date('m/d/Y', strtotime($on_sale->start_date)) : null  }}";
         var end = "{{ $on_sale->end_date ? date('m/d/Y', strtotime($on_sale->end_date)) : null }}";
+        var notif_sched = "{{ $on_sale->notification_schedule ? date('m/d/Y', strtotime($on_sale->notification_schedule)) : null }}";
         $(function() {
+            var year = new Date().getFullYear();
+
             $('#daterange').daterangepicker({
                 opens: 'left',
                 placeholder: 'Select Date Range',
                 startDate: start ? start : moment(),
                 endDate: end ? end : moment().add(7, 'days'),
+            });
+
+            $('#notif-schedule').daterangepicker({
+                placeholder: 'Select Date',
+                singleDatePicker: true,
+                showDropdowns: true,
+                startDate: notif_sched ? notif_sched : moment(),
+                minYear: year,
+                maxYear: parseInt(year) + 10
             });
         });
 
