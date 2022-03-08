@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Auth;
 use DB;
+use Newsletter;
 
 class CustomerController extends Controller
 {
@@ -40,6 +41,7 @@ class CustomerController extends Controller
     public function changeCustomerGroup($id, Request $request){
         DB::beginTransaction();
 		try{
+            $user_info = DB::table('fumaco_users')->where('id', $id)->first();
             $price_detail = DB::table('fumaco_price_list')->where('id', $request->pricelist)->first();
             $customer_groups = DB::table('fumaco_customer_group')->pluck('customer_group_name', 'id');
             $customer_group = (array_key_exists($request->customer_group, $customer_groups->toArray())) ? $customer_groups[$request->customer_group] : null;
@@ -50,6 +52,14 @@ class CustomerController extends Controller
                 'pricelist_id' => ($customer_group == 'Business') ? ($request->pricelist ? $request->pricelist : null) : null,
                 'pricelist' => ($customer_group == 'Business') ? (($price_detail) ? $price_detail->price_list_name : null) : null
             ]);
+
+            $former_customer_group = isset($customer_groups[$user_info->customer_group]) ? $customer_groups[$user_info->customer_group] : null;
+            $updated_customer_group = isset($customer_groups[$request->customer_group]) ? $customer_groups[$request->customer_group] : null;
+
+            if(Newsletter::hasMember($user_info->username) == 1){
+                Newsletter::removeTags([$former_customer_group], $user_info->username);
+                Newsletter::addTags([$updated_customer_group], $user_info->username);
+            }
 
             DB::commit();
 

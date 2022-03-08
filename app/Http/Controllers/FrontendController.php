@@ -14,6 +14,8 @@ use App\Models\User;
 use App\Models\UserVerify;
 use Illuminate\Support\Str;
 use Adrianorosa\GeoLocation\GeoLocation;
+use Illuminate\Support\Facades\Http;
+use Newsletter;
 
 use App\Http\Traits\ProductTrait;
 
@@ -852,6 +854,14 @@ class FrontendController extends Controller
                 'token' => $token
             ]);
 
+            $customer_group_id = DB::table('fumaco_users')->where('id', $user->id)->pluck('customer_group')->first();
+            $customer_group = DB::table('fumaco_customer_group')->where('id', $customer_group_id)->pluck('customer_group_name')->first();
+
+            if(!Newsletter::hasMember($user->username)){
+                Newsletter::subscribe($user->username, ['FNAME' => $user->f_name, 'LNAME' => $user->f_lname]);
+                Newsletter::addTags([$customer_group], $user->username);
+            }
+
             if(isset($request->subscribe)){
                 $checker = DB::table('fumaco_subscribe')->where('email', $request->username)->count();
                 if($checker == 0){
@@ -863,6 +873,8 @@ class FrontendController extends Controller
         
                     DB::table('fumaco_subscribe')->insert($newsletter);
                 }
+            }else{
+                Newsletter::unsubscribe($user->username);
             }
 
             Mail::send('emails.verify_email', ['token' => $token], function($message) use($request){
