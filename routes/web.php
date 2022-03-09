@@ -87,6 +87,8 @@ Route::post('/subscribe', 'FrontendController@newsletterSubscription');
 Route::get('/thankyou', 'FrontendController@subscribeThankyou');
 Route::get('/search', 'FrontendController@getAutoCompleteData');
 
+Route::get('/testing', 'FrontendController@testing');
+
 Route::get('/policy_pages', 'FrontendController@pagesList');
 Route::get('/pages/{slug}', 'FrontendController@viewPage')->name('pages');
 
