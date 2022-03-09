@@ -396,7 +396,7 @@ class Newsletter
 
         $options = array_merge($defaultOptions, $options);
 
-        $campaign = $this->mailChimp->patch('/campaigns/e2b9050e31', $options);
+        $campaign = $this->mailChimp->patch('/campaigns/'.$campaign_id, $options);
     }
 
     public function campaignInfo($campaign_id){
