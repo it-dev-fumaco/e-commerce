@@ -202,7 +202,7 @@
 													$dt2 = \Carbon\Carbon::parse($order['order_date']);
 													$is_same_day = ($dt->isSameDay($dt2));
 												@endphp	
-												<button class="btn btn-danger table-text" data-toggle="modal" data-target="#cancel-order{{ $i }}-modal" {{ !$is_same_day ? 'disabled' : '' }} {{ ($order['status'] != "Order Placed") ? 'disabled' : '' }}>Cancel Order</button>
+												<button class="btn btn-secondary table-text" data-toggle="modal" data-target="#cancel-order{{ $i }}-modal" {{ !$is_same_day ? 'disabled' : '' }} {{ ($order['status'] != "Order Placed") ? 'disabled' : '' }}>Cancel Order</button>
 											</div>
 									  	</div>
 									</div>
