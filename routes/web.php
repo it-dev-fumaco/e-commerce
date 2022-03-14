@@ -161,6 +161,10 @@ Route::prefix('admin')->group(function () {
     Route::get('/logout', 'Admin\Auth\LoginController@logout');
 
     Route::group(['middleware' => 'auth:admin'], function(){
+        Route::get('/verify', 'DashboardController@verify');
+        Route::get('/resend_otp', 'DashboardController@resendOTP');
+        Route::post('/verify_otp', 'DashboardController@verifyOTP');
+
         Route::get('/dashboard', 'DashboardController@index');
         Route::get('/send_abandoned_cart_email/{transaction_id}', 'DashboardController@sendAbandonedCartEmail');
 

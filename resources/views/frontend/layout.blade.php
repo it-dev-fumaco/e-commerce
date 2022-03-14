@@ -612,7 +612,6 @@
           url:'/website_settings',
           success: function (response) {
             $('#navbar-brand').attr('href', response.set_value);
-            // $('title').text(response.set_sitename);
           }
         });
       }

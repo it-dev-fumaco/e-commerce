@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Auth;
@@ -12,6 +13,54 @@ use DateTime;
 
 class DashboardController extends Controller
 {
+	public function verify(){
+		$user_id = Auth::user()->id;
+		return view('auth.verify_otp', compact('user_id'));
+	}
+
+	public function resendOTP(){
+		$otp = rand(111111, 999999);
+		$api = DB::table('api_setup')->where('type', 'sms_gateway_api')->first();
+		$phone = Auth::user()->mobile_number[0] == '0' ? '63'.substr(Auth::user()->mobile_number, 1) : Auth::user()->mobile_number;
+
+		$sms = Http::asForm()->withHeaders([
+			'Accept' => 'application/json',
+			'Content-Type' => 'application/x-www-form-urlencoded',
+		])->post($api->base_url, [
+			'api_key' => $api->api_key,
+			'api_secret' => $api->api_secret_key,
+			'from' => 'FUMACO',
+			'to' => preg_replace("/[^0-9]/", "", $phone),
+			'text' => 'TWO-FACTOR AUTHENTICATION: Your One-Time PIN is '.$otp.' to login in Fumaco Website, valid only within 10 mins. For any help, please contact us at it@fumaco.com'
+		]);
+
+		$details = [
+			'otp' => $otp,
+			'otp_time_sent' => Carbon::now()
+		];
+
+		DB::table('fumaco_admin_user')->where('id', Auth::user()->id)->update($details);
+		return response()->json(['status' => 1]);
+	}
+
+	public function verifyOTP(Request $request){
+        if($request->otp != Auth::user()->otp){
+            return redirect()->back()->with('error', 'OTP is incorrect and/or expired.');
+        }
+
+        $time_sent = Carbon::parse(Auth::user()->otp_time_sent);
+        $now = Carbon::now()->toDateTimeString();
+
+        $expiration_check = $time_sent->diffInMinutes($now);
+
+        if($expiration_check > 10){
+            return redirect()->back()->with('error', 'OTP is incorrect and/or expired.');
+        }
+
+		DB::table('fumaco_admin_user')->where('id', Auth::user()->id)->update(['otp_status' => 1, 'last_login' => Carbon::now(), 'last_login_ip' => $request->ip()]);
+		return redirect('/admin/dashboard');
+	}
+	
 	public function index(Request $request) {
 		$users = DB::table('fumaco_users')->where('is_email_verified', 1)->count();
 
