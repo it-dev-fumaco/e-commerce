@@ -23,7 +23,7 @@ class UserManagementController extends Controller
         DB::beginTransaction();
         try {
             $acc_name = ($request->account_name) ? $request->account_name : ' ';
-            DB::table('fumaco_admin_user')->where('username', $request->username)->update(['account_name' => $acc_name, 'user_type' => $request->user_type, 'last_modified_by' => Auth::user()->username]); 
+            DB::table('fumaco_admin_user')->where('username', $request->username)->update(['account_name' => $acc_name, 'user_type' => $request->user_type, 'mobile_number' => $request->mobile_number, 'last_modified_by' => Auth::user()->username]);
             DB::commit();
             return redirect()->back()->with('success', 'Admin Information Edited.');
         } catch (Exception $e) {

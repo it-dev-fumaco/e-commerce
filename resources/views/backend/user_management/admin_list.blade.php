@@ -119,12 +119,16 @@
                                                                                     <option value="Sales Admin" {{ ($a->user_type == "Sales Admin" ) ? 'selected' : '' }}>Sales Admin</option>
                                                                                     <option value="Marketing Admin" {{ ($a->user_type == "Marketing Admin" ) ? 'selected' : '' }}>Marketing Admin</option>
                                                                                 </select>
-                                                                            </div>  
+                                                                            </div>
+                                                                            <div class="form-group">
+                                                                                <label for="name">Mobile Number (Two-Factor Authentication)</label>
+                                                                                <input class="form-control" type="text" name="mobile_number" value="{{ $a->mobile_number }}">
+                                                                            </div>
                                                                             <div class="float-right font-italic">
                                                                                 <small>Last modified by: {{ ($a) ? $a->last_modified_by . ' - ' . $a->last_modified_at : '' }}</small>
                                                                             </div>                                                                  
                                                                         </div>
-                                                                        <div class="modal-footer">
+                                                                        <div class="modal-footer container-fluid">
                                                                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                                                                             <button type="submit" class="btn btn-primary">Save changes</button>
                                                                         </div>
