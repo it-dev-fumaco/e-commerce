@@ -34,7 +34,7 @@
     <link href="{{ asset('/assets/fumaco.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css">
     {{-- <link rel="stylesheet" href="https://resources/demos/style.css"> --}}
-    <link rel="stylesheet" type="text/css" href="{{ asset('/page_css/layout.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ asset('/page_css/layout.min.css') }}">
     @yield('style')
 
     @if ($activePage != 'error_page')

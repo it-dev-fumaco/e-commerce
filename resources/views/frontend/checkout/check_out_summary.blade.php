@@ -1,5 +1,5 @@
 @extends('frontend.layout', [
-	'namePage' => 'Checkout - Customer Form',
+	'namePage' => 'Checkout - Fumaco',
 	'activePage' => 'checkout_customer_form'
 ])
 
@@ -31,322 +31,288 @@
 		</nav>
 	</main>
 
+	@php
+		$shipping_fname = $shipping_details['fname'];
+		$shipping_lname = $shipping_details['lname'];
+		$shipping_address1 = $shipping_details['address_line1'];
+		$shipping_address2 = $shipping_details['address_line2'];
+		$shipping_province = $shipping_details['province'];
+		$shipping_city = $shipping_details['city'];
+		$shipping_brgy = $shipping_details['brgy'];
+		$shipping_postal = $shipping_details['postal_code'];
+		$shipping_country = $shipping_details['country'];
+		$shipping_address_type = $shipping_details['address_type'];
+		$shipping_mobile = $shipping_details['mobile_no'];
+		$shipping_email = $shipping_details['email_address'];
+		$shipping_business_name = $shipping_details['business_name'];
+		$shipping_tin = $shipping_details['tin'];
+
+		if($shipping_details['same_as_billing'] == 1){
+			$checkbox = 'd-block';
+			$col = "12";
+			$ship_text = " & Billing";
+		}else{
+			$checkbox = "d-none1";
+			$col = "6";
+			$ship_text = '';
+		}
+	@endphp
 	<main style="background-color:#ffffff;" class="products-head">
-		<div class="container marketing">
-		  	<br>
+		<div class="container-fluid p-0 mb-5">
 			<div class="row">
-			</div>
-		</div>
-
-		<div class="container-fluid">
-			<div class="row">
-				@if(session()->has('success'))
-					<div class="row">
-						<div class="col-md-12">
-							<div class="alert alert-success alert-dismissible fade show text-center" role="alert">
-								{!! session()->get('success') !!}
-							</div>
-						</div>
-					</div>
-				@endif
-				@if(session()->has('error'))
-					<div class="row">
-						<div class="col-md-12">
-							<div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
-								{!! session()->get('error') !!}
-							</div>
-						</div>
-					</div>
-				@endif
-				<div class="col-md-12 col-lg-8 mx-auto">
-					<div class="card" style="background-color: #f4f4f4 !important; border-radius: 0rem !important;">
-						@php
-							$shipping_fname = $shipping_details['fname'];
-							$shipping_lname = $shipping_details['lname'];
-							$shipping_address1 = $shipping_details['address_line1'];
-							$shipping_address2 = $shipping_details['address_line2'];
-							$shipping_province = $shipping_details['province'];
-							$shipping_city = $shipping_details['city'];
-							$shipping_brgy = $shipping_details['brgy'];
-							$shipping_postal = $shipping_details['postal_code'];
-							$shipping_country = $shipping_details['country'];
-							$shipping_address_type = $shipping_details['address_type'];
-							$shipping_mobile = $shipping_details['mobile_no'];
-							$shipping_email = $shipping_details['email_address'];
-							$shipping_business_name = $shipping_details['business_name'];
-							$shipping_tin = $shipping_details['tin'];
-
-							if($shipping_details['same_as_billing'] == 1){
-								$checkbox = 'd-block';
-								$col = "12";
-								$ship_text = " & Billing";
-							}else{
-								$checkbox = "d-none";
-								$col = "6";
-								$ship_text = '';
-							}
-						@endphp
-						<div class="card-body he1x" style="padding-bottom: 0px !important; font-size:1rem !important;" >
-							<strong>Your Order No : <span id="order-no">{{ $order_no }}</span></strong>
-						</div>
-						<div class="card-body he1x" style="padding-bottom: 0px !important;">
-							Customer Name :  {{ (Auth::check()) ? Auth::user()->f_name . " " . Auth::user()->f_lname : $shipping_fname." ".$shipping_lname }}
-						</div>
-						<div class="card-body he1x" style="padding-bottom: 0px !important;">Email Address :  {{ (Auth::check()) ? Auth::user()->username : $shipping_email }}
-							<div class="card-body he1x" style="padding-bottom: 0px !important;">
-								<div class="accordion" id="accordionExample">
-									<div class="row">
-										<div class="col-md-12 col-lg-{{ $col }} d-flex align-items-stretch">
-											<div class="card" style="width: 100%;">
-												<div class="card-header" id="headingOne">
-													<h2 class="mb-0">
-														<div class="row">
-															<div class="col-md-6 col-lg-12 col-xl-6">
-																<button class="btn btn-link he1x" type="button" data-toggle="collapse" data-target="" aria-expanded="true" aria-controls="collapseOne" style="text-decoration: none; color:#2c2c2d;">
-																	<b>Shipping{{ $ship_text }} Address</b>
-																</button>
-															</div>
-															<div class="col-md-6 col-lg-12 col-xl-6" style="text-align: right;">
-																@if (Auth::check())
-																	<a href="#" style="font-size: 14px; width:100%; text-decoration: none;" role="button" data-toggle="modal" data-target="#selectShippingModal">UPDATE YOUR ADDRESS</a>
-																@endif
-															</div>
-														</div>
-													</h2>
-												</div>
-
-												<div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample">
-													<div class="card-body" style="padding: 10px !important">
-                                                        <div class="card-body he1x" style="padding-bottom: 0px !important;"><b>{{ $shipping_address_type }}</b></div>
-														@if($shipping_details['address_type'] == 'Business Address' )
-															<div class="card-body he1x" style="padding-bottom: 0px !important;">
-																Business Name : {{ $shipping_business_name }}<br/>
-																TIN : {{ $shipping_tin }}
-															</div>
-														@endif
-														<div class="card-body he1x" style="padding-bottom: 0px !important;">Contact Person :  {{ $shipping_fname. " " .$shipping_lname }}</div>
-														<div class="card-body he1x" style="padding-bottom: 0px !important;">
-															{{ $shipping_address1." ".$shipping_address2.", ".$shipping_brgy.", ".$shipping_city.", ".$shipping_province.", ".$shipping_country." ".$shipping_postal }}
-														</div>
-														<div class="card-body he1x" style="padding-bottom: 0px !important;">Contact Number :  {{ $shipping_mobile }}<br/>&nbsp;</div>
-
-														<div class="form-check {{ $checkbox }} ">
-															<input class="form-check-input" type="checkbox"  checked disabled>
-															<label class="form-check-label" class="formslabelfnt">Billing address is the same as above</label>
-														</div>
-													</div>
-												</div>
-											</div>
-										</div>
-										@if ($shipping_details['same_as_billing'] == 0)
-											
-											<div class="col-12 d-block d-md-none"><br/></div>
-											<div class="col-md-12 col-lg-6 d-flex align-items-stretch">
-												<div class="card" style="width: 100%">
-													<div class="card-header" id="headingOne1">
-														<h2 class="mb-0">
-															<div class="row">
-																<div class="col-md-6 col-lg-12 col-xl-6">
-																	<button class="btn btn-link he1x" type="button" data-toggle="collapse" data-target="" aria-expanded="true" aria-controls="collapseOne" style="text-decoration: none; color:#2c2c2d;">
-																		<b>Billing Address</b>
-																	</button>
-																</div>
-																<div class="col-md-6 col-lg-12 col-xl-6" style="text-align: right;">
-																	@if (Auth::check())
-																		<a href="#" style="font-size: 14px; width:100%; text-decoration: none;" role="button"  data-toggle="modal" data-target="#selectBillingModal">UPDATE YOUR ADDRESS</a>
-																	@endif
-																</div>
-															</div>
-														</h2>
-													</div>
-
-													<div id="collapseOne1" class="collapse show" aria-labelledby="headingOne1" data-parent="#accordionExample">
-														<div class="card-body">
-															<div class="card-body he1x" style="padding-bottom: 0px !important;"><b>{{ $billing_details['address_type'] }}</b></div>
-															@if($billing_details['address_type'] == 'Business Address' )
-																<div class="card-body he1x" style="padding-bottom: 0px !important;">
-																	Business Name: {{ $billing_details['business_name'] }}<br/>
-																	{{ $billing_details['tin'] }}
-																</div>
-															@endif
-															<div class="card-body he1x" style="padding-bottom: 0px !important;">Contact Person :  {{ $billing_details['fname'] . ' ' . $billing_details['lname'] }}</div>
-															<div class="card-body he1x" style="padding-bottom: 0px !important;">
-																{{ $billing_details['address_line1']." ".$billing_details['address_line2'].", ".$billing_details['brgy'].", ".$billing_details['city'].", ".$billing_details['province'].", ".$billing_details['country']." ".$billing_details['postal_code'] }}
-															</div>
-
-															<div class="card-body he1x" style="padding-bottom: 0px !important;">Contact Number :  {{ $billing_details['mobile_no'] }}<br/>&nbsp;</div>
-														</div>
-													</div>
-												</div>
-											</div>
+				<div class="col-md-4">
+					<div class="card he1x" style="background-color: #f4f4f4 !important; padding-bottom: 11px; min-height: 600px;">
+						<p style="margin: 15px 0 0 20px;"><strong>Your Order No.: <span id="order-no">{{ $order_no }}</span></strong></p>
+						<p style="margin: 15px 0 0 20px;">Customer Name: {{ (Auth::check()) ? Auth::user()->f_name . " " . Auth::user()->f_lname : $shipping_fname." ".$shipping_lname }}</p>
+						<p style="margin: 15px 0 0 20px;">Email Address: {{ (Auth::check()) ? Auth::user()->username : $shipping_email }}</p>
+						<br>
+						<div class="card m-2">
+							<div class="card-header">
+								<div class="d-flex justify-content-between">
+									<div class="p-0"><b>Shipping{{ $ship_text }} Address</b></div>
+									<div class="p-0">
+										@if (Auth::check())
+										<a href="#" style="font-size: 14px; width:100%; text-decoration: none;" role="button" data-toggle="modal" data-target="#selectShippingModal">Edit Address</a>
 										@endif
 									</div>
-									<br/>
+								</div>
+							</div>
+							<div class="card-body">
+								<div class="he1x" style="margin-bottom: 10px !important;"><b>{{ $shipping_address_type }}</b></div>
+								@if($shipping_details['address_type'] == 'Business Address' )
+									<div class="he1x" style="margin-bottom: 10px !important;">
+										Business Name: {{ $shipping_business_name }}<br/>
+										TIN: {{ $shipping_tin }}
+									</div>
+								@endif
+								<div class="he1x" style="margin-bottom: 10px !important;">Contact Person :  {{ $shipping_fname. " " .$shipping_lname }}</div>
+								<div class="he1x" style="margin-bottom: 10px !important;">
+									{{ $shipping_address1." ".$shipping_address2.", ".$shipping_brgy.", ".$shipping_city.", ".$shipping_province.", ".$shipping_country." ".$shipping_postal }}
+								</div>
+								<div class="he1x" style="margin-bottom: 5px !important;">Contact Number :  {{ $shipping_mobile }}</div>
+								<br>
+								<div class="form-check {{ $checkbox }}">
+									<input class="form-check-input" type="checkbox" {{ $shipping_details['same_as_billing'] ? 'checked' : '' }} id="same-as-billing-cb">
+									<label class="form-check-label" class="formslabelfnt" for="same-as-billing-cb">Billing address is the same as above</label>
 								</div>
 							</div>
 						</div>
 
-					</div><br/>
+						@if ($shipping_details['same_as_billing'] == 0)
+						<div class="card m-2">
+							<div class="card-header">
+								<div class="d-flex justify-content-between">
+									<div class="p-0">	<b>Billing Address</b></div>
+									<div class="p-0">
+										@if (Auth::check())
+										<a href="#" style="font-size: 14px; width:100%; text-decoration: none;" role="button"  data-toggle="modal" data-target="#selectBillingModal">Edit Address</a>
+										@endif
+									</div>
+								</div>
+							</div>
+							<div class="card-body">
+								<div class="he1x" style="margin-bottom: 10px !important;"><b>{{ $shipping_address_type }}</b></div>
+								@if($billing_details['address_type'] == 'Business Address' )
+									<div class="he1x" style="margin-bottom: 10px !important;">
+										Business Name: {{ $billing_details['business_name'] }}<br/>
+										TIN: {{ $billing_details['tin'] }}
+									</div>
+								@endif
+								<div class="he1x" style="margin-bottom: 10px !important;">Contact Person :  {{ $billing_details['fname'] . ' ' . $billing_details['lname'] }}</div>
+								<div class="he1x" style="margin-bottom: 10px !important;">
+									{{ $billing_details['address_line1']." ".$billing_details['address_line2'].", ".$billing_details['brgy'].", ".$billing_details['city'].", ".$billing_details['province'].", ".$billing_details['country']." ".$billing_details['postal_code'] }}
+								</div>
+								<div class="he1x" style="margin-bottom: 5px !important;">Contact Number :  {{ $billing_details['mobile_no'] }}</div>
+							</div>
+						</div>
+						@endif
+					</div>
 				</div>
-				<div class="col-md-12 col-lg-4 mx-auto">
-					<div class="card" style="background-color: #f4f4f4 !important; border-radius: 0rem !important;">
-						<div class="card-body he1x" style="padding-bottom: 0px !important;">Order Summary<hr></div>
-						
-						  <div class="m-2">
-							<div id="item-preloader" style="display: none;">
-								<div class="spinner-border" role="status">
-									<span class="sr-only">Loading...</span>
-								  </div>
-							  </div>
-						<table class="table mb-0" id="cart-items">
-							<thead>
-							<tr style="font-size: 0.8rem !important;">
-								<th class="text-center" colspan="2" style="width: 70%">Product Description</th>
-								<th class="text-center" style="width: 13%">Qty</th>
-								<th class="text-center" style="width: 17%">Amount</th>
-							</tr>
-							</thead>
-							<tbody style="font-size: 0.8rem !important;">
-								@foreach ($cart_arr as $cart)
-									<tr>
-										<td class="col-md-2" style="width: 10%">
-											<center>
-												<img src="{{ asset('/storage/item_images/'.$cart['item_code'].'/gallery/preview/'.$cart['item_image']) }}" class="img-responsive" alt="{{ Str::slug(explode(".", $cart['item_image'])[0], '-') }}" width="55" height="55">
-											</center>
-										</td>
-										<td>
-											<span class="d-block">{!! $cart['item_description'] !!}</span>
-											<span id="voucherApp{{ $cart['item_code'] }}" class="text-white d-none voucher-item-code" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833;">Discount Applied</span>
-										</td>
-										<td style="text-align: center;">{{ $cart['quantity'] }}</td>
-										<td class="col-md-2" style="text-align: right;">
-											<span class="d-block" id="{{ $cart['item_code'] }}" style="white-space: nowrap !important">₱ {{ number_format($cart['subtotal'], 2, '.', ',') }}</span>
-											<span class="amount d-none">{{ $cart['subtotal'] }}</span>
-										</td>
-									</tr>
-								@endforeach
-							</tbody>
-						</table>
+				
+				<div class="col-md-4">
+					<div class="card he1x" style="background-color: #f4f4f4 !important; padding-bottom: 11px; min-height: 600px;">
+						<p style="padding: 15px 0 0 20px;">Order Summary</p>
+						<hr style="margin: -10px 20px 0 20px;">
+						<div class="card-body" style="padding-top: 5px; margin-left: 5px; margin-right: 5px;">
+							<div class="m-0">
+								<div id="item-preloader" style="display: none;">
+									<div class="spinner-border" role="status">
+										<span class="sr-only">Loading...</span>
+									</div>
+								</div>
+								<table class="table" id="cart-items" style="border-color: #8c8c8cd0 !important;">
+									<thead style="border-bottom: 1px solid #8c8c8cd0 !important;">
+										<tr style="font-size: 0.8rem !important;">
+											<th class="text-left" colspan="2" style="width: 70%">Product Description</th>
+											<th class="text-center" style="width: 13%">Qty</th>
+											<th class="text-center" style="width: 17%">Amount</th>
+										</tr>
+									</thead>
+									<tbody style="font-size: 0.8rem !important;">
+										@foreach ($cart_arr as $cart)
+										<tr>
+											<td class="col-md-2" style="width: 10%">
+												<center>
+													<img src="{{ asset('/storage/item_images/'.$cart['item_code'].'/gallery/preview/'.$cart['item_image']) }}" class="img-responsive" alt="{{ Str::slug(explode(".", $cart['item_image'])[0], '-') }}" width="55" height="55">
+												</center>
+											</td>
+											<td>
+												<span class="d-block">{!! $cart['item_description'] !!}</span>
+												<span id="voucherApp{{ $cart['item_code'] }}" class="text-white d-none voucher-item-code" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833;">Discount Applied</span>
+											</td>
+											<td style="text-align: center;">{{ $cart['quantity'] }}</td>
+											<td class="col-md-2" style="text-align: right;">
+												<span class="d-block" id="{{ $cart['item_code'] }}" style="white-space: nowrap !important">₱ {{ number_format($cart['subtotal'], 2, '.', ',') }}</span>
+												<span class="amount d-none">{{ $cart['subtotal'] }}</span>
+											</td>
+										</tr>
+										@endforeach
+									</tbody>
+								</table>
+							</div>
+							<div class="he1x">
+								<div class="d-flex justify-content-between align-items-center" style="padding: 5px 0 5px 5px; border-bottom: 1px solid #8c8c8cd0;">
+									Total Amount <small class="text-muted stylecap he1x">₱ {{ number_format(collect($cart_arr)->sum('subtotal'), 2, '.', ',') }}</small>
+								</div>
+								<div class="d-flex justify-content-between align-items-center d-none" id="discount-div">
+									<p class="m-0">Discount <span id="voucher-code" class="text-white d-none" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833;">Voucher Applied</span></p>
+									<small class="text-danger stylecap he1x">- ₱ <span id="discount-amount">0.00</span></small>
+								</div>
+								<div class="d-flex justify-content-between align-items-center" style="padding: 5px 0 5px 5px; border-bottom: 1px solid #8c8c8cd0;">
+									Subtotal <small class="text-muted stylecap he1x" id="cart-subtotal">₱ {{ number_format(collect($cart_arr)->sum('subtotal'), 2, '.', ',') }}</small>
+								</div>
+							</div>
+							<div class="he1x pt-0">
+								<div class="alert alert-danger fade show mb-0 d-none" id="coupon-alert" role="alert" style="border: 1px solid;"></div>
+								<label for="coupon-code" class="m-2 mb-0">Coupon</label>
+								<div class="d-flex flex-row">
+									<div class="p-2 col-md-10 col-lg-7 col-xl-10">
+										<input type="text" id="coupon-code" class="form-control" placeholder="Enter Coupon Code" aria-label="Enter Coupon Code" aria-describedby="basic-addon2">
+									</div>
+									<div class="p-2 col-md-2 col-lg-5 col-xl-2">
+										<button class="btn w-100 btn-outline-success" type="button" id="apply-coupon-btn">Apply</button></div>
+									  </div>
+								  <hr>
+								<div class="d-flex justify-content-between align-items-center" style="color:#FF9D00 !important;">Grand Total <small class="stylecap he1x" id="grand-total">0.00</small>
+								</div>
+							</div>
+						</div>						
+					</div>
+				</div>
+
+				<div class="col-md-4">
+					<div class="card he1x" style="background-color: #f4f4f4 !important; padding-bottom: 11px;">
+						<p style="padding: 15px 0 0 20px;">Select Shipping Method</p>
+						<hr style="margin: -10px 20px 0 20px;">
+						<div class="card-body">
+							<div class="he1x" id="ship_blk" style="padding-top: 0px !important; padding-bottom: 0px !important;">
+								<div class="alert alert-warning alert-dismissible fade show text-center m-1 p-3 d-none" role="alert" id="alert-box"></div>
+								<div id="voucher-free" class="d-none"></div>
+								@php
+									$sd_exists = false;
+									if (in_array('Standard Delivery', array_column($shipping_rates, 'shipping_service_name'))) {
+										$sd_exists = true;
+									}
+								@endphp
+								@forelse ($shipping_rates as $l => $srate)
+								@php
+									if ($sd_exists) {
+										$defaul_selected = ($srate['shipping_service_name'] == 'Standard Delivery') ? 'checked' : '';
+									} else {
+										$defaul_selected = ($loop->first) ? 'checked' : '';
+									}
+								@endphp
+								<div class="d-flex justify-content-between" style="padding: 0 15px 0 15px;">
+									<div class="form-check">
+										<input class="form-check-input" type="radio" name="shipping_fee" id="{{ 'sr' . $l }}" value="{{ $srate['shipping_cost'] }}" data-sname="{{ $srate['shipping_service_name'] }}" data-est="{{ $srate['expected_delivery_date'] }}" data-pickup="{{ $srate['pickup'] }}" required {{ $defaul_selected }} data-lead="{{ $srate['max_lead_time'] }}">
+										<label class="form-check-label" for="{{ 'sr' . $l }}">{{ $srate['shipping_service_name'] }} <br class="d-xl-none"/>
+											@if (count($srate['stores']) <= 0)<small class="fst-italic">({{ $srate['min_lead_time'] . " - ". $srate['max_lead_time'] . " Days" }})</small>@endif</label>
+									</div>
+									<small class="text-muted stylecap he1x" style="white-space: nowrap !important">₱ {{ number_format($srate['shipping_cost'], 2, '.', ',') }}</small>
+								</div>
+								@if (count($srate['stores']) > 0)
+								<div class="row d-none" id="for-store-pickup">
+									<div class="col-md-6 offset-md-3">
+										<div class="form-group">
+											<label for="store-selection">Select Store *</label>
+											<select id="store-selection" class="form-control no-click-outline formslabelfnt" style="text-align: center;">
+												<option value="">Select Store</option>
+												@foreach ($srate['stores'] as $store)
+												<option value="{{ $store->store_name }}" data-address="{{ $store->address }}" data-available-time="Available Time: <br>{{ date("h:i A", strtotime($store->available_from)) . ' - ' . date("h:i A", strtotime($store->available_to)) }}" data-start="{{ $store->available_from }}" data-end="{{ $store->available_to }}" data-leadtime="{{ $store->allowance_in_hours }}">{{ $store->store_name }}</option>
+												@endforeach
+											</select>
+											<div class="m-1 text-left" id="store-address"></div>
+											<div class="m-1 text-left" id="available-time"></div>
+										</div>
+									</div>
+									<div class="col-md-6 offset-md-3 bootstrap-timepicker">
+										<div class="form-group">
+											<label for="pickup-time">Pickup by</label>
+											<input type="text" class="form-control no-click-outline" id="pickup-time" style="text-align: center;" placeholder="Choose a date">
+										</div>
+									</div>
+									<div class="col-md-6 offset-md-3">
+										<div class="form-group">
+											<label for="pickup-timeslot">Pickup Time</label>
+											<select class="form-control no-click-outline" style="text-align: center;" id="pickup-timeslot">
+												<option value="">Please select store</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								@endif
+								@empty
+									<h6 class="text-center">No available shipping methods.</h6>
+								@endforelse
+								<hr style="margin-right: 5px; margin-left: 5px;">
+								<p class="d-none" id="est-div" style="font-size: 0.8rem; font-style: italic;">Estimated Delivery Date: <b><span id="estimated-delivery-date"></span></b></p>
+							</div>
+						</div>
+						<p style="padding: 0 0 0 20px;">Select Payment Method</p>
+						<hr style="margin: -10px 20px 0 20px;">
+						<div class="card-body">
+							<div class="he1x" id="ship_blk" style="padding-top: 0px !important; padding-bottom: 0px !important;">
+								<div class="d-flex justify-content-between" style="padding: 0 15px 0 15px;">
+									<div class="form-check">
+										<input class="form-check-input" type="radio" name="payment_method" value="CC" id="credit-card" data-ib="">
+										<label class="form-check-label" for="credit-card">Visa / Master Card</label>
+									</div>
+								</div>
+								<div class="d-flex justify-content-between" style="padding: 0 15px 0 15px;">
+									<div class="form-check">
+										<input class="form-check-input" type="radio" name="payment_method" value="WA" id="gcash" data-ib="GCash3">
+										<label class="form-check-label" for="gcash">GCash</label>
+									</div>
+								</div>
+								<div class="d-flex justify-content-between" style="padding: 0 15px 0 15px;">
+									<div class="form-check">
+										<input class="form-check-input" type="radio" name="payment_method" value="WA" id="grabpay" data-ib="GrabPayPH">
+										<label class="form-check-label" for="grabpay">GrabPay</label>
+									</div>
+								</div>
+								<hr style="margin-right: 5px; margin-left: 5px;">
+								<p class="d-none" id="est-div" style="font-size: 0.8rem; font-style: italic;">Estimated Delivery Date: <b><span id="estimated-delivery-date"></span></b></p>
+							</div>
+						</div>		
 					</div>
 
-						<div class="card-body he1x" style="padding-top: 0px !important; padding-bottom: 0px !important;">
-							<div class="d-flex justify-content-between align-items-center">
-								Total Amount <small class="text-muted stylecap he1x">₱ {{ number_format(collect($cart_arr)->sum('subtotal'), 2, '.', ',') }}</small>
-							</div>
-							<div class="d-flex justify-content-between align-items-center d-none" id="discount-div">
-								<p class="m-0">Discount <span id="voucher-code" class="text-white d-none" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833;">Voucher Applied</span></p>
-								 <small class="text-danger stylecap he1x">- ₱ <span id="discount-amount">0.00</span></small>
-							</div>
-							<hr class="mt-2 mb-2">
-							<div class="d-flex justify-content-between align-items-center">
-								Subtotal <small class="text-muted stylecap he1x" id="cart-subtotal">₱ {{ number_format(collect($cart_arr)->sum('subtotal'), 2, '.', ',') }}</small>
-							</div>
-							<hr class="mt-2">
-						</div>
-						<div class="card-body he1x" id="ship_blk" style="padding-top: 0px !important; padding-bottom: 0px !important;">Select Shipping Method
-							<div class="alert alert-warning alert-dismissible fade show text-center m-1 p-3 d-none" role="alert" id="alert-box"></div>
-							<div class="form-check">
-								<label class="form-check-label" for="shipradio">&nbsp;</label>
-							</div>
-							<div id="voucher-free" class="d-none"></div>
-							@php
-								$sd_exists = false;
-								if (in_array('Standard Delivery', array_column($shipping_rates, 'shipping_service_name'))) {
-									$sd_exists = true;
-								}
-							@endphp
-							@forelse ($shipping_rates as $l => $srate)
-							@php
-								if ($sd_exists) {
-									$defaul_selected = ($srate['shipping_service_name'] == 'Standard Delivery') ? 'checked' : '';
-								} else {
-									$defaul_selected = ($loop->first) ? 'checked' : '';
-								}
-							@endphp
-							<div class="d-flex justify-content-between align-items-center">
-								<div class="form-check">
-									<input class="form-check-input" type="radio" name="shipping_fee" id="{{ 'sr' . $l }}" value="{{ $srate['shipping_cost'] }}" data-sname="{{ $srate['shipping_service_name'] }}" data-est="{{ $srate['expected_delivery_date'] }}" data-pickup="{{ $srate['pickup'] }}" required {{ $defaul_selected }} data-lead="{{ $srate['max_lead_time'] }}">
-									<label class="form-check-label" for="{{ 'sr' . $l }}">{{ $srate['shipping_service_name'] }} <br class="d-xl-none"/>
-										@if (count($srate['stores']) <= 0)<small class="fst-italic">({{ $srate['min_lead_time'] . " - ". $srate['max_lead_time'] . " Days" }})</small>@endif</label>
-								</div>
-								<small class="text-muted stylecap he1x" style="white-space: nowrap !important">₱ {{ number_format($srate['shipping_cost'], 2, '.', ',') }}</small>
-							</div>
-							@if (count($srate['stores']) > 0)
-							<div class="row d-none" id="for-store-pickup">
-								<div class="col-md-6 offset-md-3">
-									<div class="form-group">
-										<label for="store-selection">Select Store *</label>
-										<select id="store-selection" class="form-control no-click-outline formslabelfnt" style="text-align: center;">
-											<option value="">Select Store</option>
-											@foreach ($srate['stores'] as $store)
-											<option value="{{ $store->store_name }}" data-address="{{ $store->address }}" data-available-time="Available Time: <br>{{ date("h:i A", strtotime($store->available_from)) . ' - ' . date("h:i A", strtotime($store->available_to)) }}" data-start="{{ $store->available_from }}" data-end="{{ $store->available_to }}" data-leadtime="{{ $store->allowance_in_hours }}">{{ $store->store_name }}</option>
-											@endforeach
-										</select>
-										<div class="m-1 text-left" id="store-address"></div>
-										<div class="m-1 text-left" id="available-time"></div>
-									</div>
-								</div>
-								<div class="col-md-6 offset-md-3 bootstrap-timepicker">
-									<div class="form-group">
-										<label for="pickup-time">Pickup by</label>
-										<input type="text" class="form-control no-click-outline" id="pickup-time" style="text-align: center;" placeholder="Choose a date">
-									</div>
-								</div>
-								<div class="col-md-6 offset-md-3">
-									<div class="form-group">
-										<label for="pickup-timeslot">Pickup Time</label>
-										<select class="form-control no-click-outline" style="text-align: center;" id="pickup-timeslot">
-											<option value="">Please select store</option>
-										</select>
-									</div>
-								</div>
-							</div>
-							@endif
-							@empty
-								<h6>No available shipping methods.</h6>
-							@endforelse
-							<hr>
-							<p class="d-none" id="est-div" style="font-size: 0.8rem; font-style: italic;">Estimated Delivery Date: <b><span id="estimated-delivery-date"></span></b></p>
-						</div>
-						<div class="card-body he1x pt-0">
-							<div class="alert alert-danger fade show mb-0 d-none" id="coupon-alert" role="alert" style="border: 1px solid;"></div>
-							<label for="coupon-code" class="m-2 mb-0">Coupon</label>
-							<div class="d-flex flex-row">
-								<div class="p-2 col-md-10 col-lg-7 col-xl-10">
-									<input type="text" id="coupon-code" class="form-control" placeholder="Enter Coupon Code" aria-label="Enter Coupon Code" aria-describedby="basic-addon2">
-								</div>
-								<div class="p-2 col-md-2 col-lg-5 col-xl-2">
-									<button class="btn w-100 btn-outline-success" type="button" id="apply-coupon-btn">Apply</button></div>
-							  	</div>
-							  <hr>
-							<div class="d-flex justify-content-between align-items-center" style="color:#FF9D00 !important;">Grand Total <small class="stylecap he1x" id="grand-total">0.00</small>
+					<div class="row m-4">
+						<div class="col-md-10 mx-auto">
+							<div class="card">
+									<div id="payment-form" class="d-none"></div>
+									<button class="btn btn-lg btn-outline-primary" id="checkout-btn" style="border: 0;" {{ (count($shipping_rates) <= 0) ? 'disabled' : '' }}>PAY NOW</button>
 							</div>
 						</div>
+						{{-- <div class="col-md-10 mx-auto mt-4">
+								<a href="javascript:history.back()" class="btn btn-lg btn-outline-secondary text-white" id="checkout-btn" style="background-color: #777575 !important; border-color: #777575 !important; width: 100%; border-radius: 0;">BACK</a>
+						</div> --}}
 					</div>
-				</div>
-			</div>
-			<br/>
-			<div class="row mb-4">
-				<div class="col-md-8 mx-auto">
-					<div class="col-md-4 d-none d-md-block d-xl-block">
-						<a href="javascript:history.back()" class="btn btn-lg btn-outline-primary" role="button" style="background-color: #777575 !important; border-color: #777575 !important; float: left; width: 94%;">BACK</a>
-					</div>
-				</div>
-				<div class="col-md-4 mx-auto">
-					<div class="card">
-							<div id="payment-form" class="d-none"></div>
-							<button class="btn btn-lg btn-outline-primary" id="checkout-btn" style="float: right;" {{ (count($shipping_rates) <= 0) ? 'disabled' : '' }}>PROCEED</button>
-					</div>
-				</div><br/>&nbsp;
-				<div class="col-md-4 d-md-none d-lg-none d-xl-none">
-					<a href="javascript:history.back()" class="btn btn-lg btn-outline-primary" role="button" style="background-color: #777575 !important; border-color: #777575 !important; float: left; width: 100%;">BACK</a>
 				</div>
 			</div>
 		</div>
 	</main>
 
 	{{-- Select Default Address --}}
-
 	<div class="modal fade" id="selectShippingModal" tabindex="-1" role="dialog" aria-labelledby="selectShippingModal" aria-hidden="true">
 		<div class="modal-dialog modal-xl" role="document">
 			<div class="modal-content">
@@ -728,7 +694,6 @@
 			</div>
 		</div>
 	</div>
-
 	{{-- Update Address Modal --}}
 
 	{{-- Add Address Modal --}}
@@ -1265,7 +1230,6 @@
 		function callback(data) {
 			if(data.status == 2) {
 				alert(data.message);
-				// window.location.href = '/';
 			} else if (data.status == 1) {
 				$('#payment-form').empty();
 				$.ajax({
@@ -1301,12 +1265,19 @@
 			var picktime = $('#pickup-time').val();
 			var timeslot = $('#pickup-timeslot').val();
 			var storeloc = $("#store-selection").val();
+
+			var pay_name = $("input[name='payment_method']:checked").val();
+			var ib = $("input[name='payment_method']:checked").data('ib');
 			
 			var data = {
-				estimated_del, s_name, s_amount, _token: '{{ csrf_token() }}', storeloc, picktime, timeslot
+				estimated_del, s_name, s_amount, _token: '{{ csrf_token() }}', storeloc, picktime, timeslot, pay_name, ib
 			}
 
-			if(ispick && (!storeloc || !picktime || !timeslot)) {
+			if (!s_name) {
+				$('#alert-box').removeClass('d-none').text('Please select shipping method.');
+			} else if (!pay_name) {
+				$('#alert-box').removeClass('d-none').text('Please select payment method.');
+			} else if(ispick && (!storeloc || !picktime || !timeslot)) {
 				$('#alert-box').removeClass('d-none').text('Please select store and pickup date & time');
 			} else {
 				$('#custom-overlay').fadeIn();

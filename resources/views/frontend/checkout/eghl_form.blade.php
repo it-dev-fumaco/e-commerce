@@ -20,7 +20,10 @@
 @endphp
 <form action="{{ $api->base_url }}" method="POST">
     <input name="TransactionType" value="SALE" type="hidden">
-    <input name="PymtMethod" value="ANY" type="hidden">
+    <input name="PymtMethod" value="{{ $temp->payment_method }}" type="hidden">
+    @if ($temp->issuing_bank)
+    <input name="IssuingBank" value="{{ $temp->issuing_bank }}" type="hidden">
+    @endif
     <input name="ServiceID" value="{{ $service_id }}" type="hidden">
     <input name="PaymentID" value="{{ $payment_id }}" type="hidden">
     <input name="OrderNumber" value="{{ $order_no }}" type="hidden">

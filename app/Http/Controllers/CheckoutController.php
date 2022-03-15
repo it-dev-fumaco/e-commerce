@@ -544,7 +544,9 @@ class CheckoutController extends Controller
 				'xstore_location' => ($request->s_name == 'Store Pickup') ? $request->storeloc : null,
 				'xpickup_date' => ($request->s_name == 'Store Pickup') ? Carbon::parse($request->picktime)->format('Y-m-d') : null,
 				'xpickup_time' => ($request->s_name == 'Store Pickup') ? $request->timeslot : null,
-				'voucher_code' => strtoupper($voucher_code)
+				'voucher_code' => strtoupper($voucher_code),
+				'payment_method' => $request->pay_name,
+				'issuing_bank' => $request->ib,
 			];
 
 			$existing_order_temp = DB::table('fumaco_temp')->where('order_tracker_code', $order_no)->first();
@@ -554,6 +556,8 @@ class CheckoutController extends Controller
 				DB::table('fumaco_temp')->where('id', $existing_order_temp->id)->update([
 					'shipping_name' => $request->s_name,
 					'shipping_amount' => $request->s_amount,
+					'payment_method' => $request->pay_name,
+					'issuing_bank' => $request->ib,
 					'estimated_delivery_date' => $request->estimated_del,
 					'xstore_location' => ($request->s_name == 'Store Pickup') ? $request->storeloc : null,
 					'xpickup_date' => ($request->s_name == 'Store Pickup') ? Carbon::parse($request->picktime)->format('Y-m-d') : null,
