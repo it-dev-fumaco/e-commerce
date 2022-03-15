@@ -276,22 +276,67 @@
 						<hr style="margin: -10px 20px 0 20px;">
 						<div class="card-body">
 							<div class="he1x" id="ship_blk" style="padding-top: 0px !important; padding-bottom: 0px !important;">
-								<div class="d-flex justify-content-between" style="padding: 0 15px 0 15px;">
-									<div class="form-check">
-										<input class="form-check-input" type="radio" name="payment_method" value="CC" id="credit-card" data-ib="">
-										<label class="form-check-label" for="credit-card">Visa / Master Card</label>
+								<div class="d-flex" style="padding: 0 15px 0 15px;">
+									<div class="form-check m-0">
+										<div class="d-flex flex-row align-items-center">
+											<div class="p-0">
+												<input class="form-check-input" type="radio" name="payment_method" value="CC" id="credit-card" data-ib="">
+											</div>
+											<div class="p-0 text-center" style="width: 80px;">
+												<label class="form-check-label" for="credit-card">
+													<picture>
+														<source srcset="{{ asset('/storage/payment_method/mastercard2.webp') }}" type="image/webp" style="width: 45px;">
+														<source srcset="{{ asset('/storage/payment_method/mastercard2.png') }}" type="image/jpeg" style="width: 45px;">
+														<img src="{{ asset('/storage/payment_method/mastercard2.png') }}" style="width: 45px;">
+													</picture>
+												</label>
+											</div>
+											<div class="p-0">
+												<label class="form-check-label" for="credit-card">Visa / Master Card</label>
+											</div>
+										</div>
 									</div>
 								</div>
-								<div class="d-flex justify-content-between" style="padding: 0 15px 0 15px;">
-									<div class="form-check">
-										<input class="form-check-input" type="radio" name="payment_method" value="WA" id="gcash" data-ib="GCash3">
-										<label class="form-check-label" for="gcash">GCash</label>
+								<div class="d-flex" style="padding: 0 15px 0 15px;">
+									<div class="form-check m-0">
+										<div class="d-flex flex-row align-items-center">
+											<div class="p-0">
+												<input class="form-check-input" type="radio" name="payment_method" value="WA" id="gcash" data-ib="GCash3">
+											</div>
+											<div class="p-0 text-center" style="width: 80px;">
+												<label class="form-check-label" for="gcash">
+													<picture>
+														<source srcset="{{ asset('/storage/payment_method/gcash2.webp') }}" type="image/webp" style="width: 70px;">
+														<source srcset="{{ asset('/storage/payment_method/gcash2.png') }}" type="image/jpeg" style="width: 70px;">
+														<img src="{{ asset('/storage/payment_method/gcash2.png') }}" style="width: 70px;">
+													</picture>
+												</label>
+											</div>
+											<div class="p-0">
+												<label class="form-check-label" for="gcash">GCash</label>
+											</div>
+										</div>
 									</div>
 								</div>
-								<div class="d-flex justify-content-between" style="padding: 0 15px 0 15px;">
-									<div class="form-check">
-										<input class="form-check-input" type="radio" name="payment_method" value="WA" id="grabpay" data-ib="GrabPayPH">
-										<label class="form-check-label" for="grabpay">GrabPay</label>
+								<div class="d-flex" style="padding: 0 15px 0 15px;">
+									<div class="form-check m-0">
+										<div class="d-flex flex-row align-items-center">
+											<div class="p-0">
+												<input class="form-check-input" type="radio" name="payment_method" value="WA" id="grabpay" data-ib="GrabPayPH">
+											</div>
+											<div class="p-0 text-center" style="width: 80px;">
+												<label class="form-check-label" for="grabpay">
+													<picture>
+														<source srcset="{{ asset('/storage/payment_method/grabpay2.webp') }}" type="image/webp" style="width: 70px;">
+														<source srcset="{{ asset('/storage/payment_method/grabpay2.png') }}" type="image/jpeg" style="width: 70px;">
+														<img src="{{ asset('/storage/payment_method/grabpay2.png') }}" style="width: 70px;">
+													</picture>
+												</label>
+											</div>
+											<div class="p-0">
+												<label class="form-check-label" for="grabpay">GrabPay</label>
+											</div>
+										</div>
 									</div>
 								</div>
 								<hr style="margin-right: 5px; margin-left: 5px;">
