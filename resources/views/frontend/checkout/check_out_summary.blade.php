@@ -276,7 +276,7 @@
 						<hr style="margin: -10px 20px 0 20px;">
 						<div class="card-body">
 							<div class="he1x" id="ship_blk" style="padding-top: 0px !important; padding-bottom: 0px !important;">
-								<div class="d-flex" style="padding: 0 15px 0 15px;">
+								<div class="d-flex" style="padding: 10px 15px 0 15px;">
 									<div class="form-check m-0">
 										<div class="d-flex flex-row align-items-center">
 											<div class="p-0">
@@ -297,7 +297,7 @@
 										</div>
 									</div>
 								</div>
-								<div class="d-flex" style="padding: 0 15px 0 15px;">
+								<div class="d-flex" style="padding: 10px 15px 0 15px;">
 									<div class="form-check m-0">
 										<div class="d-flex flex-row align-items-center">
 											<div class="p-0">
@@ -318,7 +318,7 @@
 										</div>
 									</div>
 								</div>
-								<div class="d-flex" style="padding: 0 15px 0 15px;">
+								<div class="d-flex" style="padding: 10px 15px 0 15px;">
 									<div class="form-check m-0">
 										<div class="d-flex flex-row align-items-center">
 											<div class="p-0">
@@ -339,6 +339,18 @@
 										</div>
 									</div>
 								</div>
+								<div class="d-flex" style="padding: 10px 15px 0 15px;">
+									<div class="form-check m-0">
+										<div class="d-flex flex-row align-items-center">
+											<div class="p-0">
+												<input class="form-check-input" type="radio" name="payment_method" value="ANY" id="bank-to-bank" data-ib="">
+											</div>
+											<div class="p-0">
+												<label class="form-check-label" for="bank-to-bank" style="display: inline-block; padding-left: 5px;">Bank to Bank</label>
+											</div>
+										</div>
+									</div>
+								</div>
 								<hr style="margin-right: 5px; margin-left: 5px;">
 								<p class="d-none" id="est-div" style="font-size: 0.8rem; font-style: italic;">Estimated Delivery Date: <b><span id="estimated-delivery-date"></span></b></p>
 							</div>
@@ -349,7 +361,7 @@
 						<div class="col-md-10 mx-auto">
 							<div class="card">
 									<div id="payment-form" class="d-none"></div>
-									<button class="btn btn-lg btn-outline-primary" id="checkout-btn" style="border: 0;" {{ (count($shipping_rates) <= 0) ? 'disabled' : '' }}>PAY NOW</button>
+									<button class="btn btn-lg btn-outline-primary" id="checkout-btn" style="border: 0;" {{ (count($shipping_rates) <= 0) ? 'disabled' : '' }}>PAY NOW <span id="grand-total1" class="font-weight-bold"></span></button>
 							</div>
 						</div>
 						{{-- <div class="col-md-10 mx-auto mt-4">
@@ -1396,6 +1408,7 @@
 			total = (isNaN(total)) ? 0 : total;
 
 			$('#grand-total').text('₱ ' + total.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,"));
+			$('#grand-total1').text('(₱ ' + total.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,") + ')');
 
 			$("#total_amount").val($('#grand-total').text());
 		}
