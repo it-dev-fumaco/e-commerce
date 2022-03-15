@@ -380,6 +380,12 @@
             </ul>
           </li>
           <li class="nav-item">
+            <a href="/admin/payment_method/list" class="nav-link {{ $activePage == 'payment_method' ? 'active' : '' }}">
+              <i class="fas fa-file-invoice-dollar nav-icon"></i>
+              <p>Payment Method</p>
+            </a>
+          </li>
+          <li class="nav-item">
             <a href="/admin/price_list" class="nav-link {{ $activePage == 'pricelist' ? 'active' : '' }}">
               <i class="fas fa-tags nav-icon"></i>
               <p>Manage Price List</p>

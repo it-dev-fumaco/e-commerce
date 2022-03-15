@@ -369,5 +369,10 @@ Route::prefix('admin')->group(function () {
         Route::post('/store/{id}/update', 'StoreController@updateStore');
         Route::get('/store/{id}/edit', 'StoreController@viewStore');
         Route::delete('/store/{id}/delete', 'StoreController@deleteStore');
+
+        Route::get('/payment_method/list', 'PaymentMethodController@viewList');
+        Route::post('/payment_method/save', 'PaymentMethodController@savePaymentMethod');
+        Route::put('/payment_method/{id}/update', 'PaymentMethodController@updatePaymentMethod');
+        Route::delete('/payment_method/{id}/delete', 'PaymentMethodController@deletePaymentMethod');
     });
 });
