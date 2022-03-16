@@ -111,7 +111,7 @@
             data: data,
             success: function (res) {
               if (res.status == 200) {
-                window.location.replace="{{ route('website') }}";
+                window.location.href="{{ route('website') }}";
               } else {
                 $('#login-fb').removeClass('d-none').text(res.message);
               }
