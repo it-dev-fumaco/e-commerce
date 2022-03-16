@@ -63,43 +63,38 @@ class LoginController extends Controller
             // save last login and no of visits
             $this->saveLoginDetails();
 
-            $user_check = $this->checkEmail();
+            $user_check = $this->checkEmail('Website Account');
+            $soc_used = collect($user_check)->implode(', ');
 
             if ($request->has('summary')){
                 return redirect('/checkout/summary');
             }
             
-            return redirect('/')->with('accounts', $user_check);
+            return redirect('/')->with('accounts', $soc_used);
         }
 
         return redirect()->back()->withInput()
             ->with('error', 'Your email address or password is incorrect, please try again');
     }
 
-    private function checkEmail(){
-        $user_check = DB::table('fumaco_users')->where('username', Auth::user()->username)->get();
-        
-        $user_arr = [];
-        if(count($user_check) > 1){
-            foreach($user_check as $user){
-                if(Auth::user()->id == $user->id){
-                    continue;
-                }
+    private function checkEmail($soc){
+        $user_check = DB::table('fumaco_users')->where('id', Auth::user()->id)->first();
 
-                $soc_used = 'Website Account';
-                if($user->facebook_id){
-                    $soc_used = 'Facebook';
-                }else if($user->google_id){
-                    $soc_used = 'Google';
-                }else if($user->linkedin_id){
-                    $soc_used = 'LinkdIn';
-                }
-    
-                $user_arr[] = [
-                    'account_id' => $user->id,
-                    'soc_used' => $soc_used
-                ];
-            }
+        $user_arr = [];
+        if($soc != 'Website Account' and $user_check->f_email == 'Website Account'){
+            array_push($user_arr, $user_check->f_email);
+        }
+
+        if($soc != 'Google' and $user_check->google_id){
+            array_push($user_arr, 'Google');
+        }
+
+        if($soc != 'LinkedIn' and $user_check->linkedin_id){
+            array_push($user_arr, 'LinkedIn');
+        }
+
+        if($soc != 'Facebook' and $user_check->facebook_id){
+            array_push($user_arr, 'Facebook');
         }
 
         return $user_arr;
@@ -134,16 +129,21 @@ class LoginController extends Controller
         try {
             $user = Socialite::driver('google')->user();
 
-            $finduser = User::where('google_id', $user->id)->first();
+            $finduser = User::where('google_id', $user->id)->orWhere('username', $user->email)->first();
             if($finduser){
                 Auth::loginUsingId($finduser->id);
 
                 $this->updateCartItemOwner();
                 $this->saveLoginDetails();
 
-                $user_check = $this->checkEmail();
+                if(!$finduser->google_id){
+                    DB::table('fumaco_users')->where('username', $user->email)->update(['google_id' => $user->id]);
+                }
 
-                return redirect('/')->with('accounts', $user_check);
+                $user_check = $this->checkEmail('Google');
+                $soc_used = collect($user_check)->implode(', ');
+
+                return redirect('/')->with('accounts', $soc_used);
             }else{
                 $newUser = new User;
                 $newUser->username = trim($user->email);
@@ -160,9 +160,10 @@ class LoginController extends Controller
                 $this->updateCartItemOwner();
                 $this->saveLoginDetails();
 
-                $user_check = $this->checkEmail();
+                $user_check = $this->checkEmail('Google');
+                $soc_used = collect($user_check)->implode(', ');
 
-                return redirect('/')->with('accounts', $user_check);
+                return redirect('/')->with('accounts', $soc_used);
             }
         } catch (\Throwable $th) {
             return redirect('/login')->with('error', 'Your email address or password is incorrect, please try again');
@@ -176,16 +177,21 @@ class LoginController extends Controller
     public function callbackFromLinkedin() {
         try {
             $user = Socialite::driver('linkedin')->user();
-            $finduser = User::where('linkedin_id', $user->id)->first();
+            $finduser = User::where('linkedin_id', $user->id)->orWhere('username', $user->email)->first();
             if($finduser){
                 Auth::loginUsingId($finduser->id);
 
                 $this->updateCartItemOwner();
                 $this->saveLoginDetails();
 
-                $user_check = $this->checkEmail();
+                if(!$finduser->linkedin_id){
+                    DB::table('fumaco_users')->where('username', $user->email)->update(['linkedin_id' => $user->id]);
+                }
 
-                return redirect('/')->with('accounts', $user_check);
+                $user_check = $this->checkEmail('LinkedIn');
+                $soc_used = collect($user_check)->implode(', ');
+
+                return redirect('/')->with('accounts', $soc_used);
             }else{
                 $newUser = new User;
                 $newUser->username = trim($user->email);
@@ -202,9 +208,10 @@ class LoginController extends Controller
                 $this->updateCartItemOwner();
                 $this->saveLoginDetails();
 
-                $user_check = $this->checkEmail();
+                $user_check = $this->checkEmail('LinkedIn');
+                $soc_used = collect($user_check)->implode(', ');
 
-                return redirect('/')->with('accounts', $user_check);
+                return redirect('/')->with('accounts', $soc_used);
             }
         } catch (\Throwable $th) {
             return redirect('/login')->with('error', 'Your email address or password is incorrect, please try again');
@@ -259,14 +266,21 @@ class LoginController extends Controller
 
     public function loginFbSdk(Request $request) {
         try {
-            $finduser = User::where('facebook_id', $request->id)->first();
+            $finduser = User::where('facebook_id', $request->id)->orWhere('username', $request->email)->first();
             if($finduser){
                 Auth::loginUsingId($finduser->id);
 
                 $this->updateCartItemOwner();
                 $this->saveLoginDetails();
 
-                return response()->json(['status' => 200, 'message' => 'Logged in']);
+                if(!$finduser->facebook_id){
+                    DB::table('fumaco_users')->where('username', $user->email)->update(['facebook_id' => $user->id]);
+                }
+
+                $user_check = $this->checkEmail('Facebook');
+                $soc_used = collect($user_check)->implode(', ');
+
+                return response()->json(['status' => 200, 'message' => 'Logged in'])->with('accounts', $soc_used);
             }else{
                 $newUser = new User;
                 $newUser->username = trim($request->email);
@@ -284,7 +298,10 @@ class LoginController extends Controller
                 $this->updateCartItemOwner();
                 $this->saveLoginDetails();
 
-                return response()->json(['status' => 200, 'message' => 'Logged in new user']);
+                $user_check = $this->checkEmail('Facebook');
+                $soc_used = collect($user_check)->implode(', ');
+
+                return response()->json(['status' => 200, 'message' => 'Logged in new user'])->with('accounts', $soc_used);
             }
         } catch (\Throwable $th) {
             return response()->json(['status' => 500, 'message' => 'Your email address or password is incorrect, please try again']);

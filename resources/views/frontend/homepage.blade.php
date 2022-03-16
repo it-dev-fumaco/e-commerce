@@ -303,19 +303,17 @@
     @php
       $accounts = Session::get('accounts');
     @endphp
-    <div id="multiple-accounts-msg" class="col-12 col-md-3">
-      <div class="card bg-white" style="box-shadow: 2px 2px 8px;">
-        <div class="card-title p-0"><span id="close-accounts-msg" class="p-0">&times;</span></div>
-        <div class="card-body pt-0">
-          The email you provided has an existing account for:
-          <ul>
-            @foreach ($accounts as $account)
-              <li>{{ $account['soc_used'] }}</li>
-            @endforeach
-          </ul>
+    @if ($accounts)
+      <div id="multiple-accounts-msg" class="col-12 col-md-3">
+        <div class="card bg-white" style="box-shadow: 2px 2px 8px;">
+          <div class="card-title p-0"><span id="close-accounts-msg" class="p-0">&times;</span></div>
+          <div class="card-body pt-0">
+            The email you provided has an existing account for: <br>
+              {{ $accounts }}
+          </div>
         </div>
       </div>
-    </div>
+    @endif
   @endif
 @endsection
 @section('style')
