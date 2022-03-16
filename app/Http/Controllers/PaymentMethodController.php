@@ -90,8 +90,6 @@ class PaymentMethodController extends Controller
         try {
             $this->validate($request, [
                 'payment_method_name' => 'required',
-                'payment_type' => 'required',
-                'issuing_bank' => 'required',
             ]);
 
             $data = [
