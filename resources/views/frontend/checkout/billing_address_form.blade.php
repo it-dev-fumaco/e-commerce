@@ -1,5 +1,5 @@
 @extends('frontend.layout', [
-	'namePage' => 'Checkout - Customer Form',
+	'namePage' => 'Billing and Shipping Form',
 	'activePage' => 'checkout_customer_form'
 ])
 
