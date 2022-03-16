@@ -27,7 +27,6 @@ class PaymentMethodController extends Controller
         try {
             $this->validate($request, [
                 'payment_method_name' => 'required',
-                'issuing_bank' => 'required',
             ]);
 
             $existing = DB::table('fumaco_payment_method')->where('payment_method_name', $request->payment_method_name)

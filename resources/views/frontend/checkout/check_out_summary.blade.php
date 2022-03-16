@@ -171,7 +171,7 @@
 								</table>
 							</div>
 							<div class="he1x">
-								<div class="d-flex justify-content-between align-items-center" style="padding: 5px 0 5px 5px; border-bottom: 1px solid #8c8c8cd0;">
+								<div class="d-flex justify-content-between align-items-center" style="padding: 0 0 5px 5px; border-bottom: 1px solid #8c8c8cd0;">
 									Total Amount <small class="text-muted stylecap he1x">₱ {{ number_format(collect($cart_arr)->sum('subtotal'), 2, '.', ',') }}</small>
 								</div>
 								<div class="d-flex justify-content-between align-items-center d-none" id="discount-div">
@@ -276,81 +276,37 @@
 						<hr style="margin: -10px 20px 0 20px;">
 						<div class="card-body">
 							<div class="he1x" id="ship_blk" style="padding-top: 0px !important; padding-bottom: 0px !important;">
-								<div class="d-flex" style="padding: 10px 15px 0 15px;">
+								@forelse ($payment_methods as $i => $pm)
+								<div class="d-flex" style="padding: 5px 15px 0 15px;">
 									<div class="form-check m-0">
 										<div class="d-flex flex-row align-items-center">
 											<div class="p-0">
-												<input class="form-check-input" type="radio" name="payment_method" value="CC" id="credit-card" data-ib="">
+												<input class="form-check-input" type="radio" name="payment_method" value="{{ $pm->payment_type }}" id="pm{{ $i }}" data-ib="{{ $pm->issuing_bank }}">
 											</div>
+											@if ($pm->show_image)
 											<div class="p-0 text-center" style="width: 80px;">
-												<label class="form-check-label" for="credit-card">
+												<label class="form-check-label" for="pm{{ $i }}">
 													<picture>
-														<source srcset="{{ asset('/storage/payment_method/mastercard2.webp') }}" type="image/webp" style="width: 45px;">
-														<source srcset="{{ asset('/storage/payment_method/mastercard2.png') }}" type="image/jpeg" style="width: 45px;">
-														<img src="{{ asset('/storage/payment_method/mastercard2.png') }}" style="width: 45px;">
+														<source srcset="{{ asset('/storage/payment_method/' . explode('.', $pm->image)[0] .'.webp') }}" type="image/webp" style="width: 70px;">
+														<source srcset="{{ asset('/storage/payment_method/mastercard2.png') }}" type="image/jpeg" style="width: 70px;">
+														<img src="{{ asset('/storage/payment_method/mastercard2.png') }}" style="width: 70px;">
 													</picture>
 												</label>
 											</div>
 											<div class="p-0">
-												<label class="form-check-label" for="credit-card">Visa / Master Card</label>
+												<label class="form-check-label" for="pm{{ $i }}">{{ $pm->payment_method_name }}</label>
 											</div>
+											@else
+											<div class="p-0">
+												<label class="form-check-label" for="pm{{ $i }}" style="display: inline-block; padding-left: 15px;">{{ $pm->payment_method_name }}</label>
+											</div>
+											@endif
 										</div>
 									</div>
 								</div>
-								<div class="d-flex" style="padding: 10px 15px 0 15px;">
-									<div class="form-check m-0">
-										<div class="d-flex flex-row align-items-center">
-											<div class="p-0">
-												<input class="form-check-input" type="radio" name="payment_method" value="WA" id="gcash" data-ib="GCash3">
-											</div>
-											<div class="p-0 text-center" style="width: 80px;">
-												<label class="form-check-label" for="gcash">
-													<picture>
-														<source srcset="{{ asset('/storage/payment_method/gcash2.webp') }}" type="image/webp" style="width: 70px;">
-														<source srcset="{{ asset('/storage/payment_method/gcash2.png') }}" type="image/jpeg" style="width: 70px;">
-														<img src="{{ asset('/storage/payment_method/gcash2.png') }}" style="width: 70px;">
-													</picture>
-												</label>
-											</div>
-											<div class="p-0">
-												<label class="form-check-label" for="gcash">GCash</label>
-											</div>
-										</div>
-									</div>
-								</div>
-								<div class="d-flex" style="padding: 10px 15px 0 15px;">
-									<div class="form-check m-0">
-										<div class="d-flex flex-row align-items-center">
-											<div class="p-0">
-												<input class="form-check-input" type="radio" name="payment_method" value="WA" id="grabpay" data-ib="GrabPayPH">
-											</div>
-											<div class="p-0 text-center" style="width: 80px;">
-												<label class="form-check-label" for="grabpay">
-													<picture>
-														<source srcset="{{ asset('/storage/payment_method/grabpay2.webp') }}" type="image/webp" style="width: 70px;">
-														<source srcset="{{ asset('/storage/payment_method/grabpay2.png') }}" type="image/jpeg" style="width: 70px;">
-														<img src="{{ asset('/storage/payment_method/grabpay2.png') }}" style="width: 70px;">
-													</picture>
-												</label>
-											</div>
-											<div class="p-0">
-												<label class="form-check-label" for="grabpay">GrabPay</label>
-											</div>
-										</div>
-									</div>
-								</div>
-								<div class="d-flex" style="padding: 10px 15px 0 15px;">
-									<div class="form-check m-0">
-										<div class="d-flex flex-row align-items-center">
-											<div class="p-0">
-												<input class="form-check-input" type="radio" name="payment_method" value="ANY" id="bank-to-bank" data-ib="">
-											</div>
-											<div class="p-0">
-												<label class="form-check-label" for="bank-to-bank" style="display: inline-block; padding-left: 5px;">Bank to Bank</label>
-											</div>
-										</div>
-									</div>
-								</div>
+								@empty
+								<h6 class="text-center">No available payment methods.</h6>
+								@endforelse
 								<hr style="margin-right: 5px; margin-left: 5px;">
 								<p class="d-none" id="est-div" style="font-size: 0.8rem; font-style: italic;">Estimated Delivery Date: <b><span id="estimated-delivery-date"></span></b></p>
 							</div>
@@ -364,9 +320,6 @@
 									<button class="btn btn-lg btn-outline-primary" id="checkout-btn" style="border: 0;" {{ (count($shipping_rates) <= 0) ? 'disabled' : '' }}>PAY NOW <span id="grand-total1" class="font-weight-bold"></span></button>
 							</div>
 						</div>
-						{{-- <div class="col-md-10 mx-auto mt-4">
-								<a href="javascript:history.back()" class="btn btn-lg btn-outline-secondary text-white" id="checkout-btn" style="background-color: #777575 !important; border-color: #777575 !important; width: 100%; border-radius: 0;">BACK</a>
-						</div> --}}
 					</div>
 				</div>
 			</div>
