@@ -127,7 +127,7 @@
 
                                     <!-- Modal -->
 									<div class="modal fade" id="edit{{ $row->payment_method_id }}" tabindex="-1" role="dialog">
-										<form action="/admin/payment_method/{{ $row->payment_method_id }}/update" method="POST">
+										<form action="/admin/payment_method/{{ $row->payment_method_id }}/update" method="POST" enctype="multipart/form-data">
 											@csrf
 											@method('put')
 											<div class="modal-dialog" role="document">
@@ -140,25 +140,41 @@
 													</div>
 													<div class="modal-body">
                                                         <div class="form-group">
-                                                            <label for="edit-payment-method-name">Payment Method Name</label>
-                                                            <input type="text" name="payment_method_name" class="form-control" id="edit-payment-method-name" value="{{ $row->payment_method_name }}">
+                                                            <label for="edit-payment-method-name{{ $row->payment_method_id }}">Payment Method Name</label>
+                                                            <input type="text" name="payment_method_name" class="form-control" id="edit-payment-method-name{{ $row->payment_method_id }}" value="{{ $row->payment_method_name }}">
                                                         </div>
                                                         <div class="form-group">
-                                                            <label for="edit-payment-type">Payment Type</label>
-                                                            <input type="text" name="payment_type" class="form-control" id="edit-payment-type" value="{{ $row->payment_type }}">
+                                                            <label for="edit-payment-type{{ $row->payment_method_id }}">Payment Type</label>
+                                                            <input type="text" name="payment_type" class="form-control" id="edit-payment-type{{ $row->payment_method_id }}" value="{{ $row->payment_type }}">
                                                         </div>
                                                         <div class="form-group">
-                                                            <label for="edit-issuing-bank">Issuing Bank</label>
-                                                            <input type="text" name="issuing_bank" class="form-control" id="edit-issuing-bank" value="{{ $row->issuing_bank }}">
+                                                            <label for="edit-issuing-bank{{ $row->payment_method_id }}">Issuing Bank</label>
+                                                            <input type="text" name="issuing_bank" class="form-control" id="edit-issuing-bank{{ $row->payment_method_id }}" value="{{ $row->issuing_bank }}">
+                                                        </div>
+														<div class="form-check mb-2">
+															<input type="checkbox" class="form-check-input edit-show-icon" id="edit-show-icon{{ $row->payment_method_id }}" {{ $row->show_image ? 'checked' : '' }} name="show_icon" value="1">
+															<label class="form-check-label" for="edit-show-icon{{ $row->payment_method_id }}">Show payment icon / logo</label>
+														</div>
+														<div class="form-group {{ ($row->image) ? 'd-block' : 'd-none' }} edit-show-icon{{ $row->payment_method_id }}">
+															<img src="{{ asset('/storage/payment_method/'. $row->image) }}" alt="{{ $row->image }}" class="img-thumbnail" id="edit-payment-icon{{ $row->payment_method_id }}-preview">
+														</div>
+                                                        <div class="form-group edit-show-icon{{ $row->payment_method_id }}">
+                                                            <label for="edit-payment-icon{{ $row->payment_method_id }}">Payment Logo</label>
+                                                            <div class="input-group">
+                                                                <div class="custom-file">
+                                                                    <input type="file" class="custom-file-input edit-payment-icon" id="edit-payment-icon{{ $row->payment_method_id }}" name="payment_icon">
+                                                                    <label class="custom-file-label" for="edit-payment-icon{{ $row->payment_method_id }}">{{ $row->image ? $row->image : 'Choose file' }}</label>
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                         <div class="form-group">
-                                                            <label for="edit-remarks">Remarks</label>
-                                                            <textarea class="form-control" name="remarks" id="edit-remarks" rows="4">{{ $row->remarks }}</textarea>
+                                                            <label for="edit-remarks{{ $row->payment_method_id }}">Remarks</label>
+                                                            <textarea class="form-control" name="remarks" id="edit-remarks{{ $row->payment_method_id }}" rows="4">{{ $row->remarks }}</textarea>
                                                         </div>
                                                         <div class="form-check">
-                                                            <input class="form-check-input" name="is_enabled" type="checkbox" value="1" id="is_enabled" {{ $row->is_enabled ? 'checked' : '' }}>
-                                                            <label class="form-check-label" for="is_enabled"> Is Enabled</label>
-                                                          </div>
+                                                            <input class="form-check-input" name="is_enabled" type="checkbox" value="1" id="is_enabled{{ $row->payment_method_id }}" {{ $row->is_enabled ? 'checked' : '' }}>
+                                                            <label class="form-check-label" for="is_enabled{{ $row->payment_method_id }}"> Is Enabled</label>
+                                                        </div>
 													</div>
 													<div class="modal-footer">
 														<button type="submit" class="btn btn-primary">Save</button>
@@ -194,7 +210,7 @@
  </div>
 
  <div class="modal fade" id="add-payment-method" tabindex="-1" role="dialog" aria-labelledby="disablemodal" aria-hidden="true">
-    <form action="/admin/payment_method/save" method="POST">
+    <form action="/admin/payment_method/save" method="POST" enctype="multipart/form-data">
         @csrf
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -217,6 +233,22 @@
                         <label for="issuing-bank">Issuing Bank</label>
                         <input type="text" name="issuing_bank" class="form-control" id="issuing-bank">
                     </div>
+					<div class="form-check mb-2">
+						<input type="checkbox" class="form-check-input" id="show-icon" checked name="show_icon" value="1">
+						<label class="form-check-label" for="show-icon">Show payment icon / logo</label>
+					</div>
+					<div class="form-group d-none" id="payment-icon-preview-1">
+						<img src="#" alt="#" class="img-thumbnail" id="payment-icon-preview-img">
+					</div>
+                    <div class="form-group" id="payment-icon-browse-file">
+                        <label for="payment-icon">Payment Logo</label>
+                        <div class="input-group">
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" id="payment-icon" name="payment_icon">
+                                <label class="custom-file-label" for="payment-icon">Choose file</label>
+                            </div>
+                        </div>
+                    </div>
 					<div class="form-group">
                         <label for="remarks">Remarks</label>
                         <textarea class="form-control" name="remarks" id="remarks" rows="4"></textarea>
@@ -230,4 +262,58 @@
         </div>
     </form>
 </div>
+@endsection
+@section('script')
+<script>
+	$(function () {
+		bsCustomFileInput.init();
+
+		$(document).on('change', '.edit-show-icon', function() {
+			var id = $(this).attr('id');
+			if($(this).is(":checked")) {
+				$('.' + id).removeClass('d-none').addClass('d-block');
+			} else {
+				$('.' + id).removeClass('d-block').addClass('d-none');
+			}
+		});
+
+		$('#show-icon').change(function() {
+			if($(this).is(":checked")) {
+				if($('#payment-icon').val() != '') {
+					$('#payment-icon-preview-1').removeClass('d-none').addClass('d-block');
+				}
+				$('#payment-icon-browse-file').removeClass('d-none').addClass('d-block');
+			} else {
+				$('#payment-icon-preview-1').removeClass('d-block').addClass('d-none');
+				$('#payment-icon-browse-file').removeClass('d-block').addClass('d-none');
+			}
+		});
+
+		$('#payment-icon').change(function(){
+			const file = this.files[0];
+			if (file){
+				let reader = new FileReader();
+				reader.onload = function(event){
+					$('#payment-icon-preview-img').attr('src', event.target.result);
+				}
+
+				$('#payment-icon-preview-1').removeClass('d-none').addClass('d-block');
+				reader.readAsDataURL(file);
+			}
+		});
+
+		$(document).on('change', '.edit-payment-icon', function() {
+			var img_div = $(this).attr('id');
+			const file1 = this.files[0];
+			if (file1){
+				let reader = new FileReader();
+				reader.onload = function(event){
+					$('#' + img_div + '-preview').attr('src', event.target.result);
+				}
+
+				reader.readAsDataURL(file1);
+			}
+		});
+	});
+</script>
 @endsection
