@@ -63,15 +63,46 @@ class LoginController extends Controller
             // save last login and no of visits
             $this->saveLoginDetails();
 
+            $user_check = $this->checkEmail();
+
             if ($request->has('summary')){
                 return redirect('/checkout/summary');
             }
             
-            return redirect('/');
+            return redirect('/')->with('accounts', $user_check);
         }
 
         return redirect()->back()->withInput()
             ->with('error', 'Your email address or password is incorrect, please try again');
+    }
+
+    private function checkEmail(){
+        $user_check = DB::table('fumaco_users')->where('username', Auth::user()->username)->get();
+        
+        $user_arr = [];
+        if(count($user_check) > 1){
+            foreach($user_check as $user){
+                if(Auth::user()->id == $user->id){
+                    continue;
+                }
+
+                $soc_used = 'Website Account';
+                if($user->facebook_id){
+                    $soc_used = 'Facebook';
+                }else if($user->google_id){
+                    $soc_used = 'Google';
+                }else if($user->linkedin_id){
+                    $soc_used = 'LinkdIn';
+                }
+    
+                $user_arr[] = [
+                    'account_id' => $user->id,
+                    'soc_used' => $soc_used
+                ];
+            }
+        }
+
+        return $user_arr;
     }
 
     private function saveLoginDetails(){
@@ -108,8 +139,11 @@ class LoginController extends Controller
                 Auth::loginUsingId($finduser->id);
 
                 $this->updateCartItemOwner();
+                $this->saveLoginDetails();
 
-                return redirect('/');
+                $user_check = $this->checkEmail();
+
+                return redirect('/')->with('accounts', $user_check);
             }else{
                 $newUser = new User;
                 $newUser->username = trim($user->email);
@@ -124,8 +158,11 @@ class LoginController extends Controller
                 Auth::loginUsingId($newUser->id);
 
                 $this->updateCartItemOwner();
+                $this->saveLoginDetails();
 
-                return redirect('/');
+                $user_check = $this->checkEmail();
+
+                return redirect('/')->with('accounts', $user_check);
             }
         } catch (\Throwable $th) {
             return redirect('/login')->with('error', 'Your email address or password is incorrect, please try again');
@@ -144,8 +181,11 @@ class LoginController extends Controller
                 Auth::loginUsingId($finduser->id);
 
                 $this->updateCartItemOwner();
+                $this->saveLoginDetails();
 
-                return redirect('/');
+                $user_check = $this->checkEmail();
+
+                return redirect('/')->with('accounts', $user_check);
             }else{
                 $newUser = new User;
                 $newUser->username = trim($user->email);
@@ -160,8 +200,11 @@ class LoginController extends Controller
                 Auth::loginUsingId($newUser->id);
 
                 $this->updateCartItemOwner();
+                $this->saveLoginDetails();
 
-                return redirect('/');
+                $user_check = $this->checkEmail();
+
+                return redirect('/')->with('accounts', $user_check);
             }
         } catch (\Throwable $th) {
             return redirect('/login')->with('error', 'Your email address or password is incorrect, please try again');
@@ -221,6 +264,7 @@ class LoginController extends Controller
                 Auth::loginUsingId($finduser->id);
 
                 $this->updateCartItemOwner();
+                $this->saveLoginDetails();
 
                 return response()->json(['status' => 200, 'message' => 'Logged in']);
             }else{
@@ -238,6 +282,7 @@ class LoginController extends Controller
                 Auth::loginUsingId($newUser->id);
 
                 $this->updateCartItemOwner();
+                $this->saveLoginDetails();
 
                 return response()->json(['status' => 200, 'message' => 'Logged in new user']);
             }
