@@ -280,7 +280,7 @@ class LoginController extends Controller
                 $user_check = $this->checkEmail('Facebook');
                 $soc_used = collect($user_check)->implode(', ');
 
-                return response()->json(['status' => 200, 'message' => 'Logged in'])->with('accounts', $soc_used);
+                return response()->json(['status' => 200, 'message' => 'Logged in']);
             }else{
                 $newUser = new User;
                 $newUser->username = trim($request->email);
@@ -301,10 +301,10 @@ class LoginController extends Controller
                 $user_check = $this->checkEmail('Facebook');
                 $soc_used = collect($user_check)->implode(', ');
 
-                return response()->json(['status' => 200, 'message' => 'Logged in new user'])->with('accounts', $soc_used);
+                return response()->json(['status' => 200, 'message' => 'Logged in new user']);
             }
         } catch (\Throwable $th) {
-            return response()->json(['status' => 500, 'message' => 'Your email address or password is incorrect, please try again']);
+            return response()->json(['status' => 500, 'message' => $th]);
         }
     }
 
