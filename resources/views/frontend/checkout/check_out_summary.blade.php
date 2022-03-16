@@ -269,7 +269,11 @@
 									<label class="form-check-label" for="{{ 'sr' . $l }}">{{ $srate['shipping_service_name'] }} <br class="d-xl-none"/>
 										@if (count($srate['stores']) <= 0)<small class="fst-italic">({{ $srate['min_lead_time'] . " - ". $srate['max_lead_time'] . " Days" }})</small>@endif</label>
 								</div>
+								@if ($srate['shipping_cost'] > 0)
 								<small class="text-muted stylecap he1x" style="white-space: nowrap !important">₱ {{ number_format($srate['shipping_cost'], 2, '.', ',') }}</small>
+								@else
+								<small class="text-muted stylecap he1x" style="white-space: nowrap !important">FREE</small>
+								@endif
 							</div>
 							@if (count($srate['stores']) > 0)
 							<div class="row d-none" id="for-store-pickup">
