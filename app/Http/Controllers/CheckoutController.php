@@ -484,7 +484,12 @@ class CheckoutController extends Controller
 
 			$shipping_zones = DB::table('fumaco_shipping_zone_rate')->distinct()->pluck('province_name')->toArray();
 
-			return view('frontend.checkout.check_out_summary', compact('shipping_details', 'billing_details', 'shipping_rates', 'order_no', 'cart_arr', 'shipping_add', 'billing_add', 'shipping_zones'));
+			$free_shipping_remarks = collect($shipping_rates)->where('shipping_service_name', 'Free Delivery')->first();
+			if ($free_shipping_remarks) {
+				$free_shipping_remarks = $free_shipping_remarks['remarks'];
+			}
+
+			return view('frontend.checkout.check_out_summary', compact('shipping_details', 'billing_details', 'shipping_rates', 'order_no', 'cart_arr', 'shipping_add', 'billing_add', 'shipping_zones', 'free_shipping_remarks'));
 		}catch(Exception $e){
 			DB::rollback();
 			return redirect()->back()->with('error', 'An error occured. Please try again.');
@@ -1292,6 +1297,7 @@ class CheckoutController extends Controller
 					'allow_delivery_after' => 0,
 					'pickup' => false,
 					'stores' => [],
+					'remarks' => null
 				];
 			}
         }
@@ -1341,6 +1347,21 @@ class CheckoutController extends Controller
 
 				$expected_delivery_date = $this->delivery_leadtime($min, $max);
 
+				$remarks = null;
+				if($row->shipping_service_name == 'Free Delivery') {
+					$free_delivery_zones = DB::table('fumaco_shipping_zone_rate')->where('shipping_service_id', $row->shipping_service_id)->pluck('province_name')->toArray();
+
+					$remarks .= 'Free delivery within ';
+					foreach($free_delivery_zones as $zone) {
+						if (end($free_delivery_zones) == $zone) {
+							$remarks = rtrim($remarks,", ");
+							$remarks .= ' and ' . ucwords(strtolower($zone));
+						} else {
+							$remarks .= ucwords(strtolower($zone)) . ', ';
+						}
+					}
+				}
+
 				$shipping_offer_rates[] = [
 					'shipping_service_name' => $row->shipping_service_name,
 					'expected_delivery_date' => $expected_delivery_date,
@@ -1351,6 +1372,7 @@ class CheckoutController extends Controller
 					'allow_delivery_after' => 0,
 					'pickup' => false,
 					'stores' => [],
+					'remarks' => $remarks
 				];
             }
         }
@@ -1376,6 +1398,7 @@ class CheckoutController extends Controller
 				'allow_delivery_after' => 0,
 				'pickup' => true,
 				'stores' => $stores,
+				'remarks' => null
 			];
 		}
 	

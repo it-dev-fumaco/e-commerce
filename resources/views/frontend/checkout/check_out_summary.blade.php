@@ -313,6 +313,11 @@
 							<p class="d-none" id="est-div" style="font-size: 0.8rem; font-style: italic;">Estimated Delivery Date: <b><span id="estimated-delivery-date"></span></b></p>
 						</div>
 						<div class="card-body he1x pt-0">
+							@if ($free_shipping_remarks)
+							<div class="alert alert-success fade show mb-0" role="alert" style="border: 1px solid;">
+								<i class="fas fa-truck d-inline-block m-1" style="font-size: 15pt;"></i> {{ $free_shipping_remarks }}
+							</div>
+							@endif
 							<div class="alert alert-danger fade show mb-0 d-none" id="coupon-alert" role="alert" style="border: 1px solid;"></div>
 							<label for="coupon-code" class="m-2 mb-0">Coupon</label>
 							<div class="d-flex flex-row">
@@ -1190,7 +1195,7 @@
 										'<label class="form-check-label" for="0l">'+ response.shipping.shipping_service_name+' <br class="d-xl-none"/>' +
 										'<small class="fst-italic">('+ response.shipping.min_lead_time+' - '+ response.shipping.max_lead_time+' Days)</small></label>' +
 										'</div>' +
-										'<small class="text-muted stylecap he1x" style="white-space: nowrap !important">₱ 0.00</small>' +
+										'<small class="text-muted stylecap he1x" style="white-space: nowrap !important">FREE</small>' +
 										'</div>';
 								
 									$('#voucher-free').html(el).removeClass('d-none');
