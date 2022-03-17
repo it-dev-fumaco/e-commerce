@@ -273,14 +273,14 @@ class LoginController extends Controller
                 $this->updateCartItemOwner();
                 $this->saveLoginDetails();
 
-                if(!$finduser->facebook_id){
+                if(!$finduser->facebook_id or $finduser->facebook_id == ''){
                     DB::table('fumaco_users')->where('username', $finduser->email)->update(['facebook_id' => $finduser->id]);
                 }
 
                 $user_check = $this->checkEmail('Facebook');
                 $soc_used = collect($user_check)->implode(', ');
 
-                return response()->json(['status' => 200, 'message' => 'Logged in']);
+                return response()->json(['status' => 200, 'message' => 'Logged in'])->with('accounts', $soc_used);
             }else{
                 $newUser = new User;
                 $newUser->username = trim($request->email);
@@ -301,7 +301,7 @@ class LoginController extends Controller
                 $user_check = $this->checkEmail('Facebook');
                 $soc_used = collect($user_check)->implode(', ');
 
-                return response()->json(['status' => 200, 'message' => 'Logged in new user']);
+                return response()->json(['status' => 200, 'message' => 'Logged in new user'])->with('accounts', $soc_used);
             }
         } catch (Exception $th) {
             return response()->json(['status' => 500, 'message' => 'Incorrect username and/or password.']);
