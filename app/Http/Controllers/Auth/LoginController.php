@@ -267,6 +267,8 @@ class LoginController extends Controller
     public function loginFbSdk(Request $request) {
         try {
             $finduser = User::where('facebook_id', $request->id)->orWhere('username', $request->email)->first();
+
+            return $finduser;
             if($finduser){
                 Auth::loginUsingId($finduser->id);
 
