@@ -61,7 +61,7 @@ class LoginController extends Controller
             $this->updateCartItemOwner();
 
             // save last login and no of visits
-            $this->saveLoginDetails();
+            $this->saveLoginDetails('Website Account');
 
             $user_check = $this->checkEmail('Website Account');
             $soc_used = collect($user_check)->implode(', ');
@@ -100,12 +100,13 @@ class LoginController extends Controller
         return $user_arr;
     }
 
-    private function saveLoginDetails(){
+    private function saveLoginDetails($last_login_used){
         DB::beginTransaction();
         try {
             $checker = DB::table('fumaco_users')->where('id', Auth::user()->id)->first();
             DB::table('fumaco_users')->where('id', Auth::user()->id)->update([
                 'last_login' => Carbon::now(),
+                'login_used' => $last_login_used,
                 'no_of_visits' => $checker->no_of_visits ? $checker->no_of_visits + 1 : 1
             ]);
             DB::commit();
@@ -134,7 +135,7 @@ class LoginController extends Controller
                 Auth::loginUsingId($finduser->id);
 
                 $this->updateCartItemOwner();
-                $this->saveLoginDetails();
+                $this->saveLoginDetails('Google');
 
                 if(!$finduser->google_id){
                     DB::table('fumaco_users')->where('username', $user->email)->update(['google_id' => $user->id]);
@@ -182,7 +183,7 @@ class LoginController extends Controller
                 Auth::loginUsingId($finduser->id);
 
                 $this->updateCartItemOwner();
-                $this->saveLoginDetails();
+                $this->saveLoginDetails('LinkedIn');
 
                 if(!$finduser->linkedin_id){
                     DB::table('fumaco_users')->where('username', $user->email)->update(['linkedin_id' => $user->id]);
@@ -272,7 +273,7 @@ class LoginController extends Controller
                 Auth::loginUsingId($finduser->id);
 
                 $this->updateCartItemOwner();
-                $this->saveLoginDetails();
+                $this->saveLoginDetails('Facebook');
 
                 if($finduser->facebook_id == null or $finduser->facebook_id == ''){
                     DB::table('fumaco_users')->where('id', $finduser->id)->update(['facebook_id' => $request->id]);
