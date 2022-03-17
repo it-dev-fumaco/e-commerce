@@ -274,7 +274,7 @@ class LoginController extends Controller
                 $this->saveLoginDetails();
 
                 if(!$finduser->facebook_id){
-                    DB::table('fumaco_users')->where('username', $user->email)->update(['facebook_id' => $user->id]);
+                    DB::table('fumaco_users')->where('username', $finduser->email)->update(['facebook_id' => $finduser->id]);
                 }
 
                 $user_check = $this->checkEmail('Facebook');
@@ -304,7 +304,7 @@ class LoginController extends Controller
                 return response()->json(['status' => 200, 'message' => 'Logged in new user']);
             }
         } catch (Exception $th) {
-            return response()->json(['status' => 500, 'message' => $th]);
+            return response()->json(['status' => 500, 'message' => 'Incorrect username and/or password.']);
         }
     }
 
