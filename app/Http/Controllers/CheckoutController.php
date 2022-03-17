@@ -1395,7 +1395,7 @@ class CheckoutController extends Controller
 		$free_delivery_zones = collect($free_delivery_zones)->unique()->toArray();
 		$free_delivery_zone_remarks = null;
 		if(count($free_delivery_zones) > 0) {
-			$free_delivery_zone_remarks = 'Free delivery within ';
+			$free_delivery_zone_remarks = 'Free shipping within ';
 			foreach($free_delivery_zones as $zone) {
 				if (end($free_delivery_zones) == $zone) {
 					$free_delivery_zone_remarks = rtrim($free_delivery_zone_remarks,", ");
