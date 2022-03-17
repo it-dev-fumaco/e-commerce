@@ -268,7 +268,6 @@ class LoginController extends Controller
         try {
             $finduser = User::where('facebook_id', $request->id)->orWhere('username', $request->email)->first();
 
-            // return $request->id;
             if($finduser){
                 Auth::loginUsingId($finduser->id);
 
