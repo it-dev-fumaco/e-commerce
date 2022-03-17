@@ -430,6 +430,14 @@ class CheckoutController extends Controller
 			$shipping_details = session()->get('fumShipDet');
 			$billing_details = session()->get('fumBillDet');
 
+			$ship = collect($shipping_details)->except('same_as_billing');
+			$address_check = $ship->diff($billing_details);
+
+			$same_as_billing = 0;
+			if($shipping_details['same_as_billing'] == 0){
+				$same_as_billing = $address_check->isEmpty() ? 1 : 0;
+			}
+
 			$shipping_add = $billing_add = [];
 			if (Auth::check()) {
 				$shipping_add = DB::table('fumaco_user_add')->where('user_idx', Auth::user()->id)->where('address_class','Delivery')
@@ -454,7 +462,7 @@ class CheckoutController extends Controller
 					'email_address' => $shipping_address['xcontactemail1'],
 					'mobile_no' => $shipping_address['xmobile_number'],
 					'contact_no' => $shipping_address['xcontactnumber1'],
-					'same_as_billing' => $shipping_details['same_as_billing']
+					'same_as_billing' => $same_as_billing //$shipping_details['same_as_billing']
 				];
 
 				$billing_add = DB::table('fumaco_user_add')->where('user_idx', Auth::user()->id)->where('address_class','Billing')
