@@ -483,7 +483,7 @@ class CheckoutController extends Controller
 			}
 
 			$shipping_zones = DB::table('fumaco_shipping_zone_rate')->distinct()->pluck('province_name')->toArray();
-
+			$free_shipping_remarks = null;
 			if ($shipping_rates['free_delivery_zones']) {
 				$free_shipping_remarks = $shipping_rates['free_delivery_zones'];
 			}
@@ -1392,15 +1392,17 @@ class CheckoutController extends Controller
 			];
 		}
 
-		$free_delivery_zones = $free_delivery_zones->unique()->toArray();
-
-		$free_delivery_zone_remarks = 'Free delivery within ';
-		foreach($free_delivery_zones as $zone) {
-			if (end($free_delivery_zones) == $zone) {
-				$free_delivery_zone_remarks = rtrim($free_delivery_zone_remarks,", ");
-				$free_delivery_zone_remarks .= (count($free_delivery_zones) > 1 ? ' and ' : ' ') . ucwords(strtolower($zone) . '.');
-			} else {
-				$free_delivery_zone_remarks .= ucwords(strtolower($zone)) . ', ';
+		$free_delivery_zones = collect($free_delivery_zones)->unique()->toArray();
+		$free_delivery_zone_remarks = null;
+		if(count($free_delivery_zones) > 0) {
+			$free_delivery_zone_remarks = 'Free delivery within ';
+			foreach($free_delivery_zones as $zone) {
+				if (end($free_delivery_zones) == $zone) {
+					$free_delivery_zone_remarks = rtrim($free_delivery_zone_remarks,", ");
+					$free_delivery_zone_remarks .= (count($free_delivery_zones) > 1 ? ' and ' : ' ') . ucwords(strtolower($zone) . '.');
+				} else {
+					$free_delivery_zone_remarks .= ucwords(strtolower($zone)) . ', ';
+				}
 			}
 		}
 
