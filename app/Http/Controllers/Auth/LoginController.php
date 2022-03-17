@@ -268,7 +268,7 @@ class LoginController extends Controller
         try {
             $finduser = User::where('facebook_id', $request->id)->orWhere('username', $request->email)->first();
 
-            return $request->id;
+            // return $request->id;
             if($finduser){
                 Auth::loginUsingId($finduser->id);
 
@@ -276,7 +276,7 @@ class LoginController extends Controller
                 $this->saveLoginDetails();
 
                 if($finduser->facebook_id == null or $finduser->facebook_id == ''){
-                    DB::table('fumaco_users')->where('username', $finduser->email)->update(['facebook_id' => $request->id]);
+                    DB::table('fumaco_users')->where('id', $finduser->id)->update(['facebook_id' => $request->id]);
                 }
 
                 $user_check = $this->checkEmail('Facebook');
