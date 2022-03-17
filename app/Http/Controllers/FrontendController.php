@@ -842,7 +842,7 @@ class FrontendController extends Controller
             $user->password = Hash::make($request->password);
             $user->f_name = $request->first_name;
             $user->f_lname = $request->last_name;
-            $user->f_email = 'fumacoco_dev';
+            $user->f_email = 'Website Account';
             $user->f_temp_passcode = 'fumaco12345';
             $user->save();
 

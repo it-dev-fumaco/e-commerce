@@ -483,8 +483,14 @@ class CheckoutController extends Controller
 			}
 
 			$shipping_zones = DB::table('fumaco_shipping_zone_rate')->distinct()->pluck('province_name')->toArray();
+			$free_shipping_remarks = null;
+			if ($shipping_rates['free_delivery_zones']) {
+				$free_shipping_remarks = $shipping_rates['free_delivery_zones'];
+			}
 
-			return view('frontend.checkout.check_out_summary', compact('shipping_details', 'billing_details', 'shipping_rates', 'order_no', 'cart_arr', 'shipping_add', 'billing_add', 'shipping_zones'));
+			$shipping_rates = $shipping_rates['shipping_offer_rates'];
+
+			return view('frontend.checkout.check_out_summary', compact('shipping_details', 'billing_details', 'shipping_rates', 'order_no', 'cart_arr', 'shipping_add', 'billing_add', 'shipping_zones', 'free_shipping_remarks'));
 		}catch(Exception $e){
 			DB::rollback();
 			return redirect()->back()->with('error', 'An error occured. Please try again.');
@@ -1261,7 +1267,8 @@ class CheckoutController extends Controller
         $shipping_services_arr = array_column($shipping_services_arr, 'shipping_service_id');
         $shipping_services_without_conditions = ShippingService::where('shipping_calculation', 'Flat Rate')->whereIn('shipping_service_id', $shipping_services_arr)
 			->select('shipping_service_id', 'min_leadtime', 'max_leadtime', 'shipping_service_name', 'amount')->get();
-        
+		
+		$free_delivery_zones = [];
         $shipping_offer_rates = [];
         foreach($shipping_services_without_conditions as $row){
 			$not_appicable_categories = DB::table('fumaco_shipping_product_category')
@@ -1341,6 +1348,11 @@ class CheckoutController extends Controller
 
 				$expected_delivery_date = $this->delivery_leadtime($min, $max);
 
+				if($shipping_cost <= 0) {
+					$delivery_zones = DB::table('fumaco_shipping_zone_rate')->where('shipping_service_id', $row->shipping_service_id)->pluck('province_name');
+					$free_delivery_zones = collect($free_delivery_zones)->merge($delivery_zones);
+				}
+
 				$shipping_offer_rates[] = [
 					'shipping_service_name' => $row->shipping_service_name,
 					'expected_delivery_date' => $expected_delivery_date,
@@ -1376,10 +1388,28 @@ class CheckoutController extends Controller
 				'allow_delivery_after' => 0,
 				'pickup' => true,
 				'stores' => $stores,
+				'remarks' => null
 			];
 		}
-	
-		return $shipping_offer_rates;
+
+		$free_delivery_zones = collect($free_delivery_zones)->unique()->toArray();
+		$free_delivery_zone_remarks = null;
+		if(count($free_delivery_zones) > 0) {
+			$free_delivery_zone_remarks = 'Free shipping within ';
+			foreach($free_delivery_zones as $zone) {
+				if (end($free_delivery_zones) == $zone) {
+					$free_delivery_zone_remarks = rtrim($free_delivery_zone_remarks,", ");
+					$free_delivery_zone_remarks .= (count($free_delivery_zones) > 1 ? ' and ' : ' ') . ucwords(strtolower($zone) . '.');
+				} else {
+					$free_delivery_zone_remarks .= ucwords(strtolower($zone)) . ', ';
+				}
+			}
+		}
+
+		return [
+			'shipping_offer_rates' => $shipping_offer_rates,
+			'free_delivery_zones' => $free_delivery_zone_remarks
+		];
 	}
 
 	public function orderFailed() {

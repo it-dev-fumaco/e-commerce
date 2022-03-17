@@ -42,6 +42,9 @@
 										<b>Date Registered:</b> <a class="float-right">{{ date('M d, Y', strtotime($customer->created_at)) }}</a>
 									</li>
 									<li class="list-group-item">
+										<b>Last Login Used:</b> <a class="float-right">{{ $customer->login_used }}</a>
+									</li>
+									<li class="list-group-item">
 										<b>Last Login Date:</b> <a class="float-right">{{ $customer->last_login ? date('M d, Y h:i A', strtotime($customer->last_login)) : '' }}</a>
 									</li>
 									<li class="list-group-item">
@@ -56,6 +59,23 @@
 									</li>
 									<li class="list-group-item">
 										<b>Price List:</b> <a class="float-right">{{ $customer->pricelist }}</a>
+									</li>
+									<li class="list-group-item">
+										<b>Registered Third-Party Accounts:</b>
+										<ul>
+											@if ($customer->f_email == 'Website Account')
+												<li>Website Account</li>
+											@endif
+											@if ($customer->facebook_id)
+												<li>Facebook</li>
+											@endif
+											@if ($customer->google_id)
+												<li>Google</li>
+											@endif
+											@if ($customer->linkedin_id)
+												<li>LinkedIn</li>
+											@endif
+										</ul>
 									</li>
 								</ul>
 							</div>

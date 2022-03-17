@@ -299,7 +299,22 @@
     </div>
   </div>
   @endif
-
+  @if (Session::has('accounts'))
+    @php
+      $accounts = Session::get('accounts');
+    @endphp
+    @if ($accounts)
+      <div id="multiple-accounts-msg" class="col-12 col-md-3">
+        <div class="card bg-white" style="box-shadow: 2px 2px 8px;">
+          <div class="card-title p-0"><span id="close-accounts-msg" class="p-0">&times;</span></div>
+          <div class="card-body pt-0">
+            The email you provided has an existing account for: <br>
+              {{ $accounts }}
+          </div>
+        </div>
+      </div>
+    @endif
+  @endif
 @endsection
 @section('style')
   <style>
@@ -500,7 +515,20 @@
   .slick-current, .slick-slide  {
     opacity: 1;
   }
+  #multiple-accounts-msg{
+    position: absolute !important;
+    left: 5px !important;
+    bottom: 5px !important;
+    z-index: 10;
+  }
 
+  #close-accounts-msg{
+    float: right !important;
+    margin-right: 10px;
+    margin-top: 10px;
+    font-size: 12pt;
+    cursor: pointer;
+  }
 </style>
 @endsection
 
@@ -510,6 +538,14 @@
     $('#myCarousel').css('margin-top', $('#navbar').height());
 
     $(document).ready(function() {
+      setTimeout(function() {
+        $('#multiple-accounts-msg').fadeOut();
+      }, 5000);
+
+      $('#close-accounts-msg').click(function(){
+        $('#multiple-accounts-msg').fadeOut();
+      });
+
       // Product Image Hover
       $('.hover-container').hover(function(){
         $(this).children('.btn-container').slideToggle('fast');
