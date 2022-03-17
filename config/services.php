@@ -33,19 +33,19 @@ return [
     'facebook' => [
         'client_id' => '435536724607670',
         'client_secret' => '983cd95dca020ece7f82b82c2f97c826',
-        'redirect' => 'https://test301.fumaco.com/auth/facebook/callback',
+        'redirect' => 'https://fumaco.com/auth/facebook/callback',
     ],
 
     'google' => [
         'client_id' => '794522382369-0pdu3n5j2ofohbae2hcbtgtfqiu898a2.apps.googleusercontent.com',
         'client_secret' => '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',
-        'redirect' => 'https://test301.fumaco.com/auth/google/callback',
+        'redirect' => 'https://fumaco.com/auth/google/callback',
     ],
 
     'linkedin' => [
         'client_id' => '86qae63bbvyy22',
         'client_secret' => '5bC4dey0d7vAqwgH',
-        'redirect' => 'https://test301.fumaco.com/auth/linkedin/callback'
+        'redirect' => 'https://www.fumaco.com/auth/linkedin/callback'
     ],
 
 ];
