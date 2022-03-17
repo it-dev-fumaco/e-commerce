@@ -2112,36 +2112,6 @@ class FrontendController extends Controller
                 DB::table('fumaco_user_add')->where('id', $id)->delete();
 
                 DB::commit();
-
-                $address_class = $type == 'shipping' ? 'Delivery' : 'Billing';
-
-                $address = DB::table('fumaco_user_add')->where('id', $default->id)->first();
-                if($address){
-                    $address_details = [
-                        'fname' => $address->xcontactname1,
-                        'lname' => $address->xcontactlastname1,
-                        'address_line1' => $address->xadd1,
-                        'address_line2' => $address->xadd2,
-                        'province' => $address->xprov,
-                        'city' => $address->xcity,
-                        'brgy' => $address->xbrgy,
-                        'postal_code' => $address->xpostal,
-                        'country' => $address->xcountry,
-                        'address_type' => $address->add_type,
-                        'business_name' => $address->xbusiness_name,
-                        'tin' => $address->xtin_no,
-                        'email_address' => $address->xcontactemail1,
-                        'mobile_no' => $address->xmobile_number,
-                        'contact_no' => $address->xcontactnumber1,
-                        'same_as_billing' => 0
-                    ];
-
-                    if($address_class == 'Delivery'){
-                        session()->put('fumShipDet', $address_details);
-                    }else{
-                        session()->put('fumBillDet', $address_details);
-                    }
-                }
             }
            
             return redirect()->back()->with('success', 'Address has been deleted.');
@@ -2197,37 +2167,6 @@ class FrontendController extends Controller
 
             DB::commit();
 
-            $address = DB::table('fumaco_user_add')->where('id', $id)->first();
-
-            if(isset($request->checkout) and $address->xdefault == 1){ // Edit from order summary page
-                $address_class = $type == 'shipping' ? 'Delivery' : 'Billing';
-
-                $address_details = [
-                    'fname' => $address->xcontactname1,
-                    'lname' => $address->xcontactlastname1,
-                    'address_line1' => $address->xadd1,
-                    'address_line2' => $address->xadd2,
-                    'province' => $address->xprov,
-                    'city' => $address->xcity,
-                    'brgy' => $address->xbrgy,
-                    'postal_code' => $address->xpostal,
-                    'country' => $address->xcountry,
-                    'address_type' => $address->add_type,
-                    'business_name' => $address->xbusiness_name,
-                    'tin' => $address->xtin_no,
-                    'email_address' => $address->xcontactemail1,
-                    'mobile_no' => $address->xmobile_number,
-                    'contact_no' => $address->xcontactnumber1,
-                    'same_as_billing' => 0
-                ];
-
-                if($address_class == 'Delivery'){
-                    session()->put('fumShipDet', $address_details);
-                }else{
-                    session()->put('fumBillDet', $address_details);
-                }
-            }
-
             return redirect()->back()->with('success', 'Address Updated');
         } catch (Exception $e) {
             DB::rollback();
@@ -2251,34 +2190,7 @@ class FrontendController extends Controller
                         ->where('id', $id)->update(['xdefault' => 1]);
 
                     DB::commit();
-
-                    $address = DB::table('fumaco_user_add')->where('user_idx', Auth::user()->id)->where('xdefault', 1)->where('address_class', $address_class)->first();
-
-                    $address_details = [
-                        'fname' => $address->xcontactname1,
-                        'lname' => $address->xcontactlastname1,
-                        'address_line1' => $address->xadd1,
-                        'address_line2' => $address->xadd2,
-                        'province' => $address->xprov,
-                        'city' => $address->xcity,
-                        'brgy' => $address->xbrgy,
-                        'postal_code' => $address->xpostal,
-                        'country' => $address->xcountry,
-                        'address_type' => $address->add_type,
-                        'business_name' => $address->xbusiness_name,
-                        'tin' => $address->xtin_no,
-                        'email_address' => $address->xcontactemail1,
-                        'mobile_no' => $address->xmobile_number,
-                        'contact_no' => $address->xcontactnumber1,
-                        'same_as_billing' => 0
-                    ];
-
-                    if($address_class == 'Delivery'){
-                        session()->put('fumShipDet', $address_details);
-                    }else{
-                        session()->put('fumBillDet', $address_details);
-                    }
-
+                    
                     return redirect()->back()->with('success', 'Default ' . $type .' address has been changed.');
                 }
             }

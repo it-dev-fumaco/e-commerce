@@ -32,8 +32,6 @@
 	</main>
 
 	@php
-		$shipping_fname = $shipping_details['fname'];
-		$shipping_lname = $shipping_details['lname'];
 		$shipping_address1 = $shipping_details['address_line1'];
 		$shipping_address2 = $shipping_details['address_line2'];
 		$shipping_province = $shipping_details['province'];
@@ -52,7 +50,7 @@
 			$col = "12";
 			$ship_text = " & Billing";
 		}else{
-			$checkbox = "d-none1";
+			$checkbox = "d-none";
 			$col = "6";
 			$ship_text = '';
 		}
@@ -63,7 +61,7 @@
 				<div class="col-md-4">
 					<div class="card he1x" style="background-color: #f4f4f4 !important; padding-bottom: 11px; min-height: 600px;">
 						<p style="margin: 15px 0 0 20px;"><strong>Your Order No.: <span id="order-no">{{ $order_no }}</span></strong></p>
-						<p style="margin: 15px 0 0 20px;">Customer Name: {{ (Auth::check()) ? Auth::user()->f_name . " " . Auth::user()->f_lname : $shipping_fname." ".$shipping_lname }}</p>
+						<p style="margin: 15px 0 0 20px;">Customer Name: {{ (Auth::check()) ? Auth::user()->f_name . " " . Auth::user()->f_lname : $shipping_details['contact_person'] }}</p>
 						<p style="margin: 15px 0 0 20px;">Email Address: {{ (Auth::check()) ? Auth::user()->username : $shipping_email }}</p>
 						<br>
 						<div class="card m-2">
@@ -85,14 +83,14 @@
 										TIN: {{ $shipping_tin }}
 									</div>
 								@endif
-								<div class="he1x" style="margin-bottom: 10px !important;">Contact Person :  {{ $shipping_fname. " " .$shipping_lname }}</div>
+								<div class="he1x" style="margin-bottom: 10px !important;">Contact Person :  {{ $shipping_details['contact_person'] }}</div>
 								<div class="he1x" style="margin-bottom: 10px !important;">
 									{{ $shipping_address1." ".$shipping_address2.", ".$shipping_brgy.", ".$shipping_city.", ".$shipping_province.", ".$shipping_country." ".$shipping_postal }}
 								</div>
 								<div class="he1x" style="margin-bottom: 5px !important;">Contact Number :  {{ $shipping_mobile }}</div>
 								<br>
 								<div class="form-check {{ $checkbox }}">
-									<input class="form-check-input" type="checkbox" {{ $shipping_details['same_as_billing'] ? 'checked' : '' }} id="same-as-billing-cb">
+									<input class="form-check-input" type="checkbox" disabled {{ $shipping_details['same_as_billing'] ? 'checked' : '' }} id="same-as-billing-cb">
 									<label class="form-check-label" class="formslabelfnt" for="same-as-billing-cb">Billing address is the same as above</label>
 								</div>
 							</div>
@@ -118,7 +116,7 @@
 										TIN: {{ $billing_details['tin'] }}
 									</div>
 								@endif
-								<div class="he1x" style="margin-bottom: 10px !important;">Contact Person :  {{ $billing_details['fname'] . ' ' . $billing_details['lname'] }}</div>
+								<div class="he1x" style="margin-bottom: 10px !important;">Contact Person :  {{ $billing_details['contact_person'] }}</div>
 								<div class="he1x" style="margin-bottom: 10px !important;">
 									{{ $billing_details['address_line1']." ".$billing_details['address_line2'].", ".$billing_details['brgy'].", ".$billing_details['city'].", ".$billing_details['province'].", ".$billing_details['country']." ".$billing_details['postal_code'] }}
 								</div>
@@ -1325,6 +1323,7 @@
 			$('#cart-subtotal').text('₱ ' + subtotal.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,"));
 
 			var shipping_fee = $("input[name='shipping_fee']:checked").val();
+			shipping_fee = (isNaN(shipping_fee)) ? 0 : shipping_fee;
 			var total = parseFloat(shipping_fee) + subtotal;
 
 			var estimated_del = $("input[name='shipping_fee']:checked").data('est');
