@@ -279,7 +279,7 @@ class LoginController extends Controller
 
                 $user_check = $this->checkEmail('Facebook');
                 $soc_used = collect($user_check)->implode(', ');
-                Session::flash('accounts', $soc_used); 
+                session()->flash('accounts', $soc_used); 
 
                 return response()->json(['status' => 200, 'message' => 'Logged in']);
             }else{
@@ -301,7 +301,7 @@ class LoginController extends Controller
 
                 $user_check = $this->checkEmail('Facebook');
                 $soc_used = collect($user_check)->implode(', ');
-                Session::flash('accounts', $soc_used); 
+                session()->flash('accounts', $soc_used); 
 
                 return response()->json(['status' => 200, 'message' => 'Logged in new user']);
             }
