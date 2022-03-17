@@ -531,64 +531,13 @@ class CheckoutController extends Controller
 		DB::beginTransaction();
 		try {
 			$order_no = session()->get('fumOrderNo');
-			$shipping_details = session()->get('fumShipDet');
-			$billing_details = session()->get('fumBillDet');
 			$voucher_code = session()->get('fumVoucher');
-	
-			$temp_data = [
-				'xtempcode' => uniqid(),
-				'xfname' => (Auth::check()) ? Auth::user()->f_name : $shipping_details['fname'],
-				'xlname' => (Auth::check()) ? Auth::user()->f_lname : $shipping_details['lname'],
-				'xcontact_person' => $billing_details['fname']. " " . $billing_details['lname'],
-				'xshipcontact_person' => $shipping_details['fname']. " " . $shipping_details['lname'],
-				'xadd1' => ($billing_details) ? $billing_details['address_line1'] : $shipping_details['address_line1'],
-				'xadd2' => ($billing_details) ? $billing_details['address_line2'] : $shipping_details['address_line2'],
-				'xprov' => ($billing_details) ? $billing_details['province'] : $shipping_details['province'],
-				'xcity' => ($billing_details) ? $billing_details['city'] : $shipping_details['city'],
-				'xbrgy' => ($billing_details) ? $billing_details['brgy'] : $shipping_details['brgy'],
-				'xpostal' => ($billing_details) ? $billing_details['postal_code'] : $shipping_details['postal_code'],
-				'xcountry' => ($billing_details) ? $billing_details['country'] : $shipping_details['country'],
-				'xaddresstype' => ($billing_details) ? $billing_details['address_type'] : $shipping_details['address_type'],
-				'xbusiness_name' => ($billing_details) ? $billing_details['business_name'] : $shipping_details['business_name'],
-				'xtin_no' => ($billing_details) ? $billing_details['tin'] : $shipping_details['tin'],
-				'xemail' => ($billing_details) ? $billing_details['email_address'] : $shipping_details['email_address'],
-				'xemail_shipping' => $shipping_details['email_address'],
-				'xmobile' => ($billing_details) ? $billing_details['mobile_no'] : $shipping_details['mobile_no'],
-				'xcontact' => $shipping_details['contact_no'],
-				'xshippadd1' => $shipping_details['address_line1'],
-				'xshippadd2' => $shipping_details['address_line2'],
-				'xshiprov' => $shipping_details['province'],
-				'xshipcity' => $shipping_details['city'],
-				'xshipbrgy' => $shipping_details['brgy'],
-				'xshippostalcode' => $shipping_details['postal_code'],
-				'xshipcountry' => $shipping_details['country'],
-				'xshiptype' => $shipping_details['address_type'],
-				'xship_business_name' => $shipping_details['business_name'],
-				'xship_tin' => $shipping_details['tin'],
-				'xlogs' => $order_no,
-				'order_status' => 'Order Pending',
-				'order_tracker_code' => $order_no,
-				'order_shipping_type' => null, 
-				'order_ip' => $request->ip(),
-				'xusertype' => (Auth::check()) ? 'Member' : 'Guest',
-				'xusernamex' => (Auth::check()) ? Auth::user()->username : null,
-				'xstatus' => 2,
-				'xuser_id' => (Auth::check()) ? Auth::user()->id : null,
-				'shipping_name' => $request->s_name,
-				'shipping_amount' => $request->s_amount,
-				'estimated_delivery_date' => $request->estimated_del,
-				'xstore_location' => ($request->s_name == 'Store Pickup') ? $request->storeloc : null,
-				'xpickup_date' => ($request->s_name == 'Store Pickup') ? Carbon::parse($request->picktime)->format('Y-m-d') : null,
-				'xpickup_time' => ($request->s_name == 'Store Pickup') ? $request->timeslot : null,
-				'voucher_code' => strtoupper($voucher_code),
-				'payment_method' => $request->pay_name,
-				'issuing_bank' => $request->ib,
-			];
 
 			$existing_order_temp = DB::table('fumaco_temp')->where('order_tracker_code', $order_no)->first();
 			if(!$existing_order_temp){
-				DB::table('fumaco_temp')->insert($temp_data);
+				return response()->json(['status' => 2, 'message' => 'An error occured. Please try again.']);
 			} else {
+				$attempt = $existing_order_temp->payment_attempt + 1;
 				DB::table('fumaco_temp')->where('id', $existing_order_temp->id)->update([
 					'shipping_name' => $request->s_name,
 					'shipping_amount' => $request->s_amount,
@@ -597,7 +546,8 @@ class CheckoutController extends Controller
 					'estimated_delivery_date' => $request->estimated_del,
 					'xstore_location' => ($request->s_name == 'Store Pickup') ? $request->storeloc : null,
 					'xpickup_date' => ($request->s_name == 'Store Pickup') ? Carbon::parse($request->picktime)->format('Y-m-d') : null,
-					'voucher_code' => ($voucher_code) ? strtoupper($voucher_code) : null
+					'voucher_code' => ($voucher_code) ? strtoupper($voucher_code) : null,
+					'payment_attempt' => $attempt
 				]);
 			}
 
