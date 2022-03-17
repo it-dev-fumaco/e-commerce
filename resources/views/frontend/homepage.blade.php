@@ -62,7 +62,7 @@
             <picture>
               <source srcset="{{ asset('/storage/journals/'. explode(".", $carousel->fumaco_image1)[0] .'.webp') }}" type="image/webp" style="object-fit: cover;opacity: 0.6;">
               <source srcset="{{ asset('/storage/journals/'. $carousel->fumaco_image1) }}" type="image/jpeg" style="object-fit: cover;opacity: 0.6;">
-              <img src="{{ asset('/storage/journals/'. $carousel->fumaco_image1) }}" alt="{{ Str::slug(explode(".", $carousel->fumaco_image1)[0], '-') }}" style="object-fit: cover;opacity: 0.6;">
+              <img src="{{ asset('/storage/journals/'. $carousel->fumaco_image1) }}" alt="{{ Str::slug(explode(".", $carousel->fumaco_image1)[0], '-') }}" style="object-fit: cover;opacity: 0.6;height: 100% !important; width: 100% !important">
             </picture>
 
             <div class="container">
@@ -515,7 +515,6 @@
   .slick-current, .slick-slide  {
     opacity: 1;
   }
-
   #multiple-accounts-msg{
     position: absolute !important;
     left: 5px !important;
@@ -536,6 +535,8 @@
 @section('script')
   <script src="{{ asset('/slick/slick.js') }}" type="text/javascript" charset="utf-8"></script>
   <script type="text/javascript">
+    $('#myCarousel').css('margin-top', $('#navbar').height());
+
     $(document).ready(function() {
       setTimeout(function() {
         $('#multiple-accounts-msg').fadeOut();
