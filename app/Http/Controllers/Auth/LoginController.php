@@ -268,14 +268,13 @@ class LoginController extends Controller
         try {
             $finduser = User::where('facebook_id', $request->id)->orWhere('username', $request->email)->first();
 
-            return $finduser;
             if($finduser){
                 Auth::loginUsingId($finduser->id);
 
                 $this->updateCartItemOwner();
                 $this->saveLoginDetails();
 
-                if(!$finduser->facebook_id or $finduser->facebook_id == ''){
+                if($finduser->facebook_id == null or $finduser->facebook_id == ''){
                     DB::table('fumaco_users')->where('username', $finduser->email)->update(['facebook_id' => $request->id]);
                 }
 
