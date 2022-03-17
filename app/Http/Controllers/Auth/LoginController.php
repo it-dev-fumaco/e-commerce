@@ -303,7 +303,7 @@ class LoginController extends Controller
 
                 return response()->json(['status' => 200, 'message' => 'Logged in new user']);
             }
-        } catch (\exception $th) {
+        } catch (Exception $th) {
             return response()->json(['status' => 500, 'message' => $th]);
         }
     }
