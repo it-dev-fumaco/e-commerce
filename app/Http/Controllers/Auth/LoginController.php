@@ -303,8 +303,8 @@ class LoginController extends Controller
 
                 return response()->json(['status' => 200, 'message' => 'Logged in new user']);
             }
-        } catch (\Throwable $th) {
-            return response()->json(['status' => 500, 'message' => 'Your email address or password is incorrect, please try again']);
+        } catch (\exception $th) {
+            return response()->json(['status' => 500, 'message' => $th]);
         }
     }
 
