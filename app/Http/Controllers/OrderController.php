@@ -837,48 +837,51 @@ class OrderController extends Controller
                     return back()->with('error', 'Cannot cancel order <b>' . $details->order_number . '</b>. Order can only be cancelled for the transaction within the same day as the order date.');
                 }
 
-                $amount_paid = number_format($details->amount_paid, 2, ".", "");
+                $transaction_success = true;
+                if($details->order_payment_method != 'Bank Deposit') {
+                    $amount_paid = number_format($details->amount_paid, 2, ".", "");
 
-                $string = $api->password . $api->service_id . $details->payment_id . $amount_paid . 'PHP';
-                $hash = hash('sha256', $string);
-
-                switch ($details->order_payment_method) {
-                    case 'Credit Card':
-                        $payment_method = 'CC';
-                        break;
-                    case 'Credit Card (MOTO)':
-                        $payment_method = 'MO';
-                        break;
-                    case 'Direct Debit':
-                        $payment_method = 'DD';
-                        break;
-                    case 'e-Wallet':
-                        $payment_method = 'WA';
-                        break;
-                    default:
-                        $payment_method = 'ANY';
-                        break;
+                    $string = $api->password . $api->service_id . $details->payment_id . $amount_paid . 'PHP';
+                    $hash = hash('sha256', $string);
+    
+                    switch ($details->order_payment_method) {
+                        case 'Credit Card':
+                            $payment_method = 'CC';
+                            break;
+                        case 'Credit Card (MOTO)':
+                            $payment_method = 'MO';
+                            break;
+                        case 'Direct Debit':
+                            $payment_method = 'DD';
+                            break;
+                        case 'e-Wallet':
+                            $payment_method = 'WA';
+                            break;
+                        default:
+                            $payment_method = 'ANY';
+                            break;
+                    }
+    
+                    $data = [
+                        'TransactionType' => 'RSALE',
+                        'PymtMethod' => $payment_method,
+                        'ServiceID' => $api->service_id,
+                        'PaymentID'=> $details->payment_id,
+                        'Amount' => $amount_paid,
+                        'CurrencyCode' => 'PHP',
+                        'HashValue' => $hash
+                    ];
+    
+                    $response = Http::asForm()->post($api->base_url, $data);
+    
+                    parse_str($response, $output);
+    
+                    if ($output['TxnStatus'] > 0) {
+                        return redirect()->back()->with('error', 'Failed to cancel order <b>'.$details->order_number.'</b>.');
+                    }
                 }
 
-                $data = [
-                    'TransactionType' => 'RSALE',
-                    'PymtMethod' => $payment_method,
-                    'ServiceID' => $api->service_id,
-                    'PaymentID'=> $details->payment_id,
-                    'Amount' => $amount_paid,
-                    'CurrencyCode' => 'PHP',
-                    'HashValue' => $hash
-                ];
-
-                $response = Http::asForm()->post($api->base_url, $data);
-
-                parse_str($response, $output);
-
-                if ($output['TxnStatus'] > 0) {
-                    return redirect()->back()->with('error', 'Failed to cancel order <b>'.$details->order_number.'</b>.');
-                }
-
-                if ($output['TxnStatus'] == 0) {
+                if ($transaction_success) {
                     $date_cancelled = Carbon::now()->toDateTimeString();
                     $order_items = DB::table('fumaco_order_items as foi')->join('fumaco_items as fi', 'foi.item_code', 'fi.f_idcode')
                         ->where('foi.order_number', $details->order_number)->select('foi.item_qty', 'foi.item_code', 'fi.f_reserved_qty', 'foi.item_name', 'foi.item_price', 'foi.item_discount', 'foi.item_total_price')->get();
