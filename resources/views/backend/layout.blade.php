@@ -248,7 +248,7 @@
           @php
             $product_pages = ['add_product_form', 'product_list', 'view_product_form', 'product_attribute_settings', 'product_category', 'product_comparison', 'product_category_settings', 'product_reviews'];
             $media_pages = ['list_media', 'add_media'];
-            $order_pages = ['order_list', 'order_cancel', 'order_delivered', 'payment_status', 'order_status', 'order_status_sequence'];
+            $order_pages = ['order_list', 'order_cancel', 'order_delivered', 'payment_status', 'order_status', 'order_status_sequence', 'payment_status_list'];
             $category_pages = ['product_category'];
             $customer_pages = ['customers_list'];
             $reports_pages = ['items_on_cart'];
@@ -349,6 +349,12 @@
                 <a href="/admin/order/sequence_list" class="nav-link {{ $activePage == 'order_status_sequence' ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Order Status Sequence</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="/admin/payment/status_list" class="nav-link {{ $activePage == 'payment_status_list' ? 'active' : '' }}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Payment Status</p>
                 </a>
               </li>
             </ul>

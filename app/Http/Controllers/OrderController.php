@@ -426,6 +426,86 @@ class OrderController extends Controller
         return view('backend.orders.status_list', compact('status_list'));
     }
 
+    public function paymentStatusList(){
+        $status_list = DB::table('fumaco_payment_status')->paginate(10);
+        return view('backend.orders.payment_status', compact('status_list'));
+    }
+
+    public function paymentStatusAddForm(){
+        return view('backend.orders.payment_status_add');
+    }
+
+    public function paymentStatusAdd(Request $request){
+        DB::beginTransaction();
+		try{
+            $rules = array(
+				'status_name' => 'required|unique:fumaco_payment_status,status',
+			);
+
+			$validation = Validator::make($request->all(), $rules);
+
+            if ($validation->fails()){
+				return redirect()->back()->with('error', "Payment Status Name must be unique.");
+			}
+
+            $insert = [
+                'status' => $request->status_name,
+                'status_description' => $request->status_description,
+                'updates_status' => isset($request->updates_status) ? 1 : 0,
+                'created_by' => Auth::user()->username
+            ];
+
+            DB::table('fumaco_payment_status')->insert($insert);
+            DB::commit();
+            return redirect('/admin/payment/status_list')->with('success', 'Payment Status Added!');
+        }catch(Exception $e){
+			DB::rollback();
+			return redirect()->back()->with('error', 'An error occured. Please try again.');
+		}
+    }
+
+    public function paymentStatusEditForm($id){
+        $status = DB::table('fumaco_payment_status')->where('id', $id)->first();
+        return view('backend.orders.payment_status_edit', compact('status'));
+    }
+
+    public function paymentStatusEdit($id, Request $request){
+        DB::beginTransaction();
+		try{
+            $checker = DB::table('fumaco_payment_status')->where('id', '!=', $id)->where('status', $request->status_name)->count();
+
+            if($checker > 0){
+                return redirect()->back()->with('error', "Payment Status Name must be unique.");
+            }
+
+            $update = [
+                'status' => $request->status_name,
+                'status_description' => $request->status_description,
+                'updates_status' => isset($request->updates_status) ? 1 : 0,
+                'last_modified_by' => Auth::user()->username
+            ];
+
+            DB::table('fumaco_payment_status')->where('id', $id)->update($update);
+            DB::commit();
+            return redirect('/admin/payment/status_list')->with('success', 'Payment Status Updated!');
+        }catch(Exception $e){
+			DB::rollback();
+			return redirect()->back()->with('error', 'An error occured. Please try again.');
+		}
+    }
+
+    public function paymentStatusDelete($id){
+        DB::beginTransaction();
+		try{
+            DB::table('fumaco_payment_status')->where('id', $id)->delete();
+            DB::commit();
+            return redirect('/admin/payment/status_list')->with('success', 'Payment Status Deleted!');
+        }catch(Exception $e){
+			DB::rollback();
+			return redirect()->back()->with('error', 'An error occured. Please try again.');
+		}
+    }
+
     public function addStatusForm(){
         return view('backend.orders.add_status');
     }
