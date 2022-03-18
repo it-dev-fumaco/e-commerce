@@ -101,7 +101,8 @@ class OrderController extends Controller
                 'pickup_date' => Carbon::parse($o->pickup_date)->format('M d, Y'),
                 'store_address' => $store_address,
                 'store' => $o->store_location,
-                'order_status' => $order_status
+                'order_status' => $order_status,
+                'deposit_slip_image' => $o->deposit_slip_image
             ];
         }
 
@@ -164,6 +165,7 @@ class OrderController extends Controller
                 'date_cancelled' => Carbon::parse($o->date_cancelled)->format('M d, Y - h:m A')
             ];
         }
+
         return view('backend.orders.cancelled_orders', compact('orders_arr', 'orders'));
     }
 
@@ -941,5 +943,44 @@ class OrderController extends Controller
 
             return redirect()->back()->with('error', 'An error occured. Please try again.');
         }
+    }
+
+    public function uploadDepositSlip($id, Request $request) {
+        $order_details = DB::table('fumaco_order')->where('id', $id)->first();
+        if(!$order_details) {
+            return redirect()->back()->with('error', 'Order id ' . $id . ' not found.');
+        }
+
+        $customer_name = $order_details->order_name . ' ' . $order_details->order_lastname;
+        $order_number = $order_details->order_number;
+        $date_uploaded = Carbon::now()->format('d-m-y');
+
+        $image_filename = $customer_name . '-' . $order_number . '-' . $date_uploaded;
+
+        if($request->hasFile('deposit_slip_image')){
+            $image = $request->file('deposit_slip_image');
+
+            $allowed_extensions = array('jpg', 'png', 'jpeg', 'gif');
+            $extension_error = "Sorry, only JPG, JPEG, PNG and GIF files are allowed.";
+
+            $destinationPath = storage_path('/app/public/deposit_slips/');
+
+            $extension = pathinfo($image->getClientOriginalName(), PATHINFO_EXTENSION);
+
+            $image_name = $image_filename.".".$extension;
+            if(!in_array($extension, $allowed_extensions)){
+                return redirect()->back()->with('error', $extension_error);
+            }
+
+            $image->move($destinationPath, $image_name);
+
+            DB::table('fumaco_order')->where('id', $id)->update([
+                'deposit_slip_image' => $image_name,
+                'deposit_slip_date_uploaded' => Carbon::now()->toDateTimeString(),
+                'payment_status' => 'Payment For Confirmation'
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Deposit Slip for order <b>'.$order_details->order_number.'</b> has been uploaded.');
     }
 }

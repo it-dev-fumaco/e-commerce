@@ -265,6 +265,9 @@
 																		$dt2 = \Carbon\Carbon::parse($order['order_date']);
 																		$is_same_day = ($dt->isSameDay($dt2));
 																	@endphp	
+																	@if($order['payment_method'] == 'Bank Deposit')
+																	<button type="button" class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#upload-deposit-slip-{{ $order['order_no'] }}">Upload Deposit Slip</button>
+																	@endif
 																	<button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#cancel-order-{{ $order['order_no'] }}" {{ !$is_same_day ? 'disabled' : '' }}>Cancel Order</button>
 																	<a href="/admin/order/print/{{ $order['order_no'] }}" class="print_order btn btn-sm btn-primary" target="_blank">Print</a>
 																	<button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#tracker-{{ $order['order_no'] }}">Add Tracker Code</button>
@@ -294,6 +297,41 @@
 																	<button type="button" class="btn btn-secondary" data-dismiss="cmodal">NO</button>
 																</div>
 															</div>
+														</div>
+													</div>
+													<div class="modal fade confirm-modal" id="upload-deposit-slip-{{ $order['order_no'] }}" tabindex="-1" role="dialog" aria-labelledby="upload-deposit-slip-{{ $order['order_no'] }}" aria-hidden="true">
+														<div class="modal-dialog modal-lg" role="document">
+															<form action="/admin/order/upload_deposit_slip/{{ $order['order_id'] }}" method="POST" autocomplete="off" enctype="multipart/form-data">
+																@csrf
+																<input type="hidden" name="is_admin" value="1">
+																<div class="modal-content">
+																	<div class="modal-header">
+																		<h5 class="modal-title">Upload Deposit Slip for <b>{{ $order['order_no'] }}</b></h5>
+																		<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+																			<span aria-hidden="true">&times;</span>
+																		</button>
+																	</div>
+																	<div class="modal-body text-center">
+																		@if ($order['deposit_slip_image'])
+																		<img src="{{ asset('/storage/deposit_slips/' . $order['deposit_slip_image']) }}" id="img-preview-{{ $order['order_no'] }}" class="img-thumbnail w-50">
+																		@else
+																		<img src="{{ asset('/storage/no-photo-available.png') }}" id="img-preview-{{ $order['order_no'] }}" class="img-thumbnail w-50">
+																		@endif
+																		<div class="row">
+																			<div class="col-md-6 offset-md-3">
+																				<div class="custom-file mt-3 text-left">
+																					<input type="file" class="custom-file-input img-upload-btn" id="file{{ $order['order_no'] }}" data-id="img-preview-{{ $order['order_no'] }}" name="deposit_slip_image">
+																					<label class="custom-file-label" for="file{{ $order['order_no'] }}">Choose file</label>
+																				</div>
+																			</div>
+																		</div>
+																	</div>
+																	<div class="modal-footer">
+																		<button type="submit" class="btn btn-primary">Upload</button>
+																		<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+																	</div>
+																</div>
+															</form>
 														</div>
 													</div>
 													<div class="modal fade confirm-modal" id="cancel-order-{{ $order['order_no'] }}" tabindex="-1" role="dialog" aria-labelledby="cancel-order-{{ $order['order_no'] }}" aria-hidden="true">
@@ -350,4 +388,25 @@
 		align-items: center;
 	}
 	</style>
+@endsection
+
+@section('script')
+<script>
+	$(function () {
+		bsCustomFileInput.init();
+
+		$(document).on('change', '.img-upload-btn', function() {
+			var img_div = $(this).data('id');
+			const file1 = this.files[0];
+			if (file1){
+				let reader = new FileReader();
+				reader.onload = function(event){
+					$('#' + img_div).attr('src', event.target.result);
+				}
+
+				reader.readAsDataURL(file1);
+			}
+		});
+	});
+</script>
 @endsection

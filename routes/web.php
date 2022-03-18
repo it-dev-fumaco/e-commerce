@@ -257,6 +257,7 @@ Route::prefix('admin')->group(function () {
         Route::post('/order/status/{id}/edit', 'OrderController@editStatus');
         Route::get('/order/status/{id}/delete', 'OrderController@deleteStatus');
         Route::post('/order/cancel/{id}', 'OrderController@cancelOrder');
+        Route::post('/order/upload_deposit_slip/{id}', 'OrderController@uploadDepositSlip');
 
         Route::get('/payment/status_list', 'OrderController@paymentStatusList');
         Route::get('/payment/status/add/form', 'OrderController@paymentStatusAddForm');
