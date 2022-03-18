@@ -950,7 +950,9 @@ class CheckoutController extends Controller
 					'pickup_date' => $temp->xpickup_date,
 					'pickup_time' => $temp->xpickup_time,
 					'voucher_code' => ($is_voucher_valid) ? $temp->voucher_code : null,
-					'discount_amount' => $discount
+					'discount_amount' => $discount,
+					'deposit_slip_token' => $payment_method == 'Bank Deposit' ? hash('sha256', Carbon::now()->toDateTimeString()) : null,
+					'deposit_slip_token_date_created' => $payment_method == 'Bank Deposit' ? Carbon::now()->toDateTimeString() : null,
 				]);
 
 				// insert order in tracking order table
