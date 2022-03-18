@@ -145,7 +145,12 @@
                                                         </div>
                                                         <div class="form-group">
                                                             <label for="edit-payment-type{{ $row->payment_method_id }}">Payment Type</label>
-                                                            <input type="text" name="payment_type" class="form-control" id="edit-payment-type{{ $row->payment_method_id }}" value="{{ $row->payment_type }}">
+															<select name="payment_type" class="form-control" id="edit-payment-type{{ $row->payment_method_id }}">
+																<option value="">Select Payment Type</option>
+																<option value="CC" {{ $row->payment_type == 'CC' ? 'selected' : '' }}>CC - Credit Cart</option>
+																<option value="WA" {{ $row->payment_type == 'WA' ? 'selected' : '' }}>WA - e-Wallet</option>
+																<option value="Bank Deposit" {{ $row->payment_type == 'Bank Deposit' ? 'selected' : '' }}>Bank Deposit</option>
+															</select>
                                                         </div>
                                                         <div class="form-group">
                                                             <label for="edit-issuing-bank{{ $row->payment_method_id }}">Issuing Bank</label>
@@ -227,7 +232,13 @@
                     </div>
                     <div class="form-group">
                         <label for="payment-type">Payment Type</label>
-                        <input type="text" name="payment_type" class="form-control" id="payment-type">
+                        <input type="text">
+						<select name="payment_type" class="form-control" id="payment-type">
+							<option value="">Select Payment Type</option>
+							<option value="CC">CC - Credit Cart</option>
+							<option value="WA">WA - e-Wallet</option>
+							<option value="Bank Deposit">Bank Deposit</option>
+						</select>
                     </div>
                     <div class="form-group">
                         <label for="issuing-bank">Issuing Bank</label>

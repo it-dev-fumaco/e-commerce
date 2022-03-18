@@ -1260,6 +1260,17 @@
 			}
 		}
 
+		function callback2(data) {
+			if(data.status == 2) {
+				alert(data.message);
+			} else if (data.status == 1) {
+				$('#payment-form').empty();
+				window.location.href = "/checkout/success/" + data.code;
+			} else {
+				alert(d.message);
+			}
+		}
+
 		function checkForm() {
 			if ($("#payment-form").find('form').length) {
 				$('#payment-form form').delay(500).submit();
@@ -1280,6 +1291,8 @@
 
 			var pay_name = $("input[name='payment_method']:checked").val();
 			var ib = $("input[name='payment_method']:checked").data('ib');
+
+			var cb = pay_name == 'Bank Deposit' ? callback2 : callback;
 			
 			var data = {
 				estimated_del, s_name, s_amount, _token: '{{ csrf_token() }}', storeloc, picktime, timeslot, pay_name, ib
@@ -1298,7 +1311,7 @@
 					url: '/order/save',
 					type:"POST",
 					data: data,
-					success: callback,
+					success: cb,
 					error : function(data) {
 						$('#alert-box').removeClass('d-none').text('An error occured. Please try again.');
 					}

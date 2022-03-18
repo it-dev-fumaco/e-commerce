@@ -631,7 +631,7 @@ class CheckoutController extends Controller
 
 			session()->forget('fumVoucher');
 
-			return response()->json(['status' => 1, 'id' => $order_no]);
+			return response()->json(['status' => 1, 'id' => $order_no, 'code' => $existing_order_temp->xtempcode]);
 		} catch (Exception $e) {
 			DB::rollback();
 
@@ -894,9 +894,12 @@ class CheckoutController extends Controller
 						$payment_method = $request->PymtMethod;
 						break;
 				}
-				
+
+				if(!$payment_method) {
+					$payment_method = $temp->payment_method;
+				}
+
 				DB::table('fumaco_order')->insert([
-					// 'order_number' => $temp->order_tracker_code,
 					'order_number' => $temp->xlogs,
 					'order_account' => $temp->xuser_id, // account number of logged user
 					'order_name' => $temp->xfname,
@@ -936,7 +939,7 @@ class CheckoutController extends Controller
 					'bank_ref_no' => $request->BankRefNo,
 					'issuing_bank' => $request->IssuingBank,
 					'payment_transaction_time' => $request->RespTime,
-					'amount_paid' => $request->Amount,
+					'amount_paid' => ($request->Amount) ? $request->Amount : 0,
 					'order_type' => $temp->xusertype,
 					'user_email' => $loggedin,
 					'shipping_business_name' => $temp->xship_business_name,
