@@ -128,7 +128,8 @@
 														<div class="card-body he1x" style="padding-bottom: 0px !important;">
 															{{ $shipping_address1." ".$shipping_address2.", ".$shipping_brgy.", ".$shipping_city.", ".$shipping_province.", ".$shipping_country." ".$shipping_postal }}
 														</div>
-														<div class="card-body he1x" style="padding-bottom: 0px !important;">Contact Number :  {{ $shipping_mobile }}<br/>&nbsp;</div>
+														<div class="card-body he1x" style="padding-bottom: 0px !important;">Contact Number :  {{ $shipping_mobile }}</div>
+														<div class="card-body he1x" style="padding-bottom: 0px !important;">Email Address :  {{ $shipping_email }}<br/>&nbsp;</div>
 
 														<div class="form-check {{ $checkbox }} ">
 															<input class="form-check-input" type="checkbox" id="same-address" checked>
@@ -173,7 +174,8 @@
 																{{ $billing_details['address_line1']." ".$billing_details['address_line2'].", ".$billing_details['brgy'].", ".$billing_details['city'].", ".$billing_details['province'].", ".$billing_details['country']." ".$billing_details['postal_code'] }}
 															</div>
 
-															<div class="card-body he1x" style="padding-bottom: 0px !important;">Contact Number :  {{ $billing_details['mobile_no'] }}<br/>&nbsp;</div>
+															<div class="card-body he1x" style="padding-bottom: 0px !important;">Contact Number :  {{ $billing_details['mobile_no'] }}</div>
+															<div class="card-body he1x" style="padding-bottom: 0px !important;">Email Address :  {{ $billing_details['email_address'] }}<br/>&nbsp;</div>
 														</div>
 													</div>
 												</div>
@@ -262,7 +264,7 @@
 									$defaul_selected = ($loop->first) ? 'checked' : '';
 								}
 							@endphp
-							<div class="d-flex justify-content-between align-items-center">
+							{{-- <div class="d-flex justify-content-between align-items-center">
 								<div class="form-check">
 									<input class="form-check-input" type="radio" name="shipping_fee" id="{{ 'sr' . $l }}" value="{{ $srate['shipping_cost'] }}" data-sname="{{ $srate['shipping_service_name'] }}" data-est="{{ $srate['expected_delivery_date'] }}" data-pickup="{{ $srate['pickup'] }}" required {{ $defaul_selected }} data-lead="{{ $srate['max_lead_time'] }}">
 									<label class="form-check-label" for="{{ 'sr' . $l }}">{{ $srate['shipping_service_name'] }} <br class="d-xl-none"/>
@@ -304,7 +306,7 @@
 									</div>
 								</div>
 							</div>
-							@endif
+							@endif --}}
 							@empty
 								<h6>No available shipping methods.</h6>
 							@endforelse
