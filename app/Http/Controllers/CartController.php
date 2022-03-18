@@ -475,6 +475,25 @@ class CartController extends Controller
     }
 
     public function setShippingBillingDetails(Request $request) {
+        $order_no = session()->get('fumOrderNo');
+        $existing_order_temp = DB::table('fumaco_temp')->where('order_tracker_code', $order_no)->first();
+        if(!$existing_order_temp){
+            if ($order_no) {
+                $existing_temp = DB::table('fumaco_temp')->where('xlogs', $order_no)->first();
+                if(!$existing_temp) {
+                    DB::table('fumaco_temp')->insert([
+                        'xtempcode' => uniqid(),
+                        'xlogs' => $order_no,
+                        'order_tracker_code' => $order_no,
+                        'order_ip' => $request->ip(),
+                        'xusertype' => Auth::check() ? 'Member' : 'Guest',
+                        'xusernamex' => Auth::check() ? Auth::user()->username : null,
+                        'xuser_id' => Auth::check() ? Auth::user()->id : null,
+                    ]);
+                }
+            }
+        }
+
         if(Auth::check()) {
             $user_id = Auth::user()->id;
             $user = DB::table('fumaco_users')->where('id', $user_id)->first();
@@ -574,7 +593,6 @@ class CartController extends Controller
             }
         }
 
-        $order_no = session()->get('fumOrderNo');
         if ($order_no) {
             $temp_data = [
                 'xfname' => (Auth::check()) ? Auth::user()->f_name : $shipping_details['fname'],
