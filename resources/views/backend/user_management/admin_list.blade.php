@@ -112,12 +112,15 @@
                                                                                 <input type="text" name="account_name" value="{{ $a->account_name }}" class="form-control">
                                                                             </div>
                                                                             <div class="form-group">
+                                                                                @php
+                                                                                    $user_type = ['Accounting Admin', 'Marketing Admin', 'Sales Admin', 'System Admin'];
+                                                                                @endphp
                                                                                 <label for="name">User Type</label>
                                                                                 <select class="form-control" name="user_type" required>
                                                                                     <option {{ ($a->user_type == "" ) ? 'selected' : '' }} disabled value="">Select User Type</option>
-                                                                                    <option value="System Admin" {{ ($a->user_type == "System Admin" ) ? 'selected' : '' }}>System Admin</option>
-                                                                                    <option value="Sales Admin" {{ ($a->user_type == "Sales Admin" ) ? 'selected' : '' }}>Sales Admin</option>
-                                                                                    <option value="Marketing Admin" {{ ($a->user_type == "Marketing Admin" ) ? 'selected' : '' }}>Marketing Admin</option>
+                                                                                    @foreach ($user_type as $user)
+                                                                                        <option value="{{ $user }}" {{ $a->user_type == $user ? 'selected' : null }}>{{ $user }}</option>
+                                                                                    @endforeach
                                                                                 </select>
                                                                             </div>
                                                                             <div class="form-group">

@@ -2421,6 +2421,18 @@ class FrontendController extends Controller
                 'transaction_member' => $order_details->order_type,
                 'last_modified_by' => Auth::user()->username
             ]);
+
+            // send notification to accounting->where('user_type', 'Accounting Admin')
+            $order = ['order_details' => $order_details];
+
+            $email_recipient = DB::table('fumaco_admin_user')->where('username', 'jave.kulong@fumaco.com')->pluck('username');
+            $recipients = collect($email_recipient)->toArray();
+            if (count(array_filter($recipients)) > 0) {
+                Mail::send('emails.deposit_slip_notif', $order, function($message) use ($recipients) {
+                    $message->to($recipients);
+                    $message->subject('Awaiting Confirmation - FUMACO - TESTING');
+                });
+            }
         }
         
         return redirect()->back()->with('success', 'Deposit Slip for your order <b>'.$order_details->order_number.'</b> has been uploaded.');

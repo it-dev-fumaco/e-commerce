@@ -52,12 +52,15 @@
                                                 <input type="email" class="form-control" name="username" placeholder="Username" required>
                                             </div>
                                             <div class="col-md-6">
+                                                @php
+                                                    $user_type = ['Accounting Admin', 'Marketing Admin', 'Sales Admin', 'System Admin'];
+                                                @endphp
                                                 <label for="user_type">User Type</label>
                                                 <select class="form-control" name="user_type" required>
                                                     <option selected disabled value="">Select User Type</option>
-                                                    <option value="System Admin">System Admin</option>
-                                                    <option value="Sales Admin">Sales Admin</option>
-                                                    <option value="Marketing Admin">Marketing Admin</option>
+                                                    @foreach ($user_type as $user)
+                                                        <option value="{{ $user }}">{{ $user }}</option>
+                                                    @endforeach
                                                 </select>
                                             </div>
                                         </div>

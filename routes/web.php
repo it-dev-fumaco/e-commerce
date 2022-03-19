@@ -247,7 +247,8 @@ Route::prefix('admin')->group(function () {
         Route::post('/add_media_records', 'MediaController@add_media_record');
         Route::post('/delete_media', 'MediaController@delete_media_record');
 
-        Route::get('/order/order_lists/', 'OrderController@orderList');
+        Route::get('/order/order_lists/', 'OrderController@orderList')->name('orders');
+        Route::get('/order/confirm_buffer/', 'OrderController@confirmBuffer')->name('confirm_buffer');
         Route::get('/order/cancelled/', 'OrderController@cancelledOrders');
         Route::get('/order/delivered/', 'OrderController@deliveredOrders');
         Route::get('/order/print/{order_id}', 'OrderController@printOrder');

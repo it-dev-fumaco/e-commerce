@@ -1001,8 +1001,25 @@ class OrderController extends Controller
                 'transaction_member' => $order_details->order_type,
                 'last_modified_by' => Auth::user()->username
             ]);
+            
+            // send notification to accounting
+            $order = ['order_details' => $order_details];
+
+            $email_recipient = DB::table('fumaco_admin_user')->where('user_type', 'Accounting Admin')->pluck('username');
+            $recipients = collect($email_recipient)->toArray();
+            if (count(array_filter($recipients)) > 0) {
+                Mail::send('emails.deposit_slip_notif', $order, function($message) use ($recipients) {
+                    $message->to($recipients);
+                    $message->subject('Awaiting Confirmation - FUMACO');
+                });
+            }
         }
 
         return redirect()->back()->with('success', 'Deposit Slip for order <b>'.$order_details->order_number.'</b> has been uploaded.');
+    }
+
+    public function confirmBuffer(Request $request){
+        session()->flash('for_confirmation', $request->order_number);
+        return redirect('/admin/order/order_lists/');
     }
 }

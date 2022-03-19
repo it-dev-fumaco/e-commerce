@@ -137,8 +137,6 @@
 																	</div>
 																	<div class="col-md-6 d-print-none">
 																		@php
-																			$account_type = explode(' - ', Auth::user()->account_name)[0];
-
 																			$update_status = null;
 																			if($order['payment_method'] == 'Bank Deposit' and $order['status'] == 'Order Placed' and !in_array($order['payment_status'], ['Payment Received', 'Payment Confirmed'])){
 																				$update_status = 'disabled';
@@ -161,7 +159,7 @@
 																			<button type="submit" class="form-control col-md-3" style="margin-left: 2%" {{ $update_status }}>Update</button>
 																		</form>
 
-																		@if ($order['payment_method'] == 'Bank Deposit' and in_array($account_type, ['System Administrator', 'Accounting']))
+																		@if ($order['payment_method'] == 'Bank Deposit' and in_array(Auth::user()->user_type, ['System Admin', 'Accounting Admin']))
 																			<div class="row container-fluid">
 																				<div class="col-1 {{ !$order['deposit_slip_image'] ? 'd-none' : null }}">
 																					<a href="{{ asset('/storage/deposit_slips/'.$order['deposit_slip_image']) }}" target="_blank">
@@ -449,6 +447,13 @@
 @endsection
 
 @section('script')
+@if (session()->has('for_confirmation'))
+	<script>
+		$(document).ready(function(){
+			$('#order-{{ session()->get("for_confirmation") }}').modal('show');
+		});
+	</script>
+@endif
 <script>
 	$(function () {
 		bsCustomFileInput.init();
