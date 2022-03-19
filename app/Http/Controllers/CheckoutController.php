@@ -1005,13 +1005,18 @@ class CheckoutController extends Controller
 			$leadtime_arr = [];
 			foreach($ordered_items as $item){
 				$category_id = DB::table('fumaco_items')->where('f_idcode', $item)->pluck('f_cat_id')->first();
-				$shipping = DB::table('fumaco_shipping_service as shipping_service')
-					->join('fumaco_shipping_zone_rate as zone_rate', 'shipping_service.shipping_service_id', 'zone_rate.shipping_service_id')
-					->where('shipping_service.shipping_service_name', $temp->shipping_name)
-					->where('zone_rate.province_name', $temp->xshiprov)
-					->first();
-
-				$lead_time_per_category = DB::table('fumaco_shipping_product_category')->where('shipping_service_id', $shipping->shipping_service_id)->where('category_id', $category_id)->select('min_leadtime', 'max_leadtime')->first();
+				if($temp->shipping_name != 'Store Pickup') {
+					$shipping = DB::table('fumaco_shipping_service as shipping_service')
+						->join('fumaco_shipping_zone_rate as zone_rate', 'shipping_service.shipping_service_id', 'zone_rate.shipping_service_id')
+						->where('shipping_service.shipping_service_name', $temp->shipping_name)
+						->where('zone_rate.province_name', $temp->xshiprov)
+						->first();
+				} else {
+					$shipping = DB::table('fumaco_shipping_service')->where('shipping_service_name', $temp->shipping_name)->first();
+				}
+				
+				$lead_time_per_category = DB::table('fumaco_shipping_product_category')->where('shipping_service_id', $shipping->shipping_service_id)
+					->where('category_id', $category_id)->select('min_leadtime', 'max_leadtime')->first();
 
 				$leadtime_arr[] = [
 					'min_leadtime' => $lead_time_per_category ? $lead_time_per_category->min_leadtime : $shipping->min_leadtime,
@@ -1045,6 +1050,8 @@ class CheckoutController extends Controller
 					$message->subject('New Order - FUMACO');
 				});
 			}
+
+			session()->forget('fumOrderNo');
 
 			return view('frontend.checkout.success', compact('order_details', 'items', 'loggedin', 'store_address'));
 		} catch (Exception $e) {

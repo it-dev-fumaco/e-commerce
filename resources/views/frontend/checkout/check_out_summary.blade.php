@@ -32,13 +32,13 @@
 	</main>
 
 	@php
-		$shipping_address1 = $shipping_details['address_line1'];
-		$shipping_address2 = $shipping_details['address_line2'];
-		$shipping_province = $shipping_details['province'];
-		$shipping_city = $shipping_details['city'];
-		$shipping_brgy = $shipping_details['brgy'];
+		$shipping_address1 = ucwords(strtolower($shipping_details['address_line1']));
+		$shipping_address2 = ucwords(strtolower($shipping_details['address_line2']));
+		$shipping_province = ucwords(strtolower($shipping_details['province']));
+		$shipping_city = ucwords(strtolower($shipping_details['city']));
+		$shipping_brgy = ucwords(strtolower($shipping_details['brgy']));
 		$shipping_postal = $shipping_details['postal_code'];
-		$shipping_country = $shipping_details['country'];
+		$shipping_country = ucwords(strtolower($shipping_details['country']));
 		$shipping_address_type = $shipping_details['address_type'];
 		$shipping_mobile = $shipping_details['mobile_no'];
 		$shipping_email = $shipping_details['email_address'];
@@ -56,9 +56,9 @@
 		}
 	@endphp
 	<main style="background-color:#ffffff;" class="products-head">
-		<div class="container-fluid p-0 mb-5">
+		<div class="container-fluid p-0"">
 			<div class="row">
-				<div class="col-md-4">
+				<div class="col-md-4 mb-3">
 					<div class="card he1x" style="background-color: #f4f4f4 !important; padding-bottom: 11px; min-height: 600px;">
 						<p style="margin: 15px 0 0 20px;"><strong>Your Order No.: <span id="order-no">{{ $order_no }}</span></strong></p>
 						<p style="margin: 15px 0 0 20px;">Customer Name: {{ (Auth::check()) ? Auth::user()->f_name . " " . Auth::user()->f_lname : $shipping_details['contact_person'] }}</p>
@@ -83,11 +83,11 @@
 										TIN: {{ $shipping_tin }}
 									</div>
 								@endif
-								<div class="he1x" style="margin-bottom: 10px !important;">Contact Person :  {{ $shipping_details['contact_person'] }}</div>
+								<div class="he1x" style="margin-bottom: 10px !important;">Contact Person: {{ $shipping_details['contact_person'] }}</div>
 								<div class="he1x" style="margin-bottom: 10px !important;">
 									{{ $shipping_address1." ".$shipping_address2.", ".$shipping_brgy.", ".$shipping_city.", ".$shipping_province.", ".$shipping_country." ".$shipping_postal }}
 								</div>
-								<div class="he1x" style="margin-bottom: 5px !important;">Contact Number :  {{ $shipping_mobile }}</div>
+								<div class="he1x" style="margin-bottom: 5px !important;">Contact Number: {{ $shipping_mobile }}</div>
 								<br>
 								<div class="form-check {{ $checkbox }}">
 									<input class="form-check-input" type="checkbox" disabled {{ $shipping_details['same_as_billing'] ? 'checked' : '' }} id="same-as-billing-cb">
@@ -116,18 +116,18 @@
 										TIN: {{ $billing_details['tin'] }}
 									</div>
 								@endif
-								<div class="he1x" style="margin-bottom: 10px !important;">Contact Person :  {{ $billing_details['contact_person'] }}</div>
+								<div class="he1x" style="margin-bottom: 10px !important;">Contact Person:  {{ $billing_details['contact_person'] }}</div>
 								<div class="he1x" style="margin-bottom: 10px !important;">
-									{{ $billing_details['address_line1']." ".$billing_details['address_line2'].", ".$billing_details['brgy'].", ".$billing_details['city'].", ".$billing_details['province'].", ".$billing_details['country']." ".$billing_details['postal_code'] }}
+									{{ ucwords(strtolower($billing_details['address_line1']))." ".ucwords(strtolower($billing_details['address_line2'])).", ".ucwords(strtolower($billing_details['brgy'])).", ".ucwords(strtolower($billing_details['city'])).", ".ucwords(strtolower($billing_details['province'])).", ".ucwords(strtolower($billing_details['country']))." ".$billing_details['postal_code'] }}
 								</div>
-								<div class="he1x" style="margin-bottom: 5px !important;">Contact Number :  {{ $billing_details['mobile_no'] }}</div>
+								<div class="he1x" style="margin-bottom: 5px !important;">Contact Number:  {{ $billing_details['mobile_no'] }}</div>
 							</div>
 						</div>
 						@endif
 					</div>
 				</div>
 				
-				<div class="col-md-4">
+				<div class="col-md-4 mb-3">
 					<div class="card he1x" style="background-color: #f4f4f4 !important; padding-bottom: 11px; min-height: 600px;">
 						<p style="padding: 15px 0 0 20px;">Order Summary</p>
 						<hr style="margin: -10px 20px 0 20px;">
@@ -198,7 +198,7 @@
 					</div>
 				</div>
 
-				<div class="col-md-4">
+				<div class="col-md-4 mb-3">
 					<div class="card he1x" style="background-color: #f4f4f4 !important; padding-bottom: 11px;">
 						<p style="padding: 15px 0 0 20px;">Select Shipping Method</p>
 						<hr style="margin: -10px 20px 0 20px;">
@@ -323,7 +323,6 @@
 			</div>
 		</div>
 	</main>
-
 	{{-- Select Default Address --}}
 	<div class="modal fade" id="selectShippingModal" tabindex="-1" role="dialog" aria-labelledby="selectShippingModal" aria-hidden="true">
 		<div class="modal-dialog modal-xl" role="document">
@@ -513,7 +512,6 @@
 			</div>
 		</div>
 	</div>
-
 	<div class="modal fade" id="selectBillingModal" tabindex="-1" role="dialog" aria-labelledby="selectBillingModal" aria-hidden="true">
 		<div class="modal-dialog modal-xl" role="document">
 			<div class="modal-content">
@@ -707,9 +705,7 @@
 		</div>
 	</div>
 	{{-- Update Address Modal --}}
-
 	{{-- Add Address Modal --}}
-
 	<div class="modal fade" id="addShippingModal" tabindex="-1" role="dialog" aria-labelledby="addShippingModal" aria-hidden="true">
 		<div class="modal-dialog modal-xl" role="document">
 			<div class="modal-content">
@@ -828,7 +824,6 @@
 			</div>
 		</div>
 	</div>
-
 	<div class="modal fade" id="addBillingModal" tabindex="-1" role="dialog" aria-labelledby="addBillingModal" aria-hidden="true">
 		<div class="modal-dialog modal-xl" role="document">
 			<div class="modal-content">
@@ -1085,6 +1080,13 @@
 			font-weight: 500;
 		}
 	}
+
+	@media only screen and (max-width: 600px) {
+  .products-head {
+		padding: 0 3% 0 3% !important;
+	}
+}
+
 </style>
 @endsection
 
