@@ -501,7 +501,7 @@ class CheckoutController extends Controller
 					'business_name' => $temp_data->xship_business_name,
 					'tin' => $temp_data->xship_tin,
 					'email_address' => $temp_data->xemail_shipping,
-					'mobile_no' => $temp_data->xmobile,
+					'mobile_no' => $temp_data->xcontact,
 					'same_as_billing' => $temp_data->shipping_same_as_billing
 				];
 
