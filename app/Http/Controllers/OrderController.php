@@ -974,7 +974,7 @@ class OrderController extends Controller
 
             $destinationPath = storage_path('/app/public/deposit_slips/');
 
-            $extension = pathinfo($image->getClientOriginalName(), PATHINFO_EXTENSION);
+           $extension = strtolower(pathinfo($image->getClientOriginalName(), PATHINFO_EXTENSION));
 
             $image_name = $image_filename.".".$extension;
             if(!in_array($extension, $allowed_extensions)){

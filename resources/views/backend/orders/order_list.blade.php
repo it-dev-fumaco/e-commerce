@@ -163,7 +163,7 @@
 																			<div class="row container-fluid">
 																				<div class="col-1 {{ !$order['deposit_slip_image'] ? 'd-none' : null }}">
 																					<a href="{{ asset('/storage/deposit_slips/'.$order['deposit_slip_image']) }}" target="_blank">
-																						<img src="{{ asset('/storage/deposit_slips/'.$order['deposit_slip_image']) }}" id="img-preview-{{ $order['order_no'] }}" class="img-thumbnail w-100">
+																						<img src="{{ asset('/storage/deposit_slips/'.$order['deposit_slip_image']) }}" class="img-thumbnail w-100">
 																					</a>
 																				</div>
 																				<div class="col-6 pt-1">
