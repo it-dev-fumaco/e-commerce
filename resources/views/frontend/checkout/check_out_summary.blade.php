@@ -286,8 +286,8 @@
 												<label class="form-check-label" for="pm{{ $i }}">
 													<picture>
 														<source srcset="{{ asset('/storage/payment_method/' . explode('.', $pm->image)[0] .'.webp') }}" type="image/webp" style="width: 70px;">
-														<source srcset="{{ asset('/storage/payment_method/mastercard2.png') }}" type="image/jpeg" style="width: 70px;">
-														<img src="{{ asset('/storage/payment_method/mastercard2.png') }}" style="width: 70px;">
+														<source srcset="{{ asset('/storage/payment_method/'. $pm->image) }}" type="image/jpeg" style="width: 70px;">
+														<img src="{{ asset('/storage/payment_method/'. $pm->image) }}" style="width: 70px;">
 													</picture>
 												</label>
 											</div>
