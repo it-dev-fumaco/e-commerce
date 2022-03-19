@@ -433,6 +433,28 @@ class CheckoutController extends Controller
 			
 			$shipping_add = $billing_add = [];
 			if (Auth::check()) {
+				$billing_add = DB::table('fumaco_user_add')->where('user_idx', Auth::user()->id)->where('address_class','Billing')
+					->select('id', 'xdefault', 'xadd1', 'xadd2', 'xprov', 'xcontactlastname1', 'xcontactname1', 'add_type', 'xcontactnumber1', 'xmobile_number', 'xcontactemail1', 'xpostal', 'xcountry', 'xbusiness_name', 'xtin_no', 'xcity', 'xpostal', 'xbrgy')->get();
+
+				$billing_address = collect($billing_add)->where('xdefault', 1)->first();
+				$billing_address = collect($billing_address)->toArray();
+
+				$billing_details = [
+					'contact_person' => $billing_address['xcontactname1'] . ' ' . $billing_address['xcontactlastname1'],
+					'address_line1' => $billing_address['xadd1'],
+					'address_line2' => $billing_address['xadd2'],
+					'province' => $billing_address['xprov'],
+					'city' => $billing_address['xcity'],
+					'brgy' => $billing_address['xbrgy'],
+					'postal_code' => $billing_address['xpostal'],
+					'country' => $billing_address['xcountry'],
+					'address_type' => $billing_address['add_type'],
+					'business_name' => $billing_address['xbusiness_name'],
+					'tin' => $billing_address['xtin_no'],
+					'email_address' => $billing_address['xcontactemail1'],
+					'mobile_no' => $billing_address['xmobile_number'],
+				];
+
 				$shipping_add = DB::table('fumaco_user_add')->where('user_idx', Auth::user()->id)->where('address_class','Delivery')
 					->select('id', 'xdefault', 'xadd1', 'xadd2', 'xprov', 'xcontactlastname1', 'xcontactname1', 'add_type', 'xcontactnumber1', 'xmobile_number', 'xcontactemail1', 'xpostal', 'xcountry', 'xbusiness_name', 'xtin_no', 'xcity', 'xpostal', 'xbrgy')->get();
 				
@@ -456,27 +478,14 @@ class CheckoutController extends Controller
 					'same_as_billing' => 0
 				];
 
-				$billing_add = DB::table('fumaco_user_add')->where('user_idx', Auth::user()->id)->where('address_class','Billing')
-					->select('id', 'xdefault', 'xadd1', 'xadd2', 'xprov', 'xcontactlastname1', 'xcontactname1', 'add_type', 'xcontactnumber1', 'xmobile_number', 'xcontactemail1', 'xpostal', 'xcountry', 'xbusiness_name', 'xtin_no', 'xcity', 'xpostal', 'xbrgy')->get();
+				$ship = collect($shipping_details)->except('same_as_billing');
+				$address_check = $ship->diff($billing_details);
 
-				$billing_address = collect($billing_add)->where('xdefault', 1)->first();
-				$billing_address = collect($billing_address)->toArray();
-
-				$billing_details = [
-					'contact_person' => $billing_address['xcontactname1'] . ' ' . $billing_address['xcontactlastname1'],
-					'address_line1' => $billing_address['xadd1'],
-					'address_line2' => $billing_address['xadd2'],
-					'province' => $billing_address['xprov'],
-					'city' => $billing_address['xcity'],
-					'brgy' => $billing_address['xbrgy'],
-					'postal_code' => $billing_address['xpostal'],
-					'country' => $billing_address['xcountry'],
-					'address_type' => $billing_address['add_type'],
-					'business_name' => $billing_address['xbusiness_name'],
-					'tin' => $billing_address['xtin_no'],
-					'email_address' => $billing_address['xcontactemail1'],
-					'mobile_no' => $billing_address['xmobile_number'],
-				];
+				$same_as_billing = 0;
+				if($shipping_details['same_as_billing'] == 0){
+					$same_as_billing = $address_check->isEmpty() ? 1 : 0;
+					$shipping_details['same_as_billing'] = $same_as_billing;	
+				}
 			} else {
 				$temp_data = DB::table('fumaco_temp')->where('order_tracker_code', $order_no)->first();
 				$shipping_details = [

@@ -90,8 +90,8 @@
 								<div class="he1x" style="margin-bottom: 5px !important;">Contact Number: {{ $shipping_mobile }}</div>
 								<br>
 								<div class="form-check {{ $checkbox }}">
-									<input class="form-check-input" type="checkbox" disabled {{ $shipping_details['same_as_billing'] ? 'checked' : '' }} id="same-as-billing-cb">
-									<label class="form-check-label" class="formslabelfnt" for="same-as-billing-cb">Billing address is the same as above</label>
+									<input class="form-check-input" type="checkbox" id="same-address" checked>
+									<label class="form-check-label" class="formslabelfnt" for="same-address">Billing address is the same as above</label>
 								</div>
 							</div>
 						</div>
@@ -508,6 +508,9 @@
 					</table>
 
 					<a href="#" class="btn btn-primary" data-target="#addShippingModal" data-toggle="modal">Add New Shipping Address</a>
+					@if ($shipping_details['same_as_billing'] == 1)
+						<a href="#" class="btn btn-primary" data-target="#addBillingModal" data-toggle="modal">Add New Billing Address</a>
+					@endif
 				</div>
 			</div>
 		</div>
@@ -1099,6 +1102,12 @@
 
 <script>
 	$(document).ready(function() {
+		$("#same-address").click(function(){
+			if($(this).prop('checked') == false){
+				$('#selectBillingModal').modal('show');
+			}
+		});
+
 		$(window).bind("pageshow", function(event) {
 			if (event.originalEvent.persisted) {
 				window.location.reload(); 
