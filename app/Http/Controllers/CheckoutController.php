@@ -996,6 +996,8 @@ class CheckoutController extends Controller
 			
 			$order_details = DB::table('fumaco_order')->where('order_number', $temp->xlogs)->first();
 			
+			session()->forget('fumOrderNo');
+
 			DB::commit();
 
 			$store_address = null;
@@ -1073,8 +1075,6 @@ class CheckoutController extends Controller
 					$message->subject('New Order - FUMACO');
 				});
 			}
-
-			session()->forget('fumOrderNo');
 
 			return view('frontend.checkout.success', compact('order_details', 'items', 'loggedin', 'store_address'));
 		} catch (Exception $e) {
