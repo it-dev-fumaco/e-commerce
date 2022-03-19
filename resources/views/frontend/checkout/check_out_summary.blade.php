@@ -138,7 +138,7 @@
 										<span class="sr-only">Loading...</span>
 									</div>
 								</div>
-								<table class="table" id="cart-items" style="border-color: #8c8c8cd0 !important;">
+								<table class="table mb-0" id="cart-items" style="border-color: #8c8c8cd0 !important;">
 									<thead style="border-bottom: 1px solid #8c8c8cd0 !important;">
 										<tr style="font-size: 0.8rem !important;">
 											<th class="text-left" colspan="2" style="width: 70%">Product Description</th>
@@ -169,14 +169,14 @@
 								</table>
 							</div>
 							<div class="he1x">
-								<div class="d-flex justify-content-between align-items-center" style="padding: 0 0 5px 5px; border-bottom: 1px solid #8c8c8cd0;">
+								<div class="d-flex justify-content-between align-items-center" style="padding: 7px 0 7px 5px; border-bottom: 1px solid #8c8c8cd0;">
 									Total Amount <small class="text-muted stylecap he1x">₱ {{ number_format(collect($cart_arr)->sum('subtotal'), 2, '.', ',') }}</small>
 								</div>
-								<div class="d-flex justify-content-between align-items-center d-none" id="discount-div">
+								<div class="d-flex justify-content-between align-items-center d-none" style="padding: 7px 0 7px 5px; border-bottom: 1px solid #8c8c8cd0;" id="discount-div">
 									<p class="m-0">Discount <span id="voucher-code" class="text-white d-none" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833;">Voucher Applied</span></p>
 									<small class="text-danger stylecap he1x">- ₱ <span id="discount-amount">0.00</span></small>
 								</div>
-								<div class="d-flex justify-content-between align-items-center" style="padding: 5px 0 5px 5px; border-bottom: 1px solid #8c8c8cd0;">
+								<div class="d-flex justify-content-between align-items-center" style="padding: 7px 0 7px 5px; border-bottom: 1px solid #8c8c8cd0;">
 									Subtotal <small class="text-muted stylecap he1x" id="cart-subtotal">₱ {{ number_format(collect($cart_arr)->sum('subtotal'), 2, '.', ',') }}</small>
 								</div>
 							</div>
