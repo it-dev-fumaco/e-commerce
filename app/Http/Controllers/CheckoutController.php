@@ -1029,6 +1029,13 @@ class CheckoutController extends Controller
 			$url = Bitly::getUrl($request->root().'/track_order/'.$temp->xlogs);
 
 			$sms_api = DB::table('api_setup')->where('type', 'sms_gateway_api')->first();
+			
+			$deposit_slip_message = null;
+
+			if($order_details->order_payment_method == 'Bank Deposit'){
+				$deposit_slip_url = Bitly::getUrl($request->root().'/upload_deposit_slip/'.$order_details->deposit_slip_token);
+				$deposit_slip_message =  ' Click '.$deposit_slip_url.' to upload your bank deposit slip.';
+			}
 
 			Http::asForm()->withHeaders([
 				'Accept' => 'application/json',
@@ -1038,7 +1045,7 @@ class CheckoutController extends Controller
 				'api_secret' => $sms_api->api_secret_key,
 				'from' => 'FUMACO',
 				'to' => preg_replace("/[^0-9]/", "", $phone),
-				'text' => 'Hi '.$temp->xfname.' '.$temp->xlname.'!, your order '.$temp->xlogs.' with an amount of '.$request->Amount.' has been received, please allow '.$min_leadtime.'-'.$max_leadtime.' business days to process your order. We will send another notification once your order is shipped out. Click '.$url.' to track your order.'
+				'text' => 'Hi '.$temp->xfname.' '.$temp->xlname.'!, your order '.$temp->xlogs.' with an amount of '.$request->Amount.' has been received, please allow '.$min_leadtime.'-'.$max_leadtime.' business days to process your order.'.$deposit_slip_message.' We will send another notification once your order is shipped out. Click '.$url.' to track your order.'
 			]);
 
 			// send email to fumaco staff
