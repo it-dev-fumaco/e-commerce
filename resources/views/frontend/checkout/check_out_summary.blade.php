@@ -180,6 +180,11 @@
 									Subtotal <small class="text-muted stylecap he1x" id="cart-subtotal">₱ {{ number_format(collect($cart_arr)->sum('subtotal'), 2, '.', ',') }}</small>
 								</div>
 							</div>
+							@if ($free_shipping_remarks)
+							<div class="alert alert-success fade show mt-2" role="alert" style="border: 1px solid;">
+								<i class="fas fa-truck d-inline-block m-1" style="font-size: 15pt;"></i> {{ $free_shipping_remarks }}
+							</div>
+							@endif
 							<div class="he1x pt-0">
 								<div class="alert alert-danger fade show mb-0 d-none" id="coupon-alert" role="alert" style="border: 1px solid;"></div>
 								<label for="coupon-code" class="m-2 mb-0">Coupon</label>
@@ -189,7 +194,7 @@
 									</div>
 									<div class="p-2 col-md-2 col-lg-5 col-xl-2">
 										<button class="btn w-100 btn-outline-success" type="button" id="apply-coupon-btn">Apply</button></div>
-									  </div>
+									</div>
 								  <hr>
 								<div class="d-flex justify-content-between align-items-center" style="color:#FF9D00 !important;">Grand Total <small class="stylecap he1x" id="grand-total">0.00</small>
 								</div>
