@@ -309,15 +309,6 @@ class OrderController extends Controller
 
                 $order_details = DB::table('fumaco_order')->where('order_number', $request->order_number)->first();
 
-                if($status == 'Order Confirmed'){
-                    $checker = DB::table('track_order')->where('track_code', $request->order_number)->where('track_status', 'Out for Delivery')->count();
-                    if($checker > 0){
-                        DB::table('track_order')->where('track_code', $request->order_number)->whereIn('track_status', ['Out for Delivery', 'Order Confirmed'])->update(['track_active' => 0]);
-                    }
-
-                    $orders_arr['deposit_slip_token_used'] = ($order_details->order_payment_method == 'Bank Deposit') ? 1 : 0;
-                }
-
                 $total_amount = $order_details->amount_paid;
                 $url = Bitly::getUrl($request->root().'/track_order/'.$request->order_number);
 
@@ -329,6 +320,16 @@ class OrderController extends Controller
                     'from' => 'FUMACO',
                     'to' => $order_details->order_bill_contact[0] == '0' ? '63'.substr($order_details->order_bill_contact, 1) : $order_details->order_bill_contact
                 ];
+
+                if ($status == 'Order Confirmed'){
+                    $checker = DB::table('track_order')->where('track_code', $request->order_number)->where('track_status', 'Out for Delivery')->count();
+                    if($checker > 0){
+                        DB::table('track_order')->where('track_code', $request->order_number)->whereIn('track_status', ['Out for Delivery', 'Order Confirmed'])->update(['track_active' => 0]);
+                    }
+
+                    $orders_arr['deposit_slip_token_used'] = ($order_details->order_payment_method == 'Bank Deposit') ? 1 : 0;
+                    $sms['text'] = 'Hi '.$order_details->order_name . ' ' . $order_details->order_lastname.'!, your payment of '.$total_amount.' has been confirmed. Click '.$url.' to track your order.';
+                }
 
                 if ($status == 'Out for Delivery') {
                     Mail::send('emails.out_for_delivery', ['order_details' => $order_details, 'status' => $status, 'items' => $items], function($message) use($order_details, $status){
@@ -353,7 +354,7 @@ class OrderController extends Controller
                     $sms['text'] = 'Hi '.$order_details->order_name . ' ' . $order_details->order_lastname.'!, your order '.$request->order_number.' with an amount of '.$total_amount.' is now ready for pickup. Click '.$url.' to track your order.';
                 }
 
-                if(in_array($status, ['Out for Delivery', 'Order Delivered', 'Ready for Pickup'])){
+                if(in_array($status, ['Order Confirmed', 'Out for Delivery', 'Order Delivered', 'Ready for Pickup'])){
                     Http::asForm()->withHeaders([
                         'Accept' => 'application/json',
                         'Content-Type' => 'application/x-www-form-urlencoded',
