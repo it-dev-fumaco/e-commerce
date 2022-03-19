@@ -314,6 +314,8 @@ class OrderController extends Controller
                     if($checker > 0){
                         DB::table('track_order')->where('track_code', $request->order_number)->whereIn('track_status', ['Out for Delivery', 'Order Confirmed'])->update(['track_active' => 0]);
                     }
+
+                    $orders_arr['deposit_slip_token_used'] = ($order_details->order_payment_method == 'Bank Deposit') ? 1 : 0;
                 }
 
                 $total_amount = $order_details->amount_paid;

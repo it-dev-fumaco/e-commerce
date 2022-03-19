@@ -25,7 +25,10 @@
 			<br>
 			<br>
 			<strong>Order No. :</strong> {{ $order['order_details']->order_number }}<br><br>
-			<strong>Payment Method :</strong> {{ $order['order_details']->order_payment_method }}<br><br>
+			<strong>Payment Method :</strong> {{ $order['order_details']->order_payment_method }}<br>
+			@if ($order['order_details']->order_payment_method == 'Bank Deposit')
+				You may upload your bank deposit slip by clicking <a href="{{ route('upload_deposit_slip', ['token' => $order['order_details']->deposit_slip_token]) }}">here</a><br><br>
+			@endif
 			<strong>Customer :</strong> {{ $order['order_details']->order_name . ' ' . $order['order_details']->order_lastname }}<br><br>
 			@if ($order['order_details']->order_shipping == 'Store Pickup')
 			<strong>Shipping Method :</strong> {{ $order['order_details']->order_shipping }}<br><br>

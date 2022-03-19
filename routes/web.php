@@ -111,7 +111,7 @@ Route::group(['middleware' => 'auth'], function(){
     Route::get('/myprofile/address/{type}/new', 'FrontendController@addAddressForm');
     Route::post('/myprofile/address/{type}/save', 'FrontendController@saveAddress');
 
-    Route::get('/upload_deposit_slip/{token}', 'FrontendController@uploadDepositSlipForm');
+    Route::get('/upload_deposit_slip/{token}', 'FrontendController@uploadDepositSlipForm')->name('upload_deposit_slip');
     Route::post('/upload_deposit_slip/{token}', 'FrontendController@submitUploadDepositSlip');
 });
 
