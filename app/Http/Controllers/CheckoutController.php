@@ -962,7 +962,9 @@ class CheckoutController extends Controller
 					'track_item' => 'Item Purchase',
 					'track_description' => 'Your order is on processing',
 					'track_status' => 'Order Placed',
+					'track_payment_status' => $payment_method == 'Bank Deposit' ? 'Pending for Upload' : null,
 					'track_ip' => $temp->order_ip,
+					'track_active' => 1,
 					'transaction_member' => $temp->xusertype
 				]);
 			}

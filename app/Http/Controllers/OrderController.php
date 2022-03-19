@@ -19,7 +19,9 @@ class OrderController extends Controller
         $search_id = ($request->search) ? $request->search : '';
         $order_status = ($request->order_status) ? $request->order_status : '';
 
-        $orders = DB::table('fumaco_order')->where('order_number', 'LIKE', '%'.$search_id.'%')->where('order_status', 'LIKE', '%'.$order_status.'%')->where('order_status', '!=', 'Cancelled')->where('order_status', '!=', 'Delivered')->where('order_status', '!=', 'Order Completed')->where('order_status', '!=', 'Order Delivered')->orderBy('id', 'desc')->paginate(10);
+        $exluded_status = ['Cancelled', 'Delivered', 'Order Completed', 'Order Delivered'];
+
+        $orders = DB::table('fumaco_order')->where('order_number', 'LIKE', '%'.$search_id.'%')->where('order_status', 'LIKE', '%'.$order_status.'%')->whereNotIn('order_status', $exluded_status)->orderBy('id', 'desc')->paginate(10);
 
         $orders_arr = [];
 
@@ -102,7 +104,8 @@ class OrderController extends Controller
                 'store_address' => $store_address,
                 'store' => $o->store_location,
                 'order_status' => $order_status,
-                'deposit_slip_image' => $o->deposit_slip_image
+                'deposit_slip_image' => $o->deposit_slip_image,
+                'payment_status' => $o->payment_status
             ];
         }
 
@@ -269,6 +272,7 @@ class OrderController extends Controller
 
                 $orders_arr = [
                     'order_status' => $status,
+                    'payment_status' => isset($request->payment_received) ? 'Payment Received' : null,
                     'order_update' => $now,
                     'date_delivered' => $delivery_date,
                     'date_cancelled' => $date_cancelled,
@@ -284,17 +288,9 @@ class OrderController extends Controller
                     'track_ip' => $request->ip(),
                     'transaction_member' => isset($request->member) ? 'Member' : 'Guest',
                     'track_active' => 1,
+                    'track_payment_status' => isset($request->payment_received) ? 'Payment Received' : null,
                     'last_modified_by' => Auth::user()->username
                 ];
-
-                if($status == 'Order Confirmed'){
-                    $checker = DB::table('track_order')->where('track_code', $request->order_number)->where('track_status', 'Out for Delivery')->count();
-
-                    if($checker > 0){
-                        DB::table('track_order')->where('track_code', $request->order_number)->where('track_status', 'Out for Delivery')->update(['track_active' => 0]);
-                        DB::table('track_order')->where('track_code', $request->order_number)->where('track_status', 'Order Confirmed')->update(['track_active' => 0]);
-                    }
-                }
 
                 $items = [];
                 foreach($ordered_items as $row) {
@@ -312,6 +308,13 @@ class OrderController extends Controller
                 }
 
                 $order_details = DB::table('fumaco_order')->where('order_number', $request->order_number)->first();
+
+                if($status == 'Order Confirmed'){
+                    $checker = DB::table('track_order')->where('track_code', $request->order_number)->where('track_status', 'Out for Delivery')->count();
+                    if($checker > 0){
+                        DB::table('track_order')->where('track_code', $request->order_number)->whereIn('track_status', ['Out for Delivery', 'Order Confirmed'])->update(['track_active' => 0]);
+                    }
+                }
 
                 $total_amount = $order_details->amount_paid;
                 $url = Bitly::getUrl($request->root().'/track_order/'.$request->order_number);
@@ -981,6 +984,19 @@ class OrderController extends Controller
                 'deposit_slip_image' => $image_name,
                 'deposit_slip_date_uploaded' => Carbon::now()->toDateTimeString(),
                 'payment_status' => 'Payment For Confirmation'
+            ]);
+
+            DB::table('track_order')->insert([
+                'track_code' => $order_number,
+                'track_date' => Carbon::now()->toDateTimeString(),
+                'track_item' => 'Item Purchase',
+                'track_description' => 'Your order is on processing',
+                'track_status' => 'Order Placed',
+                'track_payment_status' => 'Payment For Confirmation',
+                'track_ip' => $order_details->order_ip,
+                'track_active' => 1,
+                'transaction_member' => $order_details->order_type,
+                'last_modified_by' => Auth::user()->username
             ]);
         }
 

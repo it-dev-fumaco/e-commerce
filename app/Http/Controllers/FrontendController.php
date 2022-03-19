@@ -2408,6 +2408,19 @@ class FrontendController extends Controller
                 'payment_status' => 'Payment For Confirmation',
                 'deposit_slip_token_used' => 1
             ]);
+
+            DB::table('track_order')->insert([
+                'track_code' => $order_number,
+                'track_date' => Carbon::now()->toDateTimeString(),
+                'track_item' => 'Item Purchase',
+                'track_description' => 'Your order is on processing',
+                'track_status' => 'Order Placed',
+                'track_payment_status' => 'Payment For Confirmation',
+                'track_ip' => $order_details->order_ip,
+                'track_active' => 1,
+                'transaction_member' => $order_details->order_type,
+                'last_modified_by' => Auth::user()->username
+            ]);
         }
         
         return redirect()->back()->with('success', 'Deposit Slip for your order <b>'.$order_details->order_number.'</b> has been uploaded.');
