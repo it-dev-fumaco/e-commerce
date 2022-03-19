@@ -2423,14 +2423,17 @@ class FrontendController extends Controller
             ]);
 
             // send notification to accounting->where('user_type', 'Accounting Admin')
+            // send notification to accounting
             $order = ['order_details' => $order_details];
 
             $email_recipient = DB::table('fumaco_admin_user')->where('username', 'jave.kulong@fumaco.com')->pluck('username');
+            $email_recipient = DB::table('fumaco_admin_user')->where('user_type', 'Accounting Admin')->pluck('username');
             $recipients = collect($email_recipient)->toArray();
             if (count(array_filter($recipients)) > 0) {
                 Mail::send('emails.deposit_slip_notif', $order, function($message) use ($recipients) {
                     $message->to($recipients);
                     $message->subject('Awaiting Confirmation - FUMACO - TESTING');
+                    $message->subject('Awaiting Confirmation - FUMACO');
                 });
             }
         }
