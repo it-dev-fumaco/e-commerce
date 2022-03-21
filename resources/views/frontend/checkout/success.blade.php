@@ -81,10 +81,10 @@
 							{{ $order_details->order_name .' ' . $order_details->order_lastname }}
 							<br>
 							<span class="d-inline-block" style="width: 100px;"><strong>Address: </strong></span>
-							{!! $order_details->order_ship_address1 . ' ' . $order_details->order_ship_address2 . ', ' . $order_details->order_ship_brgy . ', ' . $order_details->order_ship_city . ', ' . $order_details->order_ship_prov . ', ' . $order_details->order_ship_postal . ', ' . $order_details->order_ship_country !!}
+							{!! $order_details->order_ship_address1 . ' ' . $order_details->order_ship_address2 . ', ' . ucwords(strtolower($order_details->order_ship_brgy)) . ', ' . ucwords(strtolower($order_details->order_ship_city)) . ', ' . ucwords(strtolower($order_details->order_ship_prov)) . ', ' . $order_details->order_ship_country . ' ' . $order_details->order_ship_postal !!}
 							<br>
 							<br>
-							<p><b>Estimated Delivery Date:</b> {{ $order_details->estimated_delivery_date }}</p>
+							<p><b>Est. Delivery Date:</b> {{ $order_details->estimated_delivery_date }}</p>
 							@endif
 						</div>
 						<table class="table">

@@ -1076,9 +1076,14 @@ class CheckoutController extends Controller
 				});
 			}
 
-			$view = ($payment_method == 'Bank Deposit') ? 'frontend.checkout.order_success_page' : 'frontend.checkout.success';
+			$bank_accounts = [];
+			$view = 'frontend.checkout.success';
+			if ($payment_method == 'Bank Deposit') {
+				$bank_accounts = DB::table('fumaco_bank_account')->where('is_active', 1)->get();
+				$view = 'frontend.checkout.order_success_page';
+			}
 
-			return view($view, compact('order_details', 'items', 'loggedin', 'store_address'));
+			return view($view, compact('order_details', 'items', 'loggedin', 'store_address', 'bank_accounts'));
 		} catch (Exception $e) {
 			DB::rollback();
 

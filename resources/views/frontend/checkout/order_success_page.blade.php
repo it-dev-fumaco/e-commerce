@@ -1,5 +1,5 @@
 @extends('frontend.layout', [
-	'namePage' => 'Order Summary',
+	'namePage' => 'Payment Request',
 	'activePage' => 'checkout_success'
 ])
 
@@ -62,40 +62,35 @@
 							<br>
                   		</center>
 						<div style="color:#58595A !important;">
-							<h6 class="font-weight-bold mt-2">Order no.: <b>{{ $order_details->order_number }}</b></h6>
-							<p class="mt-3 mb-5">Your order has been placed, a confirmation will be sent to your email <b>{{ $loggedin }}</b> with the details of your order.</p>
-							@if ($order_details->order_shipping == 'Store Pickup')
-							<h6 class="font-weight-bold mt-2"><b>STORE PICKUP:</b></h6>
-							<span class="d-inline-block" style="width: 100px;"><strong>Store: </strong></span>
-							{{ $order_details->store_location }}
-							<br>
-							<span class="d-inline-block" style="width: 100px;"><strong>Address: </strong></span>
-							{!! $store_address !!}
-							<br>
-							<br>
-							<p><b>Pickup by:</b> {{ \Carbon\Carbon::parse($order_details->pickup_date)->format('D, F d, Y') }}</p>
-							@else
-							<h6 class="font-weight-bold mt-2"><b>SHIPPING TO:</b></h6>
-							<span class="d-inline-block" style="width: 100px;"><strong>Customer: </strong></span>
-							{{ $order_details->order_name .' ' . $order_details->order_lastname }}
-							<br>
-							<span class="d-inline-block" style="width: 100px;"><strong>Address: </strong></span>
-							{!! $order_details->order_ship_address1 . ' ' . $order_details->order_ship_address2 . ', ' . $order_details->order_ship_brgy . ', ' . $order_details->order_ship_city . ', ' . $order_details->order_ship_prov . ', ' . $order_details->order_ship_postal . ', ' . $order_details->order_ship_country !!}
-							<br>
-							<br>
-							<p><b>Estimated Delivery Date:</b> {{ $order_details->estimated_delivery_date }}</p>
-							@endif
-
+							<h6 class="font-weight-bold mt-2">Order #: <b>{{ $order_details->order_number }}</b></h6>
+							<p class="mt-3 mb-4">Your order has been placed, to process your order, please settle your payment thru bank deposit and submit your bank deposit slip or any proof of payment via email or SMS.<br><br>Please check your email or SMS for link to upload your proof of payment / deposit slip.</p>
+							<div class="alert alert-info alert-dismissible fade show mb-4" role="alert">
+								Payment Method: <b>{{ $order_details->order_payment_method }}</b><br>
+								Status: <b>{{ $order_details->payment_status }}</b>
+							</div>
 							@if ($order_details->order_payment_method == 'Bank Deposit')
-								<p><b>Payment Method:</b> {{ $order_details->order_payment_method }}<br><b>Payment Status:</b> {{ $order_details->payment_status }}</p>
+							@if (count($bank_accounts) > 0)
+							<p>You may send your payments in the following account(s):</p>
+							<div class="row mb-4">
+								@foreach ($bank_accounts as $account)
+								<div class="col-md-4">
+									<div class="card p-3">
+										<span class="d-block"><b>{{ $account->bank_name }}</b></span>
+										<span class="d-block">Account Name: <b>{{ $account->account_name }}</b></span>
+										<span class="d-block">Account No.: <b>{{ $account->account_number }}</b></span>
+									</div>
+								</div>
+								@endforeach
+							</div>
+							@endif
 							@endif
 						</div>
-						<br>
+						<p>If you have any questions, please contact us at <a href="mailto:support@fumaco.com">support@fumaco.com</a>.</p>
 						<table class="table">
 							@php
-									$sum_discount = collect($items)->sum('discount');
-									$colspan = ($sum_discount > 0) ? 5 : 4;
-								@endphp
+								$sum_discount = collect($items)->sum('discount');
+								$colspan = ($sum_discount > 0) ? 5 : 4;
+							@endphp
 							<thead>
 								<tr style="font-size: 0.9rem;">
 									<th class="text-left" colspan="2">Item Description</th>
