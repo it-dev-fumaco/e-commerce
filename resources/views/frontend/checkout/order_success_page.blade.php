@@ -63,14 +63,14 @@
                   		</center>
 						<div style="color:#58595A !important;">
 							<h6 class="font-weight-bold mt-2">Order #: <b>{{ $order_details->order_number }}</b></h6>
-							<p class="mt-3 mb-4">Your order has been placed, to process your order, please settle your payment thru bank deposit and submit your bank deposit slip or any proof of payment via email or SMS.<br><br>Please check your email or SMS for link to upload your proof of payment / deposit slip.</p>
+							<p class="mt-3 mb-4">Your order has been placed, to process your order please settle your payment thru bank deposit. Please check your email or SMS for link to upload your proof of payment / deposit slip.</p>
 							<div class="alert alert-info alert-dismissible fade show mb-4" role="alert">
 								Payment Method: <b>{{ $order_details->order_payment_method }}</b><br>
 								Status: <b>{{ $order_details->payment_status }}</b>
 							</div>
 							@if ($order_details->order_payment_method == 'Bank Deposit')
 							@if (count($bank_accounts) > 0)
-							<p>You may send your payments in the following account(s):</p>
+							<p>You may send your payments on any of the following account(s):</p>
 							<div class="row mb-4">
 								@foreach ($bank_accounts as $account)
 								<div class="col-md-4">
