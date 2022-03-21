@@ -46,7 +46,7 @@ class PaymentMethodController extends Controller
                 $destinationPath = storage_path('/app/public/payment_method/');
 
                 $filename = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME);
-			    $extension = pathinfo($image->getClientOriginalName(), PATHINFO_EXTENSION);
+			    $extension = strtolower(pathinfo($image->getClientOriginalName(), PATHINFO_EXTENSION));
 
                 $filename = Str::slug($filename, '-');
 
@@ -99,7 +99,7 @@ class PaymentMethodController extends Controller
                 'remarks' => $request->remarks,
                 'is_enabled' => $request->is_enabled ? 1 : 0,
                 'show_image' => $request->show_icon ? 1 : 0,
-                'created_by' => Auth::user()->username
+                'last_modified_by' => Auth::user()->username
             ];
 
             if ($request->payment_icon) {
@@ -113,7 +113,7 @@ class PaymentMethodController extends Controller
                     $destinationPath = storage_path('/app/public/payment_method/');
     
                     $filename = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME);
-                    $extension = pathinfo($image->getClientOriginalName(), PATHINFO_EXTENSION);
+                    $extension = strtolower(pathinfo($image->getClientOriginalName(), PATHINFO_EXTENSION));
     
                     $filename = Str::slug($filename, '-');
     
@@ -125,10 +125,6 @@ class PaymentMethodController extends Controller
     
                     $webp = Webp::make($request->file('payment_icon'));
     
-                    if ($webp->save(storage_path('/app/public/payment_method/'.$filename.'.webp'))) {
-                        $image->move($destinationPath, $image_name);
-                    }
-
                     $has_existing_image = DB::table('fumaco_payment_method')->where('payment_method_id', $id)->whereNotNull('image')->first();
                     if ($has_existing_image) {
                         $existing_image_name = explode('.', $has_existing_image->image)[0];
@@ -142,6 +138,10 @@ class PaymentMethodController extends Controller
                         if (file_exists($webp_path)) {
                             unlink($webp_path);
                         }
+                    }
+
+                    if ($webp->save(storage_path('/app/public/payment_method/'.$filename.'.webp'))) {
+                        $image->move($destinationPath, $image_name);
                     }
 
                     $data['image'] = $image_name;
