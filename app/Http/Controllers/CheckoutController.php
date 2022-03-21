@@ -1076,7 +1076,9 @@ class CheckoutController extends Controller
 				});
 			}
 
-			return view('frontend.checkout.success', compact('order_details', 'items', 'loggedin', 'store_address'));
+			$view = ($payment_method == 'Bank Deposit') ? 'frontend.checkout.order_success_page' : 'frontend.checkout.success';
+
+			return view($view, compact('order_details', 'items', 'loggedin', 'store_address'));
 		} catch (Exception $e) {
 			DB::rollback();
 

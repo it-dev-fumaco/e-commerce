@@ -3,7 +3,6 @@
 	'activePage' => 'checkout_success'
 ])
 
-{{-- for bank deposit payment method only --}}
 @section('content')
 	<style>
 		.products-head {
@@ -86,7 +85,12 @@
 							<br>
 							<p><b>Estimated Delivery Date:</b> {{ $order_details->estimated_delivery_date }}</p>
 							@endif
+
+							@if ($order_details->order_payment_method == 'Bank Deposit')
+								<p><b>Payment Method:</b> {{ $order_details->order_payment_method }}<br><b>Payment Status:</b> {{ $order_details->payment_status }}</p>
+							@endif
 						</div>
+						<br>
 						<table class="table">
 							@php
 									$sum_discount = collect($items)->sum('discount');
