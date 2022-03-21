@@ -205,7 +205,28 @@ class CartController extends Controller
     }
 
     public function viewCart(Request $request) {
-        $order_no = session()->get('fumOrderNo');
+        $order_no = 'FUM-' . date('yd') . random_int(0, 9999);
+        if(!session()->get('fumOrderNo')){
+            session()->put('fumOrderNo', $order_no);
+        } else {
+            $order_no = session()->get('fumOrderNo');
+        }
+
+        if ($order_no) {
+			$existing_temp = DB::table('fumaco_temp')->where('xlogs', $order_no)->first();
+			if(!$existing_temp) {
+				DB::table('fumaco_temp')->insert([
+					'xtempcode' => uniqid(),
+					'xlogs' => $order_no,
+					'order_tracker_code' => $order_no,
+					'order_ip' => $request->ip(),
+					'xusertype' => Auth::check() ? 'Member' : 'Guest',
+					'xusernamex' => Auth::check() ? Auth::user()->username : null,
+					'xuser_id' => Auth::check() ? Auth::user()->id : null,
+				]);
+			}
+		}
+
         if(Auth::check()) {
             $cart_items = DB::table('fumaco_items as a')->join('fumaco_cart as b', 'a.f_idcode', 'b.item_code')
                 ->where('user_type', 'member')->where('user_email', Auth::user()->username)
