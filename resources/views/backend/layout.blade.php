@@ -391,6 +391,14 @@
               <p>Payment Method</p>
             </a>
           </li>
+
+          <li class="nav-item">
+            <a href="/admin/bank_account/list" class="nav-link {{ $activePage == 'bank_account' ? 'active' : '' }}">
+              <i class="fas fa-university nav-icon"></i>
+              <p>Bank Accounts</p>
+            </a>
+          </li>
+
           <li class="nav-item">
             <a href="/admin/price_list" class="nav-link {{ $activePage == 'pricelist' ? 'active' : '' }}">
               <i class="fas fa-tags nav-icon"></i>

@@ -386,5 +386,10 @@ Route::prefix('admin')->group(function () {
         Route::post('/payment_method/save', 'PaymentMethodController@savePaymentMethod');
         Route::put('/payment_method/{id}/update', 'PaymentMethodController@updatePaymentMethod');
         Route::delete('/payment_method/{id}/delete', 'PaymentMethodController@deletePaymentMethod');
+
+        Route::get('/bank_account/list', 'BankAccountController@list');
+        Route::post('/bank_account/save', 'BankAccountController@save');
+        Route::put('/bank_account/{id}/update', 'BankAccountController@update');
+        Route::delete('/bank_account/{id}/delete', 'BankAccountController@delete');
     });
 });
