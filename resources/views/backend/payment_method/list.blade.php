@@ -232,7 +232,6 @@
                     </div>
                     <div class="form-group">
                         <label for="payment-type">Payment Type</label>
-                        <input type="text">
 						<select name="payment_type" class="form-control" id="payment-type">
 							<option value="">Select Payment Type</option>
 							<option value="CC">CC - Credit Cart</option>
