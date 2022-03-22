@@ -2450,6 +2450,6 @@ class FrontendController extends Controller
             }
         }
         
-        return redirect()->back()->with('success', 'Deposit Slip for your order <b>'.$order_details->order_number.'</b> has been uploaded.');
+        return redirect()->back()->with('success', 'Thank you for uploading your deposit slip / proof of payment, payment confirmation will be sent to you via email and SMS.');
     }
 }
