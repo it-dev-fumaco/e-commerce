@@ -2296,7 +2296,8 @@ class FrontendController extends Controller
             $status_sequence = isset($status[$order_details->order_status]) ? $status[$order_details->order_status][0]->order_sequence : 0;
 
             $payment_statuses = DB::table('fumaco_payment_status')->get();
-            $payment_status_sequence = isset($payment_statuses[$order_details->order_status]) ? $payment_statuses[$order_details->order_status][0]->status_sequence : 1;
+            $payment_status = collect($payment_statuses)->sortByDesc('status_sequence')->groupBy('status');
+            $payment_status_sequence = isset($payment_status[$order_details->payment_status]) ? $payment_status[$order_details->payment_status][0]->status_sequence : 1;
 
             foreach ($ordered_items as $item) {
                 $item_image = DB::table('fumaco_items_image_v1')
