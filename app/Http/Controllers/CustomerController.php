@@ -218,7 +218,7 @@ class CustomerController extends Controller
             'grand_total' => $order->order_shipping_amount + ($order->order_subtotal - $order->discount_amount),
             'ordered_items' => $items_arr,
             'email' => $order->order_email,
-            'contact' => $order->order_contact == 0 ? '' : $o->order_contact ,
+            'contact' => $order->order_contact == 0 ? '' : $order->order_contact ,
         ];
 
         return view('backend.customer.order_details', compact('orders_arr'));
