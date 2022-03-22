@@ -264,7 +264,7 @@
 									$defaul_selected = ($loop->first) ? 'checked' : '';
 								}
 							@endphp
-							{{-- <div class="d-flex justify-content-between align-items-center">
+							<div class="d-flex justify-content-between align-items-center">
 								<div class="form-check">
 									<input class="form-check-input" type="radio" name="shipping_fee" id="{{ 'sr' . $l }}" value="{{ $srate['shipping_cost'] }}" data-sname="{{ $srate['shipping_service_name'] }}" data-est="{{ $srate['expected_delivery_date'] }}" data-pickup="{{ $srate['pickup'] }}" required {{ $defaul_selected }} data-lead="{{ $srate['max_lead_time'] }}">
 									<label class="form-check-label" for="{{ 'sr' . $l }}">{{ $srate['shipping_service_name'] }} <br class="d-xl-none"/>
@@ -306,7 +306,7 @@
 									</div>
 								</div>
 							</div>
-							@endif --}}
+							@endif
 							@empty
 								<h6>No available shipping methods.</h6>
 							@endforelse
