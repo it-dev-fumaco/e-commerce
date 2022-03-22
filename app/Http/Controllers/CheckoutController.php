@@ -1072,11 +1072,14 @@ class CheckoutController extends Controller
 			$bitly_response = json_decode($bitly_response, true);
 
 			if (isset($bitly_response['errors'])) {
-				DB::rollback();
+				if($order_details->order_payment_method == 'Bank Deposit'){
+					DB::rollback();
 				
-				return redirect($error_redirect_page);
+					return redirect($error_redirect_page);
+				}
 			}
 
+			$url = null;
 			if (isset($bitly_response['link'])) {
 				$url = $bitly_response['link'];
 			}
@@ -1094,9 +1097,11 @@ class CheckoutController extends Controller
 				$bitly_response = json_decode($bitly_response, true);
 	
 				if (isset($bitly_response['errors'])) {
-					DB::rollback();
-
-					return redirect($error_redirect_page);
+					if($order_details->order_payment_method == 'Bank Deposit'){
+						DB::rollback();
+					
+						return redirect($error_redirect_page);
+					}
 				}
 	
 				if (isset($bitly_response['link'])) {
@@ -1120,9 +1125,11 @@ class CheckoutController extends Controller
 			$sms_response = json_decode($sms_response, true);
 	
 			if (isset($sms_response['error'])) {
-				DB::rollback();
-
-				return redirect($error_redirect_page);
+				if($order_details->order_payment_method == 'Bank Deposit'){
+					DB::rollback();
+				
+					return redirect($error_redirect_page);
+				}
 			}
 			
 			// send email to fumaco staff
@@ -1136,9 +1143,11 @@ class CheckoutController extends Controller
 			}
 
 			if (Mail::failures()) {
-				DB::rollback();
-
-				return redirect($error_redirect_page);
+				if($order_details->order_payment_method == 'Bank Deposit'){
+					DB::rollback();
+				
+					return redirect($error_redirect_page);
+				}
 			}
 
 			session()->forget('fumOrderNo');
