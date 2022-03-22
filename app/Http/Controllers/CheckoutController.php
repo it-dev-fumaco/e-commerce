@@ -924,6 +924,11 @@ class CheckoutController extends Controller
 					$payment_method = $temp->payment_method;
 				}
 
+				$default_payment_status = 'Payment Received';
+				if($payment_method == 'Bank Deposit'){
+					$default_payment_status = DB::table('fumaco_payment_status')->where('status_sequence', 1)->pluck('status')->first();
+				}
+
 				DB::table('fumaco_order')->insert([
 					'order_number' => $temp->xlogs,
 					'order_account' => $temp->xuser_id, // account number of logged user
@@ -957,6 +962,7 @@ class CheckoutController extends Controller
 					'order_ip' => $temp->order_ip,
 				  	'order_date' => $now,
 					'order_status' => "Order Placed",
+					'payment_status' => $default_payment_status,
 					'order_payment_method' => $payment_method,
 					'tracker_code' => $temp->order_tracker_code,
 					'estimated_delivery_date' => $temp->estimated_delivery_date,
@@ -979,11 +985,6 @@ class CheckoutController extends Controller
 					'deposit_slip_token' => $payment_method == 'Bank Deposit' ? hash('sha256', Carbon::now()->toDateTimeString()) : null,
 					'deposit_slip_token_date_created' => $payment_method == 'Bank Deposit' ? Carbon::now()->toDateTimeString() : null,
 				]);
-
-				$default_payment_status = null;
-				if($payment_method == 'Bank Deposit'){
-					$default_payment_status = DB::table('fumaco_payment_status')->where('status_sequence', 1)->pluck('status_sequence')->first();
-				}
 
 				// insert order in tracking order table
 				DB::table('track_order')->insert([
