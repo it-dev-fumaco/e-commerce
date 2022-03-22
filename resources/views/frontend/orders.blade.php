@@ -234,7 +234,7 @@
 								@endif
 
 								<div class="modal fade" id="{{ $order['order_number'] }}-Modal" tabindex="-1" role="dialog" aria-labelledby="order-details" aria-hidden="true">
-									<div class="modal-dialog modal-xl" role="document">
+									<div class="modal-dialog" role="document">
 										<div class="modal-content">
 											<div class="modal-header">
 												<h5 class="modal-title">Track {{ $order['order_number'] }}</h5>
@@ -243,33 +243,187 @@
 												</button>
 											</div>
 											<div class="modal-body">
-												<div class="track-container">
-													<div class="track">
+												<div class="container-fluid">
+													<ul class="list-group vertical-steps">
 														@php
-															$step = trim(collect($order['ship_status'])->where('status', $order['status'] )->pluck('order_sequence'), '[""]');
+															$step = $order['current_order_status_sequence'];
 														@endphp
-														<div class="step active">
-															<span class="icon {{ $step > 0 ? 'inactive' : '' }}"><i class="fa fa-check {{ $step > 0 ? 'd-none' : '' }}"></i></span>
+														<li class="fa-ul list-group-item completed">
+															<span class="fa-li" style="margin-left: 15px; margin-top: -6px">
+																<i class="fas fa-circle" style="color: #008CFF !important"></i>
+															</span>
 															<span class="text status-text">Order Placed</span>
 															<span class="text status-text" style="font-size: 9pt; color: #a39f9f !important; font-style: italic !important">{{ $order['date'] }}</span>
-														</div>
+														</li>
+														@if ($order['payment_method'] == 'Bank Deposit')
+															@php
+																$order_tracker_payment = collect($order['order_tracker'])->groupBy('track_payment_status');
+															@endphp
+															@foreach ($payment_statuses as $s => $status)
+																@php
+																	$payment_status_icon = null;
+																	if($status->status == 'Pending for Payment'){
+																		$payment_status_icon = "fa-upload";
+																	}else if($status->status == 'Payment For Confirmation'){
+																		$payment_status_icon = "fa-hourglass";
+																	}
+
+																	$status_step = $status->status;
+
+																	$payment_status = isset($order_tracker_payment[$status_step]) ? 'active' : null;
+																	$payment_status_date = isset($order_tracker_payment[$status_step]) ? $order_tracker_payment[$status_step][0]->track_date : null;
+																	$payment_status_display_date = $payment_status_date ? date('M d, Y h:i A', strtotime($payment_status_date)) : null;
+																	$payment_status_icon_container = 'inactive';
+																	if($order['status'] == 'Order Placed'){
+																		$payment_status_icon_container = $order['current_payment_status_sequence'] != $s + 1 ? 'inactive' : null;
+																	}
+
+																	$payment_step_color = null;
+																	if($order['current_payment_status_sequence'] < $s + 1){
+																		$payment_step_color = '#ece5dd';
+																	}else if($order['current_payment_status_sequence'] > $s + 1){
+																		$payment_step_color = '#008CFF';
+																	}
+
+																	$payment_status_step = 'completed';
+																	if ($order['status'] == 'Order Placed'){
+																		$payment_status_step = $order['current_payment_status_sequence'] > $s + 1 ? 'completed' : null;
+																	}
+
+																	$payment_status_description = null;
+																	if ($order['status'] == 'Order Placed') {
+																		$payment_status_description = $order['current_payment_status_sequence'] >= $s + 1 ? null : 'd-none';
+																	}
+																@endphp
+																<li class="fa-ul list-group-item {{ $payment_status_step }}">
+																	@if ($order['status'] == 'Order Placed')
+																		<span class="fa-li {{ $order['current_payment_status_sequence'] == $s + 1 ? 'active-icon' : null }}" style="margin-left: 15px;">
+																			@if($order['current_payment_status_sequence'] == $s + 1)
+																				<i class="fas {{ $payment_status_icon }}" style="font-size: 16px !important"></i>
+																			@else
+																				<i class="fas fa-circle" style="color: {{ $payment_step_color }} !important"></i>
+																			@endif
+																		</span>
+																	@else
+																		<span class="fa-li" style="margin-left: 15px;">
+																			<i class="fas fa-circle" style="color: #008CFF !important"></i>
+																		</span>
+																	@endif
+																	<span>{{ $status->status }}</span>
+																	<span class="text status-text" style="font-size: 9pt; color: #a39f9f !important; font-style: italic !important">{{ $payment_status_display_date }}</span>
+																	<span class="text status-text {{ $payment_status_description }}" style="font-size: 9pt; color: #a39f9f !important; font-style: italic !important">{{ $status->status_description }}</span>
+																</li>
+															@endforeach
+														@endif
+														@php
+															$order_status_tracker = collect($order['order_tracker'])->groupBy('track_status');
+														@endphp
 														@foreach ($order['ship_status'] as $key => $name)
 															@php
-																$date = '';
-																if(collect($order['order_tracker'])->where('track_status', $name->status)->pluck('track_date_update')->first()){
-																	$date = date('M d, Y H:i A', strtotime(collect($order['order_tracker'])->where('track_status', $name->status)->pluck('track_date_update')->first()));
+																$order_status = isset($order_status_tracker[$name->status]) ? 'active' : null;
+																$status_date_update = isset($order_status_tracker[$name->status]) ? $order_status_tracker[$name->status][0]->track_date : null;
+																$date = $status_date_update ? date('M d, Y h:i A', strtotime($status_date_update)) : null;
+																$icon_display = null;
+																if($step > $key + 1){
+																	$icon_display = 'completed';
+																}else if($step == $key + 1){
+																	$icon_display = 'active';
 																}
 																
 																$icon = '';
 																if($name->status == "Order Confirmed"){
 																	$icon = 'user';
-																}else if($name->status == "Out for Delivery" or $name->status == "Ready for Pickup" ){
+																}else if($name->status == "Out for Delivery" or $name->status == "Ready for Pickup"){
+																	$icon = 'truck';
+																}else if($name->status == "Order Delivered" or $name->status == "Order Completed"){
+																	$icon = 'shopping-bag';
+																}
+
+																$order_step_color = null;
+																if($step < $key + 1){
+																	$order_step_color = '#ece5dd';
+																}else if($step > $key + 1){
+																	$order_step_color = '#008CFF';
+																}
+
+																$order_status_description = $key + 1 > $step ? 'd-none' : null;
+															@endphp
+															<li class="fa-ul list-group-item {{ $icon_display }}">
+																<span class="fa-li {{ $step == $key + 1 ? 'active-icon' : null }}" style="margin-left: 15px; {{ $loop->last ? 'margin-top: -6px' : null }}">
+																	@if ($step == $key + 1)
+																		<i class="fa fa-{{ $icon }}" style="font-size: 16px !important"></i>
+																	@else
+																		<i class="fas fa-circle" style="color: {{ $order_step_color }} !important"></i>
+																	@endif
+																</span>
+																<span style="margin-top: -3px">{{ $name->status }}</span>
+																<span class="text status-text" style="font-size: 9pt; color: #a39f9f !important; font-style: italic !important">{{ $date }}</span>
+																<span class="text status-text {{ $order_status_description }}" style="font-size: 9pt; color: #a39f9f !important; font-style: italic !important">{{ $name->status_description }}</span>
+														  	</li>
+														@endforeach
+													</ul>  
+												</div>
+												{{-- <div class="track-container">
+													<div class="track">
+														@php
+															$step = $order['current_order_status_sequence'];
+														@endphp
+														<div class="step active">
+															<span class="icon inactive"><i class="fa fa-check {{ $step > 0 ? 'd-none' : '' }}"></i></span>
+															<span class="text status-text">Order Placed</span>
+															<span class="text status-text" style="font-size: 9pt; color: #a39f9f !important; font-style: italic !important">{{ $order['date'] }}</span>
+														</div>
+														@if ($order['payment_method'] == 'Bank Deposit')
+															@php
+																$order_tracker_payment = collect($order['order_tracker'])->groupBy('track_payment_status');
+															@endphp
+															@foreach ($payment_statuses as $s => $status)
+																@php
+																	$payment_status_icon = null;
+																	if($status->status == 'Pending for Upload'){
+																		$payment_status_icon = "fa-upload";
+																	}else if($status->status == 'Payment For Confirmation'){
+																		$payment_status_icon = "fa-hourglass";
+																	}
+																	$payment_status = isset($order_tracker_payment[$status->status]) ? 'active' : null;
+																	$payment_status_date = isset($order_tracker_payment[$status->status]) ? $order_tracker_payment[$status->status][0]->track_date_update : null;
+																	$payment_status_display_date = $payment_status_date ? date('M d, Y H:i A', strtotime($payment_status_date)) : null;
+																	$payment_status_icon_container = 'inactive';
+																	$payment_status_description = 'd-none';
+																	if($order['status'] == 'Order Placed'){
+																		$payment_status_icon_container = $order['current_payment_status_sequence'] != $s + 1 ? 'inactive' : null;
+																		$payment_status_description = $order['current_payment_status_sequence'] != $s + 1 ? 'd-none' : null;
+																	}
+																@endphp
+																<div class="step {{ $payment_status }}">
+																	<span class="icon {{ $payment_status_icon_container }}"><i class="fa {{ $payment_status_icon.$order['current_payment_status_sequence'] != $s + 1 ? 'd-none' : null }}"></i></span>
+																	<span class="text status-text">{{ $status->status }}</span>
+																	<span class="text status-text" style="font-size: 9pt; color: #a39f9f !important; font-style: italic !important">
+																		{{ $payment_status_display_date }}
+																	</span>
+																	<span class="text status-text {{ $payment_status_description }}" style="font-size: 9pt; color: #a39f9f !important; font-style: italic !important">{{ $status->status_description }}</span>
+																</div>
+															@endforeach
+														@endif
+														@php
+															$order_status_tracker = collect($order['order_tracker'])->groupBy('track_status');
+														@endphp
+														@foreach ($order['ship_status'] as $key => $name)
+															@php
+																$order_status = isset($order_status_tracker[$name->status]) ? 'active' : null;
+																$status_date_update = isset($order_status_tracker[$name->status]) ? $order_status_tracker[$name->status][0]->track_date_update : null;
+																$date = $status_date_update ? date('M d, Y H:i A', strtotime($status_date_update)) : null;
+																
+																$icon = '';
+																if($name->status == "Order Confirmed"){
+																	$icon = 'user';
+																}else if($name->status == "Out for Delivery" or $name->status == "Ready for Pickup"){
 																	$icon = 'truck';
 																}else if($name->status == "Order Delivered" or $name->status == "Order Completed"){
 																	$icon = 'shopping-bag';
 																}
 															@endphp
-															<div class="step {{ collect($order['order_tracker'])->contains('track_status', $name->status) ? 'active' : '' }}">
+															<div class="step {{ $order_status }}">
 																<span class="icon {{ $step != $key + 1 ? 'inactive' : '' }}"><i class="fa fa-{{ $icon }} {{ $step != $key + 1 ? 'd-none' : '' }}"></i></span>
 																<span class="text status-text">{{ $name->status }}</span>
 																<span class="text status-text" style="font-size: 9pt; color: #a39f9f !important; font-style: italic !important">{{ $date }}</span>
@@ -277,7 +431,7 @@
 															</div>
 														@endforeach
 													</div>
-												</div>
+												</div> --}}
 											</div>
 											<div class="modal-footer">
 												<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -762,5 +916,94 @@ p {
 			min-height: 200px
 		}
 	}
+
+	/*Vertical Steps*/
+.list-group.vertical-steps{
+  padding-left:10px;
+  padding-top: 10px;
+}
+.list-group.vertical-steps .list-group-item{
+  border:none;
+  border-left:3px solid #ece5dd;
+  box-sizing:border-box;
+  border-radius:0;
+  /* counter-increment: step-counter; */
+  padding-left:25px;
+  padding-right:0px;
+  padding-bottom:20px;  
+  padding-top:0px;
+}
+.list-group.vertical-steps .list-group-item.active{
+  background-color:transparent;
+  color:inherit;
+}
+.list-group.vertical-steps .list-group-item:last-child{
+  border-left:3px solid transparent;
+  padding-bottom:0;
+}
+.list-group.vertical-steps .list-group-item::before {
+/* font-family: FontAwesome; */
+  border-radius: 50%;
+  background-color:#ece5dd;
+  color:#555;
+  /* content: counter(step-counter); */
+  /* content: 'f093'; */
+  display:inline-block;
+  float:left;
+  height:25px;
+  line-height:25px;
+  margin-left:-40px;
+  text-align:center;  
+  width:25px;  
+}
+.list-group.vertical-steps .list-group-item span,
+.list-group.vertical-steps .list-group-item a{
+  display:block;
+  overflow:hidden;
+  padding-top:2px;
+}
+
+/*Active/ Completed States*/
+.active-icon{
+	background-color: #008CFF !important;
+	color: #fff !important;
+}
+
+.fa-li{
+	border-radius: 50%;
+}
+
+.fa-li > .completed{
+	background-color:rgba(0, 0, 0, 0);
+	color: #008CFF;
+}
+
+.fa-li > .incomplete{
+	background-color:rgba(0, 0, 0, 0);
+	color: #ece5dd;
+}
+
+.list-group.vertical-steps .list-group-item.active{
+	padding-left: 20px;
+}
+
+.list-group.vertical-steps .list-group-item.active::before{
+  background-color:#008CFF;
+  color:#fff;
+  height:40px;
+  width:40px;  
+
+}
+.list-group.vertical-steps .list-group-item.completed{
+  border-left:3px solid #008CFF;
+  padding-left: 26px;
+}
+.list-group.vertical-steps .list-group-item.completed::before{
+  background-color:#008CFF;
+  color:#fff;
+}
+.list-group.vertical-steps .list-group-item.completed:last-child{
+  border-left:3px solid transparent;
+}
 </style>
 @endsection

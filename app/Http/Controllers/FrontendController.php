@@ -1912,7 +1912,7 @@ class FrontendController extends Controller
         $new_orders = DB::table('fumaco_order')->where('user_email', Auth::user()->username)
             ->whereNotIn('order_status', collect($completed_statuses)->pluck('status'))
             ->where('order_status', '!=', 'Cancelled')
-            ->select('id', 'pickup_date', 'order_number', 'order_date', 'order_status', 'estimated_delivery_date', 'date_delivered', 'order_subtotal', 'order_shipping', 'order_shipping_amount', 'discount_amount', 'voucher_code')
+            ->select('id', 'pickup_date', 'order_number', 'order_date', 'order_status', 'payment_status', 'estimated_delivery_date', 'date_delivered', 'order_subtotal', 'order_payment_method', 'order_shipping', 'order_shipping_amount', 'discount_amount', 'voucher_code')
             ->orderBy('id', 'desc')->paginate(10);
 
         $order_numbers = array_column($new_orders->items(), 'order_number');
@@ -1925,15 +1925,19 @@ class FrontendController extends Controller
 
         $order_items = collect($order_items)->groupBy('order_number')->toArray();
 
-        $track_order_detail_query = DB::table('track_order')->whereIn('track_code', $order_numbers)->where('track_active', 1)->select('track_status', 'track_date_update')->get();
-        $track_order_arr = collect($track_order_detail_query)->groupBy('track_code');
+        $track_order_detail_query = DB::table('track_order')->whereIn('track_code', $order_numbers)->where('track_active', 1)->select('track_code', 'track_status', 'track_date', 'track_payment_status', 'track_date_update')->get();
+        $track_order_arr = $track_order_detail_query ? collect($track_order_detail_query)->groupBy('track_code') : [];
+        
+        $shipping_methods = array_column($new_orders->items(), 'order_shipping');
 
-        $shipping_methods = array_column($new_orders->items(), 'shipping_method');
         $order_statuses = DB::table('order_status as s')
             ->join('order_status_process as p', 's.order_status_id', 'p.order_status_id')
             ->whereIn('shipping_method', $shipping_methods)
-            ->select('s.status', 's.status_description', 'p.order_sequence')
+            ->select('s.status', 's.status_description', 'p.order_sequence', 'p.shipping_method')
             ->orderBy('order_sequence', 'asc')->get();
+
+        $payment_statuses = DB::table('fumaco_payment_status')->get();
+        $payment_status = collect($payment_statuses)->groupBy('status');
 
         $order_statuses = collect($order_statuses)->groupBy('shipping_method');
 
@@ -1943,7 +1947,7 @@ class FrontendController extends Controller
 
             $order_item_list = array_key_exists($new_order->order_number, $order_items) ? $order_items[$new_order->order_number] : [];
 
-            $track_order_details = array_key_exists($new_order->order_number, $track_order_arr) ? $track_order_arr[$new_order->order_number] : [];
+            $track_order_details = isset($track_order_arr[$new_order->order_number]) ? $track_order_arr[$new_order->order_number] : [];
 
             foreach($order_item_list as $item){
                 $image = null;
@@ -1962,16 +1966,22 @@ class FrontendController extends Controller
                 ];
             }
             
-            $order_status = array_key_exists($new_order->order_shipping, $order_statuses) ? $order_statuses[$new_order->order_shipping] : [];
+            $order_status = isset($order_statuses[$new_order->order_shipping]) ? $order_statuses[$new_order->order_shipping] : [];
+
+            $status = collect($order_status)->groupBy('status');
 
             $new_orders_arr[] = [
                 'order_id' => $new_order->id,
                 'order_number' => $new_order->order_number,
                 'order_date' => $new_order->order_date,
-                'date' => date('M d, Y - h:i A', strtotime($new_order->order_date)),
+                'date' => date('M d, Y h:i A', strtotime($new_order->order_date)),
                 'status' => $new_order->order_status,
+                'current_order_status_sequence' => isset($status[$new_order->order_status]) ? $status[$new_order->order_status][0]->order_sequence : 0, // 0 = Order Placed
+                'current_payment_status_sequence' => isset($payment_status[$new_order->payment_status]) ? $payment_status[$new_order->payment_status][0]->status_sequence : 1, // 1 = Pending for Upload
                 'edd' => $new_order->estimated_delivery_date,
                 'items' => $items_arr,
+                'payment_method' => $new_order->order_payment_method,
+                'payment_status' => $new_order->payment_status,
                 'subtotal' => $new_order->order_subtotal,
                 'shipping_name' => $new_order->order_shipping,
                 'shipping_fee' => $new_order->order_shipping_amount,
@@ -1984,7 +1994,7 @@ class FrontendController extends Controller
             ];
         }
 
-        return view('frontend.orders', compact('orders', 'orders_arr', 'new_orders', 'new_orders_arr'));
+        return view('frontend.orders', compact('orders', 'orders_arr', 'new_orders', 'new_orders_arr', 'payment_statuses'));
     }
 
     public function viewOrder($order_id) {
@@ -2265,10 +2275,15 @@ class FrontendController extends Controller
     public function viewOrderTracking($order_number = null) {
         $order_details = DB::table('fumaco_order')->where('order_number', $order_number)->first();
 
-        $track_order_details = DB::table('track_order')->where('track_code', $order_number)->get();
+        if($order_number != null and !$order_details){
+            return redirect()->back()->with('error', 'Order Number not found!');
+        }
+
+        $track_order_details = DB::table('track_order')->where('track_code', $order_number)->where('track_active', 1)->get();
 
         $ordered_items = DB::table('fumaco_order_items')->where('order_number', $order_number)->get();
-        $order_status = '';
+        $items = $payment_statuses = $status = $order_status = [];
+        $payment_status_sequence = $status_sequence = null;
         if($order_details){
             $order_status = DB::table('order_status as s')
                 ->join('order_status_process as p', 's.order_status_id', 'p.order_status_id')
@@ -2276,31 +2291,30 @@ class FrontendController extends Controller
                 ->select('s.status', 's.status_description', 'p.order_sequence')
                 ->orderBy('order_sequence', 'asc')
                 ->get();
+            
+            $status = collect($order_status)->groupBy('status');
+            $status_sequence = isset($status[$order_details->order_status]) ? $status[$order_details->order_status][0]->order_sequence : 0;
+
+            $payment_statuses = DB::table('fumaco_payment_status')->get();
+            $payment_status_sequence = isset($payment_statuses[$order_details->order_status]) ? $payment_statuses[$order_details->order_status][0]->status_sequence : 1;
+
+            foreach ($ordered_items as $item) {
+                $item_image = DB::table('fumaco_items_image_v1')
+                    ->where('idcode', $item->item_code)->first();
+                $items[] = [
+                    'order_number' => $item->order_number,
+                    'item_code' => $item->item_code,
+                    'item_name' => $item->item_name,
+                    'item_price' => $item->item_price,
+                    'image' => ($item_image) ? $item_image->imgprimayx : null,
+                    'quantity' => $item->item_qty,
+                    'price' => $item->item_price,
+                    'amount' => $item->item_total_price
+                ];
+            }
         }
 
-        $items = [];
-        foreach ($ordered_items as $item) {
-            $item_image = DB::table('fumaco_items_image_v1')
-                ->where('idcode', $item->item_code)->first();
-            $items[] = [
-                'order_number' => $item->order_number,
-                'item_code' => $item->item_code,
-                'item_name' => $item->item_name,
-                'item_price' => $item->item_price,
-                'image' => ($item_image) ? $item_image->imgprimayx : null,
-                'quantity' => $item->item_qty,
-                'price' => $item->item_price,
-                'amount' => $item->item_total_price
-            ];
-        }
-
-        if($order_number != null and !$order_details){
-            return redirect()->back()->with('error', 'Order Number not found!');
-        }
-
-        // return $track_order_details; 
-
-        return view('frontend.track_order', compact('order_details', 'items', 'track_order_details', 'order_status'));
+        return view('frontend.track_order', compact('order_details', 'items', 'track_order_details', 'order_status', 'status_sequence', 'payment_statuses', 'payment_status_sequence'));
     }
 
     // get item code based on variants selected in product page
@@ -2422,17 +2436,14 @@ class FrontendController extends Controller
                 'last_modified_by' => Auth::user()->username
             ]);
 
-            // send notification to accounting->where('user_type', 'Accounting Admin')
             // send notification to accounting
             $order = ['order_details' => $order_details];
 
-            $email_recipient = DB::table('fumaco_admin_user')->where('username', 'jave.kulong@fumaco.com')->pluck('username');
             $email_recipient = DB::table('fumaco_admin_user')->where('user_type', 'Accounting Admin')->pluck('username');
             $recipients = collect($email_recipient)->toArray();
             if (count(array_filter($recipients)) > 0) {
                 Mail::send('emails.deposit_slip_notif', $order, function($message) use ($recipients) {
                     $message->to($recipients);
-                    $message->subject('Awaiting Confirmation - FUMACO - TESTING');
                     $message->subject('Awaiting Confirmation - FUMACO');
                 });
             }

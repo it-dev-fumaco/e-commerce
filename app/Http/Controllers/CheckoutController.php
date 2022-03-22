@@ -980,6 +980,11 @@ class CheckoutController extends Controller
 					'deposit_slip_token_date_created' => $payment_method == 'Bank Deposit' ? Carbon::now()->toDateTimeString() : null,
 				]);
 
+				$default_payment_status = null;
+				if($payment_method == 'Bank Deposit'){
+					$default_payment_status = DB::table('fumaco_payment_status')->where('status_sequence', 1)->pluck('status_sequence')->first();
+				}
+
 				// insert order in tracking order table
 				DB::table('track_order')->insert([
 					'track_code' => $temp->order_tracker_code,
@@ -987,7 +992,7 @@ class CheckoutController extends Controller
 					'track_item' => 'Item Purchase',
 					'track_description' => 'Your order is on processing',
 					'track_status' => 'Order Placed',
-					'track_payment_status' => $payment_method == 'Bank Deposit' ? 'Pending for Upload' : null,
+					'track_payment_status' => $default_payment_status,
 					'track_ip' => $temp->order_ip,
 					'track_active' => 1,
 					'transaction_member' => $temp->xusertype
