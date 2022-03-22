@@ -1010,10 +1010,6 @@ class CheckoutController extends Controller
 			}
 			
 			$order_details = DB::table('fumaco_order')->where('order_number', $temp->xlogs)->first();
-			
-			session()->forget('fumOrderNo');
-
-			DB::commit();
 
 			$store_address = null;
 			if($order_details->order_shipping == 'Store Pickup') {
@@ -1027,9 +1023,9 @@ class CheckoutController extends Controller
 				'store_address' => $store_address
 			];
 
+			// send email to customer / client
 			$emails = array_filter(array_unique([trim($order_details->order_bill_email), trim($order_details->order_email), trim($temp->xusernamex)]));
-			Mail::to($emails)
-				->queue(new OrderSuccess($order));
+			Mail::to($emails)->queue(new OrderSuccess($order));
 
 			$phone = $temp->xmobile[0] == '0' ? '63'.substr($temp->xmobile, 1) : $temp->xmobile;
 
@@ -1059,18 +1055,58 @@ class CheckoutController extends Controller
 
 			$min_leadtime = collect($leadtime_arr)->pluck('min_leadtime')->max();
 			$max_leadtime = collect($leadtime_arr)->pluck('max_leadtime')->max();
-			$url = Bitly::getUrl($request->root().'/track_order/'.$temp->xlogs);
+
+			$error_redirect_page = '/checkout/failed';
+			// generate bit.ly url
+			$requestUrl = 'https://api-ssl.bitly.com/v4/shorten';
+			$header = [
+				'Authorization' => 'Bearer ' . env('BITLY_ACCESS_TOKEN'),
+				'Content-Type'  => 'application/json',	
+			];
+
+			// api response for order tracking url
+			$bitly_response = Http::withHeaders($header)->post($requestUrl, [
+				'long_url' => $request->root().'/track_order/'.$temp->xlogs,
+			]);
+
+			$bitly_response = json_decode($bitly_response, true);
+
+			if (isset($bitly_response['errors'])) {
+				DB::rollback();
+				
+				return redirect($error_redirect_page);
+			}
+
+			if (isset($bitly_response['link'])) {
+				$url = $bitly_response['link'];
+			}
 
 			$sms_api = DB::table('api_setup')->where('type', 'sms_gateway_api')->first();
 			
 			$deposit_slip_message = null;
 
 			if($order_details->order_payment_method == 'Bank Deposit'){
-				$deposit_slip_url = Bitly::getUrl($request->root().'/upload_deposit_slip/'.$order_details->deposit_slip_token);
+				// api response for deposit slip uploading link
+				$bitly_response = Http::withHeaders($header)->post($requestUrl, [
+					'long_url' => $request->root().'/upload_deposit_slip/'.$order_details->deposit_slip_token,
+				]);
+	
+				$bitly_response = json_decode($bitly_response, true);
+	
+				if (isset($bitly_response['errors'])) {
+					DB::rollback();
+
+					return redirect($error_redirect_page);
+				}
+	
+				if (isset($bitly_response['link'])) {
+					$deposit_slip_url = $bitly_response['link'];
+				}
+
 				$deposit_slip_message =  ' Click '.$deposit_slip_url.' to upload your bank deposit slip.';
 			}
 
-			Http::asForm()->withHeaders([
+			$sms_response = Http::asForm()->withHeaders([
 				'Accept' => 'application/json',
 				'Content-Type' => 'application/x-www-form-urlencoded',
 			])->post($sms_api->base_url, [
@@ -1081,6 +1117,14 @@ class CheckoutController extends Controller
 				'text' => 'Hi '.$temp->xfname.' '.$temp->xlname.'!, your order '.$temp->xlogs.' with an amount of '.$request->Amount.' has been received, please allow '.$min_leadtime.'-'.$max_leadtime.' business days to process your order.'.$deposit_slip_message.' We will send another notification once your order is shipped out. Click '.$url.' to track your order.'
 			]);
 
+			$sms_response = json_decode($sms_response, true);
+	
+			if (isset($sms_response['error'])) {
+				DB::rollback();
+
+				return redirect($error_redirect_page);
+			}
+			
 			// send email to fumaco staff
 			$email_recipient = DB::table('email_config')->first();
 			$email_recipient = ($email_recipient) ? explode(",", $email_recipient->email_recipients) : [];
@@ -1090,6 +1134,16 @@ class CheckoutController extends Controller
 					$message->subject('New Order - FUMACO');
 				});
 			}
+
+			if (Mail::failures()) {
+				DB::rollback();
+
+				return redirect($error_redirect_page);
+			}
+
+			session()->forget('fumOrderNo');
+
+			DB::commit();
 
 			$bank_accounts = [];
 			$view = 'frontend.checkout.success';
