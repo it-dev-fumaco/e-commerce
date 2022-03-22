@@ -244,7 +244,7 @@
 											</div>
 											<div class="modal-body">
 												<div class="container-fluid">
-													<ul class="list-group vertical-steps">
+													<ul class="list-group vertical-steps" style="margin-left: -30px">
 														@php
 															$step = $order['current_order_status_sequence'];
 														@endphp
@@ -252,7 +252,7 @@
 															<span class="fa-li" style="margin-left: 15px; margin-top: -6px">
 																<i class="fas fa-circle" style="color: #008CFF !important"></i>
 															</span>
-															<span class="text status-text">Order Placed</span>
+															<span class="text">Order Placed</span>
 															<span class="text status-text" style="font-size: 9pt; color: #a39f9f !important; font-style: italic !important">{{ $order['date'] }}</span>
 														</li>
 														@if ($order['payment_method'] == 'Bank Deposit')
@@ -356,7 +356,7 @@
 																		<i class="fas fa-circle" style="color: {{ $order_step_color }} !important"></i>
 																	@endif
 																</span>
-																<span style="margin-top: -3px">{{ $name->status }}</span>
+																<span class="text" style="{{ $loop->last ? 'margin-top: -6px' : null }}">{{ $name->status }}</span>
 																<span class="text status-text" style="font-size: 9pt; color: #a39f9f !important; font-style: italic !important">{{ $date }}</span>
 																<span class="text status-text {{ $order_status_description }}" style="font-size: 9pt; color: #a39f9f !important; font-style: italic !important">{{ $name->status_description }}</span>
 														  	</li>

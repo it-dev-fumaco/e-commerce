@@ -198,7 +198,7 @@
 										</table>
 									</div>
 									{{-- Mobile/Tablet Tracker --}}
-									<div class="container-fluid d-block d-lg-none border border-success">
+									<div class="container-fluid d-block d-lg-none">
 										<ul class="list-group vertical-steps">
 											<li class="fa-ul list-group-item completed">
 												<span class="fa-li" style="margin-left: 15px; margin-top: -6px">
