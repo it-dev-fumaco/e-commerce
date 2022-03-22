@@ -83,10 +83,12 @@
 														$step_status = 'active';
 														$payment_icon_display = 'inactive';
 														$payment_status_description = null;
+														$payment_status_step = null;
 														if($order_details->order_status == 'Order Placed'){
 															$step_status = isset($order_tracker_payment[$status->status]) ? 'active' : null;
 															$payment_icon_display = $payment_status_sequence != $s + 1 ? 'inactive' : null;
 															$payment_status_description = $payment_status_sequence >= $s + 1 ? null : 'd-none';
+															$payment_status_step = $payment_status_sequence < $s + 1 ? 'text-muted' : null;
 														}
 
 														$payment_status_icon = null;
@@ -95,19 +97,10 @@
 														}else if($status->status == 'Payment For Confirmation'){
 															$payment_status_icon = "fa-hourglass";
 														}
-														
-														$icon = '';
-														if($status->status == "Order Confirmed"){
-															$icon = 'user';
-														}else if($status->status == "Out for Delivery" or $status->status == "Ready for Pickup" ){
-															$icon = 'truck';
-														}else if($status->status == "Order Delivered" or $status->status == "Order Completed"){
-															$icon = 'shopping-bag';
-														}
 													@endphp
 													<div class="step {{ $step_status }}">
-														<span class="icon {{ $payment_icon_display }}"><i class="fas {{ $payment_status_icon }} {{ $payment_status_sequence != $s + 1 ? 'd-none' : '' }}"></i></span>
-														<span class="text status-text">{{ $status->status }}</span>
+														<span class="icon {{ $payment_icon_display }}"><i class="fas {{ $payment_status_icon }} {{ $payment_status_sequence == $s + 1 ? null : 'd-none' }}"></i></span>
+														<span class="text status-text {{ $payment_status_step }}">{{ $status->status }}</span>
 														<span class="text status-text" style="font-size: 9pt; color: #a39f9f !important; font-style: italic !important">{{ $date }}</span>
 														<span class="text status-text {{ $payment_status_description }}" style="font-size: 9pt; color: #a39f9f !important; font-style: italic !important">{{ $status->status_description }}</span>
 													</div>
@@ -130,11 +123,16 @@
 														$icon = 'shopping-bag';
 													}
 
-													$order_status_description = $key + 1 > $status_sequence ? 'd-none' : null;
+ 													$order_status_description = null;
+ 													$order_status_step = null;
+													if($key + 1 > $status_sequence){
+ 														$order_status_description = 'd-none';
+ 														$order_status_step = 'text-muted';
+													}
 												@endphp
 												<div class="step {{ collect($track_order_details)->contains('track_status', $name->status) ? 'active' : '' }}">
 													<span class="icon {{ $status_sequence != $key + 1 ? 'inactive' : '' }}"><i class="fa fa-{{ $icon }} {{ $status_sequence != $key + 1 ? 'd-none' : '' }}"></i></span>
-													<span class="text status-text">{{ $name->status }}</span>
+													<span class="text status-text {{ $order_status_step }}">{{ $name->status }}</span>
 													<span class="text status-text" style="font-size: 9pt; color: #a39f9f !important; font-style: italic !important">{{ $date }}</span>
 													<span class="text status-text {{ $order_status_description }}" style="font-size: 9pt; color: #a39f9f !important; font-style: italic !important">{{ $name->status_description }}</span>
 												</div>
@@ -187,7 +185,7 @@
 													<td colspan="4" class="table-text p-1" style="text-align: right;">{{ $order_details->order_shipping }} : </td>
 													<td class="table-text p-1" style="text-align: right; white-space: nowrap !important">₱ {{ number_format($order_details->order_shipping_amount, 2) }}</td>
 												</tr>
-												<tr style="border-bottom: rgba(0,0,0,0) !important; font-size: 11pt;; font-weight: 700 !important">
+												<tr style="border-bottom: rgba(0,0,0,0) !important; font-size: 11pt; font-weight: 700 !important">
 													@php
 														$grand_total = $order_details->order_shipping_amount + ($order_details->order_subtotal - $order_details->discount_amount);
 													@endphp
@@ -201,8 +199,8 @@
 									<div class="container-fluid d-block d-lg-none">
 										<ul class="list-group vertical-steps">
 											<li class="fa-ul list-group-item completed">
-												<span class="fa-li" style="margin-left: 15px; margin-top: -6px">
-													<i class="fas fa-circle" style="color: #008CFF !important"></i>
+												<span class="fa-li" style="margin-left: 15px; margin-top: -10px">
+													<i class="fas fa-circle" style="color: #008CFF !important; font-size: 12px !important"></i>
 												</span>
 												<span style="margin-top: -6px">Order Placed</span>
 												<span class="text status-text" style="font-size: 9pt; color: #a39f9f !important; font-style: italic !important">
@@ -225,10 +223,12 @@
 														$payment_status_icon_container = 'inactive';
 														$payment_status_step = 'completed';
 														$payment_status_description = null;
+														$payment_step_status = null;
 														if($order_details->order_status == 'Order Placed'){
 															$payment_status_icon_container = $payment_status_sequence != $s + 1 ? 'inactive' : null;
 															$payment_status_step = $payment_status_sequence > $s + 1 ? 'completed' : null;
 															$payment_status_description = $payment_status_sequence >= $s + 1 ? null : 'd-none';
+															$payment_step_status = $payment_status_sequence < $s + 1 ? 'text-muted' : null;
 														}
 									
 														$payment_step_color = null;
@@ -249,10 +249,10 @@
 															</span>
 														@else
 															<span class="fa-li" style="margin-left: 15px;">
-																<i class="fas fa-circle" style="color: #008CFF !important"></i>
+																<i class="fas fa-circle" style="color: #008CFF !important; font-size: 12px !important"></i>
 															</span>
 														@endif
-														<span>{{ $status->status }}</span>
+														<span class="{{ $payment_step_status }}">{{ $status->status }}</span>
 														<span class="text status-text" style="font-size: 9pt; color: #a39f9f !important; font-style: italic !important">{{ $payment_status_display_date }}</span>
 														<span class="text status-text {{ $payment_status_description }}" style="font-size: 9pt; color: #a39f9f !important; font-style: italic !important">{{ $status->status_description }}</span>
 													</li>
@@ -286,17 +286,22 @@
 														$order_step_color = '#008CFF';
 													}
 									
-													$order_status_description = $key + 1 > $status_sequence ? 'd-none' : null;
+													$order_status_description = null;
+ 													$order_status_step = null;
+													if($key + 1 > $status_sequence){
+ 														$order_status_description = 'd-none';
+ 														$order_status_step = 'text-muted';
+													}
 												@endphp
-												<li class="fa-ul list-group-item {{ $icon_display }}" style=" {{ $loop->last ? 'margin-top: -6px' : null }}">
+												<li class="fa-ul list-group-item {{ $icon_display }}" style=" {{ $loop->last ? 'margin-top: -10px' : null }}">
 													<span class="fa-li {{ $status_sequence == $key + 1 ? 'active-icon' : null }}" style="margin-left: 15px;">
 														@if ($status_sequence == $key + 1)
 															<i class="fa fa-{{ $icon }}" style="font-size: 16px !important"></i>
 														@else
-															<i class="fas fa-circle" style="color: {{ $order_step_color }} !important"></i>
+															<i class="fas fa-circle" style="color: {{ $order_step_color }} !important; font-size: 12px !important"></i>
 														@endif
 													</span>
-													<span>{{ $name->status }}</span>
+													<span class="{{ $order_status_step }}">{{ $name->status }}</span>
 													<span class="text status-text" style="font-size: 9pt; color: #a39f9f !important; font-style: italic !important">{{ $date }}</span>
 													<span class="text status-text {{ $order_status_description }}" style="font-size: 9pt; color: #a39f9f !important; font-style: italic !important">{{ $name->status_description }}</span>
 												</li>
@@ -368,6 +373,9 @@
 
 @section('style')
 <style>
+	.fa-ul{
+		min-height: 60px;
+	}
 	.products-head {
 		margin-top: 10px !important;
 		padding-left: 40px !important;

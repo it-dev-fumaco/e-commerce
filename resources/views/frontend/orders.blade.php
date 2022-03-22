@@ -274,8 +274,14 @@
 																	$payment_status_date = isset($order_tracker_payment[$status_step]) ? $order_tracker_payment[$status_step][0]->track_date : null;
 																	$payment_status_display_date = $payment_status_date ? date('M d, Y h:i A', strtotime($payment_status_date)) : null;
 																	$payment_status_icon_container = 'inactive';
+																	$payment_status_step = 'completed';
+																	$payment_status_description = null;
+																	$payment_status = null;
 																	if($order['status'] == 'Order Placed'){
 																		$payment_status_icon_container = $order['current_payment_status_sequence'] != $s + 1 ? 'inactive' : null;
+																		$payment_status_step = $order['current_payment_status_sequence'] > $s + 1 ? 'completed' : null;
+																		$payment_status = $order['current_payment_status_sequence'] < $s + 1 ? 'text-muted' : null;
+																		$payment_status_description = $order['current_payment_status_sequence'] >= $s + 1 ? null : 'd-none';
 																	}
 
 																	$payment_step_color = null;
@@ -283,16 +289,6 @@
 																		$payment_step_color = '#ece5dd';
 																	}else if($order['current_payment_status_sequence'] > $s + 1){
 																		$payment_step_color = '#008CFF';
-																	}
-
-																	$payment_status_step = 'completed';
-																	if ($order['status'] == 'Order Placed'){
-																		$payment_status_step = $order['current_payment_status_sequence'] > $s + 1 ? 'completed' : null;
-																	}
-
-																	$payment_status_description = null;
-																	if ($order['status'] == 'Order Placed') {
-																		$payment_status_description = $order['current_payment_status_sequence'] >= $s + 1 ? null : 'd-none';
 																	}
 																@endphp
 																<li class="fa-ul list-group-item {{ $payment_status_step }}">
@@ -309,7 +305,7 @@
 																			<i class="fas fa-circle" style="color: #008CFF !important"></i>
 																		</span>
 																	@endif
-																	<span>{{ $status->status }}</span>
+																	<span class="{{ $payment_status }}">{{ $status->status }}</span>
 																	<span class="text status-text" style="font-size: 9pt; color: #a39f9f !important; font-style: italic !important">{{ $payment_status_display_date }}</span>
 																	<span class="text status-text {{ $payment_status_description }}" style="font-size: 9pt; color: #a39f9f !important; font-style: italic !important">{{ $status->status_description }}</span>
 																</li>
@@ -346,7 +342,12 @@
 																	$order_step_color = '#008CFF';
 																}
 
-																$order_status_description = $key + 1 > $step ? 'd-none' : null;
+																$order_status_description = null;
+																$order_status_step = null;
+																if($key + 1 > $step){
+																	$order_status_description = 'd-none';
+																	$order_status_step = 'text-muted';
+																}
 															@endphp
 															<li class="fa-ul list-group-item {{ $icon_display }}">
 																<span class="fa-li {{ $step == $key + 1 ? 'active-icon' : null }}" style="margin-left: 15px; {{ $loop->last ? 'margin-top: -6px' : null }}">
@@ -356,7 +357,7 @@
 																		<i class="fas fa-circle" style="color: {{ $order_step_color }} !important"></i>
 																	@endif
 																</span>
-																<span class="text" style="{{ $loop->last ? 'margin-top: -6px' : null }}">{{ $name->status }}</span>
+																<span class="text {{ $order_status_step }}" style="{{ $loop->last ? 'margin-top: -6px' : null }}">{{ $name->status }}</span>
 																<span class="text status-text" style="font-size: 9pt; color: #a39f9f !important; font-style: italic !important">{{ $date }}</span>
 																<span class="text status-text {{ $order_status_description }}" style="font-size: 9pt; color: #a39f9f !important; font-style: italic !important">{{ $name->status_description }}</span>
 														  	</li>
@@ -803,6 +804,10 @@
 .fa{
 	font-size: 24px !important;
 }
+
+.fa-ul{
+		min-height: 60px;
+	}
 
 .track .step.active .text {
     font-weight: 400;
