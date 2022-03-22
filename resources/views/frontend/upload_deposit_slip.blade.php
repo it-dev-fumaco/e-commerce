@@ -11,7 +11,7 @@
 				<img src="{{ asset('/assets/site-img/header3-sm.png') }}" alt="" style="position: absolute; top: 0;left: 0;min-width: 100%; height: unset !important; ">
 				<div class="container">
 					<div class="carousel-caption text-start" style="bottom: 1rem !important; right: 25% !important; left: 25%; !important;">
-						<h3 class="carousel-header-font text-center">UPLOAD DEPOSIT SLIP</h3>
+						<h3 class="carousel-header-font text-center">UPLOAD DEPOSIT SLIP / PROOF OF PAYMENT</h3>
 					</div>
 				</div>
 			</div>
@@ -45,7 +45,7 @@
                 @endif
                 @if(!session()->has('success'))
                 @if (!$order_details->deposit_slip_token_used)
-                <form action="/upload_deposit_slip/{{ $order_details->deposit_slip_token }}" method="POST" enctype="multipart/form-data">
+                <form action="/upload_deposit_slip/{{ $order_details->deposit_slip_token }}" method="POST" enctype="multipart/form-data" id="form-upload">
                     @csrf
                     <div class="card-body">
                         <h5>Order No.: <b>{{ $order_details->order_number }}</b></h5>
@@ -56,8 +56,17 @@
                                     <p class="uploadbox-text">Files Supported: JPG, JPEG, PNG.</p>
                                     <img src="{{ asset('/storage/no-photo-available.png') }}" id="img-preview" class="img-thumbnail w-75 d-none">
                                     <input type="file" hidden accept=".jpg,.jpeg,.png" style="display:none;" name="image">
-                                    <button class="uploadbox-btn" id="browse-btn" type="button">Choose File</button>
-                                    <button class="uploadbox-btn d-none m-3" id="submit-btn" type="submit">Upload</button>
+                                    <div class="d-flex flex-row">
+                                        <div class="p-2">
+                                            <button class="btn btn-primary btn-outline-primary bg-secondary" id="browse-btn" type="button">Choose File</button>
+                                        </div>
+                                        <div class="p-2">
+                                            <button class="btn btn-primary btn-outline-primary d-none" id="submit-btn" type="submit">Upload</button>
+                                        </div>
+                                        <div class="p-2">
+                                            <button class="btn btn-secondary btn-outline-primary bg-danger d-none" id="remove-btn" type="button">Reset</button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -71,6 +80,9 @@
 </main>
 
 <style>
+    .uploadbox-container .btn{
+        border: none !important;
+    }
     .uploadbox-container {
         width: 100%;
         align-items: center;
@@ -159,10 +171,18 @@
                 reader.readAsDataURL(file);
 
                 $('#submit-btn').removeClass('d-none');
-                $('#browse-btn').addClass('d-none');
+                $('#remove-btn').removeClass('d-none');
                 $('#img-preview').removeClass('d-none');
                 $('.uploadbox-text').addClass('d-none');
             }
+        });
+
+        $('#remove-btn').click(function() {
+            $('#submit-btn').addClass('d-none');
+            $('#remove-btn').addClass('d-none');
+            $('#img-preview').addClass('d-none');
+            $('.uploadbox-text').removeClass('d-none');
+            $('#form-upload').trigger("reset");
         });
 	});
 </script>
