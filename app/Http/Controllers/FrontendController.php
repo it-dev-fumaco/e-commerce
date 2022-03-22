@@ -2362,7 +2362,7 @@ class FrontendController extends Controller
     }
 
     public function uploadDepositSlipForm($token, Request $request) {
-        $order_details = DB::table('fumaco_order')->where('deposit_slip_token', $token)->first();
+        $order_details = DB::table('fumaco_order')->where('deposit_slip_token', $token)->where('user_email', Auth::user()->username)->first();
 
         if(!$order_details) {
             return view('error');
