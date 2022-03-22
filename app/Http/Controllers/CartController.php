@@ -223,6 +223,7 @@ class CartController extends Controller
 					'xusertype' => Auth::check() ? 'Member' : 'Guest',
 					'xusernamex' => Auth::check() ? Auth::user()->username : null,
 					'xuser_id' => Auth::check() ? Auth::user()->id : null,
+                    'last_transaction_page' => 'Shopping Cart'
 				]);
 			}
 		}
@@ -650,7 +651,7 @@ class CartController extends Controller
                 'xusernamex' => (Auth::check()) ? Auth::user()->username : null,
                 'xstatus' => 2,
                 'xuser_id' => (Auth::check()) ? Auth::user()->id : null,
-                'shipping_same_as_billing' => ($request->same_as_billing) ? 1 : 0
+                'shipping_same_as_billing' => ($request->same_as_billing) ? 1 : 0,
             ];
 
             DB::table('fumaco_temp')->where('order_tracker_code', $order_no)->update($temp_data);

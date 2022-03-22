@@ -68,11 +68,17 @@ class CheckoutController extends Controller
 				->where('address_class', 'Delivery')->exists();
 		}
 
+		DB::table('fumaco_temp')->where('order_tracker_code', $order_no)->update(['last_transaction_page' => 'Billing & Shipping Form']);
+
 		return view('frontend.checkout.billing_address_form', compact('has_shipping_address', 'shipping_zones'));
 	}
 
 	public function setBillingForm($item_code_buy = null, $qty_buy = null){
 		$shipping_zones = DB::table('fumaco_shipping_zone_rate')->distinct()->pluck('province_name')->toArray();
+
+		$order_no = session()->get('fumOrderNo');
+
+		DB::table('fumaco_temp')->where('order_tracker_code', $order_no)->update(['last_transaction_page' => 'Billing & Shipping Form']);
 
 		return view('frontend.checkout.set_billing', compact('item_code_buy', 'qty_buy', 'shipping_zones'));
 	}
@@ -522,6 +528,8 @@ class CheckoutController extends Controller
 				];
 			}
 
+			DB::table('fumaco_temp')->where('order_tracker_code', $order_no)->update(['last_transaction_page' => 'Checkout Page']);
+
 			$shipping_zones = DB::table('fumaco_shipping_zone_rate')->distinct()->pluck('province_name')->toArray();
 
 			$free_shipping_remarks = null;
@@ -563,7 +571,8 @@ class CheckoutController extends Controller
 					'xstore_location' => ($request->s_name == 'Store Pickup') ? $request->storeloc : null,
 					'xpickup_date' => ($request->s_name == 'Store Pickup') ? Carbon::parse($request->picktime)->format('Y-m-d') : null,
 					'voucher_code' => ($voucher_code) ? strtoupper($voucher_code) : null,
-					'payment_attempt' => $attempt
+					'payment_attempt' => $attempt,
+					'last_transaction_page' => 'Payment'
 				]);
 			}
 
