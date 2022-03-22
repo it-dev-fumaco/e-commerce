@@ -64,7 +64,7 @@
                                             <button class="btn btn-primary btn-outline-primary d-none" id="submit-btn" type="submit">Upload</button>
                                         </div>
                                         <div class="p-2">
-                                            <button class="btn btn-secondary btn-outline-primary bg-danger d-none" id="remove-btn" type="button">Reset</button>
+                                            <button class="btn btn-secondary btn-outline-primary bg-danger d-none" id="remove-btn" type="button">Remove</button>
                                         </div>
                                     </div>
                                 </div>
