@@ -1066,6 +1066,9 @@ class CheckoutController extends Controller
 			$bank_accounts = [];
 			$view = 'frontend.checkout.success';
 
+			$url = null;
+			$deposit_slip_url = null;
+			$sms_message = null;
 			if($order_details->order_payment_method == 'Bank Deposit'){
 				$bank_accounts = DB::table('fumaco_bank_account')->where('is_active', 1)->get();
 				$view = 'frontend.checkout.order_success_page';
@@ -1077,11 +1080,6 @@ class CheckoutController extends Controller
 					$message->subject('Order Placed - Bank Deposit - FUMACO');
 				});
 
-				if (Mail::failures()) {
-					DB::rollback();
-	
-					return redirect($error_redirect_page);
-				}
 				// api response for order tracking url
 				$bitly_response = Http::withHeaders($header)->post($requestUrl, [
 					'long_url' => $request->root().'/upload_deposit_slip/'.$order_details->deposit_slip_token,
@@ -1089,13 +1087,11 @@ class CheckoutController extends Controller
 
 				$bitly_response = json_decode($bitly_response, true);
 
-				if (isset($bitly_response['errors']) or !isset($bitly_response['link'])) {
-					DB::rollback();
-					
-					return redirect($error_redirect_page);
+				if (isset($bitly_response['link'])) {
+					$deposit_slip_url = $bitly_response['link'];
 				}
 				
-				$message = 'Hi '.$temp->xfname.' '.$temp->xlname.'!, to process your order please settle your payment thru bank deposit. Click '.$bitly_response['link'].' to upload your bank deposit slip';
+				$sms_message = 'Hi '.$temp->xfname.' '.$temp->xlname.'!, to process your order please settle your payment thru bank deposit. Click '.$deposit_slip_url.' to upload your bank deposit slip.';
 			}else{
 				// api response for order tracking url 
 				$bitly_response = Http::withHeaders($header)->post($requestUrl, [
@@ -1104,36 +1100,32 @@ class CheckoutController extends Controller
 
 				$bitly_response = json_decode($bitly_response, true);
 
-				if (isset($bitly_response['errors'])) {
-					DB::rollback();
-					
-					return redirect($error_redirect_page);
-				}
-
-				$url = null;
 				if (isset($bitly_response['link'])) {
 					$url = $bitly_response['link'];
 				}
 
 				$tracking_url = $url ? 'Click ' . $url . ' to track your order.' : null;
 
-				$message = 'Hi '.$temp->xfname.' '.$temp->xlname.'!, your order '.$temp->xlogs.' with an amount of '.$request->Amount.' has been received, please allow '.$min_leadtime.'-'.$max_leadtime.' business days to process your order. We will send another notification once your order is shipped out. ' . $tracking_url;
+				$sms_message = 'Hi '.$temp->xfname.' '.$temp->xlname.'!, your order '.$temp->xlogs.' with an amount of '.$request->Amount.' has been received, please allow '.$min_leadtime.'-'.$max_leadtime.' business days to process your order. We will send another notification once your order is shipped out. ' . $tracking_url;
 
 				Mail::to($emails)->queue(new OrderSuccess($order));
 			}
 
-			$sms_api = DB::table('api_setup')->where('type', 'sms_gateway_api')->first();
-
-			Http::asForm()->withHeaders([
-				'Accept' => 'application/json',
-				'Content-Type' => 'application/x-www-form-urlencoded',
-			])->post($sms_api->base_url, [
-				'api_key' => $sms_api->api_key,
-				'api_secret' => $sms_api->api_secret_key,
-				'from' => 'FUMACO',
-				'to' => preg_replace("/[^0-9]/", "", $phone),
-				'text' => $message
-			]);
+			if ($url || $deposit_slip_url) {
+				$sms_api = DB::table('api_setup')->where('type', 'sms_gateway_api')->first();
+				if ($sms_api) {
+					Http::asForm()->withHeaders([
+						'Accept' => 'application/json',
+						'Content-Type' => 'application/x-www-form-urlencoded',
+					])->post($sms_api->base_url, [
+						'api_key' => $sms_api->api_key,
+						'api_secret' => $sms_api->api_secret_key,
+						'from' => 'FUMACO',
+						'to' => preg_replace("/[^0-9]/", "", $phone),
+						'text' => $sms_message
+					]);
+				}
+			}
 			
 			// send email to fumaco staff
 			$email_recipient = DB::table('email_config')->first();
@@ -1145,13 +1137,8 @@ class CheckoutController extends Controller
 				});
 			}
 
-			if (Mail::failures()) {
-				DB::rollback();
-
-				return redirect($error_redirect_page);
-			}
-
 			session()->forget('fumOrderNo');
+
 			DB::commit();
 
 			return view($view, compact('order_details', 'items', 'loggedin', 'store_address', 'bank_accounts'));
