@@ -1110,10 +1110,6 @@ class CheckoutController extends Controller
 					return redirect($error_redirect_page);
 				}
 
-				$bitly_response2 = Http::withHeaders($header)->post($requestUrl, [
-					'long_url' => $request->root().'/about',
-				]);
-
 				$url = null;
 				if (isset($bitly_response['link'])) {
 					$url = $bitly_response['link'];
@@ -1121,25 +1117,23 @@ class CheckoutController extends Controller
 
 				$tracking_url = $url ? 'Click ' . $url . ' to track your order.' : null;
 
-				$message = 'Hi '.$temp->xfname.' '.$temp->xlname.'!, your order '.$temp->xlogs.' with an amount of '.$request->Amount.' has been received, please allow '.$min_leadtime.'-'.$max_leadtime.' business days to process your order. We will send another notification once your order is shipped out. ' . $tracking_url. $bitly_response2['link'];
+				$message = 'Hi '.$temp->xfname.' '.$temp->xlname.'!, your order '.$temp->xlogs.' with an amount of '.$request->Amount.' has been received, please allow '.$min_leadtime.'-'.$max_leadtime.' business days to process your order. We will send another notification once your order is shipped out. ' . $tracking_url;
 
 				Mail::to($emails)->queue(new OrderSuccess($order));
 			}
 
-			if ($order_details->order_payment_method == 'Bank Deposit') {
-				$sms_api = DB::table('api_setup')->where('type', 'sms_gateway_api')->first();
+			$sms_api = DB::table('api_setup')->where('type', 'sms_gateway_api')->first();
 
-				Http::asForm()->withHeaders([
-					'Accept' => 'application/json',
-					'Content-Type' => 'application/x-www-form-urlencoded',
-				])->post($sms_api->base_url, [
-					'api_key' => $sms_api->api_key,
-					'api_secret' => $sms_api->api_secret_key,
-					'from' => 'FUMACO',
-					'to' => preg_replace("/[^0-9]/", "", $phone),
-					'text' => $message
-				]);
-			}
+			Http::asForm()->withHeaders([
+				'Accept' => 'application/json',
+				'Content-Type' => 'application/x-www-form-urlencoded',
+			])->post($sms_api->base_url, [
+				'api_key' => $sms_api->api_key,
+				'api_secret' => $sms_api->api_secret_key,
+				'from' => 'FUMACO',
+				'to' => preg_replace("/[^0-9]/", "", $phone),
+				'text' => $message
+			]);
 			
 			// send email to fumaco staff
 			$email_recipient = DB::table('email_config')->first();
