@@ -44,7 +44,7 @@
                     </div>
                 @endif
                 @if(!session()->has('success'))
-                @if (!$order_details->deposit_slip_token_used)
+                @if (!$order_details->deposit_slip_token_used || !$order_details->deposit_slip_image)
                 <form action="/upload_deposit_slip/{{ $order_details->deposit_slip_token }}" method="POST" enctype="multipart/form-data" id="form-upload">
                     @csrf
                     <div class="card-body">
