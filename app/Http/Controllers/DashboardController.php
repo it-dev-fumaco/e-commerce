@@ -292,14 +292,14 @@ class DashboardController extends Controller
 			}
 
 			$abandoned_arr[] = [
-				'order_number' => $abandoned->order_tracker_code,
-				'contact_person' => $abandoned->xshipcontact_person,
+				'name' => trim($abandoned->xfname . ' ' . $abandoned->xlname),
 				'email' => $abandoned->xemail,
-				'last_online' => $abandoned->xdateupdate,
 				'items' => $items_arr,
-				'total_items' => collect($items_arr)->sum('qty'),
+				'transaction' => $abandoned->last_transaction_page,
 				'total_amount' => collect($items_arr)->sum('total_price'),
-				'abandoned_page' => $abandoned->payment_attempt == 1 ? 'Payment Form' : 'Checkout Page',
+				'total_items' => collect($items_arr)->sum('qty'),
+				'transaction_date' => $abandoned->xdateupdate,
+				'order_number' => $abandoned->order_tracker_code,
 				'active' => $active
 			];
 		}
