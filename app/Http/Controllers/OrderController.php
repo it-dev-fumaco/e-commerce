@@ -310,16 +310,36 @@ class OrderController extends Controller
                 $order_details = DB::table('fumaco_order')->where('order_number', $request->order_number)->first();
 
                 $total_amount = $order_details->amount_paid;
-                $url = Bitly::getUrl($request->root().'/track_order/'.$request->order_number);
 
-                $sms_api = DB::table('api_setup')->where('type', 'sms_gateway_api')->first();
-
-                $sms = [
-                    'api_key' => $sms_api->api_key,
-                    'api_secret' => $sms_api->api_secret_key,
-                    'from' => 'FUMACO',
-                    'to' => $order_details->order_bill_contact[0] == '0' ? '63'.substr($order_details->order_bill_contact, 1) : $order_details->order_bill_contact
+                $requestUrl = 'https://api-ssl.bitly.com/v4/shorten';
+                $header = [
+                    'Authorization' => 'Bearer ' . env('BITLY_ACCESS_TOKEN'),
+                    'Content-Type'  => 'application/json',	
                 ];
+
+                // api response for order tracking url
+                $bitly_response = Http::withHeaders($header)->post($requestUrl, [
+                    'long_url' => $request->root().'/track_order/'.$request->order_number,
+                ]);
+
+                $bitly_response = json_decode($bitly_response, true);
+
+                $url = null;
+                if (isset($bitly_response['link'])) {
+                    $url = $bitly_response['link'];
+                }
+                
+                $sms = [];
+                if ($url) {
+                    $sms_api = DB::table('api_setup')->where('type', 'sms_gateway_api')->first();
+
+                    $sms = [
+                        'api_key' => $sms_api->api_key,
+                        'api_secret' => $sms_api->api_secret_key,
+                        'from' => 'FUMACO',
+                        'to' => $order_details->order_bill_contact[0] == '0' ? '63'.substr($order_details->order_bill_contact, 1) : $order_details->order_bill_contact
+                    ];
+                }
 
                 if ($status == 'Order Confirmed'){
                     $checker = DB::table('track_order')->where('track_code', $request->order_number)->where('track_status', 'Out for Delivery')->count();
@@ -355,10 +375,12 @@ class OrderController extends Controller
                 }
 
                 if(in_array($status, ['Order Confirmed', 'Out for Delivery', 'Order Delivered', 'Ready for Pickup'])){
-                    Http::asForm()->withHeaders([
-                        'Accept' => 'application/json',
-                        'Content-Type' => 'application/x-www-form-urlencoded',
-                    ])->post($sms_api->base_url, $sms);
+                    if ($url) {
+                        Http::asForm()->withHeaders([
+                            'Accept' => 'application/json',
+                            'Content-Type' => 'application/x-www-form-urlencoded',
+                        ])->post($sms_api->base_url, $sms);
+                    }
                 }
 
                 DB::table('fumaco_order')->where('order_number', $request->order_number)->update($orders_arr);

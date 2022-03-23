@@ -163,8 +163,8 @@
 																													<span aria-hidden="true">&times;</span>
 																												</button>
 																											</div>
-																											<div class="modal-body">
-																												Confirm payment of ₱ {{ number_format(str_replace(",","",$order['grand_total']), 2) }}?
+																											<div class="modal-body text-center">
+																												Confirm payment of <b>₱ {{ number_format(str_replace(",","",$order['grand_total']), 2) }}</b>?
 																											</div>
 																											<form action="/admin/order/status_update" method="POST">
 																												@csrf
