@@ -2380,7 +2380,7 @@ class FrontendController extends Controller
             $reason = 'Link has been expired.';
         }
 
-        if($order_details->deposit_slip_token_used) {
+        if($order_details->deposit_slip_token_used || $order_details->deposit_slip_image) {
             $is_invalid = true;
             $reason = 'Deposit slip for your order <b>'.$order_details->order_number.'</b> has been already uploaded.';
         }
