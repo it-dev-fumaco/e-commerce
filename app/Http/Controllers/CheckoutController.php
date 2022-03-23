@@ -1023,9 +1023,8 @@ class CheckoutController extends Controller
 				'store_address' => $store_address
 			];
 
-			// send email to customer / client
+			// // send email to customer / client
 			$emails = array_filter(array_unique([trim($order_details->order_bill_email), trim($order_details->order_email), trim($temp->xusernamex)]));
-			Mail::to($emails)->queue(new OrderSuccess($order));
 
 			$phone = $temp->xmobile[0] == '0' ? '63'.substr($temp->xmobile, 1) : $temp->xmobile;
 
@@ -1057,45 +1056,77 @@ class CheckoutController extends Controller
 			$max_leadtime = collect($leadtime_arr)->pluck('max_leadtime')->max();
 
 			$error_redirect_page = '/checkout/failed';
-			// generate bit.ly url
+
 			$requestUrl = 'https://api-ssl.bitly.com/v4/shorten';
 			$header = [
 				'Authorization' => 'Bearer ' . env('BITLY_ACCESS_TOKEN'),
 				'Content-Type'  => 'application/json',	
 			];
 
-			// api response for order tracking url
-			$bitly_response = Http::withHeaders($header)->post($requestUrl, [
-				'long_url' => $request->root().'/track_order/'.$temp->xlogs,
-			]);
+			$bank_accounts = [];
+			$view = 'frontend.checkout.success';
 
-			$bitly_response = json_decode($bitly_response, true);
-
-			$url = null;
-			if (isset($bitly_response['link'])) {
-				$url = $bitly_response['link'];
-			}
-
-			$deposit_slip_message = null;
-			$deposit_slip_url = null;
 			if($order_details->order_payment_method == 'Bank Deposit'){
-				// api response for deposit slip uploading link
+				$bank_accounts = DB::table('fumaco_bank_account')->where('is_active', 1)->get();
+				$view = 'frontend.checkout.order_success_page';
+				
+				$order['bank_accounts'] = $bank_accounts;
+
+				Mail::send('emails.order_success_bank_deposit', $order, function($message) use ($emails) {
+					$message->to($emails);
+					$message->subject('Order Placed - Bank Deposit - FUMACO');
+				});
+
+				if (Mail::failures()) {
+					DB::rollback();
+	
+					return redirect($error_redirect_page);
+				}
+				// api response for order tracking url
 				$bitly_response = Http::withHeaders($header)->post($requestUrl, [
 					'long_url' => $request->root().'/upload_deposit_slip/'.$order_details->deposit_slip_token,
 				]);
-	
+
 				$bitly_response = json_decode($bitly_response, true);
 
-				if (isset($bitly_response['link'])) {
-					$deposit_slip_url = $bitly_response['link'];
+				if (isset($bitly_response['errors']) or !isset($bitly_response['link'])) {
+					DB::rollback();
+					
+					return redirect($error_redirect_page);
+				}
+				
+				$message = 'Hi '.$temp->xfname.' '.$temp->xlname.'!, to process your order please settle your payment thru bank deposit. Click '.$bitly_response['link'].' to upload your bank deposit slip';
+			}else{
+				// api response for order tracking url 
+				$bitly_response = Http::withHeaders($header)->post($requestUrl, [
+					'long_url' => $request->root().'/track_order/'.$temp->xlogs,
+				]);
+
+				$bitly_response = json_decode($bitly_response, true);
+
+				if (isset($bitly_response['errors'])) {
+					DB::rollback();
+					
+					return redirect($error_redirect_page);
 				}
 
-				$deposit_slip_message =  ' Click '.$deposit_slip_url.' to upload your bank deposit slip.';
+				$bitly_response2 = Http::withHeaders($header)->post($requestUrl, [
+					'long_url' => $request->root().'/about',
+				]);
+
+				$url = null;
+				if (isset($bitly_response['link'])) {
+					$url = $bitly_response['link'];
+				}
+
+				$tracking_url = $url ? 'Click ' . $url . ' to track your order.' : null;
+
+				$message = 'Hi '.$temp->xfname.' '.$temp->xlname.'!, your order '.$temp->xlogs.' with an amount of '.$request->Amount.' has been received, please allow '.$min_leadtime.'-'.$max_leadtime.' business days to process your order. We will send another notification once your order is shipped out. ' . $tracking_url. $bitly_response2['link'];
+
+				Mail::to($emails)->queue(new OrderSuccess($order));
 			}
 
-			$tracking_url = $url ? 'Click ' . $url . ' to track your order.' : null;
-
-			if ($url || $deposit_slip_url) {
+			if ($order_details->order_payment_method == 'Bank Deposit') {
 				$sms_api = DB::table('api_setup')->where('type', 'sms_gateway_api')->first();
 
 				Http::asForm()->withHeaders([
@@ -1106,7 +1137,7 @@ class CheckoutController extends Controller
 					'api_secret' => $sms_api->api_secret_key,
 					'from' => 'FUMACO',
 					'to' => preg_replace("/[^0-9]/", "", $phone),
-					'text' => 'Hi '.$temp->xfname.' '.$temp->xlname.'!, your order '.$temp->xlogs.' with an amount of '.$request->Amount.' has been received, please allow '.$min_leadtime.'-'.$max_leadtime.' business days to process your order.'.$deposit_slip_message.' We will send another notification once your order is shipped out. ' . $tracking_url
+					'text' => $message
 				]);
 			}
 			
@@ -1120,16 +1151,14 @@ class CheckoutController extends Controller
 				});
 			}
 
-			session()->forget('fumOrderNo');
+			if (Mail::failures()) {
+				DB::rollback();
 
-			DB::commit();
-
-			$bank_accounts = [];
-			$view = 'frontend.checkout.success';
-			if ($payment_method == 'Bank Deposit') {
-				$bank_accounts = DB::table('fumaco_bank_account')->where('is_active', 1)->get();
-				$view = 'frontend.checkout.order_success_page';
+				return redirect($error_redirect_page);
 			}
+
+			session()->forget('fumOrderNo');
+			DB::commit();
 
 			return view($view, compact('order_details', 'items', 'loggedin', 'store_address', 'bank_accounts'));
 		} catch (Exception $e) {
