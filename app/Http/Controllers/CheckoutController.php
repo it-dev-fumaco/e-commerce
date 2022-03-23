@@ -572,7 +572,7 @@ class CheckoutController extends Controller
 					'xpickup_date' => ($request->s_name == 'Store Pickup') ? Carbon::parse($request->picktime)->format('Y-m-d') : null,
 					'voucher_code' => ($voucher_code) ? strtoupper($voucher_code) : null,
 					'payment_attempt' => $attempt,
-					'last_transaction_page' => 'Payment'
+					'last_transaction_page' => 'Payment Page'
 				]);
 			}
 

@@ -223,7 +223,7 @@ class CartController extends Controller
 					'xusertype' => Auth::check() ? 'Member' : 'Guest',
 					'xusernamex' => Auth::check() ? Auth::user()->username : null,
 					'xuser_id' => Auth::check() ? Auth::user()->id : null,
-                    'last_transaction_page' => 'Shopping Cart'
+                    'last_transaction_page' => 'Shopping Cart Page'
 				]);
 			}
 		}
