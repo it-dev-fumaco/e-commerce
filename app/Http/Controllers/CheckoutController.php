@@ -68,7 +68,10 @@ class CheckoutController extends Controller
 				->where('address_class', 'Delivery')->exists();
 		}
 
-		DB::table('fumaco_temp')->where('order_tracker_code', $order_no)->update(['last_transaction_page' => 'Billing & Shipping Form']);
+		$is_on_payment_page = DB::table('fumaco_temp')->where('order_tracker_code', $order_no)->whereIn('last_transaction_page', ['Payment Page', 'Checkout Page'])->exists();
+		if (!$is_on_payment_page) {
+			DB::table('fumaco_temp')->where('order_tracker_code', $order_no)->update(['last_transaction_page' => 'Billing & Shipping Form']);
+		}
 
 		return view('frontend.checkout.billing_address_form', compact('has_shipping_address', 'shipping_zones'));
 	}
@@ -78,7 +81,10 @@ class CheckoutController extends Controller
 
 		$order_no = session()->get('fumOrderNo');
 
-		DB::table('fumaco_temp')->where('order_tracker_code', $order_no)->update(['last_transaction_page' => 'Billing & Shipping Form']);
+		$is_on_payment_page = DB::table('fumaco_temp')->where('order_tracker_code', $order_no)->whereIn('last_transaction_page', ['Payment Page', 'Checkout Page'])->exists();
+		if (!$is_on_payment_page) {
+			DB::table('fumaco_temp')->where('order_tracker_code', $order_no)->update(['last_transaction_page' => 'Billing & Shipping Form']);
+		}
 
 		return view('frontend.checkout.set_billing', compact('item_code_buy', 'qty_buy', 'shipping_zones'));
 	}
@@ -528,7 +534,10 @@ class CheckoutController extends Controller
 				];
 			}
 
-			DB::table('fumaco_temp')->where('order_tracker_code', $order_no)->update(['last_transaction_page' => 'Checkout Page']);
+			$is_on_payment_page = DB::table('fumaco_temp')->where('order_tracker_code', $order_no)->where('last_transaction_page', 'Payment Page')->exists();
+			if (!$is_on_payment_page) {
+				DB::table('fumaco_temp')->where('order_tracker_code', $order_no)->update(['last_transaction_page' => 'Checkout Page']);
+			}
 
 			$shipping_zones = DB::table('fumaco_shipping_zone_rate')->distinct()->pluck('province_name')->toArray();
 
