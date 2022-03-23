@@ -148,7 +148,7 @@
 																							@endif
 																						</div>
 																						
-																						<div class="col-10 pt-1">
+																						<div class="col-10 pt-1 border border-secondary">
 																							<p class="my-auto"><b>Payment Status:</b> {{ $order['payment_status'] }}</p>
 
 																							@if ($order['payment_status'] == 'Payment For Confirmation')
@@ -176,6 +176,36 @@
 																														<input type="text" value="{{ $order['order_no'] }}" name="order_number"/>
 																														<input type="checkbox" name="member" {{ $order['order_type'] == 'Member' ? 'checked' : '' }} readonly/>
 																														<input type="checkbox" name="payment_received" checked readonly>
+																													</div>
+																												</div>
+																											</form>
+																										</div>
+																									</div>
+																								</div>
+																							@elseif($order['payment_status'] == 'Pending for Payment')
+																								<button class="btn btn-primary btn-sm d-print-none" data-toggle="modal" data-target="#resend-upload-link-{{ $order['order_no'] }}-Modal">Resend SMS and Email Upload Link</button>
+
+																								<div class="modal fade payment-modal" id="resend-upload-link-{{ $order['order_no'] }}-Modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+																									<div class="modal-dialog" role="document">
+																										<div class="modal-content">
+																											<div class="modal-header">
+																												<h5 class="modal-title" id="exampleModalLabel">Resend Link to {{ $order['first_name'] . " " . $order['last_name'] }}</h5>
+																												<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+																													<span aria-hidden="true">&times;</span>
+																												</button>
+																											</div>
+																											<div class="modal-body text-center">
+																												Resend SMS and Email Upload Link?
+																											</div>
+																											<form action="/admin/order/resend_deposit_link" method="POST">
+																												@csrf
+																												<div class="modal-footer">
+																													<button type="submit" class="btn btn-sm btn-primary">Confirm</button>
+																													<button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Close</button>
+																													<div class="d-nones">
+																														<input type="text" value="{{ $order['order_no'] }}" name="order_number" readonly/>
+																														<input type="text" name="billing_email" value={{ $order['bill_email'] }}>
+																														<input type="text" name="billing_number" value={{ $order['bill_contact'] }}>
 																													</div>
 																												</div>
 																											</form>

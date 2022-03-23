@@ -430,7 +430,7 @@ class OrderController extends Controller
 
                 if(in_array($status, ['Order Confirmed', 'Out for Delivery', 'Order Delivered', 'Ready for Pickup'])){
                     if ($url) {
-                        $sms = Http::asForm()->withHeaders([
+                        $sms_response = Http::asForm()->withHeaders([
                             'Accept' => 'application/json',
                             'Content-Type' => 'application/x-www-form-urlencoded',
                         ])->post($sms_api->base_url, $sms);
@@ -440,10 +440,9 @@ class OrderController extends Controller
                 }
 
                 DB::table('fumaco_order')->where('order_number', $request->order_number)->update($orders_arr);
-
                 DB::table('track_order')->insert($track_order);
 
-                DB::commit();
+                // DB::commit();
             }
 
             return redirect()->back()->with('success', 'Order <b>'.$request->order_number.'</b> status has been updated.');
@@ -452,6 +451,34 @@ class OrderController extends Controller
 			return redirect()->back()->with('error', 'An error occured. Please try again.');
 		}
     }
+
+    // public function resendUploadDepositLink(Request $request){
+    //     $deposit_slip_token = hash('sha256', Carbon::now()->toDateTimeString());
+    //     $now = Carbon::now()->toDateTimeString();
+
+	// 	$phone = $request->billing_number[0] == '0' ? '63'.substr($request->billing_number, 1) : $request->billing_number;
+
+    //     $sms_api = DB::table('api_setup')->where('type', 'sms_gateway_api')->first();
+    //     $sms = [
+    //         'api_key' => $sms_api->api_key,
+    //         'api_secret' => $sms_api->api_secret_key,
+    //         'from' => 'FUMACO',
+    //         'to' => $order_details->order_bill_contact[0] == '0' ? '63'.substr($order_details->order_bill_contact, 1) : $order_details->order_bill_contact
+    //     ];
+
+    //     $sms = Http::asForm()->withHeaders([
+    //         'Accept' => 'application/json',
+    //         'Content-Type' => 'application/x-www-form-urlencoded',
+    //     ])->post($sms_api->base_url, $sms);
+
+    //     $sms_response = json_decode($sms, true);
+
+    //     Mail::send('emails.out_for_delivery', ['order_details' => $order_details, 'status' => $status, 'items' => $items], function($message) use($order_details, $status){
+    //         $message->to(trim($order_details->order_email));
+    //         $message->subject($status . ' - FUMACO');
+    //     });
+    //     return $request->all();
+    // }
 
     public function checkPaymentStatus(Request $request) {
         $payment_id = $request->payment_id;
