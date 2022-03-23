@@ -1115,7 +1115,7 @@ class CheckoutController extends Controller
 
 				$tracking_url = $url ? 'Click ' . $url . ' to track your order.' : null;
 
-				$sms_message = 'Hi '.$temp->xfname.' '.$temp->xlname.'!, your order '.$temp->xlogs.' with an amount of '.$request->Amount.' has been received, please allow '.$min_leadtime.'-'.$max_leadtime.' business days to process your order. We will send another notification once your order is shipped out. ' . $tracking_url;
+				$sms_message = 'Hi '.$temp->xfname.' '.$temp->xlname.'!, your order '.$temp->xlogs.' with an amount of P '.number_format($request->Amount, 2).' has been received, please allow '.$min_leadtime.' to '.$max_leadtime.' business days to process your order. ' . $tracking_url;
 
 				Mail::to($emails)->queue(new OrderSuccess($order));
 			}

@@ -343,12 +343,66 @@ class OrderController extends Controller
 
                 if ($status == 'Order Confirmed'){
                     $checker = DB::table('track_order')->where('track_code', $request->order_number)->where('track_status', 'Out for Delivery')->count();
+
                     if($checker > 0){
                         DB::table('track_order')->where('track_code', $request->order_number)->whereIn('track_status', ['Out for Delivery', 'Order Confirmed'])->update(['track_active' => 0]);
                     }
 
-                    $orders_arr['deposit_slip_token_used'] = ($order_details->order_payment_method == 'Bank Deposit') ? 1 : 0;
                     $sms['text'] = 'Hi '.$order_details->order_name . ' ' . $order_details->order_lastname.'!, your payment of '.$total_amount.' has been confirmed. Click '.$url.' to track your order.';
+
+                    if($order_details->order_payment_method == 'Bank Deposit'){
+                        $leadtime_arr = [];
+                        foreach($ordered_items as $item){
+                            $category_id = DB::table('fumaco_items')->where('f_idcode', $item->item_code)->pluck('f_cat_id')->first();
+                            if($order_details->order_shipping != 'Store Pickup') {
+                                $shipping = DB::table('fumaco_shipping_service as shipping_service')
+                                    ->join('fumaco_shipping_zone_rate as zone_rate', 'shipping_service.shipping_service_id', 'zone_rate.shipping_service_id')
+                                    ->where('shipping_service.shipping_service_name', $order_details->order_shipping)
+                                    ->where('zone_rate.province_name', $order_details->order_ship_prov)
+                                    ->first();
+                            } else {
+                                $shipping = DB::table('fumaco_shipping_service')->where('shipping_service_name', $order_details->order_shipping)->first();
+                            }
+                            
+                            $lead_time_per_category = DB::table('fumaco_shipping_product_category')->where('shipping_service_id', $shipping->shipping_service_id)
+                                ->where('category_id', $category_id)->select('min_leadtime', 'max_leadtime')->first();
+
+                            $leadtime_arr[] = [
+                                'min_leadtime' => $lead_time_per_category ? $lead_time_per_category->min_leadtime : $shipping->min_leadtime,
+                                'max_leadtime' => $lead_time_per_category ? $lead_time_per_category->max_leadtime : $shipping->max_leadtime
+                            ];
+                        }
+
+                        $min_leadtime = collect($leadtime_arr)->pluck('min_leadtime')->max();
+                        $max_leadtime = collect($leadtime_arr)->pluck('max_leadtime')->max();
+
+                        $total_amount = $order_details->order_subtotal + $order_details->order_shipping_amount;
+                        $orders_arr['deposit_slip_token_used'] = 1;
+
+
+                        $sms['text'] = 'Hi '.$order_details->order_name . ' ' . $order_details->order_lastname.' your order '.$request->order_number.' with an amount of P '.number_format($total_amount, 2).' has been received, please allow '.$min_leadtime.' to '.$max_leadtime.' business days to process your order. Click ' . $url . ' to track your order.';
+
+                        $store_address = null;
+                        if($order_details->order_shipping == 'Store Pickup') {
+                            $store = DB::table('fumaco_store')->where('store_name', $order_details->store_location)->first();
+                            $store_address = ($store) ? $store->address : null;
+                        }
+
+                        $order = [
+                            'order_details' => $order_details,
+                            'items' => $items,
+                            'store_address' => $store_address,
+                            'payment' => $total_amount
+                        ];
+                        $confirmed_bank_deposit_email = $order_details->order_email;
+
+                        $customer_name = $order_details->order_name . ' ' . $order_details->order_lastname;
+                        Mail::send('emails.order_confirmed_bank_deposit', $order, function($message) use($confirmed_bank_deposit_email){
+                            $message->to(trim($confirmed_bank_deposit_email));
+                            $message->subject('Order Confirmed - FUMACO');
+                        });
+                    }
+
                 }
 
                 if ($status == 'Out for Delivery') {
@@ -357,7 +411,7 @@ class OrderController extends Controller
                         $message->subject($status . ' - FUMACO');
                     });
 
-                    $sms['text'] = 'Hi '.$order_details->order_name . ' ' . $order_details->order_lastname.'!, your order '.$request->order_number.' with an amount of '.$total_amount.' is now shipped out. Click '.$url.' to track your order.';
+                    $sms['text'] = 'Hi '.$order_details->order_name . ' ' . $order_details->order_lastname.'!, your order '.$request->order_number.' with an amount of P '.number_format($total_amount, 2).' is now shipped out. Click '.$url.' to track your order.';
                 }
 
                 if ($status == 'Order Delivered') {
@@ -367,19 +421,21 @@ class OrderController extends Controller
                         $message->subject('Order Delivered - FUMACO');
                     });
 
-                    $sms['text'] = 'Hi '.$order_details->order_name . ' ' . $order_details->order_lastname.'!, your order '.$request->order_number.' with an amount of '.$total_amount.' has been delivered. Click '.$url.' to track your order.';
+                    $sms['text'] = 'Hi '.$order_details->order_name . ' ' . $order_details->order_lastname.'!, your order '.$request->order_number.' with an amount of P '.number_format($total_amount, 2).' has been delivered. Click '.$url.' to track your order.';
                 }
 
                 if($status == 'Ready for Pickup'){
-                    $sms['text'] = 'Hi '.$order_details->order_name . ' ' . $order_details->order_lastname.'!, your order '.$request->order_number.' with an amount of '.$total_amount.' is now ready for pickup. Click '.$url.' to track your order.';
+                    $sms['text'] = 'Hi '.$order_details->order_name . ' ' . $order_details->order_lastname.'!, your order '.$request->order_number.' with an amount of P '.number_format($total_amount, 2).' is now ready for pickup. Click '.$url.' to track your order.';
                 }
 
                 if(in_array($status, ['Order Confirmed', 'Out for Delivery', 'Order Delivered', 'Ready for Pickup'])){
                     if ($url) {
-                        Http::asForm()->withHeaders([
+                        $sms = Http::asForm()->withHeaders([
                             'Accept' => 'application/json',
                             'Content-Type' => 'application/x-www-form-urlencoded',
                         ])->post($sms_api->base_url, $sms);
+
+                        $sms_response = json_decode($sms, true);
                     }
                 }
 
@@ -387,7 +443,7 @@ class OrderController extends Controller
 
                 DB::table('track_order')->insert($track_order);
 
-                DB::commit();
+                // DB::commit();
             }
 
             return redirect()->back()->with('success', 'Order <b>'.$request->order_number.'</b> status has been updated.');
