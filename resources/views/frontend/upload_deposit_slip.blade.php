@@ -49,6 +49,7 @@
                     @csrf
                     <div class="card-body">
                         <h5>Order No.: <b>{{ $order_details->order_number }}</b></h5>
+                        <h6>Customer Name: <b>{{ $order_details->order_name . ' ' . $order_details->order_lastname }}</b></h6>
                         <div class="uploadbox-container">
                             <div class="uploadbox-card">
                                 <div class="uploadbox-drop_box">

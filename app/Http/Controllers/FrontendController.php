@@ -2362,7 +2362,7 @@ class FrontendController extends Controller
     }
 
     public function uploadDepositSlipForm($token, Request $request) {
-        $order_details = DB::table('fumaco_order')->where('deposit_slip_token', $token)->where('user_email', Auth::user()->username)->first();
+        $order_details = DB::table('fumaco_order')->where('deposit_slip_token', $token)->first();
 
         if(!$order_details) {
             return view('error');
@@ -2421,7 +2421,8 @@ class FrontendController extends Controller
                 'deposit_slip_image' => $image_name,
                 'deposit_slip_date_uploaded' => Carbon::now()->toDateTimeString(),
                 'payment_status' => 'Payment For Confirmation',
-                'deposit_slip_token_used' => 1
+                'deposit_slip_token_used' => 1,
+                'last_modified_by' => $customer_name
             ]);
 
             DB::table('track_order')->insert([
@@ -2434,7 +2435,7 @@ class FrontendController extends Controller
                 'track_ip' => $order_details->order_ip,
                 'track_active' => 1,
                 'transaction_member' => $order_details->order_type,
-                'last_modified_by' => Auth::user()->username
+                'last_modified_by' => $customer_name
             ]);
 
             // send notification to accounting
