@@ -431,7 +431,7 @@
 								<th class="text-center">Products</th>
 								<th class="text-center">Total Qty</th>
 								<th class="text-center">Amount</th>
-								<th class="text-center">Transaction</th>
+								<th class="text-center">Abandoned Transaction</th>
 								<th class="text-center">Transaction Date</th>
 								<th class="text-center">Action</th>
 							</thead>
