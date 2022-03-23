@@ -443,7 +443,7 @@ class OrderController extends Controller
 
                 DB::table('track_order')->insert($track_order);
 
-                // DB::commit();
+                DB::commit();
             }
 
             return redirect()->back()->with('success', 'Order <b>'.$request->order_number.'</b> status has been updated.');
