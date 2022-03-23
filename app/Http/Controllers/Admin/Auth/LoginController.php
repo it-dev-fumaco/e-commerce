@@ -19,7 +19,7 @@ class LoginController extends Controller
      */
     public function showLoginForm()
     {
-        if (Auth::guard('admin')->check() and Auth::user()->otp_status == 1) {
+        if (Auth::guard('admin')->check()) {
             return redirect('/admin/dashboard');
         }
 

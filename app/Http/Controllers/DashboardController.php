@@ -34,13 +34,17 @@ class DashboardController extends Controller
 			'text' => 'TWO-FACTOR AUTHENTICATION: Your One-Time PIN is '.$otp.' to login in Fumaco Website, valid only within 10 mins. For any help, please contact us at it@fumaco.com'
 		]);
 
+		$sms_response = json_decode($sms->getBody(), true);
+
 		$details = [
 			'otp' => $otp,
 			'otp_time_sent' => Carbon::now()
 		];
 
 		DB::table('fumaco_admin_user')->where('id', Auth::user()->id)->update($details);
-		return response()->json(['status' => 1]);
+
+		$status = isset($sms_response['error']) ? 0 : 1;
+		return response()->json(['status' => $status]);
 	}
 
 	public function verifyOTP(Request $request){

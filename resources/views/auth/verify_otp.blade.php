@@ -11,6 +11,12 @@
 		<link rel="stylesheet" href="{{ asset('/assets/admin/dist/css/adminlte.min.css') }}">
 		<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <style>
+            #resend{
+                border: none !important;
+                background-color: rgba(0,0,0,0) !important;
+            }
+        </style>
 	</head>
 	<body class="hold-transition login-page">
 		<div class="login-box">
@@ -44,7 +50,7 @@
                         <input type="text" name="user_id" value="{{ $user_id }}" hidden readonly>
                         <button type="submit" class="btn btn-primary w-100">Verify</button>
 					</form>
-                    <p class="pt-3">Didn't get the code? <span id="resend" style="color: #1E1E83; cursor: pointer">Resend</span>&nbsp;<span id="countdown" class="d-none"></span></p>
+                    <p class="pt-3">Didn't get the code? <button id="resend" style="color: #1E1E83; cursor: pointer">Resend</button>&nbsp;<span id="countdown" class="d-none"></span></p>
                     <p id="resend-error" style="color: red; display: none">An error occured, please try again.</p>
 				</div>
 			</div>
@@ -56,6 +62,7 @@
             $(document).ready(function(){
                 $('#resend').click(function(){
                     $(this).css('color', '#666666');
+                    $('#resend').prop('disabled', true);
                     $('#countdown').removeClass('d-none');
                     $('#resend-error').css('display', 'none');
 
@@ -63,16 +70,25 @@
                         type:"GET",
                         url:"/admin/resend_otp",
                         success:function(response){
-                            console.log('OTP Sent');
+                            if(response.status == 1){
+                                console.log('OTP Sent');
+                            }else{
+                                $('#resend').css('color', '#1E1E83');
+                                $('#resend').prop('disabled', false);
+                                $('#countdown').addClass('d-none');
+                                $('#resend-error').css('display', 'block');
+                            }
                         },
                         error : function(data) {
-                            $(this).css('color', '#1E1E83');
+                            $('#resend').css('color', '#1E1E83');
+                            $('#resend').prop('disabled', false);
                             $('#countdown').addClass('d-none');
                             $('#resend-error').css('display', 'block');
                         }
                     });
 
-                    var timer2 = "10:01";
+                    // var timer2 = "10:01";
+                    var timer2 = "10:05";
                     var interval = setInterval(function() {
                         var timer = timer2.split(':');
                         //by parsing integer, I avoid all extra string processing
@@ -87,7 +103,8 @@
                         //check if both minutes and seconds are 0
                         if ((seconds <= 0) && (minutes <= 0)){
                             clearInterval(interval);
-                            $(this).css('color', '#1E1E83');
+                            $('#resend').css('color', '#1E1E83');
+                            $('#resend').prop('disabled', false);
                             $('#countdown').addClass('d-none');
                         }
                         timer2 = minutes + ':' + seconds;
