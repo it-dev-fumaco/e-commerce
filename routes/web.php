@@ -41,7 +41,10 @@ Route::namespace('Auth')->group(function(){
 
     //Forgot Password Routes
     Route::get('/password/reset','ForgotPasswordController@showLinkRequestForm')->name('password.request');
+    Route::get('/password/request_reset','ForgotPasswordController@resetOptions')->name('password.reset_options');
     Route::post('/password/email','ForgotPasswordController@sendResetLinkEmail')->name('password.email');
+    Route::get('/password/otp_form','ForgotPasswordController@OTPform')->name('password.otp_form');
+    Route::post('/password/verify_otp','ForgotPasswordController@verifyOTP');
 
     //Reset Password Routes
     Route::get('/password/reset/{token}','ResetPasswordController@showResetForm')->name('password.reset');
@@ -84,6 +87,8 @@ Route::post('/subscribe', 'FrontendController@newsletterSubscription');
 Route::get('/thankyou', 'FrontendController@subscribeThankyou');
 Route::get('/search', 'FrontendController@getAutoCompleteData');
 
+Route::get('/testing', 'FrontendController@testing');
+
 Route::get('/policy_pages', 'FrontendController@pagesList');
 Route::get('/pages/{slug}', 'FrontendController@viewPage')->name('pages');
 
@@ -94,6 +99,7 @@ Route::group(['middleware' => 'auth'], function(){
     Route::delete('/mywishlist/{id}/delete', 'FrontendController@deleteWishlist');
     Route::get('/myorders', 'FrontendController@viewOrders');
     Route::get('/myorder/{order_id}', 'FrontendController@viewOrder');
+    Route::post('/myorder/cancel/{id}', 'OrderController@cancelOrder');
     Route::get('/myprofile/account_details', 'FrontendController@viewAccountDetails');
     Route::post('/myprofile/account_details/{id}/update', 'FrontendController@updateAccountDetails');
     Route::get('/myprofile/change_password', 'FrontendController@viewChangePassword');
@@ -104,7 +110,12 @@ Route::group(['middleware' => 'auth'], function(){
     Route::get('/myprofile/address/{id}/{type}/change_default/{summary?}', 'FrontendController@setDefaultAddress');
     Route::get('/myprofile/address/{type}/new', 'FrontendController@addAddressForm');
     Route::post('/myprofile/address/{type}/save', 'FrontendController@saveAddress');
+
+    Route::get('/slip_buffer/{order_number}', 'FrontendController@DepositSlipBuffer');
 });
+
+Route::get('/upload_deposit_slip/{token}', 'FrontendController@uploadDepositSlipForm')->name('upload_deposit_slip');
+Route::post('/upload_deposit_slip/{token}', 'FrontendController@submitUploadDepositSlip');
 
 // SHOPPING CART ROUTES
 Route::get('/cart', 'CartController@viewCart')->name('cart');
@@ -155,207 +166,236 @@ Route::prefix('admin')->group(function () {
     Route::get('/logout', 'Admin\Auth\LoginController@logout');
 
     Route::group(['middleware' => 'auth:admin'], function(){
-        Route::get('/dashboard', 'DashboardController@index');
-        Route::get('/send_abandoned_cart_email/{transaction_id}', 'DashboardController@sendAbandonedCartEmail');
+        Route::get('/verify', 'DashboardController@verify');
+        Route::get('/resend_otp', 'DashboardController@resendOTP');
+        Route::post('/verify_otp', 'DashboardController@verifyOTP');
 
-        Route::get('/pages/home', 'HomeCRUDController@home_crud');
-        Route::post('/add_carousel', 'HomeCRUDController@add_header_carousel');
-        Route::post('/set_active', 'HomeCRUDController@set_header_active');
-        Route::post('/remove_active', 'HomeCRUDController@remove_header_active');
-        Route::post('/delete_header', 'HomeCRUDController@remove_header');
+        Route::group(['middleware' => 'otp_status_check'], function(){ // Check for OTP
+            Route::get('/dashboard', 'DashboardController@index');
+            Route::get('/send_abandoned_cart_email/{transaction_id}', 'DashboardController@sendAbandonedCartEmail');
 
-        Route::get('/api_setup/erp', 'SettingsController@erpApiSetup');
-        Route::get('/api_setup/payment', 'SettingsController@paymentApiSetup');
-        Route::get('/api_setup/google', 'SettingsController@googleApiSetup');
-        Route::post('/api_setup/save', 'SettingsController@saveApiCredentials');
+            Route::get('/pages/home', 'HomeCRUDController@home_crud');
+            Route::post('/add_carousel', 'HomeCRUDController@add_header_carousel');
+            Route::post('/set_active', 'HomeCRUDController@set_header_active');
+            Route::post('/remove_active', 'HomeCRUDController@remove_header_active');
+            Route::post('/delete_header', 'HomeCRUDController@remove_header');
 
-        Route::get('/email_setup', 'SettingsController@emailSetup');
-        Route::post('/email_setup/save', 'SettingsController@saveEmailSetup');
-        Route::post('/email_recipients/save', 'SettingsController@saveEmailRecipients');
+            Route::get('/api_setup/erp', 'SettingsController@erpApiSetup');
+            Route::get('/api_setup/payment', 'SettingsController@paymentApiSetup');
+            Route::get('/api_setup/google', 'SettingsController@googleApiSetup');
+            Route::get('/api_setup/sms', 'SettingsController@smsApiSetup');
+            Route::post('/api_setup/save', 'SettingsController@saveApiCredentials');
 
-        Route::get('/product/settings', 'ProductController@viewCategoryAttr');
-        Route::post('/attribute_status/{cat_id}/update', 'ProductController@updateCategoryAttr');
-        
+            Route::get('/email_setup', 'SettingsController@emailSetup');
+            Route::post('/email_setup/save', 'SettingsController@saveEmailSetup');
+            Route::post('/email_recipients/save', 'SettingsController@saveEmailRecipients');
 
-        Route::get('/product/list', 'ProductController@viewList');
-        Route::get('/product/add/{type}', 'ProductController@viewAddForm');
-        Route::post('/product/save', 'ProductController@saveItem');
-        Route::get('/product/reviews', 'ProductReviewController@viewList');
-        Route::get('/product/toggle/{id}', 'ProductReviewController@toggleStatus');
+            Route::get('/product/settings', 'ProductController@viewCategoryAttr');
+            Route::post('/attribute_status/{cat_id}/update', 'ProductController@updateCategoryAttr');
 
-        Route::get('/product/search', 'ProductController@searchItem');
-        Route::get('/product/{id}/edit', 'ProductController@viewProduct');
-        Route::get('/product/{id}/edit_bundle', 'ProductController@viewProduct');
-        Route::get('/product/images/{id}', 'ProductController@uploadImagesForm');
-        Route::post('/add_product_images', 'ProductController@uploadImages');
-        Route::get('/delete_product_image/{id}/{social?}', 'ProductController@deleteProductImage');
+            Route::get('/product/list', 'ProductController@viewList');
+            Route::get('/product/add/{type}', 'ProductController@viewAddForm');
+            Route::post('/product/save', 'ProductController@saveItem');
+            Route::get('/product/reviews', 'ProductReviewController@viewList');
+            Route::get('/product/toggle/{id}', 'ProductReviewController@toggleStatus');
 
-        // Price list routes
-        Route::get('/price_list', 'PriceListController@viewPriceList');
-        Route::post('/price_list/create', 'PriceListController@savePriceList');
-        Route::get('/get_price_list', 'PriceListController@getErpPriceList');
-        Route::delete('/price_list/delete/{id}', 'PriceListController@deletePriceList');
-        Route::get('/item_prices/{pricelist_id}', 'PriceListController@viewItemPrices');
-        Route::get('/sync_price_list', 'PriceListController@syncItemPrices');
-        
-        Route::get('/select_related_products/{category_id}', 'ProductController@selectProductsRelated');
-        Route::post('/product/{parent_code}/save_related_products', 'ProductController@saveRelatedProducts');
-        Route::delete('/product/remove_related/{id}', 'ProductController@removeRelatedProduct');
-        
-        Route::post('/product/{id}/update', 'ProductController@updateItem');
-        Route::post('/product/{item_code}/disable', 'ProductController@disableItem');
-        Route::post('/product/{item_code}/enable', 'ProductController@enableItem');
-        Route::delete('/product/{item_code}/delete', 'ProductController@deleteItem');
-        Route::get('/product/{id}/featured', 'ProductController@featureItem');
-        Route::get('/is_new_item/{id}', 'ProductController@isNewItem');
-        Route::post('/product/{item_code}/enable_on_sale', 'ProductController@setProductOnSale');
-        Route::post('/product/{item_code}/disable_on_sale', 'ProductController@disableProductOnSale');
-        Route::get('/product/{item_code}/{item_type}', 'ProductController@getItemDetails');
-        Route::get('/products/compare/list', 'ProductController@viewProductsToCompare');
-        Route::get('/products/compare/add', 'ProductController@addProductsToCompare');
-        Route::get('/products/compare/{compare_id}/edit', 'ProductController@editProductsToCompare');
-        Route::get('/products/compare/{compare_id}/delete', 'ProductController@deleteProductsToCompare');
-        Route::post('/products/compare/save', 'ProductController@saveProductsToCompare');
-        Route::post('/products/compare/set_status', 'ProductController@statusProductsToCompare');
+            Route::get('/product/search', 'ProductController@searchItem');
+            Route::get('/product/{id}/edit', 'ProductController@viewProduct');
+            Route::get('/product/{id}/edit_bundle', 'ProductController@viewProduct');
+            Route::get('/product/images/{id}', 'ProductController@uploadImagesForm');
+            Route::post('/add_product_images', 'ProductController@uploadImages');
+            Route::get('/delete_product_image/{id}/{social?}', 'ProductController@deleteProductImage');
 
-        Route::get('/category/list', 'CategoryController@viewCategories');
-        Route::post('/category/edit/{id}', 'CategoryController@editCategory');
-        Route::post('/category/add', 'CategoryController@addCategory');
-        Route::get('/category/delete/{id}', 'CategoryController@deleteCategory');
-        Route::get('/category/settings/{id}', 'CategoryController@sortItems');
-        Route::post('/category/settings/{id}', 'CategoryController@sortItems');
-        Route::get('/category/reset/{id}', 'CategoryController@resetOrder');
-        Route::post('/category/set_row/{id}', 'CategoryController@changeSort');
-        Route::post('/category/publish', 'CategoryController@publishCategory');
+            // Price list routes
+            Route::get('/price_list', 'PriceListController@viewPriceList');
+            Route::post('/price_list/create', 'PriceListController@savePriceList');
+            Route::get('/get_price_list', 'PriceListController@getErpPriceList');
+            Route::delete('/price_list/delete/{id}', 'PriceListController@deletePriceList');
+            Route::get('/item_prices/{pricelist_id}', 'PriceListController@viewItemPrices');
+            Route::get('/sync_price_list', 'PriceListController@syncItemPrices');
+            
+            Route::get('/select_related_products/{category_id}', 'ProductController@selectProductsRelated');
+            Route::post('/product/{parent_code}/save_related_products', 'ProductController@saveRelatedProducts');
+            Route::delete('/product/remove_related/{id}', 'ProductController@removeRelatedProduct');
+            
+            Route::post('/product/{id}/update', 'ProductController@updateItem');
+            Route::post('/product/{item_code}/disable', 'ProductController@disableItem');
+            Route::post('/product/{item_code}/enable', 'ProductController@enableItem');
+            Route::delete('/product/{item_code}/delete', 'ProductController@deleteItem');
+            Route::get('/product/{id}/featured', 'ProductController@featureItem');
+            Route::get('/is_new_item/{id}', 'ProductController@isNewItem');
+            Route::post('/product/{item_code}/enable_on_sale', 'ProductController@setProductOnSale');
+            Route::post('/product/{item_code}/disable_on_sale', 'ProductController@disableProductOnSale');
+            Route::get('/product/{item_code}/{item_type}', 'ProductController@getItemDetails');
+            Route::get('/products/compare/list', 'ProductController@viewProductsToCompare');
+            Route::get('/products/compare/add', 'ProductController@addProductsToCompare');
+            Route::get('/products/compare/{compare_id}/edit', 'ProductController@editProductsToCompare');
+            Route::get('/products/compare/{compare_id}/delete', 'ProductController@deleteProductsToCompare');
+            Route::post('/products/compare/save', 'ProductController@saveProductsToCompare');
+            Route::post('/products/compare/set_status', 'ProductController@statusProductsToCompare');
 
-        Route::get('/media/add', 'MediaController@add_media_form');
-        Route::get('/media/list', 'MediaController@list_media');
-        Route::post('/add_media_records', 'MediaController@add_media_record');
-        Route::post('/delete_media', 'MediaController@delete_media_record');
+            Route::get('/category/list', 'CategoryController@viewCategories');
+            Route::post('/category/edit/{id}', 'CategoryController@editCategory');
+            Route::post('/category/add', 'CategoryController@addCategory');
+            Route::get('/category/delete/{id}', 'CategoryController@deleteCategory');
+            Route::get('/category/settings/{id}', 'CategoryController@sortItems');
+            Route::post('/category/settings/{id}', 'CategoryController@sortItems');
+            Route::get('/category/reset/{id}', 'CategoryController@resetOrder');
+            Route::post('/category/set_row/{id}', 'CategoryController@changeSort');
+            Route::post('/category/publish', 'CategoryController@publishCategory');
 
-        Route::get('/order/order_lists/', 'OrderController@orderList');
-        Route::get('/order/cancelled/', 'OrderController@cancelledOrders');
-        Route::get('/order/delivered/', 'OrderController@deliveredOrders');
-        Route::get('/order/print/{order_id}', 'OrderController@printOrder');
-        Route::post('/order/status_update', 'OrderController@statusUpdate');
-        
-        Route::get('/order/status_list', 'OrderController@statusList');
-        Route::get('/order/status/add_form', 'OrderController@addStatusForm');
-        Route::post('/order/status/add', 'OrderController@addStatus');
-        Route::get('/order/status/{id}/edit_form', 'OrderController@editStatusForm');
-        Route::post('/order/status/{id}/edit', 'OrderController@editStatus');
-        Route::get('/order/status/{id}/delete', 'OrderController@deleteStatus');
+            Route::get('/media/add', 'MediaController@add_media_form');
+            Route::get('/media/list', 'MediaController@list_media');
+            Route::post('/add_media_records', 'MediaController@add_media_record');
+            Route::post('/delete_media', 'MediaController@delete_media_record');
 
-        Route::get('/order/sequence_list', 'OrderController@sequenceList');
-        Route::get('/order/sequence_list/add_form', 'OrderController@addSequenceForm');
-        Route::post('/order/sequence_list/add', 'OrderController@addSequence');
-        Route::get('/order/sequence_list/{shipping}/delete', 'OrderController@deleteSequence');
+            Route::get('/order/order_lists/', 'OrderController@orderList')->name('orders');
+            Route::get('/order/confirm_buffer/', 'OrderController@confirmBuffer')->name('confirm_buffer');
+            Route::get('/order/cancelled/', 'OrderController@cancelledOrders');
+            Route::get('/order/delivered/', 'OrderController@deliveredOrders');
+            Route::get('/order/print/{order_id}', 'OrderController@printOrder');
+            Route::post('/order/status_update', 'OrderController@statusUpdate');
+            
+            Route::get('/order/status_list', 'OrderController@statusList');
+            Route::get('/order/status/add_form', 'OrderController@addStatusForm');
+            Route::post('/order/status/add', 'OrderController@addStatus');
+            Route::get('/order/status/{id}/edit_form', 'OrderController@editStatusForm');
+            Route::post('/order/status/{id}/edit', 'OrderController@editStatus');
+            Route::get('/order/status/{id}/delete', 'OrderController@deleteStatus');
+            Route::post('/order/cancel/{id}', 'OrderController@cancelOrder');
+            Route::post('/order/upload_deposit_slip/{id}', 'OrderController@uploadDepositSlip');
+            Route::post('/order/send_upload_link', 'OrderController@resendDepositSlip');
 
-        Route::get('/items_on_cart', 'OrderController@viewItemOnCart');
-        Route::get('/items_on_cart_by_location', 'OrderController@viewItemOnCartByLocation');
-        Route::get('/items_on_cart_by_item', 'OrderController@viewItemOnCartByItem');
-        Route::get('/abandoned_items_on_cart', 'OrderController@viewAbandonedItemOnCart');
+            Route::get('/payment/status_list', 'OrderController@paymentStatusList');
+            Route::get('/payment/status/add/form', 'OrderController@paymentStatusAddForm');
+            Route::post('/payment/status/add', 'OrderController@paymentStatusAdd');
+            Route::get('/payment/status/{id}/edit/form', 'OrderController@paymentStatusEditForm');
+            Route::post('/payment/status/{id}/edit', 'OrderController@paymentStatusEdit');
+            Route::get('/payment/status/{id}/delete', 'OrderController@paymentStatusDelete');
 
-        Route::get('/order/payment_status', 'OrderController@checkPaymentStatus');
-        Route::post('/order/payment_status', 'OrderController@checkPaymentStatus');
-        
-        Route::get('/customer/list', 'CustomerController@viewCustomers');
-        Route::get('/customer/profile/{id}', 'CustomerController@viewCustomerProfile');
-        Route::get('/customer/address/{address_type}/{user_id}', 'CustomerController@getCustomerAddress');
-        Route::get('/customer/orders/{user_id}', 'CustomerController@getCustomerOrders');
-        Route::get('/customer/order/{id}', 'CustomerController@viewOrderDetails');
+            Route::get('/order/sequence_list', 'OrderController@sequenceList');
+            Route::get('/order/sequence_list/add_form', 'OrderController@addSequenceForm');
+            Route::post('/order/sequence_list/add', 'OrderController@addSequence');
+            Route::get('/order/sequence_list/{shipping}/delete', 'OrderController@deleteSequence');
 
-        Route::post('/customer/profile/{id}/change_customer_group', 'CustomerController@changeCustomerGroup');
+            Route::get('/items_on_cart', 'OrderController@viewItemOnCart');
+            Route::get('/items_on_cart_by_location', 'OrderController@viewItemOnCartByLocation');
+            Route::get('/items_on_cart_by_item', 'OrderController@viewItemOnCartByItem');
+            Route::get('/abandoned_items_on_cart', 'OrderController@viewAbandonedItemOnCart');
 
-        Route::get('/blog/list', 'BlogController@viewBlogs');
-        Route::get('/blog/new', 'BlogController@newBlog');
-        Route::post('/blog/add', 'BlogController@addBlog');
-        Route::post('/blog/publish', 'BlogController@publishBlog');
-        Route::post('/blog/feature', 'BlogController@featuredBlog');
-        Route::get('/blog/edit/form/{id}', 'BlogController@editBlogForm');
-        Route::post('/blog/edit/{id}', 'BlogController@editBlog');
-        Route::post('/blog/images/edit/{id}', 'BlogController@editBlogImages');
-        Route::get('/blog/delete/{id}', 'BlogController@deleteBlog');
-        Route::get('/blog/delete/{id}', 'BlogController@deleteBlog');
-        Route::get('/blog/images/img-delete/{id}/{image}', 'BlogController@deleteBlogImage');
+            Route::get('/order/payment_status', 'OrderController@checkPaymentStatus');
+            Route::post('/order/payment_status', 'OrderController@checkPaymentStatus');
+            
+            Route::get('/customer/list', 'CustomerController@viewCustomers');
+            Route::get('/customer/profile/{id}', 'CustomerController@viewCustomerProfile');
+            Route::get('/customer/address/{address_type}/{user_id}', 'CustomerController@getCustomerAddress');
+            Route::get('/customer/orders/{user_id}', 'CustomerController@getCustomerOrders');
+            Route::get('/customer/order/{id}', 'CustomerController@viewOrderDetails');
 
-        Route::get('/blog/comments', 'BlogController@viewComments');
-        Route::post('/blog/comment/approve', 'BlogController@commentStatus');
-        Route::get('/blog/comment/delete/{id}', 'BlogController@deleteComment');
+            Route::post('/customer/profile/{id}/change_customer_group', 'CustomerController@changeCustomerGroup');
 
-        Route::get('/blog/subscribers', 'BlogController@viewSubscribers');
-        Route::post('/subscribe/change_status', 'BlogController@subscriberChangeStatus');
+            Route::get('/blog/list', 'BlogController@viewBlogs');
+            Route::get('/blog/new', 'BlogController@newBlog');
+            Route::post('/blog/add', 'BlogController@addBlog');
+            Route::post('/blog/publish', 'BlogController@publishBlog');
+            Route::post('/blog/feature', 'BlogController@featuredBlog');
+            Route::get('/blog/edit/form/{id}', 'BlogController@editBlogForm');
+            Route::post('/blog/edit/{id}', 'BlogController@editBlog');
+            Route::post('/blog/images/edit/{id}', 'BlogController@editBlogImages');
+            Route::get('/blog/delete/{id}', 'BlogController@deleteBlog');
+            Route::get('/blog/delete/{id}', 'BlogController@deleteBlog');
+            Route::get('/blog/images/img-delete/{id}/{image}', 'BlogController@deleteBlogImage');
 
-        Route::get('/user_management/list', 'UserManagementController@viewAdmin');
-        Route::get('/user_management/add', 'UserManagementController@addAdminForm');
-        Route::post('/user_management/add_admin', 'UserManagementController@addAdmin');
-        Route::post('/user_management/edit', 'UserManagementController@editAdmin');
-        Route::post('/user_management/change_status', 'UserManagementController@adminChangeStatus');
-        Route::get('/user_management/change_pass', 'UserManagementController@adminPasswordForm');
-        Route::post('/user_management/change_password/{id}', 'UserManagementController@adminChangePassword');
-        Route::post('/user_management/change_user_password/', 'UserManagementController@userChangePassword');
+            Route::get('/blog/comments', 'BlogController@viewComments');
+            Route::post('/blog/comment/approve', 'BlogController@commentStatus');
+            Route::get('/blog/comment/delete/{id}', 'BlogController@deleteComment');
 
-        Route::get('/pages/list', 'PagesController@viewPages');
-        Route::get('/pages/list', 'PagesController@viewPages');
-        Route::get('/pages/contact', 'PagesController@viewContact');
-        Route::get('/pages/contact/edit/{id}', 'PagesController@editContactForm');
-        Route::get('/pages/contact/add_form', 'PagesController@addContactForm');
-        Route::post('/pages/contact/add', 'PagesController@addContact');
-        Route::get('/pages/contact/delete/{id}', 'PagesController@deleteContact');
-        Route::post('/pages/contact/update/{id}', 'PagesController@editContact');
-        Route::get('/pages/about/sponsor/list', 'PagesController@viewSponsors');
-        Route::get('/pages/edit/{page_id}', 'PagesController@editForm');
-        Route::post('/edit/{id}', 'PagesController@editPage');
-        Route::get('/pages/about', 'PagesController@viewAbout');
-        Route::post('/edit/page/about_us', 'PagesController@editAbout');
-        Route::post('/edit/page/about_us/image', 'PagesController@aboutBackground');
-        Route::post('/edit/page/about_us/sponsor/add', 'PagesController@addSponsor');
-        Route::get('/edit/page/about_us/sponsor/delete/{id}', 'PagesController@deleteSponsor');
-        Route::post('/edit/page/about_us/sponsor/sort/{id}', 'PagesController@updateSort');
-        Route::get('/edit/page/about_us/sponsor/reset/{id}', 'PagesController@resetSort');
+            Route::get('/blog/subscribers', 'BlogController@viewSubscribers');
+            Route::post('/subscribe/change_status', 'BlogController@subscriberChangeStatus');
 
-        Route::get('/search/list', 'PagesController@searchList');
+            Route::get('/user_management/list', 'UserManagementController@viewAdmin');
+            Route::get('/user_management/add', 'UserManagementController@addAdminForm');
+            Route::post('/user_management/add_admin', 'UserManagementController@addAdmin');
+            Route::post('/user_management/edit', 'UserManagementController@editAdmin');
+            Route::post('/user_management/change_status', 'UserManagementController@adminChangeStatus');
+            Route::get('/user_management/change_pass', 'UserManagementController@adminPasswordForm');
+            Route::post('/user_management/change_password/{id}', 'UserManagementController@adminChangePassword');
+            Route::post('/user_management/change_user_password/', 'UserManagementController@userChangePassword');
+
+            Route::get('/pages/list', 'PagesController@viewPages');
+            Route::get('/pages/list', 'PagesController@viewPages');
+            Route::get('/pages/contact', 'PagesController@viewContact');
+            Route::get('/pages/contact/edit/{id}', 'PagesController@editContactForm');
+            Route::get('/pages/contact/add_form', 'PagesController@addContactForm');
+            Route::post('/pages/contact/add', 'PagesController@addContact');
+            Route::get('/pages/contact/delete/{id}', 'PagesController@deleteContact');
+            Route::post('/pages/contact/update/{id}', 'PagesController@editContact');
+            Route::get('/pages/about/sponsor/list', 'PagesController@viewSponsors');
+            Route::get('/pages/edit/{page_id}', 'PagesController@editForm');
+            Route::post('/edit/{id}', 'PagesController@editPage');
+            Route::get('/pages/about', 'PagesController@viewAbout');
+            Route::post('/edit/page/about_us', 'PagesController@editAbout');
+            Route::post('/edit/page/about_us/image', 'PagesController@aboutBackground');
+            Route::post('/edit/page/about_us/sponsor/add', 'PagesController@addSponsor');
+            Route::get('/edit/page/about_us/sponsor/delete/{id}', 'PagesController@deleteSponsor');
+            Route::post('/edit/page/about_us/sponsor/sort/{id}', 'PagesController@updateSort');
+            Route::get('/edit/page/about_us/sponsor/reset/{id}', 'PagesController@resetSort');
+
+            Route::get('/search/list', 'PagesController@searchList');
 
 
-        Route::get('/marketing/on_sale/list', 'ProductController@onSaleList');
-        Route::get('/marketing/voucher/list', 'ProductController@voucherList');
-        Route::get('/marketing/on_sale/addForm', 'ProductController@addOnsaleForm');
-        Route::post('/marketing/on_sale/add', 'ProductController@addOnsale');
-        Route::get('/marketing/on_sale/{id}/edit_form', 'ProductController@editOnsaleForm');
-        Route::post('/marketing/on_sale/{id}/edit', 'ProductController@editOnsale');
-        Route::get('/marketing/on_sale/{id}/delete', 'ProductController@removeOnsale');
-        Route::post('/marketing/on_sale/set_status', 'ProductController@setOnSaleStatus');
-        Route::post('/marketing/voucher/add', 'ProductController@addVoucher');
-        Route::get('/marketing/voucher/add_voucher', 'ProductController@addVoucherForm');
-        Route::get('/marketing/voucher/{id}/edit_form', 'ProductController@editVoucherForm');
-        Route::post('/marketing/voucher/{id}/edit', 'ProductController@editVoucher');
-        Route::get('/marketing/voucher/{id}/delete', 'ProductController@removeVoucher');
+            Route::get('/marketing/on_sale/list', 'ProductController@onSaleList');
+            Route::get('/marketing/voucher/list', 'ProductController@voucherList');
+            Route::get('/marketing/on_sale/addForm', 'ProductController@addOnsaleForm');
+            Route::post('/marketing/on_sale/add', 'ProductController@addOnsale');
+            Route::get('/marketing/on_sale/{id}/edit_form', 'ProductController@editOnsaleForm');
+            Route::post('/marketing/on_sale/{id}/edit', 'ProductController@editOnsale');
+            Route::get('/marketing/on_sale/{id}/delete', 'ProductController@removeOnsale');
+            Route::post('/marketing/on_sale/set_status', 'ProductController@setOnSaleStatus');
+            Route::post('/marketing/voucher/add', 'ProductController@addVoucher');
+            Route::get('/marketing/voucher/add_voucher', 'ProductController@addVoucherForm');
+            Route::get('/marketing/voucher/{id}/edit_form', 'ProductController@editVoucherForm');
+            Route::post('/marketing/voucher/{id}/edit', 'ProductController@editVoucher');
+            Route::get('/marketing/voucher/{id}/delete', 'ProductController@removeVoucher');
 
-        Route::get('/marketing/social/images', 'SocialImagesController@viewList');
-        Route::post('/marketing/social/create', 'SocialImagesController@uploadImage');
-        Route::delete('/marketing/social/delete/{id}', 'SocialImagesController@deleteImage');
-        Route::get('/marketing/social/default/{id}', 'SocialImagesController@setDefault');
+            Route::get('/marketing/social/images', 'SocialImagesController@viewList');
+            Route::post('/marketing/social/create', 'SocialImagesController@uploadImage');
+            Route::delete('/marketing/social/delete/{id}', 'SocialImagesController@deleteImage');
+            Route::get('/marketing/social/default/{id}', 'SocialImagesController@setDefault');
 
-        // SHIPPING SERVICES ROUTES CMS
-        Route::get('/shipping/list', 'ShippingController@viewList');
-        Route::get('/shipping/add', 'ShippingController@viewAddForm');
-        Route::post('/shipping/save', 'ShippingController@saveShipping');
-        Route::post('/shipping/{id}/update', 'ShippingController@updateShipping');
-        Route::get('/shipping/{id}/edit', 'ShippingController@viewShipping');
-        Route::delete('/shipping/{id}/delete', 'ShippingController@deleteShipping');
+            // SHIPPING SERVICES ROUTES CMS
+            Route::get('/shipping/list', 'ShippingController@viewList');
+            Route::get('/shipping/add', 'ShippingController@viewAddForm');
+            Route::post('/shipping/save', 'ShippingController@saveShipping');
+            Route::post('/shipping/{id}/update', 'ShippingController@updateShipping');
+            Route::get('/shipping/{id}/edit', 'ShippingController@viewShipping');
+            Route::delete('/shipping/{id}/delete', 'ShippingController@deleteShipping');
 
-        Route::get('/holiday/list', 'ShippingController@viewHolidays');
-        Route::post('/holiday/new', 'ShippingController@addHoliday');
-        Route::get('/holiday/add_form', 'ShippingController@addHolidayForm');
-        Route::post('/holiday/edit', 'ShippingController@editHoliday');
-        Route::get('/holiday/delete/{id}', 'ShippingController@deleteHoliday');
+            Route::get('/holiday/list', 'ShippingController@viewHolidays');
+            Route::post('/holiday/new', 'ShippingController@addHoliday');
+            Route::get('/holiday/add_form', 'ShippingController@addHolidayForm');
+            Route::post('/holiday/edit', 'ShippingController@editHoliday');
+            Route::get('/holiday/delete/{id}', 'ShippingController@deleteHoliday');
 
-        // STORE ROUTES CMS
-        Route::get('/store/list', 'StoreController@viewList');
-        Route::get('/store/add', 'StoreController@viewAddForm');
-        Route::post('/store/save', 'StoreController@saveStore');
-        Route::post('/store/{id}/update', 'StoreController@updateStore');
-        Route::get('/store/{id}/edit', 'StoreController@viewStore');
-        Route::delete('/store/{id}/delete', 'StoreController@deleteStore');
+            // STORE ROUTES CMS
+            Route::get('/store/list', 'StoreController@viewList');
+            Route::get('/store/add', 'StoreController@viewAddForm');
+            Route::post('/store/save', 'StoreController@saveStore');
+            Route::post('/store/{id}/update', 'StoreController@updateStore');
+            Route::get('/store/{id}/edit', 'StoreController@viewStore');
+            Route::delete('/store/{id}/delete', 'StoreController@deleteStore');
+
+            Route::get('/payment_method/list', 'PaymentMethodController@viewList');
+            Route::post('/payment_method/save', 'PaymentMethodController@savePaymentMethod');
+            Route::put('/payment_method/{id}/update', 'PaymentMethodController@updatePaymentMethod');
+            Route::delete('/payment_method/{id}/delete', 'PaymentMethodController@deletePaymentMethod');
+
+            Route::get('/bank_account/list', 'BankAccountController@list');
+            Route::post('/bank_account/save', 'BankAccountController@save');
+            Route::put('/bank_account/{id}/update', 'BankAccountController@update');
+            Route::delete('/bank_account/{id}/delete', 'BankAccountController@delete'); 
+        });
     });
 });
+
+Route::get('{code}', 'FrontendController@viewShortenLink');

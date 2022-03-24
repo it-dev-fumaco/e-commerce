@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Auth;
@@ -13,7 +14,58 @@ use App\Http\Traits\ProductTrait;
 
 class DashboardController extends Controller
 {
-	use ProductTrait;
+	public function verify(){
+		$user_id = Auth::user()->id;
+		return view('auth.verify_otp', compact('user_id'));
+	}
+
+	public function resendOTP(){
+		$otp = rand(111111, 999999);
+		$api = DB::table('api_setup')->where('type', 'sms_gateway_api')->first();
+		$phone = Auth::user()->mobile_number[0] == '0' ? '63'.substr(Auth::user()->mobile_number, 1) : Auth::user()->mobile_number;
+
+		$sms = Http::asForm()->withHeaders([
+			'Accept' => 'application/json',
+			'Content-Type' => 'application/x-www-form-urlencoded',
+		])->post($api->base_url, [
+			'api_key' => $api->api_key,
+			'api_secret' => $api->api_secret_key,
+			'from' => 'FUMACO',
+			'to' => preg_replace("/[^0-9]/", "", $phone),
+			'text' => 'TWO-FACTOR AUTHENTICATION: Your One-Time PIN is '.$otp.' to login in Fumaco Website, valid only within 10 mins. For any help, please contact us at it@fumaco.com'
+		]);
+
+		$sms_response = json_decode($sms->getBody(), true);
+
+		$details = [
+			'otp' => $otp,
+			'otp_time_sent' => Carbon::now()
+		];
+
+		DB::table('fumaco_admin_user')->where('id', Auth::user()->id)->update($details);
+
+		$status = isset($sms_response['error']) ? 0 : 1;
+		return response()->json(['status' => $status]);
+	}
+
+	public function verifyOTP(Request $request){
+        if($request->otp != Auth::user()->otp){
+            return redirect()->back()->with('error', 'OTP is incorrect and/or expired.');
+        }
+
+        $time_sent = Carbon::parse(Auth::user()->otp_time_sent);
+        $now = Carbon::now()->toDateTimeString();
+
+        $expiration_check = $time_sent->diffInMinutes($now);
+
+        if($expiration_check > 10){
+            return redirect()->back()->with('error', 'OTP is incorrect and/or expired.');
+        }
+
+		DB::table('fumaco_admin_user')->where('id', Auth::user()->id)->update(['otp_status' => 1, 'last_login' => Carbon::now(), 'last_login_ip' => $request->ip()]);
+		return redirect('/admin/dashboard');
+	}
+	
 	public function index(Request $request) {
 		$users = DB::table('fumaco_users')->where('is_email_verified', 1)->count();
 
@@ -211,48 +263,124 @@ class DashboardController extends Controller
 		$paginatedItems->setPath($request->url());
 		$cart_collection = $paginatedItems;
 
-		return view('backend.dashboard.index', compact('new_orders', 'total_orders', 'users', 'total_sales', 'most_searched', 'sales_arr', 'sales_year', 'search_terms', 'cart_collection', 'cart_transactions'));
+		$abandoned_cart = DB::table('fumaco_temp')->whereDate('xdateupdate', '<=', Carbon::now()->subHours(8)->toDateTimeString())->orderBy('xdateupdate', 'desc')->paginate(10, ['*'], 'abandoned_page');
+		
+		$abandoned_order_numbers = collect($abandoned_cart->items())->map(function($result){
+			return $result->order_tracker_code;
+		});
+
+		$items = DB::table('fumaco_order_items as order')
+			->join('fumaco_items as items', 'order.item_code', 'items.f_idcode')
+			->whereIn('order.order_number', $abandoned_order_numbers)
+			->select('order.*', 'items.slug')
+			->get();
+
+		$abandoned_items = collect($items)->groupBy('order_number');
+
+		$abandoned_arr = [];
+		foreach($abandoned_cart as $abandoned){
+			$items_arr = [];
+			$active = 1;
+			if(isset($abandoned_items[$abandoned->order_tracker_code])){
+				foreach($abandoned_items[$abandoned->order_tracker_code] as $items){
+					$items_arr[] = [
+						'item_code' => $items->item_code,
+						'item_name' => $items->item_name,
+						'slug' => $items->slug,
+						'qty' => $items->item_qty,
+						'item_price' => $items->item_price,
+						'total_price' => $items->item_total_price
+					];
+				}
+			}else{
+				$active = 0;
+			}
+
+			$abandoned_arr[] = [
+				'name' => trim($abandoned->xfname . ' ' . $abandoned->xlname),
+				'email' => $abandoned->xemail,
+				'items' => $items_arr,
+				'transaction' => $abandoned->last_transaction_page,
+				'total_amount' => collect($items_arr)->sum('total_price'),
+				'total_items' => collect($items_arr)->sum('qty'),
+				'transaction_date' => $abandoned->xdateupdate,
+				'order_number' => $abandoned->order_tracker_code,
+				'active' => $active
+			];
+		}
+
+		return view('backend.dashboard.index', compact('new_orders', 'total_orders', 'users', 'total_sales', 'most_searched', 'sales_arr', 'sales_year', 'search_terms', 'cart_collection', 'cart_transactions', 'abandoned_cart', 'abandoned_arr'));
 	}
 
 	public function sendAbandonedCartEmail($transaction_id){
-		$cart_details = DB::table('fumaco_cart')->where('transaction_id', $transaction_id)->get();
+		$cart_details = DB::table('fumaco_cart')->where('transaction_id', $transaction_id)->select('user_email', 'item_code', 'qty')->get();
 
-		$username = collect($cart_details)->pluck('user_email')->first();
-		if($username){
+		$username = null;
+		$customer_name = null;
+		$abandon_details = [];
+
+		if(count($cart_details) > 0){
+			$item_codes = collect($cart_details)->map(function($result){
+				return $result->item_code;
+			});
+
+			$username = collect($cart_details)->pluck('user_email')->first();
+			$abandon_details = collect($cart_details);
+
 			$user = DB::table('fumaco_users')->where('username', $username)->first();
 			$customer_name = $user->f_name.' '.$user->f_lname;
+		}else{
+			$customer_info = DB::table('fumaco_temp')->where('order_tracker_code', $transaction_id)->select('xemail', 'xcontact_person', 'xshipcontact_person')->first();
+			$user = DB::table('fumaco_users')->where('username', $customer_info->xemail)->first();
+
+			$username = $customer_info->xemail;
+			if($user){
+				$customer_name = $user->f_name.' '.$user->f_lname;
+			}else{
+				$customer_name = $customer_info->xcontact_person ? $customer_info->xcontact_person : $customer_info->xshipcontact_person;
+			}
+
+			$order_items = DB::table('fumaco_order_items')->where('order_number', $transaction_id)->select('item_code', 'item_qty as qty')->get();
+
+			$item_codes = collect($order_items)->map(function($result){
+				return $result->item_code;
+			});
+
+			$abandon_details = collect($order_items);
+		}
+
+		if($username){
+			$item_details = DB::table('fumaco_items')->whereIn('f_idcode', $item_codes)->get();
+			$item_detail = collect($item_details)->groupBy('f_idcode');
+
+			$item_images = DB::table('fumaco_items_image_v1')->whereIn('idcode', $item_codes)->get();
+			$image = collect($item_images)->groupBy('idcode');
 
 			$cart_arr = [];
-
-			$sale = $this->getSalePerCustomerGroup($user->customer_group);
-			$sale_per_category = [];
-			foreach($cart_details as $cart){
-				$item_details = DB::table('fumaco_items')->where('f_idcode', $cart->item_code)->first();
-				$item_image = DB::table('fumaco_items_image_v1')->where('idcode', $cart->item_code)->first();
-				// $price = $item_details->f_discount_trigger == 1 ? $item_details->f_price : $item_details->f_original_price;
-
-				$item_price = $item_details->f_default_price;
-            	$item_on_sale = $item_details->f_onsale;
-
-				$item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $item_details->f_cat_id, $sale, $item_price, $item_details->f_idcode, $item_details->f_discount_type, $item_details->f_discount_rate, $item_details->f_stock_uom, $sale_per_category);
-
-				$price = $item_price_data['is_on_sale'] == 1 ? $item_price_data['discounted_price'] : $item_price_data['item_price'];
+			foreach($abandon_details as $cart){
+				$price = 0;
+				if(isset($item_detail[$cart->item_code])){
+					$price = $item_detail[$cart->item_code][0]->f_discount_trigger == 1 ? $item_detail[$cart->item_code][0]->f_price : $item_detail[$cart->item_code][0]->f_original_price;
+				}
 
 				$cart_arr[] = [
 					'item_code' => $cart->item_code,
-					'image' => $item_image->imgprimayx,
+					'image' => isset($image[$cart->item_code]) ? $image[$cart->item_code][0]->imgprimayx : null,
 					'qty' => $cart->qty,
-					'name' => $item_details->f_name_name,
+					'name' => isset($item_detail[$cart->item_code]) ? $item_detail[$cart->item_code][0]->f_name_name : null,
 					'price' => $price,
 					'total_price_per_item' => $price * $cart->qty
 				];
 			}
 
-			// return $cart_arr;
 			Mail::send('emails.abandoned_cart', ['cart_details' => $cart_arr, 'status' => 'Abandoned', 'username' => $username, 'customer_name' => $customer_name], function($message) use($username){
 				$message->to(trim($username));
 				$message->subject("Let's check this off your list - FUMACO");
 			});
+
+			// if(count(Mail::failures()) > 0) { // for email error checking
+			// 	return Mail::failures();
+			// }
 		}
 
 		return redirect()->back()->with('success', 'Email Sent!');

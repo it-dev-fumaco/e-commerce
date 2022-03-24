@@ -248,7 +248,7 @@
           @php
             $product_pages = ['add_product_form', 'product_list', 'view_product_form', 'product_attribute_settings', 'product_category', 'product_comparison', 'product_category_settings', 'product_reviews'];
             $media_pages = ['list_media', 'add_media'];
-            $order_pages = ['order_list', 'order_cancel', 'order_delivered', 'payment_status', 'order_status', 'order_status_sequence'];
+            $order_pages = ['order_list', 'order_cancel', 'order_delivered', 'payment_status', 'order_status', 'order_status_sequence', 'payment_status_list'];
             $category_pages = ['product_category'];
             $customer_pages = ['customers_list'];
             $reports_pages = ['items_on_cart'];
@@ -351,6 +351,12 @@
                   <p>Order Status Sequence</p>
                 </a>
               </li>
+              <li class="nav-item">
+                <a href="/admin/payment/status_list" class="nav-link {{ $activePage == 'payment_status_list' ? 'active' : '' }}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Payment Status</p>
+                </a>
+              </li>
             </ul>
           </li>
           <li class="nav-item {{ (in_array($activePage, ['shipping_list', 'store_list', 'holiday_list']) ? 'menu-open' : '') }}">
@@ -379,6 +385,20 @@
               </li>
             </ul>
           </li>
+          <li class="nav-item">
+            <a href="/admin/payment_method/list" class="nav-link {{ $activePage == 'payment_method' ? 'active' : '' }}">
+              <i class="fas fa-file-invoice-dollar nav-icon"></i>
+              <p>Payment Method</p>
+            </a>
+          </li>
+
+          <li class="nav-item">
+            <a href="/admin/bank_account/list" class="nav-link {{ $activePage == 'bank_account' ? 'active' : '' }}">
+              <i class="fas fa-university nav-icon"></i>
+              <p>Bank Accounts</p>
+            </a>
+          </li>
+
           <li class="nav-item">
             <a href="/admin/price_list" class="nav-link {{ $activePage == 'pricelist' ? 'active' : '' }}">
               <i class="fas fa-tags nav-icon"></i>
@@ -458,7 +478,7 @@
 
           <li class="nav-header {{ Auth::user()->user_type != 'System Admin' ? 'd-none' : ''  }}">SYSTEM SETTINGS</li>
           @php
-            $settings_pages = ['erp_api_setup', 'payment_api_setup', 'google_api_setup'];
+            $settings_pages = ['erp_api_setup', 'payment_api_setup', 'google_api_setup', 'sms_api_setup'];
           @endphp
           <li class="nav-item {{ Auth::user()->user_type != 'System Admin' ? 'd-none' : ''  }} {{ (in_array($activePage, $settings_pages) ? 'menu-open' : '') }}">
             <a href="#" class="nav-link {{ (in_array($activePage, $settings_pages) ? 'active' : '') }}">
@@ -488,6 +508,12 @@
                 <a href=" " class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Social Media API</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="/admin/api_setup/sms" class="nav-link {{ $activePage == 'sms_api_setup' ? 'active' : '' }}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>SMS Gateway API</p>
                 </a>
               </li>
             </ul>
@@ -584,6 +610,8 @@
 <script src="{{ asset('/assets/admin/dist/js/adminlte.js') }}"></script>
 <!-- Select2 -->
 <script src="{{ asset('/assets/admin/plugins/select2/js/select2.full.min.js') }}"></script>
+<!-- bs-custom-file-input -->
+<script src="{{ asset('/assets/admin/plugins/bs-custom-file-input/bs-custom-file-input.min.js') }}"></script>
 <script>
   $(document).ready(function() {
     policyPages();
@@ -615,6 +643,14 @@
         }
       });
     }
+
+    $(document).on('show.bs.modal', '.modal', function (event) {
+      var zIndex = 1040 + (10 * $('.modal:visible').length);
+      $(this).css('z-index', zIndex);
+      setTimeout(function() {
+          $('.modal-backdrop').not('.modal-stack').css('z-index', zIndex - 1).addClass('modal-stack');
+      }, 0);
+    });
   });
 </script>
 @yield('script')

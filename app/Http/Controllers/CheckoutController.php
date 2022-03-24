@@ -16,20 +16,41 @@ use App\Models\ShippingZoneRate;
 use App\Models\ShippingCondition;
 
 use App\Http\Traits\ProductTrait;
-use Bitly;
+use App\Http\Traits\GeneralTrait;
 
 class CheckoutController extends Controller
 {
 	use ProductTrait;
-	public function billingForm() {
+	use GeneralTrait;
+
+	private function saveTempOrder($order_no, $ip) {
+		if ($order_no) {
+			$existing_temp = DB::table('fumaco_temp')->where('xlogs', $order_no)->first();
+			if(!$existing_temp) {
+				DB::table('fumaco_temp')->insert([
+					'xtempcode' => uniqid(),
+					'xlogs' => $order_no,
+					'order_tracker_code' => $order_no,
+					'order_ip' => $ip,
+					'xusertype' => Auth::check() ? 'Member' : 'Guest',
+					'xusernamex' => Auth::check() ? Auth::user()->username : null,
+					'xuser_id' => Auth::check() ? Auth::user()->id : null,
+				]);
+			}
+		}
+	}
+
+	public function billingForm(Request $request) {
 		$order_no = session()->get('fumOrderNo');
+
+		$this->saveTempOrder($order_no, $request->ip());
+	
         if(Auth::check()) {
             $cart_items = DB::table('fumaco_items as a')->join('fumaco_cart as b', 'a.f_idcode', 'b.item_code')
-				->where('user_type', 'member')->where('user_email', Auth::user()->username)->get();
+				->where('user_type', 'member')->where('user_email', Auth::user()->username)->select('qty', 'f_qty')->get();
         } else {
             $cart_items = DB::table('fumaco_items as a')->join('fumaco_cart as b', 'a.f_idcode', 'b.item_code')
-				->where('user_type', 'guest')->where('transaction_id', $order_no)
-				->select('qty', 'f_qty')->get();
+				->where('user_type', 'guest')->where('transaction_id', $order_no)->select('qty', 'f_qty')->get();
         }
 
         $cart_arr = [];
@@ -48,11 +69,23 @@ class CheckoutController extends Controller
 				->where('address_class', 'Delivery')->exists();
 		}
 
+		$is_on_payment_page = DB::table('fumaco_temp')->where('order_tracker_code', $order_no)->whereIn('last_transaction_page', ['Payment Page', 'Checkout Page'])->exists();
+		if (!$is_on_payment_page) {
+			DB::table('fumaco_temp')->where('order_tracker_code', $order_no)->update(['last_transaction_page' => 'Billing & Shipping Form']);
+		}
+
 		return view('frontend.checkout.billing_address_form', compact('has_shipping_address', 'shipping_zones'));
 	}
 
 	public function setBillingForm($item_code_buy = null, $qty_buy = null){
 		$shipping_zones = DB::table('fumaco_shipping_zone_rate')->distinct()->pluck('province_name')->toArray();
+
+		$order_no = session()->get('fumOrderNo');
+
+		$is_on_payment_page = DB::table('fumaco_temp')->where('order_tracker_code', $order_no)->whereIn('last_transaction_page', ['Payment Page', 'Checkout Page'])->exists();
+		if (!$is_on_payment_page) {
+			DB::table('fumaco_temp')->where('order_tracker_code', $order_no)->update(['last_transaction_page' => 'Billing & Shipping Form']);
+		}
 
 		return view('frontend.checkout.set_billing', compact('item_code_buy', 'qty_buy', 'shipping_zones'));
 	}
@@ -119,14 +152,6 @@ class CheckoutController extends Controller
 		DB::beginTransaction();
 		try{
 			if ($request->ajax()) {
-				if ($request->same_as_billing) {
-					$shipping_session = session()->get('fumShipDet');
-
-					$shipping_session['same_as_billing'] = 1;
-
-					session()->put('fumShipDet', $shipping_session);
-				}
-			
 				$user_id = Auth::user()->id;
 	
 				$bill_address = DB::table('fumaco_user_add')->where('xdefault', 1)->where('user_idx', $user_id)->where('address_class', 'Billing')->get();
@@ -247,29 +272,6 @@ class CheckoutController extends Controller
 
 			DB::table('fumaco_user_add')->where('user_idx', Auth::user()->id)->where('address_class', 'Delivery')->update(['xdefault' => 0]);
 
-			$billing_details = session()->get('fumBillDet');
-
-			$shipping_details = [
-                'fname' => $request->fname,
-                'lname' => $request->lname,
-                'address_line1' => $request->ship_Address1_1,
-                'address_line2' => $request->ship_Address2_1,
-                'province' => $request->ship_province1_1,
-                'city' => $request->ship_City_Municipality1_1,
-                'brgy' => $request->ship_Barangay1_1,
-                'postal_code' => $request->ship_postal1_1,
-                'country' => $request->ship_country_region1_1,
-                'address_type' => $request->ship_Address_type1_1,
-                'business_name' => $request->ship_business_name,
-                'tin' => $request->ship_tin,
-                'email_address' => $request->ship_email,
-                'mobile_no' => $request->ship_mobilenumber1_1,
-                'contact_no' => $request->contactnumber1_1,
-                'same_as_billing' => 0
-            ];
-
-            session()->put('fumShipDet', $shipping_details);
-
 			DB::table('fumaco_user_add')->insert($insert);
 
 			DB::commit();
@@ -305,28 +307,6 @@ class CheckoutController extends Controller
 
 			DB::table('fumaco_user_add')->where('user_idx', Auth::user()->id)->where('address_class', 'Billing')->update(['xdefault' => 0]);
 
-			$shipping_details = session()->get('fumShipDet');
-
-			$billing_details = [
-                'fname' => $request->bill_fname,
-                'lname' => $request->bill_lname,
-                'address_line1' => $request->Address1_1,
-                'address_line2' => $request->Address2_1,
-                'province' => $request->province1_1,
-                'city' => $request->City_Municipality1_1,
-                'brgy' => $request->Barangay1_1,
-                'postal_code' => $request->postal1_1,
-                'country' => $request->country_region1_1,
-                'address_type' => $request->Address_type1_1,
-                'business_name' => $request->bill_business_name,
-                'tin' => $request->bill_tin,
-                'email_address' => $request->email,
-                'mobile_no' => $request->mobilenumber1_1,
-                'same_as_billing' => 0
-            ];
-
-            session()->put('fumBillDet', $billing_details);
-
 			DB::table('fumaco_user_add')->insert($insert);
 
 			DB::commit();
@@ -352,11 +332,11 @@ class CheckoutController extends Controller
 			if(Auth::check()) {
 				$cart_items = DB::table('fumaco_items as a')->join('fumaco_cart as b', 'a.f_idcode', 'b.item_code')
 					->where('user_type', 'member')->where('user_email', Auth::user()->username)
-					->select('f_idcode', 'f_default_price', 'f_onsale', 'b.qty', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'slug', 'f_name_name', 'f_qty', 'f_reserved_qty')->get();
+					->select('f_idcode', 'f_default_price', 'f_onsale', 'b.qty', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'slug', 'f_name_name', 'f_qty', 'f_reserved_qty', 'f_item_type')->get();
 			} else {
 				$cart_items = DB::table('fumaco_items as a')->join('fumaco_cart as b', 'a.f_idcode', 'b.item_code')
 					->where('user_type', 'guest')->where('transaction_id', $order_no)
-					->select('f_idcode', 'f_default_price', 'f_onsale', 'b.qty', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'slug', 'f_name_name', 'f_qty', 'f_reserved_qty')->get();
+					->select('f_idcode', 'f_default_price', 'f_onsale', 'b.qty', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'slug', 'f_name_name', 'f_qty', 'f_reserved_qty', 'f_item_type')->get();
 			}
 
 			if(count($cart_items) <= 0) {
@@ -392,8 +372,9 @@ class CheckoutController extends Controller
 			if (Auth::check()) {
 				$sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
 			}
-			
+
 			$cart_arr = [];
+			$order_cart = [];
 			foreach ($cart_items as $n => $item) {
 				$image = null;
 				if (array_key_exists($item->f_idcode, $item_images)) {
@@ -411,60 +392,60 @@ class CheckoutController extends Controller
 				}
 				// get item price, discounted price and discount rate
 				$item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $item->f_cat_id, $sale, $item_price, $item->f_idcode, $item->f_discount_type, $item->f_discount_rate, $item->f_stock_uom, $sale_per_category);
-
+			
+				$price = $item_price_data['discounted_price'];
+				$total_amount = $price * $item->qty;
+				$item_discount = $item_price_data['discount_rate'];
 				$cart_arr[] = [
 					'item_code' => $item->f_idcode,
 					'item_description' => $item->f_name_name,
-					'price' => $item_price_data['discounted_price'],
-					'subtotal' => ($item_price_data['discounted_price'] * $item->qty),
+					'price' => $price,
+					'subtotal' => ($total_amount),
 					'original_price' => $item_price_data['item_price'],
-					'discount' => ($item_price_data['discount_rate'] > 0) ? $item_price_data['is_on_sale'] : 0,
+					'discount' => ($item_discount > 0) ? $item_price_data['is_on_sale'] : 0,
 					'quantity' => $item->qty,
 					'stock_qty' => $item->f_qty,
 					'item_image' => $image
 				];
+
+				$existing_order_item = DB::table('fumaco_order_items')->where('order_number', $order_no)
+					->where('item_code', $item->f_idcode)->exists();
+			
+				if($existing_order_item){
+					// update item qty
+					DB::table('fumaco_order_items')->where('order_number', $order_no)
+						->where('item_code', $item->f_idcode)->update([
+							'item_name' => $item->f_name_name,
+							'item_discount' => $item_discount,
+							'item_original_price' => $item->f_default_price,
+							'item_qty' => $item->qty,
+							'item_price' => $price,	
+							'item_total_price' => $total_amount,
+						]);
+				} else {
+					$order_cart[] = [
+						'order_number' => $order_no,
+						'item_code' => $item->f_idcode,
+						'item_name' => $item->f_name_name,
+						'item_discount' => $item_discount,
+						'item_original_price' => $item->f_default_price,
+						'item_qty' => $item->qty,
+						'item_price' => $price,
+						'item_status' => 2,
+						'date_update' => Carbon::now()->toDateTimeString(),
+						'ip_address' => $request->ip(),
+						'item_total_price' => $total_amount,
+						'item_type' => $item->f_item_type,
+					];
+				}
 			}
+
+			DB::table('fumaco_order_items')->insert($order_cart);
 
 			$shipping_rates = $this->getShippingRates();
 			
-			$shipping_details = session()->get('fumShipDet');
-			$billing_details = session()->get('fumBillDet');
-
-			$ship = collect($shipping_details)->except('same_as_billing');
-			$address_check = $ship->diff($billing_details);
-
-			$same_as_billing = 0;
-			if($shipping_details['same_as_billing'] == 0){
-				$same_as_billing = $address_check->isEmpty() ? 1 : 0;
-			}
-
 			$shipping_add = $billing_add = [];
 			if (Auth::check()) {
-				$shipping_add = DB::table('fumaco_user_add')->where('user_idx', Auth::user()->id)->where('address_class','Delivery')
-					->select('id', 'xdefault', 'xadd1', 'xadd2', 'xprov', 'xcontactlastname1', 'xcontactname1', 'add_type', 'xcontactnumber1', 'xmobile_number', 'xcontactemail1', 'xpostal', 'xcountry', 'xbusiness_name', 'xtin_no', 'xcity', 'xpostal', 'xbrgy')->get();
-				
-				$shipping_address = collect($shipping_add)->where('xdefault', 1)->first();
-				$shipping_address = collect($shipping_address)->toArray();
-
-				$shipping_details = [
-					'fname' => $shipping_address['xcontactname1'],
-					'lname' => $shipping_address['xcontactlastname1'],
-					'address_line1' => $shipping_address['xadd1'],
-					'address_line2' => $shipping_address['xadd2'],
-					'province' => $shipping_address['xprov'],
-					'city' => $shipping_address['xcity'],
-					'brgy' => $shipping_address['xbrgy'],
-					'postal_code' => $shipping_address['xpostal'],
-					'country' => $shipping_address['xcountry'],
-					'address_type' => $shipping_address['add_type'],
-					'business_name' => $shipping_address['xbusiness_name'],
-					'tin' => $shipping_address['xtin_no'],
-					'email_address' => $shipping_address['xcontactemail1'],
-					'mobile_no' => $shipping_address['xmobile_number'],
-					'contact_no' => $shipping_address['xcontactnumber1'],
-					'same_as_billing' => $same_as_billing //$shipping_details['same_as_billing']
-				];
-
 				$billing_add = DB::table('fumaco_user_add')->where('user_idx', Auth::user()->id)->where('address_class','Billing')
 					->select('id', 'xdefault', 'xadd1', 'xadd2', 'xprov', 'xcontactlastname1', 'xcontactname1', 'add_type', 'xcontactnumber1', 'xmobile_number', 'xcontactemail1', 'xpostal', 'xcountry', 'xbusiness_name', 'xtin_no', 'xcity', 'xpostal', 'xbrgy')->get();
 
@@ -472,8 +453,7 @@ class CheckoutController extends Controller
 				$billing_address = collect($billing_address)->toArray();
 
 				$billing_details = [
-					'fname' => $billing_address['xcontactname1'],
-					'lname' => $billing_address['xcontactlastname1'],
+					'contact_person' => $billing_address['xcontactname1'] . ' ' . $billing_address['xcontactlastname1'],
 					'address_line1' => $billing_address['xadd1'],
 					'address_line2' => $billing_address['xadd2'],
 					'province' => $billing_address['xprov'],
@@ -486,8 +466,78 @@ class CheckoutController extends Controller
 					'tin' => $billing_address['xtin_no'],
 					'email_address' => $billing_address['xcontactemail1'],
 					'mobile_no' => $billing_address['xmobile_number'],
-					'contact_no' => $billing_address['xcontactnumber1'],
 				];
+
+				$shipping_add = DB::table('fumaco_user_add')->where('user_idx', Auth::user()->id)->where('address_class','Delivery')
+					->select('id', 'xdefault', 'xadd1', 'xadd2', 'xprov', 'xcontactlastname1', 'xcontactname1', 'add_type', 'xcontactnumber1', 'xmobile_number', 'xcontactemail1', 'xpostal', 'xcountry', 'xbusiness_name', 'xtin_no', 'xcity', 'xpostal', 'xbrgy')->get();
+				
+				$shipping_address = collect($shipping_add)->where('xdefault', 1)->first();
+				$shipping_address = collect($shipping_address)->toArray();
+
+				$shipping_details = [
+					'contact_person' => $shipping_address['xcontactname1'] . ' ' . $shipping_address['xcontactlastname1'],
+					'address_line1' => $shipping_address['xadd1'],
+					'address_line2' => $shipping_address['xadd2'],
+					'province' => $shipping_address['xprov'],
+					'city' => $shipping_address['xcity'],
+					'brgy' => $shipping_address['xbrgy'],
+					'postal_code' => $shipping_address['xpostal'],
+					'country' => $shipping_address['xcountry'],
+					'address_type' => $shipping_address['add_type'],
+					'business_name' => $shipping_address['xbusiness_name'],
+					'tin' => $shipping_address['xtin_no'],
+					'email_address' => $shipping_address['xcontactemail1'],
+					'mobile_no' => $shipping_address['xmobile_number'],
+					'same_as_billing' => 0
+				];
+
+				$ship = collect($shipping_details)->except('same_as_billing');
+				$address_check = $ship->diff($billing_details);
+
+				$same_as_billing = 0;
+				if($shipping_details['same_as_billing'] == 0){
+					$same_as_billing = $address_check->isEmpty() ? 1 : 0;
+					$shipping_details['same_as_billing'] = $same_as_billing;	
+				}
+			} else {
+				$temp_data = DB::table('fumaco_temp')->where('order_tracker_code', $order_no)->first();
+				$shipping_details = [
+					'contact_person' => $temp_data->xshipcontact_person,
+					'address_line1' => $temp_data->xshippadd1,
+					'address_line2' => $temp_data->xshippadd2,
+					'province' => $temp_data->xshiprov,
+					'city' => $temp_data->xshipcity,
+					'brgy' => $temp_data->xshipbrgy,
+					'postal_code' => $temp_data->xshippostalcode,
+					'country' => $temp_data->xshipcountry,
+					'address_type' => $temp_data->xshiptype,
+					'business_name' => $temp_data->xship_business_name,
+					'tin' => $temp_data->xship_tin,
+					'email_address' => $temp_data->xemail_shipping,
+					'mobile_no' => $temp_data->xcontact,
+					'same_as_billing' => $temp_data->shipping_same_as_billing
+				];
+
+				$billing_details = [
+					'contact_person' => $temp_data->xcontact_person,
+					'address_line1' => $temp_data->xadd1,
+					'address_line2' => $temp_data->xadd2,
+					'province' => $temp_data->xprov,
+					'city' => $temp_data->xcity,
+					'brgy' => $temp_data->xbrgy,
+					'postal_code' => $temp_data->xpostal,
+					'country' => $temp_data->xcountry,
+					'address_type' => $temp_data->xaddresstype,
+					'business_name' => $temp_data->xbusiness_name,
+					'tin' => $temp_data->xtin_no,
+					'email_address' => $temp_data->xemail,
+					'mobile_no' => $temp_data->xmobile,
+				];
+			}
+
+			$is_on_payment_page = DB::table('fumaco_temp')->where('order_tracker_code', $order_no)->where('last_transaction_page', 'Payment Page')->exists();
+			if (!$is_on_payment_page) {
+				DB::table('fumaco_temp')->where('order_tracker_code', $order_no)->update(['last_transaction_page' => 'Checkout Page']);
 			}
 
 			$shipping_zones = DB::table('fumaco_shipping_zone_rate')->distinct()->pluck('province_name')->toArray();
@@ -496,9 +546,19 @@ class CheckoutController extends Controller
 				$free_shipping_remarks = $shipping_rates['free_delivery_zones'];
 			}
 
+			$free_shipping_remarks = null;
+			if ($shipping_rates['free_delivery_zones']) {
+				$free_shipping_remarks = $shipping_rates['free_delivery_zones'];
+			}
+
 			$shipping_rates = $shipping_rates['shipping_offer_rates'];
 
-			return view('frontend.checkout.check_out_summary', compact('shipping_details', 'billing_details', 'shipping_rates', 'order_no', 'cart_arr', 'shipping_add', 'billing_add', 'shipping_zones', 'free_shipping_remarks'));
+			$payment_methods = DB::table('fumaco_payment_method')->where('is_enabled', 1)
+				->select('payment_method_name', 'payment_type', 'issuing_bank', 'show_image', 'image')->get();
+
+			DB::commit();
+
+			return view('frontend.checkout.check_out_summary', compact('shipping_details', 'billing_details', 'shipping_rates', 'order_no', 'cart_arr', 'shipping_add', 'billing_add', 'shipping_zones', 'payment_methods', 'free_shipping_remarks'));
 		}catch(Exception $e){
 			DB::rollback();
 			return redirect()->back()->with('error', 'An error occured. Please try again.');
@@ -509,69 +569,24 @@ class CheckoutController extends Controller
 		DB::beginTransaction();
 		try {
 			$order_no = session()->get('fumOrderNo');
-			$shipping_details = session()->get('fumShipDet');
-			$billing_details = session()->get('fumBillDet');
 			$voucher_code = session()->get('fumVoucher');
-	
-			$temp_data = [
-				'xtempcode' => uniqid(),
-				'xfname' => (Auth::check()) ? Auth::user()->f_name : $shipping_details['fname'],
-				'xlname' => (Auth::check()) ? Auth::user()->f_lname : $shipping_details['lname'],
-				'xcontact_person' => $billing_details['fname']. " " . $billing_details['lname'],
-				'xshipcontact_person' => $shipping_details['fname']. " " . $shipping_details['lname'],
-				'xadd1' => ($billing_details) ? $billing_details['address_line1'] : $shipping_details['address_line1'],
-				'xadd2' => ($billing_details) ? $billing_details['address_line2'] : $shipping_details['address_line2'],
-				'xprov' => ($billing_details) ? $billing_details['province'] : $shipping_details['province'],
-				'xcity' => ($billing_details) ? $billing_details['city'] : $shipping_details['city'],
-				'xbrgy' => ($billing_details) ? $billing_details['brgy'] : $shipping_details['brgy'],
-				'xpostal' => ($billing_details) ? $billing_details['postal_code'] : $shipping_details['postal_code'],
-				'xcountry' => ($billing_details) ? $billing_details['country'] : $shipping_details['country'],
-				'xaddresstype' => ($billing_details) ? $billing_details['address_type'] : $shipping_details['address_type'],
-				'xbusiness_name' => ($billing_details) ? $billing_details['business_name'] : $shipping_details['business_name'],
-				'xtin_no' => ($billing_details) ? $billing_details['tin'] : $shipping_details['tin'],
-				'xemail' => ($billing_details) ? $billing_details['email_address'] : $shipping_details['email_address'],
-				'xemail_shipping' => $shipping_details['email_address'],
-				'xmobile' => ($billing_details) ? $billing_details['mobile_no'] : $shipping_details['mobile_no'],
-				'xcontact' => $shipping_details['contact_no'],
-				'xshippadd1' => $shipping_details['address_line1'],
-				'xshippadd2' => $shipping_details['address_line2'],
-				'xshiprov' => $shipping_details['province'],
-				'xshipcity' => $shipping_details['city'],
-				'xshipbrgy' => $shipping_details['brgy'],
-				'xshippostalcode' => $shipping_details['postal_code'],
-				'xshipcountry' => $shipping_details['country'],
-				'xshiptype' => $shipping_details['address_type'],
-				'xship_business_name' => $shipping_details['business_name'],
-				'xship_tin' => $shipping_details['tin'],
-				'xlogs' => $order_no,
-				'order_status' => 'Order Pending',
-				'order_tracker_code' => $order_no,
-				'order_shipping_type' => null, 
-				'order_ip' => $request->ip(),
-				'xusertype' => (Auth::check()) ? 'Member' : 'Guest',
-				'xusernamex' => (Auth::check()) ? Auth::user()->username : null,
-				'xstatus' => 2,
-				'xuser_id' => (Auth::check()) ? Auth::user()->id : null,
-				'shipping_name' => $request->s_name,
-				'shipping_amount' => $request->s_amount,
-				'estimated_delivery_date' => $request->estimated_del,
-				'xstore_location' => ($request->s_name == 'Store Pickup') ? $request->storeloc : null,
-				'xpickup_date' => ($request->s_name == 'Store Pickup') ? Carbon::parse($request->picktime)->format('Y-m-d') : null,
-				'xpickup_time' => ($request->s_name == 'Store Pickup') ? $request->timeslot : null,
-				'voucher_code' => strtoupper($voucher_code)
-			];
 
 			$existing_order_temp = DB::table('fumaco_temp')->where('order_tracker_code', $order_no)->first();
 			if(!$existing_order_temp){
-				DB::table('fumaco_temp')->insert($temp_data);
+				return response()->json(['status' => 2, 'message' => 'An error occured. Please try again.']);
 			} else {
+				$attempt = $existing_order_temp->payment_attempt + 1;
 				DB::table('fumaco_temp')->where('id', $existing_order_temp->id)->update([
 					'shipping_name' => $request->s_name,
 					'shipping_amount' => $request->s_amount,
+					'payment_method' => $request->pay_name,
+					'issuing_bank' => $request->ib,
 					'estimated_delivery_date' => $request->estimated_del,
 					'xstore_location' => ($request->s_name == 'Store Pickup') ? $request->storeloc : null,
 					'xpickup_date' => ($request->s_name == 'Store Pickup') ? Carbon::parse($request->picktime)->format('Y-m-d') : null,
-					'voucher_code' => ($voucher_code) ? strtoupper($voucher_code) : null
+					'voucher_code' => ($voucher_code) ? strtoupper($voucher_code) : null,
+					'payment_attempt' => $attempt,
+					'last_transaction_page' => 'Payment Page'
 				]);
 			}
 
@@ -655,7 +670,7 @@ class CheckoutController extends Controller
 
 			session()->forget('fumVoucher');
 
-			return response()->json(['status' => 1, 'id' => $order_no]);
+			return response()->json(['status' => 1, 'id' => $order_no, 'code' => $existing_order_temp->xtempcode]);
 		} catch (Exception $e) {
 			DB::rollback();
 
@@ -918,9 +933,17 @@ class CheckoutController extends Controller
 						$payment_method = $request->PymtMethod;
 						break;
 				}
-				
+
+				if(!$payment_method) {
+					$payment_method = $temp->payment_method;
+				}
+
+				$default_payment_status = 'Payment Received';
+				if($payment_method == 'Bank Deposit'){
+					$default_payment_status = DB::table('fumaco_payment_status')->where('status_sequence', 1)->pluck('status')->first();
+				}
+
 				DB::table('fumaco_order')->insert([
-					// 'order_number' => $temp->order_tracker_code,
 					'order_number' => $temp->xlogs,
 					'order_account' => $temp->xuser_id, // account number of logged user
 					'order_name' => $temp->xfname,
@@ -953,6 +976,7 @@ class CheckoutController extends Controller
 					'order_ip' => $temp->order_ip,
 				  	'order_date' => $now,
 					'order_status' => "Order Placed",
+					'payment_status' => $default_payment_status,
 					'order_payment_method' => $payment_method,
 					'tracker_code' => $temp->order_tracker_code,
 					'estimated_delivery_date' => $temp->estimated_delivery_date,
@@ -960,7 +984,7 @@ class CheckoutController extends Controller
 					'bank_ref_no' => $request->BankRefNo,
 					'issuing_bank' => $request->IssuingBank,
 					'payment_transaction_time' => $request->RespTime,
-					'amount_paid' => $request->Amount,
+					'amount_paid' => ($request->Amount) ? $request->Amount : 0,
 					'order_type' => $temp->xusertype,
 					'user_email' => $loggedin,
 					'shipping_business_name' => $temp->xship_business_name,
@@ -971,7 +995,9 @@ class CheckoutController extends Controller
 					'pickup_date' => $temp->xpickup_date,
 					'pickup_time' => $temp->xpickup_time,
 					'voucher_code' => ($is_voucher_valid) ? $temp->voucher_code : null,
-					'discount_amount' => $discount
+					'discount_amount' => $discount,
+					'deposit_slip_token' => $payment_method == 'Bank Deposit' ? hash('sha256', Carbon::now()->toDateTimeString()) : null,
+					'deposit_slip_token_date_created' => $payment_method == 'Bank Deposit' ? Carbon::now()->toDateTimeString() : null,
 				]);
 
 				// insert order in tracking order table
@@ -981,7 +1007,9 @@ class CheckoutController extends Controller
 					'track_item' => 'Item Purchase',
 					'track_description' => 'Your order is on processing',
 					'track_status' => 'Order Placed',
+					'track_payment_status' => $default_payment_status,
 					'track_ip' => $temp->order_ip,
+					'track_active' => 1,
 					'transaction_member' => $temp->xusertype
 				]);
 			}
@@ -996,8 +1024,6 @@ class CheckoutController extends Controller
 			}
 			
 			$order_details = DB::table('fumaco_order')->where('order_number', $temp->xlogs)->first();
-			
-			DB::commit();
 
 			$store_address = null;
 			if($order_details->order_shipping == 'Store Pickup') {
@@ -1008,12 +1034,12 @@ class CheckoutController extends Controller
 			$order = [
 				'order_details' => $order_details,
 				'items' => $items,
-				'store_address' => $store_address
+				'store_address' => $store_address,
+				'new_token' => null
 			];
 
+			// // send email to customer / client
 			$emails = array_filter(array_unique([trim($order_details->order_bill_email), trim($order_details->order_email), trim($temp->xusernamex)]));
-			Mail::to($emails)
-				->queue(new OrderSuccess($order));
 
 			$phone = $temp->xmobile[0] == '0' ? '63'.substr($temp->xmobile, 1) : $temp->xmobile;
 
@@ -1022,13 +1048,18 @@ class CheckoutController extends Controller
 			$leadtime_arr = [];
 			foreach($ordered_items as $item){
 				$category_id = DB::table('fumaco_items')->where('f_idcode', $item)->pluck('f_cat_id')->first();
-				$shipping = DB::table('fumaco_shipping_service as shipping_service')
-					->join('fumaco_shipping_zone_rate as zone_rate', 'shipping_service.shipping_service_id', 'zone_rate.shipping_service_id')
-					->where('shipping_service.shipping_service_name', $temp->shipping_name)
-					->where('zone_rate.province_name', $temp->xshiprov)
-					->first();
-
-				$lead_time_per_category = DB::table('fumaco_shipping_product_category')->where('shipping_service_id', $shipping->shipping_service_id)->where('category_id', $category_id)->select('min_leadtime', 'max_leadtime')->first();
+				if($temp->shipping_name != 'Store Pickup') {
+					$shipping = DB::table('fumaco_shipping_service as shipping_service')
+						->join('fumaco_shipping_zone_rate as zone_rate', 'shipping_service.shipping_service_id', 'zone_rate.shipping_service_id')
+						->where('shipping_service.shipping_service_name', $temp->shipping_name)
+						->where('zone_rate.province_name', $temp->xshiprov)
+						->first();
+				} else {
+					$shipping = DB::table('fumaco_shipping_service')->where('shipping_service_name', $temp->shipping_name)->first();
+				}
+				
+				$lead_time_per_category = DB::table('fumaco_shipping_product_category')->where('shipping_service_id', $shipping->shipping_service_id)
+					->where('category_id', $category_id)->select('min_leadtime', 'max_leadtime')->first();
 
 				$leadtime_arr[] = [
 					'min_leadtime' => $lead_time_per_category ? $lead_time_per_category->min_leadtime : $shipping->min_leadtime,
@@ -1038,19 +1069,55 @@ class CheckoutController extends Controller
 
 			$min_leadtime = collect($leadtime_arr)->pluck('min_leadtime')->max();
 			$max_leadtime = collect($leadtime_arr)->pluck('max_leadtime')->max();
-			$url = Bitly::getUrl($request->root().'/track_order/'.$temp->xlogs);
 
-			Http::asForm()->withHeaders([
-				'Accept' => 'application/json',
-				'Content-Type' => 'application/x-www-form-urlencoded',
-			])->post('https://api.movider.co/v1/sms', [
-				'api_key' => "24wezX69kvuWfnqZazxUhsiifcd",
-				'api_secret' => "Dd1PnbBIUgf7RFVKSaZEGzBsDDrjKDffimF9dVLH",
-				'from' => 'FUMACO',
-				'to' => preg_replace("/[^0-9]/", "", $phone),
-				'text' => 'Hi '.$temp->xfname.' '.$temp->xlname.'!, your order '.$temp->xlogs.' with an amount of '.$request->Amount.' has been received, please allow '.$min_leadtime.'-'.$max_leadtime.' business days to process your order. We will send another notification once your order is shipped out. Click '.$url.' to track your order.'
-			]);
+			$bank_accounts = [];
+			$view = 'frontend.checkout.success';
 
+			$url = null;
+			$deposit_slip_url = null;
+			$sms_message = null;
+			if($order_details->order_payment_method == 'Bank Deposit'){
+				$bank_accounts = DB::table('fumaco_bank_account')->where('is_active', 1)->get();
+				$view = 'frontend.checkout.order_success_page';
+				
+				$order['bank_accounts'] = $bank_accounts;
+
+				Mail::send('emails.order_success_bank_deposit', $order, function($message) use ($emails) {
+					$message->to($emails);
+					$message->subject('Order Placed - Bank Deposit - FUMACO');
+				});
+
+				$deposit_slip_url = $request->root().'/upload_deposit_slip/'.$order_details->deposit_slip_token;
+				$shortened_deposit_slip_url = $this->generateShortUrl($request->root(), $deposit_slip_url);
+				
+				$sms_message = 'Hi '.$temp->xfname.' '.$temp->xlname.'!, to process your order please settle your payment thru bank deposit. Click '.$shortened_deposit_slip_url.' to upload your bank deposit slip.';
+			}else{
+				$tracking_url = $request->root().'/track_order/'.$temp->xlogs;
+				$shortened_tracking_url = $this->generateShortUrl($request->root(), $tracking_url);
+				
+				$tracking_url_text = $shortened_tracking_url ? 'Click ' . $shortened_tracking_url . ' to track your order.' : null;
+
+				$sms_message = 'Hi '.$temp->xfname.' '.$temp->xlname.'!, your order '.$temp->xlogs.' with an amount of P '.number_format($request->Amount, 2).' has been received, please allow '.$min_leadtime.' to '.$max_leadtime.' business days to process your order. ' . $tracking_url_text;
+
+				Mail::to($emails)->queue(new OrderSuccess($order));
+			}
+
+			if ($url || $deposit_slip_url) {
+				$sms_api = DB::table('api_setup')->where('type', 'sms_gateway_api')->first();
+				if ($sms_api) {
+					Http::asForm()->withHeaders([
+						'Accept' => 'application/json',
+						'Content-Type' => 'application/x-www-form-urlencoded',
+					])->post($sms_api->base_url, [
+						'api_key' => $sms_api->api_key,
+						'api_secret' => $sms_api->api_secret_key,
+						'from' => 'FUMACO',
+						'to' => preg_replace("/[^0-9]/", "", $phone),
+						'text' => $sms_message
+					]);
+				}
+			}
+			
 			// send email to fumaco staff
 			$email_recipient = DB::table('email_config')->first();
 			$email_recipient = ($email_recipient) ? explode(",", $email_recipient->email_recipients) : [];
@@ -1061,7 +1128,11 @@ class CheckoutController extends Controller
 				});
 			}
 
-			return view('frontend.checkout.success', compact('order_details', 'items', 'loggedin', 'store_address'));
+			session()->forget('fumOrderNo');
+
+			DB::commit();
+
+			return view($view, compact('order_details', 'items', 'loggedin', 'store_address', 'bank_accounts'));
 		} catch (Exception $e) {
 			DB::rollback();
 
@@ -1159,9 +1230,30 @@ class CheckoutController extends Controller
     }
 
 	private function getShippingRates(){
-		$shipping_details = session()->get('fumShipDet');
-		if (!$shipping_details) {
-			return [];
+		$shipping_details = [];
+		if (Auth::check()) {
+			$shipping_address = DB::table('fumaco_user_add')->where('xdefault', 1)
+            	->where('user_idx', Auth::user()->id)->where('address_class', 'Delivery')->first();
+            
+            $shipping_details = [
+                'address_line1' => $shipping_address->xadd1,
+                'address_line2' => $shipping_address->xadd2,
+                'province' => $shipping_address->xprov,
+                'city' => $shipping_address->xcity,
+                'brgy' => $shipping_address->xbrgy,
+                'country' => $shipping_address->xcountry,
+            ];
+		} else {
+			$order_no = session()->get('fumOrderNo');
+			$shipping_address = DB::table('fumaco_temp')->where('order_tracker_code', $order_no)->first();
+			$shipping_details = [
+                'address_line1' => $shipping_address->xshippadd1,
+                'address_line2' => $shipping_address->xshippadd2,
+                'province' => $shipping_address->xshiprov,
+                'city' => $shipping_address->xshipcity,
+                'brgy' => $shipping_address->xshipbrgy,
+                'country' => $shipping_address->xshipcountry,
+            ];
 		}
 
 		$address = strtolower($shipping_details['address_line1'] . ' ' . $shipping_details['address_line2'] . ' ' . $shipping_details['brgy']. ' ' . $shipping_details['city'] . ' ' . $shipping_details['province'] . ' ' .	$shipping_details['country']);
@@ -1275,7 +1367,7 @@ class CheckoutController extends Controller
         $shipping_services_arr = array_column($shipping_services_arr, 'shipping_service_id');
         $shipping_services_without_conditions = ShippingService::where('shipping_calculation', 'Flat Rate')->whereIn('shipping_service_id', $shipping_services_arr)
 			->select('shipping_service_id', 'min_leadtime', 'max_leadtime', 'shipping_service_name', 'amount')->get();
-		
+
 		$free_delivery_zones = [];
         $shipping_offer_rates = [];
         foreach($shipping_services_without_conditions as $row){

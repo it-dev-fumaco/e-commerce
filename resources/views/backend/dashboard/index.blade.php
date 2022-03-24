@@ -126,7 +126,7 @@
 					<div class="tab-content p-0">
 						<div class="container mt-4">
 							<div class="col-10 mx-auto" id="chart-container">
-					  			<canvas id="myChart"></canvas>
+					  			<canvas id="myChart" height="80"></canvas>
 							</div>
 						</div>
 					</div>
@@ -140,62 +140,54 @@
 					<div class="card-header">
 						<h3 class="card-title container-fluid">
 							<div class="row">
-								<div class="col-9 text-bold"><i class="fas fa-search mr-1"></i> Most Searched Terms </div>
-								<div class="col-3 text-bold">Frequency</div>
+								<div class="col-12 text-bold"><i class="fas fa-search mr-1"></i> Most Searched Terms </div>
 							</div>
 						</h3>
 					</div>
 					<div class="card-body">
-						<table class="table table-hover table-bordered">
-							@foreach ($search_terms as $search)
-								<tr>
-									<td>
-										<a href="#" data-toggle="modal" data-target="#{{ Str::slug($search['search_term']) }}Modal" style="font-size: 11pt">
-											{{ $search['search_term'] }}
-										</a>
-										<div class="modal fade" id="{{ Str::slug($search['search_term']) }}Modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-											<div class="modal-dialog" role="document">
-												<div class="modal-content">
-													<div class="modal-header">
-														<h5 class="modal-title" id="exampleModalLabel">{{ $search['search_term'] }}</h5>
-														<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-															<span aria-hidden="true">&times;</span>
-														</button>
-													</div>
-													<div class="modal-body">
-														<table class="table table-hover table-bordered">
-															<tr>
-																<th class="text-center">Location</th>
-																<th class="text-center">Frequency</th>
-															</tr>
-															@foreach ($search['location'] as $location)
-																<tr>
-																	<td class="text-center">
-																		{{ $location->city ? $location->city : '-' }}
-																	</td>
-																	<td class="text-center">{{ $location->count }}</td>
-																</tr>
-															@endforeach
-														</table>
-													</div>
-													<div class="modal-footer">
-														<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-													</div>
-												</div>
-											</div>
-										</div>
-									</td>
-									<td class="text-center" style="font-size: 11pt">{{ $search['search_term_count'] }}</td>
-								</tr>
-							@endforeach
-						</table>
+						@foreach ($search_terms as $search)
+						<button class="btn btn-outline-primary btn-sm btn-flat mb-2 mr-2" data-toggle="modal" data-target="#{{ Str::slug($search['search_term']) }}Modal" type="button">{{ $search['search_term'] }} ({{ $search['search_term_count'] }})</button>
+						<div class="modal fade" id="{{ Str::slug($search['search_term']) }}Modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+							<div class="modal-dialog" role="document">
+								<div class="modal-content">
+									<div class="modal-header">
+										<h5 class="modal-title font-weight-bold" id="exampleModalLabel">{{ $search['search_term'] }}</h5>
+										<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+											<span aria-hidden="true">&times;</span>
+										</button>
+									</div>
+									<div class="modal-body p-4">
+										<table class="table table-sm table-hover table-bordered m-0" >
+											<thead>
+											<tr>
+												<th class="text-center" style="width: 60%;">Location</th>
+												<th class="text-center" style="width: 40%;">Frequency</th>
+											</tr>
+										</thead>
+											@foreach ($search['location'] as $location)
+												<tr>
+													<td class="text-center">
+														{{ $location->city ? $location->city : '-' }}
+													</td>
+													<td class="text-center">{{ $location->count }}</td>
+												</tr>
+											@endforeach
+										</table>
+									</div>
+									<div class="modal-footer">
+										<button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Close</button>
+									</div>
+								</div>
+							</div>
+						</div>
+						@endforeach
 					</div>
 				</div>
 			</div>
 		</div>
 		<br/>
 		<div class="row">
-			<div class="col-12">
+			<div class="container-fluid">
 				<div class="card">
 					<div class="card-header">
 						<h3 class="card-title">
@@ -204,15 +196,15 @@
 					</div>
 					<div class="card-body">
 						<table class="table table-hover table-bordered table-striped">
-							<tr>
-								<th>Cart Owner</th>
-								<th>Cart Status</th>
-								<th>Last Online</th>
-								<th>Products</th>
-								<th>Total Qty</th>
-								<th>Amount</th>
-								<th>Action</th>
-							</tr>
+							<thead>
+								<th style="width: 20%" class="text-center">Cart Owner</th>
+								<th style="width: 10%" class="text-center">Cart Status</th>
+								<th style="width: 15%" class="text-center">Last Online</th>
+								<th style="width: 20%" class="text-center">Products</th>
+								<th style="width: 10%" class="text-center">Total Qty</th>
+								<th style="width: 10%" class="text-center">Amount</th>
+								<th style="width: 15%" class="text-center">Action</th>
+							</thead>
 							@foreach ($cart_collection as $cart)
 								@php
 									$status_color = '#DC3545';
@@ -223,11 +215,11 @@
 									}
 								@endphp
 								<tr>
-									<td>{{ $cart['user_type'] == 'member' ? $cart['owner'] : 'Guest' }}</td>
+									<td class="text-center">{{ $cart['user_type'] == 'member' ? $cart['owner'] : 'Guest' }}</td>
 									<td class="text-center">
 										<span class="badge w-100" style="font-size: 11pt; background-color: {{ $status_color }}; color: #fff">{{ $cart['status'] }}</span>
 									</td>
-									<td style="font-size: 11pt">{{ $cart['last_online'] ? \Carbon\Carbon::parse($cart['last_online'])->format('M d, Y - h:i a') : null }}</td>
+									<td style="font-size: 11pt" class="text-center">{{ $cart['last_online'] ? \Carbon\Carbon::parse($cart['last_online'])->format('M d, Y - h:i a') : null }}</td>
 									<td>
 										@foreach ($cart['items'] as $item)
 											<a href="/product/{{ $item['slug'] ? $item['slug'] : $item['item_code'] }}" class="badge badge-primary" target="_blank">{{ $item['item_code'] }}</a>
@@ -418,6 +410,140 @@
 						</table>
 						<div class="float-right mt-4">
 							{{ $cart_collection->withQueryString()->links('pagination::bootstrap-4') }}
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="container-fluid">
+				<div class="card">
+					<div class="card-header">
+						<h3 class="card-title">
+							<i class="fas fa-shopping-cart"></i> Abandoned Cart
+						</h3>
+					</div>
+					<div class="card-body">
+						<table class="table table-hover table-bordered table-striped">
+							<thead>
+								<th class="text-center">Name</th>
+								<th class="text-center">Email</th>
+								<th class="text-center">Products</th>
+								<th class="text-center">Total Qty</th>
+								<th class="text-center">Amount</th>
+								<th class="text-center">Abandoned Transaction</th>
+								<th class="text-center">Transaction Date</th>
+								<th class="text-center">Action</th>
+							</thead>
+							@forelse ($abandoned_arr as $abandoned)
+								<tr>
+									<td class="text-center">{{ $abandoned['name'] ? $abandoned['name'] : 'Guest' }}</td>
+									<td class="text-center">{{ $abandoned['email'] ? $abandoned['email'] : '-' }}</td>
+									<td>
+										@forelse ($abandoned['items'] as $item)
+										<a href="/product/{{ $item['slug'] ? $item['slug'] : $item['item_code'] }}" class="badge badge-primary" target="_blank">{{ $item['item_code'] }}</a>
+										@empty
+										-
+										@endforelse
+									</td>
+									<td class="text-center">{{ $abandoned['total_items'] }}</td>
+									<td class="text-center">₱ {{ number_format($abandoned['total_amount'], 2) }}</td>
+									<td class="text-center">{{ $abandoned['transaction'] ? $abandoned['transaction'] : '-' }}
+										<div class="modal fade" id="abandoned-{{ $abandoned['order_number'] }}-Modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+											<div class="modal-dialog modal-xl" role="document">
+												<div class="modal-content">
+													<div class="modal-header">
+														<div class="col-md-6 text-left">
+															<h4 class="modal-title">ORDER NO. {{ $cart['transaction_id'] }}</h4>
+														</div>
+														<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+															<span aria-hidden="true">&times;</span>
+														</button>
+													</div>
+													<div class="modal-body text-left">
+														<div class="row">
+															<div class="col-6">
+																<p class="mt-3 mb-0"><strong>Customer Name : </strong> {{ $abandoned['name'] ? $abandoned['name'] : 'Guest' }}</p>
+																<p class="mb-0"><strong>Email Address : </strong> {{ $abandoned['email'] ? $abandoned['email'] : '-' }}</p>
+																<p class="mb-0"><strong>Abandoned in : </strong> {{ $abandoned['transaction'] }}</p>
+															</div>
+														</div>
+														<br>
+														<div class="container">
+															<table class="table table-bordered table-striped">
+																<thead>
+																	<tr>
+																		<th class="text-center" style="width: 10%;">ITEM CODE</th>
+																		<th class="text-center" style="width: 50%;">DESCRIPTION</th>
+																		<th class="text-center" style="width: 10%;">QTY</th>
+																		<th class="text-center" style="width: 10%;">PRICE</th>
+																		<th class="text-center" style="width: 10%;">AMOUNT</th>
+																	</tr>
+																</thead>
+																<tbody>
+																	@forelse ($abandoned['items'] as $item)
+																		<tr>
+																			<td>{{ $item['item_code'] }}</td>
+																			<td>{{ $item['item_name'] }}</td>
+																			<td class="text-center">{{ $item['qty'] }}</td>
+																			<td class="text-center">₱ {{ number_format($item['item_price'], 2) }}</td>
+																			<td class="text-center">₱ {{ number_format($item['total_price'], 2) }}</td>
+																		</tr>
+																	@empty
+																		<tr>
+																			<td class="text-center" colspan=5>No item(s) found.</td>
+																		</tr>
+																	@endforelse
+																</tbody>
+															</table>
+														</div>
+													</div>
+													<div class="modal-footer">
+														<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+													</div>
+												</div>
+											</div>
+										</div>
+									</td>
+									<td class="text-center">{{ $abandoned['transaction_date'] ? \Carbon\Carbon::parse($abandoned['transaction_date'])->format('M. d, Y - h:i a') : '-' }}</td>
+									<td class="text-center">
+										<div class="btn-group" role="group" aria-label="Basic example">
+											<a href="#" class="btn btn-outline-secondary btn-sm" data-toggle="modal" data-target="#abandoned-{{ $abandoned['order_number'] }}-Modal">View</a>
+											@if ($abandoned['active'] == 1)
+											<button type="button" class="btn btn-outline-primary btn-sm" data-toggle="modal" data-target="#email-{{ $abandoned['order_number'] }}">Email</button>
+											@endif
+										</div>
+										@if ($abandoned['active'] == 1)
+										<div class="modal fade" id="email-{{ $abandoned['order_number'] }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+											<div class="modal-dialog" role="document">
+												<div class="modal-content">
+													<div class="modal-header">
+														<h5 class="modal-title" id="exampleModalLabel">Send Abandoned Cart Email?</h5>
+														<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+															<span aria-hidden="true">&times;</span>
+														</button>
+													</div>
+													<div class="modal-body">
+														Send an email to <b>{{ $abandoned['email'] }}</b>?
+													</div>
+													<div class="modal-footer">
+														<a href="/admin/send_abandoned_cart_email/{{ $abandoned['order_number'] }}" class="btn btn-sm btn-primary">Send Email</a>
+														<button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Close</button>
+													</div>
+												</div>
+											</div>
+										</div>
+										@endif
+									</td>
+								</tr>
+							@empty
+							<tr>
+								<td colspan="8">No Abandoned Cart(s)</td>
+							</tr>
+							@endforelse
+						</table>
+						<div class="float-right mt-4">
+							{{ $abandoned_cart->withQueryString()->links('pagination::bootstrap-4') }}
 						</div>
 					</div>
 				</div>

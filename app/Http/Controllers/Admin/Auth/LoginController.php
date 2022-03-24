@@ -7,6 +7,7 @@ use DB;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\ThrottlesLogins;
+use Illuminate\Support\Facades\Http;
 use Carbon\Carbon;
 
 class LoginController extends Controller
@@ -38,13 +39,37 @@ class LoginController extends Controller
         if(Auth::guard('admin')->attempt(['username' => $request->username,'password' => $request->password], 0)){
             //Authentication passed...
             $checker = DB::table('fumaco_admin_user')->where('username', $request->username)->first();
+
             if($checker->xstatus == 0){
                 Auth::guard('admin')->logout();
                 return redirect('/admin/login')->withInput()->with('d_info','Your admin account is deactivated.');
             }
 
-            DB::table('fumaco_admin_user')->where('username', $request->username)->update(['last_login' => Carbon::now(), 'last_login_ip' => $request->ip()]);
-            return redirect('/admin/dashboard');
+            $otp = rand(111111, 999999);
+            $api = DB::table('api_setup')->where('type', 'sms_gateway_api')->first();
+            $phone = $checker->mobile_number[0] == '0' ? '63'.substr($checker->mobile_number, 1) : $checker->mobile_number;
+
+            $sms = Http::asForm()->withHeaders([
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/x-www-form-urlencoded',
+            ])->post($api->base_url, [
+                'api_key' => $api->api_key,
+                'api_secret' => $api->api_secret_key,
+                'from' => 'FUMACO',
+                'to' => preg_replace("/[^0-9]/", "", $phone),
+                'text' => 'TWO-FACTOR AUTHENTICATION: Your One-Time PIN is '.$otp.' to login in Fumaco Website Admin Page, valid only within 10 mins. For any help, please contact us at it@fumaco.com'
+            ]);
+
+            $details = [
+                'otp' => $otp,
+                'otp_time_sent' => Carbon::now(),
+                'otp_status' => 0,
+                'last_login' => Carbon::now(),
+                'last_login_ip' => $request->ip()
+            ];
+
+            DB::table('fumaco_admin_user')->where('username', $request->username)->update($details);
+            return redirect('/admin/verify');
         }
 
         //Authentication failed...

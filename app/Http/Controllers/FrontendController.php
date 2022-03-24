@@ -14,14 +14,18 @@ use App\Models\User;
 use App\Models\UserVerify;
 use Illuminate\Support\Str;
 use Adrianorosa\GeoLocation\GeoLocation;
+use Illuminate\Support\Facades\Http;
+use Newsletter;
 
 use App\Http\Traits\ProductTrait;
+use App\Http\Traits\GeneralTrait;
 
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class FrontendController extends Controller
 {   
     use ProductTrait;
+    use GeneralTrait;
     public function signupForm() {
         return view('frontend.register');
     }
@@ -737,22 +741,78 @@ class FrontendController extends Controller
 
             DB::table('fumaco_subscribe')->insert($insert);
 
-         
+            if(Newsletter::isSubscribed($request->email) == 0){
+                Newsletter::subscribeOrUpdate($request->email);
+            }else{
+                Newsletter::subscribe($request->email);
+            }
+
             $featured_items = DB::table('fumaco_items')->where('f_status', 1)->where('f_featured', 1)->limit(4)->get();
             $featured = [];
 
+            $featured_item_codes = collect($featured_items)->pluck('f_idcode');
+
+            $sale = DB::table('fumaco_on_sale')
+                ->whereDate('start_date', '<=', Carbon::now()->toDateString())
+                ->whereDate('end_date', '>=', Carbon::today()->toDateString())
+                ->where('status', 1)->where('apply_discount_to', 'All Items')
+                ->select('discount_type', 'discount_rate')->first();
+
+            $product_reviews = $this->getProductRating($featured_item_codes);
+
+            $item_images = DB::table('fumaco_items_image_v1')->whereIn('idcode', $featured_item_codes)
+            ->select('imgprimayx', 'idcode')->get();
+            $item_images = collect($item_images)->groupBy('idcode')->toArray();
+
+            $sale_per_category = [];
+            if (!$sale && !Auth::check()) {
+                $item_categories = array_column($featured_items->toArray(), 'f_cat_id');
+                $sale_per_category = $this->getSalePerItemCategory($item_categories);
+            }
+
+            if (Auth::check()) {
+                $sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
+            }
+
             foreach($featured_items as $row){
-                $bs_img = DB::table('fumaco_items_image_v1')->where('idcode', $row->f_idcode)->first();
+                $image = null;
+                if (array_key_exists($row->f_idcode, $item_images)) {
+                    $image = $item_images[$row->f_idcode][0]->imgprimayx;
+                }
 
                 $bs_item_name = $row->f_name_name;
+
+                $item_price = $row->f_default_price;
+                $item_on_sale = $row->f_onsale;
+                $item_code = $row->f_idcode;
+
+                $is_new_item = 0;
+                if($row->f_new_item == 1){
+                    if($row->f_new_item_start <= Carbon::now() and $row->f_new_item_end >= Carbon::now()){
+                        $is_new_item = 1;
+                    }
+                }
+
+                // get item price, discounted price and discount rate
+                $item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $row->f_cat_id, $sale, $item_price, $item_code, $row->f_discount_type, $row->f_discount_rate, $row->f_stock_uom, $sale_per_category);
+                // get product reviews
+                $total_reviews = array_key_exists($item_code, $product_reviews) ? $product_reviews[$item_code]['total_reviews'] : 0;
+                $overall_rating = array_key_exists($item_code, $product_reviews) ? $product_reviews[$item_code]['overall_rating'] : 0;
+
                 $featured[] = [
+                    'id' => $row->id,
                     'item_code' => $row->f_idcode,
-                    'item_name' => $bs_item_name,
-                    'orig_price' => $row->f_original_price,
-                    'is_discounted' => $row->f_discount_trigger,
-                    'new_price' => $row->f_price,
-                    'discount' => $row->f_discount_percent,
-                    'image' => ($bs_img) ? $bs_img->imgprimayx : null
+                    'item_name' => $row->f_name_name,
+                    'default_price' => '₱ ' . number_format($item_price_data['item_price'], 2, '.', ','),
+                    'is_discounted' => ($item_price_data['discount_rate'] > 0) ? $item_price_data['is_on_sale'] : 0,
+                    'on_stock' => ($row->f_qty - $row->f_reserved_qty) > 0 ? 1 : 0,
+                    'discounted_price' => '₱ ' . number_format($item_price_data['discounted_price'], 2, '.', ','),
+                    'discount_display' => $item_price_data['discount_display'],
+                    'image' => $image,
+                    'slug' => $row->slug,
+                    'is_new_item' => $is_new_item,
+                    'overall_rating' => $overall_rating,
+                    'total_reviews' => $total_reviews,
                 ];
             }
 
@@ -852,6 +912,14 @@ class FrontendController extends Controller
                 'token' => $token
             ]);
 
+            $customer_group_id = DB::table('fumaco_users')->where('id', $user->id)->pluck('customer_group')->first();
+            $customer_group = DB::table('fumaco_customer_group')->where('id', $customer_group_id)->pluck('customer_group_name')->first();
+
+            if(!Newsletter::hasMember($user->username)){
+                Newsletter::subscribe($user->username, ['FNAME' => $user->f_name, 'LNAME' => $user->f_lname]);
+                Newsletter::addTags([$customer_group], $user->username);
+            }
+
             if(isset($request->subscribe)){
                 $checker = DB::table('fumaco_subscribe')->where('email', $request->username)->count();
                 if($checker == 0){
@@ -863,6 +931,8 @@ class FrontendController extends Controller
         
                     DB::table('fumaco_subscribe')->insert($newsletter);
                 }
+            }else{
+                Newsletter::unsubscribe($user->username);
             }
 
             Mail::send('emails.verify_email', ['token' => $token], function($message) use($request){
@@ -1715,7 +1785,7 @@ class FrontendController extends Controller
 
         $orders = DB::table('fumaco_order')->where('user_email', Auth::user()->username)
             ->whereNotIn('order_status', $active_order_statuses)
-            ->select('order_number', 'order_date', 'order_status', 'estimated_delivery_date', 'date_delivered', 'order_subtotal', 'order_shipping', 'order_shipping_amount', 'discount_amount', 'voucher_code')
+            ->select('id', 'order_number', 'order_date', 'order_status', 'estimated_delivery_date', 'date_delivered', 'order_subtotal', 'order_shipping', 'order_shipping_amount', 'discount_amount', 'voucher_code')
             ->orderBy('id', 'desc')->paginate(10);
 
         $order_numbers = array_column($orders->items(), 'order_number');
@@ -1750,6 +1820,7 @@ class FrontendController extends Controller
             }
 
             $orders_arr[] = [
+                'order_id' => $order->id,
                 'order_number' => $order->order_number,
                 'date' => date('M d, Y - h:i A', strtotime($order->order_date)),
                 'status' => $order->order_status,
@@ -1769,7 +1840,7 @@ class FrontendController extends Controller
         $new_orders = DB::table('fumaco_order')->where('user_email', Auth::user()->username)
             ->whereNotIn('order_status', collect($completed_statuses)->pluck('status'))
             ->where('order_status', '!=', 'Cancelled')
-            ->select('pickup_date', 'order_number', 'order_date', 'order_status', 'estimated_delivery_date', 'date_delivered', 'order_subtotal', 'order_shipping', 'order_shipping_amount', 'discount_amount', 'voucher_code')
+            ->select('id', 'pickup_date', 'order_number', 'order_date', 'order_status', 'payment_status', 'estimated_delivery_date', 'date_delivered', 'order_subtotal', 'order_payment_method', 'order_shipping', 'order_shipping_amount', 'discount_amount', 'voucher_code')
             ->orderBy('id', 'desc')->paginate(10);
 
         $order_numbers = array_column($new_orders->items(), 'order_number');
@@ -1782,15 +1853,19 @@ class FrontendController extends Controller
 
         $order_items = collect($order_items)->groupBy('order_number')->toArray();
 
-        $track_order_detail_query = DB::table('track_order')->whereIn('track_code', $order_numbers)->where('track_active', 1)->select('track_status', 'track_date_update')->get();
-        $track_order_arr = collect($track_order_detail_query)->groupBy('track_code');
+        $track_order_detail_query = DB::table('track_order')->whereIn('track_code', $order_numbers)->where('track_active', 1)->select('track_code', 'track_status', 'track_date', 'track_payment_status', 'track_date_update')->get();
+        $track_order_arr = $track_order_detail_query ? collect($track_order_detail_query)->groupBy('track_code') : [];
+        
+        $shipping_methods = array_column($new_orders->items(), 'order_shipping');
 
-        $shipping_methods = array_column($new_orders->items(), 'shipping_method');
         $order_statuses = DB::table('order_status as s')
             ->join('order_status_process as p', 's.order_status_id', 'p.order_status_id')
             ->whereIn('shipping_method', $shipping_methods)
-            ->select('s.status', 's.status_description', 'p.order_sequence')
+            ->select('s.status', 's.status_description', 'p.order_sequence', 'p.shipping_method')
             ->orderBy('order_sequence', 'asc')->get();
+
+        $payment_statuses = DB::table('fumaco_payment_status')->get();
+        $payment_status = collect($payment_statuses)->groupBy('status');
 
         $order_statuses = collect($order_statuses)->groupBy('shipping_method');
 
@@ -1800,7 +1875,7 @@ class FrontendController extends Controller
 
             $order_item_list = array_key_exists($new_order->order_number, $order_items) ? $order_items[$new_order->order_number] : [];
 
-            $track_order_details = array_key_exists($new_order->order_number, $track_order_arr) ? $track_order_arr[$new_order->order_number] : [];
+            $track_order_details = isset($track_order_arr[$new_order->order_number]) ? $track_order_arr[$new_order->order_number] : [];
 
             foreach($order_item_list as $item){
                 $image = null;
@@ -1819,14 +1894,22 @@ class FrontendController extends Controller
                 ];
             }
             
-            $order_status = array_key_exists($new_order->order_shipping, $order_statuses) ? $order_statuses[$new_order->order_shipping] : [];
+            $order_status = isset($order_statuses[$new_order->order_shipping]) ? $order_statuses[$new_order->order_shipping] : [];
+
+            $status = collect($order_status)->groupBy('status');
 
             $new_orders_arr[] = [
+                'order_id' => $new_order->id,
                 'order_number' => $new_order->order_number,
-                'date' => date('M d, Y - h:i A', strtotime($new_order->order_date)),
+                'order_date' => $new_order->order_date,
+                'date' => date('M d, Y h:i A', strtotime($new_order->order_date)),
                 'status' => $new_order->order_status,
+                'current_order_status_sequence' => isset($status[$new_order->order_status]) ? $status[$new_order->order_status][0]->order_sequence : 0, // 0 = Order Placed
+                'current_payment_status_sequence' => isset($payment_status[$new_order->payment_status]) ? $payment_status[$new_order->payment_status][0]->status_sequence : 1, // 1 = Pending for Upload
                 'edd' => $new_order->estimated_delivery_date,
                 'items' => $items_arr,
+                'payment_method' => $new_order->order_payment_method,
+                'payment_status' => $new_order->payment_status,
                 'subtotal' => $new_order->order_subtotal,
                 'shipping_name' => $new_order->order_shipping,
                 'shipping_fee' => $new_order->order_shipping_amount,
@@ -1839,7 +1922,7 @@ class FrontendController extends Controller
             ];
         }
 
-        return view('frontend.orders', compact('orders', 'orders_arr', 'new_orders', 'new_orders_arr'));
+        return view('frontend.orders', compact('orders', 'orders_arr', 'new_orders', 'new_orders_arr', 'payment_statuses'));
     }
 
     public function viewOrder($order_id) {
@@ -1967,36 +2050,6 @@ class FrontendController extends Controller
                 DB::table('fumaco_user_add')->where('id', $id)->delete();
 
                 DB::commit();
-
-                $address_class = $type == 'shipping' ? 'Delivery' : 'Billing';
-
-                $address = DB::table('fumaco_user_add')->where('id', $default->id)->first();
-                if($address){
-                    $address_details = [
-                        'fname' => $address->xcontactname1,
-                        'lname' => $address->xcontactlastname1,
-                        'address_line1' => $address->xadd1,
-                        'address_line2' => $address->xadd2,
-                        'province' => $address->xprov,
-                        'city' => $address->xcity,
-                        'brgy' => $address->xbrgy,
-                        'postal_code' => $address->xpostal,
-                        'country' => $address->xcountry,
-                        'address_type' => $address->add_type,
-                        'business_name' => $address->xbusiness_name,
-                        'tin' => $address->xtin_no,
-                        'email_address' => $address->xcontactemail1,
-                        'mobile_no' => $address->xmobile_number,
-                        'contact_no' => $address->xcontactnumber1,
-                        'same_as_billing' => 0
-                    ];
-
-                    if($address_class == 'Delivery'){
-                        session()->put('fumShipDet', $address_details);
-                    }else{
-                        session()->put('fumBillDet', $address_details);
-                    }
-                }
             }
            
             return redirect()->back()->with('success', 'Address has been deleted.');
@@ -2052,37 +2105,6 @@ class FrontendController extends Controller
 
             DB::commit();
 
-            $address = DB::table('fumaco_user_add')->where('id', $id)->first();
-
-            if(isset($request->checkout) and $address->xdefault == 1){ // Edit from order summary page
-                $address_class = $type == 'shipping' ? 'Delivery' : 'Billing';
-
-                $address_details = [
-                    'fname' => $address->xcontactname1,
-                    'lname' => $address->xcontactlastname1,
-                    'address_line1' => $address->xadd1,
-                    'address_line2' => $address->xadd2,
-                    'province' => $address->xprov,
-                    'city' => $address->xcity,
-                    'brgy' => $address->xbrgy,
-                    'postal_code' => $address->xpostal,
-                    'country' => $address->xcountry,
-                    'address_type' => $address->add_type,
-                    'business_name' => $address->xbusiness_name,
-                    'tin' => $address->xtin_no,
-                    'email_address' => $address->xcontactemail1,
-                    'mobile_no' => $address->xmobile_number,
-                    'contact_no' => $address->xcontactnumber1,
-                    'same_as_billing' => 0
-                ];
-
-                if($address_class == 'Delivery'){
-                    session()->put('fumShipDet', $address_details);
-                }else{
-                    session()->put('fumBillDet', $address_details);
-                }
-            }
-
             return redirect()->back()->with('success', 'Address Updated');
         } catch (Exception $e) {
             DB::rollback();
@@ -2106,34 +2128,7 @@ class FrontendController extends Controller
                         ->where('id', $id)->update(['xdefault' => 1]);
 
                     DB::commit();
-
-                    $address = DB::table('fumaco_user_add')->where('user_idx', Auth::user()->id)->where('xdefault', 1)->where('address_class', $address_class)->first();
-
-                    $address_details = [
-                        'fname' => $address->xcontactname1,
-                        'lname' => $address->xcontactlastname1,
-                        'address_line1' => $address->xadd1,
-                        'address_line2' => $address->xadd2,
-                        'province' => $address->xprov,
-                        'city' => $address->xcity,
-                        'brgy' => $address->xbrgy,
-                        'postal_code' => $address->xpostal,
-                        'country' => $address->xcountry,
-                        'address_type' => $address->add_type,
-                        'business_name' => $address->xbusiness_name,
-                        'tin' => $address->xtin_no,
-                        'email_address' => $address->xcontactemail1,
-                        'mobile_no' => $address->xmobile_number,
-                        'contact_no' => $address->xcontactnumber1,
-                        'same_as_billing' => 0
-                    ];
-
-                    if($address_class == 'Delivery'){
-                        session()->put('fumShipDet', $address_details);
-                    }else{
-                        session()->put('fumBillDet', $address_details);
-                    }
-
+                    
                     return redirect()->back()->with('success', 'Default ' . $type .' address has been changed.');
                 }
             }
@@ -2208,10 +2203,15 @@ class FrontendController extends Controller
     public function viewOrderTracking($order_number = null) {
         $order_details = DB::table('fumaco_order')->where('order_number', $order_number)->first();
 
-        $track_order_details = DB::table('track_order')->where('track_code', $order_number)->get();
+        if($order_number != null and !$order_details){
+            return redirect()->back()->with('error', 'Order Number not found!');
+        }
+
+        $track_order_details = DB::table('track_order')->where('track_code', $order_number)->where('track_active', 1)->get();
 
         $ordered_items = DB::table('fumaco_order_items')->where('order_number', $order_number)->get();
-        $order_status = '';
+        $items = $payment_statuses = $status = $order_status = [];
+        $payment_status_sequence = $status_sequence = null;
         if($order_details){
             $order_status = DB::table('order_status as s')
                 ->join('order_status_process as p', 's.order_status_id', 'p.order_status_id')
@@ -2219,31 +2219,31 @@ class FrontendController extends Controller
                 ->select('s.status', 's.status_description', 'p.order_sequence')
                 ->orderBy('order_sequence', 'asc')
                 ->get();
+            
+            $status = collect($order_status)->groupBy('status');
+            $status_sequence = isset($status[$order_details->order_status]) ? $status[$order_details->order_status][0]->order_sequence : 0;
+
+            $payment_statuses = DB::table('fumaco_payment_status')->get();
+            $payment_status = collect($payment_statuses)->sortByDesc('status_sequence')->groupBy('status');
+            $payment_status_sequence = isset($payment_status[$order_details->payment_status]) ? $payment_status[$order_details->payment_status][0]->status_sequence : 1;
+
+            foreach ($ordered_items as $item) {
+                $item_image = DB::table('fumaco_items_image_v1')
+                    ->where('idcode', $item->item_code)->first();
+                $items[] = [
+                    'order_number' => $item->order_number,
+                    'item_code' => $item->item_code,
+                    'item_name' => $item->item_name,
+                    'item_price' => $item->item_price,
+                    'image' => ($item_image) ? $item_image->imgprimayx : null,
+                    'quantity' => $item->item_qty,
+                    'price' => $item->item_price,
+                    'amount' => $item->item_total_price
+                ];
+            }
         }
 
-        $items = [];
-        foreach ($ordered_items as $item) {
-            $item_image = DB::table('fumaco_items_image_v1')
-                ->where('idcode', $item->item_code)->first();
-            $items[] = [
-                'order_number' => $item->order_number,
-                'item_code' => $item->item_code,
-                'item_name' => $item->item_name,
-                'item_price' => $item->item_price,
-                'image' => ($item_image) ? $item_image->imgprimayx : null,
-                'quantity' => $item->item_qty,
-                'price' => $item->item_price,
-                'amount' => $item->item_total_price
-            ];
-        }
-
-        if($order_number != null and !$order_details){
-            return redirect()->back()->with('error', 'Order Number not found!');
-        }
-
-        // return $track_order_details; 
-
-        return view('frontend.track_order', compact('order_details', 'items', 'track_order_details', 'order_status'));
+        return view('frontend.track_order', compact('order_details', 'items', 'track_order_details', 'order_status', 'status_sequence', 'payment_statuses', 'payment_status_sequence'));
     }
 
     // get item code based on variants selected in product page
@@ -2287,5 +2287,107 @@ class FrontendController extends Controller
             ->where('b.attribute_value', $attr_collection[$selected_cb])->where('a.f_status', 1)->select('a.slug', 'a.f_idcode')->first();
 
         return ($item_code) ? ($item_code->slug) ? $item_code->slug : $item_code->f_idcode : $request->id;
+    }
+
+    public function uploadDepositSlipForm($token, Request $request) {
+        $order_details = DB::table('fumaco_order')->where('deposit_slip_token', $token)->first();
+
+        if(!$order_details) {
+            return view('error');
+        }
+
+        $is_invalid = false;
+        $reason = null;
+
+        $startTime = Carbon::parse($order_details->deposit_slip_token_date_created);
+        $endTime = Carbon::now();
+
+        $totalDuration = $endTime->diffInSeconds($startTime);
+        if($totalDuration > 86400) {
+            $is_invalid = true;
+            $reason = 'Link has been expired.';
+        }
+
+        if($order_details->deposit_slip_token_used || $order_details->deposit_slip_image) {
+            $is_invalid = true;
+            $reason = 'Deposit slip for your order <b>'.$order_details->order_number.'</b> has been already uploaded.';
+        }
+
+        return view('frontend.upload_deposit_slip', compact('order_details', 'is_invalid', 'reason'));
+    }
+
+    public function submitUploadDepositSlip($token, Request $request) {
+        $order_details = DB::table('fumaco_order')->where('deposit_slip_token', $token)->first();
+        if(!$order_details) {
+            return redirect()->back()->with('error', 'Record not found.');
+        }
+
+        $customer_name = $order_details->order_name . ' ' . $order_details->order_lastname;
+        $order_number = $order_details->order_number;
+        $date_uploaded = Carbon::now()->format('d-m-y');
+
+        $image_filename = $customer_name . '-' . $order_number . '-' . $date_uploaded;
+
+        if($request->hasFile('image')){
+            $image = $request->file('image');
+
+            $allowed_extensions = array('jpg', 'png', 'jpeg', 'gif');
+            $extension_error = "Sorry, only JPG, JPEG and PNG files are allowed.";
+
+            $destinationPath = storage_path('/app/public/deposit_slips/');
+
+            $extension = strtolower(pathinfo($image->getClientOriginalName(), PATHINFO_EXTENSION));
+
+            $image_name = $image_filename.".".$extension;
+            if(!in_array($extension, $allowed_extensions)){
+                return redirect()->back()->with('error', $extension_error);
+            }
+
+            $image->move($destinationPath, $image_name);
+
+            DB::table('fumaco_order')->where('id', $order_details->id)->update([
+                'deposit_slip_image' => $image_name,
+                'deposit_slip_date_uploaded' => Carbon::now()->toDateTimeString(),
+                'payment_status' => 'Payment For Confirmation',
+                'deposit_slip_token_used' => 1,
+                'last_modified_by' => $customer_name
+            ]);
+
+            DB::table('track_order')->insert([
+                'track_code' => $order_number,
+                'track_date' => Carbon::now()->toDateTimeString(),
+                'track_item' => 'Item Purchase',
+                'track_description' => 'Your order is on processing',
+                'track_status' => 'Order Placed',
+                'track_payment_status' => 'Payment For Confirmation',
+                'track_ip' => $order_details->order_ip,
+                'track_active' => 1,
+                'transaction_member' => $order_details->order_type,
+                'last_modified_by' => $customer_name
+            ]);
+
+            // send notification to accounting
+            $order = ['order_details' => $order_details];
+
+            $email_recipient = DB::table('fumaco_admin_user')->where('user_type', 'Accounting Admin')->pluck('username');
+            $recipients = collect($email_recipient)->toArray();
+            if (count(array_filter($recipients)) > 0) {
+                Mail::send('emails.deposit_slip_notif', $order, function($message) use ($recipients) {
+                    $message->to($recipients);
+                    $message->subject('Awaiting Confirmation - FUMACO');
+                });
+            }
+        }
+        
+        return redirect()->back()->with('success', 'Thank you for uploading your deposit slip / proof of payment, payment confirmation will be sent to you via email and SMS.');
+    }
+
+    public function viewShortenLink($code) {
+        $findurl = DB::table('fumaco_short_links')->where('code', $code)->first();
+        if (!$findurl) {
+            return abort(404);
+        }
+   
+        return redirect($findurl->url);
     }
 }

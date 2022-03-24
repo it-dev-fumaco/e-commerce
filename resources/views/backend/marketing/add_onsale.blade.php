@@ -54,6 +54,10 @@
                                                 <label>Set Sale Duration</label>
                                                 <input type="text" class="form-control set_duration" id="daterange" name="sale_duration" required/>
                                             </div>
+                                            {{-- <div class="col-4">
+                                                <label>Email Notification Schedule</label>
+                                                <input type="text" class="form-control" id="notif-schedule" name="notif_schedule" required/>
+                                            </div> --}}
                                         </div>
                                         <br/>
                                         <div class="row">
@@ -171,6 +175,39 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <h4>Email Notification</h4>
+                                            </div>
+                                            <div class="col-4">
+                                                <label>Email Template</label>
+                                                <select class="form-control" name="email_template" required>
+                                                    <option disabled selected value="">Select Template</option>
+                                                    @foreach ($templates as $template)
+                                                        @if (!$template['template_id'] or $template['template_type'] != 'user')
+                                                            @continue
+                                                        @endif
+                                                        <option value="{{ $template['template_id'] }}">{{ $template['template_name'] }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            <div class="col-4">
+                                                <label>Tag</label>
+                                                <select class="form-control" name="email_tag" required>
+                                                    <option disabled selected value="">Select a Tag</option>
+                                                    @foreach ($tags as $tag)
+                                                        @if (!$tag['list_id'])
+                                                            @continue
+                                                        @endif
+                                                        <option value="{{ $tag['list_id'] }}">{{ $tag['list_name'] }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            <div class="col-4">
+                                                <label>Email Notification Schedule</label>
+                                                <input type="text" class="form-control" id="notif-schedule" name="notif_schedule" required/>
+                                            </div>
+                                        </div>
                                     </form>
                                 </div>
                             </div>
@@ -189,10 +226,20 @@
         requireCoupon();
 
         $(function() {
+            var year = new Date().getFullYear();
+
             $('#daterange').daterangepicker({
                 opens: 'left',
                 placeholder: 'Select Date Range',
                 startDate: moment(), endDate: moment().add(7, 'days'),
+            });
+
+            $('#notif-schedule').daterangepicker({
+                placeholder: 'Select Date',
+                singleDatePicker: true,
+                showDropdowns: true,
+                minYear: year,
+                maxYear: parseInt(year) + 10
             });
         });
 

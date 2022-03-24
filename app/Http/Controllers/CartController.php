@@ -205,7 +205,29 @@ class CartController extends Controller
     }
 
     public function viewCart(Request $request) {
-        $order_no = session()->get('fumOrderNo');
+        $order_no = 'FUM-' . date('yd') . random_int(0, 9999);
+        if(!session()->get('fumOrderNo')){
+            session()->put('fumOrderNo', $order_no);
+        } else {
+            $order_no = session()->get('fumOrderNo');
+        }
+
+        if ($order_no) {
+			$existing_temp = DB::table('fumaco_temp')->where('xlogs', $order_no)->first();
+			if(!$existing_temp) {
+				DB::table('fumaco_temp')->insert([
+					'xtempcode' => uniqid(),
+					'xlogs' => $order_no,
+					'order_tracker_code' => $order_no,
+					'order_ip' => $request->ip(),
+					'xusertype' => Auth::check() ? 'Member' : 'Guest',
+					'xusernamex' => Auth::check() ? Auth::user()->username : null,
+					'xuser_id' => Auth::check() ? Auth::user()->id : null,
+                    'last_transaction_page' => 'Shopping Cart Page'
+				]);
+			}
+		}
+
         if(Auth::check()) {
             $cart_items = DB::table('fumaco_items as a')->join('fumaco_cart as b', 'a.f_idcode', 'b.item_code')
                 ->where('user_type', 'member')->where('user_email', Auth::user()->username)
@@ -475,6 +497,25 @@ class CartController extends Controller
     }
 
     public function setShippingBillingDetails(Request $request) {
+        $order_no = session()->get('fumOrderNo');
+        $existing_order_temp = DB::table('fumaco_temp')->where('order_tracker_code', $order_no)->first();
+        if(!$existing_order_temp){
+            if ($order_no) {
+                $existing_temp = DB::table('fumaco_temp')->where('xlogs', $order_no)->first();
+                if(!$existing_temp) {
+                    DB::table('fumaco_temp')->insert([
+                        'xtempcode' => uniqid(),
+                        'xlogs' => $order_no,
+                        'order_tracker_code' => $order_no,
+                        'order_ip' => $request->ip(),
+                        'xusertype' => Auth::check() ? 'Member' : 'Guest',
+                        'xusernamex' => Auth::check() ? Auth::user()->username : null,
+                        'xuser_id' => Auth::check() ? Auth::user()->id : null,
+                    ]);
+                }
+            }
+        }
+
         if(Auth::check()) {
             $user_id = Auth::user()->id;
             $user = DB::table('fumaco_users')->where('id', $user_id)->first();
@@ -521,13 +562,7 @@ class CartController extends Controller
                     'mobile_no' => $billing_address->xmobile_number,
                     'contact_no' => $billing_address->xcontactnumber1,
                 ];
-
-                session()->put('fumBillDet', $billing_details);
-            } else {
-                session()->forget('fumBillDet');
             }
-            
-            session()->put('fumShipDet', $shipping_details);
         }
         
         if($request->isMethod('POST')) {
@@ -557,7 +592,8 @@ class CartController extends Controller
                     'contact_no' => $request->contactnumber1_1,
                     'same_as_billing' => ($request->same_as_billing) ? 1 : 0
                 ];
-        
+                
+                $billing_details = [];
                 if(!$request->same_as_billing) {
                     $billing_details = [
                         'fname' => $request->bill_fname,
@@ -575,18 +611,56 @@ class CartController extends Controller
                         'email_address' => $request->email,
                         'mobile_no' => $request->mobilenumber1_1,
                     ];
-        
-                    session()->put('fumBillDet', $billing_details);
-                } else {
-                    session()->forget('fumBillDet');
                 }
-    
-                session()->put('fumShipDet', $shipping_details);
-    
-                return response()->json(['status' => 'success', 'message' => '/checkout/summary']);
             }
         }
-    
+
+        if ($order_no) {
+            $temp_data = [
+                'xfname' => (Auth::check()) ? Auth::user()->f_name : $shipping_details['fname'],
+                'xlname' => (Auth::check()) ? Auth::user()->f_lname : $shipping_details['lname'],
+                'xcontact_person' => ($billing_details) ? $billing_details['fname']. " " . $billing_details['lname'] : $shipping_details['fname']. " " . $shipping_details['lname'],
+                'xshipcontact_person' => $shipping_details['fname']. " " . $shipping_details['lname'],
+                'xadd1' => ($billing_details) ? $billing_details['address_line1'] : $shipping_details['address_line1'],
+                'xadd2' => ($billing_details) ? $billing_details['address_line2'] : $shipping_details['address_line2'],
+                'xprov' => ($billing_details) ? $billing_details['province'] : $shipping_details['province'],
+                'xcity' => ($billing_details) ? $billing_details['city'] : $shipping_details['city'],
+                'xbrgy' => ($billing_details) ? $billing_details['brgy'] : $shipping_details['brgy'],
+                'xpostal' => ($billing_details) ? $billing_details['postal_code'] : $shipping_details['postal_code'],
+                'xcountry' => ($billing_details) ? $billing_details['country'] : $shipping_details['country'],
+                'xaddresstype' => ($billing_details) ? $billing_details['address_type'] : $shipping_details['address_type'],
+                'xbusiness_name' => ($billing_details) ? $billing_details['business_name'] : $shipping_details['business_name'],
+                'xtin_no' => ($billing_details) ? $billing_details['tin'] : $shipping_details['tin'],
+                'xemail' => ($billing_details) ? $billing_details['email_address'] : $shipping_details['email_address'],
+                'xemail_shipping' => $shipping_details['email_address'],
+                'xmobile' => ($billing_details) ? $billing_details['mobile_no'] : null,
+                'xcontact' => $shipping_details['mobile_no'],
+                'xshippadd1' => $shipping_details['address_line1'],
+                'xshippadd2' => $shipping_details['address_line2'],
+                'xshiprov' => $shipping_details['province'],
+                'xshipcity' => $shipping_details['city'],
+                'xshipbrgy' => $shipping_details['brgy'],
+                'xshippostalcode' => $shipping_details['postal_code'],
+                'xshipcountry' => $shipping_details['country'],
+                'xshiptype' => $shipping_details['address_type'],
+                'xship_business_name' => $shipping_details['business_name'],
+                'xship_tin' => $shipping_details['tin'],
+                'order_status' => 'Order Pending',
+                'order_shipping_type' => null, 
+                'xusertype' => (Auth::check()) ? 'Member' : 'Guest',
+                'xusernamex' => (Auth::check()) ? Auth::user()->username : null,
+                'xstatus' => 2,
+                'xuser_id' => (Auth::check()) ? Auth::user()->id : null,
+                'shipping_same_as_billing' => ($request->same_as_billing) ? 1 : 0,
+            ];
+
+            DB::table('fumaco_temp')->where('order_tracker_code', $order_no)->update($temp_data);
+        }
+
+        if($request->isMethod('POST')) {
+            return response()->json(['status' => 'success', 'message' => '/checkout/summary']);
+        }
+
         return redirect('/checkout/summary');
     }
 }

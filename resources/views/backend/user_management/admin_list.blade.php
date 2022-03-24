@@ -112,19 +112,26 @@
                                                                                 <input type="text" name="account_name" value="{{ $a->account_name }}" class="form-control">
                                                                             </div>
                                                                             <div class="form-group">
+                                                                                @php
+                                                                                    $user_type = ['Accounting Admin', 'Marketing Admin', 'Sales Admin', 'System Admin'];
+                                                                                @endphp
                                                                                 <label for="name">User Type</label>
                                                                                 <select class="form-control" name="user_type" required>
                                                                                     <option {{ ($a->user_type == "" ) ? 'selected' : '' }} disabled value="">Select User Type</option>
-                                                                                    <option value="System Admin" {{ ($a->user_type == "System Admin" ) ? 'selected' : '' }}>System Admin</option>
-                                                                                    <option value="Sales Admin" {{ ($a->user_type == "Sales Admin" ) ? 'selected' : '' }}>Sales Admin</option>
-                                                                                    <option value="Marketing Admin" {{ ($a->user_type == "Marketing Admin" ) ? 'selected' : '' }}>Marketing Admin</option>
+                                                                                    @foreach ($user_type as $user)
+                                                                                        <option value="{{ $user }}" {{ $a->user_type == $user ? 'selected' : null }}>{{ $user }}</option>
+                                                                                    @endforeach
                                                                                 </select>
-                                                                            </div>  
+                                                                            </div>
+                                                                            <div class="form-group">
+                                                                                <label for="name">Mobile Number (Two-Factor Authentication)</label>
+                                                                                <input class="form-control" type="text" name="mobile_number" value="{{ $a->mobile_number }}">
+                                                                            </div>
                                                                             <div class="float-right font-italic">
                                                                                 <small>Last modified by: {{ ($a) ? $a->last_modified_by . ' - ' . $a->last_modified_at : '' }}</small>
                                                                             </div>                                                                  
                                                                         </div>
-                                                                        <div class="modal-footer">
+                                                                        <div class="modal-footer container-fluid">
                                                                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                                                                             <button type="submit" class="btn btn-primary">Save changes</button>
                                                                         </div>

@@ -11,15 +11,18 @@ use Mail;
 use Auth;
 use Carbon\Carbon;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Bitly;
+use App\Http\Traits\GeneralTrait;
 
 class OrderController extends Controller
 {
+    use GeneralTrait;
     public function orderList(Request $request){
         $search_id = ($request->search) ? $request->search : '';
         $order_status = ($request->order_status) ? $request->order_status : '';
 
-        $orders = DB::table('fumaco_order')->where('order_number', 'LIKE', '%'.$search_id.'%')->where('order_status', 'LIKE', '%'.$order_status.'%')->where('order_status', '!=', 'Cancelled')->where('order_status', '!=', 'Delivered')->where('order_status', '!=', 'Order Completed')->where('order_status', '!=', 'Order Delivered')->orderBy('id', 'desc')->paginate(10);
+        $exluded_status = ['Cancelled', 'Delivered', 'Order Completed', 'Order Delivered'];
+
+        $orders = DB::table('fumaco_order')->where('order_number', 'LIKE', '%'.$search_id.'%')->where('order_status', 'LIKE', '%'.$order_status.'%')->whereNotIn('order_status', $exluded_status)->orderBy('id', 'desc')->paginate(10);
 
         $orders_arr = [];
 
@@ -54,6 +57,8 @@ class OrderController extends Controller
             ->get();
 
             $orders_arr[] = [
+                'order_id' => $o->id,
+                'order_date' => $o->order_date,
                 'order_no' => $o->order_number,
                 'first_name' => $o->order_name,
                 'last_name' => $o->order_lastname,
@@ -99,7 +104,9 @@ class OrderController extends Controller
                 'pickup_date' => Carbon::parse($o->pickup_date)->format('M d, Y'),
                 'store_address' => $store_address,
                 'store' => $o->store_location,
-                'order_status' => $order_status
+                'order_status' => $order_status,
+                'deposit_slip_image' => $o->deposit_slip_image,
+                'payment_status' => $o->payment_status
             ];
         }
 
@@ -162,6 +169,7 @@ class OrderController extends Controller
                 'date_cancelled' => Carbon::parse($o->date_cancelled)->format('M d, Y - h:m A')
             ];
         }
+
         return view('backend.orders.cancelled_orders', compact('orders_arr', 'orders'));
     }
 
@@ -263,18 +271,9 @@ class OrderController extends Controller
                     $delivery_date = Carbon::now()->toDateTimeString();
                 }
 
-                if($status == 'Cancelled'){
-                    $date_cancelled = Carbon::now()->toDateTimeString();
-                    foreach($ordered_items as $orders){
-                        $items = DB::table('fumaco_items')->select('f_reserved_qty', 'f_qty')->where('f_idcode', $orders->item_code)->first();
-                        $r_qty = $items->f_reserved_qty - $orders->item_qty;
-
-                        DB::table('fumaco_items')->where('f_idcode', $orders->item_code)->update(['f_reserved_qty' => $r_qty, 'last_modified_by' => Auth::user()->username]);
-                    }
-                }
-
                 $orders_arr = [
                     'order_status' => $status,
+                    'payment_status' => isset($request->payment_received) ? 'Payment Received' : null,
                     'order_update' => $now,
                     'date_delivered' => $delivery_date,
                     'date_cancelled' => $date_cancelled,
@@ -290,17 +289,9 @@ class OrderController extends Controller
                     'track_ip' => $request->ip(),
                     'transaction_member' => isset($request->member) ? 'Member' : 'Guest',
                     'track_active' => 1,
+                    'track_payment_status' => isset($request->payment_received) ? 'Payment Received' : null,
                     'last_modified_by' => Auth::user()->username
                 ];
-
-                if($status == 'Order Confirmed'){
-                    $checker = DB::table('track_order')->where('track_code', $request->order_number)->where('track_status', 'Out for Delivery')->count();
-
-                    if($checker > 0){
-                        DB::table('track_order')->where('track_code', $request->order_number)->where('track_status', 'Out for Delivery')->update(['track_active' => 0]);
-                        DB::table('track_order')->where('track_code', $request->order_number)->where('track_status', 'Order Confirmed')->update(['track_active' => 0]);
-                    }
-                }
 
                 $items = [];
                 foreach($ordered_items as $row) {
@@ -320,14 +311,82 @@ class OrderController extends Controller
                 $order_details = DB::table('fumaco_order')->where('order_number', $request->order_number)->first();
 
                 $total_amount = $order_details->amount_paid;
-                $url = Bitly::getUrl($request->root().'/track_order/'.$request->order_number);
+                
+                $track_url = $request->root().'/track_order/'.$request->order_number;
+                $sms_short_url = $this->generateShortUrl($request->root(), $track_url);
 
-                $sms = [
-                    'api_key' => "24wezX69kvuWfnqZazxUhsiifcd",
-                    'api_secret' => "Dd1PnbBIUgf7RFVKSaZEGzBsDDrjKDffimF9dVLH",
-                    'from' => 'FUMACO',
-                    'to' => $order_details->order_bill_contact[0] == '0' ? '63'.substr($order_details->order_bill_contact, 1) : $order_details->order_bill_contact
-                ];
+                $sms = [];
+                $message = null;
+
+                if ($status == 'Order Confirmed'){
+                    $checker = DB::table('track_order')->where('track_code', $request->order_number)->where('track_status', 'Out for Delivery')->count();
+
+                    if($checker > 0){
+                        DB::table('track_order')->where('track_code', $request->order_number)->whereIn('track_status', ['Out for Delivery', 'Order Confirmed'])->update(['track_active' => 0]);
+                    }
+
+                    $message = 'Hi '.$order_details->order_name . ' ' . $order_details->order_lastname.'!, your payment of '.$total_amount.' has been confirmed. Click '.$sms_short_url.' to track your order.';
+
+                    if($order_details->order_payment_method == 'Bank Deposit'){
+                        $leadtime_arr = [];
+                        foreach($ordered_items as $item){
+                            $category_id = DB::table('fumaco_items')->where('f_idcode', $item->item_code)->pluck('f_cat_id')->first();
+                            if($order_details->order_shipping != 'Store Pickup') {
+                                $shipping = DB::table('fumaco_shipping_service as shipping_service')
+                                    ->join('fumaco_shipping_zone_rate as zone_rate', 'shipping_service.shipping_service_id', 'zone_rate.shipping_service_id')
+                                    ->where('shipping_service.shipping_service_name', $order_details->order_shipping)
+                                    ->where('zone_rate.province_name', $order_details->order_ship_prov)
+                                    ->first();
+                            } else {
+                                $shipping = DB::table('fumaco_shipping_service')->where('shipping_service_name', $order_details->order_shipping)->first();
+                            }
+                            
+                            $lead_time_per_category = DB::table('fumaco_shipping_product_category')->where('shipping_service_id', $shipping->shipping_service_id)
+                                ->where('category_id', $category_id)->select('min_leadtime', 'max_leadtime')->first();
+
+                            $leadtime_arr[] = [
+                                'min_leadtime' => $lead_time_per_category ? $lead_time_per_category->min_leadtime : $shipping->min_leadtime,
+                                'max_leadtime' => $lead_time_per_category ? $lead_time_per_category->max_leadtime : $shipping->max_leadtime
+                            ];
+                        }
+
+                        $min_leadtime = collect($leadtime_arr)->pluck('min_leadtime')->max();
+                        $max_leadtime = collect($leadtime_arr)->pluck('max_leadtime')->max();
+
+                        $total_amount = $order_details->order_subtotal + $order_details->order_shipping_amount;
+                        $orders_arr['deposit_slip_token_used'] = 1;
+
+                        $message = 'Hi '.$order_details->order_name . ' ' . $order_details->order_lastname.' your order '.$request->order_number.' with an amount of P '.number_format($total_amount, 2).' has been received, please allow '.$min_leadtime.' to '.$max_leadtime.' business days to process your order. Click ' . $sms_short_url . ' to track your order.';
+
+                        $store_address = null;
+                        if($order_details->order_shipping == 'Store Pickup') {
+                            $store = DB::table('fumaco_store')->where('store_name', $order_details->store_location)->first();
+                            $store_address = ($store) ? $store->address : null;
+                        }
+
+                        $order = [
+                            'order_details' => $order_details,
+                            'items' => $items,
+                            'store_address' => $store_address,
+                            'payment' => $total_amount
+                        ];
+                        $confirmed_bank_deposit_email = $order_details->order_email;
+
+                        $customer_name = $order_details->order_name . ' ' . $order_details->order_lastname;
+                        Mail::send('emails.order_confirmed_bank_deposit', $order, function($message) use($confirmed_bank_deposit_email){
+                            $message->to(trim($confirmed_bank_deposit_email));
+                            $message->subject('Order Confirmed - FUMACO');
+                        });
+
+                        if(Mail::failures()){
+                            DB::rollback();
+                            return redirect()->back()->with('error', 'An error occured. Please try again.');
+                        }
+
+                        DB::table('fumaco_order')->where('order_number', $request->order_number)->update(['amount_paid' => $total_amount]);
+                    }
+
+                }
 
                 if ($status == 'Out for Delivery') {
                     Mail::send('emails.out_for_delivery', ['order_details' => $order_details, 'status' => $status, 'items' => $items], function($message) use($order_details, $status){
@@ -335,7 +394,12 @@ class OrderController extends Controller
                         $message->subject($status . ' - FUMACO');
                     });
 
-                    $sms['text'] = 'Hi '.$order_details->order_name . ' ' . $order_details->order_lastname.'!, your order '.$request->order_number.' with an amount of '.$total_amount.' is now shipped out. Click '.$url.' to track your order.';
+                    if(Mail::failures()){
+                        DB::rollback();
+                        return redirect()->back()->with('error', 'An error occured. Please try again.');
+                    }
+
+                    $message = 'Hi '.$order_details->order_name . ' ' . $order_details->order_lastname.'!, your order '.$request->order_number.' with an amount of P '.number_format($total_amount, 2).' is now shipped out. Click '.$sms_short_url.' to track your order.';
                 }
 
                 if ($status == 'Order Delivered') {
@@ -345,22 +409,43 @@ class OrderController extends Controller
                         $message->subject('Order Delivered - FUMACO');
                     });
 
-                    $sms['text'] = 'Hi '.$order_details->order_name . ' ' . $order_details->order_lastname.'!, your order '.$request->order_number.' with an amount of '.$total_amount.' has been delivered. Click '.$url.' to track your order.';
+                    if(Mail::failures()){
+                        DB::rollback();
+                        return redirect()->back()->with('error', 'An error occured. Please try again.');
+                    }
+
+                    $message = 'Hi '.$order_details->order_name . ' ' . $order_details->order_lastname.'!, your order '.$request->order_number.' with an amount of P '.number_format($total_amount, 2).' has been delivered. Click '.$sms_short_url.' to track your order.';
                 }
 
                 if($status == 'Ready for Pickup'){
-                    $sms['text'] = 'Hi '.$order_details->order_name . ' ' . $order_details->order_lastname.'!, your order '.$request->order_number.' with an amount of '.$total_amount.' is now ready for pickup. Click '.$url.' to track your order.';
+                    $message = 'Hi '.$order_details->order_name . ' ' . $order_details->order_lastname.'!, your order '.$request->order_number.' with an amount of P '.number_format($total_amount, 2).' is now ready for pickup. Click '.$sms_short_url.' to track your order.';
                 }
 
-                if(in_array($status, ['Out for Delivery', 'Order Delivered', 'Ready for Pickup'])){
-                    Http::asForm()->withHeaders([
-                        'Accept' => 'application/json',
-                        'Content-Type' => 'application/x-www-form-urlencoded',
-                    ])->post('https://api.movider.co/v1/sms', $sms);
+                if(in_array($status, ['Order Confirmed', 'Out for Delivery', 'Order Delivered', 'Ready for Pickup'])){
+                    $sms_api = DB::table('api_setup')->where('type', 'sms_gateway_api')->first();
+                    if ($sms_api and $sms_short_url) {
+                        $sms = Http::asForm()->withHeaders([
+                            'Accept' => 'application/json',
+                            'Content-Type' => 'application/x-www-form-urlencoded',
+                        ])->post($sms_api->base_url, [
+                            'api_key' => $sms_api->api_key,
+                            'api_secret' => $sms_api->api_secret_key,
+                            'from' => 'FUMACO',
+                            'to' => $order_details->order_bill_contact[0] == '0' ? '63'.substr($order_details->order_bill_contact, 1) : $order_details->order_bill_contact,
+                            'text' => $message
+                        ]);
+
+                        $sms_response = json_decode($sms, true);
+
+                        if(isset($sms_response['error'])){
+                            DB::rollback();
+                            $error = $sms_response['error']['code'] == 409 ? 'No mobile number found.' : 'Mobile number is invalid.';
+                            return redirect()->back()->with('error', 'An error occured. '.$error);
+                        }
+                    }
                 }
 
                 DB::table('fumaco_order')->where('order_number', $request->order_number)->update($orders_arr);
-
                 DB::table('track_order')->insert($track_order);
 
                 DB::commit();
@@ -371,6 +456,109 @@ class OrderController extends Controller
 			DB::rollback();
 			return redirect()->back()->with('error', 'An error occured. Please try again.');
 		}
+    }
+
+    public function resendDepositSlip(Request $request){
+        DB::beginTransaction();
+		try{
+            $new_token = hash('sha256', Carbon::now()->toDateTimeString());
+            $now = Carbon::now()->toDateTimeString();
+
+            $order_details = DB::table('fumaco_order')->where('order_number', $request->order_number)->first();
+
+            if(!$order_details){
+                return redirect()->back()->with('error', 'Order Number not found!');
+            }
+
+            $order_items = DB::table('fumaco_order_items')->where('order_number', $request->order_number)->get();
+            $item_codes = collect($order_items)->pluck('item_code');
+
+            $images = DB::table('fumaco_items_image_v1')->whereIn('idcode', $item_codes)->get();
+            $image = collect($images)->groupBy('idcode');
+
+            $subtotal = collect($order_items)->sum('item_total_price');
+
+            DB::table('fumaco_order')->where('order_number', $request->order_number)->update([
+                'deposit_slip_token' => $new_token,
+                'deposit_slip_token_date_created' => $now
+            ]);
+
+            $items = [];
+            foreach($order_items as $row) {
+                $items[] = [
+                    'item_code' => $row->item_code,
+                    'item_name' => $row->item_name,
+                    'price' => $row->item_price,
+                    'discount' => $row->item_discount,
+                    'qty' => $row->item_qty,
+                    'amount' => $row->item_total_price,
+                    'image' => isset($image[$row->item_code]) ? $image[$row->item_code][0]->imgprimayx : null
+                ];
+            }
+
+            $store_address = null;
+            if($order_details->order_shipping == 'Store Pickup') {
+                $store = DB::table('fumaco_store')->where('store_name', $order_details->store_location)->first();
+                $store_address = ($store) ? $store->address : null;
+            }
+
+            $bank_accounts = DB::table('fumaco_bank_account')->where('is_active', 1)->get();
+				
+            $order = [
+                'order_details' => $order_details,
+                'items' => $items,
+                'store_address' => $store_address,
+                'bank_accounts' => $bank_accounts,
+                'new_token' => $new_token
+            ];
+
+            $sms_api = DB::table('api_setup')->where('type', 'sms_gateway_api')->first();
+            $customer_name = $order_details->order_name.' '.$order_details->order_lastname;
+            $phone = $request->billing_number[0] == '0' ? '63'.substr($request->billing_number, 1) : $request->billing_number;
+            $email = $request->billing_email;
+
+            $track_url = $request->root().'/track_order/'.$request->order_number;
+            $deposit_slip_url = $this->generateShortUrl($request->root(), $track_url);
+
+            $sms_message = 'Hi '.$customer_name.'!, to process your order please settle your payment thru bank deposit. Click '.$deposit_slip_url.' to upload your bank deposit slip.';
+
+            if ($sms_api) {
+                $sms = Http::asForm()->withHeaders([
+                    'Accept' => 'application/json',
+                    'Content-Type' => 'application/x-www-form-urlencoded',
+                ])->post($sms_api->base_url, [
+                    'api_key' => $sms_api->api_key,
+                    'api_secret' => $sms_api->api_secret_key,
+                    'from' => 'FUMACO',
+                    'to' => preg_replace("/[^0-9]/", "", $phone),
+                    'text' => $sms_message
+                ]);
+                
+                $sms_response = json_decode($sms, true);
+
+                if(isset($sms_response['error'])){
+                    DB::rollback();
+                    $error = $sms_response['error']['code'] == 409 ? 'No mobile number found.' : 'Mobile number is invalid.';
+                    return redirect()->back()->with('error', 'An error occured. '.$error);
+                }
+            }
+            
+            Mail::send('emails.order_success_bank_deposit', $order, function($message) use ($email) {
+                $message->to($email);
+                $message->subject('Order Placed - Bank Deposit - FUMACO');
+            });
+
+            if(Mail::failures()){
+                DB::rollback();
+                return redirect()->back()->with('error', 'An error occured. Please try again.');
+            }
+
+            DB::commit();
+            return redirect()->back()->with('success', 'Deposit Slip Upload Link Sent!');
+        }catch(Exception $e){
+            DB::rollback();
+            return redirect()->back()->with('error', 'An error occured. Please try again.');
+        }
     }
 
     public function checkPaymentStatus(Request $request) {
@@ -430,6 +618,86 @@ class OrderController extends Controller
     public function statusList(){
         $status_list = DB::table('order_status')->paginate(10);
         return view('backend.orders.status_list', compact('status_list'));
+    }
+
+    public function paymentStatusList(){
+        $status_list = DB::table('fumaco_payment_status')->paginate(10);
+        return view('backend.orders.payment_status', compact('status_list'));
+    }
+
+    public function paymentStatusAddForm(){
+        return view('backend.orders.payment_status_add');
+    }
+
+    public function paymentStatusAdd(Request $request){
+        DB::beginTransaction();
+		try{
+            $rules = array(
+				'status_name' => 'required|unique:fumaco_payment_status,status',
+			);
+
+			$validation = Validator::make($request->all(), $rules);
+
+            if ($validation->fails()){
+				return redirect()->back()->with('error', "Payment Status Name must be unique.");
+			}
+
+            $insert = [
+                'status' => $request->status_name,
+                'status_description' => $request->status_description,
+                'updates_status' => isset($request->updates_status) ? 1 : 0,
+                'created_by' => Auth::user()->username
+            ];
+
+            DB::table('fumaco_payment_status')->insert($insert);
+            DB::commit();
+            return redirect('/admin/payment/status_list')->with('success', 'Payment Status Added!');
+        }catch(Exception $e){
+			DB::rollback();
+			return redirect()->back()->with('error', 'An error occured. Please try again.');
+		}
+    }
+
+    public function paymentStatusEditForm($id){
+        $status = DB::table('fumaco_payment_status')->where('id', $id)->first();
+        return view('backend.orders.payment_status_edit', compact('status'));
+    }
+
+    public function paymentStatusEdit($id, Request $request){
+        DB::beginTransaction();
+		try{
+            $checker = DB::table('fumaco_payment_status')->where('id', '!=', $id)->where('status', $request->status_name)->count();
+
+            if($checker > 0){
+                return redirect()->back()->with('error', "Payment Status Name must be unique.");
+            }
+
+            $update = [
+                'status' => $request->status_name,
+                'status_description' => $request->status_description,
+                'updates_status' => isset($request->updates_status) ? 1 : 0,
+                'last_modified_by' => Auth::user()->username
+            ];
+
+            DB::table('fumaco_payment_status')->where('id', $id)->update($update);
+            DB::commit();
+            return redirect('/admin/payment/status_list')->with('success', 'Payment Status Updated!');
+        }catch(Exception $e){
+			DB::rollback();
+			return redirect()->back()->with('error', 'An error occured. Please try again.');
+		}
+    }
+
+    public function paymentStatusDelete($id){
+        DB::beginTransaction();
+		try{
+            DB::table('fumaco_payment_status')->where('id', $id)->delete();
+            DB::commit();
+            return redirect('/admin/payment/status_list')->with('success', 'Payment Status Deleted!');
+        }catch(Exception $e){
+			DB::rollback();
+			return redirect()->back()->with('error', 'An error occured. Please try again.');
+		}
     }
 
     public function addStatusForm(){
@@ -732,5 +1000,212 @@ class OrderController extends Controller
 
             return view('backend.item_on_cart.abandoned_cart_items', compact('abandoned_cart'));
         }
+    }
+
+    public function cancelOrder($id, Request $request) {
+        DB::beginTransaction();
+        try {
+            $output = [];
+            if ($id) {
+                $api = DB::table('api_setup')->where('type', 'payment_api')->first();
+
+                $details = DB::table('fumaco_order')->where('id', $id)->first();
+
+                if(!$details) {
+                    return back()->with('error', 'Order ID <b>' . $id . '</b> not found.');
+                }
+
+                if(!$request->is_admin) {
+                    if (Auth::user()->username != $details->order_bill_email) {
+                        return back()->with('error', 'Invalid transaction.');
+                    }
+                }
+
+                $dt = Carbon::now();
+                $dt2 = Carbon::parse($details->order_date);
+                $is_same_day = ($dt->isSameDay($dt2));
+
+                if (!$is_same_day) {
+                    return back()->with('error', 'Cannot cancel order <b>' . $details->order_number . '</b>. Order can only be cancelled for the transaction within the same day as the order date.');
+                }
+
+                $transaction_success = true;
+                if($details->order_payment_method != 'Bank Deposit') {
+                    $amount_paid = number_format($details->amount_paid, 2, ".", "");
+
+                    $string = $api->password . $api->service_id . $details->payment_id . $amount_paid . 'PHP';
+                    $hash = hash('sha256', $string);
+    
+                    switch ($details->order_payment_method) {
+                        case 'Credit Card':
+                            $payment_method = 'CC';
+                            break;
+                        case 'Credit Card (MOTO)':
+                            $payment_method = 'MO';
+                            break;
+                        case 'Direct Debit':
+                            $payment_method = 'DD';
+                            break;
+                        case 'e-Wallet':
+                            $payment_method = 'WA';
+                            break;
+                        default:
+                            $payment_method = 'ANY';
+                            break;
+                    }
+    
+                    $data = [
+                        'TransactionType' => 'RSALE',
+                        'PymtMethod' => $payment_method,
+                        'ServiceID' => $api->service_id,
+                        'PaymentID'=> $details->payment_id,
+                        'Amount' => $amount_paid,
+                        'CurrencyCode' => 'PHP',
+                        'HashValue' => $hash
+                    ];
+    
+                    $response = Http::asForm()->post($api->base_url, $data);
+    
+                    parse_str($response, $output);
+    
+                    if ($output['TxnStatus'] > 0) {
+                        return redirect()->back()->with('error', 'Failed to cancel order <b>'.$details->order_number.'</b>.');
+                    }
+                }
+
+                if ($transaction_success) {
+                    $date_cancelled = Carbon::now()->toDateTimeString();
+                    $order_items = DB::table('fumaco_order_items as foi')->join('fumaco_items as fi', 'foi.item_code', 'fi.f_idcode')
+                        ->where('foi.order_number', $details->order_number)->select('foi.item_qty', 'foi.item_code', 'fi.f_reserved_qty', 'foi.item_name', 'foi.item_price', 'foi.item_discount', 'foi.item_total_price')->get();
+
+                    $items = [];
+                    foreach($order_items as $row){
+                        $r_qty = $row->f_reserved_qty - $row->item_qty;
+                        DB::table('fumaco_items')->where('f_idcode', $row->item_code)
+                            ->update(['f_reserved_qty' => $r_qty, 'last_modified_by' => Auth::user()->username]);
+
+                        $image = DB::table('fumaco_items_image_v1')->where('idcode', $row->item_code)->first();
+                        $items[] = [
+                            'item_code' => $row->item_code,
+                            'item_name' => $row->item_name,
+                            'price' => $row->item_price,
+                            'discount' => $row->item_discount,
+                            'qty' => $row->item_qty,
+                            'amount' => $row->item_total_price,
+                            'image' => ($image) ? $image->imgprimayx : null
+                        ];
+                    }
+
+                    DB::table('fumaco_order')->where('id', $id)
+                        ->update(['order_status' => 'Cancelled', 'last_modified_by' => Auth::user()->username, 'date_cancelled' => $date_cancelled]);
+
+                    DB::commit();
+
+                    $store_address = null;
+                    if($details->order_shipping == 'Store Pickup') {
+                        $store = DB::table('fumaco_store')->where('store_name', $details->store_location)->first();
+                        $store_address = ($store) ? $store->address : null;
+                    }
+
+                    $email_recipient = DB::table('email_config')->first();
+                    $email_recipient = ($email_recipient) ? explode(",", $email_recipient->email_recipients) : [];
+                    $order = [
+                        'order_details' => $details,
+                        'items' => $items,
+                        'store_address' => $store_address
+                    ];
+
+                    if ($details->order_bill_email) {
+                        $customer_email = $details->order_bill_email;
+                        Mail::send('emails.cancelled_order_customer', $order, function($message) use ($customer_email) {
+                            $message->to($customer_email);
+                            $message->subject('Cancelled Order - FUMACO');
+                        });
+                    }
+
+                    if (count(array_filter($email_recipient)) > 0) {
+                        Mail::send('emails.cancelled_order_admin', $order, function($message) use ($email_recipient) {
+                            $message->to($email_recipient);
+                            $message->subject('Cancelled Order - FUMACO');
+                        });
+                    }
+
+                    return redirect()->back()->with('success', 'Order <b>'.$details->order_number.'</b> has been cancelled.');
+                }
+            }
+        } catch (Exception $e) {
+            DB::rollback();
+
+            return redirect()->back()->with('error', 'An error occured. Please try again.');
+        }
+    }
+
+    public function uploadDepositSlip($id, Request $request) {
+        $order_details = DB::table('fumaco_order')->where('id', $id)->first();
+        if(!$order_details) {
+            return redirect()->back()->with('error', 'Order id ' . $id . ' not found.');
+        }
+
+        $customer_name = $order_details->order_name . ' ' . $order_details->order_lastname;
+        $order_number = $order_details->order_number;
+        $date_uploaded = Carbon::now()->format('d-m-y');
+
+        $image_filename = $customer_name . '-' . $order_number . '-' . $date_uploaded;
+
+        if($request->hasFile('deposit_slip_image')){
+            $image = $request->file('deposit_slip_image');
+
+            $allowed_extensions = array('jpg', 'png', 'jpeg', 'gif');
+            $extension_error = "Sorry, only JPG, JPEG, PNG and GIF files are allowed.";
+
+            $destinationPath = storage_path('/app/public/deposit_slips/');
+
+           $extension = strtolower(pathinfo($image->getClientOriginalName(), PATHINFO_EXTENSION));
+
+            $image_name = $image_filename.".".$extension;
+            if(!in_array($extension, $allowed_extensions)){
+                return redirect()->back()->with('error', $extension_error);
+            }
+
+            $image->move($destinationPath, $image_name);
+
+            DB::table('fumaco_order')->where('id', $id)->update([
+                'deposit_slip_image' => $image_name,
+                'deposit_slip_date_uploaded' => Carbon::now()->toDateTimeString(),
+                'payment_status' => 'Payment For Confirmation'
+            ]);
+
+            DB::table('track_order')->insert([
+                'track_code' => $order_number,
+                'track_date' => Carbon::now()->toDateTimeString(),
+                'track_item' => 'Item Purchase',
+                'track_description' => 'Your order is on processing',
+                'track_status' => 'Order Placed',
+                'track_payment_status' => 'Payment For Confirmation',
+                'track_ip' => $order_details->order_ip,
+                'track_active' => 1,
+                'transaction_member' => $order_details->order_type,
+                'last_modified_by' => Auth::user()->username
+            ]);
+            
+            // send notification to accounting
+            $order = ['order_details' => $order_details];
+
+            $email_recipient = DB::table('fumaco_admin_user')->where('user_type', 'Accounting Admin')->pluck('username');
+            $recipients = collect($email_recipient)->toArray();
+            if (count(array_filter($recipients)) > 0) {
+                Mail::send('emails.deposit_slip_notif', $order, function($message) use ($recipients) {
+                    $message->to($recipients);
+                    $message->subject('Awaiting Confirmation - FUMACO');
+                });
+            }
+        }
+
+        return redirect()->back()->with('success', 'Deposit Slip for order <b>'.$order_details->order_number.'</b> has been uploaded.');
+    }
+
+    public function confirmBuffer(Request $request){
+        session()->flash('for_confirmation', $request->order_number);
+        return redirect('/admin/order/order_lists/');
     }
 }

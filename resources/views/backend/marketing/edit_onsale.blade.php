@@ -54,13 +54,19 @@
                                                 <label>Set Sale Duration</label>
                                                 <input type="text" class="form-control set_duration" id="daterange" name="sale_duration"/>
                                             </div>
+                                            {{-- <div class="col-4">
+                                                <label>Email Notification Schedule</label>
+                                                <input type="text" class="form-control" id="notif-schedule" name="notif_schedule"/>
+                                            </div> --}}
                                         </div>
                                         <br/>
                                         <div class="row">
-                                            <div class="col-1">
-                                                <img class="img-thumbnail" src="{{ asset('/assets/site-img/'.$on_sale->banner_image) }}" alt="" style="width: 100%">
-                                            </div>
-                                            <div class="col-5">
+                                            @if ($on_sale->banner_image)
+                                                <div class="col-1">
+                                                    <img class="img-thumbnail" src="{{ asset('/assets/site-img/'.$on_sale->banner_image) }}" alt="" style="width: 100%">
+                                                </div>
+                                            @endif
+                                            <div class="col-{{ $on_sale->banner_image ? '5' : '6' }}">
                                                 <label>Banner Image</label>
                                                 <div class="custom-file mb-3">
                                                     <input type="file" class="custom-file-input" id="customFile" name="banner_img">
@@ -239,6 +245,41 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        <br>
+
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <h4>Email Notification</h4>
+                                            </div>
+                                            <div class="col-4">
+                                                <label>Email Template</label>
+                                                <select class="form-control" name="email_template" required>
+                                                    <option disabled value="">Select Template</option>
+                                                    @foreach ($templates as $template)
+                                                        @if (!$template['template_id'] or $template['template_type'] != 'user')
+                                                            @continue
+                                                        @endif
+                                                        <option value="{{ $template['template_id'] }}" {{ $selected_template == $template['template_id'] ? 'selected' : null }}>{{ $template['template_name'] }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            <div class="col-4">
+                                                <label>Tag</label>
+                                                <select class="form-control" name="email_tag" required>
+                                                    <option disabled value="">Select a Tag</option>
+                                                    @foreach ($tags as $tag)
+                                                        @if (!$tag['list_id'])
+                                                            @continue
+                                                        @endif
+                                                        <option value="{{ $tag['list_id'] }}" {{ $selected_tag == $tag['list_id'] ? 'selected' : null}}>{{ $tag['list_name'] }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            <div class="col-4">
+                                                <label>Email Notification Schedule</label>
+                                                <input type="text" class="form-control" id="notif-schedule" name="notif_schedule" required/>
+                                            </div>
+                                        </div>
                                         <div class="row">
                                             <div class="col-12">
                                                 <br/>
@@ -269,12 +310,24 @@
 
         var start = "{{ $on_sale->start_date ? date('m/d/Y', strtotime($on_sale->start_date)) : null  }}";
         var end = "{{ $on_sale->end_date ? date('m/d/Y', strtotime($on_sale->end_date)) : null }}";
+        var notif_sched = "{{ $on_sale->notification_schedule ? date('m/d/Y', strtotime($on_sale->notification_schedule)) : null }}";
         $(function() {
+            var year = new Date().getFullYear();
+
             $('#daterange').daterangepicker({
                 opens: 'left',
                 placeholder: 'Select Date Range',
                 startDate: start ? start : moment(),
                 endDate: end ? end : moment().add(7, 'days'),
+            });
+
+            $('#notif-schedule').daterangepicker({
+                placeholder: 'Select Date',
+                singleDatePicker: true,
+                showDropdowns: true,
+                startDate: notif_sched ? notif_sched : moment(),
+                minYear: year,
+                maxYear: parseInt(year) + 10
             });
         });
 

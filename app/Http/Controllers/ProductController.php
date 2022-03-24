@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
+use Newsletter;
 use Auth;
 use Webp;
 use DB;
@@ -1030,6 +1031,7 @@ class ProductController extends Controller
                 'apply_discount_to' => $sale->apply_discount_to,
                 'categories' => $categories_arr,
                 'sale_duration' => $sale_duration,
+                'notification_schedule' => $sale->notification_schedule ? Carbon::parse($sale->notification_schedule)->format('M d, Y') : null,
                 'status' => $sale->status,
                 'customer_group' => $customer_group_arr
             ];
@@ -1043,7 +1045,12 @@ class ProductController extends Controller
 
         $customer_groups = DB::table('fumaco_customer_group')->get();
 
-        return view('backend.marketing.add_onsale', compact('categories', 'customer_groups'));
+        $list_id = env('MAILCHIMP_LIST_ID');
+
+        $templates = Newsletter::getTemplatesList();
+        $tags = Newsletter::getSegmentsList($list_id);
+
+        return view('backend.marketing.add_onsale', compact('categories', 'customer_groups', 'templates', 'tags'));
     }
 
     public function editOnsaleForm($id){
@@ -1065,7 +1072,17 @@ class ProductController extends Controller
 
         $customer_groups = DB::table('fumaco_customer_group')->get();
 
-        return view('backend.marketing.edit_onsale', compact('on_sale', 'categories', 'discounted_categories', 'customer_groups', 'discounted_customer_group'));
+        $list_id = env('MAILCHIMP_LIST_ID');
+
+        $templates = Newsletter::getTemplatesList();
+        $tags = Newsletter::getSegmentsList($list_id);
+
+        $campaign = Newsletter::campaignInfo($on_sale->mailchimp_campaign_id);
+
+        $selected_tag = $campaign ? $campaign['recipients']['segment_opts']['saved_segment_id'] : null;
+        $selected_template = $campaign ? $campaign['settings']['template_id'] : null;
+
+        return view('backend.marketing.edit_onsale', compact('on_sale', 'categories', 'discounted_categories', 'customer_groups', 'discounted_customer_group', 'templates', 'tags', 'selected_template', 'selected_tag'));
     }
 
     public function setOnSaleStatus(Request $request){
@@ -1503,16 +1520,15 @@ class ProductController extends Controller
 				return redirect()->back()->with('error', "Cannot select the same category twice.");
             }
 
-            $from = null;
-            $to = null;
             $discount_rate = null;
             $discount_type = null;
             $capped_amount = null;
 
             $sale_duration = explode(' - ', $request->sale_duration);
 
-            $from = date('Y-m-d', strtotime($sale_duration[0]));
-            $to = date('Y-m-d', strtotime($sale_duration[1]));
+            $from = $request->sale_duration ? date('Y-m-d', strtotime($sale_duration[0])) : null;
+            $to = $request->sale_duration ? date('Y-m-d', strtotime($sale_duration[1])) : null;
+            $notif_schedule = $request->notif_schedule ? date('Y-m-d', strtotime($request->notif_schedule)) : null;
 
             // check if date overlaps with other "On Sale"
             $date_check = DB::table('fumaco_on_sale')->where('start_date', '!=', '')->where('end_date', '!=', '')->get();
@@ -1555,6 +1571,7 @@ class ProductController extends Controller
                 'sale_name' => $request->sale_name,
                 'start_date' => $from,
                 'end_date' => $to,
+                'notification_schedule' => $notif_schedule,
                 'discount_type' => $discount_type,
                 'discount_rate' => $discount_rate,
                 'capped_amount' => $capped_amount,
@@ -1562,7 +1579,6 @@ class ProductController extends Controller
                 'apply_discount_to' => $request->apply_discount_to,
                 'created_by' => Auth::user()->username
             ];
-
 
             // Image upload
             $rules = array(
@@ -1602,6 +1618,34 @@ class ProductController extends Controller
 
                 $insert['banner_image'] = $banner_image_name;
             }
+
+            // mailchimp
+            $list_id = env('MAILCHIMP_LIST_ID');
+            $campaign = Newsletter::createCampaign(
+                'FUMACO', // from - name,
+                'it@fumaco.com', // from - email,
+                $request->sale_name, // subject,
+                '', // content - html (would be replaced by email template),
+                'subscribers',
+                [
+                    'settings' => [
+                        'title' => $request->sale_name,
+                        'subject_line' => $request->sale_name,
+                        'from_name' => 'FUMACO',
+                        'from_email' => 'it@fumaco.com',
+                        'reply_to' => 'it@fumaco.com',
+                        'template_id' => (int)$request->email_template,
+                    ],
+                    'recipients' => [
+                        'list_id' => $list_id,
+                        'segment_opts' => [
+                            'saved_segment_id' => (int)$request->email_tag,
+                        ],
+                    ],
+                ],
+            );
+
+            $insert['mailchimp_campaign_id'] = $campaign['id'];
 
             DB::table('fumaco_on_sale')->insert($insert);
 
@@ -1670,16 +1714,15 @@ class ProductController extends Controller
 				return redirect()->back()->with('error', "Cannot select the same category twice.");
             }
 
-            $from = null;
-            $to = null;
             $discount_rate = null;
             $discount_type = null;
             $capped_amount = null;
 
             $sale_duration = explode(' - ', $request->sale_duration);
 
-            $from = date('Y-m-d', strtotime($sale_duration[0]));
-            $to = date('Y-m-d', strtotime($sale_duration[1]));
+            $from = $request->sale_duration ? date('Y-m-d', strtotime($sale_duration[0])) : null;
+            $to = $request->sale_duration ? date('Y-m-d', strtotime($sale_duration[1])) : null;
+            $notif_schedule = $request->notif_schedule ? date('Y-m-d', strtotime($request->notif_schedule)) : null;
 
             // check if date overlaps with other "On Sale"
             $date_check = DB::table('fumaco_on_sale')->where('id', '!=', $id)->where('start_date', '!=', '')->where('end_date', '!=', '')->get();
@@ -1725,6 +1768,7 @@ class ProductController extends Controller
                 'sale_name' => $request->sale_name,
                 'start_date' => $from,
                 'end_date' => $to,
+                'notification_schedule' => $notif_schedule,
                 'discount_type' => $discount_type,
                 'discount_rate' => $discount_rate,
                 'discount_for' => $request->discount_for,
@@ -1772,6 +1816,34 @@ class ProductController extends Controller
 
                 $update['banner_image'] = $banner_image_name;
             }
+
+            $list_id = env('MAILCHIMP_LIST_ID');
+            $campaign_id = DB::table('fumaco_on_sale')->where('id', $id)->pluck('mailchimp_campaign_id')->first();
+
+            Newsletter::editCampaign(
+                $campaign_id, // Campaign ID
+                'FUMACO', // from - name,
+                'it@fumaco.com', // from - email,
+                $request->sale_name, // subject,
+                '', // content - html (would be replaced by email template),
+                'subscribers',
+                [
+                    'settings' => [
+                        'title' => $request->sale_name,
+                        'subject_line' => $request->sale_name,
+                        'from_name' => 'FUMACO',
+                        'from_email' => 'it@fumaco.com',
+                        'reply_to' => 'it@fumaco.com',
+                        'template_id' => (int)$request->email_template,
+                    ],
+                    'recipients' => [
+                        'list_id' => $list_id,
+                        'segment_opts' => [
+                            'saved_segment_id' => (int)$request->email_tag,
+                        ],
+                    ],
+                ],
+            );
 
             DB::table('fumaco_on_sale')->where('id', $id)->update($update);
 
