@@ -16,11 +16,13 @@ use App\Models\ShippingZoneRate;
 use App\Models\ShippingCondition;
 
 use App\Http\Traits\ProductTrait;
+use App\Http\Traits\GeneralTrait;
 use Bitly;
 
 class CheckoutController extends Controller
 {
 	use ProductTrait;
+	use GeneralTrait;
 
 	private function saveTempOrder($order_no, $ip) {
 		if ($order_no) {
@@ -1064,14 +1066,6 @@ class CheckoutController extends Controller
 			$min_leadtime = collect($leadtime_arr)->pluck('min_leadtime')->max();
 			$max_leadtime = collect($leadtime_arr)->pluck('max_leadtime')->max();
 
-			$error_redirect_page = '/checkout/failed';
-
-			$requestUrl = 'https://api-ssl.bitly.com/v4/shorten';
-			$header = [
-				'Authorization' => 'Bearer ' . env('BITLY_ACCESS_TOKEN'),
-				'Content-Type'  => 'application/json',	
-			];
-
 			$bank_accounts = [];
 			$view = 'frontend.checkout.success';
 
@@ -1089,33 +1083,17 @@ class CheckoutController extends Controller
 					$message->subject('Order Placed - Bank Deposit - FUMACO');
 				});
 
-				// api response for order tracking url
-				$bitly_response = Http::withHeaders($header)->post($requestUrl, [
-					'long_url' => $request->root().'/upload_deposit_slip/'.$order_details->deposit_slip_token,
-				]);
-
-				$bitly_response = json_decode($bitly_response, true);
-
-				if (isset($bitly_response['link'])) {
-					$deposit_slip_url = $bitly_response['link'];
-				}
+				$deposit_slip_url = $request->root().'/upload_deposit_slip/'.$order_details->deposit_slip_token;
+				$shortened_deposit_slip_url = $this->generateShortUrl($request->root(), $deposit_slip_url);
 				
-				$sms_message = 'Hi '.$temp->xfname.' '.$temp->xlname.'!, to process your order please settle your payment thru bank deposit. Click '.$deposit_slip_url.' to upload your bank deposit slip.';
+				$sms_message = 'Hi '.$temp->xfname.' '.$temp->xlname.'!, to process your order please settle your payment thru bank deposit. Click '.$shortened_deposit_slip_url.' to upload your bank deposit slip.';
 			}else{
-				// api response for order tracking url 
-				$bitly_response = Http::withHeaders($header)->post($requestUrl, [
-					'long_url' => $request->root().'/track_order/'.$temp->xlogs,
-				]);
+				$tracking_url = $request->root().'/track_order/'.$temp->xlogs;
+				$shortened_tracking_url = $this->generateShortUrl($request->root(), $tracking_url);
+				
+				$tracking_url_text = $shortened_tracking_url ? 'Click ' . $shortened_tracking_url . ' to track your order.' : null;
 
-				$bitly_response = json_decode($bitly_response, true);
-
-				if (isset($bitly_response['link'])) {
-					$url = $bitly_response['link'];
-				}
-
-				$tracking_url = $url ? 'Click ' . $url . ' to track your order.' : null;
-
-				$sms_message = 'Hi '.$temp->xfname.' '.$temp->xlname.'!, your order '.$temp->xlogs.' with an amount of P '.number_format($request->Amount, 2).' has been received, please allow '.$min_leadtime.' to '.$max_leadtime.' business days to process your order. ' . $tracking_url;
+				$sms_message = 'Hi '.$temp->xfname.' '.$temp->xlname.'!, your order '.$temp->xlogs.' with an amount of P '.number_format($request->Amount, 2).' has been received, please allow '.$min_leadtime.' to '.$max_leadtime.' business days to process your order. ' . $tracking_url_text;
 
 				Mail::to($emails)->queue(new OrderSuccess($order));
 			}

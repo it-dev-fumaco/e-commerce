@@ -11,10 +11,12 @@ use Mail;
 use Auth;
 use Carbon\Carbon;
 use Illuminate\Pagination\LengthAwarePaginator;
+use App\Http\Traits\GeneralTrait;
 use Bitly;
 
 class OrderController extends Controller
 {
+    use GeneralTrait;
     public function orderList(Request $request){
         $search_id = ($request->search) ? $request->search : '';
         $order_status = ($request->order_status) ? $request->order_status : '';

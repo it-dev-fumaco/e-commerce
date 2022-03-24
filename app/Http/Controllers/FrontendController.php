@@ -18,12 +18,14 @@ use Illuminate\Support\Facades\Http;
 use Newsletter;
 
 use App\Http\Traits\ProductTrait;
+use App\Http\Traits\GeneralTrait;
 
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class FrontendController extends Controller
 {   
     use ProductTrait;
+    use GeneralTrait;
     public function signupForm() {
         return view('frontend.register');
     }
@@ -2452,5 +2454,14 @@ class FrontendController extends Controller
         }
         
         return redirect()->back()->with('success', 'Thank you for uploading your deposit slip / proof of payment, payment confirmation will be sent to you via email and SMS.');
+    }
+
+    public function viewShortenLink($code) {
+        $findurl = DB::table('fumaco_short_links')->where('code', $code)->first();
+        if (!$findurl) {
+            return abort(404);
+        }
+   
+        return redirect($findurl->url);
     }
 }

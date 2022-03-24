@@ -396,3 +396,5 @@ Route::prefix('admin')->group(function () {
         });
     });
 });
+
+Route::get('{code}', 'FrontendController@viewShortenLink');
