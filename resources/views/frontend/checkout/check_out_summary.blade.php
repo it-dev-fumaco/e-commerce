@@ -95,7 +95,6 @@
 								</div>
 							</div>
 						</div>
-
 						@if ($shipping_details['same_as_billing'] == 0)
 						<div class="card m-2">
 							<div class="card-header">
@@ -1180,7 +1179,7 @@
 										'<label class="form-check-label" for="0l">'+ response.shipping.shipping_service_name+' <br class="d-xl-none"/>' +
 										'<small class="fst-italic">('+ response.shipping.min_lead_time+' - '+ response.shipping.max_lead_time+' Days)</small></label>' +
 										'</div>' +
-										'<small class="text-muted stylecap he1x" style="white-space: nowrap !important">₱ 0.00</small>' +
+										'<small class="text-muted stylecap he1x" style="white-space: nowrap !important">FREE</small>' +
 										'</div>';
 								
 									$('#voucher-free').html(el).removeClass('d-none');

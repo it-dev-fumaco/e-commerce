@@ -118,7 +118,7 @@ Route::get('/upload_deposit_slip/{token}', 'FrontendController@uploadDepositSlip
 Route::post('/upload_deposit_slip/{token}', 'FrontendController@submitUploadDepositSlip');
 
 // SHOPPING CART ROUTES
-Route::get('/cart', 'CartController@viewCart');
+Route::get('/cart', 'CartController@viewCart')->name('cart');
 Route::post('/product_actions', 'CartController@productActions');
 Route::patch('/updatecart', 'CartController@updateCart');
 Route::delete('/removefromcart', 'CartController@removeFromCart');

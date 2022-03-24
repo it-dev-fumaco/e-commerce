@@ -541,6 +541,10 @@ class CheckoutController extends Controller
 			}
 
 			$shipping_zones = DB::table('fumaco_shipping_zone_rate')->distinct()->pluck('province_name')->toArray();
+			$free_shipping_remarks = null;
+			if ($shipping_rates['free_delivery_zones']) {
+				$free_shipping_remarks = $shipping_rates['free_delivery_zones'];
+			}
 
 			$free_shipping_remarks = null;
 			if ($shipping_rates['free_delivery_zones']) {
@@ -1363,7 +1367,7 @@ class CheckoutController extends Controller
         $shipping_services_arr = array_column($shipping_services_arr, 'shipping_service_id');
         $shipping_services_without_conditions = ShippingService::where('shipping_calculation', 'Flat Rate')->whereIn('shipping_service_id', $shipping_services_arr)
 			->select('shipping_service_id', 'min_leadtime', 'max_leadtime', 'shipping_service_name', 'amount')->get();
-        
+
 		$free_delivery_zones = [];
         $shipping_offer_rates = [];
         foreach($shipping_services_without_conditions as $row){
@@ -1484,6 +1488,7 @@ class CheckoutController extends Controller
 				'allow_delivery_after' => 0,
 				'pickup' => true,
 				'stores' => $stores,
+				'remarks' => null
 			];
 		}
 

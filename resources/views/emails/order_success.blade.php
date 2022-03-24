@@ -88,7 +88,7 @@
 					</tr>
 					@if ($order['order_details']->voucher_code)
 					<tr style="font-size: 0.8rem; text-align: right;">
-						<td class="pb-1 pt-1" style="padding: 6px;" colspan="{{ $colspan }}">Discount <span class="text-white" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833;">{{ $order['order_details']->voucher_code }}</span></td>
+						<td class="pb-1 pt-1" style="padding: 6px;" colspan="{{ $colspan }}">Discount <span class="text-white" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833; color: #fff !important;">{{ $order['order_details']->voucher_code }}</span></td>
 						<td class="pb-1 pt-1" style="padding: 6px;">- ₱ {{ number_format(str_replace(",","",$order['order_details']->discount_amount), 2) }}</td>
 					</tr>
 					@endif

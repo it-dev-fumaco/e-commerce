@@ -47,6 +47,7 @@
                                                 <th class="text-center">Email Address</th>
                                                 <th class="text-center">Customer Group</th>
                                                 <th class="text-center">Last Login Date</th>
+                                                <th class="text-center">Last Login Used</th>
                                                 <th class="text-center">Action</th>
                                             </tr>
                                         </thead>
@@ -59,6 +60,7 @@
                                                 <td class="text-center">
                                                     {{ (array_key_exists($user->customer_group, $customer_groups->toArray())) ? $customer_groups[$user->customer_group] : null; }}</td>
                                                 <td class="text-center">{{ \Carbon\Carbon::parse($user->created_at)->format('M d, Y - h:i A') }}</td>
+                                                <td class="text-center">{{ $user->login_used }}</td>
                                                 <td class="text-center">
                                                     <a href="/admin/customer/profile/{{ $user->id }}" class="btn btn-sm btn-primary">View Profile</a>
                                                 </td>

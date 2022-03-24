@@ -10,6 +10,7 @@ use Auth;
 use DB;
 use Mail;
 use DateTime;
+use App\Http\Traits\ProductTrait;
 
 class DashboardController extends Controller
 {

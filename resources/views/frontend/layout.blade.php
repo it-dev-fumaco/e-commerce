@@ -143,7 +143,7 @@
       <div class="spinner"></div>
     </div>
     <header>
-      <nav class="navbar navbar-expand-lg navbar-light fixed-top bg-light" style="padding-left: 20px; padding-right: 20px; padding-bottom:0px; border-bottom: 1px solid #e4e4e4;">
+      <nav id="navbar" class="navbar navbar-expand-lg navbar-light fixed-top bg-light" style="padding-left: 20px; padding-right: 20px; padding-bottom:0px; border-bottom: 1px solid #e4e4e4;">
         <div class="container-fluid">
           <a class="navbar-brand d-none d-md-block" href="/" id="navbar-brand">
             <img src="{{ asset('/assets/site-img/logo-sm.png') }}" alt="" width="155" height="54">
@@ -410,6 +410,7 @@
 
         loadcart();
       });
+
       $(document).click(function() {
         var $item = $("#shopping-cart");
         if (!$item.is(event.target) && !$item.has(event.target).length) {

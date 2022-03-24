@@ -62,7 +62,7 @@
             <picture>
               <source srcset="{{ asset('/storage/journals/'. explode(".", $carousel->fumaco_image1)[0] .'.webp') }}" type="image/webp" style="object-fit: cover;opacity: 0.6;">
               <source srcset="{{ asset('/storage/journals/'. $carousel->fumaco_image1) }}" type="image/jpeg" style="object-fit: cover;opacity: 0.6;">
-              <img src="{{ asset('/storage/journals/'. $carousel->fumaco_image1) }}" alt="{{ Str::slug(explode(".", $carousel->fumaco_image1)[0], '-') }}" style="object-fit: cover;opacity: 0.6;">
+              <img src="{{ asset('/storage/journals/'. $carousel->fumaco_image1) }}" alt="{{ Str::slug(explode(".", $carousel->fumaco_image1)[0], '-') }}" style="object-fit: cover;opacity: 0.6;height: 100% !important; width: 100% !important">
             </picture>
 
             <div class="container">
@@ -299,7 +299,22 @@
     </div>
   </div>
   @endif
-
+  @if (Session::has('accounts'))
+    @php
+      $accounts = Session::get('accounts');
+    @endphp
+    @if ($accounts)
+      <div id="multiple-accounts-msg" class="col-12 col-md-3">
+        <div class="card bg-white" style="box-shadow: 2px 2px 8px;">
+          <div class="card-title p-0"><span id="close-accounts-msg" class="p-0">&times;</span></div>
+          <div class="card-body pt-0">
+            The email you provided has an existing account for: <br>
+              {{ $accounts }}
+          </div>
+        </div>
+      </div>
+    @endif
+  @endif
 @endsection
 @section('style')
 
@@ -312,7 +327,17 @@
 @section('script')
   <script src="{{ asset('/slick/slick.js') }}" type="text/javascript" charset="utf-8"></script>
   <script type="text/javascript">
+    $('#myCarousel').css('margin-top', $('#navbar').height());
+
     $(document).ready(function() {
+      setTimeout(function() {
+        $('#multiple-accounts-msg').fadeOut();
+      }, 5000);
+
+      $('#close-accounts-msg').click(function(){
+        $('#multiple-accounts-msg').fadeOut();
+      });
+
       // Product Image Hover
       $('.hover-container').hover(function(){
         $(this).children('.btn-container').slideToggle('fast');
