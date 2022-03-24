@@ -538,7 +538,7 @@ class OrderController extends Controller
 
                 if(isset($sms_response['error'])){
                     DB::rollback();
-                    $error = $sms_response['error']['code'] == 409 ? 'No mobile number found.' : 'Mobile number is invalid.';
+                    $error = $sms_response['error']['code'] == 409 ? 'No mobile number not found.' : 'Mobile number is invalid.';
                     return redirect()->back()->with('error', 'An error occured. '.$error);
                 }
             }
