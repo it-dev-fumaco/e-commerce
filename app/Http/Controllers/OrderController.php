@@ -455,6 +455,99 @@ class OrderController extends Controller
 		}
     }
 
+    public function resendDepositSlip(Request $request){
+        DB::beginTransaction();
+		try{
+            $new_token = hash('sha256', Carbon::now()->toDateTimeString());
+            $now = Carbon::now()->toDateTimeString();
+
+            $order_details = DB::table('fumaco_order')->where('order_number', $request->order_number)->first();
+
+            $order_items = DB::table('fumaco_order_items')->where('order_number', $request->order_number)->get();
+            $item_codes = collect($order_items)->pluck('item_code');
+
+            $images = DB::table('fumaco_items_image_v1')->whereIn('idcode', $item_codes)->get();
+            $image = collect($images)->groupBy('idcode');
+
+            $subtotal = collect($order_items)->sum('item_total_price');
+
+            DB::table('fumaco_order')->where('order_number', $request->order_number)->update([
+                'deposit_slip_token' => $new_token,
+                'deposit_slip_token_date_created' => $now
+            ]);
+
+            $items = [];
+            foreach($order_items as $row) {
+                $items[] = [
+                    'item_code' => $row->item_code,
+                    'item_name' => $row->item_name,
+                    'price' => $row->item_price,
+                    'discount' => $row->item_discount,
+                    'qty' => $row->item_qty,
+                    'amount' => $row->item_total_price,
+                    'image' => isset($image[$row->item_code]) ? $image[$row->item_code][0]->imgprimayx : null
+                ];
+            }
+
+            $store_address = null;
+            if($order_details->order_shipping == 'Store Pickup') {
+                $store = DB::table('fumaco_store')->where('store_name', $order_details->store_location)->first();
+                $store_address = ($store) ? $store->address : null;
+            }
+
+            $bank_accounts = DB::table('fumaco_bank_account')->where('is_active', 1)->get();
+				
+            $order = [
+                'order_details' => $order_details,
+                'items' => $items,
+                'store_address' => $store_address,
+                'bank_accounts' => $bank_accounts,
+                'new_token' => $new_token
+            ];
+
+            $sms_api = DB::table('api_setup')->where('type', 'sms_gateway_api')->first();
+            $customer_name = $order_details->order_name.' '.$order_details->order_lastname;
+            $phone = $request->billing_number[0] == '0' ? '63'.substr($request->billing_number, 1) : $request->billing_number;
+            $email = $request->billing_email;
+
+            $deposit_slip_url = 'url_placeholder';
+
+            $sms_message = 'Hi '.$customer_name.'!, to process your order please settle your payment thru bank deposit. Click '.$deposit_slip_url.' to upload your bank deposit slip.';
+
+            if ($sms_api) {
+                $sms = Http::asForm()->withHeaders([
+                    'Accept' => 'application/json',
+                    'Content-Type' => 'application/x-www-form-urlencoded',
+                ])->post($sms_api->base_url, [
+                    'api_key' => $sms_api->api_key,
+                    'api_secret' => $sms_api->api_secret_key,
+                    'from' => 'FUMACO',
+                    'to' => preg_replace("/[^0-9]/", "", $phone),
+                    'text' => $sms_message
+                ]);
+
+                if(isset($sms['error'])){
+                    return redirect()->back()->with('error', 'An error occured. Please try again.');
+                }
+            }
+            
+            Mail::send('emails.order_success_bank_deposit', $order, function($message) use ($email) {
+                $message->to($email);
+                $message->subject('Order Placed - Bank Deposit - FUMACO');
+            });
+
+            if(Mail::failures()){
+                return redirect()->back()->with('error', 'An error occured. Please try again.');
+            }
+
+            DB::commit();
+            return redirect()->back()->with('success', 'Deposit Slip Upload Link Sent!');
+        }catch(Exception $e){
+            DB::rollback();
+            return redirect()->back()->with('error', 'An error occured. Please try again.');
+        }
+    }
+
     public function checkPaymentStatus(Request $request) {
         $payment_id = $request->payment_id;
         $output = [];
