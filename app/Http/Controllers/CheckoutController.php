@@ -17,7 +17,6 @@ use App\Models\ShippingCondition;
 
 use App\Http\Traits\ProductTrait;
 use App\Http\Traits\GeneralTrait;
-use Bitly;
 
 class CheckoutController extends Controller
 {
@@ -1084,13 +1083,13 @@ class CheckoutController extends Controller
 					$message->subject('Order Placed - Bank Deposit - FUMACO');
 				});
 
-				$deposit_slip_url = $request->root().'/upload_deposit_slip/'.$order_details->deposit_slip_token;
-				$shortened_deposit_slip_url = $this->generateShortUrl($request->root(), $deposit_slip_url);
+				$deposit_slip_url = 'https://fumaco.com/upload_deposit_slip/'.$order_details->deposit_slip_token;
+				$shortened_deposit_slip_url = $this->generateShortUrl('https://fumaco.com', $deposit_slip_url);
 				
 				$sms_message = 'Hi '.$temp->xfname.' '.$temp->xlname.'!, to process your order please settle your payment thru bank deposit. Click '.$shortened_deposit_slip_url.' to upload your bank deposit slip.';
 			}else{
-				$tracking_url = $request->root().'/track_order/'.$temp->xlogs;
-				$shortened_tracking_url = $this->generateShortUrl($request->root(), $tracking_url);
+				$tracking_url = 'https://fumaco.com/track_order/'.$temp->xlogs;
+				$shortened_tracking_url = $this->generateShortUrl('https://fumaco.com', $tracking_url);
 				
 				$tracking_url_text = $shortened_tracking_url ? 'Click ' . $shortened_tracking_url . ' to track your order.' : null;
 

@@ -12,7 +12,6 @@ use Auth;
 use Carbon\Carbon;
 use Illuminate\Pagination\LengthAwarePaginator;
 use App\Http\Traits\GeneralTrait;
-use Bitly;
 
 class OrderController extends Controller
 {
@@ -312,27 +311,12 @@ class OrderController extends Controller
                 $order_details = DB::table('fumaco_order')->where('order_number', $request->order_number)->first();
 
                 $total_amount = $order_details->amount_paid;
-
-                $requestUrl = 'https://api-ssl.bitly.com/v4/shorten';
-                $header = [
-                    'Authorization' => 'Bearer ' . env('BITLY_ACCESS_TOKEN'),
-                    'Content-Type'  => 'application/json',	
-                ];
-
-                // api response for order tracking url
-                $bitly_response = Http::withHeaders($header)->post($requestUrl, [
-                    'long_url' => $request->root().'/track_order/'.$request->order_number,
-                ]);
-
-                $bitly_response = json_decode($bitly_response, true);
-
-                $url = null;
-                if (isset($bitly_response['link'])) {
-                    $url = $bitly_response['link'];
-                }
                 
+                $track_url = 'https://fumaco.com/track_order/'.$request->order_number;
+                $sms_short_url = $this->generateShortUrl('https://fumaco.com', $track_url);
+
                 $sms = [];
-                if ($url) {
+                if ($sms_short_url) {
                     $sms_api = DB::table('api_setup')->where('type', 'sms_gateway_api')->first();
 
                     $sms = [
@@ -350,7 +334,7 @@ class OrderController extends Controller
                         DB::table('track_order')->where('track_code', $request->order_number)->whereIn('track_status', ['Out for Delivery', 'Order Confirmed'])->update(['track_active' => 0]);
                     }
 
-                    $sms['text'] = 'Hi '.$order_details->order_name . ' ' . $order_details->order_lastname.'!, your payment of '.$total_amount.' has been confirmed. Click '.$url.' to track your order.';
+                    $sms['text'] = 'Hi '.$order_details->order_name . ' ' . $order_details->order_lastname.'!, your payment of '.$total_amount.' has been confirmed. Click '.$sms_short_url.' to track your order.';
 
                     if($order_details->order_payment_method == 'Bank Deposit'){
                         $leadtime_arr = [];
@@ -381,8 +365,7 @@ class OrderController extends Controller
                         $total_amount = $order_details->order_subtotal + $order_details->order_shipping_amount;
                         $orders_arr['deposit_slip_token_used'] = 1;
 
-
-                        $sms['text'] = 'Hi '.$order_details->order_name . ' ' . $order_details->order_lastname.' your order '.$request->order_number.' with an amount of P '.number_format($total_amount, 2).' has been received, please allow '.$min_leadtime.' to '.$max_leadtime.' business days to process your order. Click ' . $url . ' to track your order.';
+                        $sms['text'] = 'Hi '.$order_details->order_name . ' ' . $order_details->order_lastname.' your order '.$request->order_number.' with an amount of P '.number_format($total_amount, 2).' has been received, please allow '.$min_leadtime.' to '.$max_leadtime.' business days to process your order. Click ' . $sms_short_url . ' to track your order.';
 
                         $store_address = null;
                         if($order_details->order_shipping == 'Store Pickup') {
@@ -403,6 +386,13 @@ class OrderController extends Controller
                             $message->to(trim($confirmed_bank_deposit_email));
                             $message->subject('Order Confirmed - FUMACO');
                         });
+
+                        if(Mail::failures()){
+                            DB::rollback();
+                            return redirect()->back()->with('error', 'An error occured. Please try again.');
+                        }
+
+                        DB::table('fumaco_order')->where('order_number', $request->order_number)->update(['amount_paid' => $total_amount]);
                     }
 
                 }
@@ -413,7 +403,12 @@ class OrderController extends Controller
                         $message->subject($status . ' - FUMACO');
                     });
 
-                    $sms['text'] = 'Hi '.$order_details->order_name . ' ' . $order_details->order_lastname.'!, your order '.$request->order_number.' with an amount of P '.number_format($total_amount, 2).' is now shipped out. Click '.$url.' to track your order.';
+                    if(Mail::failures()){
+                        DB::rollback();
+                        return redirect()->back()->with('error', 'An error occured. Please try again.');
+                    }
+
+                    $sms['text'] = 'Hi '.$order_details->order_name . ' ' . $order_details->order_lastname.'!, your order '.$request->order_number.' with an amount of P '.number_format($total_amount, 2).' is now shipped out. Click '.$sms_short_url.' to track your order.';
                 }
 
                 if ($status == 'Order Delivered') {
@@ -423,26 +418,36 @@ class OrderController extends Controller
                         $message->subject('Order Delivered - FUMACO');
                     });
 
-                    $sms['text'] = 'Hi '.$order_details->order_name . ' ' . $order_details->order_lastname.'!, your order '.$request->order_number.' with an amount of P '.number_format($total_amount, 2).' has been delivered. Click '.$url.' to track your order.';
+                    if(Mail::failures()){
+                        DB::rollback();
+                        return redirect()->back()->with('error', 'An error occured. Please try again.');
+                    }
+
+                    $sms['text'] = 'Hi '.$order_details->order_name . ' ' . $order_details->order_lastname.'!, your order '.$request->order_number.' with an amount of P '.number_format($total_amount, 2).' has been delivered. Click '.$sms_short_url.' to track your order.';
                 }
 
                 if($status == 'Ready for Pickup'){
-                    $sms['text'] = 'Hi '.$order_details->order_name . ' ' . $order_details->order_lastname.'!, your order '.$request->order_number.' with an amount of P '.number_format($total_amount, 2).' is now ready for pickup. Click '.$url.' to track your order.';
+                    $sms['text'] = 'Hi '.$order_details->order_name . ' ' . $order_details->order_lastname.'!, your order '.$request->order_number.' with an amount of P '.number_format($total_amount, 2).' is now ready for pickup. Click '.$sms_short_url.' to track your order.';
                 }
 
                 if(in_array($status, ['Order Confirmed', 'Out for Delivery', 'Order Delivered', 'Ready for Pickup'])){
-                    if ($url) {
+                    if ($sms_short_url) {
                         $sms = Http::asForm()->withHeaders([
                             'Accept' => 'application/json',
                             'Content-Type' => 'application/x-www-form-urlencoded',
                         ])->post($sms_api->base_url, $sms);
 
                         $sms_response = json_decode($sms, true);
+
+                        if(isset($sms_response['error'])){
+                            DB::rollback();
+                            $error = $sms_response['error']['code'] == 409 ? 'No mobile number found.' : 'Mobile number is invalid.';
+                            return redirect()->back()->with('error', 'An error occured. '.$error);
+                        }
                     }
                 }
 
                 DB::table('fumaco_order')->where('order_number', $request->order_number)->update($orders_arr);
-
                 DB::table('track_order')->insert($track_order);
 
                 DB::commit();
@@ -510,7 +515,8 @@ class OrderController extends Controller
             $phone = $request->billing_number[0] == '0' ? '63'.substr($request->billing_number, 1) : $request->billing_number;
             $email = $request->billing_email;
 
-            $deposit_slip_url = 'url_placeholder';
+            $track_url = 'https://fumaco.com/track_order/'.$request->order_number;
+            $deposit_slip_url = $this->generateShortUrl('https://fumaco.com', $track_url);
 
             $sms_message = 'Hi '.$customer_name.'!, to process your order please settle your payment thru bank deposit. Click '.$deposit_slip_url.' to upload your bank deposit slip.';
 
@@ -525,9 +531,13 @@ class OrderController extends Controller
                     'to' => preg_replace("/[^0-9]/", "", $phone),
                     'text' => $sms_message
                 ]);
+                
+                $sms_response = json_decode($sms, true);
 
-                if(isset($sms['error'])){
-                    return redirect()->back()->with('error', 'An error occured. Please try again.');
+                if(isset($sms_response['error'])){
+                    DB::rollback();
+                    $error = $sms_response['error']['code'] == 409 ? 'No mobile number found.' : 'Mobile number is invalid.';
+                    return redirect()->back()->with('error', 'An error occured. '.$error);
                 }
             }
             
@@ -537,6 +547,7 @@ class OrderController extends Controller
             });
 
             if(Mail::failures()){
+                DB::rollback();
                 return redirect()->back()->with('error', 'An error occured. Please try again.');
             }
 
