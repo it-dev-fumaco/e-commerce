@@ -517,7 +517,7 @@ class OrderController extends Controller
             $phone = $request->billing_number[0] == '0' ? '63'.substr($request->billing_number, 1) : $request->billing_number;
             $email = $request->billing_email;
 
-            $track_url = $request->root().'/track_order/'.$request->order_number;
+            $track_url = $request->root().'/upload_deposit_slip/'.$request->order_number;
             $deposit_slip_url = $this->generateShortUrl($request->root(), $track_url);
 
             $sms_message = 'Hi '.$customer_name.'!, to process your order please settle your payment thru bank deposit. Click '.$deposit_slip_url.' to upload your bank deposit slip.';
@@ -642,9 +642,12 @@ class OrderController extends Controller
 				return redirect()->back()->with('error', "Payment Status Name must be unique.");
 			}
 
+            $checker = DB::table('fumaco_payment_status')->get();
+
             $insert = [
                 'status' => $request->status_name,
                 'status_description' => $request->status_description,
+                'status_sequence' => !$checker ? 1 : null,
                 'updates_status' => isset($request->updates_status) ? 1 : 0,
                 'created_by' => Auth::user()->username
             ];
