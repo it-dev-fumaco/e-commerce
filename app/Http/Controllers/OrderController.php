@@ -312,8 +312,8 @@ class OrderController extends Controller
 
                 $total_amount = $order_details->amount_paid;
                 
-                $track_url = 'https://fumaco.com/track_order/'.$request->order_number;
-                $sms_short_url = $this->generateShortUrl('https://fumaco.com', $track_url);
+                $track_url = $request->root().'/track_order/'.$request->order_number;
+                $sms_short_url = $this->generateShortUrl($request->root(), $track_url);
 
                 $sms = [];
                 if ($sms_short_url) {
@@ -515,8 +515,8 @@ class OrderController extends Controller
             $phone = $request->billing_number[0] == '0' ? '63'.substr($request->billing_number, 1) : $request->billing_number;
             $email = $request->billing_email;
 
-            $track_url = 'https://fumaco.com/track_order/'.$request->order_number;
-            $deposit_slip_url = $this->generateShortUrl('https://fumaco.com', $track_url);
+            $track_url = $request->root().'/track_order/'.$request->order_number;
+            $deposit_slip_url = $this->generateShortUrl($request->root(), $track_url);
 
             $sms_message = 'Hi '.$customer_name.'!, to process your order please settle your payment thru bank deposit. Click '.$deposit_slip_url.' to upload your bank deposit slip.';
 
