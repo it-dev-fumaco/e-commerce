@@ -137,8 +137,8 @@
 																	</div>
 																	<div class="col-8 d-print-none">
 																		<div class="row">
-																			@if ($order['payment_method'] == 'Bank Deposit' and in_array(Auth::user()->user_type, ['System Admin', 'Accounting Admin']))
-																				<div class="col-6 p-0">
+																			<div class="col-6 p-0">
+																				@if ($order['payment_method'] == 'Bank Deposit' and in_array(Auth::user()->user_type, ['System Admin', 'Accounting Admin']))
 																					<div class="row">
 																						<div class="col-2">
 																							@if ($order['payment_status'] == 'Payment For Confirmation')
@@ -150,8 +150,38 @@
 																						
 																						<div class="col-10 pt-1">
 																							<p class="my-auto"><b>Payment Status:</b> {{ $order['payment_status'] }}</p>
+																							
+																							@if($order['payment_status'] == 'Pending for Payment')
+																								<button class="btn btn-primary btn-sm d-print-none" data-toggle="modal" data-target="#send-deposit-link-{{ $order['order_no'] }}-Modal">Send Deposit Slip Upload Link</button>
 
-																							@if ($order['payment_status'] == 'Payment For Confirmation')
+																								<div class="modal fade payment-modal" id="send-deposit-link-{{ $order['order_no'] }}-Modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+																									<div class="modal-dialog" role="document">
+																										<div class="modal-content">
+																											<div class="modal-header">
+																												<h5 class="modal-title" id="exampleModalLabel">Send Deposit Slip Upload Link</h5>
+																												<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+																													<span aria-hidden="true">&times;</span>
+																												</button>
+																											</div>
+																											<div class="modal-body text-center">
+																												Send deposit slip upload link for {{ $order['order_no'] }}?
+																											</div>
+																											<form action="/admin/order/send_upload_link" method="POST">
+																												@csrf
+																												<div class="modal-footer">
+																													<button type="submit" class="btn btn-sm btn-primary">Confirm</button>
+																													<button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Close</button>
+																													<div class="d-none">
+																														<input type="text" name="order_number" value="{{ $order['order_no'] }}" readonly/>
+																														<input type="text" name="billing_email" value="{{ $order['bill_email'] }}" readonly>
+																														<input type="text" name="billing_number" value="{{ $order['bill_contact'] }}" readonly>
+																													</div>
+																												</div>
+																											</form>
+																										</div>
+																									</div>
+																								</div>
+																							@elseif ($order['payment_status'] == 'Payment For Confirmation')
 																								<button class="btn btn-primary btn-sm d-print-none" data-toggle="modal" data-target="#payment-status-{{ $order['order_no'] }}-Modal">Confirm Payment</button>
 
 																								<div class="modal fade payment-modal" id="payment-status-{{ $order['order_no'] }}-Modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -185,8 +215,8 @@
 																							@endif
 																						</div>
 																					</div>
-																				</div>
-																			@endif
+																				@endif
+																			</div>
 																			<div class="col-6">
 																				@php
 																					$update_status = null;
@@ -196,7 +226,7 @@
 																				@endphp
 																				<form class="btn-group" action="/admin/order/status_update" method="POST" style="width: 100%; height: 40px !important;">
 																					@csrf
-																					<label class="stat-label p-0" for="status">Order Status&nbsp;</label>
+																					<label class="stat-label p-0" for="status">Order Status&nbsp;&nbsp;</label>
 																					<select name="status" class="form-control col-md-6" name="order_status" required {{ $update_status }}> 
 																						<option value="" {{ ($order['status'] == 'Order Placed') ? 'selected' : '' }} disabled>Order Placed</option>
 																						@foreach($order['order_status'] as $status)

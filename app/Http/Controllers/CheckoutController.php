@@ -1031,7 +1031,8 @@ class CheckoutController extends Controller
 			$order = [
 				'order_details' => $order_details,
 				'items' => $items,
-				'store_address' => $store_address
+				'store_address' => $store_address,
+				'new_token' => null
 			];
 
 			// // send email to customer / client

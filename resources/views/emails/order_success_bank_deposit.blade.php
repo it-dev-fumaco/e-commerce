@@ -19,6 +19,9 @@
      </tr>
      <tr>
         <td class="bodycopy borderbottom" style="padding: 5%;">
+			@php
+				$deposit_slip_token = $new_token ? $new_token : $order_details->deposit_slip_token;
+			@endphp
 			Hi {{ $order_details->order_name . ' ' . $order_details->order_lastname }},<br><br>
 			<strong>Order No. :</strong> {{ $order_details->order_number }}<br><br>
 			Your order has been placed, to process your order please settle your payment thru bank deposit. You may upload your proof of payment/bank deposit slip by clicking <a href="{{ route('upload_deposit_slip', ['token' => $order_details->deposit_slip_token]) }}">here</a><br><br>
