@@ -47,6 +47,12 @@ class LoginController extends Controller
 
             $otp = rand(111111, 999999);
             $api = DB::table('api_setup')->where('type', 'sms_gateway_api')->first();
+            if(!$api or !$checker->mobile_number){
+                $error_message = !$checker->mobile_number ? 'Your account does not have a registered mobile number. ' : 'OTP cannot be sent. ';
+                Auth::guard('admin')->logout();
+                return redirect('/admin/login')->withInput()->with('d_info', $error_message.'Please contact the system administrator');
+            }
+
             $phone = $checker->mobile_number[0] == '0' ? '63'.substr($checker->mobile_number, 1) : $checker->mobile_number;
 
             $sms = Http::asForm()->withHeaders([
@@ -59,6 +65,12 @@ class LoginController extends Controller
                 'to' => preg_replace("/[^0-9]/", "", $phone),
                 'text' => 'TWO-FACTOR AUTHENTICATION: Your One-Time PIN is '.$otp.' to login in Fumaco Website Admin Page, valid only within 10 mins. For any help, please contact us at it@fumaco.com'
             ]);
+
+            if(isset($sms['error'])){
+                Auth::guard('admin')->logout();
+                $error = $sms['error']['code'] == 409 ? 'No mobile number not found. ' : 'Mobile number is invalid. ';
+                return redirect('/admin/login')->withInput()->with('d_info', $error.'Please contact the system administrator');
+            }
 
             $details = [
                 'otp' => $otp,
