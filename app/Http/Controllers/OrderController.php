@@ -316,16 +316,7 @@ class OrderController extends Controller
                 $sms_short_url = $this->generateShortUrl($request->root(), $track_url);
 
                 $sms = [];
-                if ($sms_short_url) {
-                    $sms_api = DB::table('api_setup')->where('type', 'sms_gateway_api')->first();
-
-                    $sms = [
-                        'api_key' => $sms_api->api_key,
-                        'api_secret' => $sms_api->api_secret_key,
-                        'from' => 'FUMACO',
-                        'to' => $order_details->order_bill_contact[0] == '0' ? '63'.substr($order_details->order_bill_contact, 1) : $order_details->order_bill_contact
-                    ];
-                }
+                $message = null;
 
                 if ($status == 'Order Confirmed'){
                     $checker = DB::table('track_order')->where('track_code', $request->order_number)->where('track_status', 'Out for Delivery')->count();
@@ -334,7 +325,7 @@ class OrderController extends Controller
                         DB::table('track_order')->where('track_code', $request->order_number)->whereIn('track_status', ['Out for Delivery', 'Order Confirmed'])->update(['track_active' => 0]);
                     }
 
-                    $sms['text'] = 'Hi '.$order_details->order_name . ' ' . $order_details->order_lastname.'!, your payment of '.$total_amount.' has been confirmed. Click '.$sms_short_url.' to track your order.';
+                    $message = 'Hi '.$order_details->order_name . ' ' . $order_details->order_lastname.'!, your payment of '.$total_amount.' has been confirmed. Click '.$sms_short_url.' to track your order.';
 
                     if($order_details->order_payment_method == 'Bank Deposit'){
                         $leadtime_arr = [];
@@ -365,7 +356,7 @@ class OrderController extends Controller
                         $total_amount = $order_details->order_subtotal + $order_details->order_shipping_amount;
                         $orders_arr['deposit_slip_token_used'] = 1;
 
-                        $sms['text'] = 'Hi '.$order_details->order_name . ' ' . $order_details->order_lastname.' your order '.$request->order_number.' with an amount of P '.number_format($total_amount, 2).' has been received, please allow '.$min_leadtime.' to '.$max_leadtime.' business days to process your order. Click ' . $sms_short_url . ' to track your order.';
+                        $message = 'Hi '.$order_details->order_name . ' ' . $order_details->order_lastname.' your order '.$request->order_number.' with an amount of P '.number_format($total_amount, 2).' has been received, please allow '.$min_leadtime.' to '.$max_leadtime.' business days to process your order. Click ' . $sms_short_url . ' to track your order.';
 
                         $store_address = null;
                         if($order_details->order_shipping == 'Store Pickup') {
@@ -408,7 +399,7 @@ class OrderController extends Controller
                         return redirect()->back()->with('error', 'An error occured. Please try again.');
                     }
 
-                    $sms['text'] = 'Hi '.$order_details->order_name . ' ' . $order_details->order_lastname.'!, your order '.$request->order_number.' with an amount of P '.number_format($total_amount, 2).' is now shipped out. Click '.$sms_short_url.' to track your order.';
+                    $message = 'Hi '.$order_details->order_name . ' ' . $order_details->order_lastname.'!, your order '.$request->order_number.' with an amount of P '.number_format($total_amount, 2).' is now shipped out. Click '.$sms_short_url.' to track your order.';
                 }
 
                 if ($status == 'Order Delivered') {
@@ -423,19 +414,26 @@ class OrderController extends Controller
                         return redirect()->back()->with('error', 'An error occured. Please try again.');
                     }
 
-                    $sms['text'] = 'Hi '.$order_details->order_name . ' ' . $order_details->order_lastname.'!, your order '.$request->order_number.' with an amount of P '.number_format($total_amount, 2).' has been delivered. Click '.$sms_short_url.' to track your order.';
+                    $message = 'Hi '.$order_details->order_name . ' ' . $order_details->order_lastname.'!, your order '.$request->order_number.' with an amount of P '.number_format($total_amount, 2).' has been delivered. Click '.$sms_short_url.' to track your order.';
                 }
 
                 if($status == 'Ready for Pickup'){
-                    $sms['text'] = 'Hi '.$order_details->order_name . ' ' . $order_details->order_lastname.'!, your order '.$request->order_number.' with an amount of P '.number_format($total_amount, 2).' is now ready for pickup. Click '.$sms_short_url.' to track your order.';
+                    $message = 'Hi '.$order_details->order_name . ' ' . $order_details->order_lastname.'!, your order '.$request->order_number.' with an amount of P '.number_format($total_amount, 2).' is now ready for pickup. Click '.$sms_short_url.' to track your order.';
                 }
 
                 if(in_array($status, ['Order Confirmed', 'Out for Delivery', 'Order Delivered', 'Ready for Pickup'])){
-                    if ($sms_short_url) {
+                    $sms_api = DB::table('api_setup')->where('type', 'sms_gateway_api')->first();
+                    if ($sms_api and $sms_short_url) {
                         $sms = Http::asForm()->withHeaders([
                             'Accept' => 'application/json',
                             'Content-Type' => 'application/x-www-form-urlencoded',
-                        ])->post($sms_api->base_url, $sms);
+                        ])->post($sms_api->base_url, [
+                            'api_key' => $sms_api->api_key,
+                            'api_secret' => $sms_api->api_secret_key,
+                            'from' => 'FUMACO',
+                            'to' => $order_details->order_bill_contact[0] == '0' ? '63'.substr($order_details->order_bill_contact, 1) : $order_details->order_bill_contact,
+                            'text' => $message
+                        ]);
 
                         $sms_response = json_decode($sms, true);
 
@@ -467,6 +465,10 @@ class OrderController extends Controller
             $now = Carbon::now()->toDateTimeString();
 
             $order_details = DB::table('fumaco_order')->where('order_number', $request->order_number)->first();
+
+            if(!$order_details){
+                return redirect()->back()->with('error', 'Order Number not found!');
+            }
 
             $order_items = DB::table('fumaco_order_items')->where('order_number', $request->order_number)->get();
             $item_codes = collect($order_items)->pluck('item_code');
