@@ -40,6 +40,7 @@ class LoginController extends Controller
             //Authentication passed...
             $checker = DB::table('fumaco_admin_user')->where('username', $request->username)->first();
 
+
             if($checker->xstatus == 0){
                 Auth::guard('admin')->logout();
                 return redirect('/admin/login')->withInput()->with('d_info','Your admin account is deactivated.');
@@ -66,7 +67,9 @@ class LoginController extends Controller
                 'text' => 'TWO-FACTOR AUTHENTICATION: Your One-Time PIN is '.$otp.' to login in Fumaco Website Admin Page, valid only within 10 mins. For any help, please contact us at it@fumaco.com'
             ]);
 
-            if(isset($sms['error'])){
+            $sms_response = json_decode($sms, true);
+
+            if(isset($sms_response['error'])){
                 Auth::guard('admin')->logout();
                 $error = $sms['error']['code'] == 409 ? 'No mobile number not found. ' : 'Mobile number is invalid. ';
                 return redirect('/admin/login')->withInput()->with('d_info', $error.'Please contact the system administrator');
