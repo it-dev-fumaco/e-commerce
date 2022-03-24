@@ -517,8 +517,8 @@ class OrderController extends Controller
             $phone = $request->billing_number[0] == '0' ? '63'.substr($request->billing_number, 1) : $request->billing_number;
             $email = $request->billing_email;
 
-            $track_url = $request->root().'/upload_deposit_slip/'.$request->order_number;
-            $deposit_slip_url = $this->generateShortUrl($request->root(), $track_url);
+            $deposit_slip = $request->root().'/upload_deposit_slip/'.$order_details->deposit_slip_token;
+            $deposit_slip_url = $this->generateShortUrl($request->root(), $deposit_slip);
 
             $sms_message = 'Hi '.$customer_name.'!, to process your order please settle your payment thru bank deposit. Click '.$deposit_slip_url.' to upload your bank deposit slip.';
 
