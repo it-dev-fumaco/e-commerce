@@ -5,12 +5,12 @@
 
 @section('content')
 <main style="background-color:#0062A5;">
-	<div id="myCarousel" class="carousel slide" data-bs-ride="carousel">
-		<div class="carousel-inner">
-			<div class="carousel-item active" style="height: 13rem !important;">
-				<img src="{{ asset('/assets/site-img/header3-sm.png') }}" alt="" style="position: absolute; top: 0;left: 0;min-width: 100%; height: unset !important; ">
-				<div class="container">
-					<div class="carousel-caption text-start" style="bottom: 1rem !important; right: 25% !important; left: 25%; !important;">
+	<div id="myCarousel" class="carousel slide p-0 m-0" data-bs-ride="carousel">
+		<div class="carousel-inner custom-margin">
+			<div class="carousel-item active p-0 m-0" style="height: 13rem !important;">
+				<img src="{{ asset('/assets/site-img/header3-sm.png') }}" alt="" style="position: absolute; top: 0;left: 0;min-width: 100%; height: unset !important;">
+				<div class="container-fluid p-0 m-0">
+					<div class="carousel-caption text-start p-0 m-0" style="bottom: 1rem !important;">
 						<h3 class="carousel-header-font text-center">UPLOAD DEPOSIT SLIP / PROOF OF PAYMENT</h3>
 					</div>
 				</div>
@@ -142,6 +142,24 @@
         outline: none;
         padding: 12px 20px;
         border-radius: 4px;
+    }
+    .custom-margin{
+        margin-top: 0;
+    }
+    @media (max-width: 575.98px) {
+        .custom-margin{
+            margin-top: 75px;
+        }
+    }
+    @media (max-width: 767.98px) {
+        .custom-margin{
+            margin-top: 75px;
+        }
+    }
+    @media only screen and (min-device-width : 768px) and (max-device-width : 1024px) and (orientation : portrait) {
+        .custom-margin{
+            margin-top: 75px;
+        }
     }
 </style>
 @endsection
