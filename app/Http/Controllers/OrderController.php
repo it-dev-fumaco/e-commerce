@@ -70,6 +70,7 @@ class OrderController extends Controller
                 'ordered_items' => $items_arr,
                 'order_tracker_code' => $o->tracker_code,
                 'payment_method' => $o->order_payment_method,
+                'issuing_bank' => $o->issuing_bank,
                 'cust_id' => $o->order_account,
                 'bill_address1' => $o->order_bill_address1,
                 'bill_address2' => $o->order_bill_address2,

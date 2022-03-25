@@ -251,6 +251,9 @@
 																			<strong>Order ID : </strong> {{ $order['order_no'] }} <br>
 																			<strong>Payment ID : </strong> {{ $order['payment_id'] }}<br>
 																			<strong>Payment Method : </strong> {{ $order['payment_method'] }}<br>
+																			@if ($order['payment_method'] != 'Bank Deposit')
+																			<strong>Issuing Bank : </strong> {{ $order['issuing_bank'] }}<br>
+																			@endif
 																			<strong>Order Date : </strong> {{ $order['date'] }} <br>
 																			<strong>Status : </strong> <span class="badge badge-{{ $badge }}" style="font-size: 1rem;">{{ $order['status'] }}</span>
 																		</p>
