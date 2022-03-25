@@ -26,7 +26,7 @@
 			<strong>Order No. :</strong> {{ $order_details->order_number }}<br><br>
 			Your order has been placed, to process your order please settle your payment thru bank deposit. You may upload your proof of payment/bank deposit slip by clicking <a href="{{ route('upload_deposit_slip', ['token' => $order_details->deposit_slip_token]) }}">here</a><br><br>
 			<div style="text-align: center;" class="button">
-				<a href="{{ route('upload_deposit_slip', ['token' => $order_details->deposit_slip_token]) }}" style="background: #e05443; padding: 2% 5%;">Upload Now</a>
+				<a href="{{ route('upload_deposit_slip', ['token' => $deposit_slip_token]) }}" style="background: #e05443; padding: 2% 5%;">Upload Now</a>
 			</div>
 			<br><br>
 			<div style="background-color: rgba(207, 244, 252, 0.8); width: 100%; padding: 10px; color: #055160">

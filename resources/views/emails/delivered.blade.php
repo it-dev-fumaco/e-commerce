@@ -25,7 +25,7 @@
 	<tr>
         <td class="borderbottom" style="padding: 6% 5% 3% 5%; text-align: center;">
           <div class="button">
-            <a href="{{ route('track_order', ['id' => $id]) }}" style="background: #e05443; padding: 2% 5%;">Track my Order</a>
+            <a href="{{ route('track_order', [$id]) }}" style="background: #e05443; padding: 2% 5%;">Track my Order</a>
           </div>
           <br>
           <small>or</small>

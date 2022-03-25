@@ -45,6 +45,29 @@
 			padding-bottom: 25px !important;
 			padding-top: 25px !important;
 		}
+		.custom-padding{
+			padding-left: 15% !important;
+			padding-right: 15% !important;
+		}
+		@media (max-width: 575.98px) {
+			.custom-padding{
+				padding-left: none !important;
+				padding-right: none !important;
+			}
+		}
+  		@media (max-width: 767.98px) {
+			  .custom-padding{
+				padding-left: none !important;
+				padding-right: none !important;
+			}
+		  }
+		@media only screen and (min-device-width : 768px) and (max-device-width : 1024px) and (orientation : portrait) {
+			.custom-padding{
+				padding-left: none !important;
+				padding-right: none !important;
+			}
+		}
+
 	</style>
 
 	<main style="background-color:#0062A5;">
@@ -54,7 +77,7 @@
 	<main style="background-color:#ffffff;" class="products-head">
 		<div class="container">
 			<div class="row">
-				<div class="col-lg-12" style="padding-left: 15% !important; padding-right: 15% !important;">
+				<div class="col-lg-12 custom-padding">
 					<div class="col-lg-12">
 						<center>
 							<br><br><br>

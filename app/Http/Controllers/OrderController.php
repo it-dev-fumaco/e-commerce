@@ -245,7 +245,8 @@ class OrderController extends Controller
 
             if($status) {
                 $order_status_check = DB::table('order_status')->where('status', $status)->first();
-                
+
+                $order_details = DB::table('fumaco_order')->where('order_number', $request->order_number)->first();
                 $ordered_items = DB::table('fumaco_order_items')->where('order_number', $request->order_number)->get();
                 
                 if($order_status_check){
@@ -271,9 +272,14 @@ class OrderController extends Controller
                     $delivery_date = Carbon::now()->toDateTimeString();
                 }
 
+                $payment_status = 'Payment Received';
+                if($order_details->order_payment_method == 'Bank Deposit'){
+                    $payment_status = isset($request->payment_received) ? 'Payment Received' : $order_details->payment_status;
+                }
+
                 $orders_arr = [
                     'order_status' => $status,
-                    'payment_status' => isset($request->payment_received) ? 'Payment Received' : null,
+                    'payment_status' => $payment_status,
                     'order_update' => $now,
                     'date_delivered' => $delivery_date,
                     'date_cancelled' => $date_cancelled,
@@ -289,7 +295,7 @@ class OrderController extends Controller
                     'track_ip' => $request->ip(),
                     'transaction_member' => isset($request->member) ? 'Member' : 'Guest',
                     'track_active' => 1,
-                    'track_payment_status' => isset($request->payment_received) ? 'Payment Received' : null,
+                    'track_payment_status' => $payment_status,
                     'last_modified_by' => Auth::user()->username
                 ];
 
@@ -307,8 +313,6 @@ class OrderController extends Controller
                         'image' => ($image) ? $image->imgprimayx : null
                     ];
                 }
-
-                $order_details = DB::table('fumaco_order')->where('order_number', $request->order_number)->first();
 
                 $total_amount = $order_details->amount_paid;
                 
@@ -642,12 +646,12 @@ class OrderController extends Controller
 				return redirect()->back()->with('error', "Payment Status Name must be unique.");
 			}
 
-            $checker = DB::table('fumaco_payment_status')->get();
+            $status_sequence = DB::table('fumaco_payment_status')->orderBy('id', 'desc')->pluck('status_sequence')->first();
 
             $insert = [
                 'status' => $request->status_name,
                 'status_description' => $request->status_description,
-                'status_sequence' => !$checker ? 1 : null,
+                'status_sequence' => $status_sequence ? $status_sequence + 1 : 1,
                 'updates_status' => isset($request->updates_status) ? 1 : 0,
                 'created_by' => Auth::user()->username
             ];
