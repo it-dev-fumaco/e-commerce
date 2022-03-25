@@ -318,8 +318,8 @@
 					<div class="row m-4">
 						<div class="col-md-10 mx-auto">
 							<div class="card">
-									<div id="payment-form" class="d-none"></div>
-									<button class="btn btn-lg btn-outline-primary" id="checkout-btn" style="border: 0;" {{ (count($shipping_rates) <= 0) ? 'disabled' : '' }}>PAY NOW <span id="grand-total1" class="font-weight-bold"></span></button>
+								<div id="payment-form" class="d-none"></div>
+								<button class="btn btn-lg btn-outline-primary" id="checkout-btn" style="border: 0;" {{ (count($shipping_rates) <= 0) ? 'disabled' : '' }}>PAY NOW <br class="d-none d-lg-block d-xl-none"><span id="grand-total1" class="font-weight-bold"></span></button>
 							</div>
 						</div>
 					</div>
