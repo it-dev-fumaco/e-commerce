@@ -149,12 +149,6 @@
 									</div>
 								  </div>
 								<div class="row mb-2">
-									{{-- <div class="col-md-6 pr-1" style="text-align: right;">
-									
-									</div>
-									<div class="col-md-6" style="padding: 0; float: right !important; min-width: 120px !important; padding-right: 5%;">
-									
-									</div> --}}
 									<div class="modal right fade" id="filterModal2" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel2" aria-hidden="true">
 										<div class="modal-dialog modal-dialog-slideout modal-sm" role="document">
 											<div class="modal-content">
@@ -272,9 +266,9 @@
 											<div class="d-flex text ellipsis">
 												<a href="/product/{{ ($product['slug']) ? $product['slug'] : $product['item_code'] }}" class="card-text fumacoFont_card_title text-concat prod-desc" style="text-transform: none !important; text-decoration: none !important; color:#0062A5 !important; min-height: 100px; font-size: 16px !important; font-weight: 500 !important;">{{ $product['item_name'] }}</a>
 											</div>
-											<p class="card-text fumacoFont_card_price product_price_card" style="color:#000000 !important;">
+											<p class="card-text fumacoFont_card_price" style="color:#000000 !important; white-space: nowrap !important;">
 												@if($product['is_discounted'] == 1)
-												{{ $product['discounted_price'] }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">{{ $product['default_price'] }}</s>
+												{{ $product['discounted_price'] }}&nbsp;<s style="color: #c5c5c5; white-space: nowrap !important;">{{ $product['default_price'] }}</s>
 												@else
 												{{ $product['default_price'] }}
 												@endif
