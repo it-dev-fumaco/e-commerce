@@ -182,6 +182,51 @@
 						</div>
 						@endforeach
 					</div>
+					<div class="card-header">
+						<h3 class="card-title container-fluid">
+							<div class="row">
+								<div class="col-12 text-bold"><i class="fas fa-search mr-1"></i> Recent Search Terms</div>
+							</div>
+						</h3>
+					</div>
+					<div class="card-body">
+						@foreach ($recent_searches as $rs)
+						<button class="btn btn-outline-primary btn-sm btn-flat mb-2 mr-2" data-toggle="modal" data-target="#rs{{ Str::slug($rs['search_term']) }}Modal" type="button">{{ $rs['search_term'] }} ({{ $rs['search_term_count'] }})</button>
+						<div class="modal fade" id="rs{{ Str::slug($rs['search_term']) }}Modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+							<div class="modal-dialog" role="document">
+								<div class="modal-content">
+									<div class="modal-header">
+										<h5 class="modal-title font-weight-bold" id="exampleModalLabel">{{ $rs['search_term'] }}</h5>
+										<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+											<span aria-hidden="true">&times;</span>
+										</button>
+									</div>
+									<div class="modal-body p-4">
+										<table class="table table-sm table-hover table-bordered m-0" >
+											<thead>
+											<tr>
+												<th class="text-center" style="width: 60%;">Location</th>
+												<th class="text-center" style="width: 40%;">Frequency</th>
+											</tr>
+										</thead>
+											@foreach ($rs['location'] as $loc)
+												<tr>
+													<td class="text-center">
+														{{ $loc->city ? $loc->city : '-' }}
+													</td>
+													<td class="text-center">{{ $loc->count }}</td>
+												</tr>
+											@endforeach
+										</table>
+									</div>
+									<div class="modal-footer">
+										<button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Close</button>
+									</div>
+								</div>
+							</div>
+						</div>
+						@endforeach
+					</div>
 				</div>
 			</div>
 		</div>

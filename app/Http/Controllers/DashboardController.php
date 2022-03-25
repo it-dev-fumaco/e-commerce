@@ -309,7 +309,33 @@ class DashboardController extends Controller
 			];
 		}
 
-		return view('backend.dashboard.index', compact('new_orders', 'total_orders', 'users', 'total_sales', 'most_searched', 'sales_arr', 'sales_year', 'search_terms', 'cart_collection', 'cart_transactions', 'abandoned_cart', 'abandoned_arr'));
+		$today = Carbon::now()->format('Y-m-d');
+		$weekbefore = Carbon::now()->subDays(7)->format('Y-m-d');
+		$recent_searches_query = DB::table('fumaco_search_terms')->whereBetween('created_at', [$weekbefore, $today])
+			->select('search_term', DB::raw('COUNT(id) as count'))->groupBy('search_term')
+			->orderBy('count', 'desc')->limit(10)->get()->toArray();
+
+		$recent_searches_terms = array_column($recent_searches_query, 'search_term');
+
+		$recent_searches_location = DB::table('fumaco_search_terms')
+			->whereIn('search_term', $recent_searches_terms)->whereBetween('created_at', [$weekbefore, $today])
+			->select('search_term', 'city', 'region', 'country', DB::raw('COUNT(id) as count'))
+			->groupBy('search_term', 'city', 'region', 'country')->get();
+
+		$recent_searches_location = collect($recent_searches_location)->groupBy('search_term')->toArray();
+
+		$recent_searches = [];
+		foreach($recent_searches_query as $row){
+			$location = array_key_exists($row->search_term, $recent_searches_location) ? $recent_searches_location[$row->search_term] : [];
+
+			$recent_searches[] = [
+				'search_term' => $row->search_term,
+				'search_term_count' => $row->count,
+				'location' => $location,
+			];
+		}
+
+		return view('backend.dashboard.index', compact('new_orders', 'total_orders', 'users', 'total_sales', 'most_searched', 'sales_arr', 'sales_year', 'search_terms', 'cart_collection', 'cart_transactions', 'abandoned_cart', 'abandoned_arr', 'recent_searches'));
 	}
 
 	public function sendAbandonedCartEmail($transaction_id){
