@@ -98,7 +98,12 @@
 								@foreach ($bank_accounts as $account)
 								<div class="col-md-4">
 									<div class="card p-3">
-										<span class="d-block"><b>{{ $account->bank_name }}</b></span>
+										<div>
+											@if ($account->show_bank_logo && $account->bank_logo)
+											<img src="{{ asset('storage/bank_account_images/' . $account->bank_logo) }}" height="30" style="height: 30px !important;">
+											@endif
+											<span class="d-inline-block" style="vertical-align: bottom !important;"><b>{{ $account->bank_name }}</b></span>
+										</div>
 										<span class="d-block">Account Name: <b>{{ $account->account_name }}</b></span>
 										<span class="d-block">Account No.: <b>{{ $account->account_number }}</b></span>
 									</div>
