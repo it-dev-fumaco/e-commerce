@@ -58,7 +58,7 @@
 	<main style="background-color:#ffffff;" class="products-head">
 		<div class="container-fluid p-0"">
 			<div class="row">
-				<div class="col-md-4 mb-3">
+				<div class="col-12 col-lg-4 mb-3">
 					<div class="card he1x" style="background-color: #f4f4f4 !important; padding-bottom: 11px; min-height: 600px;">
 						<p style="margin: 15px 0 0 20px;"><strong>Your Order No.: <span id="order-no">{{ $order_no }}</span></strong></p>
 						<p style="margin: 15px 0 0 20px;">Customer Name: {{ (Auth::check()) ? Auth::user()->f_name . " " . Auth::user()->f_lname : $shipping_details['contact_person'] }}</p>
@@ -126,7 +126,7 @@
 					</div>
 				</div>
 				
-				<div class="col-md-4 mb-3">
+				<div class="col-12 col-lg-4 mb-3">
 					<div class="card he1x" style="background-color: #f4f4f4 !important; padding-bottom: 11px; min-height: 600px;">
 						<p style="padding: 15px 0 0 20px;">Order Summary</p>
 						<hr style="margin: -10px 20px 0 20px;">
@@ -202,7 +202,7 @@
 					</div>
 				</div>
 
-				<div class="col-md-4 mb-3">
+				<div class="col-12 col-lg-4 mb-3">
 					<div class="card he1x" style="background-color: #f4f4f4 !important; padding-bottom: 11px;">
 						<p style="padding: 15px 0 0 20px;">Select Shipping Method</p>
 						<hr style="margin: -10px 20px 0 20px;">

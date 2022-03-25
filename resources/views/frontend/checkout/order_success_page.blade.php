@@ -49,22 +49,34 @@
 			padding-left: 15% !important;
 			padding-right: 15% !important;
 		}
+		.bank-accounts{
+			margin-bottom: 0 !important
+		}
 		@media (max-width: 575.98px) {
 			.custom-padding{
-				padding-left: none !important;
-				padding-right: none !important;
+				padding-left: 0 !important;
+				padding-right: 0 !important;
+			}
+			.bank-accounts{
+				margin-bottom: 5px !important
 			}
 		}
   		@media (max-width: 767.98px) {
-			  .custom-padding{
-				padding-left: none !important;
-				padding-right: none !important;
+			.custom-padding{
+				padding-left: 0 !important;
+				padding-right: 0 !important;
+			}
+			.bank-accounts{
+				margin-bottom: 5px !important
 			}
 		  }
 		@media only screen and (min-device-width : 768px) and (max-device-width : 1024px) and (orientation : portrait) {
 			.custom-padding{
-				padding-left: none !important;
-				padding-right: none !important;
+				padding-left: 0 !important;
+				padding-right: 0 !important;
+			}
+			.bank-accounts{
+				margin-bottom: 5px !important
 			}
 		}
 
@@ -77,8 +89,8 @@
 	<main style="background-color:#ffffff;" class="products-head">
 		<div class="container">
 			<div class="row">
-				<div class="col-lg-12 custom-padding">
-					<div class="col-lg-12">
+				<div class="col-lg-12">
+					<div class="col-lg-12 p-0 custom-padding">
 						<center>
 							<br><br><br>
 							<h1 style="color:#186EA9 !important; letter-spacing: 2px !important;">THANK YOU FOR SHOPPING!</h1>
@@ -96,7 +108,7 @@
 							<p>You may send your payments on any of the following account(s):</p>
 							<div class="row mb-4">
 								@foreach ($bank_accounts as $account)
-								<div class="col-md-4">
+								<div class="col-md-4 bank-accounts">
 									<div class="card p-3">
 										<div>
 											@if ($account->show_bank_logo && $account->bank_logo)
@@ -168,7 +180,7 @@
 							<tfoot>
 								<tr style="font-size: 0.8rem; text-align: right;">
 									<td class="pb-1 pt-1 d-none d-sm-table-cell" colspan="{{ $colspan }}">Subtotal</td>
-									<td class="pb-1 pt-1 d-md-none">Subtotal</td>
+									<td class="pb-1 pt-1 d-md-none" style="white-space: nowrap !important;">Subtotal</td>
 									<td class="pb-1 pt-1" style="white-space: nowrap !important;">₱ {{ number_format(str_replace(",","",$order_details->order_subtotal), 2) }}</td>
 								</tr>
 								@if ($order_details->voucher_code)
@@ -184,12 +196,12 @@
 								@endif
 								<tr style="font-size: 0.8rem; text-align: right; border-top: 0;">
 									<td class="pb-1 pt-1 d-none d-sm-table-cell" colspan="{{ $colspan }}">{{ $order_details->order_shipping }}</td>
-									<td class="pb-1 pt-1 d-md-none">{{ $order_details->order_shipping }}</td>
+									<td class="pb-1 pt-1 d-md-none" style="white-space: nowrap !important;">{{ $order_details->order_shipping }}</td>
 									<td class="pb-1 pt-1" style="white-space: nowrap !important;">₱ {{ number_format(str_replace(",","",$order_details->order_shipping_amount), 2) }}</td>
 								</tr>
 								<tr style="font-size: 0.9rem; text-align: right; border-top: 2px solid;">
 									<td class="pb-1 pt-1 d-none d-sm-table-cell" colspan="{{ $colspan }}"><b>Grand Total</b></td>
-									<td class="pb-1 pt-1 d-md-none"><b>Grand Total</b></td>
+									<td class="pb-1 pt-1 d-md-none" style="white-space: nowrap !important;"><b>Grand Total</b></td>
 									<td class="pb-1 pt-1" style="white-space: nowrap !important;"><b>₱ {{ number_format(str_replace(",","",($order_details->order_shipping_amount + ($order_details->order_subtotal - $order_details->discount_amount))), 2) }}</b></td>
 								</tr>
 							</tfoot>
