@@ -110,7 +110,7 @@
      </tr>
 	 <tr>
         <td class="button borderbottom" style="padding: 6% 5% 6% 5%; text-align: left;">
-            <a href="{{ route('track_order', ['id' => $order['order_details']->order_number]) }}" style="background: #e05443; padding: 2% 5%;">Track my Order</a>
+            <a href="{{ route('track_order', [$order['order_details']->order_number]) }}" style="background: #e05443; padding: 2% 5%;">Track my Order</a>
         </td>
      </tr>
 
