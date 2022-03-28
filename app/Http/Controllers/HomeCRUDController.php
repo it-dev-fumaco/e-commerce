@@ -106,20 +106,25 @@ class HomeCRUDController extends Controller
 		DB::beginTransaction();
 		try{
 			$checker = DB::table('fumaco_header')->where('id', $request->id)->first();
-
 			if($checker->fumaco_active == 1){
-				return redirect()->back()->with('active', 'Header is already active');
+				return redirect()->back()->with('error', 'Header is already active');
 			}
 
 			if($checker->fumaco_status == 0){
-				return redirect()->back()->with('disabled', 'Header is disabled');
+				return redirect()->back()->with('error', 'Header is disabled');
 			}
 
-			$update = DB::table('fumaco_header')->where('id', $request->id)->update(['fumaco_active' => 1, 'last_modified_by' => Auth::user()->username]);
+			$checker2 = DB::table('fumaco_header')->where('id', '!=', $request->id)->where('fumaco_active', 1)->exists();
+			if($checker2){
+				return redirect()->back()->with('error', 'Another item is currently active. Please remove active status of existing one.');
+			}
+
+			DB::table('fumaco_header')->where('id', $request->id)->update(['fumaco_active' => 1, 'last_modified_by' => Auth::user()->username]);
             DB::commit();
 			return redirect()->back()->with('active_success', 'Record Updated Successfully');
 		}catch(Exception $e){
 			DB::rollback();
+			return redirect()->back()->with('error', 'An error occured. Please try again');
 		}
     }
 
