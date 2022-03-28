@@ -500,9 +500,9 @@
 														<div class="text ellipsis">
 															<a href="/product/{{ ($rp['slug']) ? $rp['slug'] : $rp['item_code'] }}" class="card-text product-head fumacoFont_card_title text-concat prod_desc" style="text-decoration: none !important; text-transform: none !important; color:#0062A5 !important;  min-height: 100px;">{{ $rp['item_name'] }}</a>
 														</div>
-														<p class="card-text fumacoFont_card_price d-sm-block d-md-none d-lg-block" style="color:#000000 !important; ">
+														<p class="card-text fumacoFont_card_price" style="color:#000000 !important; ">
 															@if ($rp['is_discounted'] == 1)
-															<span style="white-space: nowrap !important">{{ $rp['discounted_price'] }}</span>&nbsp;<br class="d-lg-none"/><s style="color: #c5c5c5;">{{ $rp['default_price'] }}</s>
+															<span style="white-space: nowrap !important;">{{ $rp['discounted_price'] }}</span><br class="d-lg-none"/><s style="color: #c5c5c5; white-space: nowrap !important;">{{ $rp['default_price'] }}</s>
 															@else
 															{{ $rp['default_price'] }}
 															@endif
