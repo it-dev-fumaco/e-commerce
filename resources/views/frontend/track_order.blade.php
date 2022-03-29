@@ -192,6 +192,10 @@
 													<td colspan="4" class="table-text p-1" style="text-align: right;">Grand Total : </td>
 													<td class="table-text p-1" style="text-align: right; white-space: nowrap !important">₱ {{ number_format($grand_total, 2) }}</td>
 												</tr>
+												<tr style="border-bottom: rgba(0,0,0,0) !important; font-size: 11pt;">
+													<td colspan="4" class="table-text p-1" style="text-align: right;">Payment Method : </td>
+													<td class="table-text p-1" style="text-align: right; white-space: nowrap !important">{{ $order_details->order_payment_method }}</td>
+												</tr>
 											</tbody>
 										</table>
 									</div>
