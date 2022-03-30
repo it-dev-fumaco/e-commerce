@@ -25,27 +25,25 @@
             <div class="col-lg-12">
               <br>
                 <div id="logreg-forms" style="box-shadow: unset !important;">
-              
-
                     <form action="user_register" class="form-signup1" method="post" style="max-width: 600px !important; border-color: #efefef; border-style: solid; border-width: 1px; border-top: 8px solid #186eaa; ">
                         @if(session()->has('success'))
-                        <div class="alert alert-success alert-dismissible fade show" role="alert">
-                            {{ session()->get('success') }}
-                        </div>
-                    @endif
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                {{ session()->get('success') }}
+                            </div>
+                        @endif
 
-                    @if(session()->has('error'))
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            {{ session()->get('error') }}
-                        </div>
-                    @endif
-                    @if(count($errors->all()) > 0)
-						<div class="alert alert-warning alert-dismissible fade show text-center" role="alert">
-							@foreach ($errors->all() as $error)
-								{{ $error }}
-							@endforeach 
-						</div>
-					@endif
+                        @if(session()->has('error'))
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                {{ session()->get('error') }}
+                            </div>
+                        @endif
+                        @if(count($errors->all()) > 0)
+                            <div class="alert alert-warning alert-dismissible fade show text-center" role="alert">
+                                @foreach ($errors->all() as $error)
+                                    {{ $error }}
+                                @endforeach 
+                            </div>
+                        @endif
                         @csrf
                         <h4 style="color: #404040; border-bottom: 2px solid  #e59866 ; padding-bottom: 8px; text-align: center;">Sign Up</h4>
                         <br>
@@ -72,12 +70,14 @@
                                     <label class="login_1">Password <span class="text-danger">*</span></label>
                                     <input type="password" name="password" id="password" class="form-control caption_1" value="" required>
                                     <span class="help-block"></span>
+                                    <span class="password-warning-text d-none">* Password must be at least 6 characters</span>
                                 </div>
                                 <br/>
                                 <div class="row">
                                     <label class="login_1">Confirm Password <span class="text-danger">*</span></label>
                                     <input type="password" name="password_confirmation" id="confirm_password"  class="form-control caption_1" value="" required>
                                     <span class="help-block"></span>
+                                    <span class="confirm-password-warning-text d-none">* Passwords do not match</span>
                                 </div>
                                 <br>
                                 <div class="row">
@@ -133,6 +133,72 @@
   });
 </script> 
 <script>
+    var pass_length_error = 0;
+    var pass_confirm_error = 0;
+    var terms_error = 0;
+
+    function passwordLengthCheck(){
+        if(parseInt($('#password').val().length) > 0 && parseInt($('#password').val().length) < 6){
+            $('#password').addClass('password-warning');
+            $('.password-warning-text').removeClass('d-none');
+            pass_length_error = 1;
+        }else{
+            $('#password').removeClass('password-warning');
+            $('.password-warning-text').addClass('d-none');
+            pass_length_error = 0;
+        }
+    }
+
+    function confirmPasswordCheck(){
+        if($('#confirm_password').val() != $('#password').val()){
+            $('#confirm_password').addClass('password-warning');
+            $('.confirm-password-warning-text').removeClass('d-none');
+            pass_confirm_error = 1;
+        }else{
+            $('#confirm_password').removeClass('password-warning');
+            $('.confirm-password-warning-text').addClass('d-none');
+            pass_confirm_error = 0;
+        }
+    }
+
+    function termsCheck(){
+        if($('#terms_checkbox').prop("checked") == false) {
+            terms_error = 1;
+        }else{
+            terms_error = 0;
+        }
+    }
+
+    function enableSubmit(){
+        if(parseInt(pass_confirm_error) == 0 && parseInt(pass_length_error) == 0 && parseInt(terms_error) == 0){
+            $("#reg_btn").prop('disabled',false);
+        }else{
+            $("#reg_btn").prop('disabled',true);
+        }
+    }
+
+    $('#password').keyup(function(){
+        passwordLengthCheck();
+        confirmPasswordCheck();
+        termsCheck();
+        enableSubmit();
+    });
+
+    $('#confirm_password').keyup(function(){
+        if(parseInt($(this).val().length) > 0 && parseInt($('#password').val().length) > 0){
+            confirmPasswordCheck();
+            passwordLengthCheck();
+            termsCheck();
+            enableSubmit();
+        }
+    });
+
+    $('#terms_checkbox').click(function() {
+        confirmPasswordCheck();
+        passwordLengthCheck();
+        termsCheck();
+        enableSubmit();
+    });
 
     function toggleResetPswd(e){
         e.preventDefault();
@@ -154,21 +220,18 @@
         $('#logreg-forms #cancel_signup').click(toggleSignUp);
     })
 
-    $(document).ready(function() {
-        $('#terms_checkbox').click(function() {
-            if($(this).prop("checked") == false) {
-                $("#reg_btn").prop('disabled',true);
-            }else{
-                $("#reg_btn").prop('disabled',false);
-            }
-        });
-    });
-
 	</script>
 @endsection
 
 @section('style')
 <style>
+    .password-warning{
+        border: 1px solid #FF0000;
+    }
+    .password-warning-text, .confirm-password-warning-text{
+        color: #ec4a4a;
+        font-size: 9pt;
+    }
     .reg_link{
         font-size: 9pt;
         white-space: nowrap !important;
