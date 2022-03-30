@@ -32,16 +32,94 @@
                             <h3 class="card-title">List Carousel</h3>
                         </div>
                         <div class="card-body">
-                            @if(session()->has('success'))
-                                <div class="alert alert-success fade show" role="alert">
-                                    {{ session()->get('success') }}
+                            <div class="container-fluid text-right mb-2">
+                                @if(session()->has('success'))
+                                    <div class="alert alert-success fade show text-left" role="alert">
+                                        {{ session()->get('success') }}
+                                    </div>
+                                @endif
+                                @if(session()->has('error'))
+                                    <div class="alert alert-warning fade show text-left" role="alert">
+                                        {{ session()->get('error') }}
+                                    </div>
+                                @endif
+                                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+                                    Add header carousel
+                                </button>
+
+                                <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-xl" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="exampleModalLabel">Add Header Carousel</h5>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <form role="form" action="/admin/add_carousel" method="post" enctype="multipart/form-data">
+                                                <div class="modal-body text-left">
+                                                    @csrf
+                                                    <div class="card-body">
+                                                        <div class="row">
+                                                            <div class="col-12 mb-2">
+                                                                <label for="heading">Heading 1 *</label>
+                                                                <input type="text" class="form-control" id="heading" name="heading" value="" required>
+                                                            </div>
+
+                                                            <div class="col-12 mb-2">
+                                                                <label for="caption">Caption 1</label>
+                                                                <textarea class="form-control" rows="3" id="caption" name="caption"></textarea>
+                                                            </div>
+
+                                                            <div class="col-6 mb-2">
+                                                                <label for="btn_name">Button Name *</label>
+                                                                <input type="text" class="form-control" id="btn_name" name="btn_name" value="" required>
+                                                            </div>
+
+                                                            <div class="col-6 mb-2">
+                                                                <label for="url">URL *</label>
+                                                                <input type="text" class="form-control" id="url" name="url" value="" required>
+                                                            </div>
+
+                                                            <div class="col-6 mb-2">
+                                                                <label>Desktop Image *</label>
+                                                                <div class="input-group">
+                                                                    <div class="input-group-prepend">
+                                                                      <span class="input-group-text" id="inputGroupFileAddon01">Upload</span>
+                                                                    </div>
+                                                                    <div class="custom-file">
+                                                                      <input type="file" class="custom-file-input" name="fileToUpload" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01" required>
+                                                                      <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            {{-- <div class="col-6 mb-2">
+                                                                <label>Mobile Image *</label>
+                                                                <div class="input-group">
+                                                                    <div class="input-group-prepend">
+                                                                      <span class="input-group-text" id="inputGroupFileAddon01">Upload</span>
+                                                                    </div>
+                                                                    <div class="custom-file">
+                                                                      <input type="file" class="custom-file-input" name="mobile_image" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01" required>
+                                                                      <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
+                                                                    </div>
+                                                                </div>
+                                                            </div> --}}
+                                                        </div>
+                        
+                                                    </div>
+                                                    <!-- /.card-body -->
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                    <button type="submit" class="btn btn-primary">Upload</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
                                 </div>
-                            @endif
-                            @if(session()->has('error'))
-                                <div class="alert alert-warning fade show" role="alert">
-                                    {{ session()->get('error') }}
-                                </div>
-                            @endif
+                            </div>
                             <table id="example2" data-pagination="true" class="table table-bordered table-hover">
                                 <thead>
                                 <tr>
@@ -125,7 +203,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-12">
+                {{-- <div class="col-md-12">
                     <div class="card card-primary">
                         <div class="card-header">
                             <h3 class="card-title">Add Header Carousel</h3>
@@ -154,8 +232,9 @@
                                 </div>
 
                                 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#upload-desktop-image-Modal">
-                                    Upload an image *
+                                    Upload Images *
                                 </button>
+
                                 <span id="no-img-warning" class="badge badge-warning p-2 d-none">Image is required</span>
                                   
                                 <!-- Modal -->
@@ -169,13 +248,29 @@
                                                 </button>
                                             </div>
                                             <div class="modal-body">
-                                                <div class="input-group">
-                                                    <div class="input-group-prepend">
-                                                      <span class="input-group-text" id="inputGroupFileAddon01">Upload</span>
+                                                <div class="container">
+                                                    <label>Desktop Image *</label>
+                                                    <div class="input-group">
+                                                        <div class="input-group-prepend">
+                                                          <span class="input-group-text" id="inputGroupFileAddon01">Upload</span>
+                                                        </div>
+                                                        <div class="custom-file">
+                                                          <input type="file" class="custom-file-input" name="fileToUpload" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01" required>
+                                                          <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
+                                                        </div>
                                                     </div>
-                                                    <div class="custom-file">
-                                                      <input type="file" class="custom-file-input" name="fileToUpload" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01" required>
-                                                      <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
+                                                </div>
+
+                                                <div class="container mt-3">
+                                                    <label>Mobile Image *</label>
+                                                    <div class="input-group">
+                                                        <div class="input-group-prepend">
+                                                          <span class="input-group-text" id="inputGroupFileAddon01">Upload</span>
+                                                        </div>
+                                                        <div class="custom-file">
+                                                          <input type="file" class="custom-file-input" name="mobile_image" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01" required>
+                                                          <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -185,13 +280,12 @@
                             </div>
                             <!-- /.card-body -->
                             <div class="card-footer">
-                                {{-- <input type="submit" class="btn btn-primary" value="Upload"> --}}
                                 <button type="submit" class="btn btn-primary" id="save-carousel">Upload</button>
                             </div>
                         </form>
                     </div>
                     <!-- /.card -->
-                </div>
+                </div> --}}
                 <div class="col-md-12">
                     <div class="card card-primary">
                         <div class="card-header">
@@ -301,13 +395,6 @@
     }
 </style>
 <script>
-    $(document).ready(function(){
-        $("#save-carousel").click(function(){
-            if($(".custom-file-input").val().length == 0){
-                $("#no-img-warning").removeClass('d-none');
-            }
-        });
-    });
     $(".custom-file-input").change(function() {
         var fileName = $(this).val().split("\\").pop();
         $(this).siblings(".custom-file-label").addClass("selected").html(fileName);

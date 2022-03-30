@@ -35,18 +35,44 @@ class HomeCRUDController extends Controller
 		return view('backend.dashboard.home_crud', compact('carousel_arr', 'page'));
 	}
 
+	private function uploadImage(object $image, $filename, $img_name){
+		$webp = Webp::make($image);
+
+		if ($webp->save(storage_path('/app/public/journals/'.$filename.'.webp'))) {
+			// File is saved successfully
+			$destinationPath = storage_path('/app/public/journals/');
+			$image->move($destinationPath, $img_name);
+		}
+	}
+
 	public function add_header_carousel(Request $request){
 		DB::beginTransaction();
 		try{
-			$checker = DB::table('fumaco_header')->pluck('fumaco_image1')->toArray();
-			$img = $request->file('fileToUpload');
+			$checker = DB::table('fumaco_header')->select('fumaco_image1', 'fumaco_image2')->get();
+			$desktop_img_check = collect($checker)->map(function ($check) {
+				return $check->fumaco_image1;
+			});
 
+			// $mobile_img_check = collect($checker)->map(function ($check) {
+			// 	return $check->fumaco_image2;
+			// });
+
+			$img = $request->file('fileToUpload');
+			// $mobile_img = $request->file('mobile_image');
+
+			// desktop image
 			$filename = pathinfo($img->getClientOriginalName(), PATHINFO_FILENAME);
 			$extension = pathinfo($img->getClientOriginalName(), PATHINFO_EXTENSION);
 
+			// mobile image
+			// $mobile_filename = pathinfo($mobile_img->getClientOriginalName(), PATHINFO_FILENAME);
+			// $mobile_extension = pathinfo($mobile_img->getClientOriginalName(), PATHINFO_EXTENSION);
+
 			$filename = Str::slug($filename, '-');
+			// $mobile_filename = Str::slug($mobile_filename, '-');
 
 			$image_name = $filename.".".$extension;
+			// $mobile_image_name = $mobile_filename.".".$mobile_extension;
 
 			$image_error = '';
 			$rules = array(
@@ -64,7 +90,7 @@ class HomeCRUDController extends Controller
 				return redirect()->back()->with('error', "Sorry, only JPG, JPEG, PNG and GIF files are allowed.");
 			}
 
-			if(in_array($image_name, $checker)){
+			if(in_array($image_name, $desktop_img_check->toArray())){
 				return redirect()->back()->with('error', "Sorry, file already exists.");
 			}
 
@@ -76,18 +102,13 @@ class HomeCRUDController extends Controller
 				'fumaco_active' => 0,
 				'fumaco_status' => 1,
 				'fumaco_image1' => $image_name,
-				'fumaco_image2' => $image_name,
+				'fumaco_image2' => $image_name,//$mobile_image_name,
 				'created_by' => Auth::user()->username,
 				'last_modified_by' => Auth::user()->username,
 			];
 
-			$webp = Webp::make($request->file('fileToUpload'));
-
-			if ($webp->save(storage_path('/app/public/journals/'.$filename.'.webp'))) {
-				// File is saved successfully
-				$destinationPath = storage_path('/app/public/journals/');
-				$img->move($destinationPath, $img->getClientOriginalName());
-			}
+			$this->uploadImage($img, $filename, $image_name); // convert desktop image
+			// $this->uploadImage($mobile_img, $mobile_filename, $mobile_image_name); // convert mobile image
 
 			DB::table('fumaco_header')->insert($add_carousel);
             DB::commit();
