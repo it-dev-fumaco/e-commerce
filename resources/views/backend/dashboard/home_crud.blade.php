@@ -62,6 +62,10 @@
                                                     <div class="card-body">
                                                         <div class="row">
                                                             <div class="col-12 mb-2">
+                                                                <label>Text Color (Default: White)</label>
+                                                                <input type="text" class="color-picker" name="text_color" value="#FFF">
+                                                            </div>
+                                                            <div class="col-12 mb-2">
                                                                 <label for="heading">Heading 1 *</label>
                                                                 <input type="text" class="form-control" id="heading" name="heading" value="" required>
                                                             </div>
@@ -94,7 +98,7 @@
                                                                 </div>
                                                             </div>
 
-                                                            {{-- <div class="col-6 mb-2">
+                                                            <div class="col-6 mb-2">
                                                                 <label>Mobile Image *</label>
                                                                 <div class="input-group">
                                                                     <div class="input-group-prepend">
@@ -105,7 +109,7 @@
                                                                       <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
                                                                     </div>
                                                                 </div>
-                                                            </div> --}}
+                                                            </div>
                                                         </div>
                         
                                                     </div>
@@ -137,14 +141,23 @@
                                         <tr>
                                             <td style="width: 10%">
                                                 <a href="#" data-toggle="modal" data-target="#image-preview-Modal{{ $carousel['id'] }}">
-                                                    <img src="{{ asset('/storage/journals/'.$carousel['sm_img']) }}" class="img-thumbnail" alt="{{ Str::slug(explode(".", $carousel['sm_img'])[0], '-') }}">
+                                                    <img src="{{ asset('/storage/journals/'.$carousel['lg_img']) }}" class="img-thumbnail" alt="{{ Str::slug(explode(".", $carousel['lg_img'])[0], '-') }}">
                                                 </a>
 
                                                 <div class="modal fade" id="image-preview-Modal{{ $carousel['id'] }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                                    <div class="modal-dialog" role="document">
+                                                    <div class="modal-dialog modal-xl" role="document">
                                                         <div class="modal-content">
                                                             <div class="modal-body">
-                                                                <img src="{{ asset('/storage/journals/'.$carousel['lg_img']) }}" class="img-thumbnail w-100" alt="{{ Str::slug(explode(".", $carousel['lg_img'])[0], '-') }}">
+                                                                <div class="row">
+                                                                    <div class="col-3">
+                                                                        <label>Mobile Image</label>
+                                                                        <img src="{{ asset('/storage/journals/'.$carousel['sm_img']) }}" class="img-thumbnail w-100" alt="{{ Str::slug(explode(".", $carousel['sm_img'])[0], '-') }}">
+                                                                    </div>
+                                                                    <div class="col-9">
+                                                                        <label>Desktop Image</label>
+                                                                        <img src="{{ asset('/storage/journals/'.$carousel['lg_img']) }}" class="img-thumbnail w-100" alt="{{ Str::slug(explode(".", $carousel['lg_img'])[0], '-') }}">
+                                                                    </div>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -200,92 +213,12 @@
                                     @endforeach
                                 </tbody>
                             </table>
+                            <div class="float-right mt-4">
+                                {{ $carousel_data->withQueryString()->links('pagination::bootstrap-4') }}
+                            </div>
                         </div>
                     </div>
                 </div>
-                {{-- <div class="col-md-12">
-                    <div class="card card-primary">
-                        <div class="card-header">
-                            <h3 class="card-title">Add Header Carousel</h3>
-                        </div>
-                        <form role="form" action="/admin/add_carousel" method="post" enctype="multipart/form-data">
-                            @csrf
-                            <div class="card-body">
-                                <div class="form-group">
-                                    <label for="heading">Heading 1 *</label>
-                                    <input type="text" class="form-control" id="heading" name="heading" value="" required>
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="caption">Caption 1</label>
-                                    <textarea class="form-control" rows="6" id="caption" name="caption"></textarea>
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="btn_name">Button Name *</label>
-                                    <input type="text" class="form-control" id="btn_name" name="btn_name" value="" required>
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="url">URL *</label>
-                                    <input type="text" class="form-control" id="url" name="url" value="" required>
-                                </div>
-
-                                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#upload-desktop-image-Modal">
-                                    Upload Images *
-                                </button>
-
-                                <span id="no-img-warning" class="badge badge-warning p-2 d-none">Image is required</span>
-                                  
-                                <!-- Modal -->
-                                <div class="modal fade" id="upload-desktop-image-Modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                    <div class="modal-dialog" role="document">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="exampleModalLabel">Upload Image</h5>
-                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                <span aria-hidden="true">&times;</span>
-                                                </button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <div class="container">
-                                                    <label>Desktop Image *</label>
-                                                    <div class="input-group">
-                                                        <div class="input-group-prepend">
-                                                          <span class="input-group-text" id="inputGroupFileAddon01">Upload</span>
-                                                        </div>
-                                                        <div class="custom-file">
-                                                          <input type="file" class="custom-file-input" name="fileToUpload" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01" required>
-                                                          <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <div class="container mt-3">
-                                                    <label>Mobile Image *</label>
-                                                    <div class="input-group">
-                                                        <div class="input-group-prepend">
-                                                          <span class="input-group-text" id="inputGroupFileAddon01">Upload</span>
-                                                        </div>
-                                                        <div class="custom-file">
-                                                          <input type="file" class="custom-file-input" name="mobile_image" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01" required>
-                                                          <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- /.card-body -->
-                            <div class="card-footer">
-                                <button type="submit" class="btn btn-primary" id="save-carousel">Upload</button>
-                            </div>
-                        </form>
-                    </div>
-                    <!-- /.card -->
-                </div> --}}
                 <div class="col-md-12">
                     <div class="card card-primary">
                         <div class="card-header">
@@ -339,6 +272,8 @@
   </aside>
 
 </div>
+<script src="{{ asset('/color_picker/jquery.minicolors.js') }}"></script>
+<link rel="stylesheet" href="{{ asset('/color_picker/jquery.minicolors.css') }}">
 <style>
     .dropbtn {
       background-color: #3498DB;
@@ -393,8 +328,13 @@
         background-color: #d1d1d1;
         transition: .4s;
     }
+    .color-picker{
+        cursor: pointer;
+        border: none !important;
+    }
 </style>
 <script>
+    $('.color-picker').minicolors();
     $(".custom-file-input").change(function() {
         var fileName = $(this).val().split("\\").pop();
         $(this).siblings(".custom-file-label").addClass("selected").html(fileName);

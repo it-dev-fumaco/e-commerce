@@ -62,18 +62,24 @@
             }
           @endphp
           <div class="carousel-item {{ $active }}" style="background: black;">
-            <picture>
+            <picture class="d-none d-md-block">
               <source srcset="{{ asset('/storage/journals/'. explode(".", $carousel->fumaco_image1)[0] .'.webp') }}" type="image/webp" style="object-fit: cover;">
               <source srcset="{{ asset('/storage/journals/'. $carousel->fumaco_image1) }}" type="image/jpeg" style="object-fit: cover;">
               <img src="{{ asset('/storage/journals/'. $carousel->fumaco_image1) }}" alt="{{ Str::slug(explode(".", $carousel->fumaco_image1)[0], '-') }}" style="object-fit: cover;height: 100% !important; width: 100% !important">
             </picture>
 
+            <picture class="d-block d-md-none">
+              <source srcset="{{ asset('/storage/journals/'. explode(".", $carousel->fumaco_image2)[0] .'.webp') }}" type="image/webp" style="object-fit: cover;">
+              <source srcset="{{ asset('/storage/journals/'. $carousel->fumaco_image2) }}" type="image/jpeg" style="object-fit: cover;">
+              <img src="{{ asset('/storage/journals/'. $carousel->fumaco_image2) }}" alt="{{ Str::slug(explode(".", $carousel->fumaco_image2)[0], '-') }}" style="object-fit: cover;height: 100% !important; width: 100% !important">
+            </picture>
+
             <div class="container">
               <div class="carousel-caption text-start">
-                <h3 class="carousel-header-font fumacoFont1">{{ $carousel->fumaco_title }}</h3>
+                <h3 class="carousel-header-font fumacoFont1" style="color: {{ $carousel->text_color }} !important">{{ $carousel->fumaco_title }}</h3>
                 @if ($carousel->fumaco_caption)
                   <div class="text ellipsis">
-                    <p class="carousel-caption-font fumacoFont2 carousel-text-concat" style="text-align: left; text-justify: left; letter-spacing: 1px;">{{ $string }}</p>
+                    <p class="carousel-caption-font fumacoFont2 carousel-text-concat" style="text-align: left; text-justify: left; letter-spacing: 1px;color: {{ $carousel->text_color }} !important">{{ $string }}</p>
                   </div>
                 @endif
                 <p><a class="btn btn-lg btn-primary btn-fumaco fumacoFont_btn" href="{{ $carousel->fumaco_url }}"role="button">{{ $carousel->fumaco_btn_name }}</a></p>
@@ -332,7 +338,9 @@
 @section('script')
   <script src="{{ asset('/slick/slick.js') }}" type="text/javascript" charset="utf-8"></script>
   <script type="text/javascript">
-    $('#myCarousel').css('margin-top', $('#navbar').height());
+    if( !/Android|webOS|iPhone|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+      $('#myCarousel').css('margin-top', $('#navbar').height());
+    }
 
     $(document).ready(function() {
       setTimeout(function() {

@@ -15,7 +15,7 @@ use DB;
 class HomeCRUDController extends Controller
 {
     public function home_crud(){
-		$carousel_data = DB::table('fumaco_header')->get();
+		$carousel_data = DB::table('fumaco_header')->paginate(10);
 		$carousel_arr = [];
 		foreach($carousel_data as $carousel){
 			$carousel_arr[] = [
@@ -32,7 +32,7 @@ class HomeCRUDController extends Controller
 		}
         $page = DB::table('fumaco_pages')->where('is_homepage', 1)->first();
 
-		return view('backend.dashboard.home_crud', compact('carousel_arr', 'page'));
+		return view('backend.dashboard.home_crud', compact('carousel_data', 'carousel_arr', 'page'));
 	}
 
 	private function uploadImage(object $image, $filename, $img_name){
@@ -53,26 +53,26 @@ class HomeCRUDController extends Controller
 				return $check->fumaco_image1;
 			});
 
-			// $mobile_img_check = collect($checker)->map(function ($check) {
-			// 	return $check->fumaco_image2;
-			// });
+			$mobile_img_check = collect($checker)->map(function ($check) {
+				return $check->fumaco_image2;
+			});
 
 			$img = $request->file('fileToUpload');
-			// $mobile_img = $request->file('mobile_image');
+			$mobile_img = $request->file('mobile_image');
 
 			// desktop image
 			$filename = pathinfo($img->getClientOriginalName(), PATHINFO_FILENAME);
 			$extension = pathinfo($img->getClientOriginalName(), PATHINFO_EXTENSION);
 
 			// mobile image
-			// $mobile_filename = pathinfo($mobile_img->getClientOriginalName(), PATHINFO_FILENAME);
-			// $mobile_extension = pathinfo($mobile_img->getClientOriginalName(), PATHINFO_EXTENSION);
+			$mobile_filename = pathinfo($mobile_img->getClientOriginalName(), PATHINFO_FILENAME);
+			$mobile_extension = pathinfo($mobile_img->getClientOriginalName(), PATHINFO_EXTENSION);
 
 			$filename = Str::slug($filename, '-');
-			// $mobile_filename = Str::slug($mobile_filename, '-');
+			$mobile_filename = Str::slug($mobile_filename, '-');
 
 			$image_name = $filename.".".$extension;
-			// $mobile_image_name = $mobile_filename.".".$mobile_extension;
+			$mobile_image_name = $mobile_filename.".".$mobile_extension;
 
 			$image_error = '';
 			$rules = array(
@@ -86,29 +86,30 @@ class HomeCRUDController extends Controller
 				return redirect()->back()->with('error', "Sorry, your file is too large.");
 			}
 
-			if(!in_array($extension, $allowed_extensions)){
+			if(!in_array($extension, $allowed_extensions) or !in_array($mobile_extension, $allowed_extensions)){
 				return redirect()->back()->with('error', "Sorry, only JPG, JPEG, PNG and GIF files are allowed.");
 			}
 
-			if(in_array($image_name, $desktop_img_check->toArray())){
+			if(in_array($image_name, $desktop_img_check->toArray()) or in_array($mobile_image_name, $mobile_img_check->toArray())){
 				return redirect()->back()->with('error', "Sorry, file already exists.");
 			}
 
 			$add_carousel = [
 				'fumaco_title' => $request->heading,
 				'fumaco_caption' => $request->caption,
+				'text_color' => $request->text_color,
 				'fumaco_url' => $request->url,
 				'fumaco_btn_name' => $request->btn_name,
 				'fumaco_active' => 0,
 				'fumaco_status' => 1,
 				'fumaco_image1' => $image_name,
-				'fumaco_image2' => $image_name,//$mobile_image_name,
+				'fumaco_image2' => $mobile_image_name,
 				'created_by' => Auth::user()->username,
 				'last_modified_by' => Auth::user()->username,
 			];
 
 			$this->uploadImage($img, $filename, $image_name); // convert desktop image
-			// $this->uploadImage($mobile_img, $mobile_filename, $mobile_image_name); // convert mobile image
+			$this->uploadImage($mobile_img, $mobile_filename, $mobile_image_name); // convert mobile image
 
 			DB::table('fumaco_header')->insert($add_carousel);
             DB::commit();
