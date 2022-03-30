@@ -40,16 +40,19 @@
           @endforelse
         @foreach ($carousel_data as $carousel)
           @php
-            $string = strip_tags($carousel->fumaco_caption);
-            if (strlen($string) > 250) {
+            $string = null;
+            if($carousel->fumaco_caption){
+              $string = strip_tags($carousel->fumaco_caption);
+              if (strlen($string) > 250) {
 
-              // truncate string
-              $stringCut = substr($string, 0, 180);
-              $endPoint = strrpos($stringCut, ' ');
+                // truncate string
+                $stringCut = substr($string, 0, 180);
+                $endPoint = strrpos($stringCut, ' ');
 
-              //if the string doesn't contain any space then it will cut without word basis.
-              $string = $endPoint? substr($stringCut, 0, $endPoint) : substr($stringCut, 0);
-              $string .= '...';
+                //if the string doesn't contain any space then it will cut without word basis.
+                $string = $endPoint? substr($stringCut, 0, $endPoint) : substr($stringCut, 0);
+                $string .= '...';
+              }
             }
             $active = '';
             if(count($onsale_carousel_data) == 0){
@@ -68,9 +71,11 @@
             <div class="container">
               <div class="carousel-caption text-start">
                 <h3 class="carousel-header-font fumacoFont1">{{ $carousel->fumaco_title }}</h3>
-                <div class="text ellipsis">
-                  <p class="carousel-caption-font fumacoFont2 carousel-text-concat" style="text-align: left; text-justify: left; letter-spacing: 1px;">{{ $string }}</p>
-                </div>
+                @if ($carousel->fumaco_caption)
+                  <div class="text ellipsis">
+                    <p class="carousel-caption-font fumacoFont2 carousel-text-concat" style="text-align: left; text-justify: left; letter-spacing: 1px;">{{ $string }}</p>
+                  </div>
+                @endif
                 <p><a class="btn btn-lg btn-primary btn-fumaco fumacoFont_btn" href="{{ $carousel->fumaco_url }}"role="button">{{ $carousel->fumaco_btn_name }}</a></p>
               </div>
             </div>

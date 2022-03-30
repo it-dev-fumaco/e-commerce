@@ -32,42 +32,6 @@
                             <h3 class="card-title">List Carousel</h3>
                         </div>
                         <div class="card-body">
-                            @if(session()->has('active_success'))
-                                <div class="alert alert-success">
-                                    {{ session()->get('active_success') }}
-                                </div>
-                            @elseif(session()->has('active'))
-                                <div class="alert alert-success">
-                                    {{ session()->get('active') }}
-                                </div>
-                            @elseif(session()->has('active'))
-                                <div class="alert alert-success">
-                                    {{ session()->get('active') }}
-                                </div>
-                            @endif
-
-                            @if(session()->has('remove_success'))
-                                <div class="alert alert-success">
-                                    {{ session()->get('remove_success') }}
-                                </div>
-                            @elseif(session()->has('remove_active'))
-                                <div class="alert alert-success">
-                                    {{ session()->get('remove_active') }}
-                                </div>
-                            @endif
-
-                            @if(session()->has('remove_header'))
-                                <div class="alert alert-success">
-                                    {{ session()->get('remove_header') }}
-                                </div>
-                            @endif
-
-                            @if(session()->has('image_error'))
-                                <div class="alert alert-success">
-                                    {{ session()->get('image_error') }}
-                                </div>
-                            @endif
-
                             @if(session()->has('success'))
                                 <div class="alert alert-success fade show" role="alert">
                                     {{ session()->get('success') }}
@@ -81,6 +45,7 @@
                             <table id="example2" data-pagination="true" class="table table-bordered table-hover">
                                 <thead>
                                 <tr>
+                                    <th>Image</th>
                                     <th>Title</th>
                                     <th>Btn Caption</th>
                                     <th>Url</th>
@@ -92,6 +57,21 @@
                                 <tbody>
                                     @foreach($carousel_arr as $carousel)
                                         <tr>
+                                            <td style="width: 10%">
+                                                <a href="#" data-toggle="modal" data-target="#image-preview-Modal{{ $carousel['id'] }}">
+                                                    <img src="{{ asset('/storage/journals/'.$carousel['sm_img']) }}" class="img-thumbnail" alt="{{ Str::slug(explode(".", $carousel['sm_img'])[0], '-') }}">
+                                                </a>
+
+                                                <div class="modal fade" id="image-preview-Modal{{ $carousel['id'] }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                    <div class="modal-dialog" role="document">
+                                                        <div class="modal-content">
+                                                            <div class="modal-body">
+                                                                <img src="{{ asset('/storage/journals/'.$carousel['lg_img']) }}" class="img-thumbnail w-100" alt="{{ Str::slug(explode(".", $carousel['lg_img'])[0], '-') }}">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                 </div>
+                                            </td>
                                             <td>{{ $carousel['title'] }}</td>
                                             <td>{{ $carousel['btn_name'] }}</td>
                                             <td>{{ $carousel['url'] }}</td>
@@ -101,43 +81,14 @@
                                             <td><span class="badge badge-{{ $carousel['status'] }}">{{ $carousel['status'] != 'danger' ? 'OK' : 'DISABLED'}}</span></td>
                                             <td>
                                                 <div class="dropdown">
-                                                    <button onclick="myFunction{{ $carousel['id'] }}()" class="dropbtn">Action</button>
-                                                    <div id="myDropdown{{ $carousel['id'] }}" class="dropdown-content" style="z-index: 9;">
-                                                        <form action="/admin/set_active" method="post">
-                                                            @csrf
-                                                            <input type="text" name="id" value="{{ $carousel['id'] }}" readonly hidden/>
-                                                            <input type="submit" role="menuitem" value="Set Active" class="menu"/>
-                                                        </form>
-                                                        <form action="/admin/remove_active" method="post">
-                                                            @csrf
-                                                            <input type="text" name="id" value="{{ $carousel['id'] }}" readonly hidden/>
-                                                            <input type="submit" role="menuitem" value="Remove Active" class="menu"/>
-                                                        </form>
-                                                        <form action="/admin/delete_header" method="post">
-                                                            @csrf
-                                                            <input type="text" name="id" value="{{ $carousel['id'] }}" readonly hidden/>
-                                                            <input type="submit" role="menuitem" value="Delete" class="menu"/>
-                                                        </form>
+                                                    <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Action
+                                                    </button>
+                                                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
+                                                        <a class="dropdown-item" href="/admin/set_active/{{ $carousel['id'] }}">Set Active</a>
+                                                        <a class="dropdown-item" href="/admin/remove_active/{{ $carousel['id'] }}">Remove Active</a>
+                                                        <a class="dropdown-item" href="/admin/delete_header/{{ $carousel['id'] }}">Delete</a>
                                                     </div>
                                                 </div>
-                                                <script>
-                                                    function myFunction{{ $carousel['id'] }}() {
-                                                        document.getElementById("myDropdown{{ $carousel['id'] }}").classList.toggle("show");
-                                                    }
-                                                    // Close the dropdown if the user clicks outside of it
-                                                    window.onclick = function(event) {
-                                                        if (!event.target.matches('.dropbtn')) {
-                                                            var dropdowns = document.getElementsByClassName("dropdown-content");
-                                                            var i;
-                                                            for (i = 0; i < dropdowns.length; i++) {
-                                                            var openDropdown = dropdowns[i];
-                                                            if (openDropdown.classList.contains('show')) {
-                                                                openDropdown.classList.remove('show');
-                                                            }
-                                                            }
-                                                        }
-                                                    }
-                                                </script>
                                             </td>
                                         </tr>
 
@@ -183,38 +134,59 @@
                             @csrf
                             <div class="card-body">
                                 <div class="form-group">
-                                    <label for="heading">Heading 1</label>
+                                    <label for="heading">Heading 1 *</label>
                                     <input type="text" class="form-control" id="heading" name="heading" value="" required>
                                 </div>
 
                                 <div class="form-group">
                                     <label for="caption">Caption 1</label>
-                                    <textarea class="form-control" rows="6" id="caption" name="caption" required></textarea>
+                                    <textarea class="form-control" rows="6" id="caption" name="caption"></textarea>
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="btn_name">Button Name</label>
+                                    <label for="btn_name">Button Name *</label>
                                     <input type="text" class="form-control" id="btn_name" name="btn_name" value="" required>
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="url">URL</label>
+                                    <label for="url">URL *</label>
                                     <input type="text" class="form-control" id="url" name="url" value="" required>
                                 </div>
 
-                                <div class="input-group">
-                                    <div class="input-group-prepend">
-                                      <span class="input-group-text" id="inputGroupFileAddon01">Upload</span>
-                                    </div>
-                                    <div class="custom-file">
-                                      <input type="file" class="custom-file-input" name="fileToUpload" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01" required>
-                                      <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
+                                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#upload-desktop-image-Modal">
+                                    Upload an image *
+                                </button>
+                                <span id="no-img-warning" class="badge badge-warning p-2 d-none">Image is required</span>
+                                  
+                                <!-- Modal -->
+                                <div class="modal fade" id="upload-desktop-image-Modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="exampleModalLabel">Upload Image</h5>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="input-group">
+                                                    <div class="input-group-prepend">
+                                                      <span class="input-group-text" id="inputGroupFileAddon01">Upload</span>
+                                                    </div>
+                                                    <div class="custom-file">
+                                                      <input type="file" class="custom-file-input" name="fileToUpload" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01" required>
+                                                      <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                             <!-- /.card-body -->
                             <div class="card-footer">
-                                <input type="submit" class="btn btn-primary" value="Upload">
+                                {{-- <input type="submit" class="btn btn-primary" value="Upload"> --}}
+                                <button type="submit" class="btn btn-primary" id="save-carousel">Upload</button>
                             </div>
                         </form>
                     </div>
@@ -329,6 +301,13 @@
     }
 </style>
 <script>
+    $(document).ready(function(){
+        $("#save-carousel").click(function(){
+            if($(".custom-file-input").val().length == 0){
+                $("#no-img-warning").removeClass('d-none');
+            }
+        });
+    });
     $(".custom-file-input").change(function() {
         var fileName = $(this).val().split("\\").pop();
         $(this).siblings(".custom-file-label").addClass("selected").html(fileName);

@@ -176,9 +176,9 @@ Route::prefix('admin')->group(function () {
 
             Route::get('/pages/home', 'HomeCRUDController@home_crud');
             Route::post('/add_carousel', 'HomeCRUDController@add_header_carousel');
-            Route::post('/set_active', 'HomeCRUDController@set_header_active');
-            Route::post('/remove_active', 'HomeCRUDController@remove_header_active');
-            Route::post('/delete_header', 'HomeCRUDController@remove_header');
+            Route::get('/set_active/{carousel_id}', 'HomeCRUDController@set_header_active');
+            Route::get('/remove_active/{carousel_id}', 'HomeCRUDController@remove_header_active');
+            Route::get('/delete_header/{carousel_id}', 'HomeCRUDController@remove_header');
 
             Route::get('/api_setup/erp', 'SettingsController@erpApiSetup');
             Route::get('/api_setup/payment', 'SettingsController@paymentApiSetup');
