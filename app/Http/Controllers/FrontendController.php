@@ -456,7 +456,7 @@ class FrontendController extends Controller
         }
 
         $carousel_data = DB::table('fumaco_header')->where('fumaco_status', 1)
-            ->select('fumaco_title', 'fumaco_caption', 'fumaco_image1', 'fumaco_image2', 'text_color', 'fumaco_url', 'fumaco_btn_name')
+            ->select('fumaco_title', 'fumaco_caption', 'fumaco_image1', 'fumaco_image2', 'text_color', 'btn_position', 'fumaco_url', 'fumaco_btn_name')
             ->orderBy('fumaco_active', 'desc')->get();
 
         $onsale_carousel_data = DB::table('fumaco_on_sale')

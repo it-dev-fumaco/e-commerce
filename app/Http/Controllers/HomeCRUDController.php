@@ -100,6 +100,7 @@ class HomeCRUDController extends Controller
 				'text_color' => $request->text_color,
 				'fumaco_url' => $request->url,
 				'fumaco_btn_name' => $request->btn_name,
+				'btn_position' => $request->btn_position,
 				'fumaco_active' => 0,
 				'fumaco_status' => 1,
 				'fumaco_image1' => $image_name,

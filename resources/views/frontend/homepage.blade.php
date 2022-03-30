@@ -82,7 +82,9 @@
                     <p class="carousel-caption-font fumacoFont2 carousel-text-concat" style="text-align: left; text-justify: left; letter-spacing: 1px;color: {{ $carousel->text_color }} !important">{{ $string }}</p>
                   </div>
                 @endif
-                <p><a class="btn btn-lg btn-primary btn-fumaco fumacoFont_btn" href="{{ $carousel->fumaco_url }}"role="button">{{ $carousel->fumaco_btn_name }}</a></p>
+                <div style="text-align: {{ $carousel->btn_position }}">
+                  <p><a class="btn btn-lg btn-primary btn-fumaco fumacoFont_btn" href="{{ $carousel->fumaco_url }}"role="button">{{ $carousel->fumaco_btn_name }}</a></p>
+                </div>
               </div>
             </div>
           </div>

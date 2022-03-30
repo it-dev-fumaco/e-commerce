@@ -81,6 +81,18 @@
                                                             </div>
 
                                                             <div class="col-6 mb-2">
+                                                                @php
+                                                                    $btn_position = ['Left', 'Center', 'Right'];
+                                                                @endphp
+                                                                <label>Button Position</label>
+                                                                <select class="form-control" name="btn_position">
+                                                                    @foreach ($btn_position as $position)
+                                                                        <option value="{{ $position }}">{{ $position }}</option>
+                                                                    @endforeach
+                                                                </select>
+                                                            </div>
+
+                                                            <div class="col-12 mb-2">
                                                                 <label for="url">URL *</label>
                                                                 <input type="text" class="form-control" id="url" name="url" value="" required>
                                                             </div>
