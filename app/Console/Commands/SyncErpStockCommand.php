@@ -62,7 +62,10 @@ class SyncErpStockCommand extends Command
                 if ($response->successful()) {
                     if (isset($response['data']) && count($response['data']) > 0) {
                         DB::table('fumaco_items')->where('f_idcode', $item_code)->where('f_warehouse', $warehouse)
-                            ->where('stock_source', 1)->update(['f_qty' => $response['data'][0]['actual_qty']]);
+                            ->where('stock_source', 1)->update([
+                                'f_qty' => $response['data'][0]['actual_qty'],
+                                'last_sync_date' => Carbon::now()->toDateTimeString()
+                            ]);
                     }                   
                 }
 
@@ -82,7 +85,10 @@ class SyncErpStockCommand extends Command
                     if (isset($response['data']) && count($response['data']) > 0) {
                         info($item_code);
                         DB::table('fumaco_items')->where('f_idcode', $item_code)->where('f_warehouse', $warehouse)
-                            ->update(['f_default_price' => $response['data'][0]['price_list_rate']]);
+                            ->update([
+                                'f_default_price' => $response['data'][0]['price_list_rate'],
+                                'last_sync_date' => Carbon::now()->toDateTimeString()
+                            ]);
                     }
                 }
             }

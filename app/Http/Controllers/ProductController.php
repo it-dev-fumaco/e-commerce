@@ -887,6 +887,7 @@ class ProductController extends Controller
                 'pricelist' => $pricelist,
                 'discount_type' => $product->f_discount_type,
                 'discount_rate' => $product->f_discount_rate,
+                'last_sync_date' => $product->last_sync_date
             ];
         }
 

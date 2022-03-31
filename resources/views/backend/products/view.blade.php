@@ -53,6 +53,7 @@
                   <div class="card">
                      <div class="card-body">
                         <h4 class="d-inline-block">Product Information</h4>
+                        <p>Last Sync: {{ $details->last_sync_date ? Carbon\Carbon::parse($details->last_sync_date)->format('M d, Y H:i a') : '-' }}</p>
                         <div class="float-right">
                            <div class="dropdown d-inline-block mr-2">
                               <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdowncreate" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Create New Product
