@@ -215,11 +215,15 @@ class CartController extends Controller
         if ($order_no) {
 			$existing_temp = DB::table('fumaco_temp')->where('xlogs', $order_no)->first();
 			if(!$existing_temp) {
+                $loc = GeoLocation::lookup($request->ip());
 				DB::table('fumaco_temp')->insert([
 					'xtempcode' => uniqid(),
 					'xlogs' => $order_no,
 					'order_tracker_code' => $order_no,
 					'order_ip' => $request->ip(),
+                    'ip_city' => $loc->getCity(),
+                    'ip_region' => $loc->getRegion(),
+                    'ip_country' => $loc->getCountry(),
 					'xusertype' => Auth::check() ? 'Member' : 'Guest',
 					'xusernamex' => Auth::check() ? Auth::user()->username : null,
 					'xuser_id' => Auth::check() ? Auth::user()->id : null,
@@ -503,11 +507,15 @@ class CartController extends Controller
             if ($order_no) {
                 $existing_temp = DB::table('fumaco_temp')->where('xlogs', $order_no)->first();
                 if(!$existing_temp) {
+                    $loc = GeoLocation::lookup($request->ip());
                     DB::table('fumaco_temp')->insert([
                         'xtempcode' => uniqid(),
                         'xlogs' => $order_no,
                         'order_tracker_code' => $order_no,
                         'order_ip' => $request->ip(),
+                        'ip_city' => $loc->getCity(),
+                        'ip_region' => $loc->getRegion(),
+                        'ip_country' => $loc->getCountry(), 
                         'xusertype' => Auth::check() ? 'Member' : 'Guest',
                         'xusernamex' => Auth::check() ? Auth::user()->username : null,
                         'xuser_id' => Auth::check() ? Auth::user()->id : null,

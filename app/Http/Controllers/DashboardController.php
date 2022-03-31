@@ -263,7 +263,7 @@ class DashboardController extends Controller
 		$paginatedItems->setPath($request->url());
 		$cart_collection = $paginatedItems;
 
-		$abandoned_cart = DB::table('fumaco_temp')->whereDate('xdateupdate', '<=', Carbon::now()->subHours(8)->toDateTimeString())->orderBy('xdateupdate', 'desc')->paginate(10, ['*'], 'abandoned_page');
+		$abandoned_cart = DB::table('fumaco_temp')->whereRaw("xdateupdate < STR_TO_DATE(?, '%Y-%m-%d %H:%i:%s')" , Carbon::now()->subHours(8)->toDateTimeString())->orderBy('xdateupdate', 'desc')->paginate(10, ['*'], 'abandoned_page');
 
 		$abandoned_order_numbers = collect($abandoned_cart->items())->map(function($result){
 			return $result->order_tracker_code;
@@ -296,6 +296,11 @@ class DashboardController extends Controller
 				$active = 0;
 			}
 
+			$location = null;
+			if($abandoned->ip_city or $abandoned->ip_region){
+				$location = $abandoned->ip_city.', '.$abandoned->ip_region;
+			}
+
 			$abandoned_arr[] = [
 				'name' => trim($abandoned->xfname . ' ' . $abandoned->xlname),
 				'email' => $abandoned->xemail,
@@ -306,7 +311,8 @@ class DashboardController extends Controller
 				'transaction_date' => $abandoned->xdateupdate,
 				'order_number' => $abandoned->order_tracker_code,
 				'ip_address' => $abandoned->order_ip,
-				'active' => $active
+				'location' => $location,
+				'active' => $active,
 			];
 		}
 
