@@ -477,6 +477,7 @@
 								<th class="text-center">Total Qty</th>
 								<th class="text-center">Amount</th>
 								<th class="text-center">Abandoned Transaction</th>
+								<th class="text-center">IP Address</th>
 								<th class="text-center">Transaction Date</th>
 								<th class="text-center">Action</th>
 							</thead>
@@ -550,6 +551,7 @@
 											</div>
 										</div>
 									</td>
+									<td class="text-center">{{ $abandoned['ip_address'] }}</td>
 									<td class="text-center">{{ $abandoned['transaction_date'] ? \Carbon\Carbon::parse($abandoned['transaction_date'])->format('M. d, Y - h:i a') : '-' }}</td>
 									<td class="text-center">
 										<div class="btn-group" role="group" aria-label="Basic example">

@@ -264,7 +264,7 @@ class DashboardController extends Controller
 		$cart_collection = $paginatedItems;
 
 		$abandoned_cart = DB::table('fumaco_temp')->whereDate('xdateupdate', '<=', Carbon::now()->subHours(8)->toDateTimeString())->orderBy('xdateupdate', 'desc')->paginate(10, ['*'], 'abandoned_page');
-		
+
 		$abandoned_order_numbers = collect($abandoned_cart->items())->map(function($result){
 			return $result->order_tracker_code;
 		});
@@ -305,6 +305,7 @@ class DashboardController extends Controller
 				'total_items' => collect($items_arr)->sum('qty'),
 				'transaction_date' => $abandoned->xdateupdate,
 				'order_number' => $abandoned->order_tracker_code,
+				'ip_address' => $abandoned->order_ip,
 				'active' => $active
 			];
 		}
