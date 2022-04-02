@@ -256,6 +256,9 @@
 																			@endif
 																			<strong>Order Date : </strong> {{ $order['date'] }} <br>
 																			<strong>Status : </strong> <span class="badge badge-{{ $badge }}" style="font-size: 1rem;">{{ $order['status'] }}</span>
+																			@if ($order['erp_sales_order'] && $order['status'] == 'Order Confirmed')
+																			<br><strong>ERP Sales Order : </strong> {{ $order['erp_sales_order'] }}
+																			@endif 
 																		</p>
 																	</div>
 																	<div class="col-md-4">

@@ -106,7 +106,8 @@ class OrderController extends Controller
                 'store' => $o->store_location,
                 'order_status' => $order_status,
                 'deposit_slip_image' => $o->deposit_slip_image,
-                'payment_status' => $o->payment_status
+                'payment_status' => $o->payment_status,
+                'erp_sales_order' => $o->erp_sales_order
             ];
         }
 
