@@ -1262,4 +1262,48 @@ class OrderController extends Controller
         session()->flash('for_confirmation', $request->order_number);
         return redirect('/admin/order/order_lists/');
     }
+
+    public function getErpSalesOrderStatus($sales_order, Request $request) {
+        if($request->ajax()) {
+            $erp_api = DB::table('api_setup')->where('type', 'erp_api')->first();
+            if ($erp_api) {
+                $headers = [
+                    'Content-Type' => 'application/json',
+                    'Authorization' => 'token '. $erp_api->api_key. ':' . $erp_api->api_secret_key . '',
+                    'Accept-Language' => 'en'
+                ];
+    
+                $sales_order_response = Http::withHeaders($headers)
+                    ->get($erp_api->base_url . '/api/resource/Sales Order/' . $sales_order);
+    
+                if ($sales_order_response->successful()) {
+                    $status = $sales_order_response['data']['status'];
+                    if (in_array($status, ['Draft', 'Cancelled'])) {
+                        $badge = 'badge-danger';
+                    }
+
+                    if (in_array($status, ['To Deliver and Bill', 'To Bill', 'To Deliver'])) {
+                        $badge = 'badge-warning';
+                    }
+
+                    if (in_array($status, ['Completed'])) {
+                        $badge = 'badge-success';
+                    }
+                } else {
+                    $status = 'Not Found';
+                    $badge = 'badge-danger';
+                }
+
+                return [
+                    'status' => $status,
+                    'badge' => $badge
+                ];
+            }
+
+            return [
+                'status' => 'Not Found',
+                'badge' => 'badge-danger'
+            ];
+        }
+    }
 }
