@@ -477,6 +477,8 @@
 								<th class="text-center">Total Qty</th>
 								<th class="text-center">Amount</th>
 								<th class="text-center">Abandoned Transaction</th>
+								<th class="text-center">IP Address</th>
+								<th class="text-center">Location</th>
 								<th class="text-center">Transaction Date</th>
 								<th class="text-center">Action</th>
 							</thead>
@@ -492,7 +494,7 @@
 										@endforelse
 									</td>
 									<td class="text-center">{{ $abandoned['total_items'] }}</td>
-									<td class="text-center">₱ {{ number_format($abandoned['total_amount'], 2) }}</td>
+									<td class="text-center" style="white-space: nowrap !important">₱ {{ number_format($abandoned['total_amount'], 2) }}</td>
 									<td class="text-center">{{ $abandoned['transaction'] ? $abandoned['transaction'] : '-' }}
 										<div class="modal fade" id="abandoned-{{ $abandoned['order_number'] }}-Modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 											<div class="modal-dialog modal-xl" role="document">
@@ -550,7 +552,9 @@
 											</div>
 										</div>
 									</td>
-									<td class="text-center">{{ $abandoned['transaction_date'] ? \Carbon\Carbon::parse($abandoned['transaction_date'])->format('M. d, Y - h:i a') : '-' }}</td>
+									<td class="text-center">{{ $abandoned['ip_address'] }}</td>
+									<td class="text-center">{{ $abandoned['location'] ? $abandoned['location'] : '-' }}</td>
+									<td class="text-center" style="white-space: nowrap !important">{{ $abandoned['transaction_date'] ? \Carbon\Carbon::parse($abandoned['transaction_date'])->format('M. d, Y - h:i a') : '-' }}</td>
 									<td class="text-center">
 										<div class="btn-group" role="group" aria-label="Basic example">
 											<a href="#" class="btn btn-outline-secondary btn-sm" data-toggle="modal" data-target="#abandoned-{{ $abandoned['order_number'] }}-Modal">View</a>

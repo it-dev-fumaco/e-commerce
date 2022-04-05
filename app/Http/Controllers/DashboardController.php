@@ -263,8 +263,8 @@ class DashboardController extends Controller
 		$paginatedItems->setPath($request->url());
 		$cart_collection = $paginatedItems;
 
-		$abandoned_cart = DB::table('fumaco_temp')->whereDate('xdateupdate', '<=', Carbon::now()->subHours(8)->toDateTimeString())->orderBy('xdateupdate', 'desc')->paginate(10, ['*'], 'abandoned_page');
-		
+		$abandoned_cart = DB::table('fumaco_temp')->whereRaw("xdateupdate < STR_TO_DATE(?, '%Y-%m-%d %H:%i:%s')" , Carbon::now()->subHours(8)->toDateTimeString())->orderBy('xdateupdate', 'desc')->paginate(10, ['*'], 'abandoned_page');
+
 		$abandoned_order_numbers = collect($abandoned_cart->items())->map(function($result){
 			return $result->order_tracker_code;
 		});
@@ -275,25 +275,55 @@ class DashboardController extends Controller
 			->select('order.*', 'items.slug')
 			->get();
 
+		$guest_items = DB::table('fumaco_cart as cart')
+			->join('fumaco_items as items', 'cart.item_code', 'items.f_idcode')
+			->whereIn('cart.transaction_id', $abandoned_order_numbers)
+			->select('cart.*', 'items.slug', 'items.f_name_name as item_name', 'items.f_onsale', 'items.f_price', 'items.f_original_price')
+			->get();
+
 		$abandoned_items = collect($items)->groupBy('order_number');
+		$guest_abandoned_items = collect($guest_items)->groupBy('transaction_id');
 
 		$abandoned_arr = [];
 		foreach($abandoned_cart as $abandoned){
 			$items_arr = [];
 			$active = 1;
-			if(isset($abandoned_items[$abandoned->order_tracker_code])){
-				foreach($abandoned_items[$abandoned->order_tracker_code] as $items){
-					$items_arr[] = [
-						'item_code' => $items->item_code,
-						'item_name' => $items->item_name,
-						'slug' => $items->slug,
-						'qty' => $items->item_qty,
-						'item_price' => $items->item_price,
-						'total_price' => $items->item_total_price
-					];
+
+			if(in_array($abandoned->last_transaction_page, ['Shopping Cart', 'Shopping Cart Page'])){
+				if(isset($guest_abandoned_items[$abandoned->order_tracker_code])){
+					foreach($guest_abandoned_items[$abandoned->order_tracker_code] as $items){
+						$items_arr[] = [
+							'item_code' => $items->item_code,
+							'item_name' => $items->item_name,
+							'slug' => $items->slug,
+							'qty' => $items->qty,
+							'item_price' => $items->f_onsale == 1 ? $items->f_price : $items->f_original_price,
+							'total_price' => $items->f_onsale == 1 ? $items->qty * $items->f_price : $items->qty * $items->f_original_price
+						];
+					}
+				}else{
+					$active = 0;
 				}
 			}else{
-				$active = 0;
+				if(isset($abandoned_items[$abandoned->order_tracker_code])){
+					foreach($abandoned_items[$abandoned->order_tracker_code] as $items){
+						$items_arr[] = [
+							'item_code' => $items->item_code,
+							'item_name' => $items->item_name,
+							'slug' => $items->slug,
+							'qty' => $items->item_qty,
+							'item_price' => $items->item_price,
+							'total_price' => $items->item_total_price
+						];
+					}
+				}else{
+					$active = 0;
+				}
+			}
+
+			$location = null;
+			if($abandoned->ip_city or $abandoned->ip_region){
+				$location = $abandoned->ip_city.', '.$abandoned->ip_region;
 			}
 
 			$abandoned_arr[] = [
@@ -305,7 +335,9 @@ class DashboardController extends Controller
 				'total_items' => collect($items_arr)->sum('qty'),
 				'transaction_date' => $abandoned->xdateupdate,
 				'order_number' => $abandoned->order_tracker_code,
-				'active' => $active
+				'ip_address' => $abandoned->order_ip,
+				'location' => $location,
+				'active' => $active,
 			];
 		}
 

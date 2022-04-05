@@ -157,6 +157,10 @@
 													<td colspan="3" class="table-text" style="text-align: right;">Grand Total: </td>
 													<td class="table-text" style="text-align: right; white-space: nowrap !important; padding-right: 20px;">₱ {{ number_format($order['grand_total'], 2) }}</td>
 												</tr>
+												<tr class="d-lg-none d-xl-none" style="border-bottom: rgba(0,0,0,0) !important;">
+													<td colspan="3" class="table-text" style="text-align: right;">Payment Method: </td>
+													<td class="table-text" style="text-align: right; white-space: nowrap !important; padding-right: 20px;">{{ $order['payment_method'] }}</td>
+												</tr>
 											</table>
 											<div class="d-none d-lg-block d-xl-block">
 												<div class="row m-1">
@@ -192,6 +196,14 @@
 													</div>
 													<div class="col-md-2" style="text-align: right; padding-right: 25px;">
 														<span style="font-weight: 700">₱ {{ number_format($order['grand_total'], 2) }}</span>
+													</div>
+												</div>
+												<div class="row m-1">
+													<div class="col-md-10 p-0" style="text-align: right;">
+														<span>Payment Method:</span>
+													</div>
+													<div class="col-md-2" style="text-align: right; padding-right: 25px;">
+														<span>{{ $order['payment_method'] }}</span>
 													</div>
 												</div>
 											</div>
@@ -364,75 +376,6 @@
 														@endforeach
 													</ul>  
 												</div>
-												{{-- <div class="track-container">
-													<div class="track">
-														@php
-															$step = $order['current_order_status_sequence'];
-														@endphp
-														<div class="step active">
-															<span class="icon inactive"><i class="fa fa-check {{ $step > 0 ? 'd-none' : '' }}"></i></span>
-															<span class="text status-text">Order Placed</span>
-															<span class="text status-text" style="font-size: 9pt; color: #a39f9f !important; font-style: italic !important">{{ $order['date'] }}</span>
-														</div>
-														@if ($order['payment_method'] == 'Bank Deposit')
-															@php
-																$order_tracker_payment = collect($order['order_tracker'])->groupBy('track_payment_status');
-															@endphp
-															@foreach ($payment_statuses as $s => $status)
-																@php
-																	$payment_status_icon = null;
-																	if($status->status == 'Pending for Upload'){
-																		$payment_status_icon = "fa-upload";
-																	}else if($status->status == 'Payment For Confirmation'){
-																		$payment_status_icon = "fa-hourglass";
-																	}
-																	$payment_status = isset($order_tracker_payment[$status->status]) ? 'active' : null;
-																	$payment_status_date = isset($order_tracker_payment[$status->status]) ? $order_tracker_payment[$status->status][0]->track_date_update : null;
-																	$payment_status_display_date = $payment_status_date ? date('M d, Y H:i A', strtotime($payment_status_date)) : null;
-																	$payment_status_icon_container = 'inactive';
-																	$payment_status_description = 'd-none';
-																	if($order['status'] == 'Order Placed'){
-																		$payment_status_icon_container = $order['current_payment_status_sequence'] != $s + 1 ? 'inactive' : null;
-																		$payment_status_description = $order['current_payment_status_sequence'] != $s + 1 ? 'd-none' : null;
-																	}
-																@endphp
-																<div class="step {{ $payment_status }}">
-																	<span class="icon {{ $payment_status_icon_container }}"><i class="fa {{ $payment_status_icon.$order['current_payment_status_sequence'] != $s + 1 ? 'd-none' : null }}"></i></span>
-																	<span class="text status-text">{{ $status->status }}</span>
-																	<span class="text status-text" style="font-size: 9pt; color: #a39f9f !important; font-style: italic !important">
-																		{{ $payment_status_display_date }}
-																	</span>
-																	<span class="text status-text {{ $payment_status_description }}" style="font-size: 9pt; color: #a39f9f !important; font-style: italic !important">{{ $status->status_description }}</span>
-																</div>
-															@endforeach
-														@endif
-														@php
-															$order_status_tracker = collect($order['order_tracker'])->groupBy('track_status');
-														@endphp
-														@foreach ($order['ship_status'] as $key => $name)
-															@php
-																$order_status = isset($order_status_tracker[$name->status]) ? 'active' : null;
-																$status_date_update = isset($order_status_tracker[$name->status]) ? $order_status_tracker[$name->status][0]->track_date_update : null;
-																$date = $status_date_update ? date('M d, Y H:i A', strtotime($status_date_update)) : null;
-																
-																$icon = '';
-																if($name->status == "Order Confirmed"){
-																	$icon = 'user';
-																}else if($name->status == "Out for Delivery" or $name->status == "Ready for Pickup"){
-																	$icon = 'truck';
-																}else if($name->status == "Order Delivered" or $name->status == "Order Completed"){
-																	$icon = 'shopping-bag';
-																}
-															@endphp
-															<div class="step {{ $order_status }}">
-																<span class="icon {{ $step != $key + 1 ? 'inactive' : '' }}"><i class="fa fa-{{ $icon }} {{ $step != $key + 1 ? 'd-none' : '' }}"></i></span>
-																<span class="text status-text">{{ $name->status }}</span>
-																<span class="text status-text" style="font-size: 9pt; color: #a39f9f !important; font-style: italic !important">{{ $date }}</span>
-																<span class="text status-text {{ $step != $key + 1 ? 'd-none' : '' }}" style="font-size: 9pt; color: #a39f9f !important; font-style: italic !important">{{ $name->status_description }}</span>
-															</div>
-														@endforeach
-													</div>
-												</div> --}}
 											</div>
 											<div class="modal-footer">
 												<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -591,14 +534,30 @@
 											<div class="d-lg-none table-text" style="text-align: left;">
 												<br/>
 												<b>Order Number:</b><br/>{{ $order['order_number'] }}<br/><br/>
-												<b>Shipping Name:</b> {{ $order['shipping_name'] }}<br/><br/>
-												<b>Delivery Date:</b> {{ $order['date_delivered'] ? date('M d, Y', strtotime($order['date_delivered'])) : '' }}<br/>
+												<b>Shipping Name:</b> {{ $order['shipping_name'] }}<br/>
+												@if ($order['status'] != 'Cancelled')
+													@if ($order['shipping_name'] != 'Store Pickup')
+														<br/>
+														<b>Delivery Date:</b> {{ $order['date_delivered'] ? date('M d, Y', strtotime($order['date_delivered'])) : null }}<br/>
+													@else
+														<br/>
+														<b>Date Completed:</b> {{ $order['pickup_date'] ? date('M d, Y', strtotime($order['pickup_date'])) : null }}<br/>
+													@endif
+												@endif
 												<p><span class="badge text-dark" style="background-color: {{ $badge }}; font-size: 0.9rem; color: #fff !important;">{{ $order['status'] }}</span></p>
-												<button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#reorder{{ $order['order_number'] }}Modal"  {{ $order['status'] == 'Cancelled' ? 'disabled' : '' }}>Re-Order</button>
+												<button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#reorder{{ $order['order_number'] }}Modal" {{ $order['status'] == 'Cancelled' ? 'disabled' : '' }}>Re-Order</button>
 											</div>
 										</td>
 										<td class="text-center align-middle d-none d-lg-table-cell">{{ $order['shipping_name'] }}</td>
-										<td class="text-center align-middle d-none d-lg-table-cell">{{ $order['date_delivered'] ? date('M d, Y', strtotime($order['date_delivered'])) : '' }}</td>
+										<td class="text-center align-middle d-none d-lg-table-cell">
+											@if ($order['status'] != 'Cancelled')
+												@if ($order['shipping_name'] != 'Store Pickup')
+													{{ $order['date_delivered'] ? date('M d, Y', strtotime($order['date_delivered'])) : null }}
+												@else
+													{{ $order['pickup_date'] ? date('M d, Y', strtotime($order['pickup_date'])) : null }}
+												@endif
+											@endif
+										</td>
 										<td class="text-center align-middle d-none d-lg-table-cell"><span class="badge text-dark" style="background-color: {{ $badge }}; font-size: 0.9rem; color: #fff !important;">{{ $order['status'] }}</span></td>
 										<td class="text-center align-middle d-none d-lg-table-cell"><button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#reorder{{ $order['order_number'] }}Modal" {{ $order['status'] == 'Cancelled' ? 'disabled' : '' }}>Re-Order</button></td>
 

@@ -539,6 +539,12 @@
               </li>
             </ul>
           </li>
+          <li class="nav-item {{ Auth::user()->user_type != 'System Admin' ? 'd-none' : ''  }}">
+            <a href="/admin/system_logs" class="nav-link {{ $activePage == 'system_logs' ? 'active' : '' }}">
+              <i class="fas fa-file nav-icon"></i>
+              <p>System Logs</p>
+            </a>
+          </li>
           @php
               $user_mgt_pages = ['admin_list', 'change_password']
           @endphp

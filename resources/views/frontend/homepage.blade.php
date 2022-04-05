@@ -40,16 +40,19 @@
           @endforelse
         @foreach ($carousel_data as $carousel)
           @php
-            $string = strip_tags($carousel->fumaco_caption);
-            if (strlen($string) > 250) {
+            $string = null;
+            if($carousel->fumaco_caption){
+              $string = strip_tags($carousel->fumaco_caption);
+              if (strlen($string) > 250) {
 
-              // truncate string
-              $stringCut = substr($string, 0, 180);
-              $endPoint = strrpos($stringCut, ' ');
+                // truncate string
+                $stringCut = substr($string, 0, 180);
+                $endPoint = strrpos($stringCut, ' ');
 
-              //if the string doesn't contain any space then it will cut without word basis.
-              $string = $endPoint? substr($stringCut, 0, $endPoint) : substr($stringCut, 0);
-              $string .= '...';
+                //if the string doesn't contain any space then it will cut without word basis.
+                $string = $endPoint? substr($stringCut, 0, $endPoint) : substr($stringCut, 0);
+                $string .= '...';
+              }
             }
             $active = '';
             if(count($onsale_carousel_data) == 0){
@@ -59,19 +62,29 @@
             }
           @endphp
           <div class="carousel-item {{ $active }}" style="background: black;">
-            <picture>
-              <source srcset="{{ asset('/storage/journals/'. explode(".", $carousel->fumaco_image1)[0] .'.webp') }}" type="image/webp" style="object-fit: cover;opacity: 0.6;">
-              <source srcset="{{ asset('/storage/journals/'. $carousel->fumaco_image1) }}" type="image/jpeg" style="object-fit: cover;opacity: 0.6;">
-              <img src="{{ asset('/storage/journals/'. $carousel->fumaco_image1) }}" alt="{{ Str::slug(explode(".", $carousel->fumaco_image1)[0], '-') }}" style="object-fit: cover;opacity: 0.6;height: 100% !important; width: 100% !important">
+            <picture class="d-none d-md-block">
+              <source srcset="{{ asset('/storage/journals/'. explode(".", $carousel->fumaco_image1)[0] .'.webp') }}" type="image/webp" style="object-fit: cover;">
+              <source srcset="{{ asset('/storage/journals/'. $carousel->fumaco_image1) }}" type="image/jpeg" style="object-fit: cover;">
+              <img src="{{ asset('/storage/journals/'. $carousel->fumaco_image1) }}" alt="{{ Str::slug(explode(".", $carousel->fumaco_image1)[0], '-') }}" style="object-fit: cover;height: 100% !important; width: 100% !important">
+            </picture>
+
+            <picture class="d-block d-md-none">
+              <source srcset="{{ asset('/storage/journals/'. explode(".", $carousel->fumaco_image2)[0] .'.webp') }}" type="image/webp" style="object-fit: cover;">
+              <source srcset="{{ asset('/storage/journals/'. $carousel->fumaco_image2) }}" type="image/jpeg" style="object-fit: cover;">
+              <img src="{{ asset('/storage/journals/'. $carousel->fumaco_image2) }}" alt="{{ Str::slug(explode(".", $carousel->fumaco_image2)[0], '-') }}" style="object-fit: cover;height: 100% !important; width: 100% !important">
             </picture>
 
             <div class="container">
-              <div class="carousel-caption text-start">
-                <h3 class="carousel-header-font fumacoFont1">{{ $carousel->fumaco_title }}</h3>
-                <div class="text ellipsis">
-                  <p class="carousel-caption-font fumacoFont2 carousel-text-concat" style="text-align: left; text-justify: left; letter-spacing: 1px;">{{ $string }}</p>
+              <div class="carousel-caption text-start" style="margin-left: 80px !important">
+                <h3 class="carousel-header-font fumacoFont1" style="color: {{ $carousel->text_color }} !important">{{ $carousel->fumaco_title }}</h3>
+                @if ($carousel->fumaco_caption)
+                  <div class="text ellipsis">
+                    <p class="carousel-caption-font fumacoFont2 carousel-text-concat" style="text-align: left; text-justify: left; letter-spacing: 1px;color: {{ $carousel->text_color }} !important">{{ $string }}</p>
+                  </div>
+                @endif
+                <div style="text-align: {{ $carousel->btn_position }};">
+                  <p><a class="btn btn-lg btn-primary btn-fumaco fumacoFont_btn" href="{{ $carousel->fumaco_url }}"role="button">{{ $carousel->fumaco_btn_name }}</a></p>
                 </div>
-                <p><a class="btn btn-lg btn-primary btn-fumaco fumacoFont_btn" href="{{ $carousel->fumaco_url }}"role="button">{{ $carousel->fumaco_btn_name }}</a></p>
               </div>
             </div>
           </div>
@@ -327,7 +340,9 @@
 @section('script')
   <script src="{{ asset('/slick/slick.js') }}" type="text/javascript" charset="utf-8"></script>
   <script type="text/javascript">
-    $('#myCarousel').css('margin-top', $('#navbar').height());
+    if( !/Android|webOS|iPhone|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+      $('#myCarousel').css('margin-top', $('#navbar').height());
+    }
 
     $(document).ready(function() {
       setTimeout(function() {

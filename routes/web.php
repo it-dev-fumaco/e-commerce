@@ -176,9 +176,10 @@ Route::prefix('admin')->group(function () {
 
             Route::get('/pages/home', 'HomeCRUDController@home_crud');
             Route::post('/add_carousel', 'HomeCRUDController@add_header_carousel');
-            Route::post('/set_active', 'HomeCRUDController@set_header_active');
-            Route::post('/remove_active', 'HomeCRUDController@remove_header_active');
-            Route::post('/delete_header', 'HomeCRUDController@remove_header');
+            Route::post('/edit_carousel/{id}', 'HomeCRUDController@edit_header_carousel');
+            Route::get('/set_active/{carousel_id}', 'HomeCRUDController@set_header_active');
+            Route::get('/remove_active/{carousel_id}', 'HomeCRUDController@remove_header_active');
+            Route::get('/delete_header/{carousel_id}', 'HomeCRUDController@remove_header');
 
             Route::get('/api_setup/erp', 'SettingsController@erpApiSetup');
             Route::get('/api_setup/payment', 'SettingsController@paymentApiSetup');
@@ -189,6 +190,8 @@ Route::prefix('admin')->group(function () {
             Route::get('/email_setup', 'SettingsController@emailSetup');
             Route::post('/email_setup/save', 'SettingsController@saveEmailSetup');
             Route::post('/email_recipients/save', 'SettingsController@saveEmailRecipients');
+
+            Route::get('/system_logs', 'SettingsController@systemLogs');
 
             Route::get('/product/settings', 'ProductController@viewCategoryAttr');
             Route::post('/attribute_status/{cat_id}/update', 'ProductController@updateCategoryAttr');

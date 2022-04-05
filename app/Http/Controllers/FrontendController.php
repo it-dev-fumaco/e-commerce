@@ -456,7 +456,7 @@ class FrontendController extends Controller
         }
 
         $carousel_data = DB::table('fumaco_header')->where('fumaco_status', 1)
-            ->select('fumaco_title', 'fumaco_caption', 'fumaco_image1', 'fumaco_url', 'fumaco_btn_name')
+            ->select('fumaco_title', 'fumaco_caption', 'fumaco_image1', 'fumaco_image2', 'text_color', 'btn_position', 'fumaco_url', 'fumaco_btn_name')
             ->orderBy('fumaco_active', 'desc')->get();
 
         $onsale_carousel_data = DB::table('fumaco_on_sale')
@@ -1780,12 +1780,12 @@ class FrontendController extends Controller
     }
 
     public function viewOrders() {
-        $completed_statuses = DB::table('order_status')->where('update_stocks', 1)->select('status')->get();
-        $active_order_statuses = array('Order Placed', 'Order Confirmed', 'Out for Delivery');
+        $completed_statuses = DB::table('order_status')->where('update_stocks', 1)->pluck('status');
+        $archived_statuses = collect($completed_statuses)->push('Cancelled');
 
         $orders = DB::table('fumaco_order')->where('user_email', Auth::user()->username)
-            ->whereNotIn('order_status', $active_order_statuses)
-            ->select('id', 'order_number', 'order_date', 'order_status', 'estimated_delivery_date', 'date_delivered', 'order_subtotal', 'order_shipping', 'order_shipping_amount', 'discount_amount', 'voucher_code')
+            ->whereIn('order_status', $archived_statuses)
+            ->select('id', 'order_number', 'order_date', 'order_status', 'estimated_delivery_date', 'date_delivered', 'pickup_date', 'order_subtotal', 'order_shipping', 'order_shipping_amount', 'discount_amount', 'voucher_code')
             ->orderBy('id', 'desc')->paginate(10);
 
         $order_numbers = array_column($orders->items(), 'order_number');
@@ -1826,6 +1826,7 @@ class FrontendController extends Controller
                 'status' => $order->order_status,
                 'edd' => $order->estimated_delivery_date,
                 'date_delivered' => $order->date_delivered,
+                'pickup_date' => $order->pickup_date,
                 'items' => $items_arr,
                 'subtotal' => $order->order_subtotal,
                 'shipping_name' => $order->order_shipping,
@@ -1836,10 +1837,8 @@ class FrontendController extends Controller
             ];
         }
 
-        
         $new_orders = DB::table('fumaco_order')->where('user_email', Auth::user()->username)
-            ->whereNotIn('order_status', collect($completed_statuses)->pluck('status'))
-            ->where('order_status', '!=', 'Cancelled')
+            ->whereNotIn('order_status', $archived_statuses)
             ->select('id', 'pickup_date', 'order_number', 'order_date', 'order_status', 'payment_status', 'estimated_delivery_date', 'date_delivered', 'order_subtotal', 'order_payment_method', 'order_shipping', 'order_shipping_amount', 'discount_amount', 'voucher_code')
             ->orderBy('id', 'desc')->paginate(10);
 
@@ -2203,7 +2202,7 @@ class FrontendController extends Controller
     public function viewOrderTracking($order_number = null) {
         $order_details = DB::table('fumaco_order')->where('order_number', $order_number)->first();
 
-        if($order_number != null and !$order_details){
+        if($order_number and !$order_details){
             return redirect()->back()->with('error', 'Order Number not found!');
         }
 
