@@ -94,9 +94,35 @@ class SyncErpStockCommand extends Command
             }
 
             DB::table('api_setup')->where('type', 'erp_api')->update(['last_sync_date' => Carbon::now()]);
+            $system_logs = [
+                [
+                    'status' => 'successful',
+                    'operation' => 'sync price',
+                    'last_sync_date' => Carbon::now()->toDateTimeString()
+                ],
+                [
+                    'status' => 'successful',
+                    'operation' => 'sync product',
+                    'last_sync_date' => Carbon::now()->toDateTimeString()
+                ]
+            ];
             
             info('stocks updated');
+        }else{
+            $system_logs = [
+                [
+                    'status' => 'failed',
+                    'operation' => 'sync price',
+                    'last_sync_date' => Carbon::now()->toDateTimeString()
+                ],
+                [
+                    'status' => 'failed',
+                    'operation' => 'sync product',
+                    'last_sync_date' => Carbon::now()->toDateTimeString()
+                ]
+            ];
         }
+        DB::table('fumaco_system_logs')->insert($system_logs);
 
         return 0;
     }
