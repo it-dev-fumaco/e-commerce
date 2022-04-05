@@ -75,7 +75,7 @@
             </picture>
 
             <div class="container">
-              <div class="carousel-caption text-start" style="margin-left: 80px !important">
+              <div class="carousel-caption text-start carousel-box-item">
                 <h3 class="carousel-header-font fumacoFont1" style="color: {{ $carousel->text_color }} !important">{{ $carousel->fumaco_title }}</h3>
                 @if ($carousel->fumaco_caption)
                   <div class="text ellipsis">
