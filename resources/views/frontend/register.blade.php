@@ -136,6 +136,7 @@
     var pass_length_error = 0;
     var pass_confirm_error = 0;
     var terms_error = 0;
+    var input_error = 0;
 
     function passwordLengthCheck(){
         if(parseInt($('#password').val().length) > 0 && parseInt($('#password').val().length) < 6){
@@ -161,6 +162,14 @@
         }
     }
 
+    function checkPasswordIfEmpty(){
+        if(parseInt($('#password').val().length) > 0){
+            input_error = 0;
+        }else{
+            input_error = 1;
+        }
+    }
+
     function termsCheck(){
         if($('#terms_checkbox').prop("checked") == false) {
             terms_error = 1;
@@ -170,7 +179,7 @@
     }
 
     function enableSubmit(){
-        if(parseInt(pass_confirm_error) == 0 && parseInt(pass_length_error) == 0 && parseInt(terms_error) == 0){
+        if(pass_confirm_error === 0 && pass_length_error === 0 && terms_error === 0  && input_error === 0){
             $("#reg_btn").prop('disabled',false);
         }else{
             $("#reg_btn").prop('disabled',true);
@@ -178,6 +187,7 @@
     }
 
     $('#password').keyup(function(){
+        checkPasswordIfEmpty();
         passwordLengthCheck();
         confirmPasswordCheck();
         termsCheck();
@@ -185,15 +195,15 @@
     });
 
     $('#confirm_password').keyup(function(){
-        if(parseInt($(this).val().length) > 0 && parseInt($('#password').val().length) > 0){
-            confirmPasswordCheck();
-            passwordLengthCheck();
-            termsCheck();
-            enableSubmit();
-        }
+        checkPasswordIfEmpty();
+        confirmPasswordCheck();
+        passwordLengthCheck();
+        termsCheck();
+        enableSubmit();
     });
 
     $('#terms_checkbox').click(function() {
+        checkPasswordIfEmpty();
         confirmPasswordCheck();
         passwordLengthCheck();
         termsCheck();
