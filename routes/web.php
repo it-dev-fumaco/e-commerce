@@ -176,6 +176,7 @@ Route::prefix('admin')->group(function () {
 
             Route::get('/pages/home', 'HomeCRUDController@home_crud');
             Route::post('/add_carousel', 'HomeCRUDController@add_header_carousel');
+            Route::post('/edit_carousel/{id}', 'HomeCRUDController@edit_header_carousel');
             Route::get('/set_active/{carousel_id}', 'HomeCRUDController@set_header_active');
             Route::get('/remove_active/{carousel_id}', 'HomeCRUDController@remove_header_active');
             Route::get('/delete_header/{carousel_id}', 'HomeCRUDController@remove_header');

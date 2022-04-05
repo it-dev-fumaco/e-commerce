@@ -23,9 +23,11 @@ class HomeCRUDController extends Controller
 				'title' => $carousel->fumaco_title,
 				'caption' => $carousel->fumaco_caption,
 				'btn_name' => $carousel->fumaco_btn_name,
+				'btn_position' => $carousel->btn_position,
 				'url' => $carousel->fumaco_url,
 				'lg_img' => $carousel->fumaco_image1,
 				'sm_img' => $carousel->fumaco_image2,
+				'text-color' => $carousel->text_color,
 				'is_active' => $carousel->fumaco_active == 1 ? 'primary' : '',
 				'status' => $carousel->fumaco_status == 1 ? 'primary' : 'danger'
 			];
@@ -113,6 +115,110 @@ class HomeCRUDController extends Controller
 			$this->uploadImage($mobile_img, $mobile_filename, $mobile_image_name); // convert mobile image
 
 			DB::table('fumaco_header')->insert($add_carousel);
+            DB::commit();
+			return redirect()->back()->with('success', 'Record Updated Successfully.');
+		}catch(Exception $e){
+			DB::rollback();
+			return redirect()->back()->with('error', 'An error occured. Please try again.');
+		}
+	}
+
+	public function edit_header_carousel($id, Request $request){
+		DB::beginTransaction();
+		try{
+			$carousel = [
+				'fumaco_title' => $request->heading,
+				'fumaco_caption' => $request->caption,
+				'text_color' => $request->text_color,
+				'fumaco_url' => $request->url,
+				'fumaco_btn_name' => $request->btn_name,
+				'btn_position' => $request->btn_position,
+				'fumaco_active' => 0,
+				'fumaco_status' => 1,
+				'created_by' => Auth::user()->username,
+				'last_modified_by' => Auth::user()->username,
+			];
+			
+			$checker = DB::table('fumaco_header')->select('fumaco_image1', 'fumaco_image2')->get();
+			$allowed_extensions = array("jpg", "png", "jpeg", "gif");
+
+			if($request->has('fileToUpload')){
+				$desktop_img_check = collect($checker)->map(function ($check) {
+					return $check->fumaco_image1;
+				});
+
+				$img = $request->file('fileToUpload');
+				// desktop image
+				$filename = pathinfo($img->getClientOriginalName(), PATHINFO_FILENAME);
+				$extension = pathinfo($img->getClientOriginalName(), PATHINFO_EXTENSION);
+
+				$filename = Str::slug($filename, '-');
+				$image_name = $filename.".".$extension;
+
+				$image_error = '';
+				$rules = array(
+					'uploadFile' => 'image|max:500000'
+				);
+
+				$validation = Validator::make($request->all(), $rules);
+
+				if ($validation->fails()){
+					return redirect()->back()->with('error', "Sorry, your file is too large.");
+				}
+
+				if(!in_array($extension, $allowed_extensions)){
+					return redirect()->back()->with('error', "Sorry, only JPG, JPEG, PNG and GIF files are allowed.");
+				}
+
+				if(in_array($image_name, $desktop_img_check->toArray())){
+					return redirect()->back()->with('error', "Sorry, file already exists.");
+				}
+
+				$this->uploadImage($img, $filename, $image_name); // convert desktop image
+
+				$carousel['fumaco_image1'] = $image_name;
+			}
+
+			if($request->has('mobile_image')){
+				$mobile_img_check = collect($checker)->map(function ($check) {
+					return $check->fumaco_image2;
+				});
+	
+				$mobile_img = $request->file('mobile_image');
+	
+				// mobile image
+				$mobile_filename = pathinfo($mobile_img->getClientOriginalName(), PATHINFO_FILENAME);
+				$mobile_extension = pathinfo($mobile_img->getClientOriginalName(), PATHINFO_EXTENSION);
+	
+				$mobile_filename = Str::slug($mobile_filename, '-');
+	
+				$mobile_image_name = $mobile_filename.".".$mobile_extension;
+	
+				$image_error = '';
+				$rules = array(
+					'uploadFile' => 'image|max:500000'
+				);
+	
+				$validation = Validator::make($request->all(), $rules);
+	
+				if ($validation->fails()){
+					return redirect()->back()->with('error', "Sorry, your file is too large.");
+				}
+	
+				if(!in_array($mobile_extension, $allowed_extensions)){
+					return redirect()->back()->with('error', "Sorry, only JPG, JPEG, PNG and GIF files are allowed.");
+				}
+	
+				if(in_array($mobile_image_name, $mobile_img_check->toArray())){
+					return redirect()->back()->with('error', "Sorry, file already exists.");
+				}
+	
+				$this->uploadImage($mobile_img, $mobile_filename, $mobile_image_name); // convert mobile image
+
+				$carousel['fumaco_image2'] = $mobile_image_name;
+			}
+
+			DB::table('fumaco_header')->where('id', $id)->update($carousel);
             DB::commit();
 			return redirect()->back()->with('success', 'Record Updated Successfully.');
 		}catch(Exception $e){

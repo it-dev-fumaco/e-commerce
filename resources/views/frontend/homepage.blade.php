@@ -75,14 +75,14 @@
             </picture>
 
             <div class="container">
-              <div class="carousel-caption text-start">
+              <div class="carousel-caption text-start" style="margin-left: 80px !important">
                 <h3 class="carousel-header-font fumacoFont1" style="color: {{ $carousel->text_color }} !important">{{ $carousel->fumaco_title }}</h3>
                 @if ($carousel->fumaco_caption)
                   <div class="text ellipsis">
                     <p class="carousel-caption-font fumacoFont2 carousel-text-concat" style="text-align: left; text-justify: left; letter-spacing: 1px;color: {{ $carousel->text_color }} !important">{{ $string }}</p>
                   </div>
                 @endif
-                <div style="text-align: {{ $carousel->btn_position }}">
+                <div style="text-align: {{ $carousel->btn_position }};">
                   <p><a class="btn btn-lg btn-primary btn-fumaco fumacoFont_btn" href="{{ $carousel->fumaco_url }}"role="button">{{ $carousel->fumaco_btn_name }}</a></p>
                 </div>
               </div>

@@ -98,7 +98,7 @@
                                                             </div>
 
                                                             <div class="col-6 mb-2">
-                                                                <label>Desktop Image *</label>
+                                                                <label>Desktop Image (1920 x 720) *</label>
                                                                 <div class="input-group">
                                                                     <div class="input-group-prepend">
                                                                       <span class="input-group-text" id="inputGroupFileAddon01">Upload</span>
@@ -111,7 +111,7 @@
                                                             </div>
 
                                                             <div class="col-6 mb-2">
-                                                                <label>Mobile Image *</label>
+                                                                <label>Mobile Image (360 x 640) *</label>
                                                                 <div class="input-group">
                                                                     <div class="input-group-prepend">
                                                                       <span class="input-group-text" id="inputGroupFileAddon01">Upload</span>
@@ -187,9 +187,113 @@
                                                     <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Action
                                                     </button>
                                                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
+                                                        <a class="dropdown-item" href="#" data-toggle="modal" data-target="#header-{{ $carousel['id'] }}-Modal">Edit Carousel Item</a>
                                                         <a class="dropdown-item" href="/admin/set_active/{{ $carousel['id'] }}">Set Active</a>
                                                         <a class="dropdown-item" href="/admin/remove_active/{{ $carousel['id'] }}">Remove Active</a>
                                                         <a class="dropdown-item" href="/admin/delete_header/{{ $carousel['id'] }}">Delete</a>
+                                                    </div>
+                                                </div>
+
+                                                <div class="modal fade" id="header-{{ $carousel['id'] }}-Modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                    <div class="modal-dialog modal-xl" role="document">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                    <span aria-hidden="true">&times;</span>
+                                                                </button>
+                                                            </div>
+                                                            <form action="/admin/edit_carousel/{{ $carousel['id'] }}" method="post" enctype="multipart/form-data">
+                                                                <div class="modal-body">
+                                                                    @csrf
+                                                                    <div class="card-body">
+                                                                        <div class="row">
+                                                                            <div class="col-12 mb-2">
+                                                                                <label>Text Color (Default: White)</label>
+                                                                                <input type="text" class="color-picker" name="text_color" value="{{ $carousel['text-color'] }}">
+                                                                            </div>
+                                                                            <div class="col-12 mb-2">
+                                                                                <label for="heading">Heading 1 *</label>
+                                                                                <input type="text" class="form-control" id="heading" name="heading" value="{{ $carousel['title'] }}" required>
+                                                                            </div>
+                
+                                                                            <div class="col-12 mb-2">
+                                                                                <label for="caption">Caption 1</label>
+                                                                                <textarea class="form-control" rows="3" id="caption" name="caption">{{ $carousel['caption'] }}</textarea>
+                                                                            </div>
+                
+                                                                            <div class="col-6 mb-2">
+                                                                                <label for="btn_name">Button Name *</label>
+                                                                                <input type="text" class="form-control" id="btn_name" name="btn_name" value="{{ $carousel['btn_name'] }}" required>
+                                                                            </div>
+                
+                                                                            <div class="col-6 mb-2">
+                                                                                @php
+                                                                                    $btn_position = ['Left', 'Center', 'Right'];
+                                                                                @endphp
+                                                                                <label>Button Position</label>
+                                                                                <select class="form-control" name="btn_position">
+                                                                                    @foreach ($btn_position as $position)
+                                                                                        <option value="{{ $position }}" {{ $position == $carousel['btn_position'] ? 'selected' : null }}>{{ $position }}</option>
+                                                                                    @endforeach
+                                                                                </select>
+                                                                            </div>
+                
+                                                                            <div class="col-12 mb-2">
+                                                                                <label for="url">URL *</label>
+                                                                                <input type="text" class="form-control" id="url" name="url" value="{{ $carousel['url'] }}" required>
+                                                                            </div>
+                
+                                                                            <div class="col-6 mb-2">
+                                                                                <div class="row">
+                                                                                    <div class="col-4">
+                                                                                        <img src="{{ asset('/storage/journals/'.$carousel['lg_img']) }}" class="img-thumbnail" alt="{{ Str::slug(explode(".", $carousel['lg_img'])[0], '-') }}">
+                                                                                    </div>
+                                                                                    <div class="col-8">
+                                                                                        <label>Desktop Image (1920 x 720) *</label>
+                                                                                        <div class="input-group">
+                                                                                            <div class="input-group-prepend">
+                                                                                            <span class="input-group-text" id="inputGroupFileAddon01">Upload</span>
+                                                                                            </div>
+                                                                                            <div class="custom-file">
+                                                                                            <input type="file" class="custom-file-input" name="fileToUpload" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01">
+                                                                                            <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
+                                                                                            </div>
+                                                                                        </div><br>
+                                                                                        <label>Saved Image: {{ $carousel['lg_img'] }}</label>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                
+                                                                            <div class="col-6 mb-2">
+                                                                                <div class="row">
+                                                                                    <div class="col-4">
+                                                                                        <img src="{{ asset('/storage/journals/'.$carousel['sm_img']) }}" class="img-thumbnail" alt="{{ Str::slug(explode(".", $carousel['sm_img'])[0], '-') }}">
+                                                                                    </div>
+                                                                                    <div class="col-8">
+                                                                                        <label>Mobile Image (360 x 640) *</label>
+                                                                                        <div class="input-group">
+                                                                                            <div class="input-group-prepend">
+                                                                                            <span class="input-group-text" id="inputGroupFileAddon01">Upload</span>
+                                                                                            </div>
+                                                                                            <div class="custom-file">
+                                                                                            <input type="file" class="custom-file-input" name="mobile_image" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01">
+                                                                                            <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
+                                                                                            </div>
+                                                                                        </div><br>
+                                                                                        <label>Saved Image: {{ $carousel['sm_img'] }}</label>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                                    <button type="submit" class="btn btn-primary">Upload</button>
+                                                                </div>
+                                                            </form>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </td>
