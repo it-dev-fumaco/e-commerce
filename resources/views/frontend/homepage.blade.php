@@ -63,15 +63,15 @@
           @endphp
           <div class="carousel-item {{ $active }}" style="background: black;">
             <picture class="d-none d-md-block">
-              <source srcset="{{ asset('/storage/journals/'. explode(".", $carousel->fumaco_image1)[0] .'.webp') }}" type="image/webp" style="object-fit: cover;">
-              <source srcset="{{ asset('/storage/journals/'. $carousel->fumaco_image1) }}" type="image/jpeg" style="object-fit: cover;">
-              <img src="{{ asset('/storage/journals/'. $carousel->fumaco_image1) }}" alt="{{ Str::slug(explode(".", $carousel->fumaco_image1)[0], '-') }}" style="object-fit: cover;height: 100% !important; width: 100% !important">
+              <source srcset="{{ asset('/storage/journals/'. explode(".", $carousel->fumaco_image1)[0] .'.webp') }}" type="image/webp" style="object-fit: cover;opacity: 0.6">
+              <source srcset="{{ asset('/storage/journals/'. $carousel->fumaco_image1) }}" type="image/jpeg" style="object-fit: cover;opacity: 0.6">
+              <img src="{{ asset('/storage/journals/'. $carousel->fumaco_image1) }}" alt="{{ Str::slug(explode(".", $carousel->fumaco_image1)[0], '-') }}" style="object-fit: cover;opacity: 0.6;height: 100% !important; width: 100% !important">
             </picture>
 
             <picture class="d-block d-md-none">
-              <source srcset="{{ asset('/storage/journals/'. explode(".", $carousel->fumaco_image2)[0] .'.webp') }}" type="image/webp" style="object-fit: cover;">
-              <source srcset="{{ asset('/storage/journals/'. $carousel->fumaco_image2) }}" type="image/jpeg" style="object-fit: cover;">
-              <img src="{{ asset('/storage/journals/'. $carousel->fumaco_image2) }}" alt="{{ Str::slug(explode(".", $carousel->fumaco_image2)[0], '-') }}" style="object-fit: cover;height: 100% !important; width: 100% !important">
+              <source srcset="{{ asset('/storage/journals/'. explode(".", $carousel->fumaco_image2)[0] .'.webp') }}" type="image/webp" style="object-fit: cover;opacity: 0.6;">
+              <source srcset="{{ asset('/storage/journals/'. $carousel->fumaco_image2) }}" type="image/jpeg" style="object-fit: cover;opacity: 0.6;">
+              <img src="{{ asset('/storage/journals/'. $carousel->fumaco_image2) }}" alt="{{ Str::slug(explode(".", $carousel->fumaco_image2)[0], '-') }}" style="object-fit: cover;opacity: 0.6;height: 100% !important; width: 100% !important">
             </picture>
 
             <div class="container">
