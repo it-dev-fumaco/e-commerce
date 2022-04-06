@@ -323,7 +323,7 @@ class DashboardController extends Controller
 
 			$location = null;
 			if($abandoned->ip_city or $abandoned->ip_region){
-				$location = $abandoned->ip_city.', '.$abandoned->ip_region;
+				$location = $abandoned->ip_city.', '.$abandoned->ip_region.', '.$abandoned->ip_country;
 			}
 
 			$abandoned_arr[] = [
