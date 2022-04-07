@@ -62,17 +62,13 @@
                                                     <div class="card-body">
                                                         <div class="row">
                                                             <div class="col-12 mb-2">
-                                                                <label>Text Color (Default: White)</label>
-                                                                <input type="text" class="color-picker" name="text_color" value="#FFF">
-                                                            </div>
-                                                            <div class="col-12 mb-2">
                                                                 <label for="heading">Heading 1 *</label>
-                                                                <input type="text" class="form-control" id="heading" name="heading" value="" required>
+                                                                <textarea name="heading" class="form-control title-text-editor" rows="2"></textarea>
                                                             </div>
 
                                                             <div class="col-12 mb-2">
                                                                 <label for="caption">Caption 1</label>
-                                                                <textarea class="form-control" rows="3" id="caption" name="caption"></textarea>
+                                                                <textarea class="form-control caption-text-editor" rows="3" id="caption" name="caption"></textarea>
                                                             </div>
 
                                                             <div class="col-6 mb-2">
@@ -98,7 +94,7 @@
                                                             </div>
 
                                                             <div class="col-6 mb-2">
-                                                                <label>Desktop Image (1920 x 720) *</label>
+                                                                <label>Desktop Image (1920p x 720p) *</label>
                                                                 <div class="input-group">
                                                                     <div class="input-group-prepend">
                                                                       <span class="input-group-text" id="inputGroupFileAddon01">Upload</span>
@@ -111,7 +107,7 @@
                                                             </div>
 
                                                             <div class="col-6 mb-2">
-                                                                <label>Mobile Image (360 x 640) *</label>
+                                                                <label>Mobile Image (360p x 420p) *</label>
                                                                 <div class="input-group">
                                                                     <div class="input-group-prepend">
                                                                       <span class="input-group-text" id="inputGroupFileAddon01">Upload</span>
@@ -175,7 +171,7 @@
                                                     </div>
                                                  </div>
                                             </td>
-                                            <td>{{ $carousel['title'] }}</td>
+                                            <td>{{ strip_tags($carousel['title']) }}</td>
                                             <td>{{ $carousel['btn_name'] }}</td>
                                             <td>{{ $carousel['url'] }}</td>
                                             <td>
@@ -198,7 +194,7 @@
                                                     <div class="modal-dialog modal-xl" role="document">
                                                         <div class="modal-content">
                                                             <div class="modal-header">
-                                                                <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                                                                <h5 class="modal-title" id="exampleModalLabel">Edit Carousel {{ $carousel['id'] }}</h5>
                                                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                                                     <span aria-hidden="true">&times;</span>
                                                                 </button>
@@ -209,17 +205,13 @@
                                                                     <div class="card-body">
                                                                         <div class="row">
                                                                             <div class="col-12 mb-2">
-                                                                                <label>Text Color (Default: White)</label>
-                                                                                <input type="text" class="color-picker" name="text_color" value="{{ $carousel['text-color'] }}">
-                                                                            </div>
-                                                                            <div class="col-12 mb-2">
                                                                                 <label for="heading">Heading 1 *</label>
-                                                                                <input type="text" class="form-control" id="heading" name="heading" value="{{ $carousel['title'] }}" required>
+                                                                                <textarea name="heading" rows="1" class="form-control title-text-editor">{{ $carousel['title'] }}</textarea>
                                                                             </div>
                 
                                                                             <div class="col-12 mb-2">
                                                                                 <label for="caption">Caption 1</label>
-                                                                                <textarea class="form-control" rows="3" id="caption" name="caption">{{ $carousel['caption'] }}</textarea>
+                                                                                <textarea class="form-control caption-text-editor" rows="3" id="caption" name="caption">{{ $carousel['caption'] }}</textarea>
                                                                             </div>
                 
                                                                             <div class="col-6 mb-2">
@@ -250,7 +242,7 @@
                                                                                         <img src="{{ asset('/storage/journals/'.$carousel['lg_img']) }}" class="img-thumbnail" alt="{{ Str::slug(explode(".", $carousel['lg_img'])[0], '-') }}">
                                                                                     </div>
                                                                                     <div class="col-8">
-                                                                                        <label>Desktop Image (1920 x 720) *</label>
+                                                                                        <label>Desktop Image (1920p x 720p) *</label>
                                                                                         <div class="input-group">
                                                                                             <div class="input-group-prepend">
                                                                                             <span class="input-group-text" id="inputGroupFileAddon01">Upload</span>
@@ -271,7 +263,7 @@
                                                                                         <img src="{{ asset('/storage/journals/'.$carousel['sm_img']) }}" class="img-thumbnail" alt="{{ Str::slug(explode(".", $carousel['sm_img'])[0], '-') }}">
                                                                                     </div>
                                                                                     <div class="col-8">
-                                                                                        <label>Mobile Image (360 x 640) *</label>
+                                                                                        <label>Mobile Image (360p x 420p) *</label>
                                                                                         <div class="input-group">
                                                                                             <div class="input-group-prepend">
                                                                                             <span class="input-group-text" id="inputGroupFileAddon01">Upload</span>
@@ -298,34 +290,6 @@
                                                 </div>
                                             </td>
                                         </tr>
-
-                                        <div class="modal fade" id="myModal{{ $carousel['id'] }}" role="dialog">
-                                            <div class="modal-dialog">
-                                                <!-- Modal content-->
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h4 class="modal-title">{{ $carousel['title'] }}</h4>
-                                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <p>{{ $carousel['caption'] }}</p>
-                                                        <br>
-                                                        <br>
-                                                        <p>Large Image</p>
-                                                        <br>
-                                                        <img src="'{{asset('/assets/site-img/').$carousel['lg_img'] }}'" alt="" width="400">
-                                                        <br>
-                                                        <br>
-                                                        <p>Mobile Image</p>
-                                                        <br>
-                                                        <img src="'{{asset('/assets/site-img/').$carousel['sm_img'] }}'" alt="" width="200">
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
                                     @endforeach
                                 </tbody>
                             </table>
@@ -388,7 +352,6 @@
   </aside>
 
 </div>
-<script src="{{ asset('/color_picker/jquery.minicolors.js') }}"></script>
 <link rel="stylesheet" href="{{ asset('/color_picker/jquery.minicolors.css') }}">
 <style>
     .dropbtn {
@@ -449,8 +412,24 @@
         border: none !important;
     }
 </style>
+@endsection
+@section('script')
+<script src="{{ asset('/color_picker/jquery.minicolors.js') }}"></script>
 <script>
     $('.color-picker').minicolors();
+
+    $(".title-text-editor").summernote({
+        dialogsInBody: true,
+        dialogsFade: true,
+        height: "70px",
+    });
+
+    $(".caption-text-editor").summernote({
+        dialogsInBody: true,
+        dialogsFade: true,
+        height: "200px",
+    });
+
     $(".custom-file-input").change(function() {
         var fileName = $(this).val().split("\\").pop();
         $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
