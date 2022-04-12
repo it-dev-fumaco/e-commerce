@@ -65,22 +65,21 @@
             <picture class="d-none d-md-block">
               <source srcset="{{ asset('/storage/journals/'. explode(".", $carousel->fumaco_image1)[0] .'.webp') }}" type="image/webp" style="object-fit: cover;opacity: 0.6">
               <source srcset="{{ asset('/storage/journals/'. $carousel->fumaco_image1) }}" type="image/jpeg" style="object-fit: cover;opacity: 0.6">
-              <img src="{{ asset('/storage/journals/'. $carousel->fumaco_image1) }}" alt="{{ Str::slug(explode(".", $carousel->fumaco_image1)[0], '-') }}" style="object-fit: cover;opacity: 0.6;">
+              <img src="{{ asset('/storage/journals/'. $carousel->fumaco_image1) }}" alt="{{ Str::slug(explode(".", $carousel->fumaco_image1)[0], '-') }}" style="object-fit: cover;opacity: 0.6;height: 100% !important; margin-left: auto;margin-right: auto;">
             </picture>
 
-            <picture class="d-block d-md-none">
-              <source srcset="{{ asset('/storage/journals/'. explode(".", $carousel->fumaco_image2)[0] .'.webp') }}" type="image/webp" style="object-fit: cover;opacity: 0.6;">
-              <source srcset="{{ asset('/storage/journals/'. $carousel->fumaco_image2) }}" type="image/jpeg" style="object-fit: cover;opacity: 0.6;">
-              <img src="{{ asset('/storage/journals/'. $carousel->fumaco_image2) }}" alt="{{ Str::slug(explode(".", $carousel->fumaco_image2)[0], '-') }}" style="object-fit: cover;opacity: 0.6;height: 100% !important; width: 100% !important">
+            <picture id="mob-picture" class="d-block d-md-none">
+              <source srcset="{{ asset('/storage/journals/'. explode(".", $carousel->fumaco_image2)[0] .'.webp') }}" type="image/webp" style="object-fit: cover;opacity: 0.6">
+              <source srcset="{{ asset('/storage/journals/'. $carousel->fumaco_image2) }}" type="image/jpeg" style="object-fit: cover;opacity: 0.6">
+              <img src="{{ asset('/storage/journals/'. $carousel->fumaco_image2) }}" alt="{{ Str::slug(explode(".", $carousel->fumaco_image2)[0], '-') }}" style="object-fit: cover;height: 100% !important; width: 100% !important;opacity: 0.6">
             </picture>
 
             <div class="container">
-              <div class="carousel-caption text-start carousel-caption-container">
+              <div class="carousel-caption text-start carousel-item-container">
                 <h3 class="carousel-header-font fumacoFont1">{!! $carousel->fumaco_title !!}</h3>
                 @if ($carousel->fumaco_caption)
                   <div class="text ellipsis">
-                    {{-- <p class="carousel-caption-font fumacoFont2 carousel-text-concat" style="letter-spacing: 1px;">{{ $string }}</p> --}}
-                    <p class="w-100 carousel-caption-font fumacoFont2 carousel-text-concat" style="letter-spacing: 1px;">{!! $carousel->fumaco_caption !!}</p>
+                    <p class="carousel-caption-font fumacoFont2 carousel-text-concat" style="text-align: left; text-justify: left; letter-spacing: 1px;">{!! $carousel->fumaco_caption !!}</p>
                   </div>
                 @endif
                 <div style="text-align: {{ $carousel->btn_position }};">
@@ -341,8 +340,10 @@
 @section('script')
   <script src="{{ asset('/slick/slick.js') }}" type="text/javascript" charset="utf-8"></script>
   <script type="text/javascript">
-    if( !/Android|webOS|iPhone|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+    if( !/Android|webOS|iPad|iPod|iPhone|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
       $('#myCarousel').css('margin-top', $('#navbar').height());
+    }else{
+      $('#mob-picture').css('margin-top', $('#navbar').height());
     }
 
     $(document).ready(function() {

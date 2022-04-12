@@ -133,7 +133,6 @@ class HomeCRUDController extends Controller
 				'fumaco_url' => $request->url,
 				'fumaco_btn_name' => $request->btn_name,
 				'btn_position' => $request->btn_position,
-				'fumaco_active' => 0,
 				'fumaco_status' => 1,
 				'created_by' => Auth::user()->username,
 				'last_modified_by' => Auth::user()->username,
