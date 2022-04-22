@@ -52,7 +52,7 @@ class FrontendController extends Controller
             ->where('status', 1)->where('apply_discount_to', 'All Items')
             ->select('discount_type', 'discount_rate')->first();
 
-        if ($request->has('s')) {
+        if ($request->has('s') && $request->s != null) {
             $orderby = ($request->order) ? $request->order : 'asc';
             $search_by = $request->by;
             $search_str = $request->s;
@@ -257,9 +257,9 @@ class FrontendController extends Controller
     
             foreach ($results as $result) {
                 if($result['item_code'] != null) {
-                    if(in_array($result['item_code'], $recently_added_item_codes)){
-                        continue; // if an item is already displayed on recently added, it will not show in search results
-                    }
+                    // if(in_array($result['item_code'], $recently_added_item_codes)){
+                    //     continue; // if an item is already displayed on recently added, it will not show in search results
+                    // }
 
                     $image = null;
                     if (array_key_exists($result['item_code'], $product_list_images)) {
@@ -388,40 +388,40 @@ class FrontendController extends Controller
                     $sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
                 }
     
-                foreach($recently_added_items_query as $item_details){
-                    $item_code = $item_details->f_idcode;
+                // foreach($recently_added_items_query as $item_details){
+                //     $item_code = $item_details->f_idcode;
                 
-                    $image = null;
-                    if (array_key_exists($item_code, $recently_added_items_images)) {
-                        $image = $recently_added_items_images[$item_code][0]->imgprimayx;
-                    }
+                //     $image = null;
+                //     if (array_key_exists($item_code, $recently_added_items_images)) {
+                //         $image = $recently_added_items_images[$item_code][0]->imgprimayx;
+                //     }
 
-                    $item_price = $item_details->f_default_price;
-                    $item_on_sale = $item_details->f_onsale;
+                //     $item_price = $item_details->f_default_price;
+                //     $item_on_sale = $item_details->f_onsale;
                     
-                    $is_new_item = 1;
+                //     $is_new_item = 1;
           
-                    // get item price, discounted price and discount rate
-                    $item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $item_details->f_cat_id, $sale, $item_price, $item_code, $item_details->f_discount_type, $item_details->f_discount_rate, $item_details->f_stock_uom, $sale_per_category);
-                    // get product reviews
-                    $total_reviews = array_key_exists($item_code, $product_reviews) ? $product_reviews[$item_code]['total_reviews'] : 0;
-                    $overall_rating = array_key_exists($item_code, $product_reviews) ? $product_reviews[$item_code]['overall_rating'] : 0;
+                //     // get item price, discounted price and discount rate
+                //     $item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $item_details->f_cat_id, $sale, $item_price, $item_code, $item_details->f_discount_type, $item_details->f_discount_rate, $item_details->f_stock_uom, $sale_per_category);
+                //     // get product reviews
+                //     $total_reviews = array_key_exists($item_code, $product_reviews) ? $product_reviews[$item_code]['total_reviews'] : 0;
+                //     $overall_rating = array_key_exists($item_code, $product_reviews) ? $product_reviews[$item_code]['overall_rating'] : 0;
 
-                    $recently_added_arr[] = [
-                        'item_code' => $item_code,
-                        'item_name' => $item_details->f_name_name,
-                        'image' => $image,
-                        'default_price' => '₱ ' . number_format($item_price_data['item_price'], 2, '.', ','),
-                        'is_discounted' => ($item_price_data['discount_rate'] > 0) ? $item_price_data['is_on_sale'] : 0,
-                        'on_stock' => ($item_details->f_qty - $item_details->f_reserved_qty) > 0 ? 1 : 0,
-                        'discounted_price' => '₱ ' . number_format($item_price_data['discounted_price'], 2, '.', ','),
-                        'discount_display' => $item_price_data['discount_display'],
-                        'slug' => $item_details->slug,
-                        'is_new_item' => $is_new_item,
-                        'overall_rating' => $overall_rating,
-                        'total_reviews' => $total_reviews,
-                    ];
-                }
+                //     $recently_added_arr[] = [
+                //         'item_code' => $item_code,
+                //         'item_name' => $item_details->f_name_name,
+                //         'image' => $image,
+                //         'default_price' => '₱ ' . number_format($item_price_data['item_price'], 2, '.', ','),
+                //         'is_discounted' => ($item_price_data['discount_rate'] > 0) ? $item_price_data['is_on_sale'] : 0,
+                //         'on_stock' => ($item_details->f_qty - $item_details->f_reserved_qty) > 0 ? 1 : 0,
+                //         'discounted_price' => '₱ ' . number_format($item_price_data['discounted_price'], 2, '.', ','),
+                //         'discount_display' => $item_price_data['discount_display'],
+                //         'slug' => $item_details->slug,
+                //         'is_new_item' => $is_new_item,
+                //         'overall_rating' => $overall_rating,
+                //         'total_reviews' => $total_reviews,
+                //     ];
+                // }
             }
 
             // Filters
