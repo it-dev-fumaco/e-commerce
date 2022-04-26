@@ -147,7 +147,13 @@
 																			<dt class="col-sm-10 text-right">Subtotal</dt>
 																			<dd class="col-sm-2 text-right">₱ {{ number_format(str_replace(",","",$order['subtotal']), 2) }}</dd>
 																			<dt class="col-sm-10 text-right">{{ $order['shipping_name'] }}</dt>
-																			<dd class="col-sm-2 text-right">₱ {{ number_format(str_replace(",","",$order['shipping_amount']), 2) }}</dd>
+																			<dd class="col-sm-2 text-right">
+																				@if ($order['shipping_amount'] > 0)
+																				₱ {{ number_format(str_replace(",","",$order['shipping_amount']), 2) }}
+																				@else
+																				FREE
+																				@endif
+																			</dd>
 																			<dt class="col-sm-10 text-right">Grand Total</dt>
 																			<dd class="col-sm-2 text-right">₱ {{ number_format(str_replace(",","",$order['grand_total']), 2) }}</dd>
 																		</dl>
