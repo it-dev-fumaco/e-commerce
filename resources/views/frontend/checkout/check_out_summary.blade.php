@@ -244,7 +244,13 @@
 											<select id="store-selection" class="form-control no-click-outline formslabelfnt" style="text-align: center;">
 												<option value="">Select Store</option>
 												@foreach ($srate['stores'] as $store)
-												<option value="{{ $store->store_name }}" data-address="{{ $store->address }}" data-available-time="Available Time: <br>{{ date("h:i A", strtotime($store->available_from)) . ' - ' . date("h:i A", strtotime($store->available_to)) }}" data-start="{{ $store->available_from }}" data-end="{{ $store->available_to }}" data-leadtime="{{ $store->allowance_in_hours }}">{{ $store->store_name }}</option>
+												@php
+													$leadtime = $srate['max_lead_time'];
+													if ($srate['max_lead_time'] <= 0) {
+														$leadtime = $store->allowance_in_hours / 24;
+													}
+												@endphp
+												<option value="{{ $store->store_name }}" data-address="{{ $store->address }}" data-available-time="Available Time: <br>{{ date("h:i A", strtotime($store->available_from)) . ' - ' . date("h:i A", strtotime($store->available_to)) }}" data-start="{{ $store->available_from }}" data-end="{{ $store->available_to }}" data-leadtime="{{ $leadtime }}">{{ $store->store_name }}</option>
 												@endforeach
 											</select>
 											<div class="m-1 text-left" id="store-address"></div>
@@ -1852,7 +1858,7 @@
 
 			$("#pickup-time").datepicker({
 				showInputs: false,
-				startDate: '+'+ (leadtime/24) +'d',
+				startDate: '+'+ (leadtime) +'d',
 				format: 'D, M. dd, yyyy',
 				autoclose: true,
 				daysOfWeekDisabled: [0],
