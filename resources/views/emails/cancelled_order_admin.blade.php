@@ -80,7 +80,13 @@
 					</tr>
 					<tr style="font-size: 0.8rem; text-align: right;">
 						<td class="pb-1 pt-1" style="padding: 6px;" colspan="{{ $colspan }}">{{ $order_details->order_shipping }}</td>
-						<td class="pb-1 pt-1" style="padding: 6px; white-space: nowrap !important">₱ {{ number_format(str_replace(",","",$order_details->order_shipping_amount), 2) }}</td>
+						<td class="pb-1 pt-1" style="padding: 6px; white-space: nowrap !important">
+							@if ($order_details->order_shipping_amount > 0)
+							₱ {{ number_format(str_replace(",","",$order_details->order_shipping_amount), 2) }}
+							@else
+							FREE	
+							@endif
+						</td>
 					</tr>
 					<tr style="font-size: 0.9rem; text-align: right; border-top: 2px solid;">
 						<td class="pb-1 pt-1" style="padding: 8px;" colspan="{{ $colspan }}"><b>Grand Total</b></td>
