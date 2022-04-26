@@ -183,7 +183,13 @@
 												
 												<tr style="border-bottom: rgba(0,0,0,0) !important; font-size: 10pt;">
 													<td colspan="4" class="table-text p-1" style="text-align: right;">{{ $order_details->order_shipping }} : </td>
-													<td class="table-text p-1" style="text-align: right; white-space: nowrap !important">₱ {{ number_format($order_details->order_shipping_amount, 2) }}</td>
+													<td class="table-text p-1" style="text-align: right; white-space: nowrap !important">
+														@if ($order_details->order_shipping_amount > 0)
+														₱ {{ number_format($order_details->order_shipping_amount, 2) }}
+														@else
+														FREE
+														@endif
+													</td>
 												</tr>
 												<tr style="border-bottom: rgba(0,0,0,0) !important; font-size: 11pt; font-weight: 700 !important">
 													@php
