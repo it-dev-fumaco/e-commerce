@@ -184,7 +184,7 @@
                       </div>
                       <p class="card-text fumacoFont_card_price" style="color:#000000 !important; ">
                         @if($bs['is_discounted'] == 1)
-											  {{ $bs['discounted_price'] }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">{{ $bs['default_price'] }}</s>
+											  {{ $bs['discounted_price'] }}&nbsp;<br class="d-block d-xl-none"/><s style="color: #c5c5c5;">{{ $bs['default_price'] }}</s>
 												@else
                         {{ $bs['default_price'] }}
 												@endif
@@ -276,7 +276,7 @@
                       </div>
                       <p class="card-text fumacoFont_card_price" style="color:#000000 !important; min-height: 30px">
                         @if($os['is_discounted'] == 1)
-                          {{ $os['discounted_price'] }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">{{ $os['default_price'] }}</s>
+                          {{ $os['discounted_price'] }}&nbsp;<br class="d-block d-xl-none"/><s style="color: #c5c5c5;">{{ $os['default_price'] }}</s>
                         @else
                           {{ $os['default_price'] }}
                         @endif
