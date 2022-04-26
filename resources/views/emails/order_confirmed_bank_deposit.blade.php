@@ -29,7 +29,7 @@
 			<strong>Customer :</strong> {{ $order_details->order_name . ' ' . $order_details->order_lastname }}<br><br>
 			@if ($order_details->order_shipping == 'Store Pickup')
 			<strong>Shipping Method :</strong> {{ $order_details->order_shipping }}<br><br>
-			<strong>Store Location :</strong> {!! $order_details->store_location . ' - ' . $order['store_address'] !!}<br><br>
+			<strong>Store Location :</strong> {!! $order_details->store_location . ' - ' . $store_address !!}<br><br>
 			<strong>Pickup by :</strong> {{ \Carbon\Carbon::parse($order_details->pickup_date)->format('D, F d, Y') }}<br>
 			@else
 			<strong>Shipping Address :</strong> {{ $order_details->order_ship_address1 . ' ' . $order_details->order_ship_address2 . ', ' . $order_details->order_ship_brgy . ', ' . $order_details->order_ship_city .', ' . $order_details->order_ship_prov . ', ' . $order_details->order_ship_country .', ' . $order_details->order_ship_postal }}<br><br>
@@ -91,7 +91,13 @@
 					@endif
 					<tr style="font-size: 0.8rem; text-align: right;">
 						<td class="pb-1 pt-1" style="padding: 6px;" colspan="{{ $colspan }}">{{ $order_details->order_shipping }}</td>
-						<td class="pb-1 pt-1" style="padding: 6px; white-space: nowrap !important">₱ {{ number_format(str_replace(",","",$order_details->order_shipping_amount), 2) }}</td>
+						<td class="pb-1 pt-1" style="padding: 6px; white-space: nowrap !important">
+							@if ($order_details->order_shipping_amount > 0)
+							₱ {{ number_format(str_replace(",","",$order_details->order_shipping_amount), 2) }}
+							@else
+							FREE	
+							@endif
+						</td>
 					</tr>
 					<tr style="font-size: 0.9rem; text-align: right; border-top: 2px solid;">
 						<td class="pb-1 pt-1" style="padding: 8px;" colspan="{{ $colspan }}"><b>Grand Total</b></td>
