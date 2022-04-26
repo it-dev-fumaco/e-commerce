@@ -212,26 +212,6 @@ class CartController extends Controller
             $order_no = session()->get('fumOrderNo');
         }
 
-        if ($order_no) {
-			$existing_temp = DB::table('fumaco_temp')->where('xlogs', $order_no)->first();
-			if(!$existing_temp) {
-                $loc = GeoLocation::lookup($request->ip());
-				DB::table('fumaco_temp')->insert([
-					'xtempcode' => uniqid(),
-					'xlogs' => $order_no,
-					'order_tracker_code' => $order_no,
-					'order_ip' => $request->ip(),
-                    'ip_city' => $loc->getCity(),
-                    'ip_region' => $loc->getRegion(),
-                    'ip_country' => $loc->getCountry(),
-					'xusertype' => Auth::check() ? 'Member' : 'Guest',
-					'xusernamex' => Auth::check() ? Auth::user()->username : null,
-					'xuser_id' => Auth::check() ? Auth::user()->id : null,
-                    'last_transaction_page' => 'Shopping Cart Page'
-				]);
-			}
-		}
-
         if(Auth::check()) {
             $cart_items = DB::table('fumaco_items as a')->join('fumaco_cart as b', 'a.f_idcode', 'b.item_code')
                 ->where('user_type', 'member')->where('user_email', Auth::user()->username)
@@ -240,6 +220,28 @@ class CartController extends Controller
             $cart_items = DB::table('fumaco_items as a')->join('fumaco_cart as b', 'a.f_idcode', 'b.item_code')
                 ->where('user_type', 'guest')->where('transaction_id', $order_no)
                 ->select('f_idcode', 'f_default_price', 'f_onsale', 'b.qty', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'slug', 'f_name_name', 'f_qty', 'f_reserved_qty')->get();
+        }
+
+        if (count($cart_items) > 0) {
+            if ($order_no) {
+                $existing_temp = DB::table('fumaco_temp')->where('xlogs', $order_no)->first();
+                if(!$existing_temp) {
+                    $loc = GeoLocation::lookup($request->ip());
+                    DB::table('fumaco_temp')->insert([
+                        'xtempcode' => uniqid(),
+                        'xlogs' => $order_no,
+                        'order_tracker_code' => $order_no,
+                        'order_ip' => $request->ip(),
+                        'ip_city' => $loc->getCity(),
+                        'ip_region' => $loc->getRegion(),
+                        'ip_country' => $loc->getCountry(),
+                        'xusertype' => Auth::check() ? 'Member' : 'Guest',
+                        'xusernamex' => Auth::check() ? Auth::user()->username : null,
+                        'xuser_id' => Auth::check() ? Auth::user()->id : null,
+                        'last_transaction_page' => 'Shopping Cart Page'
+                    ]);
+                }
+            }
         }
 
         // get sitewide sale
