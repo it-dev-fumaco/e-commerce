@@ -513,6 +513,12 @@
 																<p class="mt-3 mb-0"><strong>Customer Name : </strong> {{ $abandoned['name'] ? $abandoned['name'] : 'Guest' }}</p>
 																<p class="mb-0"><strong>Email Address : </strong> {{ $abandoned['email'] ? $abandoned['email'] : '-' }}</p>
 																<p class="mb-0"><strong>Abandoned in : </strong> {{ $abandoned['transaction'] }}</p>
+																<p class="mb-0"><strong>Billing Address : </strong> {{ $abandoned['billing_address'] }}</p>
+																<p class="mb-0"><strong>Contact Person : </strong> {{ $abandoned['billing_contact_person'] }}</p>
+																<p class="mb-0"><strong>Mobile No. : </strong> {{ $abandoned['billing_mobile'] }}</p>
+																<p class="mb-0"><strong>Shipping Method : </strong> {{ $abandoned['shipping_method'] }}</p>
+																<p class="mb-0"><strong>Shipping Address : </strong> {{ $abandoned['shipping_address'] }}</p>
+																<p class="mb-0"><strong>Contact Person : </strong> {{ $abandoned['shipping_contact_person'] }}</p>
 															</div>
 														</div>
 														<br>

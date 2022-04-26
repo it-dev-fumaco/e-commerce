@@ -338,6 +338,12 @@ class DashboardController extends Controller
 				'ip_address' => $abandoned->order_ip,
 				'location' => $location,
 				'active' => $active,
+				'shipping_contact_person' => $abandoned->xshipcontact_person,
+				'billing_address' => $abandoned->xadd1 . ' ' . $abandoned->xadd2 . ' ' . $abandoned->xbrgy . ' ' . $abandoned->xcity . ' ' . $abandoned->xprov . ' ' . $abandoned->xcountry,
+				'billing_contact_person' => $abandoned->xemail,
+				'billing_mobile' => $abandoned->xmobile,
+				'shipping_method' => $abandoned->shipping_name,
+				'shipping_address' => $abandoned->xshippadd1 . ' ' . $abandoned->xshippadd2 . ' ' . $abandoned->xshipbrgy . ' ' . $abandoned->xshipcity . ' ' . $abandoned->xshiprov . ' ' . $abandoned->xshipcountry,
 			];
 		}
 
