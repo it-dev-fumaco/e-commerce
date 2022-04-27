@@ -101,7 +101,6 @@ trait ProductTrait {
         return DB::table('fumaco_on_sale')
             ->join('fumaco_on_sale_customer_group', 'fumaco_on_sale.id', 'fumaco_on_sale_customer_group.sale_id')
             ->join('fumaco_customer_group', 'fumaco_customer_group.id', 'fumaco_on_sale_customer_group.customer_group_id')
-            ->where('fumaco_on_sale.apply_discount_to', 'Per Customer Group')
             ->whereDate('fumaco_on_sale.start_date', '<=', Carbon::now())->whereDate('fumaco_on_sale.end_date', '>=', Carbon::now())
             ->where('fumaco_on_sale.status', 1)->where('fumaco_customer_group.id', $customer_group_id)
             ->select('fumaco_on_sale_customer_group.discount_type', 'fumaco_on_sale_customer_group.discount_rate')

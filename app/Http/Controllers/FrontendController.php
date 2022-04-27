@@ -252,9 +252,7 @@ class FrontendController extends Controller
             }
 
             if (Auth::check()) {
-                $customer_group_sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
-
-                $sale = $customer_group_sale ? $customer_group_sale : $sale;
+                $sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
             }
     
             foreach ($results as $result) {
@@ -387,9 +385,7 @@ class FrontendController extends Controller
                 }
 
                 if (Auth::check()) {
-                    $customer_group_sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
-
-                    $sale = $customer_group_sale ? $customer_group_sale : $sale;
+                    $sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
                 }
     
                 // foreach($recently_added_items_query as $item_details){
@@ -499,9 +495,7 @@ class FrontendController extends Controller
         }
 
         if (Auth::check()) {
-            $customer_group_sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
-
-            $sale = $customer_group_sale ? $customer_group_sale : $sale;
+            $sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
         }
 
         $best_selling_arr = [];
@@ -655,9 +649,7 @@ class FrontendController extends Controller
             }
 
             if (Auth::check()) {
-                $customer_group_sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
-
-                $sale = $customer_group_sale ? $customer_group_sale : $sale;
+                $sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
             }
 
             foreach($item_keywords as $item){
@@ -779,9 +771,7 @@ class FrontendController extends Controller
             }
 
             if (Auth::check()) {
-                $customer_group_sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
-                
-                $sale = $customer_group_sale ? $customer_group_sale : $sale;
+                $sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
             }
 
             foreach($featured_items as $row){
@@ -1365,9 +1355,7 @@ class FrontendController extends Controller
         }
 
         if (Auth::check()) {
-            $customer_group_sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
-
-            $sale = $customer_group_sale ? $customer_group_sale : $sale;
+            $sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
         }
 
         $products_arr = [];
@@ -1495,9 +1483,7 @@ class FrontendController extends Controller
         }
 
         if (Auth::check()) {
-            $customer_group_sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
-
-            $sale = $customer_group_sale ? $customer_group_sale : $sale;
+            $sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
         }
 
         // get item price, discounted price and discount rate
@@ -1567,9 +1553,7 @@ class FrontendController extends Controller
             }
 
             if (Auth::check()) {
-                $customer_group_sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
-
-                $sale = $customer_group_sale ? $customer_group_sale : $sale;
+                $sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
             }
 
             foreach($products_to_compare as $item_details){
@@ -1637,9 +1621,7 @@ class FrontendController extends Controller
         }
 
         if (Auth::check()) {
-            $customer_group_sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
-
-            $sale = $customer_group_sale ? $customer_group_sale : $sale;
+            $sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
         }
         
         $recommended_items = [];
@@ -1712,9 +1694,7 @@ class FrontendController extends Controller
         }
 
         if (Auth::check()) {
-            $customer_group_sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
-
-            $sale = $customer_group_sale ? $customer_group_sale : $sale;
+            $sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
         }
 
         $related_products = [];
