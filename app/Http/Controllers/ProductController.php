@@ -1078,8 +1078,8 @@ class ProductController extends Controller
         $templates = Newsletter::getTemplatesList();
         $tags = Newsletter::getSegmentsList($list_id);
 
-        $campaign = Newsletter::campaignInfo($on_sale->mailchimp_campaign_id);
-
+        $campaign = $on_sale->mailchimp_campaign_id ? Newsletter::campaignInfo($on_sale->mailchimp_campaign_id) : [];
+        
         $selected_tag = $campaign ? $campaign['recipients']['segment_opts']['saved_segment_id'] : null;
         $selected_template = $campaign ? $campaign['settings']['template_id'] : null;
 
