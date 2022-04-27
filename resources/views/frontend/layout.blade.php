@@ -260,7 +260,8 @@
             <div class="col-md-12">
               <form action="/" id="mob-search-bar-form" method="GET">
                 <div class="input-group mb-0 searchbar" id="mob-search-bar-form" style="width: 100% !important;">
-                  <input type="text" id='mob-autocomplete-search' placeholder="Search" name="s" value="{{ request()->s }}" class="form-control searchstyle" aria-label="Text input with dropdown button">
+                <input type="text" name="name" style="display: none;">
+                <input type="text" id='mob-autocomplete-search' placeholder="Search" name="s" value="{{ request()->s }}" class="form-control searchstyle" aria-label="Text input with dropdown button">
                     <button class="btn btn-outline-secondary searchstyle" type="submit"><i class="fas fa-search"></i></button>
                     {{-- <div id="mob-search-container" class="border border-danger"></div> --}}
                 </div>
