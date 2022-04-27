@@ -265,7 +265,9 @@ class CartController extends Controller
         }
 
         if (Auth::check()) {
-            $sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
+            $customer_group_sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
+
+            $sale = $customer_group_sale ? $customer_group_sale : $sale;
         }
 
         $cart_arr = [];
@@ -323,7 +325,9 @@ class CartController extends Controller
         }
 
         if (Auth::check()) {
-            $sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
+            $customer_group_sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
+
+            $sale = $customer_group_sale ? $customer_group_sale : $sale;
         }
     
         $cross_sell_arr = [];

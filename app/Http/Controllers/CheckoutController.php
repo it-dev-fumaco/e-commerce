@@ -370,7 +370,9 @@ class CheckoutController extends Controller
 			}
 
 			if (Auth::check()) {
-				$sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
+				$customer_group_sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
+
+				$sale = $customer_group_sale ? $customer_group_sale : $sale;
 			}
 
 			$cart_arr = [];
@@ -614,7 +616,9 @@ class CheckoutController extends Controller
 			}
 
 			if (Auth::check()) {
-				$sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
+				$customer_group_sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
+
+				$sale = $customer_group_sale ? $customer_group_sale : $sale;
 			}
  
 			$cart_arr = [];
@@ -1289,7 +1293,9 @@ class CheckoutController extends Controller
 		}
 
 		if (Auth::check()) {
-            $sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
+            $customer_group_sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
+
+			$sale = $customer_group_sale ? $customer_group_sale : $sale;
         }
 			
         foreach ($order_items as $row) {
@@ -1599,7 +1605,9 @@ class CheckoutController extends Controller
 			}
 
 			if (Auth::check()) {
-				$sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
+				$customer_group_sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
+
+				$sale = $customer_group_sale ? $customer_group_sale : $sale;
 			}
 
 			$subtotal = 0;
