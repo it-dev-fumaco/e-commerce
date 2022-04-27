@@ -1732,7 +1732,6 @@ class ProductController extends Controller
 
             foreach($date_check as $date){
                 if($from >= $date->start_date and $from <= $date->end_date){
-                    // return redirect()->back()->with('error', 'On Sale dates cannot overlap');
                     if($request->apply_discount_to != 'Per Customer Group'){
                         return redirect()->back()->with('error', 'On Sale dates cannot overlap');
                     }else{ // for customer group sale date
@@ -1743,7 +1742,6 @@ class ProductController extends Controller
                 }
 
                 if($to >= $date->start_date and $to <= $date->end_date){
-                    // return redirect()->back()->with('error', 'On Sale dates cannot overlap');
                     if($request->apply_discount_to != 'Per Customer Group'){
                         return redirect()->back()->with('error', 'On Sale dates cannot overlap');
                     }else{ // for customer group sale date
@@ -1755,7 +1753,6 @@ class ProductController extends Controller
             }
 
             if($request->apply_discount_to == 'All Items'){
-                DB::table('fumaco_on_sale_categories')->where('sale_id', $id)->delete(); // if sale is from per category to all items
                 $discount_type = $request->discount_type;
                 if($discount_type == 'Fixed Amount'){
                     $discount_rate = $request->discount_amount;
@@ -1763,6 +1760,14 @@ class ProductController extends Controller
                     $discount_rate = $request->discount_percentage;
                     $capped_amount = $request->capped_amount;
                 }
+            }
+
+            if($request->apply_discount_to == 'Per Customer Group'){
+                DB::table('fumaco_on_sale_customer_group')->where('sale_id', $id)->delete();
+            }
+
+            if($request->apply_discount_to == 'Per Category'){
+                DB::table('fumaco_on_sale_categories')->where('sale_id', $id)->delete();
             }
 
             $update = [
@@ -1821,30 +1826,32 @@ class ProductController extends Controller
             $list_id = env('MAILCHIMP_LIST_ID');
             $campaign_id = DB::table('fumaco_on_sale')->where('id', $id)->pluck('mailchimp_campaign_id')->first();
 
-            Newsletter::editCampaign(
-                $campaign_id, // Campaign ID
-                'FUMACO', // from - name,
-                'it@fumaco.com', // from - email,
-                $request->sale_name, // subject,
-                '', // content - html (would be replaced by email template),
-                'subscribers',
-                [
-                    'settings' => [
-                        'title' => $request->sale_name,
-                        'subject_line' => $request->sale_name,
-                        'from_name' => 'FUMACO',
-                        'from_email' => 'it@fumaco.com',
-                        'reply_to' => 'it@fumaco.com',
-                        'template_id' => (int)$request->email_template,
-                    ],
-                    'recipients' => [
-                        'list_id' => $list_id,
-                        'segment_opts' => [
-                            'saved_segment_id' => (int)$request->email_tag,
+            if($campaign_id){
+                Newsletter::editCampaign(
+                    $campaign_id, // Campaign ID
+                    'FUMACO', // from - name,
+                    'it@fumaco.com', // from - email,
+                    $request->sale_name, // subject,
+                    '', // content - html (would be replaced by email template),
+                    'subscribers',
+                    [
+                        'settings' => [
+                            'title' => $request->sale_name,
+                            'subject_line' => $request->sale_name,
+                            'from_name' => 'FUMACO',
+                            'from_email' => 'it@fumaco.com',
+                            'reply_to' => 'it@fumaco.com',
+                            'template_id' => (int)$request->email_template,
+                        ],
+                        'recipients' => [
+                            'list_id' => $list_id,
+                            'segment_opts' => [
+                                'saved_segment_id' => (int)$request->email_tag,
+                            ],
                         ],
                     ],
-                ],
-            );
+                );
+            }
 
             DB::table('fumaco_on_sale')->where('id', $id)->update($update);
 
@@ -1937,6 +1944,7 @@ class ProductController extends Controller
 
             DB::table('fumaco_on_sale')->where('id', $id)->delete();
             DB::table('fumaco_on_sale_categories')->where('sale_id', $id)->delete();
+            DB::table('fumaco_on_sale_customer_group')->where('sale_id', $id)->delete();
             DB::commit();
             return redirect()->back()->with('success', 'On Sale Deleted.');
         } catch (Exception $e) {
