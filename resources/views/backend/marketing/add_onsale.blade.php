@@ -54,10 +54,6 @@
                                                 <label>Set Sale Duration</label>
                                                 <input type="text" class="form-control set_duration" id="daterange" name="sale_duration" required/>
                                             </div>
-                                            {{-- <div class="col-4">
-                                                <label>Email Notification Schedule</label>
-                                                <input type="text" class="form-control" id="notif-schedule" name="notif_schedule" required/>
-                                            </div> --}}
                                         </div>
                                         <br/>
                                         <div class="row">
@@ -239,7 +235,8 @@
                 singleDatePicker: true,
                 showDropdowns: true,
                 minYear: year,
-                maxYear: parseInt(year) + 10
+                maxYear: parseInt(year) + 10,
+                startDate: moment()
             });
         });
 
