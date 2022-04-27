@@ -1077,6 +1077,10 @@ class OrderController extends Controller
 
                     if ($output['TxnStatus'] != 0) {
                         if($request->is_admin) {
+                            if($payment_method == 'WA') {
+                                return redirect()->back()->with('error', 'Unable to refund for e-Wallet.');
+                            }
+                            
                             return redirect()->back()->with('error', 'Failed to cancel order <b>'.$details->order_number.'</b><br>Error Message: <b>' . $output['TxnMessage'] . '</b>');
                         } else {
                             return redirect()->back()->with('error', 'Failed to cancel order <b>'.$details->order_number.'</b>');
