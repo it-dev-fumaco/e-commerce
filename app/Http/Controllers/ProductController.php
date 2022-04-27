@@ -1354,7 +1354,7 @@ class ProductController extends Controller
 
             if($request->discount_type == 'By Percentage'){
                 $discount_rate = preg_replace("/[^0-9]/", "", $request->discount_percentage);
-                $capped_amount = $request->capped_amount;
+                $capped_amount = preg_replace("/[^0-9]/", "", $request->capped_amount);
             }else if($request->discount_type == 'Fixed Amount'){
                 $discount_rate = preg_replace("/[^0-9]/", "", $request->discount_amount);
             }
@@ -1370,7 +1370,7 @@ class ProductController extends Controller
                 'total_allotment' => isset($request->unlimited_allotment) ? null : $request->allotment,
                 'unlimited' => isset($request->unlimited_allotment) ? 1 : 0,
                 'allowed_usage' => $request->allowed_usage,
-                'minimum_spend' => $request->minimum_spend,
+                'minimum_spend' => preg_replace("/[^0-9]/", "", $request->minimum_spend),
                 'discount_type' => $request->discount_type,
                 'discount_rate' => $discount_rate,
                 'capped_amount' => $capped_amount,
@@ -1441,7 +1441,7 @@ class ProductController extends Controller
 
             if($request->discount_type == 'By Percentage'){
                 $discount_rate = preg_replace("/[^0-9]/", "", $request->discount_percentage);
-                $capped_amount = $request->capped_amount;
+                $capped_amount = preg_replace("/[^0-9]/", "", $request->capped_amount);
             }else if($request->discount_type == 'Fixed Amount'){
                 $discount_rate = preg_replace("/[^0-9]/", "", $request->discount_amount);
             }
@@ -1457,7 +1457,7 @@ class ProductController extends Controller
                 'total_allotment' => isset($request->unlimited_allotment) ? null : $request->allotment,
                 'unlimited' => isset($request->unlimited_allotment) ? 1 : 0,
                 'allowed_usage' => $request->allowed_usage,
-                'minimum_spend' => $request->minimum_spend,
+                'minimum_spend' => preg_replace("/[^0-9]/", "", $request->minimum_spend),
                 'discount_type' => $request->discount_type,
                 'discount_rate' => $discount_rate,
                 'capped_amount' => $capped_amount,
