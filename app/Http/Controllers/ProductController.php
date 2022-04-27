@@ -1762,11 +1762,11 @@ class ProductController extends Controller
                 }
             }
 
-            if($request->apply_discount_to == 'Per Customer Group'){
+            if($request->apply_discount_to != 'Per Customer Group'){
                 DB::table('fumaco_on_sale_customer_group')->where('sale_id', $id)->delete();
             }
 
-            if($request->apply_discount_to == 'Per Category'){
+            if($request->apply_discount_to != 'Per Category'){
                 DB::table('fumaco_on_sale_categories')->where('sale_id', $id)->delete();
             }
 
