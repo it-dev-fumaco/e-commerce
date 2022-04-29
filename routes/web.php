@@ -192,6 +192,8 @@ Route::prefix('admin')->group(function () {
             Route::post('/email_recipients/save', 'SettingsController@saveEmailRecipients');
 
             Route::get('/system_logs', 'SettingsController@systemLogs');
+            Route::get('/export_images/{export?}', 'PagesController@exportImagesView');
+            Route::get('/download_images', 'PagesController@download_athena_images');
 
             Route::get('/product/settings', 'ProductController@viewCategoryAttr');
             Route::post('/attribute_status/{cat_id}/update', 'ProductController@updateCategoryAttr');
