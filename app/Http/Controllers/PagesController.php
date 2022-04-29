@@ -490,7 +490,7 @@ class PagesController extends Controller
                 Storage::disk('public')->makeDirectory('/export_for_athena/webp/');
             }
 
-            $item_images = DB::table('fumaco_items_image_v1')->where('exported', 0)->where('idcode', 'LR00402')->select('idcode', 'imgoriginalx')->limit(10)->get();
+            $item_images = DB::table('fumaco_items_image_v1')->where('exported', 0)->select('idcode', 'imgoriginalx')->get();
             $images = collect($item_images)->groupBy('idcode');
             $item_codes = array_keys($images->toArray());
             
