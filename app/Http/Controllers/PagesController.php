@@ -482,7 +482,8 @@ class PagesController extends Controller
         $now = Carbon::now();
 
         if($export){
-            $item_images = DB::table('fumaco_items_image_v1')->where('exported', 0)->select('idcode', 'imgoriginalx')->get();
+            $item_images = DB::table('fumaco_items_image_v1')
+                ->where('exported', 0)->select('idcode', 'imgoriginalx')->get();
 
             if(count($item_images) == 0){
                 session()->flash('error', 'All images already exported.');
@@ -539,6 +540,11 @@ class PagesController extends Controller
                         }
                     }
                 }
+            }
+            
+            // check if there are previous exports
+            if(Storage::disk('public')->exists('/athena_images.zip')){ 
+                Storage::disk('public')->delete('/athena_images.zip');
             }
 
             // Zip Archive the exported files
