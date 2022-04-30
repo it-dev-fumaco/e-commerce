@@ -482,7 +482,7 @@ class PagesController extends Controller
         $now = Carbon::now();
 
         if($export){
-            $item_images = DB::table('fumaco_items_image_v1')->where('exported', 0)->where('idcode', 'LR00402')->select('idcode', 'imgoriginalx')->get();
+            $item_images = DB::table('fumaco_items_image_v1')->where('exported', 0)->select('idcode', 'imgoriginalx')->get();
 
             if(count($item_images) == 0){
                 session()->flash('error', 'All images already exported.');
