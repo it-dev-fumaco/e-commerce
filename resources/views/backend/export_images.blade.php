@@ -37,11 +37,11 @@
                                         </div>
                                     @endif
                                     <a href="/admin/export_images/1" class="btn btn-primary d-inline">Export Images</a>
-                                    @if (Storage::disk('public')->exists('/athena_images.zip'))
-                                        <a href="/admin/download_images" class="btn btn-primary d-inline">Download Zip</a>
-                                        <a href="http://athenaerp.fumaco.local/import_from_ecommerce" target="_blank" class="btn btn-primary float-right">Import to AthenaERP&nbsp;&nbsp;<i class="fa fa-arrow-right"></i></a>
-                                    @endif
                                     @if ($exported_jpg or $exported_webp or $webp_unable_to_export)
+                                        @if (Storage::disk('public')->exists('/athena_images.zip'))
+                                            <a href="/admin/download_images" class="btn btn-primary d-inline">Download Zip</a>
+                                            <a href="http://athenaerp.fumaco.local/import_from_ecommerce" target="_blank" class="btn btn-primary float-right">Import to AthenaERP&nbsp;&nbsp;<i class="fa fa-arrow-right"></i></a>
+                                        @endif
                                         <div class="container-fluid mt-4">
                                             <div class="row">
                                                 <div class="scroll col-2 border border-outline-secondary">
