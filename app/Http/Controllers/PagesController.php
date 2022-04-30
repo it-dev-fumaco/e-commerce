@@ -482,6 +482,13 @@ class PagesController extends Controller
         $now = Carbon::now();
 
         if($export){
+            $item_images = DB::table('fumaco_items_image_v1')->where('exported', 0)->where('idcode', 'LR00402')->select('idcode', 'imgoriginalx')->get();
+
+            if(count($item_images) == 0){
+                session()->flash('error', 'All images already exported.');
+                return view('backend.export_images', compact('exported_jpg', 'exported_webp', 'jpg_unable_to_export', 'webp_unable_to_export'));
+            }
+
             if(!Storage::disk('public')->exists('/export_for_athena/jpg/')){ // check export folders
                 Storage::disk('public')->makeDirectory('/export_for_athena/jpg/');
             }
@@ -490,7 +497,6 @@ class PagesController extends Controller
                 Storage::disk('public')->makeDirectory('/export_for_athena/webp/');
             }
 
-            $item_images = DB::table('fumaco_items_image_v1')->where('exported', 0)->select('idcode', 'imgoriginalx')->get();
             $images = collect($item_images)->groupBy('idcode');
             $item_codes = array_keys($images->toArray());
             
@@ -542,7 +548,6 @@ class PagesController extends Controller
 
             $files = collect($jpg_files)->merge($webp_files);
             if ($zip->open(storage_path('/app/public/athena_images.zip'), \ZipArchive::CREATE)== TRUE){
-                
                 foreach ($files as $key => $value){
                     $relativeName = basename($value);
                     $zip->addFile($value, $relativeName);
