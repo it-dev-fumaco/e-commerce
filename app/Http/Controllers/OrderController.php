@@ -425,6 +425,17 @@ class OrderController extends Controller
                     $message = 'Hi '.$order_details->order_name . ' ' . $order_details->order_lastname.'!, your order '.$request->order_number.' with an amount of P '.number_format($total_amount, 2).' is now ready for pickup. Click '.$sms_short_url.' to track your order.';
                 }
 
+                $phone = null;
+                if($order_details->order_bill_contact || $order_details->order_contact){
+                    $phone = $order_details->order_bill_contact ? $order_details->order_bill_contact : $order_details->order_contact;
+                    $phone = preg_replace("/[^0-9]/", "", $phone);
+                    if($phone[0] == 0){
+                        $phone = '63'.substr($phone, 1);
+                    }else if(substr($phone, 0, 2) != '63' || $phone[0] == '9'){
+                        $phone = '63'.$phone;
+                    }
+                }
+
                 if(in_array($status, ['Order Confirmed', 'Out for Delivery', 'Order Delivered', 'Ready for Pickup'])){
                     $sms_api = DB::table('api_setup')->where('type', 'sms_gateway_api')->first();
                     if ($sms_api and $sms_short_url) {
@@ -435,7 +446,7 @@ class OrderController extends Controller
                             'api_key' => $sms_api->api_key,
                             'api_secret' => $sms_api->api_secret_key,
                             'from' => 'FUMACO',
-                            'to' => $order_details->order_bill_contact[0] == '0' ? '63'.substr($order_details->order_bill_contact, 1) : $order_details->order_bill_contact,
+                            'to' => $phone,
                             'text' => $message
                         ]);
 
@@ -518,8 +529,18 @@ class OrderController extends Controller
 
             $sms_api = DB::table('api_setup')->where('type', 'sms_gateway_api')->first();
             $customer_name = $order_details->order_name.' '.$order_details->order_lastname;
-            $phone = $request->billing_number[0] == '0' ? '63'.substr($request->billing_number, 1) : $request->billing_number;
-            $email = $request->billing_email;
+            // $phone = $request->billing_number[0] == '0' ? '63'.substr($request->billing_number, 1) : $request->billing_number;
+            $phone = null;
+            if($order_details->order_contact){
+                $phone = preg_replace("/[^0-9]/", "", $order_details->order_contact);
+                if($phone[0] == 0){
+                    $phone = '63'.substr($phone, 1);
+                }else if(substr($phone, 0, 2) != '63' || $phone[0] == '9'){
+                    $phone = '63'.$phone;
+                }
+            }
+
+            $email = $order_details->order_email;
 
             $deposit_slip = $request->root().'/upload_deposit_slip/'.$new_token;
             $deposit_slip_url = $this->generateShortUrl($request->root(), $deposit_slip);
@@ -534,7 +555,7 @@ class OrderController extends Controller
                     'api_key' => $sms_api->api_key,
                     'api_secret' => $sms_api->api_secret_key,
                     'from' => 'FUMACO',
-                    'to' => preg_replace("/[^0-9]/", "", $phone),
+                    'to' => $phone,
                     'text' => $sms_message
                 ]);
                 

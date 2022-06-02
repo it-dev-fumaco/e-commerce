@@ -1981,12 +1981,23 @@ class FrontendController extends Controller
                 'email_address' => 'required|email'
             ]);
 
+            $mobile = null;
+            if($request->mobile_no){
+                $mobile = preg_replace("/[^0-9]/", "", $request->mobile_no);
+                $mobile = $mobile[0] == 0 ? '63'.substr($mobile, 1) : '63'.$mobile;
+                if($mobile[0] == 0){
+                    $mobile = '63'.substr($mobile, 1);
+                }else if(substr($mobile, 0, 2) != '63' || $mobile[0] == '9'){
+                    $mobile = '63'.$mobile;
+                }
+            }
+
             DB::table('fumaco_users')->where('id', $id)->update(
                 [
                     'f_name' => $request->first_name,
                     'f_lname' => $request->last_name,
                     'username' => $request->email_address,
-                    'f_mobilenumber' => $request->mobile_no,
+                    'f_mobilenumber' => $mobile,
                     'f_business' => $request->business_name,
                     'f_website' => $request->website,
                     'f_job_position' => $request->job_position,
@@ -2102,6 +2113,29 @@ class FrontendController extends Controller
             if($validator->fails()){
                 return redirect()->back()->with('error', 'All fields with * are required.');
             }
+
+            $mobile = null;
+            if($request->mobile){
+                $mobile = preg_replace("/[^0-9]/", "", $request->mobile);
+                // $mobile = $mobile[0] == 0 ? '63'.substr($mobile, 1) : '63'.$mobile;
+                if($mobile[0] == 0){
+                    $mobile = '63'.substr($mobile, 1);
+                }else if(substr($mobile, 0, 2) != '63' || $mobile[0] == '9'){
+                    $mobile = '63'.$mobile;
+                }
+            }
+
+            $contact = null;
+            if($request->contact){
+                $contact = preg_replace("/[^0-9]/", "", $request->contact);
+                // $contact = $contact[0] == 0 ? '63'.substr($contact, 1) : '63'.$contact;
+                if($contact[0] == 0){
+                    $contact = '63'.substr($contact, 1);
+                }else if(substr($contact, 0, 2) != '63' || $contact[0] == '9'){
+                    $contact = '63'.$contact;
+                }
+            }
+
             $update = [
                 'add_type' => $request->Address_type1_1,
                 'xbusiness_name' => $request->business_name,
@@ -2113,10 +2147,10 @@ class FrontendController extends Controller
                 'xbrgy' => $request->brgy,
                 'xpostal' => $request->postal,
                 'xcountry' => $request->country,
-                'xmobile_number' => $request->mobile,
+                'xmobile_number' => $mobile,
                 'xcontactname1' => $request->first_name,
                 'xcontactlastname1' => $request->last_name,
-                'xcontactnumber1' => $request->contact,
+                'xcontactnumber1' => $contact,
                 'xcontactemail1' => $request->email 
             ];
 
@@ -2186,6 +2220,28 @@ class FrontendController extends Controller
             
             $checker = DB::table('fumaco_user_add')->where('user_idx', Auth::user()->id)->where('address_class', $address_class)->count();
 
+            $mobile = null;
+            if($request->mobile_no){
+                $mobile = preg_replace("/[^0-9]/", "", $request->mobile_no);
+                // $mobile = $mobile[0] == 0 ? '63'.substr($mobile, 1) : '63'.$mobile;
+                if($mobile[0] == 0){
+                    $mobile = '63'.substr($mobile, 1);
+                }else if(substr($mobile, 0, 2) != '63' || $mobile[0] == '9'){
+                    $mobile = '63'.$mobile;
+                }
+            }
+            
+            $contact = null;
+            if($request->contact_no){
+                $contact = preg_replace("/[^0-9]/", "", $request->contact_no);
+                // $contact = $contact[0] == 0 ? '63'.substr($contact, 1) : '63'.$contact;
+                if($contact[0] == 0){
+                    $contact = '63'.substr($contact, 1);
+                }else if(substr($contact, 0, 2) != '63' || $contact[0] == '9'){
+                    $contact = '63'.$contact;
+                }
+            }
+            
             DB::table('fumaco_user_add')->insert(
                 [
                     'address_class' => $address_class,
@@ -2200,8 +2256,8 @@ class FrontendController extends Controller
                     'add_type' => $request->address_type,
                     'xcontactname1' => $request->first_name,
                     'xcontactlastname1' => $request->last_name,
-                    'xcontactnumber1' => $request->contact_no,
-                    'xmobile_number' => $request->mobile_no,
+                    'xcontactnumber1' => $contact,
+                    'xmobile_number' => $mobile,
                     'xcontactemail1' => $request->email_address,
                     'xbusiness_name' => ($request->address_type == 'Business Address') ? $request->business_name : null,
                     'xtin_no' => $request->tin_no,

@@ -947,6 +947,8 @@ class CheckoutController extends Controller
 					$default_payment_status = DB::table('fumaco_payment_status')->where('status_sequence', 1)->pluck('status')->first();
 				}
 
+				$phone = $temp->xmobile;
+
 				DB::table('fumaco_order')->insert([
 					'order_number' => $temp->xlogs,
 					'order_account' => $temp->xuser_id, // account number of logged user
@@ -960,7 +962,7 @@ class CheckoutController extends Controller
 					'order_bill_postal' => $temp->xpostal,
 					'order_bill_country' => $temp->xcountry,
 					'order_bill_type' => $temp->xaddresstype,
-					'order_bill_contact' => $temp->xmobile,
+					'order_bill_contact' => $phone,
 					'order_bill_email' => $temp->xemail,
 					'order_contactperson' => $temp->xcontact_person,
 					'order_ship_contactperson' => $temp->xshipcontact_person,
@@ -1045,8 +1047,6 @@ class CheckoutController extends Controller
 			// // send email to customer / client
 			$emails = array_filter(array_unique([trim($order_details->order_bill_email), trim($order_details->order_email), trim($temp->xusernamex)]));
 
-			$phone = $temp->xmobile[0] == '0' ? '63'.substr($temp->xmobile, 1) : $temp->xmobile;
-
 			$ordered_items = DB::table('fumaco_order_items as ordered')->where('order_number', $temp->xlogs)->pluck('item_code');
         
 			$leadtime_arr = [];
@@ -1109,14 +1109,14 @@ class CheckoutController extends Controller
 			if ($url || $deposit_slip_url) {
 				$sms_api = DB::table('api_setup')->where('type', 'sms_gateway_api')->first();
 				if ($sms_api) {
-					Http::asForm()->withHeaders([
+					$sms = Http::asForm()->withHeaders([
 						'Accept' => 'application/json',
 						'Content-Type' => 'application/x-www-form-urlencoded',
 					])->post($sms_api->base_url, [
 						'api_key' => $sms_api->api_key,
 						'api_secret' => $sms_api->api_secret_key,
 						'from' => 'FUMACO',
-						'to' => preg_replace("/[^0-9]/", "", $phone),
+						'to' => $phone,
 						'text' => $sms_message
 					]);
 				}
