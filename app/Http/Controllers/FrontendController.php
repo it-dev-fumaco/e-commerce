@@ -1985,6 +1985,11 @@ class FrontendController extends Controller
             if($request->mobile_no){
                 $mobile = preg_replace("/[^0-9]/", "", $request->mobile_no);
                 $mobile = $mobile[0] == 0 ? '63'.substr($mobile, 1) : '63'.$mobile;
+                if($mobile[0] == 0){
+                    $mobile = '63'.substr($mobile, 1);
+                }else if(substr($mobile, 0, 2) != '63' || $mobile[0] == '9'){
+                    $mobile = '63'.$mobile;
+                }
             }
 
             DB::table('fumaco_users')->where('id', $id)->update(
@@ -2112,13 +2117,23 @@ class FrontendController extends Controller
             $mobile = null;
             if($request->mobile){
                 $mobile = preg_replace("/[^0-9]/", "", $request->mobile);
-                $mobile = $mobile[0] == 0 ? '63'.substr($mobile, 1) : '63'.$mobile;
+                // $mobile = $mobile[0] == 0 ? '63'.substr($mobile, 1) : '63'.$mobile;
+                if($mobile[0] == 0){
+                    $mobile = '63'.substr($mobile, 1);
+                }else if(substr($mobile, 0, 2) != '63' || $mobile[0] == '9'){
+                    $mobile = '63'.$mobile;
+                }
             }
 
             $contact = null;
             if($request->contact){
                 $contact = preg_replace("/[^0-9]/", "", $request->contact);
-                $contact = $contact[0] == 0 ? '63'.substr($contact, 1) : '63'.$contact;
+                // $contact = $contact[0] == 0 ? '63'.substr($contact, 1) : '63'.$contact;
+                if($contact[0] == 0){
+                    $contact = '63'.substr($contact, 1);
+                }else if(substr($contact, 0, 2) != '63' || $contact[0] == '9'){
+                    $contact = '63'.$contact;
+                }
             }
 
             $update = [
@@ -2205,11 +2220,28 @@ class FrontendController extends Controller
             
             $checker = DB::table('fumaco_user_add')->where('user_idx', Auth::user()->id)->where('address_class', $address_class)->count();
 
-            $mobile = preg_replace("/[^0-9]/", "", $request->mobile_no);
-            $mobile = $mobile[0] == 0 ? '63'.substr($mobile, 1) : '63'.$mobile;
-            $contact = preg_replace("/[^0-9]/", "", $request->contact_no);
-            $contact = $contact[0] == 0 ? '63'.substr($contact, 1) : '63'.$contact;
-
+            $mobile = null;
+            if($request->mobile_no){
+                $mobile = preg_replace("/[^0-9]/", "", $request->mobile_no);
+                // $mobile = $mobile[0] == 0 ? '63'.substr($mobile, 1) : '63'.$mobile;
+                if($mobile[0] == 0){
+                    $mobile = '63'.substr($mobile, 1);
+                }else if(substr($mobile, 0, 2) != '63' || $mobile[0] == '9'){
+                    $mobile = '63'.$mobile;
+                }
+            }
+            
+            $contact = null;
+            if($request->contact_no){
+                $contact = preg_replace("/[^0-9]/", "", $request->contact_no);
+                // $contact = $contact[0] == 0 ? '63'.substr($contact, 1) : '63'.$contact;
+                if($contact[0] == 0){
+                    $contact = '63'.substr($contact, 1);
+                }else if(substr($contact, 0, 2) != '63' || $contact[0] == '9'){
+                    $contact = '63'.$contact;
+                }
+            }
+            
             DB::table('fumaco_user_add')->insert(
                 [
                     'address_class' => $address_class,

@@ -540,13 +540,23 @@ class CartController extends Controller
             $mobile = null;
             if($shipping_address->xmobile_number){
                 $mobile = preg_replace("/[^0-9]/", "", $shipping_address->xmobile_number);
-                $mobile = $mobile[0] == 0 ? '63'.substr($mobile, 1) : '63'.$mobile;
+                if($mobile[0] == 0){
+                    $mobile = '63'.substr($mobile, 1);
+                }else if(substr($mobile, 0, 2) != '63' || $mobile[0] == '9'){
+                    $mobile = '63'.$mobile;
+                }
+                // $mobile = $mobile[0] == 0 ? '63'.substr($mobile, 1) : '63'.$mobile;
             }
 
             $contact = null;
             if($shipping_address->xcontactnumber1){
                 $contact = preg_replace("/[^0-9]/", "", $shipping_address->xcontactnumber1);
-                $contact = $contact[0] == 0 ? '63'.substr($contact, 1) : '63'.$contact;
+                // $contact = $contact[0] == 0 ? '63'.substr($contact, 1) : '63'.$contact;
+                if($contact[0] == 0){
+                    $contact = '63'.substr($contact, 1);
+                }else if(substr($contact, 0, 2) != '63' || $contact[0] == '9'){
+                    $contact = '63'.$contact;
+                }
             }
 
             $bill_mobile = $mobile;
@@ -577,13 +587,23 @@ class CartController extends Controller
                 $bill_mobile = null;
                 if($billing_address->xmobile_number){
                     $bill_mobile = preg_replace("/[^0-9]/", "", $billing_address->xmobile_number);
-                    $bill_mobile = $bill_mobile[0] == 0 ? '63'.substr($bill_mobile, 1) : '63'.$bill_mobile;
+                    // $bill_mobile = $bill_mobile[0] == 0 ? '63'.substr($bill_mobile, 1) : '63'.$bill_mobile;
+                    if($bill_mobile[0] == 0){
+                        $bill_mobile = '63'.substr($bill_mobile, 1);
+                    }else if(substr($bill_mobile, 0, 2) != '63' || $bill_mobile[0] == '9'){
+                        $bill_mobile = '63'.$bill_mobile;
+                    }
                 }
 
                 $bill_contact = null;
                 if($billing_address->xcontactnumber1){
                     $bill_contact = preg_replace("/[^0-9]/", "", $billing_address->xcontactnumber1);
-                    $bill_contact = $bill_contact[0] == 0 ? '63'.substr($bill_contact, 1) : '63'.$bill_contact;
+                    // $bill_contact = $bill_contact[0] == 0 ? '63'.substr($bill_contact, 1) : '63'.$bill_contact;
+                    if($bill_contact[0] == 0){
+                        $bill_contact = '63'.substr($bill_contact, 1);
+                    }else if(substr($bill_contact, 0, 2) != '63' || $bill_contact[0] == '9'){
+                        $bill_contact = '63'.$bill_contact;
+                    }
                 }
 
                 $billing_details = [
@@ -618,13 +638,23 @@ class CartController extends Controller
                 $ship_mobile = null;
                 if($request->ship_mobilenumber1_1){
                     $ship_mobile = preg_replace("/[^0-9]/", "", $request->ship_mobilenumber1_1);
-                    $ship_mobile = $ship_mobile[0] == 0 ? '63'.substr($ship_mobile, 1) : '63'.$ship_mobile;
+                    // $ship_mobile = $ship_mobile[0] == 0 ? '63'.substr($ship_mobile, 1) : '63'.$ship_mobile;
+                    if($ship_mobile[0] == 0){
+                        $ship_mobile = '63'.substr($ship_mobile, 1);
+                    }else if(substr($ship_mobile, 0, 2) != '63' || $ship_mobile[0] == '9'){
+                        $ship_mobile = '63'.$ship_mobile;
+                    }
                 }
 
                 $ship_contact = null;
                 if($request->contactnumber1_1){
                     $ship_contact = preg_replace("/[^0-9]/", "", $request->contactnumber1_1);
-                    $ship_contact = $ship_contact[0] == 0 ? '63'.substr($ship_contact, 1) : '63'.$ship_contact;
+                    // $ship_contact = $ship_contact[0] == 0 ? '63'.substr($ship_contact, 1) : '63'.$ship_contact;
+                    if($ship_contact[0] == 0){
+                        $ship_contact = '63'.substr($ship_contact, 1);
+                    }else if(substr($ship_contact, 0, 2) != '63' || $ship_contact[0] == '9'){
+                        $ship_contact = '63'.$ship_contact;
+                    }
                 }
 
                 $bill_mobile = $ship_mobile;
@@ -653,7 +683,12 @@ class CartController extends Controller
                     $bill_mobile = null;
                     if($request->mobilenumber1_1){
                         $bill_mobile = preg_replace("/[^0-9]/", "", $request->mobilenumber1_1);
-                        $bill_mobile = $bill_mobile[0] == 0 ? '63'.substr($bill_mobile, 1) : '63'.$bill_mobile;
+                        // $bill_mobile = $bill_mobile[0] == 0 ? '63'.substr($bill_mobile, 1) : '63'.$bill_mobile;
+                        if($bill_mobile[0] == 0){
+                            $bill_mobile = '63'.substr($bill_mobile, 1);
+                        }else if(substr($bill_mobile, 0, 2) != '63' || $bill_mobile[0] == '9'){
+                            $bill_mobile = '63'.$bill_mobile;
+                        }
                     }
                     
                     $billing_details = [
