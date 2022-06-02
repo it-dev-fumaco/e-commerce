@@ -32,7 +32,7 @@ class AppServiceProvider extends ServiceProvider
             });
 
             Config::set('app.url', $config->set_value);
-            Config::set('app.asset_url', $config->set_value);
+            // Config::set('app.asset_url', $config->set_value);
         }
     }
 }

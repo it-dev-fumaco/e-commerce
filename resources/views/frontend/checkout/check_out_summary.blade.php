@@ -87,7 +87,7 @@
 								<div class="he1x" style="margin-bottom: 10px !important;">
 									{{ $shipping_address1." ".$shipping_address2.", ".$shipping_brgy.", ".$shipping_city.", ".$shipping_province.", ".$shipping_country." ".$shipping_postal }}
 								</div>
-								<div class="he1x" style="margin-bottom: 5px !important;">Contact Number: {{ $shipping_mobile }}</div>
+								<div class="he1x" style="margin-bottom: 5px !important;">Contact Number: +{{ $shipping_mobile }}</div>
 								<br>
 								<div class="form-check {{ $checkbox }}">
 									<input class="form-check-input" type="checkbox" id="same-address" checked>
@@ -119,7 +119,7 @@
 								<div class="he1x" style="margin-bottom: 10px !important;">
 									{{ ucwords(strtolower($billing_details['address_line1']))." ".ucwords(strtolower($billing_details['address_line2'])).", ".ucwords(strtolower($billing_details['brgy'])).", ".ucwords(strtolower($billing_details['city'])).", ".ucwords(strtolower($billing_details['province'])).", ".ucwords(strtolower($billing_details['country']))." ".$billing_details['postal_code'] }}
 								</div>
-								<div class="he1x" style="margin-bottom: 5px !important;">Contact Number:  {{ $billing_details['mobile_no'] }}</div>
+								<div class="he1x" style="margin-bottom: 5px !important;">Contact Number: +{{ $billing_details['mobile_no'] }}</div>
 							</div>
 						</div>
 						@endif

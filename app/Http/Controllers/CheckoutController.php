@@ -1045,8 +1045,6 @@ class CheckoutController extends Controller
 			// // send email to customer / client
 			$emails = array_filter(array_unique([trim($order_details->order_bill_email), trim($order_details->order_email), trim($temp->xusernamex)]));
 
-			$phone = $temp->xmobile[0] == '0' ? '63'.substr($temp->xmobile, 1) : $temp->xmobile;
-
 			$ordered_items = DB::table('fumaco_order_items as ordered')->where('order_number', $temp->xlogs)->pluck('item_code');
         
 			$leadtime_arr = [];
@@ -1105,7 +1103,7 @@ class CheckoutController extends Controller
 
 				Mail::to($emails)->queue(new OrderSuccess($order));
 			}
-
+			
 			if ($url || $deposit_slip_url) {
 				$sms_api = DB::table('api_setup')->where('type', 'sms_gateway_api')->first();
 				if ($sms_api) {
@@ -1116,7 +1114,7 @@ class CheckoutController extends Controller
 						'api_key' => $sms_api->api_key,
 						'api_secret' => $sms_api->api_secret_key,
 						'from' => 'FUMACO',
-						'to' => preg_replace("/[^0-9]/", "", $phone),
+						'to' => $temp->xmobile,
 						'text' => $sms_message
 					]);
 				}
