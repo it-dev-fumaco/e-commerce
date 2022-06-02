@@ -31,7 +31,7 @@ class AppServiceProvider extends ServiceProvider
                 return DB::table('fumaco_settings')->first();
             });
 
-            // Config::set('app.url', $config->set_value);
+            Config::set('app.url', $config->set_value);
             Config::set('app.asset_url', $config->set_value);
         }
     }
