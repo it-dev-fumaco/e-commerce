@@ -16,10 +16,6 @@ use Illuminate\Support\Str;
 use Adrianorosa\GeoLocation\GeoLocation;
 use Illuminate\Support\Facades\Http;
 use Newsletter;
-use Response;
-use Storage;
-use ZipArchive;
-use File;
 
 use App\Http\Traits\ProductTrait;
 use App\Http\Traits\GeneralTrait;
@@ -32,153 +28,6 @@ class FrontendController extends Controller
     use GeneralTrait;
     public function signupForm() {
         return view('frontend.register');
-    }
-
-    public function testing(Request $request){
-        // $zip = new \ZipArchive();
-        // $jpg_files = File::files(storage_path('/app/public/export_for_athena/jpg'));
-        // $webp_files = File::files(storage_path('/app/public/export_for_athena/webp'));
-
-        // $files = collect($jpg_files)->merge($webp_files);
-        // if ($zip->open(storage_path('/app/public/export_for_athena/testing.zip'), \ZipArchive::CREATE)== TRUE){
-            
-        //     foreach ($files as $key => $value){
-        //         $relativeName = basename($value);
-        //         $zip->addFile($value, $relativeName);
-        //     }
-        //     $zip->close();
-        // }
-
-        // if ($zip->open(storage_path('/app/public/export_for_athena/testing_webp.zip'), \ZipArchive::CREATE)== TRUE){
-        //     $files = File::files(storage_path('/app/public/export_for_athena/webp'));
-        //     foreach ($files as $key => $value){
-        //         $relativeName = basename($value);
-        //         $zip->addFile($value, $relativeName);
-        //     }
-        //     $zip->close();
-        // }
-
-        return response()->download(storage_path('/app/public/export_for_athena/testing.zip'));
-        // $test = DB::connection('mysql_athena')->table('tabItem')->limit(10)->get();
-        // return $test;
-        // $items = DB::table('fumaco_items')->limit(10)->get();
-        // return $items;
-        // $files = Storage::disk('public')->files('/export_for_athena/jpg');
-        // return $files;
-        // $images = DB::table('fumaco_items_image_v1')->first();
-
-        // return view('download_images', compact('images'));
-        // storage_path('/app/public/gallery/')
-        // $filepath = storage_path('/app/public/item_images/'. $images->idcode .'/gallery/original/'.$images->imgoriginalx);
-        // return Response::download($filepath);
-
-        // $files = array('readme.txt', 'test.html', 'image.gif');
-        // $zip = new ZipArchive();
-        // $zip_name = "testing.zip"; // Zip name
-        // $zip->open($zip_name,  ZipArchive::CREATE);
-        // // foreach ($files as $file) {
-        //     $filepath = storage_path('/app/public/item_images/'. $images->idcode .'/gallery/original/'.$images->imgoriginalx);
-        //     if(file_exists($filepath)){
-        //         $zip->addFromString(basename($filepath),  file_get_contents($filepath));  
-        //     }
-        // // }
-        // $zip->close();
-
-        // return 1;
-        // item_images\BT00674\gallery\original
-        // $api = DB::table('api_setup')->where('type', 'sms_gateway_api')->first();
-        // // $apiKey = "24wezX69kvuWfnqZazxUhsiifcd";
-        // // $apiSecret = "Dd1PnbBIUgf7RFVKSaZEGzBsDDrjKDffimF9dVLH";
-        // $message = "Test 1";
-        // $phone = "639178423741";
-
-        // $sms = Http::asForm()->withHeaders([
-        //     'Accept' => 'application/json',
-        //     'Content-Type' => 'application/x-www-form-urlencoded',
-        // ])->post('https://api.movider.co/v1/sms', [ // /balance, /sms
-        //     'api_key' => $api->api_key,
-        //     'api_secret' => $api->api_secret_key,
-        //     'from' => 'FUMACO',
-        //     'to' => $phone,
-        //     'text' => $message
-        // ]);
-
-        // $response = json_decode($sms->getBody(), true);
-        // return $response;
-
-        // return $bitly_response['link'];
-
-        // Newsletter::subscribe('jave.kulong@fumaco.com', ['FNAME' => 'Jave', 'LNAME' => 'Kulong', 'ADDRESS' => 'Testing']);
-        // Newsletter::unsubscribe('clynton.manaois@fumaco.com');
-        // $response = Newsletter::getApi();
-        // dd($response);
-        // $fromName = 'Fumaco Test';
-        // $fromEmail = 'it@fumaco.com';
-        // $subject = 'Campaign Testing';
-        // $content = '<p>Test</p>';
-        
-        // $apiKey = env('MAILCHIMP_APIKEY');
-        // $list_id = env('MAILCHIMP_LIST_ID');
-
-        // // $templates = Newsletter::getTemplatesList();
-        // // return $templates;
-        // // $segments = Newsletter::getSegmentsList($list_id);
-        // // return $segments;
-
-        // $campaigns = Newsletter::getCampaignsList();
-        // return $campaigns;
-
-        // Newsletter::sendCampaign(); // for testing
-
-        // $response = Newsletter::getApi();
-
-        // dd($test);
-        
-        // return $segments;
-        // return is_array($conditions) ? 1 : 0;
-  
-        // $campaign = Newsletter::createCampaign(
-        //     // $campagin_id,
-        //     $fromName,
-        //     $fromEmail,
-        //     $subject,
-        //     $content,
-        //     'subscribers',
-        //     [
-        //         'settings' => [
-        //             'title' => 'Edit Campaign Testing 4',
-        //             'subject_line' => 'Edit Campaign Settings Testing 4',
-        //             'from_name' => 'FUMACO',
-        //             'from_email' => 'it@fumaco.com',
-        //             'reply_to' => 'it@fumaco.com',
-        //             'template_id' => 11988974,
-        //         ],
-        //         'recipients' => [
-        //             'list_id' => '19868f39d9',
-        //             'segment_opts' => [
-        //                 'saved_segment_id' => 2517382,
-        //             ],
-        //         ],
-        //     ],
-        // );
-
-        // // // return $campaign['id'];
-
-        // $response = Newsletter::getApi();
-
-        // dd($response);
-        // $order_details = DB::table('fumaco_order')->where('id', 50)->first();
-        // $order = [
-        //     'order_details' => $order_details
-        // ];
-        // $email_recipient = DB::table('fumaco_admin_user')->whereIn('user_type', ['System Admin'])->pluck('username');
-        // $recipients = collect($email_recipient)->toArray();
-        // if (count(array_filter($recipients)) > 0) {
-        //     Mail::send('emails.deposit_slip_notif', $order, function($message) use ($recipients) {
-        //         $message->to($recipients);
-        //         $message->subject('Awaiting Confirmation - FUMACO');
-        //     });
-        // }
     }
 
     public function index(Request $request) {
@@ -1039,23 +888,23 @@ class FrontendController extends Controller
                 'last_name' => 'required',
                 'username' => 'required|email|unique:fumaco_users,username',
                 'password' => 'required|confirmed|min:6',
-                // 'g-recaptcha-response' => ['required',function ($attribute, $value, $fail) {
-                //     $secret_key = config('recaptcha.api_secret_key');
-                //     $response = $value;
-                //     $userIP = $_SERVER['REMOTE_ADDR'];
-                //     $url = "https://www.google.com/recaptcha/api/siteverify?secret=$secret_key&response=$response&remoteip=$userIP";
-                //     $response = \file_get_contents($url);
-                //     $response = json_decode($response);
-                //     if (!$response->success) {
-                //         $fail('ReCaptcha failed.');
-                //     }
-                // }],
+                'g-recaptcha-response' => ['required',function ($attribute, $value, $fail) {
+                    $secret_key = config('recaptcha.api_secret_key');
+                    $response = $value;
+                    $userIP = $_SERVER['REMOTE_ADDR'];
+                    $url = "https://www.google.com/recaptcha/api/siteverify?secret=$secret_key&response=$response&remoteip=$userIP";
+                    $response = \file_get_contents($url);
+                    $response = json_decode($response);
+                    if (!$response->success) {
+                        $fail('ReCaptcha failed.');
+                    }
+                }],
             ],
             [
                 'password.confirmed' => 'Password does not match.',
-                // 'g-recaptcha-response' => [
-                //     'required' => 'Please check ReCaptcha.'
-                // ]
+                'g-recaptcha-response' => [
+                    'required' => 'Please check ReCaptcha.'
+                ]
             ]);
 
             $user = new User;
