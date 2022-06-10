@@ -76,10 +76,10 @@
 
             <div class="container">
               <div class="carousel-caption text-start carousel-item-container">
-                <h3 class="carousel-header-font fumacoFont1">{!! $carousel->fumaco_title !!}</h3>
+                <h3 class="carousel-header-font fumacoFont1">{!! strip_tags($carousel->fumaco_title) !!}</h3>
                 @if ($carousel->fumaco_caption)
                   <div class="text ellipsis">
-                    <p class="carousel-caption-font fumacoFont2 carousel-text-concat" style="text-align: left; text-justify: left; letter-spacing: 1px;">{!! $carousel->fumaco_caption !!}</p>
+                    <p class="carousel-caption-font fumacoFont2 carousel-text-concat" style="text-align: left; text-justify: left; letter-spacing: 1px;">{!! strip_tags($carousel->fumaco_caption) !!}</p>
                   </div>
                 @endif
                 <div style="text-align: {{ $carousel->btn_position }};">
