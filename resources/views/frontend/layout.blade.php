@@ -52,7 +52,7 @@
             <!-- Messenger Chat Plugin Code -->
 <div id="fb-root"></div>
 <!-- Your Chat Plugin code -->
-<!-- <div id="fb-customer-chat" class="fb-customerchat">
+<div id="fb-customer-chat" class="fb-customerchat">
 </div>
 
     <script>
@@ -74,9 +74,8 @@
         js.src = 'https://connect.facebook.net/en_US/sdk/xfbml.customerchat.js';
         fjs.parentNode.insertBefore(js, fjs);
       }(document, 'script', 'facebook-jssdk'));
-    </script> -->
-<!-- This site is converting visitors into subscribers and customers with https://respond.io -->
-<script id="respondio__widget" src="https://cdn.respond.io/webchat/widget/widget.js?cId=b2974a12c79b4661e2238f99a27c386171328442edabaec32e03deec626103c5"></script><!-- https://respond.io -->
+    </script>
+
     @if (in_array($activePage, ['login','checkout_customer_form']))
     <script>
       function statusChangeCallback(response) {  // Called with the results from FB.getLoginStatus().
