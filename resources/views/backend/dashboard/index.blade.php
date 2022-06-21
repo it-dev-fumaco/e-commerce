@@ -564,11 +564,11 @@
 									<td class="text-center">
 										<div class="btn-group" role="group" aria-label="Basic example">
 											<a href="#" class="btn btn-outline-secondary btn-sm" data-toggle="modal" data-target="#abandoned-{{ $abandoned['order_number'] }}-Modal">View</a>
-											@if ($abandoned['active'] == 1)
+											@if ($abandoned['active'] == 1 && $abandoned['email'] && $abandoned['name'])
 											<button type="button" class="btn btn-outline-primary btn-sm" data-toggle="modal" data-target="#email-{{ $abandoned['order_number'] }}">Email</button>
 											@endif
 										</div>
-										@if ($abandoned['active'] == 1)
+										@if ($abandoned['active'] == 1 && $abandoned['email'] && $abandoned['name'])
 										<div class="modal fade" id="email-{{ $abandoned['order_number'] }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 											<div class="modal-dialog" role="document">
 												<div class="modal-content">
