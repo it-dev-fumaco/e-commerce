@@ -392,7 +392,15 @@ class DashboardController extends Controller
 			$abandon_details = collect($cart_details);
 
 			$user = DB::table('fumaco_users')->where('username', $username)->first();
-			$customer_name = $user->f_name.' '.$user->f_lname;
+			$customer_info = DB::table('fumaco_temp')->where('order_tracker_code', $transaction_id)->select('xemail', 'xcontact_person', 'xshipcontact_person')->first();
+
+			if($user){
+				$customer_name = $user->f_name.' '.$user->f_lname;
+			}else if($customer_info){
+				$customer_name = $customer_info->xcontact_person ? $customer_info->xcontact_person : $customer_info->xshipcontact_person;
+			}else{
+				$customer_name = 'Customer';
+			}
 		}else{
 			$customer_info = DB::table('fumaco_temp')->where('order_tracker_code', $transaction_id)->select('xemail', 'xcontact_person', 'xshipcontact_person')->first();
 			$user = DB::table('fumaco_users')->where('username', $customer_info->xemail)->first();
@@ -400,8 +408,10 @@ class DashboardController extends Controller
 			$username = $customer_info->xemail;
 			if($user){
 				$customer_name = $user->f_name.' '.$user->f_lname;
-			}else{
+			}else if($customer_info){
 				$customer_name = $customer_info->xcontact_person ? $customer_info->xcontact_person : $customer_info->xshipcontact_person;
+			}else{
+				$customer_name = 'Customer';
 			}
 
 			$order_items = DB::table('fumaco_order_items')->where('order_number', $transaction_id)->select('item_code', 'item_qty as qty')->get();
