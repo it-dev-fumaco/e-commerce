@@ -52,29 +52,9 @@
             <!-- Messenger Chat Plugin Code -->
 <div id="fb-root"></div>
 <!-- Your Chat Plugin code -->
-<div id="fb-customer-chat" class="fb-customerchat">
-</div>
+<!-- This site is converting visitors into subscribers and customers with https://respond.io --><script id="respondio__widget" src="https://cdn.respond.io/webchat/widget/widget.js?cId=bcbec99c4b1e53857fe19384a14dc8d5156f11d83b30763afabee85d62fc1da6"></script><!-- https://respond.io -->
 
-    <script>
-      var chatbox = document.getElementById('fb-customer-chat');
-      chatbox.setAttribute("page_id", "276044345867555");
-      chatbox.setAttribute("attribution", "biz_inbox");
-
-      window.fbAsyncInit = function() {
-        FB.init({
-          xfbml : true,
-          version : 'v12.0'
-        });
-      };
-
-      (function(d, s, id) {
-        var js, fjs = d.getElementsByTagName(s)[0];
-        if (d.getElementById(id)) return;
-        js = d.createElement(s); js.id = id;
-        js.src = 'https://connect.facebook.net/en_US/sdk/xfbml.customerchat.js';
-        fjs.parentNode.insertBefore(js, fjs);
-      }(document, 'script', 'facebook-jssdk'));
-    </script>
+    
 
     @if (in_array($activePage, ['login','checkout_customer_form']))
     <script>
