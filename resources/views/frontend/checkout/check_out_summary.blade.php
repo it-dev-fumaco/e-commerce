@@ -1137,7 +1137,7 @@
 
 		$('#coupon-code').val('');
 		$("#coupon-code").keyup(function () {  
-            $(this).val($(this).val().toUpperCase());  
+            $(this).val($(this).val().toUpperCase().replace(' ', ''));
         });
 
 		$('#apply-coupon-btn').click(function(e){
