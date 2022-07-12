@@ -394,9 +394,16 @@ class CartController extends Controller
                 } else {
                     $order_no = session()->get('fumOrderNo');
                 }
-                // add qty to fumaco cart table
-                $existing_cart = DB::table('fumaco_cart')->where('transaction_id', $order_no)
-                    ->where('item_code', $product_details->f_idcode)->first();
+
+                if (Auth::check()) {
+                     // add qty to fumaco cart table
+                    $existing_cart = DB::table('fumaco_cart')->where('user_email', Auth::user()->username)
+                        ->where('item_code', $product_details->f_idcode)->orderBy('last_modified_at', 'desc')->first();
+                } else {
+                    // add qty to fumaco cart table
+                    $existing_cart = DB::table('fumaco_cart')->where('transaction_id', $order_no)
+                        ->where('item_code', $product_details->f_idcode)->first();
+                }
                 if ($existing_cart) {
                     if($request->type == 'increment'){
                         $new_qty = $existing_cart->qty + 1;
