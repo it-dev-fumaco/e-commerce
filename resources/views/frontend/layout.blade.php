@@ -52,7 +52,7 @@
             <!-- Messenger Chat Plugin Code -->
 <div id="fb-root"></div>
 <!-- Your Chat Plugin code -->
-<div id="fb-customer-chat" class="fb-customerchat">
+<!-- <div id="fb-customer-chat" class="fb-customerchat">
 </div>
 
     <script>
@@ -74,7 +74,9 @@
         js.src = 'https://connect.facebook.net/en_US/sdk/xfbml.customerchat.js';
         fjs.parentNode.insertBefore(js, fjs);
       }(document, 'script', 'facebook-jssdk'));
-    </script>
+    </script> -->
+<!-- This site is converting visitors into subscribers and customers with https://respond.io --><script id="respondio__widget" src="https://cdn.respond.io/webchat/widget/widget.js?cId=bcbec99c4b1e53857fe19384a14dc8d5156f11d83b30763afabee85d62fc1da6"></script><!-- https://respond.io -->
+
 
     @if (in_array($activePage, ['login','checkout_customer_form']))
     <script>
