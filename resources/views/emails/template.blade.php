@@ -56,7 +56,7 @@
 					<a href="{{ route('pages', ['slug' => 'privacy_policy']) }}">Privacy Policy</a> | <a href="{{ route('contact') }}">Contact</a> | <a href="{{ route('pages', ['slug' => 'terms_condition']) }}">Terms of Use</a>
 				</p>
 				<br><br>				
-				&copy; Copyright 2021 Fumaco. All rights reserved. Fumaco, the Fumaco logo and other Fumaco<br>marks are owned by Fumaco and may be registered. All other trademarks are the property of their<br>respective owners.
+				&copy; Copyright 2022 Fumaco. All rights reserved. Fumaco, the Fumaco logo and other Fumaco<br>marks are owned by Fumaco and may be registered. All other trademarks are the property of their<br>respective owners.
 				<br><br>
 				<span style="font-size: 14px;">
 				Fumaco</span><br>35 Pleasant View Drive, Bagbaguin, Caloocan City, Metro Manila, Philippines
