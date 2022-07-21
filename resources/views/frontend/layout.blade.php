@@ -141,9 +141,11 @@
     @endif
   </head>
   <body>
-    <div class="spinner-wrapper">
-      <div class="spinner"></div>
-    </div>
+    @if ($activePage != 'product_page')
+      <div class="spinner-wrapper">
+        <div class="spinner"></div>
+      </div>
+    @endif
     <header style="min-height: 1px;">
       <nav id="navbar" class="navbar navbar-expand-lg navbar-light fixed-top bg-light" style="padding-left: 20px; padding-right: 20px; padding-bottom:0px; border-bottom: 1px solid #e4e4e4;">
         <div class="container-fluid">
