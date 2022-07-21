@@ -66,6 +66,7 @@ class DashboardController extends Controller
 		return redirect('/admin/dashboard');
 	}
 	
+	// /admin/dashboard
 	public function index(Request $request) {
 		$users = DB::table('fumaco_users')->where('is_email_verified', 1)->count();
 
@@ -289,36 +290,30 @@ class DashboardController extends Controller
 			$items_arr = [];
 			$active = 1;
 
-			if(in_array($abandoned->last_transaction_page, ['Shopping Cart', 'Shopping Cart Page'])){
-				if(isset($guest_abandoned_items[$abandoned->order_tracker_code])){
-					foreach($guest_abandoned_items[$abandoned->order_tracker_code] as $items){
-						$items_arr[] = [
-							'item_code' => $items->item_code,
-							'item_name' => $items->item_name,
-							'slug' => $items->slug,
-							'qty' => $items->qty,
-							'item_price' => $items->f_onsale == 1 ? $items->f_price : $items->f_original_price,
-							'total_price' => $items->f_onsale == 1 ? $items->qty * $items->f_price : $items->qty * $items->f_original_price
-						];
-					}
-				}else{
-					$active = 0;
+			if(isset($guest_abandoned_items[$abandoned->order_tracker_code])){
+				foreach($guest_abandoned_items[$abandoned->order_tracker_code] as $items){
+					$items_arr[] = [
+						'item_code' => $items->item_code,
+						'item_name' => $items->item_name,
+						'slug' => $items->slug,
+						'qty' => $items->qty,
+						'item_price' => $items->f_onsale == 1 ? $items->f_price : $items->f_original_price,
+						'total_price' => $items->f_onsale == 1 ? $items->qty * $items->f_price : $items->qty * $items->f_original_price
+					];
+				}
+			}else if(isset($abandoned_items[$abandoned->order_tracker_code])){
+				foreach($abandoned_items[$abandoned->order_tracker_code] as $items){
+					$items_arr[] = [
+						'item_code' => $items->item_code,
+						'item_name' => $items->item_name,
+						'slug' => $items->slug,
+						'qty' => $items->item_qty,
+						'item_price' => $items->item_price,
+						'total_price' => $items->item_total_price
+					];
 				}
 			}else{
-				if(isset($abandoned_items[$abandoned->order_tracker_code])){
-					foreach($abandoned_items[$abandoned->order_tracker_code] as $items){
-						$items_arr[] = [
-							'item_code' => $items->item_code,
-							'item_name' => $items->item_name,
-							'slug' => $items->slug,
-							'qty' => $items->item_qty,
-							'item_price' => $items->item_price,
-							'total_price' => $items->item_total_price
-						];
-					}
-				}else{
-					$active = 0;
-				}
+				$active = 0;
 			}
 
 			$location = null;
