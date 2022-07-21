@@ -2374,15 +2374,13 @@ class ProductController extends Controller
     public function disableProductOnSale($item_code, Request $request) {
         DB::beginTransaction();
         try {
-            $selected_pricelists = $request->price_list;
-            if (in_array('Website Price List', $selected_pricelists)) {
-                DB::table('fumaco_items')->where('f_idcode', $item_code)->update([
-                    'f_onsale' => 0,
-                    'f_discount_rate' => 0,
-                    'f_discount_type' => null,
-                    'last_modified_by' => Auth::user()->username
-                ]);
-            }
+            $selected_pricelists = $request->price_list ? $request->price_list : [];
+            DB::table('fumaco_items')->where('f_idcode', $item_code)->update([
+                'f_onsale' => 0,
+                'f_discount_rate' => 0,
+                'f_discount_type' => null,
+                'last_modified_by' => Auth::user()->username
+            ]);
 
             if (($key = array_search("Website Price List", $selected_pricelists)) !== false) {
                 unset($selected_pricelists[$key]);
