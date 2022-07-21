@@ -81,6 +81,14 @@
 						<td class="pb-1 pt-1" style="padding: 6px;" colspan="{{ $colspan }}">Subtotal</td>
 						<td class="pb-1 pt-1" style="padding: 6px; white-space: nowrap !important">₱ {{ number_format(str_replace(",","",$order_details->order_subtotal), 2) }}</td>
 					</tr>
+					@if ($order_details->voucher_code)
+						<tr style="font-size: 0.8rem; text-align: right;">
+							<td class="pb-1 pt-1" style="padding: 6px;" colspan="{{ $colspan }}">
+								Discount&nbsp;<span class="text-white" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833; color: #fff !important;">{{ $order_details->voucher_code }}</span>
+							</td>
+							<td class="pb-1 pt-1" style="padding: 6px; white-space: nowrap !important">- ₱ {{ number_format(str_replace(",","",$order_details->discount_amount), 2) }}</td>
+						</tr>
+					@endif
 					<tr style="font-size: 0.8rem; text-align: right;">
 						<td class="pb-1 pt-1" style="padding: 6px;" colspan="{{ $colspan }}">{{ $order_details->order_shipping }}</td>
 						<td class="pb-1 pt-1" style="padding: 6px; white-space: nowrap !important">
@@ -91,9 +99,13 @@
 							@endif
 						</td>
 					</tr>
+					@php
+						$discount = $order_details->voucher_code ? $order_details->discount_amount : 0;
+						$grand_total = $order_details->order_shipping_amount + ($order_details->order_subtotal - $discount);
+					@endphp
 					<tr style="font-size: 0.9rem; text-align: right; border-top: 2px solid;">
 						<td class="pb-1 pt-1" style="padding: 8px;" colspan="{{ $colspan }}"><b>Grand Total</b></td>
-						<td class="pb-1 pt-1" style="padding: 8px; white-space: nowrap !important"><b>₱ {{ number_format(str_replace(",","",($order_details->order_shipping_amount + $order_details->order_subtotal)), 2) }}</b></td>
+						<td class="pb-1 pt-1" style="padding: 8px; white-space: nowrap !important"><b>₱ {{ number_format(str_replace(",","",($grand_total)), 2) }}</b></td>
 					</tr>
 					<tr style="font-size: 0.9rem; text-align: right;">
 						<td class="pb-1 pt-1" style="padding: 8px;" colspan="{{ $colspan }}"><b>Amount Paid</b></td>
