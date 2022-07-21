@@ -38,15 +38,35 @@
     <br>
     <div>
     <div class="row" style="padding-left: 5% !important; padding-right: 5% !important;">
-      @foreach($fumaco_contact as $contact)
+      @foreach($contact_info as $contact)
         <div class="col-md-6 animated animatedFadeInUp fadeInUp">
           <center>
-            <p style="color:#186EA9 !important;" class="fumacoFont_card_title">{{ $contact->office_title }}</p>
-            <p style="color:#58595A !important;" class="fumacoFont_card_caption">{{ $contact->office_address }}</p>
-            <p style="color:#58595A !important; line-height: 10px !important;" class="fumacoFont_card_caption">Phone: {{ $contact->office_phone }}</p>
-            <p style="color:#58595A !important; line-height: 10px !important;" class="fumacoFont_card_caption">Mobile: {{ $contact->office_mobile }}</p>
-            <p style="color:#58595A !important; line-height: 10px !important;" class="fumacoFont_card_caption">Fax: {{ $contact->office_fax }}</p>
-            <p style="color:#58595A !important;" class="fumacoFont_card_caption">Email: {{ $contact->office_email }}</p>
+            <p style="color:#186EA9 !important;" class="fumacoFont_card_title">{{ $contact['title'] }}</p>
+            <p style="color:#58595A !important;" class="fumacoFont_card_caption">{{ $contact['address'] }}</p>
+            @foreach ($contact['info'] as $info)
+              <p style="color:#58595A !important; line-height: 10px !important;" class="fumacoFont_card_caption {{ $info['type'] == 'Mobile' ? 'd-inline' : '' }}">
+                {{ $info['type'] }}: {{ $info['contact'] }}
+                @if ($info['type'] == 'Mobile' && $info['apps'])
+                @php
+                    $apps = explode(',',$info['apps']);
+                @endphp
+                <div class="row d-inline" style="margin-left: 10px;">
+                  @foreach($apps as $img)
+                    @php
+                      $image = '/storage/gallery/'.strtolower($img).'.png';
+                      $image_webp = '/storage/gallery/'.strtolower($img).'.webp';
+                    @endphp
+                      <div class="d-inline" style="position: relative !important; width: 30px; height: 30px"><picture>
+                        <source srcset="{{ asset($image_webp) }}" type="image/webp" style="object-fit: cover;">
+                        <source srcset="{{ asset($image) }}" type="image/jpeg" style="object-fit: cover;">
+                        <img src="{{ asset($image) }}" style="object-fit: cover; max-height: 100%;max-width: 90%;width: auto;height: auto;position: absolute;top: 0;bottom: 0;left: 0;right: 0;margin: auto;">
+                      </picture></div>
+                    @endforeach
+                </div>
+              @endif
+              </p>
+                
+              @endforeach
           </center>
           <br>
           <br>
