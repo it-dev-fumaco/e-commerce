@@ -66,8 +66,8 @@
 											<td>₱ {{ $order['grand_total'] }}</td>
 											<td><span class="badge" style=" background-color: #fd6300 !important; color: #fff;">{{ $order['status'] }}</span></td>
 											<td>
-												<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#order-{{ $order['cust_id'] }}">View Orders</button>
-												<div class="modal fade" id="order-{{ $order['cust_id'] }}" role="dialog">
+												<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#order-{{ $order['order_no'] }}">View Orders</button>
+												<div class="modal fade" id="order-{{ $order['order_no'] }}" role="dialog">
 													<div class="modal-dialog modal-xl" style="min-width: 70%;">
 														<div class="modal-content">
 															<div class="modal-header">

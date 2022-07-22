@@ -72,27 +72,57 @@ class PagesController extends Controller
 
     public function editContactForm($id){
         $address = DB::table('fumaco_contact')->where('id', $id)->first();
+        $contact_info = DB::table('fumaco_contact_numbers')->where('parent', $id)->get();
 
-        return view('backend.pages.edit_contact', compact('address'));
+        return view('backend.pages.edit_contact', compact('address', 'contact_info'));
     }
 
+    // /admin/pages/contact/update/{id}
     public function editContact(Request $request, $id){
         DB::beginTransaction();
         try {
             $checker = DB::table('fumaco_contact')->where('id', '!=', $id)->where('office_title', $request->title)->first();
+            $type = $request->type ? $request->type : [];
+            $contact = $request->contact ? $request->contact : [];
+            $messaging_platform = $request->messaging_platform ? $request->messaging_platform : [];
+
+            if(count($type) <= 0 || count($contact) <= 0){
+                return redirect()->back()->with('error', 'Contact information cannot be empty.');
+            }
+            
             if($checker){
                 return redirect()->back()->with('error', 'Office title must be unique.');
             }
             $update = [
                 'office_title' => $request->title,
                 'office_address' => $request->address,
-                'office_phone' => $request->phone,
-                'office_mobile' => $request->mobile,
-                'office_email' => $request->email,
                 'last_modified_by' => Auth::user()->username
             ];
 
             DB::table('fumaco_contact')->where('id', $id)->update($update);
+            DB::table('fumaco_contact_numbers')->where('parent', $id)->delete();
+
+            $rows = array_keys($request->type);
+            foreach($rows as $row){
+                if(!isset($type[$row]) || !isset($contact[$row])){
+                    return redirect()->back()->with('error', 'Please enter contact info.');
+                }
+
+                $contact_info = [
+                    'parent' => $id,
+                    'type' => $type[$row],
+                    'contact' => $contact[$row],
+                    'created_by' => Auth::user()->username,
+                ];
+
+                $platforms = [];
+                if(isset($messaging_platform[$row])){
+                    $platforms = collect(array_keys($messaging_platform[$row]))->implode(',');
+                    $contact_info['messaging_apps'] = $platforms;
+                }
+
+                DB::table('fumaco_contact_numbers')->insert($contact_info);
+            }
 
             DB::commit();
             return redirect()->back()->with('success', 'Address has been updated.');
@@ -107,6 +137,7 @@ class PagesController extends Controller
         return view('backend.pages.add_contact');
     }
 
+    // /admin/pages/contact/add
     public function addContact(Request $request){
         DB::beginTransaction();
         try {
@@ -115,17 +146,44 @@ class PagesController extends Controller
                 return redirect()->back()->with('error', 'Office title must be unique.');
             }
 
+            $type = $request->type ? $request->type : [];
+            $contact = $request->contact ? $request->contact : [];
+            $messaging_platform = $request->messaging_platform ? $request->messaging_platform : [];
+
+            if(count($type) <= 0 || count($contact) <= 0){
+                return redirect()->back()->with('error', 'Contact information cannot be empty.');
+            }
+
             $insert = [
                 'office_title' => $request->title,
                 'office_address' => $request->address,
-                'office_phone' => $request->phone,
-                'office_mobile' => $request->mobile,
-                'office_email' => $request->email,
                 'created_by' => Auth::user()->username,
                 'created_at' => Carbon::now()->toDateTimeString()
             ];
 
-            DB::table('fumaco_contact')->insert($insert);
+            $id = DB::table('fumaco_contact')->insertGetId($insert);
+
+            $rows = array_keys($request->type);
+            foreach($rows as $row){
+                if(!isset($type[$row]) || !isset($contact[$row])){
+                    return redirect()->back()->with('error', 'Please enter contact info.');
+                }
+
+                $contact_info = [
+                    'parent' => $id,
+                    'type' => $type[$row],
+                    'contact' => $contact[$row],
+                    'created_by' => Auth::user()->username,
+                ];
+
+                $platforms = [];
+                if(isset($messaging_platform[$row])){
+                    $platforms = collect(array_keys($messaging_platform[$row]))->implode(',');
+                    $contact_info['messaging_apps'] = $platforms;
+                }
+
+                DB::table('fumaco_contact_numbers')->insert($contact_info);
+            }
 
             DB::commit();
             return redirect('/admin/pages/contact')->with('success', 'Address added.');
@@ -141,6 +199,7 @@ class PagesController extends Controller
         try {
 
             DB::table('fumaco_contact')->where('id', $id)->delete();
+            DB::table('fumaco_contact_numbers')->where('parent', $id)->delete();
 
             DB::commit();
             return redirect()->back()->with('success', 'Address added.');

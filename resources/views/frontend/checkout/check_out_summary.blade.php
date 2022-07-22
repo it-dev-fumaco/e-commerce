@@ -212,6 +212,7 @@
 								<div id="voucher-free" class="d-none"></div>
 								@php
 									$sd_exists = false;
+									$shipping_rates_check = collect($shipping_rates)->pluck('shipping_service_name')->toArray();
 									if (in_array('Standard Delivery', array_column($shipping_rates, 'shipping_service_name'))) {
 										$sd_exists = true;
 									}
@@ -219,7 +220,11 @@
 								@forelse ($shipping_rates as $l => $srate)
 								@php
 									if ($sd_exists) {
-										$defaul_selected = ($srate['shipping_service_name'] == 'Standard Delivery') ? 'checked' : '';
+										if(in_array('Free Delivery', $shipping_rates_check)){
+											$defaul_selected = ($srate['shipping_service_name'] == 'Free Delivery') ? 'checked' : '';
+										}else{
+											$defaul_selected = ($srate['shipping_service_name'] == 'Standard Delivery') ? 'checked' : '';
+										}
 									} else {
 										$defaul_selected = ($loop->first) ? 'checked' : '';
 									}

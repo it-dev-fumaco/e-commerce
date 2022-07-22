@@ -128,8 +128,15 @@
 															</div>
 															<div class="modal-body" id="customer-order-{{ $order['order_no'] }}">
 																<div class="row {{ ($order['status'] == 'Delivered') ? 'd-none' : '' }}">
+																	@if ($order['status'] == 'Order Placed' && $order['payment_method'] == 'Bank Deposit' && $order['payment_status'] != 'Received')
+																		<div class="col-12">
+																			<div class="callout callout-info text-center">
+																				<small><i class="fas fa-info-circle"></i> &nbsp;Bank Deposit: Please Contact Accounting for Payment Confirmation before you can update the Order Status.</small>
+																			</div>
+																		</div>
+																	@endif
 																	<div class="col-4">
-																		<p class="mt-3 mb-0"><strong>Customer Name : </strong> {{ $order['first_name'] . " " . $order['last_name'] }}</p>
+																		<p class="mb-0"><strong>Customer Name : </strong> {{ $order['first_name'] . " " . $order['last_name'] }}</p>
 																		@if($order['user_email'])
 																		<p class="mb-0"><strong>Email Address : </strong> {{ $order['user_email'] }}</p>
 																		@endif
