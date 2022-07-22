@@ -128,14 +128,21 @@
 															</div>
 															<div class="modal-body" id="customer-order-{{ $order['order_no'] }}">
 																<div class="row {{ ($order['status'] == 'Delivered') ? 'd-none' : '' }}">
-																	<div class="col-3">
+																	@if ($order['status'] == 'Order Placed' && $order['payment_method'] == 'Bank Deposit' && $order['payment_status'] != 'Received')
+																		<div class="col-12">
+																			<div class="callout callout-info text-center">
+																				<small><i class="fas fa-info-circle"></i> &nbsp;Bank Deposit: Please Contact Accounting for Payment Confirmation before you can update the Order Status.</small>
+																			</div>
+																		</div>
+																	@endif
+																	<div class="col-4">
 																		<p class="mb-0"><strong>Customer Name : </strong> {{ $order['first_name'] . " " . $order['last_name'] }}</p>
 																		@if($order['user_email'])
 																		<p class="mb-0"><strong>Email Address : </strong> {{ $order['user_email'] }}</p>
 																		@endif
 																		<p class="text-muted mb-0"><strong>{{ $order['order_type'] }} Checkout</strong></p>
 																	</div>
-																	<div class="col-9 d-print-none">
+																	<div class="col-8 d-print-none">
 																		<div class="row">
 																			<div class="col-6 p-0">
 																				@if ($order['payment_method'] == 'Bank Deposit' and in_array(Auth::user()->user_type, ['System Admin', 'Accounting Admin']))
@@ -215,12 +222,6 @@
 																							@endif
 																						</div>
 																					</div>
-																				@else
-																					@if ($order['status'] == 'Order Placed' && $order['payment_method'] == 'Bank Deposit' && $order['payment_status'] != 'Received')
-																						<div class="callout callout-info text-center p-1">
-																							<small><i class="fas fa-info-circle"></i> &nbsp;Bank Deposit: Please Contact Accounting for Payment Confirmation before you can update the Order Status.</small>
-																						</div>
-																					@endif
 																				@endif
 																			</div>
 																			<div class="col-6">
