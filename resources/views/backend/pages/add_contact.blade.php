@@ -86,7 +86,7 @@
                                                                 <input type="text" name="contact[row-1]" class="form-control" required>
                                                                 <div id="row-1-msg-container" class="text-left p-2" style="display: none">
                                                                     <div id="msg-content">
-                                                                        Other Messaging Platforms:&nbsp;&nbsp;
+                                                                       <i> Display Available Messaging Platforms:&nbsp;&nbsp;<i>
                                                                         @foreach ($messaging_platforms as $msg)
                                                                             <input type="checkbox" name="messaging_platform[row-1][{{ $msg }}]"> <label>{{ $msg }}</label>&nbsp;&nbsp;
                                                                         @endforeach
