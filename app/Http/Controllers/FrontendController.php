@@ -1121,7 +1121,28 @@ class FrontendController extends Controller
     }
 
     public function viewContactPage() {
-        $fumaco_contact = DB::table('fumaco_contact')->select('office_title', 'office_address', 'office_phone', 'office_mobile', 'office_fax', 'office_email')->get();
+        $fumaco_contact = DB::table('fumaco_contact')->select('id', 'office_title', 'office_address')->get();
+        $fumaco_contact_numbers = DB::table('fumaco_contact_numbers')->whereIn('parent', collect($fumaco_contact)->pluck('id'))->get();
+        $fumaco_contact_numbers = collect($fumaco_contact_numbers)->groupBy('parent');
+
+        $contact_info = [];
+        foreach($fumaco_contact as $contact){
+            $info_arr = [];
+            if(isset($fumaco_contact_numbers[$contact->id])){
+                foreach($fumaco_contact_numbers[$contact->id] as $info){
+                    $info_arr[] = [
+                        'type' => $info->type,
+                        'contact' => $info->contact,
+                        'apps' => $info->messaging_apps
+                    ];
+                }
+            }
+            $contact_info[] = [
+                'title' => $contact->office_title,
+                'address' => $contact->office_address,
+                'info' => $info_arr
+            ];
+        }
 
         $fumaco_map = DB::table('fumaco_map_1')->select('map_url')->first();
 
@@ -1132,7 +1153,7 @@ class FrontendController extends Controller
             $image_for_sharing = ($default_image_for_sharing->filename) ? asset('/storage/social_images/'. $default_image_for_sharing->filename) : null;
         } 
 
-        return view('frontend.contact', compact('fumaco_contact', 'fumaco_map', 'image_for_sharing'));
+        return view('frontend.contact', compact('fumaco_contact', 'fumaco_map', 'image_for_sharing', 'contact_info'));
     }
 
     public function addContact(Request $request){
