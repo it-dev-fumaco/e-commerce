@@ -53,8 +53,8 @@
                 <div class="row d-inline" style="margin-left: 10px;">
                   @foreach($apps as $img)
                     @php
-                      $image = '/storage/gallery/'.strtolower($img).'.png';
-                      $image_webp = '/storage/gallery/'.strtolower($img).'.webp';
+                      $image = '/storage/contacts/'.strtolower($img).'.png';
+                      $image_webp = '/storage/contacts/'.strtolower($img).'.webp';
                     @endphp
                       <div class="d-inline" style="position: relative !important; width: 30px; height: 30px"><picture>
                         <source srcset="{{ asset($image_webp) }}" type="image/webp" style="object-fit: cover;">
