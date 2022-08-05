@@ -1085,11 +1085,15 @@ class CheckoutController extends Controller
 				$view = 'frontend.checkout.order_success_page';
 				
 				$order['bank_accounts'] = $bank_accounts;
+				
+				try {
+					Mail::send('emails.order_success_bank_deposit', $order, function($message) use ($emails) {
+						$message->to($emails);
+						$message->subject('Order Placed - Bank Deposit - FUMACO');
+					});
+				} catch (\Swift_TransportException  $e) {
 
-				Mail::send('emails.order_success_bank_deposit', $order, function($message) use ($emails) {
-					$message->to($emails);
-					$message->subject('Order Placed - Bank Deposit - FUMACO');
-				});
+				}
 
 				$deposit_slip_url = $request->root().'/upload_deposit_slip/'.$order_details->deposit_slip_token;
 				$shortened_deposit_slip_url = $this->generateShortUrl($request->root(), $deposit_slip_url);
@@ -1103,7 +1107,11 @@ class CheckoutController extends Controller
 
 				$sms_message = 'Hi '.$temp->xfname.' '.$temp->xlname.'!, your order '.$temp->xlogs.' with an amount of P '.number_format($request->Amount, 2).' has been received, please allow '.$min_leadtime.' to '.$max_leadtime.' business days to process your order. ' . $tracking_url_text;
 
-				Mail::to($emails)->queue(new OrderSuccess($order));
+				try {
+					Mail::to($emails)->queue(new OrderSuccess($order));
+				} catch (\Swift_TransportException $e) {
+		
+				}
 			}
 
 			if ($url || $deposit_slip_url) {
@@ -1126,10 +1134,14 @@ class CheckoutController extends Controller
 			$email_recipient = DB::table('email_config')->first();
 			$email_recipient = ($email_recipient) ? explode(",", $email_recipient->email_recipients) : [];
 			if (count(array_filter($email_recipient)) > 0) {
-				Mail::send('emails.new_order', $order, function($message) use ($email_recipient) {
-					$message->to($email_recipient);
-					$message->subject('New Order - FUMACO');
-				});
+				try {
+					Mail::send('emails.new_order', $order, function($message) use ($email_recipient) {
+						$message->to($email_recipient);
+						$message->subject('New Order - FUMACO');
+					});
+				} catch (\Swift_TransportException $e) {
+					
+				}
 			}
 
 			session()->forget('fumOrderNo');

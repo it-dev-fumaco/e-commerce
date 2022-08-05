@@ -442,14 +442,14 @@ class DashboardController extends Controller
 				];
 			}
 
-			Mail::send('emails.abandoned_cart', ['cart_details' => $cart_arr, 'status' => 'Abandoned', 'username' => $username, 'customer_name' => $customer_name], function($message) use($username){
-				$message->to(trim($username));
-				$message->subject("Let's check this off your list - FUMACO");
-			});
-
-			// if(count(Mail::failures()) > 0) { // for email error checking
-			// 	return Mail::failures();
-			// }
+			try {
+				Mail::send('emails.abandoned_cart', ['cart_details' => $cart_arr, 'status' => 'Abandoned', 'username' => $username, 'customer_name' => $customer_name], function($message) use($username){
+					$message->to(trim($username));
+					$message->subject("Let's check this off your list - FUMACO");
+				});
+			} catch (\Swift_TransportException  $e) {
+				return redirect()->back()->with('error', 'Email not sent!');
+			}
 		}
 
 		return redirect()->back()->with('success', 'Email Sent!');

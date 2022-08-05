@@ -377,10 +377,17 @@ class OrderController extends Controller
                         $confirmed_bank_deposit_email = $order_details->order_email;
 
                         $customer_name = $order_details->order_name . ' ' . $order_details->order_lastname;
-                        Mail::send('emails.order_confirmed_bank_deposit', $order, function($message) use($confirmed_bank_deposit_email){
-                            $message->to(trim($confirmed_bank_deposit_email));
-                            $message->subject('Order Confirmed - FUMACO');
-                        });
+                        
+                        try {
+                            Mail::send('emails.order_confirmed_bank_deposit', $order, function($message) use($confirmed_bank_deposit_email){
+                                $message->to(trim($confirmed_bank_deposit_email));
+                                $message->subject('Order Confirmed - FUMACO');
+                            });
+                        } catch (\Swift_TransportException  $e) {
+                            DB::rollback();
+                            
+                            return redirect()->back()->with('error', 'An error occured. Please try again.');
+                        }
 
                         if(Mail::failures()){
                             DB::rollback();
@@ -393,10 +400,17 @@ class OrderController extends Controller
                 }
 
                 if ($status == 'Out for Delivery') {
-                    Mail::send('emails.out_for_delivery', ['order_details' => $order_details, 'status' => $status, 'items' => $items], function($message) use($order_details, $status){
-                        $message->to(trim($order_details->order_email));
-                        $message->subject($status . ' - FUMACO');
-                    });
+                    
+                    try {
+                        Mail::send('emails.out_for_delivery', ['order_details' => $order_details, 'status' => $status, 'items' => $items], function($message) use($order_details, $status){
+                            $message->to(trim($order_details->order_email));
+                            $message->subject($status . ' - FUMACO');
+                        });
+                    } catch (\Swift_TransportException  $e) {
+                        DB::rollback();
+                        
+                        return redirect()->back()->with('error', 'An error occured. Please try again.');
+                    }
 
                     if(Mail::failures()){
                         DB::rollback();
@@ -408,10 +422,17 @@ class OrderController extends Controller
 
                 if ($status == 'Order Delivered') {
                     $customer_name = $order_details->order_name . ' ' . $order_details->order_lastname;
-                    Mail::send('emails.delivered', ['id' => $order_details->order_number, 'customer_name' => $customer_name], function($message) use($order_details, $status){
-                        $message->to(trim($order_details->order_email));
-                        $message->subject('Order Delivered - FUMACO');
-                    });
+                    
+                    try {
+                        Mail::send('emails.delivered', ['id' => $order_details->order_number, 'customer_name' => $customer_name], function($message) use($order_details, $status){
+                            $message->to(trim($order_details->order_email));
+                            $message->subject('Order Delivered - FUMACO');
+                        });
+                    } catch (\Swift_TransportException  $e) {
+                        DB::rollback();
+                        
+                        return redirect()->back()->with('error', 'An error occured. Please try again.');
+                    }
 
                     if(Mail::failures()){
                         DB::rollback();
@@ -568,10 +589,16 @@ class OrderController extends Controller
                 }
             }
             
-            Mail::send('emails.order_success_bank_deposit', $order, function($message) use ($email) {
-                $message->to($email);
-                $message->subject('Order Placed - Bank Deposit - FUMACO');
-            });
+            try {
+                Mail::send('emails.order_success_bank_deposit', $order, function($message) use ($email) {
+                    $message->to($email);
+                    $message->subject('Order Placed - Bank Deposit - FUMACO');
+                });
+            } catch (\Swift_TransportException  $e) {
+                DB::rollback();
+
+                return redirect()->back()->with('error', 'An error occured. Please try again.');
+            }
 
             if(Mail::failures()){
                 DB::rollback();
@@ -1153,17 +1180,25 @@ class OrderController extends Controller
 
                     if ($details->order_bill_email) {
                         $customer_email = $details->order_bill_email;
-                        Mail::send('emails.cancelled_order_customer', $order, function($message) use ($customer_email) {
-                            $message->to($customer_email);
-                            $message->subject('Cancelled Order - FUMACO');
-                        });
+                        try {
+                            Mail::send('emails.cancelled_order_customer', $order, function($message) use ($customer_email) {
+                                $message->to($customer_email);
+                                $message->subject('Cancelled Order - FUMACO');
+                            });
+                        } catch (\Swift_TransportException  $e) {
+                            
+                        }
                     }
 
                     if (count(array_filter($email_recipient)) > 0) {
-                        Mail::send('emails.cancelled_order_admin', $order, function($message) use ($email_recipient) {
-                            $message->to($email_recipient);
-                            $message->subject('Cancelled Order - FUMACO');
-                        });
+                        try {
+                            Mail::send('emails.cancelled_order_admin', $order, function($message) use ($email_recipient) {
+                                $message->to($email_recipient);
+                                $message->subject('Cancelled Order - FUMACO');
+                            });
+                        } catch (\Swift_TransportException  $e) {
+                           
+                        }
                     }
 
                     return redirect()->back()->with('success', 'Order <b>'.$details->order_number.'</b> has been cancelled.');
@@ -1230,10 +1265,14 @@ class OrderController extends Controller
             $email_recipient = DB::table('fumaco_admin_user')->where('user_type', 'Accounting Admin')->pluck('username');
             $recipients = collect($email_recipient)->toArray();
             if (count(array_filter($recipients)) > 0) {
-                Mail::send('emails.deposit_slip_notif', $order, function($message) use ($recipients) {
-                    $message->to($recipients);
-                    $message->subject('Awaiting Confirmation - FUMACO');
-                });
+                try {
+                    Mail::send('emails.deposit_slip_notif', $order, function($message) use ($recipients) {
+                        $message->to($recipients);
+                        $message->subject('Awaiting Confirmation - FUMACO');
+                    });
+                } catch (\Swift_TransportException  $e) {
+                    
+                }
             }
         }
 

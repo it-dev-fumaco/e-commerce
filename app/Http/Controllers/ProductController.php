@@ -1259,10 +1259,14 @@ class ProductController extends Controller
                         ];
     
                         if($type == 'cart' or $type == 'wishlist'){
-                            Mail::send('emails.multiple_items_on_cart', $sale_details, function($message) use($subscriber){
-                                $message->to(trim($subscriber));
-                                $message->subject("Hurry or you might miss out - FUMACO");
-                            });
+                            try {
+                                Mail::send('emails.multiple_items_on_cart', $sale_details, function($message) use($subscriber){
+                                    $message->to(trim($subscriber));
+                                    $message->subject("Hurry or you might miss out - FUMACO");
+                                });
+                            } catch (\Swift_TransportException  $e) {
+                                
+                            }
                         }else if($type == 'general'){
                             if($sale_check->apply_discount_to == 'Per Category'){
                                 

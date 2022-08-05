@@ -826,10 +826,14 @@ class FrontendController extends Controller
                 ];
             }
 
-            Mail::send('emails.new_subscriber', ['featured' => $featured], function($message) use ($request) {
-                $message->to($request->email);
-                $message->subject('Thank you for subscribing - FUMACO');
-            });
+            try {
+                Mail::send('emails.new_subscriber', ['featured' => $featured], function($message) use ($request) {
+                    $message->to($request->email);
+                    $message->subject('Thank you for subscribing - FUMACO');
+                });
+            } catch (\Swift_TransportException  $e) {
+                return redirect()->back()->with('error', 'An error occured. Please try again.');
+            }
 
             // check for failures
             if (Mail::failures()) {
@@ -945,10 +949,14 @@ class FrontendController extends Controller
                 Newsletter::unsubscribe($user->username);
             }
 
-            Mail::send('emails.verify_email', ['token' => $token], function($message) use($request){
-                $message->to($request->username);
-                $message->subject('Verify email from Fumaco.com');
-            });
+            try {
+                Mail::send('emails.verify_email', ['token' => $token], function($message) use($request){
+                    $message->to($request->username);
+                    $message->subject('Verify email from Fumaco.com');
+                });
+            } catch (\Swift_TransportException  $e) {
+
+            }
 
             DB::commit();
 
@@ -966,11 +974,15 @@ class FrontendController extends Controller
                 'user_id' => $existing->id, 
                 'token' => $token
             ]);
+   
+            try {
+                Mail::send('emails.verify_email', ['token' => $token], function($message) use($email){
+                    $message->to($email);
+                    $message->subject('Verify email from Fumaco.com');
+                });
+            } catch (\Swift_TransportException  $e) {
 
-            Mail::send('emails.verify_email', ['token' => $token], function($message) use($email){
-                $message->to($email);
-                $message->subject('Verify email from Fumaco.com');
-            });
+            }
         }
 
         return redirect()->back()->with(['email' => $email, 'resend' => true]);
@@ -988,10 +1000,14 @@ class FrontendController extends Controller
                 $verifyUser->user->save();
                 $message = "Your email is verified. You can now login.";
 
-                Mail::send('emails.welcome', ['username' => trim($user->username), 'password' => $user->password], function($message) use($user){
-                    $message->to($user->username);
-                    $message->subject('Welcome Email from Fumaco.com');
-                });
+                try {
+                    Mail::send('emails.welcome', ['username' => trim($user->username), 'password' => $user->password], function($message) use($user){
+                        $message->to($user->username);
+                        $message->subject('Welcome Email from Fumaco.com');
+                    });
+                } catch (\Swift_TransportException  $e) {
+    
+                }
             } else {
                 $message = "Your email is already verified. You can now login.";
             }
@@ -1199,16 +1215,25 @@ class FrontendController extends Controller
             $email_recipient = DB::table('email_config')->first();
             $email_recipient = ($email_recipient) ? explode(",", $email_recipient->email_recipients) : [];
             if (count(array_filter($email_recipient)) > 0) {
-                Mail::send('emails.new_contact', ['new_contact' => $new_contact, 'client' => 0], function($message) use ($email_recipient) {
-                    $message->to($email_recipient);
-                    $message->subject('New Contact - FUMACO');
-                });
+                try {
+                    Mail::send('emails.new_contact', ['new_contact' => $new_contact, 'client' => 0], function($message) use ($email_recipient) {
+                        $message->to($email_recipient);
+                        $message->subject('New Contact - FUMACO');
+                    });
+                } catch (\Swift_TransportException  $e) {
+    
+                }
             }
-            // send email to client 
-            Mail::send('emails.new_contact', ['new_contact' => $new_contact, 'client' => 1], function($message) use ($request) {
-                $message->to(trim($request->email));
-                $message->subject('Contact Us - FUMACO');
-            });
+            
+            try {
+                // send email to client 
+                Mail::send('emails.new_contact', ['new_contact' => $new_contact, 'client' => 1], function($message) use ($request) {
+                    $message->to(trim($request->email));
+                    $message->subject('Contact Us - FUMACO');
+                });
+            } catch (\Swift_TransportException  $e) {
+
+            }
 
             // check for failures
             if (Mail::failures()) {
@@ -2468,10 +2493,14 @@ class FrontendController extends Controller
             $email_recipient = DB::table('fumaco_admin_user')->where('user_type', 'Accounting Admin')->pluck('username');
             $recipients = collect($email_recipient)->toArray();
             if (count(array_filter($recipients)) > 0) {
-                Mail::send('emails.deposit_slip_notif', $order, function($message) use ($recipients) {
-                    $message->to($recipients);
-                    $message->subject('Awaiting Confirmation - FUMACO');
-                });
+                try {
+                    Mail::send('emails.deposit_slip_notif', $order, function($message) use ($recipients) {
+                        $message->to($recipients);
+                        $message->subject('Awaiting Confirmation - FUMACO');
+                    });
+                } catch (\Swift_TransportException  $e) {
+    
+                }
             }
         }
         
