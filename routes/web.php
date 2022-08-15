@@ -32,6 +32,10 @@ Route::get('/products/category/lighting-components/208', function() {
     return redirect('/products/led-lamps-and-bulbs');
 });
 
+// https://www.fumaco.com/products/category/luminaires/1469 - Troofers and Luminaires
+Route::get('/products/troffer-luminaires', function() {
+    return redirect('/products/troffers-and-louvers');
+});
 
 Route::namespace('Auth')->group(function(){
     //Login Routes
