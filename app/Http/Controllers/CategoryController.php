@@ -59,12 +59,8 @@ class CategoryController extends Controller
                 'last_modified_by' => Auth::user()->username,
             ];
             if($request->add_cat_slug){
-                $rules = array(
-                    'slug' => 'required|unique:fumaco_categories,slug'
-                );
-
-                $validation = Validator::make($request->all(), $rules);
-                if($validation->fails()){
+                $cat_slugs = DB::table('fumaco_categories')->pluck('slug');
+                if(in_array($request->add_cat_slug, $cat_slugs->toArray())){
                     return redirect()->back()->with('error', 'Slug must be unique');
                 }
             }
