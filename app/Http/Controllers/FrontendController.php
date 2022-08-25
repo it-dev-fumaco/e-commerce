@@ -884,6 +884,7 @@ class FrontendController extends Controller
         return DB::table('fumaco_settings')->select('set_value')->first();
     }
 
+    // /user_register
     public function userRegistration(Request $request){
         DB::beginTransaction();
         try{
@@ -909,6 +910,7 @@ class FrontendController extends Controller
                 'g-recaptcha-response' => [
                     'required' => 'Please check ReCaptcha.'
                 ]
+                'username.unique' => 'The email address has already been taken.',
             ]);
 
             $user = new User;
