@@ -67,7 +67,6 @@
                                  </div>
                               </div>
                               <button type="submit" class="btn btn-primary mr-2">Update</button>
-                              <a href="/admin/product/{{ $details->id }}/sync" class="btn btn-info">Sync Stock & Price</a>
                            </div>
                         </div>
                      </div>
@@ -210,7 +209,7 @@
                            <div class="col-md-4">
                               <div class="form-group">
                                  <label for="warehouse">Warehouse</label>
-                                 <input type="text" class="form-control" id="warehouse" value="{{ $details->f_warehouse }}" readonly required>
+                                 <select class="form-control select2" name="warehouse" id="warehouse" style="width: 100%;" required></select>
                               </div>
                            </div>
                            <div class="col-md-4">
@@ -477,6 +476,32 @@
 				}
 			});
       }
+
+      $('#warehouse').select2({
+         placeholder: 'Search Warehouse',
+         ajax: {
+            url: '/admin/warehouse/search',
+            method: 'GET',
+            dataType: 'json',
+            data: function (data) {
+               return {
+                  q: data.term, // search term
+               };
+            },
+            processResults: function (response) {
+               return {
+                  results: response
+               };
+            },
+            error: function () {
+               console.log('An error occured.');
+            },
+            cache: true
+         }
+      });
+
+      var newOption = new Option('{{ $details->f_warehouse }}', '{{ $details->f_warehouse }}', false, false);
+      $('#warehouse').append(newOption).trigger('change');
    })();
 </script>
 @endsection
