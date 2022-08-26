@@ -619,6 +619,7 @@ class ProductController extends Controller
                 'f_cat_id' => $request->product_category,
                 'f_category' => $item_category,
                 'f_alert_qty' => $request->alert_qty,
+                'f_warehouse' => $request->warehouse,
                 'f_caption' => $request->website_caption,
                 'f_full_description' => $request->full_detail,
                 'f_featured_image' => $featured_image_name,
@@ -687,6 +688,54 @@ class ProductController extends Controller
                             'last_modified_by' => Auth::user()->username,
                         ]
                     );
+                }
+            }
+
+            $erp_api = DB::table('api_setup')->where('type', 'erp_api')->first();
+            if ($erp_api) {
+                $item_code = $detail->f_idcode;
+                $warehouse = $request->warehouse;
+
+                $api_header = [
+                    'Content-Type' => 'application/json',
+                    'Authorization' => 'token '. $erp_api->api_key. ':' . $erp_api->api_secret_key . '',
+                    'Accept-Language' => 'en'
+                ];
+
+                // get stock quantity of selected item code
+                $fields = '?fields=["item_code","warehouse","actual_qty","website_reserved_qty"]';
+                $filter = '&filters=[["item_code","=","' . $item_code . '"],["warehouse","=","' .$warehouse .'"]]';
+        
+                $params = $fields . '' . $filter;
+                
+                $response = Http::withHeaders($api_header)->get($erp_api->base_url . '/api/resource/Bin' . $params);
+
+                if ($response->successful()) {
+                    if (isset($response['data']) && count($response['data']) > 0) {
+                        DB::table('fumaco_items')->where('id', $id)
+                            ->where('stock_source', 1)->update([
+                                'f_qty' => $response['data'][0]['actual_qty'],
+                                'last_sync_date' => Carbon::now()->toDateTimeString()
+                            ]);
+                    }
+                }
+
+                // get item price
+                $fields = '?fields=["item_code","price_list","price_list_rate","currency"]';
+                $filter = '&filters=[["item_code","=","' . $item_code . '"],["price_list","=","Website Price List"]]';
+
+                $params = $fields . '' . $filter;
+                
+                $response = Http::withHeaders($api_header)->get($erp_api->base_url . '/api/resource/Item Price' . $params);
+
+                if ($response->successful()) {
+                    if (isset($response['data']) && count($response['data']) > 0) {
+                        DB::table('fumaco_items')->where('id', $id)
+                            ->update([
+                                'f_default_price' => $response['data'][0]['price_list_rate'],
+                                'last_sync_date' => Carbon::now()->toDateTimeString()
+                            ]);
+                    }
                 }
             }
 
@@ -2577,71 +2626,36 @@ class ProductController extends Controller
         }
     }
 
-    public function syncStockPrice($id, Request $request) {
-        DB::beginTransaction();
-        try {
+    // function to get items from ERP via API
+    public function searchWarehouse(Request $request) {
+        if($request->ajax()) {
             $erp_api = DB::table('api_setup')->where('type', 'erp_api')->first();
-            if ($erp_api) {
-                $detail = DB::table('fumaco_items')->where('id', $id)->select('f_warehouse', 'f_idcode')->first();
-                if (!$detail) {
-                    return redirect()->back()->with('error', 'Product not found.');
-                }
-
-                $item_code = $detail->f_idcode;
-                $warehouse = $detail->f_warehouse;
-
-                $api_header = [
-                    'Content-Type' => 'application/json',
-                    'Authorization' => 'token '. $erp_api->api_key. ':' . $erp_api->api_secret_key . '',
-                    'Accept-Language' => 'en'
-                ];
-
-                // get stock quantity of selected item code
-                $fields = '?fields=["item_code","warehouse","actual_qty","website_reserved_qty"]';
-                $filter = '&filters=[["item_code","=","' . $item_code . '"],["warehouse","=","' .$warehouse .'"]]';
-        
-                $params = $fields . '' . $filter;
-                
-                $response = Http::withHeaders($api_header)->get($erp_api->base_url . '/api/resource/Bin' . $params);
-
-                if ($response->successful()) {
-                    if (isset($response['data']) && count($response['data']) > 0) {
-                        DB::table('fumaco_items')->where('id', $id)
-                            ->where('stock_source', 1)->update([
-                                'f_qty' => $response['data'][0]['actual_qty'],
-                                'last_sync_date' => Carbon::now()->toDateTimeString()
-                            ]);
-                    }
-                }
-
-                // get item price
-                $fields = '?fields=["item_code","price_list","price_list_rate","currency"]';
-                $filter = '&filters=[["item_code","=","' . $item_code . '"],["price_list","=","Website Price List"]]';
-
-                $params = $fields . '' . $filter;
-                
-                $response = Http::withHeaders($api_header)->get($erp_api->base_url . '/api/resource/Item Price' . $params);
-
-                if ($response->successful()) {
-                    if (isset($response['data']) && count($response['data']) > 0) {
-                        DB::table('fumaco_items')->where('id', $id)
-                            ->update([
-                                'f_default_price' => $response['data'][0]['price_list_rate'],
-                                'last_sync_date' => Carbon::now()->toDateTimeString()
-                            ]);
-                    }
-                }
-                
-                DB::commit();
-
-                return redirect()->back()->with('success', 'Product Stock and Price has been updated.');
+            if (!$erp_api) {
+                return response()->json(['status' => 0, 'ERP API not configured.']);
             }
-         
-            return redirect()->back()->with('error', 'ERP API not configured.');
-        } catch (Exception $e) {
-            DB::rollback();
 
-            return redirect()->back()->with('error', 'An error occured. Please try again.');
+            $params = '?filters=[["name","LIKE","%25' . $request->q . '%25"],["is_group","=","0"],["disabled","=","0"],["stock_warehouse","=","1"],["parent_warehouse","!=","P2 Consignment Warehouse - FI"]]';
+
+            $response = Http::withHeaders([
+                'Content-Type' => 'application/json',
+                'Authorization' => 'token '. $erp_api->api_key. ':' . $erp_api->api_secret_key . '',
+                'Accept-Language' => 'en'
+            ])->get($erp_api->base_url . '/api/resource/Warehouse' . ($params));
+
+
+            if ($response->failed()) {
+                return response()->json(['status' => 0, 'message' => 'An error occured. Please try again.']);
+            }
+    
+            $result = [];
+            foreach ($response['data'] as $row) {
+                $result[] = [
+                    'id' => $row['name'],
+                    'text' => $row['name'],
+                ];
+            }
+    
+            return $result;
         }
     }
 }
