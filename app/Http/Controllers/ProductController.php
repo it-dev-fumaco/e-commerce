@@ -711,13 +711,15 @@ class ProductController extends Controller
                 $response = Http::withHeaders($api_header)->get($erp_api->base_url . '/api/resource/Bin' . $params);
 
                 if ($response->successful()) {
+                    $qty = 0;
                     if (isset($response['data']) && count($response['data']) > 0) {
-                        DB::table('fumaco_items')->where('id', $id)
-                            ->where('stock_source', 1)->update([
-                                'f_qty' => $response['data'][0]['actual_qty'],
-                                'last_sync_date' => Carbon::now()->toDateTimeString()
-                            ]);
+                        $qty = $response['data'][0]['actual_qty'];
                     }
+                    DB::table('fumaco_items')->where('id', $id)
+                        ->where('stock_source', 1)->update([
+                            'f_qty' => $qty,
+                            'last_sync_date' => Carbon::now()->toDateTimeString()
+                        ]);
                 }
 
                 // get item price
@@ -729,13 +731,16 @@ class ProductController extends Controller
                 $response = Http::withHeaders($api_header)->get($erp_api->base_url . '/api/resource/Item Price' . $params);
 
                 if ($response->successful()) {
+                    $price = 0;
                     if (isset($response['data']) && count($response['data']) > 0) {
-                        DB::table('fumaco_items')->where('id', $id)
-                            ->update([
-                                'f_default_price' => $response['data'][0]['price_list_rate'],
-                                'last_sync_date' => Carbon::now()->toDateTimeString()
-                            ]);
+                        $price = $response['data'][0]['price_list_rate'];
                     }
+
+                    DB::table('fumaco_items')->where('id', $id)
+                        ->update([
+                            'f_default_price' => $price,
+                            'last_sync_date' => Carbon::now()->toDateTimeString()
+                        ]);
                 }
             }
 
