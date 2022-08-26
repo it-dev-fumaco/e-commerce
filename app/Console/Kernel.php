@@ -24,7 +24,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('sync:erpstock')->hourly();
+        $schedule->command('sync:erpstock')->daily();
         $schedule->command('stock_reservation:save')->everyFiveMinutes();
         $schedule->command('sitemap:generate')->daily();
     }
