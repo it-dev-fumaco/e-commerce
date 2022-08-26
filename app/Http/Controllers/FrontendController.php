@@ -909,7 +909,7 @@ class FrontendController extends Controller
                 'password.confirmed' => 'Password does not match.',
                 'g-recaptcha-response' => [
                     'required' => 'Please check ReCaptcha.'
-                ]
+                ],
                 'username.unique' => 'The email address has already been taken.',
             ]);
 
