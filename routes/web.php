@@ -211,6 +211,7 @@ Route::prefix('admin')->group(function () {
             Route::get('/product/search', 'ProductController@searchItem');
             Route::get('/product/{id}/edit', 'ProductController@viewProduct');
             Route::get('/product/{id}/edit_bundle', 'ProductController@viewProduct');
+            Route::get('/product/{id}/sync', 'ProductController@syncStockPrice');
             Route::get('/product/images/{id}', 'ProductController@uploadImagesForm');
             Route::post('/add_product_images', 'ProductController@uploadImages');
             Route::get('/delete_product_image/{id}/{social?}', 'ProductController@deleteProductImage');

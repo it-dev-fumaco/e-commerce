@@ -51,21 +51,27 @@
                   @endif
                   <!-- general form elements -->
                   <div class="card">
-                     <div class="card-body">
-                        <h4 class="d-inline-block">Product Information</h4>
-                        <p>Last Sync: {{ $details->last_sync_date ? Carbon\Carbon::parse($details->last_sync_date)->format('M d, Y H:i a') : '-' }}</p>
-                        <div class="float-right">
-                           <div class="dropdown d-inline-block mr-2">
-                              <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdowncreate" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Create New Product
-                              </button>
-                              <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdowncreate" style="width: 100%;">
-                                 <a class="dropdown-item" href="/admin/product/add/simple_product">Simple Product</a>
-                                 <a class="dropdown-item" href="/admin/product/add/product_bundle">Product Bundle</a>
-                              </div>
+                     <div class="card-header">
+                        <div class="d-flex flex-row align-items-center justify-content-between">
+                           <div>
+                              <h4 class="d-inline-block m-0">Product Information</h4>
+                              <p class="p-0 m-0">Last Sync: {{ $details->last_sync_date ? Carbon\Carbon::parse($details->last_sync_date)->format('M. d, Y h:i A') : '-' }}</p>
                            </div>
-                           <button type="submit" class="btn btn-primary">Update</button>
+                           <div>
+                              <div class="dropdown d-inline-block mr-2">
+                                 <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdowncreate" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Create New Product
+                                 </button>
+                                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdowncreate" style="width: 100%;">
+                                    <a class="dropdown-item" href="/admin/product/add/simple_product">Simple Product</a>
+                                    <a class="dropdown-item" href="/admin/product/add/product_bundle">Product Bundle</a>
+                                 </div>
+                              </div>
+                              <button type="submit" class="btn btn-primary mr-2">Update</button>
+                              <a href="/admin/product/{{ $details->id }}/sync" class="btn btn-info">Sync Stock & Price</a>
+                           </div>
                         </div>
-                        <hr>
+                     </div>
+                     <div class="card-body">
                         <div class="row">
                            <div class="col-md-2">
                               @php
