@@ -355,11 +355,7 @@
 
 @section('style')
 <style>
-    .MsoNormal span{
-        font-family: 'poppins', sans-serif !important;
-    }
-
-    .MsoNormal{
+    .MsoNormal, .MsoNormal span{
         font-family: 'poppins', sans-serif !important;
     }
 

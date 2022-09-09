@@ -385,26 +385,14 @@
 		font-weight: 300 !important;
 		font-size: 12px !important;
 	}
-	.he2 {
-		font-weight: 200 !important;
-		font-size: 10px !important;
-	}
 	.btmp {
 		margin-bottom: 15px !important;
 	}
-	.caption_1 {
+	.caption_1, .order-font {
 		font-weight: 200 !important;
 		font-size: 14px !important;
 	}
-	.caption_2 {
-		font-weight: 200 !important;
-		font-size: 10px !important;
-	}
-	.order-font {
-		font-weight: 200 !important;
-		font-size: 14px !important;
-	}
-	.order-font-sub {
+	.caption_2, .he2, .order-font-sub {
 		font-weight: 200 !important;
 		font-size: 10px !important;
 	}
@@ -412,17 +400,6 @@
 		font-weight: 300 !important;
 		font-size: 14px !important;
 	}
-	@media (max-width: 575.98px) {
-		.track-order-eta{
-			text-align: left !important;
-		}
-	}
-	@media (max-width: 767.98px) {
-		.track-order-eta{
-			text-align: left !important;
-		}
-	}
-
 
 	@import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');
 
@@ -596,7 +573,11 @@ p {
 	.tr-font{
 		font-size: 16px;
 	}
-@media (max-width: 575.98px) {
+
+	@media (max-width: 575.98px) {
+		.track-order-eta{
+			text-align: left !important;
+		}
 		.products-head{
 			padding-left: 0 !important;
 			padding-right: 0 !important;
@@ -616,6 +597,9 @@ p {
     }
 
     @media (max-width: 767.98px) {
+		.track-order-eta{
+			text-align: left !important;
+		}
 		.products-head{
 			padding-left: 0 !important;
 			padding-right: 0 !important;
@@ -633,6 +617,7 @@ p {
 			font-size: 10pt !important;
 		}
     }
+
 	@media (max-width: 1199.98px) {
 		.track-container{
 			min-height: 200px

@@ -14,7 +14,7 @@
 			font-weight: 300 !important;
 			font-size: 12px !important;
 		}
-		.he2 {
+		.he2, .he2x2x {
 			font-weight: 200 !important;
 			font-size: 10px !important;
 		}
@@ -29,10 +29,6 @@
 		.he2x2 {
 			font-weight: 200 !important;
 			font-size: 14px !important;
-		}
-		.he2x2x {
-			font-weight: 200 !important;
-			font-size: 10px !important;
 		}
 		.he3x1x {
 			font-weight: 100 !important;
