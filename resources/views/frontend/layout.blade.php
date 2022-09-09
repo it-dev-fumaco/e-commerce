@@ -32,7 +32,8 @@
     {{-- <link rel="preconnect" href="https://fonts.googleapis.com"> --}}
     {{-- <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet"> --}}
     <link href="{{ asset('/assets/fumaco.css') }}" rel="stylesheet">
-    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css">
+    {{-- <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css"> --}}
+    <link rel="stylesheet" href="{{ asset('assets/minified-css/jquery-ui.css') }}">
     {{-- <link rel="stylesheet" href="https://resources/demos/style.css"> --}}
     <link rel="stylesheet" type="text/css" href="{{ asset('/page_css/layout.min.css') }}">
     @yield('style')
@@ -367,12 +368,14 @@
   <script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.4/Chart.bundle.min.js'></script>
   <script src="{{ asset('/assets/dist/js/bootstrap.bundle.min.js') }}"></script>
 
-  <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
-  <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.js"></script>
+  @if (!in_array($activePage, ['homepage']))
+  <script src="{{ asset('assets/minified-js/minified-jquery-3.6.0.js') }}"></script>
+  <script src="{{ asset('assets/minified-js/minified-jquery-ui.js') }}"></script>
+  {{-- <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+  <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.js"></script> --}}
+  @endif
   <script>
     $(document).ready(function() {
-      // $('.autocomplete-search').select2();
-
       $(document).on('click', '.remove-cart-btn', function(e){
             e.preventDefault();
             var tr = $(this);
