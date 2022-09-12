@@ -25,9 +25,9 @@
   <link rel="stylesheet" href="{{ asset('/assets/admin/plugins/select2/css/select2.min.css') }}">
   <link rel="stylesheet" href="{{ asset('/assets/admin/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css') }}">
     @endif
-    {{-- <link href="{{ asset('/assets/dist/css/bootstrap.min.css') }}" rel="stylesheet"> --}}
-    <link rel="preload" href="{{ asset('/assets/dist/css/bootstrap.min.css') }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="{{ asset('/assets/dist/css/bootstrap.min.css') }}"></noscript>
+    <link href="{{ asset('/assets/dist/css/bootstrap.min.css') }}" rel="stylesheet">
+    {{-- <link rel="preload" href="{{ asset('/assets/dist/css/bootstrap.min.css') }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="{{ asset('/assets/dist/css/bootstrap.min.css') }}"></noscript> --}}
 
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
     
