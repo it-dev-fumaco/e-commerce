@@ -318,31 +318,25 @@
 @endsection
 @section('style')
 
-<link rel="stylesheet" type="text/css" href="{{ asset('/page_css/homepage.min.css') }}">
-<link rel="stylesheet" type="text/css" href="{{ asset('/slick/slick.css') }}">
-<link rel="stylesheet" type="text/css" href="{{ asset('/slick/slick-theme.css') }}">
+{{-- <link rel="stylesheet" type="text/css" href="{{ asset('/page_css/homepage.min.css') }}"> --}}
+<link rel="preload" href="{{ asset('/page_css/homepage.min.css') }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="{{ asset('/page_css/homepage.min.css') }}"></noscript>
+
+{{-- <link rel="stylesheet" type="text/css" href="{{ asset('/slick/slick.css') }}"> --}}
+<link rel="preload" href="{{ asset('/slick/slick.css') }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="{{ asset('/slick/slick.css') }}"></noscript>
+
+{{-- <link rel="stylesheet" type="text/css" href="{{ asset('/slick/slick-theme.css') }}"> --}}
+<link rel="preload" href="{{ asset('/slick/slick-theme.css') }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="{{ asset('/slick/slick-theme.css') }}"></noscript>
 
 @endsection
-
 @section('script')
   <script src="{{ asset('/slick/slick.js') }}" type="text/javascript" charset="utf-8"></script>
   <script type="text/javascript">
     $('#myCarousel').css('margin-top', $('#navbar').height());
 
     $(document).ready(function() {
-      setTimeout(function() {
-        $('#multiple-accounts-msg').fadeOut();
-      }, 5000);
-
-      $('#close-accounts-msg').click(function(){
-        $('#multiple-accounts-msg').fadeOut();
-      });
-
-      // Product Image Hover
-      $('.hover-container').hover(function(){
-        $(this).children('.btn-container').slideToggle('fast');
-      });
-
       $(".regular").slick({
         dots: false,
         infinite: true,
@@ -382,6 +376,21 @@
         }
       ]
       });
+
+      setTimeout(function() {
+        $('#multiple-accounts-msg').fadeOut();
+      }, 5000);
+
+      $('#close-accounts-msg').click(function(){
+        $('#multiple-accounts-msg').fadeOut();
+      });
+
+      // Product Image Hover
+      $('.hover-container').hover(function(){
+        $(this).children('.btn-container').slideToggle('fast');
+      });
+
+      
     });
   </script>
 @endsection

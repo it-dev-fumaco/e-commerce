@@ -25,23 +25,39 @@
   <link rel="stylesheet" href="{{ asset('/assets/admin/plugins/select2/css/select2.min.css') }}">
   <link rel="stylesheet" href="{{ asset('/assets/admin/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css') }}">
     @endif
-    <link href="{{ asset('/assets/dist/css/bootstrap.min.css') }}" rel="stylesheet">
+    {{-- <link href="{{ asset('/assets/dist/css/bootstrap.min.css') }}" rel="stylesheet"> --}}
+    <link rel="preload" href="{{ asset('/assets/dist/css/bootstrap.min.css') }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="{{ asset('/assets/dist/css/bootstrap.min.css') }}"></noscript>
+
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+    
+    {{-- <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet"> --}}
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap"></noscript>
+
     {{-- <link rel="preconnect" href="https://fonts.googleapis.com"> --}}
     {{-- <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet"> --}}
-    <link href="{{ asset('/assets/fumaco.css') }}" rel="stylesheet">
+
+    {{-- <link href="{{ asset('/assets/fumaco.css') }}" rel="stylesheet"> --}}
+    <link rel="preload" href="{{ asset('/assets/fumaco.css') }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="{{ asset('/assets/fumaco.css') }}"></noscript>
+
+    {{-- <link rel="stylesheet" href="https://resources/demos/style.css"> --}}
+
+    {{-- <link rel="stylesheet" type="text/css" href="{{ asset('/page_css/layout.min.css') }}"> --}}
+    <link rel="preload" href="{{ asset('/page_css/layout.min.css') }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="{{ asset('/page_css/layout.min.css') }}"></noscript>
+
+    @yield('style')
+
     @if (!in_array($activePage, ['homepage']))
       {{-- <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css"> --}}
       <link rel="stylesheet" href="{{ asset('assets/minified-css/jquery-ui.min.css') }}">
     @endif
-    {{-- <link rel="stylesheet" href="https://resources/demos/style.css"> --}}
-    <link rel="stylesheet" type="text/css" href="{{ asset('/page_css/layout.min.css') }}">
-    @yield('style')
 
     @if ($activePage != 'error_page')
     <!-- Google Tag Manager -->
-    <script>
+    <script async>
       (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
       new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
       j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
@@ -57,7 +73,7 @@
 <div id="fb-customer-chat" class="fb-customerchat">
 </div>
 
-    <script>
+    <script async>
       var chatbox = document.getElementById('fb-customer-chat');
       chatbox.setAttribute("page_id", "276044345867555");
       chatbox.setAttribute("attribution", "biz_inbox");
@@ -377,6 +393,113 @@
   @endif
   <script>
     $(document).ready(function() {
+      websiteSettings();
+      productCategories();
+      countCartItems();
+      countWishItems();
+      policyPages();
+      //Preloader
+      preloaderFadeOutTime = 800;
+      function hidePreloader() {
+          var preloader = $('.spinner-wrapper');
+          preloader.fadeOut(preloaderFadeOutTime);
+      }
+      hidePreloader();
+
+      setTimeout(function () {
+          $("#cookieConsent").fadeIn(200);
+      }, 2000);
+
+      // set product category dropdown in navbar and links in dooter
+      function productCategories() {
+        $('#product-category-dropdown').empty();
+        $('#product-category-footer').empty();
+        $.ajax({
+          type:'GET',
+          url:'/categories',
+          success: function (response) {
+            var l = '';
+            var f = '';
+            $(response).each(function(i, d){
+              var slug = "";
+              if(d.slug){
+                slug = d.slug;
+              }else{
+                slug = d.id;
+              }
+              var link = (d.external_link) ? d.external_link : '/products/' + slug ;
+              var target = (d.external_link) ? 'target="_blank"' : '';
+              // for navbar dropdown
+              l += '<li><a class="dropdown-item" style="font-weight: 300 !important;" href="' + link +'" ' + target + '>' +
+              '<img src="{{ asset("assets/site-img/icon/") }}/' + d.image + '" alt="' + d.name +'" width="30">' + d.name +'</a></li>';
+              // for footer links
+              f += '<tr style="border-style: unset !important;">' +
+                '<td class="tdfooter footer2nd" style="border-style: unset !important;">' +
+                '<a style="text-decoration:none; color: #0062A5;" href="'+ link +'" ' + target + '>' + d.name +'</a>' +
+              '</td></tr>';
+            });
+
+            $('#product-category-footer').append(f);
+            $('#product-category-dropdown').append(l);
+          }
+        });
+      }
+
+      function websiteSettings() {
+        $.ajax({
+          type:'GET',
+          url:'/website_settings',
+          success: function (response) {
+            $('#navbar-brand').attr('href', response.set_value);
+          }
+        });
+      }
+
+      function countCartItems() {
+        $.ajax({
+          type:'GET',
+          url:'/countcartitems',
+          success: function (response) {
+            $('.count-cart-items').text(response);
+          }
+        });
+      }
+
+      function countWishItems() {
+        $.ajax({
+          type:'GET',
+          url:'/countwishlist',
+          success: function (response) {
+            $('.count-wish-items').text(response);
+          }
+        });
+      }
+
+      // policy pages
+      function policyPages() {
+        $('#policy-pages-footer').empty();
+        $.ajax({
+          type:'GET',
+          url:'/policy_pages',
+          success: function (response) {
+            var f = '';
+            $(response).each(function(i, d){
+              var link = '/pages/' + d.slug;
+              // for footer links
+              f += '<tr style="border-style: unset !important;">' +
+                '<td class="tdfooter footer2nd" style="border-style: unset !important;">' +
+                '<a style="text-decoration:none; color: #0062A5;" href="'+ link +'" >' + d.page_title +'</a>' +
+              '</td></tr>';
+            });
+
+
+            $('#policy-pages-footer').append(f);
+          }
+        });
+      }
+
+      // $('#bootstrap-min-css').removeAttr('disabled');
+      
       $(document).on('click', '.remove-cart-btn', function(e){
             e.preventDefault();
             var tr = $(this);
@@ -473,48 +596,6 @@
           });
         });
       @endif
-      websiteSettings();
-      productCategories();
-      countCartItems();
-      countWishItems();
-      policyPages();
-      //Preloader
-      preloaderFadeOutTime = 800;
-      function hidePreloader() {
-          var preloader = $('.spinner-wrapper');
-          preloader.fadeOut(preloaderFadeOutTime);
-      }
-      hidePreloader();
-
-      setTimeout(function () {
-          $("#cookieConsent").fadeIn(200);
-      }, 2000);
-      $("#closeCookieConsent, .cookieConsentOK").click(function() {
-          $("#cookieConsent").fadeOut(200);
-      });
-
-      // policy pages
-      function policyPages() {
-        $('#policy-pages-footer').empty();
-        $.ajax({
-          type:'GET',
-          url:'/policy_pages',
-          success: function (response) {
-            var f = '';
-            $(response).each(function(i, d){
-              var link = '/pages/' + d.slug;
-              // for footer links
-              f += '<tr style="border-style: unset !important;">' +
-                '<td class="tdfooter footer2nd" style="border-style: unset !important;">' +
-                '<a style="text-decoration:none; color: #0062A5;" href="'+ link +'" >' + d.page_title +'</a>' +
-              '</td></tr>';
-            });
-
-
-            $('#policy-pages-footer').append(f);
-          }
-        });
-      }
 
       $('.autocomplete-search').keyup(function(){
         var data = {
@@ -576,70 +657,9 @@
         });
       });
 
-      // set product category dropdown in navbar and links in dooter
-      function productCategories() {
-        $('#product-category-dropdown').empty();
-        $('#product-category-footer').empty();
-        $.ajax({
-          type:'GET',
-          url:'/categories',
-          success: function (response) {
-            var l = '';
-            var f = '';
-            $(response).each(function(i, d){
-              var slug = "";
-              if(d.slug){
-                slug = d.slug;
-              }else{
-                slug = d.id;
-              }
-              var link = (d.external_link) ? d.external_link : '/products/' + slug ;
-              var target = (d.external_link) ? 'target="_blank"' : '';
-              // for navbar dropdown
-              l += '<li><a class="dropdown-item" style="font-weight: 300 !important;" href="' + link +'" ' + target + '>' +
-              '<img src="{{ asset("assets/site-img/icon/") }}/' + d.image + '" alt="' + d.name +'" width="30">' + d.name +'</a></li>';
-              // for footer links
-              f += '<tr style="border-style: unset !important;">' +
-                '<td class="tdfooter footer2nd" style="border-style: unset !important;">' +
-                '<a style="text-decoration:none; color: #0062A5;" href="'+ link +'" ' + target + '>' + d.name +'</a>' +
-              '</td></tr>';
-            });
-
-            $('#product-category-footer').append(f);
-            $('#product-category-dropdown').append(l);
-          }
-        });
-      }
-
-      function websiteSettings() {
-        $.ajax({
-          type:'GET',
-          url:'/website_settings',
-          success: function (response) {
-            $('#navbar-brand').attr('href', response.set_value);
-          }
-        });
-      }
-
-      function countCartItems() {
-        $.ajax({
-          type:'GET',
-          url:'/countcartitems',
-          success: function (response) {
-            $('.count-cart-items').text(response);
-          }
-        });
-      }
-
-      function countWishItems() {
-        $.ajax({
-          type:'GET',
-          url:'/countwishlist',
-          success: function (response) {
-            $('.count-wish-items').text(response);
-          }
-        });
-      }
+      $("#closeCookieConsent, .cookieConsentOK").click(function() {
+          $("#cookieConsent").fadeOut(200);
+      });
     });
   </script>
 
