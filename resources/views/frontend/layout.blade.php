@@ -367,22 +367,7 @@
   </footer>
   <script src="https://kit.fontawesome.com/ec0415ab92.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-  @if($activePage == 'contact')
-  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
-  @else
-  <script src="https://www.google.com/recaptcha/api.js?render={{ config('recaptcha.api_site_key') }}" async defer></script>
-  <script async defer> 
-    grecaptcha.ready(function() {
-      grecaptcha.execute("{{ config('recaptcha.api_site_key') }}", {action: 'homepage'}).then(function(token) {
-        if(token) {
-          $("#recaptcha_v3-subscribe").val(token); 
-        } 
-      });
-    });
-  </script> 
-  @endif
-  {{-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script> --}}
-  <script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.4/Chart.bundle.min.js' async defer></script>
+  
   <script src="{{ asset('/assets/dist/js/bootstrap.bundle.min.js') }}"></script>
 
   @if (!in_array($activePage, ['homepage']))
@@ -664,5 +649,22 @@
   </script>
 
   @yield('script')
+
+  @if($activePage == 'contact')
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+  @else
+  <script src="https://www.google.com/recaptcha/api.js?render={{ config('recaptcha.api_site_key') }}" defer></script>
+  <script defer> 
+    grecaptcha.ready(function() {
+      grecaptcha.execute("{{ config('recaptcha.api_site_key') }}", {action: 'homepage'}).then(function(token) {
+        if(token) {
+          $("#recaptcha_v3-subscribe").val(token); 
+        } 
+      });
+    });
+  </script> 
+  @endif
+  {{-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script> --}}
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.4/Chart.bundle.min.js' defer></script>
 </body>
 </html>
