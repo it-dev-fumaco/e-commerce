@@ -353,7 +353,7 @@
                     <div class="d-inline m-2 payment-icons" style="position: relative !important"><picture>
                       <source srcset="{{ asset($image_webp) }}" type="image/webp" style="object-fit: cover;">
                       <source srcset="{{ asset($image) }}" type="image/jpeg" style="object-fit: cover;">
-                      <img src="{{ asset($image) }}" style="object-fit: cover; max-height: 100%;max-width: 90%;width: auto;height: auto;position: absolute;top: 0;bottom: 0;left: 0;right: 0;margin: auto;">
+                      <img src="{{ asset($image) }}" style="object-fit: cover; max-height: 100%;max-width: 90%;width: auto;height: auto;position: absolute;top: 0;bottom: 0;left: 0;right: 0;margin: auto;" loading="lazy">
                     </picture></div>
                   @endforeach
               </div>

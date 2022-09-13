@@ -99,7 +99,7 @@
               <picture>
                 <source srcset="{{ asset($image_webp) }}" type="image/webp" class="card-img-top">
                 <source srcset="{{ asset($image) }}" type="image/jpeg" class="card-img-top">
-                <img src="{{ asset($image) }}" alt="{{ Str::slug(explode(".", $b->{'blogprimayimage-home'})[0], '-') }}" class="card-img-top hover">
+                <img src="{{ asset($image) }}" alt="{{ Str::slug(explode(".", $b->{'blogprimayimage-home'})[0], '-') }}" class="card-img-top hover" loading="lazy">
               </picture>
               </div>
               
@@ -162,7 +162,7 @@
                       <picture>
                         <source srcset="{{ asset($img_bs_webp) }}" type="image/webp" class="img-responsive" style="width: 100% !important;">
                         <source srcset="{{ asset($img_bs) }}" type="image/jpeg" class="img-responsive" style="width: 100% !important;">
-                        <img src="{{ asset($img_bs) }}" alt="{{ Str::slug(explode(".", $bs['image'])[0], '-') }}" class="img-responsive hover" style="width: 100% !important;">
+                        <img src="{{ asset($img_bs) }}" alt="{{ Str::slug(explode(".", $bs['image'])[0], '-') }}" class="img-responsive hover" style="width: 100% !important;" loading="lazy">
                       </picture>
                     </div>
                     <div class="card-body d-flex flex-column">
@@ -254,7 +254,7 @@
                       <picture>
                         <source srcset="{{ asset($img_os_webp) }}" type="image/webp" class="img-responsive" style="width: 100% !important;">
                         <source srcset="{{ asset($img_os) }}" type="image/jpeg" class="img-responsive" style="width: 100% !important;">
-                        <img src="{{ asset($img_os) }}" alt="{{ Str::slug(explode(".", $os['image'])[0], '-') }}" class="img-responsive hover" style="width: 100% !important;">
+                        <img src="{{ asset($img_os) }}" alt="{{ Str::slug(explode(".", $os['image'])[0], '-') }}" class="img-responsive hover" style="width: 100% !important;" loading="lazy">
                       </picture>
                     </div>
                     <div class="card-body d-flex flex-column">
@@ -389,8 +389,6 @@
       $('.hover-container').hover(function(){
         $(this).children('.btn-container').slideToggle('fast');
       });
-
-      
     });
   </script>
 @endsection
