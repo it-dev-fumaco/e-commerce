@@ -66,6 +66,7 @@ class DashboardController extends Controller
 		return redirect('/admin/dashboard');
 	}
 	
+	// /admin/dashboard
 	public function index(Request $request) {
 		$users = DB::table('fumaco_users')->where('is_email_verified', 1)->count();
 
@@ -263,8 +264,8 @@ class DashboardController extends Controller
 		$paginatedItems->setPath($request->url());
 		$cart_collection = $paginatedItems;
 
-		$abandoned_cart = DB::table('fumaco_temp')->whereDate('xdateupdate', '<=', Carbon::now()->subHours(8)->toDateTimeString())->orderBy('xdateupdate', 'desc')->paginate(10, ['*'], 'abandoned_page');
-		
+		$abandoned_cart = DB::table('fumaco_temp')->orderBy('xdateupdate', 'desc')->paginate(10, ['*'], 'abandoned_page');
+
 		$abandoned_order_numbers = collect($abandoned_cart->items())->map(function($result){
 			return $result->order_tracker_code;
 		});
@@ -275,13 +276,32 @@ class DashboardController extends Controller
 			->select('order.*', 'items.slug')
 			->get();
 
+		$guest_items = DB::table('fumaco_cart as cart')
+			->join('fumaco_items as items', 'cart.item_code', 'items.f_idcode')
+			->whereIn('cart.transaction_id', $abandoned_order_numbers)
+			->select('cart.*', 'items.slug', 'items.f_name_name as item_name', 'items.f_onsale', 'items.f_price', 'items.f_original_price')
+			->get();
+
 		$abandoned_items = collect($items)->groupBy('order_number');
+		$guest_abandoned_items = collect($guest_items)->groupBy('transaction_id');
 
 		$abandoned_arr = [];
 		foreach($abandoned_cart as $abandoned){
 			$items_arr = [];
 			$active = 1;
-			if(isset($abandoned_items[$abandoned->order_tracker_code])){
+
+			if(isset($guest_abandoned_items[$abandoned->order_tracker_code])){
+				foreach($guest_abandoned_items[$abandoned->order_tracker_code] as $items){
+					$items_arr[] = [
+						'item_code' => $items->item_code,
+						'item_name' => $items->item_name,
+						'slug' => $items->slug,
+						'qty' => $items->qty,
+						'item_price' => $items->f_onsale == 1 ? $items->f_price : $items->f_original_price,
+						'total_price' => $items->f_onsale == 1 ? $items->qty * $items->f_price : $items->qty * $items->f_original_price
+					];
+				}
+			}else if(isset($abandoned_items[$abandoned->order_tracker_code])){
 				foreach($abandoned_items[$abandoned->order_tracker_code] as $items){
 					$items_arr[] = [
 						'item_code' => $items->item_code,
@@ -296,6 +316,11 @@ class DashboardController extends Controller
 				$active = 0;
 			}
 
+			$location = null;
+			if($abandoned->ip_city or $abandoned->ip_region){
+				$location = $abandoned->ip_city.', '.$abandoned->ip_region.', '.$abandoned->ip_country;
+			}
+
 			$abandoned_arr[] = [
 				'name' => trim($abandoned->xfname . ' ' . $abandoned->xlname),
 				'email' => $abandoned->xemail,
@@ -305,7 +330,15 @@ class DashboardController extends Controller
 				'total_items' => collect($items_arr)->sum('qty'),
 				'transaction_date' => $abandoned->xdateupdate,
 				'order_number' => $abandoned->order_tracker_code,
-				'active' => $active
+				'ip_address' => $abandoned->order_ip,
+				'location' => $location,
+				'active' => $active,
+				'shipping_contact_person' => $abandoned->xshipcontact_person,
+				'billing_address' => $abandoned->xadd1 . ' ' . $abandoned->xadd2 . ' ' . $abandoned->xbrgy . ' ' . $abandoned->xcity . ' ' . $abandoned->xprov . ' ' . $abandoned->xcountry,
+				'billing_contact_person' => $abandoned->xemail,
+				'billing_mobile' => $abandoned->xmobile,
+				'shipping_method' => $abandoned->shipping_name,
+				'shipping_address' => $abandoned->xshippadd1 . ' ' . $abandoned->xshippadd2 . ' ' . $abandoned->xshipbrgy . ' ' . $abandoned->xshipcity . ' ' . $abandoned->xshiprov . ' ' . $abandoned->xshipcountry,
 			];
 		}
 
@@ -354,7 +387,15 @@ class DashboardController extends Controller
 			$abandon_details = collect($cart_details);
 
 			$user = DB::table('fumaco_users')->where('username', $username)->first();
-			$customer_name = $user->f_name.' '.$user->f_lname;
+			$customer_info = DB::table('fumaco_temp')->where('order_tracker_code', $transaction_id)->select('xemail', 'xcontact_person', 'xshipcontact_person')->first();
+
+			if($user){
+				$customer_name = $user->f_name.' '.$user->f_lname;
+			}else if($customer_info){
+				$customer_name = $customer_info->xcontact_person ? $customer_info->xcontact_person : $customer_info->xshipcontact_person;
+			}else{
+				$customer_name = 'Customer';
+			}
 		}else{
 			$customer_info = DB::table('fumaco_temp')->where('order_tracker_code', $transaction_id)->select('xemail', 'xcontact_person', 'xshipcontact_person')->first();
 			$user = DB::table('fumaco_users')->where('username', $customer_info->xemail)->first();
@@ -362,8 +403,10 @@ class DashboardController extends Controller
 			$username = $customer_info->xemail;
 			if($user){
 				$customer_name = $user->f_name.' '.$user->f_lname;
-			}else{
+			}else if($customer_info){
 				$customer_name = $customer_info->xcontact_person ? $customer_info->xcontact_person : $customer_info->xshipcontact_person;
+			}else{
+				$customer_name = 'Customer';
 			}
 
 			$order_items = DB::table('fumaco_order_items')->where('order_number', $transaction_id)->select('item_code', 'item_qty as qty')->get();
@@ -399,14 +442,14 @@ class DashboardController extends Controller
 				];
 			}
 
-			Mail::send('emails.abandoned_cart', ['cart_details' => $cart_arr, 'status' => 'Abandoned', 'username' => $username, 'customer_name' => $customer_name], function($message) use($username){
-				$message->to(trim($username));
-				$message->subject("Let's check this off your list - FUMACO");
-			});
-
-			// if(count(Mail::failures()) > 0) { // for email error checking
-			// 	return Mail::failures();
-			// }
+			try {
+				Mail::send('emails.abandoned_cart', ['cart_details' => $cart_arr, 'status' => 'Abandoned', 'username' => $username, 'customer_name' => $customer_name], function($message) use($username){
+					$message->to(trim($username));
+					$message->subject("Let's check this off your list - FUMACO");
+				});
+			} catch (\Swift_TransportException  $e) {
+				return redirect()->back()->with('error', 'Email not sent!');
+			}
 		}
 
 		return redirect()->back()->with('success', 'Email Sent!');

@@ -75,7 +75,15 @@
 
 							<div class="col">
 								<label for="mobile_no" class="myprofile-font-form">Mobile Number : <span class="text-danger">*</span></label>
-								<input type="text" class="form-control caption_1" id="mobile_no" name="mobile_no" value="" required/>
+								{{-- <input type="text" class="form-control caption_1" id="mobile_no" name="mobile_no" value="" required/> --}}
+								<div class="row">
+									<div class="col-2 col-xl-1" style="display: flex; align-items: center">
+										+63
+									</div>
+									<div class="col-10 col-lg-8 col-xl-11" style="margin-left: -5px">
+										<input type="text" class="form-control caption_1" id="mobile_no" name="mobile_no" value="" required/>
+									</div>
+								</div>
 							</div>
 
 							<div class="col">

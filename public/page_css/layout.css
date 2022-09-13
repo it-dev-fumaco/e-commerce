@@ -12,6 +12,7 @@
     overflow-x: hidden !important;
     font-family: 'poppins', sans-serif !important;
     scroll-behavior: smooth;
+    position: absolute !important;
   }
   a, button, input:focus, *:focus{
     outline: none !important;

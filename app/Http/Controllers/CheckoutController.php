@@ -370,7 +370,9 @@ class CheckoutController extends Controller
 			}
 
 			if (Auth::check()) {
-				$sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
+				$customer_group_sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
+
+				$sale = $customer_group_sale ? $customer_group_sale : $sale;
 			}
 
 			$cart_arr = [];
@@ -614,7 +616,9 @@ class CheckoutController extends Controller
 			}
 
 			if (Auth::check()) {
-				$sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
+				$customer_group_sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
+
+				$sale = $customer_group_sale ? $customer_group_sale : $sale;
 			}
  
 			$cart_arr = [];
@@ -943,6 +947,8 @@ class CheckoutController extends Controller
 					$default_payment_status = DB::table('fumaco_payment_status')->where('status_sequence', 1)->pluck('status')->first();
 				}
 
+				$phone = $temp->xmobile;
+
 				DB::table('fumaco_order')->insert([
 					'order_number' => $temp->xlogs,
 					'order_account' => $temp->xuser_id, // account number of logged user
@@ -956,7 +962,7 @@ class CheckoutController extends Controller
 					'order_bill_postal' => $temp->xpostal,
 					'order_bill_country' => $temp->xcountry,
 					'order_bill_type' => $temp->xaddresstype,
-					'order_bill_contact' => $temp->xmobile,
+					'order_bill_contact' => $phone,
 					'order_bill_email' => $temp->xemail,
 					'order_contactperson' => $temp->xcontact_person,
 					'order_ship_contactperson' => $temp->xshipcontact_person,
@@ -1041,8 +1047,6 @@ class CheckoutController extends Controller
 			// // send email to customer / client
 			$emails = array_filter(array_unique([trim($order_details->order_bill_email), trim($order_details->order_email), trim($temp->xusernamex)]));
 
-			$phone = $temp->xmobile[0] == '0' ? '63'.substr($temp->xmobile, 1) : $temp->xmobile;
-
 			$ordered_items = DB::table('fumaco_order_items as ordered')->where('order_number', $temp->xlogs)->pluck('item_code');
         
 			$leadtime_arr = [];
@@ -1081,11 +1085,15 @@ class CheckoutController extends Controller
 				$view = 'frontend.checkout.order_success_page';
 				
 				$order['bank_accounts'] = $bank_accounts;
+				
+				try {
+					Mail::send('emails.order_success_bank_deposit', $order, function($message) use ($emails) {
+						$message->to($emails);
+						$message->subject('Order Placed - Bank Deposit - FUMACO');
+					});
+				} catch (\Swift_TransportException  $e) {
 
-				Mail::send('emails.order_success_bank_deposit', $order, function($message) use ($emails) {
-					$message->to($emails);
-					$message->subject('Order Placed - Bank Deposit - FUMACO');
-				});
+				}
 
 				$deposit_slip_url = $request->root().'/upload_deposit_slip/'.$order_details->deposit_slip_token;
 				$shortened_deposit_slip_url = $this->generateShortUrl($request->root(), $deposit_slip_url);
@@ -1099,20 +1107,24 @@ class CheckoutController extends Controller
 
 				$sms_message = 'Hi '.$temp->xfname.' '.$temp->xlname.'!, your order '.$temp->xlogs.' with an amount of P '.number_format($request->Amount, 2).' has been received, please allow '.$min_leadtime.' to '.$max_leadtime.' business days to process your order. ' . $tracking_url_text;
 
-				Mail::to($emails)->queue(new OrderSuccess($order));
+				try {
+					Mail::to($emails)->queue(new OrderSuccess($order));
+				} catch (\Swift_TransportException $e) {
+		
+				}
 			}
 
 			if ($url || $deposit_slip_url) {
 				$sms_api = DB::table('api_setup')->where('type', 'sms_gateway_api')->first();
 				if ($sms_api) {
-					Http::asForm()->withHeaders([
+					$sms = Http::asForm()->withHeaders([
 						'Accept' => 'application/json',
 						'Content-Type' => 'application/x-www-form-urlencoded',
 					])->post($sms_api->base_url, [
 						'api_key' => $sms_api->api_key,
 						'api_secret' => $sms_api->api_secret_key,
 						'from' => 'FUMACO',
-						'to' => preg_replace("/[^0-9]/", "", $phone),
+						'to' => $phone,
 						'text' => $sms_message
 					]);
 				}
@@ -1122,10 +1134,14 @@ class CheckoutController extends Controller
 			$email_recipient = DB::table('email_config')->first();
 			$email_recipient = ($email_recipient) ? explode(",", $email_recipient->email_recipients) : [];
 			if (count(array_filter($email_recipient)) > 0) {
-				Mail::send('emails.new_order', $order, function($message) use ($email_recipient) {
-					$message->to($email_recipient);
-					$message->subject('New Order - FUMACO');
-				});
+				try {
+					Mail::send('emails.new_order', $order, function($message) use ($email_recipient) {
+						$message->to($email_recipient);
+						$message->subject('New Order - FUMACO');
+					});
+				} catch (\Swift_TransportException $e) {
+					
+				}
 			}
 
 			session()->forget('fumOrderNo');
@@ -1370,7 +1386,9 @@ class CheckoutController extends Controller
 		}
 
 		if (Auth::check()) {
-            $sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
+            $customer_group_sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
+
+			$sale = $customer_group_sale ? $customer_group_sale : $sale;
         }
 			
         foreach ($order_items as $row) {
@@ -1680,7 +1698,9 @@ class CheckoutController extends Controller
 			}
 
 			if (Auth::check()) {
-				$sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
+				$customer_group_sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
+
+				$sale = $customer_group_sale ? $customer_group_sale : $sale;
 			}
 
 			$subtotal = 0;

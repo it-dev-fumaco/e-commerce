@@ -619,6 +619,7 @@ class ProductController extends Controller
                 'f_cat_id' => $request->product_category,
                 'f_category' => $item_category,
                 'f_alert_qty' => $request->alert_qty,
+                'f_warehouse' => $request->warehouse,
                 'f_caption' => $request->website_caption,
                 'f_full_description' => $request->full_detail,
                 'f_featured_image' => $featured_image_name,
@@ -687,6 +688,59 @@ class ProductController extends Controller
                             'last_modified_by' => Auth::user()->username,
                         ]
                     );
+                }
+            }
+
+            $erp_api = DB::table('api_setup')->where('type', 'erp_api')->first();
+            if ($erp_api) {
+                $item_code = $detail->f_idcode;
+                $warehouse = $request->warehouse;
+
+                $api_header = [
+                    'Content-Type' => 'application/json',
+                    'Authorization' => 'token '. $erp_api->api_key. ':' . $erp_api->api_secret_key . '',
+                    'Accept-Language' => 'en'
+                ];
+
+                // get stock quantity of selected item code
+                $fields = '?fields=["item_code","warehouse","actual_qty","website_reserved_qty"]';
+                $filter = '&filters=[["item_code","=","' . $item_code . '"],["warehouse","=","' .$warehouse .'"]]';
+        
+                $params = $fields . '' . $filter;
+                
+                $response = Http::withHeaders($api_header)->get($erp_api->base_url . '/api/resource/Bin' . $params);
+
+                if ($response->successful()) {
+                    $qty = 0;
+                    if (isset($response['data']) && count($response['data']) > 0) {
+                        $qty = $response['data'][0]['actual_qty'];
+                    }
+                    DB::table('fumaco_items')->where('id', $id)
+                        ->where('stock_source', 1)->update([
+                            'f_qty' => $qty,
+                            'last_sync_date' => Carbon::now()->toDateTimeString()
+                        ]);
+                }
+
+                // get item price
+                $fields = '?fields=["item_code","price_list","price_list_rate","currency"]';
+                $filter = '&filters=[["item_code","=","' . $item_code . '"],["price_list","=","Website Price List"]]';
+
+                $params = $fields . '' . $filter;
+                
+                $response = Http::withHeaders($api_header)->get($erp_api->base_url . '/api/resource/Item Price' . $params);
+
+                if ($response->successful()) {
+                    $price = 0;
+                    if (isset($response['data']) && count($response['data']) > 0) {
+                        $price = $response['data'][0]['price_list_rate'];
+                    }
+
+                    DB::table('fumaco_items')->where('id', $id)
+                        ->update([
+                            'f_default_price' => $price,
+                            'last_sync_date' => Carbon::now()->toDateTimeString()
+                        ]);
                 }
             }
 
@@ -887,6 +941,7 @@ class ProductController extends Controller
                 'pricelist' => $pricelist,
                 'discount_type' => $product->f_discount_type,
                 'discount_rate' => $product->f_discount_rate,
+                'last_sync_date' => $product->last_sync_date
             ];
         }
 
@@ -1077,8 +1132,8 @@ class ProductController extends Controller
         $templates = Newsletter::getTemplatesList();
         $tags = Newsletter::getSegmentsList($list_id);
 
-        $campaign = Newsletter::campaignInfo($on_sale->mailchimp_campaign_id);
-
+        $campaign = $on_sale->mailchimp_campaign_id ? Newsletter::campaignInfo($on_sale->mailchimp_campaign_id) : [];
+        
         $selected_tag = $campaign ? $campaign['recipients']['segment_opts']['saved_segment_id'] : null;
         $selected_template = $campaign ? $campaign['settings']['template_id'] : null;
 
@@ -1258,10 +1313,14 @@ class ProductController extends Controller
                         ];
     
                         if($type == 'cart' or $type == 'wishlist'){
-                            Mail::send('emails.multiple_items_on_cart', $sale_details, function($message) use($subscriber){
-                                $message->to(trim($subscriber));
-                                $message->subject("Hurry or you might miss out - FUMACO");
-                            });
+                            try {
+                                Mail::send('emails.multiple_items_on_cart', $sale_details, function($message) use($subscriber){
+                                    $message->to(trim($subscriber));
+                                    $message->subject("Hurry or you might miss out - FUMACO");
+                                });
+                            } catch (\Swift_TransportException  $e) {
+                                
+                            }
                         }else if($type == 'general'){
                             if($sale_check->apply_discount_to == 'Per Category'){
                                 
@@ -1353,7 +1412,7 @@ class ProductController extends Controller
 
             if($request->discount_type == 'By Percentage'){
                 $discount_rate = preg_replace("/[^0-9]/", "", $request->discount_percentage);
-                $capped_amount = $request->capped_amount;
+                $capped_amount = preg_replace("/[^0-9]/", "", $request->capped_amount);
             }else if($request->discount_type == 'Fixed Amount'){
                 $discount_rate = preg_replace("/[^0-9]/", "", $request->discount_amount);
             }
@@ -1369,7 +1428,7 @@ class ProductController extends Controller
                 'total_allotment' => isset($request->unlimited_allotment) ? null : $request->allotment,
                 'unlimited' => isset($request->unlimited_allotment) ? 1 : 0,
                 'allowed_usage' => $request->allowed_usage,
-                'minimum_spend' => $request->minimum_spend,
+                'minimum_spend' => preg_replace("/[^0-9]/", "", $request->minimum_spend),
                 'discount_type' => $request->discount_type,
                 'discount_rate' => $discount_rate,
                 'capped_amount' => $capped_amount,
@@ -1440,7 +1499,7 @@ class ProductController extends Controller
 
             if($request->discount_type == 'By Percentage'){
                 $discount_rate = preg_replace("/[^0-9]/", "", $request->discount_percentage);
-                $capped_amount = $request->capped_amount;
+                $capped_amount = preg_replace("/[^0-9]/", "", $request->capped_amount);
             }else if($request->discount_type == 'Fixed Amount'){
                 $discount_rate = preg_replace("/[^0-9]/", "", $request->discount_amount);
             }
@@ -1456,7 +1515,7 @@ class ProductController extends Controller
                 'total_allotment' => isset($request->unlimited_allotment) ? null : $request->allotment,
                 'unlimited' => isset($request->unlimited_allotment) ? 1 : 0,
                 'allowed_usage' => $request->allowed_usage,
-                'minimum_spend' => $request->minimum_spend,
+                'minimum_spend' => preg_replace("/[^0-9]/", "", $request->minimum_spend),
                 'discount_type' => $request->discount_type,
                 'discount_rate' => $discount_rate,
                 'capped_amount' => $capped_amount,
@@ -1731,7 +1790,6 @@ class ProductController extends Controller
 
             foreach($date_check as $date){
                 if($from >= $date->start_date and $from <= $date->end_date){
-                    // return redirect()->back()->with('error', 'On Sale dates cannot overlap');
                     if($request->apply_discount_to != 'Per Customer Group'){
                         return redirect()->back()->with('error', 'On Sale dates cannot overlap');
                     }else{ // for customer group sale date
@@ -1742,7 +1800,6 @@ class ProductController extends Controller
                 }
 
                 if($to >= $date->start_date and $to <= $date->end_date){
-                    // return redirect()->back()->with('error', 'On Sale dates cannot overlap');
                     if($request->apply_discount_to != 'Per Customer Group'){
                         return redirect()->back()->with('error', 'On Sale dates cannot overlap');
                     }else{ // for customer group sale date
@@ -1754,7 +1811,6 @@ class ProductController extends Controller
             }
 
             if($request->apply_discount_to == 'All Items'){
-                DB::table('fumaco_on_sale_categories')->where('sale_id', $id)->delete(); // if sale is from per category to all items
                 $discount_type = $request->discount_type;
                 if($discount_type == 'Fixed Amount'){
                     $discount_rate = $request->discount_amount;
@@ -1762,6 +1818,14 @@ class ProductController extends Controller
                     $discount_rate = $request->discount_percentage;
                     $capped_amount = $request->capped_amount;
                 }
+            }
+
+            if($request->apply_discount_to != 'Per Customer Group'){
+                DB::table('fumaco_on_sale_customer_group')->where('sale_id', $id)->delete();
+            }
+
+            if($request->apply_discount_to != 'Per Category'){
+                DB::table('fumaco_on_sale_categories')->where('sale_id', $id)->delete();
             }
 
             $update = [
@@ -1820,30 +1884,32 @@ class ProductController extends Controller
             $list_id = env('MAILCHIMP_LIST_ID');
             $campaign_id = DB::table('fumaco_on_sale')->where('id', $id)->pluck('mailchimp_campaign_id')->first();
 
-            Newsletter::editCampaign(
-                $campaign_id, // Campaign ID
-                'FUMACO', // from - name,
-                'it@fumaco.com', // from - email,
-                $request->sale_name, // subject,
-                '', // content - html (would be replaced by email template),
-                'subscribers',
-                [
-                    'settings' => [
-                        'title' => $request->sale_name,
-                        'subject_line' => $request->sale_name,
-                        'from_name' => 'FUMACO',
-                        'from_email' => 'it@fumaco.com',
-                        'reply_to' => 'it@fumaco.com',
-                        'template_id' => (int)$request->email_template,
-                    ],
-                    'recipients' => [
-                        'list_id' => $list_id,
-                        'segment_opts' => [
-                            'saved_segment_id' => (int)$request->email_tag,
+            if($campaign_id){
+                Newsletter::editCampaign(
+                    $campaign_id, // Campaign ID
+                    'FUMACO', // from - name,
+                    'it@fumaco.com', // from - email,
+                    $request->sale_name, // subject,
+                    '', // content - html (would be replaced by email template),
+                    'subscribers',
+                    [
+                        'settings' => [
+                            'title' => $request->sale_name,
+                            'subject_line' => $request->sale_name,
+                            'from_name' => 'FUMACO',
+                            'from_email' => 'it@fumaco.com',
+                            'reply_to' => 'it@fumaco.com',
+                            'template_id' => (int)$request->email_template,
+                        ],
+                        'recipients' => [
+                            'list_id' => $list_id,
+                            'segment_opts' => [
+                                'saved_segment_id' => (int)$request->email_tag,
+                            ],
                         ],
                     ],
-                ],
-            );
+                );
+            }
 
             DB::table('fumaco_on_sale')->where('id', $id)->update($update);
 
@@ -1936,6 +2002,7 @@ class ProductController extends Controller
 
             DB::table('fumaco_on_sale')->where('id', $id)->delete();
             DB::table('fumaco_on_sale_categories')->where('sale_id', $id)->delete();
+            DB::table('fumaco_on_sale_customer_group')->where('sale_id', $id)->delete();
             DB::commit();
             return redirect()->back()->with('success', 'On Sale Deleted.');
         } catch (Exception $e) {
@@ -2365,15 +2432,13 @@ class ProductController extends Controller
     public function disableProductOnSale($item_code, Request $request) {
         DB::beginTransaction();
         try {
-            $selected_pricelists = $request->price_list;
-            if (in_array('Website Price List', $selected_pricelists)) {
-                DB::table('fumaco_items')->where('f_idcode', $item_code)->update([
-                    'f_onsale' => 0,
-                    'f_discount_rate' => 0,
-                    'f_discount_type' => null,
-                    'last_modified_by' => Auth::user()->username
-                ]);
-            }
+            $selected_pricelists = $request->price_list ? $request->price_list : [];
+            DB::table('fumaco_items')->where('f_idcode', $item_code)->update([
+                'f_onsale' => 0,
+                'f_discount_rate' => 0,
+                'f_discount_type' => null,
+                'last_modified_by' => Auth::user()->username
+            ]);
 
             if (($key = array_search("Website Price List", $selected_pricelists)) !== false) {
                 unset($selected_pricelists[$key]);
@@ -2563,6 +2628,39 @@ class ProductController extends Controller
             DB::rollback();
 
             return redirect()->back()->with('error', 'An error occured. Please try again.');
+        }
+    }
+
+    // function to get items from ERP via API
+    public function searchWarehouse(Request $request) {
+        if($request->ajax()) {
+            $erp_api = DB::table('api_setup')->where('type', 'erp_api')->first();
+            if (!$erp_api) {
+                return response()->json(['status' => 0, 'ERP API not configured.']);
+            }
+
+            $params = '?filters=[["name","LIKE","%25' . $request->q . '%25"],["is_group","=","0"],["disabled","=","0"],["stock_warehouse","=","1"],["parent_warehouse","!=","P2 Consignment Warehouse - FI"]]';
+
+            $response = Http::withHeaders([
+                'Content-Type' => 'application/json',
+                'Authorization' => 'token '. $erp_api->api_key. ':' . $erp_api->api_secret_key . '',
+                'Accept-Language' => 'en'
+            ])->get($erp_api->base_url . '/api/resource/Warehouse' . ($params));
+
+
+            if ($response->failed()) {
+                return response()->json(['status' => 0, 'message' => 'An error occured. Please try again.']);
+            }
+    
+            $result = [];
+            foreach ($response['data'] as $row) {
+                $result[] = [
+                    'id' => $row['name'],
+                    'text' => $row['name'],
+                ];
+            }
+    
+            return $result;
         }
     }
 }

@@ -212,22 +212,6 @@ class CartController extends Controller
             $order_no = session()->get('fumOrderNo');
         }
 
-        if ($order_no) {
-			$existing_temp = DB::table('fumaco_temp')->where('xlogs', $order_no)->first();
-			if(!$existing_temp) {
-				DB::table('fumaco_temp')->insert([
-					'xtempcode' => uniqid(),
-					'xlogs' => $order_no,
-					'order_tracker_code' => $order_no,
-					'order_ip' => $request->ip(),
-					'xusertype' => Auth::check() ? 'Member' : 'Guest',
-					'xusernamex' => Auth::check() ? Auth::user()->username : null,
-					'xuser_id' => Auth::check() ? Auth::user()->id : null,
-                    'last_transaction_page' => 'Shopping Cart Page'
-				]);
-			}
-		}
-
         if(Auth::check()) {
             $cart_items = DB::table('fumaco_items as a')->join('fumaco_cart as b', 'a.f_idcode', 'b.item_code')
                 ->where('user_type', 'member')->where('user_email', Auth::user()->username)
@@ -236,6 +220,28 @@ class CartController extends Controller
             $cart_items = DB::table('fumaco_items as a')->join('fumaco_cart as b', 'a.f_idcode', 'b.item_code')
                 ->where('user_type', 'guest')->where('transaction_id', $order_no)
                 ->select('f_idcode', 'f_default_price', 'f_onsale', 'b.qty', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'slug', 'f_name_name', 'f_qty', 'f_reserved_qty')->get();
+        }
+
+        if (count($cart_items) > 0) {
+            if ($order_no) {
+                $existing_temp = DB::table('fumaco_temp')->where('xlogs', $order_no)->first();
+                if(!$existing_temp) {
+                    $loc = GeoLocation::lookup($request->ip());
+                    DB::table('fumaco_temp')->insert([
+                        'xtempcode' => uniqid(),
+                        'xlogs' => $order_no,
+                        'order_tracker_code' => $order_no,
+                        'order_ip' => $request->ip(),
+                        'ip_city' => $loc->getCity(),
+                        'ip_region' => $loc->getRegion(),
+                        'ip_country' => $loc->getCountry(),
+                        'xusertype' => Auth::check() ? 'Member' : 'Guest',
+                        'xusernamex' => Auth::check() ? Auth::user()->username : null,
+                        'xuser_id' => Auth::check() ? Auth::user()->id : null,
+                        'last_transaction_page' => 'Shopping Cart Page'
+                    ]);
+                }
+            }
         }
 
         // get sitewide sale
@@ -259,7 +265,9 @@ class CartController extends Controller
         }
 
         if (Auth::check()) {
-            $sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
+            $customer_group_sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
+
+            $sale = $customer_group_sale ? $customer_group_sale : $sale;
         }
 
         $cart_arr = [];
@@ -317,7 +325,9 @@ class CartController extends Controller
         }
 
         if (Auth::check()) {
-            $sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
+            $customer_group_sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
+
+            $sale = $customer_group_sale ? $customer_group_sale : $sale;
         }
     
         $cross_sell_arr = [];
@@ -384,9 +394,16 @@ class CartController extends Controller
                 } else {
                     $order_no = session()->get('fumOrderNo');
                 }
-                // add qty to fumaco cart table
-                $existing_cart = DB::table('fumaco_cart')->where('transaction_id', $order_no)
-                    ->where('item_code', $product_details->f_idcode)->first();
+
+                if (Auth::check()) {
+                     // add qty to fumaco cart table
+                    $existing_cart = DB::table('fumaco_cart')->where('user_email', Auth::user()->username)
+                        ->where('item_code', $product_details->f_idcode)->orderBy('last_modified_at', 'desc')->first();
+                } else {
+                    // add qty to fumaco cart table
+                    $existing_cart = DB::table('fumaco_cart')->where('transaction_id', $order_no)
+                        ->where('item_code', $product_details->f_idcode)->first();
+                }
                 if ($existing_cart) {
                     if($request->type == 'increment'){
                         $new_qty = $existing_cart->qty + 1;
@@ -503,11 +520,15 @@ class CartController extends Controller
             if ($order_no) {
                 $existing_temp = DB::table('fumaco_temp')->where('xlogs', $order_no)->first();
                 if(!$existing_temp) {
+                    $loc = GeoLocation::lookup($request->ip());
                     DB::table('fumaco_temp')->insert([
                         'xtempcode' => uniqid(),
                         'xlogs' => $order_no,
                         'order_tracker_code' => $order_no,
                         'order_ip' => $request->ip(),
+                        'ip_city' => $loc->getCity(),
+                        'ip_region' => $loc->getRegion(),
+                        'ip_country' => $loc->getCountry(), 
                         'xusertype' => Auth::check() ? 'Member' : 'Guest',
                         'xusernamex' => Auth::check() ? Auth::user()->username : null,
                         'xuser_id' => Auth::check() ? Auth::user()->id : null,
@@ -522,6 +543,31 @@ class CartController extends Controller
 
             $shipping_address = DB::table('fumaco_user_add')->where('xdefault', 1)
                 ->where('user_idx', $user_id)->where('address_class', 'Delivery')->first();
+
+            $mobile = null;
+            if($shipping_address->xmobile_number){
+                $mobile = preg_replace("/[^0-9]/", "", $shipping_address->xmobile_number);
+                if($mobile[0] == 0){
+                    $mobile = '63'.substr($mobile, 1);
+                }else if(substr($mobile, 0, 2) != '63' || $mobile[0] == '9'){
+                    $mobile = '63'.$mobile;
+                }
+                // $mobile = $mobile[0] == 0 ? '63'.substr($mobile, 1) : '63'.$mobile;
+            }
+
+            $contact = null;
+            if($shipping_address->xcontactnumber1){
+                $contact = preg_replace("/[^0-9]/", "", $shipping_address->xcontactnumber1);
+                // $contact = $contact[0] == 0 ? '63'.substr($contact, 1) : '63'.$contact;
+                if($contact[0] == 0){
+                    $contact = '63'.substr($contact, 1);
+                }else if(substr($contact, 0, 2) != '63' || $contact[0] == '9'){
+                    $contact = '63'.$contact;
+                }
+            }
+
+            $bill_mobile = $mobile;
+            $bill_contact = $contact;
             
             $shipping_details = [
                 'fname' => $shipping_address->xcontactname1,
@@ -537,14 +583,36 @@ class CartController extends Controller
                 'business_name' => $shipping_address->xbusiness_name,
                 'tin' => $shipping_address->xtin_no,
                 'email_address' => $shipping_address->xcontactemail1,
-                'mobile_no' => $shipping_address->xmobile_number,
-                'contact_no' => $shipping_address->xcontactnumber1,
+                'mobile_no' => $mobile,
+                'contact_no' => $contact,
                 'same_as_billing' => 0
             ];
 
             $billing_address = DB::table('fumaco_user_add')->where('xdefault', 1)
                 ->where('user_idx', $user_id)->where('address_class', 'Billing')->first();
             if ($billing_address) {
+                $bill_mobile = null;
+                if($billing_address->xmobile_number){
+                    $bill_mobile = preg_replace("/[^0-9]/", "", $billing_address->xmobile_number);
+                    // $bill_mobile = $bill_mobile[0] == 0 ? '63'.substr($bill_mobile, 1) : '63'.$bill_mobile;
+                    if($bill_mobile[0] == 0){
+                        $bill_mobile = '63'.substr($bill_mobile, 1);
+                    }else if(substr($bill_mobile, 0, 2) != '63' || $bill_mobile[0] == '9'){
+                        $bill_mobile = '63'.$bill_mobile;
+                    }
+                }
+
+                $bill_contact = null;
+                if($billing_address->xcontactnumber1){
+                    $bill_contact = preg_replace("/[^0-9]/", "", $billing_address->xcontactnumber1);
+                    // $bill_contact = $bill_contact[0] == 0 ? '63'.substr($bill_contact, 1) : '63'.$bill_contact;
+                    if($bill_contact[0] == 0){
+                        $bill_contact = '63'.substr($bill_contact, 1);
+                    }else if(substr($bill_contact, 0, 2) != '63' || $bill_contact[0] == '9'){
+                        $bill_contact = '63'.$bill_contact;
+                    }
+                }
+
                 $billing_details = [
                     'fname' => $billing_address->xcontactname1,
                     'lname' => $billing_address->xcontactlastname1,
@@ -559,8 +627,8 @@ class CartController extends Controller
                     'business_name' => $billing_address->xbusiness_name,
                     'tin' => $billing_address->xtin_no,
                     'email_address' => $billing_address->xcontactemail1,
-                    'mobile_no' => $billing_address->xmobile_number,
-                    'contact_no' => $billing_address->xcontactnumber1,
+                    'mobile_no' => $bill_mobile,
+                    'contact_no' => $bill_contact,
                 ];
             }
         }
@@ -573,6 +641,30 @@ class CartController extends Controller
                         return response()->json(['status' => 'error', 'message' => 'Email already exists, please <a href="'. route('login') .'">login</a>.']);
                     }
                 }
+
+                $ship_mobile = null;
+                if($request->ship_mobilenumber1_1){
+                    $ship_mobile = preg_replace("/[^0-9]/", "", $request->ship_mobilenumber1_1);
+                    // $ship_mobile = $ship_mobile[0] == 0 ? '63'.substr($ship_mobile, 1) : '63'.$ship_mobile;
+                    if($ship_mobile[0] == 0){
+                        $ship_mobile = '63'.substr($ship_mobile, 1);
+                    }else if(substr($ship_mobile, 0, 2) != '63' || $ship_mobile[0] == '9'){
+                        $ship_mobile = '63'.$ship_mobile;
+                    }
+                }
+
+                $ship_contact = null;
+                if($request->contactnumber1_1){
+                    $ship_contact = preg_replace("/[^0-9]/", "", $request->contactnumber1_1);
+                    // $ship_contact = $ship_contact[0] == 0 ? '63'.substr($ship_contact, 1) : '63'.$ship_contact;
+                    if($ship_contact[0] == 0){
+                        $ship_contact = '63'.substr($ship_contact, 1);
+                    }else if(substr($ship_contact, 0, 2) != '63' || $ship_contact[0] == '9'){
+                        $ship_contact = '63'.$ship_contact;
+                    }
+                }
+
+                $bill_mobile = $ship_mobile;
                
                 $shipping_details = [
                     'fname' => $request->fname,
@@ -588,13 +680,24 @@ class CartController extends Controller
                     'business_name' => $request->ship_business_name,
                     'tin' => $request->ship_tin,
                     'email_address' => $request->ship_email,
-                    'mobile_no' => $request->ship_mobilenumber1_1,
-                    'contact_no' => $request->contactnumber1_1,
+                    'mobile_no' => $ship_mobile,
+                    'contact_no' => $ship_contact,
                     'same_as_billing' => ($request->same_as_billing) ? 1 : 0
                 ];
                 
                 $billing_details = [];
                 if(!$request->same_as_billing) {
+                    $bill_mobile = null;
+                    if($request->mobilenumber1_1){
+                        $bill_mobile = preg_replace("/[^0-9]/", "", $request->mobilenumber1_1);
+                        // $bill_mobile = $bill_mobile[0] == 0 ? '63'.substr($bill_mobile, 1) : '63'.$bill_mobile;
+                        if($bill_mobile[0] == 0){
+                            $bill_mobile = '63'.substr($bill_mobile, 1);
+                        }else if(substr($bill_mobile, 0, 2) != '63' || $bill_mobile[0] == '9'){
+                            $bill_mobile = '63'.$bill_mobile;
+                        }
+                    }
+                    
                     $billing_details = [
                         'fname' => $request->bill_fname,
                         'lname' => $request->bill_lname,
@@ -609,7 +712,7 @@ class CartController extends Controller
                         'business_name' => $request->bill_business_name,
                         'tin' => $request->bill_tin,
                         'email_address' => $request->email,
-                        'mobile_no' => $request->mobilenumber1_1,
+                        'mobile_no' => $bill_mobile,
                     ];
                 }
             }

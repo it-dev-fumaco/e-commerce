@@ -476,11 +476,12 @@
             </a>
           </li>
 
-          <li class="nav-header {{ Auth::user()->user_type != 'System Admin' ? 'd-none' : ''  }}">SYSTEM SETTINGS</li>
+          @if (Auth::user()->user_type == 'System Admin')
+          <li class="nav-header">SYSTEM SETTINGS</li>
           @php
             $settings_pages = ['erp_api_setup', 'payment_api_setup', 'google_api_setup', 'sms_api_setup'];
           @endphp
-          <li class="nav-item {{ Auth::user()->user_type != 'System Admin' ? 'd-none' : ''  }} {{ (in_array($activePage, $settings_pages) ? 'menu-open' : '') }}">
+          <li class="nav-item {{ (in_array($activePage, $settings_pages) ? 'menu-open' : '') }}">
             <a href="#" class="nav-link {{ (in_array($activePage, $settings_pages) ? 'active' : '') }}">
               <i class="nav-icon fas fa-cogs"></i>
               <p>API Management <i class="fas fa-angle-left right"></i></p>
@@ -518,7 +519,7 @@
               </li>
             </ul>
           </li>
-          <li class="nav-item {{ Auth::user()->user_type != 'System Admin' ? 'd-none' : ''  }} {{ (in_array($activePage, ['email_setup']) ? 'menu-open' : '') }}">
+          <li class="nav-item {{ (in_array($activePage, ['email_setup']) ? 'menu-open' : '') }}">
             <a href="#" class="nav-link {{ (in_array($activePage, ['email_setup']) ? 'active' : '') }}">
               <i class="nav-icon fas fa-cogs"></i>
 
@@ -539,6 +540,21 @@
               </li>
             </ul>
           </li>
+
+          <li class="nav-item">
+            <a href="/admin/system_logs" class="nav-link {{ $activePage == 'system_logs' ? 'active' : '' }}">
+              <i class="fas fa-file nav-icon"></i>
+              <p>System Logs</p>
+            </a>
+          </li>
+
+          <li class="nav-item">
+            <a href="/admin/export_images" class="nav-link {{ $activePage == 'export_images' ? 'active' : '' }}">
+              <i class="fas fa-photo-video nav-icon"></i>
+              <p>Export Images</p>
+            </a>
+          </li>
+          @endif
           @php
               $user_mgt_pages = ['admin_list', 'change_password']
           @endphp
@@ -549,12 +565,14 @@
               <p>Users <i class="fas fa-angle-left right"></i></p>
             </a>
             <ul class="nav nav-treeview">
-              <li class="nav-item {{ Auth::user()->user_type != 'System Admin' ? 'd-none' : ''  }}">
-                <a href="/admin/user_management/list" class="nav-link {{ $activePage == 'admin_list' ? 'active' : '' }}">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Admin</p>
-                </a>
-              </li>
+              @if (Auth::user()->user_type == 'System Admin')
+                <li class="nav-item">
+                  <a href="/admin/user_management/list" class="nav-link {{ $activePage == 'admin_list' ? 'active' : '' }}">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>Admin</p>
+                  </a>
+                </li>
+              @endif
               <li class="nav-item">
                 <a href="/admin/user_management/change_pass" class="nav-link {{ $activePage == 'change_password' ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>

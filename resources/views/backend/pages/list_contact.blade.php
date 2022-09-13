@@ -49,18 +49,12 @@
                                         <tr>
                                             <th>Title</th>
                                             <th>Address</th>
-                                            <th>Phone</th>
-                                            <th>Mobile</th>
-                                            <th>Email</th>
                                             <th>Action</th>
                                         </tr>
                                         @forelse ($address as $add)
                                             <tr>
                                                 <td>{{ $add->office_title }}</td>
                                                 <td>{{ $add->office_address }}</td>
-                                                <td>{{ $add->office_phone }}</td>
-                                                <td>{{ $add->office_mobile }}</td>
-                                                <td>{{ $add->office_email }}</td>
                                                 <td>
                                                     <div class="dropdown">
                                                         <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Action

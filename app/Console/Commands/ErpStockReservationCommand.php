@@ -152,7 +152,20 @@ class ErpStockReservationCommand extends Command
                     }
                 }
             }
+
+            $system_logs = [
+                'status' => 'successful',
+                'operation' => 'sync reservation',
+                'last_sync_date' => Carbon::now()->toDateTimeString()
+            ];
+        }else{
+            $system_logs = [
+                'status' => 'failed',
+                'operation' => 'sync reservation',
+                'last_sync_date' => Carbon::now()->toDateTimeString()
+            ];
         }
+        DB::table('fumaco_system_logs')->insert($system_logs);
 
         return 0;
     }

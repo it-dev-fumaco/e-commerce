@@ -66,8 +66,8 @@
 											<td>₱ {{ $order['grand_total'] }}</td>
 											<td><span class="badge" style=" background-color: #fd6300 !important; color: #fff;">{{ $order['status'] }}</span></td>
 											<td>
-												<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#order-{{ $order['cust_id'] }}">View Orders</button>
-												<div class="modal fade" id="order-{{ $order['cust_id'] }}" role="dialog">
+												<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#order-{{ $order['order_no'] }}">View Orders</button>
+												<div class="modal fade" id="order-{{ $order['order_no'] }}" role="dialog">
 													<div class="modal-dialog modal-xl" style="min-width: 70%;">
 														<div class="modal-content">
 															<div class="modal-header">
@@ -147,7 +147,13 @@
 																			<dt class="col-sm-10 text-right">Subtotal</dt>
 																			<dd class="col-sm-2 text-right">₱ {{ number_format(str_replace(",","",$order['subtotal']), 2) }}</dd>
 																			<dt class="col-sm-10 text-right">{{ $order['shipping_name'] }}</dt>
-																			<dd class="col-sm-2 text-right">₱ {{ number_format(str_replace(",","",$order['shipping_amount']), 2) }}</dd>
+																			<dd class="col-sm-2 text-right">
+																				@if ($order['shipping_amount'] > 0)
+																				₱ {{ number_format(str_replace(",","",$order['shipping_amount']), 2) }}
+																				@else
+																				FREE
+																				@endif
+																			</dd>
 																			<dt class="col-sm-10 text-right">Grand Total</dt>
 																			<dd class="col-sm-2 text-right">₱ {{ number_format(str_replace(",","",$order['grand_total']), 2) }}</dd>
 																		</dl>

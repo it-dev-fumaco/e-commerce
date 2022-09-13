@@ -10,6 +10,9 @@ use DB;
 use Auth;
 use Carbon\Carbon;
 use Webp;
+use Storage;
+use File;
+use ZipArchive;
 use Illuminate\Support\Str;
 
 class PagesController extends Controller
@@ -69,27 +72,57 @@ class PagesController extends Controller
 
     public function editContactForm($id){
         $address = DB::table('fumaco_contact')->where('id', $id)->first();
+        $contact_info = DB::table('fumaco_contact_numbers')->where('parent', $id)->get();
 
-        return view('backend.pages.edit_contact', compact('address'));
+        return view('backend.pages.edit_contact', compact('address', 'contact_info'));
     }
 
+    // /admin/pages/contact/update/{id}
     public function editContact(Request $request, $id){
         DB::beginTransaction();
         try {
             $checker = DB::table('fumaco_contact')->where('id', '!=', $id)->where('office_title', $request->title)->first();
+            $type = $request->type ? $request->type : [];
+            $contact = $request->contact ? $request->contact : [];
+            $messaging_platform = $request->messaging_platform ? $request->messaging_platform : [];
+
+            if(count($type) <= 0 || count($contact) <= 0){
+                return redirect()->back()->with('error', 'Contact information cannot be empty.');
+            }
+            
             if($checker){
                 return redirect()->back()->with('error', 'Office title must be unique.');
             }
             $update = [
                 'office_title' => $request->title,
                 'office_address' => $request->address,
-                'office_phone' => $request->phone,
-                'office_mobile' => $request->mobile,
-                'office_email' => $request->email,
                 'last_modified_by' => Auth::user()->username
             ];
 
             DB::table('fumaco_contact')->where('id', $id)->update($update);
+            DB::table('fumaco_contact_numbers')->where('parent', $id)->delete();
+
+            $rows = array_keys($request->type);
+            foreach($rows as $row){
+                if(!isset($type[$row]) || !isset($contact[$row])){
+                    return redirect()->back()->with('error', 'Please enter contact info.');
+                }
+
+                $contact_info = [
+                    'parent' => $id,
+                    'type' => $type[$row],
+                    'contact' => $contact[$row],
+                    'created_by' => Auth::user()->username,
+                ];
+
+                $platforms = [];
+                if(isset($messaging_platform[$row])){
+                    $platforms = collect(array_keys($messaging_platform[$row]))->implode(',');
+                    $contact_info['messaging_apps'] = $platforms;
+                }
+
+                DB::table('fumaco_contact_numbers')->insert($contact_info);
+            }
 
             DB::commit();
             return redirect()->back()->with('success', 'Address has been updated.');
@@ -104,6 +137,7 @@ class PagesController extends Controller
         return view('backend.pages.add_contact');
     }
 
+    // /admin/pages/contact/add
     public function addContact(Request $request){
         DB::beginTransaction();
         try {
@@ -112,17 +146,44 @@ class PagesController extends Controller
                 return redirect()->back()->with('error', 'Office title must be unique.');
             }
 
+            $type = $request->type ? $request->type : [];
+            $contact = $request->contact ? $request->contact : [];
+            $messaging_platform = $request->messaging_platform ? $request->messaging_platform : [];
+
+            if(count($type) <= 0 || count($contact) <= 0){
+                return redirect()->back()->with('error', 'Contact information cannot be empty.');
+            }
+
             $insert = [
                 'office_title' => $request->title,
                 'office_address' => $request->address,
-                'office_phone' => $request->phone,
-                'office_mobile' => $request->mobile,
-                'office_email' => $request->email,
                 'created_by' => Auth::user()->username,
                 'created_at' => Carbon::now()->toDateTimeString()
             ];
 
-            DB::table('fumaco_contact')->insert($insert);
+            $id = DB::table('fumaco_contact')->insertGetId($insert);
+
+            $rows = array_keys($request->type);
+            foreach($rows as $row){
+                if(!isset($type[$row]) || !isset($contact[$row])){
+                    return redirect()->back()->with('error', 'Please enter contact info.');
+                }
+
+                $contact_info = [
+                    'parent' => $id,
+                    'type' => $type[$row],
+                    'contact' => $contact[$row],
+                    'created_by' => Auth::user()->username,
+                ];
+
+                $platforms = [];
+                if(isset($messaging_platform[$row])){
+                    $platforms = collect(array_keys($messaging_platform[$row]))->implode(',');
+                    $contact_info['messaging_apps'] = $platforms;
+                }
+
+                DB::table('fumaco_contact_numbers')->insert($contact_info);
+            }
 
             DB::commit();
             return redirect('/admin/pages/contact')->with('success', 'Address added.');
@@ -138,6 +199,7 @@ class PagesController extends Controller
         try {
 
             DB::table('fumaco_contact')->where('id', $id)->delete();
+            DB::table('fumaco_contact_numbers')->where('parent', $id)->delete();
 
             DB::commit();
             return redirect()->back()->with('success', 'Address added.');
@@ -466,5 +528,110 @@ class PagesController extends Controller
         }
 
         return view('backend.search_terms', compact('search_arr', 'search_list'));
+    }
+
+	public function exportImagesView($export = 0){
+        $exported_jpg = [];
+        $exported_webp = [];
+        $unable_to_export = [];
+        $exported_images = [];
+        $jpg_unable_to_export = [];
+        $webp_unable_to_export = [];
+        $duplicates = [];
+        $now = Carbon::now();
+
+        if($export){
+            $item_images = DB::table('fumaco_items_image_v1')
+                ->where('exported', 0)->select('idcode', 'imgoriginalx')->get();
+
+            if(count($item_images) == 0){
+                session()->flash('error', 'All images already exported.');
+                return view('backend.export_images', compact('exported_jpg', 'exported_webp', 'jpg_unable_to_export', 'webp_unable_to_export'));
+            }
+
+            if(!Storage::disk('public')->exists('/export_for_athena/jpg/')){ // check export folders
+                Storage::disk('public')->makeDirectory('/export_for_athena/jpg/');
+            }
+    
+            if(!Storage::disk('public')->exists('/export_for_athena/webp/')){ // check export folders
+                Storage::disk('public')->makeDirectory('/export_for_athena/webp/');
+            }
+
+            $images = collect($item_images)->groupBy('idcode');
+            $item_codes = array_keys($images->toArray());
+            
+            foreach($item_codes as $item_code){
+                if(isset($images[$item_code])){
+                    foreach($images[$item_code] as $i => $image){
+                        $webp = explode('.', $image->imgoriginalx)[0].'.webp';
+                        $microtime = round(microtime(true));
+
+                        if(Storage::disk('public')->exists('/item_images/'.$image->idcode.'/gallery/original/'.$image->imgoriginalx)){ // check jpg
+                            $extension = explode('.', $image->imgoriginalx)[1];
+                            $athena_jpg_name = $microtime.$i.'-'.$image->idcode.'.'.$extension;
+        
+                            if(!Storage::disk('public')->exists('/export_for_athena/jpg/'.$athena_jpg_name)){
+                                Storage::disk('public')->copy('/item_images/'.$image->idcode.'/gallery/original/'.$image->imgoriginalx, '/export_for_athena/jpg/'.$athena_jpg_name);
+                                $exported_jpg[] = [
+                                    'item_code' => $image->idcode,
+                                    'image' => $athena_jpg_name
+                                ];
+
+                                DB::table('fumaco_items_image_v1')->where('idcode', $image->idcode)->where('imgoriginalx', $image->imgoriginalx)->update(['exported' => 1]);
+                            }else{
+                                array_push($duplicates, $athena_jpg_name);
+                            }
+                        }else{
+                            array_push($jpg_unable_to_export, $image->imgoriginalx);
+                        }
+
+                        if(Storage::disk('public')->exists('/item_images/'.$image->idcode.'/gallery/original/'.$webp)){ // check webp
+                            $athena_webp_name = $microtime.$i.'-'.$image->idcode.'.webp';
+        
+                            if(!Storage::disk('public')->exists('/export_for_athena/webp/'.$athena_webp_name)){
+                                Storage::disk('public')->copy('/item_images/'.$image->idcode.'/gallery/original/'.$webp, '/export_for_athena/webp/'.$athena_webp_name);
+                                array_push($exported_webp, $athena_webp_name);
+                            }else{
+                                array_push($duplicates, $athena_webp_name);
+                            }
+                        }else{
+                            array_push($webp_unable_to_export, $webp);
+                        }
+                    }
+                }
+            }
+            
+            // check if there are previous exports
+            if(Storage::disk('public')->exists('/athena_images.zip')){ 
+                Storage::disk('public')->delete('/athena_images.zip');
+            }
+
+            // Zip Archive the exported files
+            $zip = new \ZipArchive();
+            $jpg_files = File::files(storage_path('/app/public/export_for_athena/jpg'));
+            $webp_files = File::files(storage_path('/app/public/export_for_athena/webp'));
+
+            $files = collect($jpg_files)->merge($webp_files);
+            if ($zip->open(storage_path('/app/public/athena_images.zip'), \ZipArchive::CREATE)== TRUE){
+                foreach ($files as $key => $value){
+                    $relativeName = basename($value);
+                    $zip->addFile($value, $relativeName);
+                }
+
+                $zip->close();
+            }
+
+            // Delete folder after archive to save space
+            Storage::disk('public')->deleteDirectory('/export_for_athena/');
+        }
+
+		return view('backend.export_images', compact('exported_jpg', 'exported_webp', 'jpg_unable_to_export', 'webp_unable_to_export'));
+	}
+
+    public function download_athena_images(){
+        if(!Storage::disk('public')->exists('/athena_images.zip')){
+            return redirect()->back()->with('error', 'No exported files to download');
+        }
+        return response()->download(storage_path('/app/public/athena_images.zip'));
     }
 }

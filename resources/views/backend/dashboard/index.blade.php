@@ -477,6 +477,8 @@
 								<th class="text-center">Total Qty</th>
 								<th class="text-center">Amount</th>
 								<th class="text-center">Abandoned Transaction</th>
+								<th class="text-center">IP Address</th>
+								<th class="text-center">Location</th>
 								<th class="text-center">Transaction Date</th>
 								<th class="text-center">Action</th>
 							</thead>
@@ -492,7 +494,7 @@
 										@endforelse
 									</td>
 									<td class="text-center">{{ $abandoned['total_items'] }}</td>
-									<td class="text-center">₱ {{ number_format($abandoned['total_amount'], 2) }}</td>
+									<td class="text-center" style="white-space: nowrap !important">₱ {{ number_format($abandoned['total_amount'], 2) }}</td>
 									<td class="text-center">{{ $abandoned['transaction'] ? $abandoned['transaction'] : '-' }}
 										<div class="modal fade" id="abandoned-{{ $abandoned['order_number'] }}-Modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 											<div class="modal-dialog modal-xl" role="document">
@@ -508,9 +510,33 @@
 													<div class="modal-body text-left">
 														<div class="row">
 															<div class="col-6">
-																<p class="mt-3 mb-0"><strong>Customer Name : </strong> {{ $abandoned['name'] ? $abandoned['name'] : 'Guest' }}</p>
-																<p class="mb-0"><strong>Email Address : </strong> {{ $abandoned['email'] ? $abandoned['email'] : '-' }}</p>
-																<p class="mb-0"><strong>Abandoned in : </strong> {{ $abandoned['transaction'] }}</p>
+																<p class="mt-3 mb-0">
+																	<strong>Customer Name : </strong> {{ $abandoned['name'] ? $abandoned['name'] : 'Guest' }}
+																</p>
+																<p class="mb-0 {{ !$abandoned['email'] ? 'd-none' : null }}">
+																	<strong>Email Address : </strong> {{ $abandoned['email'] }}
+																</p>
+																<p class="mb-0 {{ !$abandoned['transaction'] ? 'd-none' : null }}">
+																	<strong>Abandoned in : </strong> {{ $abandoned['transaction'] }}
+																</p>
+																<p class="mb-0 {{ !str_replace(' ', '', $abandoned['billing_address']) ? 'd-none' : null }}">
+																	<strong>Billing Address : </strong> {{ $abandoned['billing_address'] }}
+																</p>
+																<p class="mb-0 {{ !$abandoned['billing_contact_person'] ? 'd-none' : null }}">
+																	<strong>Contact Person : </strong> {{ $abandoned['billing_contact_person'] }}
+																</p>
+																<p class="mb-0 {{ !$abandoned['billing_mobile'] ? 'd-none' : null }}">
+																	<strong>Mobile No. : </strong> {{ $abandoned['billing_mobile'] }}
+																</p>
+																<p class="mb-0 {{ !$abandoned['shipping_method'] ? 'd-none' : null }}">
+																	<strong>Shipping Method : </strong> {{ $abandoned['shipping_method'] }}
+																</p>
+																<p class="mb-0 {{ !str_replace(' ', '', $abandoned['shipping_address']) ? 'd-none' : null }}">
+																	<strong>Shipping Address : </strong> {{ $abandoned['shipping_address'] }}
+																</p>
+																<p class="mb-0 {{ !$abandoned['shipping_contact_person'] ? 'd-none' : null }}">
+																	<strong>Contact Person : </strong> {{ $abandoned['shipping_contact_person'] }}
+																</p>
 															</div>
 														</div>
 														<br>
@@ -550,15 +576,17 @@
 											</div>
 										</div>
 									</td>
-									<td class="text-center">{{ $abandoned['transaction_date'] ? \Carbon\Carbon::parse($abandoned['transaction_date'])->format('M. d, Y - h:i a') : '-' }}</td>
+									<td class="text-center">{{ $abandoned['ip_address'] }}</td>
+									<td class="text-center">{{ $abandoned['location'] ? $abandoned['location'] : '-' }}</td>
+									<td class="text-center" style="white-space: nowrap !important">{{ $abandoned['transaction_date'] ? \Carbon\Carbon::parse($abandoned['transaction_date'])->format('M. d, Y - h:i a') : '-' }}</td>
 									<td class="text-center">
 										<div class="btn-group" role="group" aria-label="Basic example">
 											<a href="#" class="btn btn-outline-secondary btn-sm" data-toggle="modal" data-target="#abandoned-{{ $abandoned['order_number'] }}-Modal">View</a>
-											@if ($abandoned['active'] == 1)
+											@if ($abandoned['active'] == 1 && $abandoned['email'] && $abandoned['name'])
 											<button type="button" class="btn btn-outline-primary btn-sm" data-toggle="modal" data-target="#email-{{ $abandoned['order_number'] }}">Email</button>
 											@endif
 										</div>
-										@if ($abandoned['active'] == 1)
+										@if ($abandoned['active'] == 1 && $abandoned['email'] && $abandoned['name'])
 										<div class="modal fade" id="email-{{ $abandoned['order_number'] }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 											<div class="modal-dialog" role="document">
 												<div class="modal-content">

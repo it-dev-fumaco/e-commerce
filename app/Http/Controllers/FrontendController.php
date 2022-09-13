@@ -54,7 +54,7 @@ class FrontendController extends Controller
             ->where('status', 1)->where('apply_discount_to', 'All Items')
             ->select('discount_type', 'discount_rate')->first();
 
-        if ($request->has('s')) {
+        if ($request->has('s') && $request->s != null) {
             $orderby = ($request->order) ? $request->order : 'asc';
             $search_by = $request->by;
             $search_str = $request->s;
@@ -254,14 +254,16 @@ class FrontendController extends Controller
             }
 
             if (Auth::check()) {
-                $sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
+                $customer_group_sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
+
+                $sale = $customer_group_sale ? $customer_group_sale : $sale;
             }
     
             foreach ($results as $result) {
                 if($result['item_code'] != null) {
-                    if(in_array($result['item_code'], $recently_added_item_codes)){
-                        continue; // if an item is already displayed on recently added, it will not show in search results
-                    }
+                    // if(in_array($result['item_code'], $recently_added_item_codes)){
+                    //     continue; // if an item is already displayed on recently added, it will not show in search results
+                    // }
 
                     $image = null;
                     if (array_key_exists($result['item_code'], $product_list_images)) {
@@ -387,43 +389,45 @@ class FrontendController extends Controller
                 }
 
                 if (Auth::check()) {
-                    $sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
+                    $customer_group_sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
+
+                    $sale = $customer_group_sale ? $customer_group_sale : $sale;
                 }
     
-                foreach($recently_added_items_query as $item_details){
-                    $item_code = $item_details->f_idcode;
+                // foreach($recently_added_items_query as $item_details){
+                //     $item_code = $item_details->f_idcode;
                 
-                    $image = null;
-                    if (array_key_exists($item_code, $recently_added_items_images)) {
-                        $image = $recently_added_items_images[$item_code][0]->imgprimayx;
-                    }
+                //     $image = null;
+                //     if (array_key_exists($item_code, $recently_added_items_images)) {
+                //         $image = $recently_added_items_images[$item_code][0]->imgprimayx;
+                //     }
 
-                    $item_price = $item_details->f_default_price;
-                    $item_on_sale = $item_details->f_onsale;
+                //     $item_price = $item_details->f_default_price;
+                //     $item_on_sale = $item_details->f_onsale;
                     
-                    $is_new_item = 1;
+                //     $is_new_item = 1;
           
-                    // get item price, discounted price and discount rate
-                    $item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $item_details->f_cat_id, $sale, $item_price, $item_code, $item_details->f_discount_type, $item_details->f_discount_rate, $item_details->f_stock_uom, $sale_per_category);
-                    // get product reviews
-                    $total_reviews = array_key_exists($item_code, $product_reviews) ? $product_reviews[$item_code]['total_reviews'] : 0;
-                    $overall_rating = array_key_exists($item_code, $product_reviews) ? $product_reviews[$item_code]['overall_rating'] : 0;
+                //     // get item price, discounted price and discount rate
+                //     $item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $item_details->f_cat_id, $sale, $item_price, $item_code, $item_details->f_discount_type, $item_details->f_discount_rate, $item_details->f_stock_uom, $sale_per_category);
+                //     // get product reviews
+                //     $total_reviews = array_key_exists($item_code, $product_reviews) ? $product_reviews[$item_code]['total_reviews'] : 0;
+                //     $overall_rating = array_key_exists($item_code, $product_reviews) ? $product_reviews[$item_code]['overall_rating'] : 0;
 
-                    $recently_added_arr[] = [
-                        'item_code' => $item_code,
-                        'item_name' => $item_details->f_name_name,
-                        'image' => $image,
-                        'default_price' => '₱ ' . number_format($item_price_data['item_price'], 2, '.', ','),
-                        'is_discounted' => ($item_price_data['discount_rate'] > 0) ? $item_price_data['is_on_sale'] : 0,
-                        'on_stock' => ($item_details->f_qty - $item_details->f_reserved_qty) > 0 ? 1 : 0,
-                        'discounted_price' => '₱ ' . number_format($item_price_data['discounted_price'], 2, '.', ','),
-                        'discount_display' => $item_price_data['discount_display'],
-                        'slug' => $item_details->slug,
-                        'is_new_item' => $is_new_item,
-                        'overall_rating' => $overall_rating,
-                        'total_reviews' => $total_reviews,
-                    ];
-                }
+                //     $recently_added_arr[] = [
+                //         'item_code' => $item_code,
+                //         'item_name' => $item_details->f_name_name,
+                //         'image' => $image,
+                //         'default_price' => '₱ ' . number_format($item_price_data['item_price'], 2, '.', ','),
+                //         'is_discounted' => ($item_price_data['discount_rate'] > 0) ? $item_price_data['is_on_sale'] : 0,
+                //         'on_stock' => ($item_details->f_qty - $item_details->f_reserved_qty) > 0 ? 1 : 0,
+                //         'discounted_price' => '₱ ' . number_format($item_price_data['discounted_price'], 2, '.', ','),
+                //         'discount_display' => $item_price_data['discount_display'],
+                //         'slug' => $item_details->slug,
+                //         'is_new_item' => $is_new_item,
+                //         'overall_rating' => $overall_rating,
+                //         'total_reviews' => $total_reviews,
+                //     ];
+                // }
             }
 
             // Filters
@@ -458,7 +462,7 @@ class FrontendController extends Controller
         }
 
         $carousel_data = DB::table('fumaco_header')->where('fumaco_status', 1)
-            ->select('fumaco_title', 'fumaco_caption', 'fumaco_image1', 'fumaco_url', 'fumaco_btn_name')
+            ->select('fumaco_title', 'fumaco_caption', 'fumaco_image1', 'fumaco_image2', 'text_color', 'btn_position', 'fumaco_url', 'fumaco_btn_name')
             ->orderBy('fumaco_active', 'desc')->get();
 
         $onsale_carousel_data = DB::table('fumaco_on_sale')
@@ -497,7 +501,9 @@ class FrontendController extends Controller
         }
 
         if (Auth::check()) {
-            $sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
+            $customer_group_sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
+
+            $sale = $customer_group_sale ? $customer_group_sale : $sale;
         }
 
         $best_selling_arr = [];
@@ -651,7 +657,9 @@ class FrontendController extends Controller
             }
 
             if (Auth::check()) {
-                $sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
+                $customer_group_sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
+
+                $sale = $customer_group_sale ? $customer_group_sale : $sale;
             }
 
             foreach($item_keywords as $item){
@@ -773,7 +781,9 @@ class FrontendController extends Controller
             }
 
             if (Auth::check()) {
-                $sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
+                $customer_group_sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
+
+                $sale = $customer_group_sale ? $customer_group_sale : $sale;
             }
 
             foreach($featured_items as $row){
@@ -818,10 +828,14 @@ class FrontendController extends Controller
                 ];
             }
 
-            Mail::send('emails.new_subscriber', ['featured' => $featured], function($message) use ($request) {
-                $message->to($request->email);
-                $message->subject('Thank you for subscribing - FUMACO');
-            });
+            try {
+                Mail::send('emails.new_subscriber', ['featured' => $featured], function($message) use ($request) {
+                    $message->to($request->email);
+                    $message->subject('Thank you for subscribing - FUMACO');
+                });
+            } catch (\Swift_TransportException  $e) {
+                return redirect()->back()->with('error', 'An error occured. Please try again.');
+            }
 
             // check for failures
             if (Mail::failures()) {
@@ -887,6 +901,7 @@ class FrontendController extends Controller
         return DB::table('fumaco_settings')->select('set_value')->first();
     }
 
+    // /user_register
     public function userRegistration(Request $request){
         DB::beginTransaction();
         try{
@@ -911,7 +926,8 @@ class FrontendController extends Controller
                 'password.confirmed' => 'Password does not match.',
                 'g-recaptcha-response' => [
                     'required' => 'Please check ReCaptcha.'
-                ]
+                ],
+                'username.unique' => 'The email address has already been taken.',
             ]);
 
             $user = new User;
@@ -952,10 +968,14 @@ class FrontendController extends Controller
                 Newsletter::unsubscribe($user->username);
             }
 
-            Mail::send('emails.verify_email', ['token' => $token], function($message) use($request){
-                $message->to($request->username);
-                $message->subject('Verify email from Fumaco.com');
-            });
+            try {
+                Mail::send('emails.verify_email', ['token' => $token], function($message) use($request){
+                    $message->to($request->username);
+                    $message->subject('Verify email from Fumaco.com');
+                });
+            } catch (\Swift_TransportException  $e) {
+
+            }
 
             DB::commit();
 
@@ -973,11 +993,15 @@ class FrontendController extends Controller
                 'user_id' => $existing->id, 
                 'token' => $token
             ]);
+   
+            try {
+                Mail::send('emails.verify_email', ['token' => $token], function($message) use($email){
+                    $message->to($email);
+                    $message->subject('Verify email from Fumaco.com');
+                });
+            } catch (\Swift_TransportException  $e) {
 
-            Mail::send('emails.verify_email', ['token' => $token], function($message) use($email){
-                $message->to($email);
-                $message->subject('Verify email from Fumaco.com');
-            });
+            }
         }
 
         return redirect()->back()->with(['email' => $email, 'resend' => true]);
@@ -995,10 +1019,14 @@ class FrontendController extends Controller
                 $verifyUser->user->save();
                 $message = "Your email is verified. You can now login.";
 
-                Mail::send('emails.welcome', ['username' => trim($user->username), 'password' => $user->password], function($message) use($user){
-                    $message->to($user->username);
-                    $message->subject('Welcome Email from Fumaco.com');
-                });
+                try {
+                    Mail::send('emails.welcome', ['username' => trim($user->username), 'password' => $user->password], function($message) use($user){
+                        $message->to($user->username);
+                        $message->subject('Welcome Email from Fumaco.com');
+                    });
+                } catch (\Swift_TransportException  $e) {
+    
+                }
             } else {
                 $message = "Your email is already verified. You can now login.";
             }
@@ -1128,7 +1156,28 @@ class FrontendController extends Controller
     }
 
     public function viewContactPage() {
-        $fumaco_contact = DB::table('fumaco_contact')->select('office_title', 'office_address', 'office_phone', 'office_mobile', 'office_fax', 'office_email')->get();
+        $fumaco_contact = DB::table('fumaco_contact')->select('id', 'office_title', 'office_address')->get();
+        $fumaco_contact_numbers = DB::table('fumaco_contact_numbers')->whereIn('parent', collect($fumaco_contact)->pluck('id'))->get();
+        $fumaco_contact_numbers = collect($fumaco_contact_numbers)->groupBy('parent');
+
+        $contact_info = [];
+        foreach($fumaco_contact as $contact){
+            $info_arr = [];
+            if(isset($fumaco_contact_numbers[$contact->id])){
+                foreach($fumaco_contact_numbers[$contact->id] as $info){
+                    $info_arr[] = [
+                        'type' => $info->type,
+                        'contact' => $info->contact,
+                        'apps' => $info->messaging_apps
+                    ];
+                }
+            }
+            $contact_info[] = [
+                'title' => $contact->office_title,
+                'address' => $contact->office_address,
+                'info' => $info_arr
+            ];
+        }
 
         $fumaco_map = DB::table('fumaco_map_1')->select('map_url')->first();
 
@@ -1139,7 +1188,7 @@ class FrontendController extends Controller
             $image_for_sharing = ($default_image_for_sharing->filename) ? asset('/storage/social_images/'. $default_image_for_sharing->filename) : null;
         } 
 
-        return view('frontend.contact', compact('fumaco_contact', 'fumaco_map', 'image_for_sharing'));
+        return view('frontend.contact', compact('fumaco_contact', 'fumaco_map', 'image_for_sharing', 'contact_info'));
     }
 
     public function addContact(Request $request){
@@ -1185,16 +1234,25 @@ class FrontendController extends Controller
             $email_recipient = DB::table('email_config')->first();
             $email_recipient = ($email_recipient) ? explode(",", $email_recipient->email_recipients) : [];
             if (count(array_filter($email_recipient)) > 0) {
-                Mail::send('emails.new_contact', ['new_contact' => $new_contact, 'client' => 0], function($message) use ($email_recipient) {
-                    $message->to($email_recipient);
-                    $message->subject('New Contact - FUMACO');
-                });
+                try {
+                    Mail::send('emails.new_contact', ['new_contact' => $new_contact, 'client' => 0], function($message) use ($email_recipient) {
+                        $message->to($email_recipient);
+                        $message->subject('New Contact - FUMACO');
+                    });
+                } catch (\Swift_TransportException  $e) {
+    
+                }
             }
-            // send email to client 
-            Mail::send('emails.new_contact', ['new_contact' => $new_contact, 'client' => 1], function($message) use ($request) {
-                $message->to(trim($request->email));
-                $message->subject('Contact Us - FUMACO');
-            });
+            
+            try {
+                // send email to client 
+                Mail::send('emails.new_contact', ['new_contact' => $new_contact, 'client' => 1], function($message) use ($request) {
+                    $message->to(trim($request->email));
+                    $message->subject('Contact Us - FUMACO');
+                });
+            } catch (\Swift_TransportException  $e) {
+
+            }
 
             // check for failures
             if (Mail::failures()) {
@@ -1372,7 +1430,9 @@ class FrontendController extends Controller
         }
 
         if (Auth::check()) {
-            $sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
+            $customer_group_sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
+
+            $sale = $customer_group_sale ? $customer_group_sale : $sale;
         }
 
         $products_arr = [];
@@ -1500,7 +1560,9 @@ class FrontendController extends Controller
         }
 
         if (Auth::check()) {
-            $sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
+            $customer_group_sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
+
+            $sale = $customer_group_sale ? $customer_group_sale : $sale;
         }
 
         // get item price, discounted price and discount rate
@@ -1570,7 +1632,9 @@ class FrontendController extends Controller
             }
 
             if (Auth::check()) {
-                $sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
+                $customer_group_sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
+
+                $sale = $customer_group_sale ? $customer_group_sale : $sale;
             }
 
             foreach($products_to_compare as $item_details){
@@ -1638,7 +1702,9 @@ class FrontendController extends Controller
         }
 
         if (Auth::check()) {
-            $sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
+            $customer_group_sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
+
+            $sale = $customer_group_sale ? $customer_group_sale : $sale;
         }
         
         $recommended_items = [];
@@ -1711,7 +1777,9 @@ class FrontendController extends Controller
         }
 
         if (Auth::check()) {
-            $sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
+            $customer_group_sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
+
+            $sale = $customer_group_sale ? $customer_group_sale : $sale;
         }
 
         $related_products = [];
@@ -1797,12 +1865,12 @@ class FrontendController extends Controller
     }
 
     public function viewOrders() {
-        $completed_statuses = DB::table('order_status')->where('update_stocks', 1)->select('status')->get();
-        $active_order_statuses = array('Order Placed', 'Order Confirmed', 'Out for Delivery');
+        $completed_statuses = DB::table('order_status')->where('update_stocks', 1)->pluck('status');
+        $archived_statuses = collect($completed_statuses)->push('Cancelled');
 
         $orders = DB::table('fumaco_order')->where('user_email', Auth::user()->username)
-            ->whereNotIn('order_status', $active_order_statuses)
-            ->select('id', 'order_number', 'order_date', 'order_status', 'estimated_delivery_date', 'date_delivered', 'order_subtotal', 'order_shipping', 'order_shipping_amount', 'discount_amount', 'voucher_code')
+            ->whereIn('order_status', $archived_statuses)
+            ->select('id', 'order_number', 'order_date', 'order_status', 'estimated_delivery_date', 'date_delivered', 'pickup_date', 'order_subtotal', 'order_shipping', 'order_shipping_amount', 'discount_amount', 'voucher_code')
             ->orderBy('id', 'desc')->paginate(10);
 
         $order_numbers = array_column($orders->items(), 'order_number');
@@ -1843,6 +1911,7 @@ class FrontendController extends Controller
                 'status' => $order->order_status,
                 'edd' => $order->estimated_delivery_date,
                 'date_delivered' => $order->date_delivered,
+                'pickup_date' => $order->pickup_date,
                 'items' => $items_arr,
                 'subtotal' => $order->order_subtotal,
                 'shipping_name' => $order->order_shipping,
@@ -1853,10 +1922,8 @@ class FrontendController extends Controller
             ];
         }
 
-        
         $new_orders = DB::table('fumaco_order')->where('user_email', Auth::user()->username)
-            ->whereNotIn('order_status', collect($completed_statuses)->pluck('status'))
-            ->where('order_status', '!=', 'Cancelled')
+            ->whereNotIn('order_status', $archived_statuses)
             ->select('id', 'pickup_date', 'order_number', 'order_date', 'order_status', 'payment_status', 'estimated_delivery_date', 'date_delivered', 'order_subtotal', 'order_payment_method', 'order_shipping', 'order_shipping_amount', 'discount_amount', 'voucher_code')
             ->orderBy('id', 'desc')->paginate(10);
 
@@ -1979,12 +2046,23 @@ class FrontendController extends Controller
                 'email_address' => 'required|email'
             ]);
 
+            $mobile = null;
+            if($request->mobile_no){
+                $mobile = preg_replace("/[^0-9]/", "", $request->mobile_no);
+                $mobile = $mobile[0] == 0 ? '63'.substr($mobile, 1) : '63'.$mobile;
+                if($mobile[0] == 0){
+                    $mobile = '63'.substr($mobile, 1);
+                }else if(substr($mobile, 0, 2) != '63' || $mobile[0] == '9'){
+                    $mobile = '63'.$mobile;
+                }
+            }
+
             DB::table('fumaco_users')->where('id', $id)->update(
                 [
                     'f_name' => $request->first_name,
                     'f_lname' => $request->last_name,
                     'username' => $request->email_address,
-                    'f_mobilenumber' => $request->mobile_no,
+                    'f_mobilenumber' => $mobile,
                     'f_business' => $request->business_name,
                     'f_website' => $request->website,
                     'f_job_position' => $request->job_position,
@@ -2100,6 +2178,29 @@ class FrontendController extends Controller
             if($validator->fails()){
                 return redirect()->back()->with('error', 'All fields with * are required.');
             }
+
+            $mobile = null;
+            if($request->mobile){
+                $mobile = preg_replace("/[^0-9]/", "", $request->mobile);
+                // $mobile = $mobile[0] == 0 ? '63'.substr($mobile, 1) : '63'.$mobile;
+                if($mobile[0] == 0){
+                    $mobile = '63'.substr($mobile, 1);
+                }else if(substr($mobile, 0, 2) != '63' || $mobile[0] == '9'){
+                    $mobile = '63'.$mobile;
+                }
+            }
+
+            $contact = null;
+            if($request->contact){
+                $contact = preg_replace("/[^0-9]/", "", $request->contact);
+                // $contact = $contact[0] == 0 ? '63'.substr($contact, 1) : '63'.$contact;
+                if($contact[0] == 0){
+                    $contact = '63'.substr($contact, 1);
+                }else if(substr($contact, 0, 2) != '63' || $contact[0] == '9'){
+                    $contact = '63'.$contact;
+                }
+            }
+
             $update = [
                 'add_type' => $request->Address_type1_1,
                 'xbusiness_name' => $request->business_name,
@@ -2111,10 +2212,10 @@ class FrontendController extends Controller
                 'xbrgy' => $request->brgy,
                 'xpostal' => $request->postal,
                 'xcountry' => $request->country,
-                'xmobile_number' => $request->mobile,
+                'xmobile_number' => $mobile,
                 'xcontactname1' => $request->first_name,
                 'xcontactlastname1' => $request->last_name,
-                'xcontactnumber1' => $request->contact,
+                'xcontactnumber1' => $contact,
                 'xcontactemail1' => $request->email 
             ];
 
@@ -2184,6 +2285,28 @@ class FrontendController extends Controller
             
             $checker = DB::table('fumaco_user_add')->where('user_idx', Auth::user()->id)->where('address_class', $address_class)->count();
 
+            $mobile = null;
+            if($request->mobile_no){
+                $mobile = preg_replace("/[^0-9]/", "", $request->mobile_no);
+                // $mobile = $mobile[0] == 0 ? '63'.substr($mobile, 1) : '63'.$mobile;
+                if($mobile[0] == 0){
+                    $mobile = '63'.substr($mobile, 1);
+                }else if(substr($mobile, 0, 2) != '63' || $mobile[0] == '9'){
+                    $mobile = '63'.$mobile;
+                }
+            }
+            
+            $contact = null;
+            if($request->contact_no){
+                $contact = preg_replace("/[^0-9]/", "", $request->contact_no);
+                // $contact = $contact[0] == 0 ? '63'.substr($contact, 1) : '63'.$contact;
+                if($contact[0] == 0){
+                    $contact = '63'.substr($contact, 1);
+                }else if(substr($contact, 0, 2) != '63' || $contact[0] == '9'){
+                    $contact = '63'.$contact;
+                }
+            }
+            
             DB::table('fumaco_user_add')->insert(
                 [
                     'address_class' => $address_class,
@@ -2198,8 +2321,8 @@ class FrontendController extends Controller
                     'add_type' => $request->address_type,
                     'xcontactname1' => $request->first_name,
                     'xcontactlastname1' => $request->last_name,
-                    'xcontactnumber1' => $request->contact_no,
-                    'xmobile_number' => $request->mobile_no,
+                    'xcontactnumber1' => $contact,
+                    'xmobile_number' => $mobile,
                     'xcontactemail1' => $request->email_address,
                     'xbusiness_name' => ($request->address_type == 'Business Address') ? $request->business_name : null,
                     'xtin_no' => $request->tin_no,
@@ -2220,7 +2343,7 @@ class FrontendController extends Controller
     public function viewOrderTracking($order_number = null) {
         $order_details = DB::table('fumaco_order')->where('order_number', $order_number)->first();
 
-        if($order_number != null and !$order_details){
+        if($order_number and !$order_details){
             return redirect()->back()->with('error', 'Order Number not found!');
         }
 
@@ -2389,10 +2512,14 @@ class FrontendController extends Controller
             $email_recipient = DB::table('fumaco_admin_user')->where('user_type', 'Accounting Admin')->pluck('username');
             $recipients = collect($email_recipient)->toArray();
             if (count(array_filter($recipients)) > 0) {
-                Mail::send('emails.deposit_slip_notif', $order, function($message) use ($recipients) {
-                    $message->to($recipients);
-                    $message->subject('Awaiting Confirmation - FUMACO');
-                });
+                try {
+                    Mail::send('emails.deposit_slip_notif', $order, function($message) use ($recipients) {
+                        $message->to($recipients);
+                        $message->subject('Awaiting Confirmation - FUMACO');
+                    });
+                } catch (\Swift_TransportException  $e) {
+    
+                }
             }
         }
         

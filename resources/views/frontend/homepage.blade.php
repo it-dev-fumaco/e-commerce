@@ -40,17 +40,20 @@
           @endforelse
         @foreach ($carousel_data as $carousel)
           @php
-            $string = strip_tags($carousel->fumaco_caption);
-            if (strlen($string) > 250) {
+            // $string = null;
+            // if($carousel->fumaco_caption){
+            //   $string = strip_tags($carousel->fumaco_caption);
+            //   if (strlen($string) > 250) {
 
-              // truncate string
-              $stringCut = substr($string, 0, 180);
-              $endPoint = strrpos($stringCut, ' ');
+            //     // truncate string
+            //     $stringCut = substr($string, 0, 180);
+            //     $endPoint = strrpos($stringCut, ' ');
 
-              //if the string doesn't contain any space then it will cut without word basis.
-              $string = $endPoint? substr($stringCut, 0, $endPoint) : substr($stringCut, 0);
-              $string .= '...';
-            }
+            //     //if the string doesn't contain any space then it will cut without word basis.
+            //     $string = $endPoint? substr($stringCut, 0, $endPoint) : substr($stringCut, 0);
+            //     $string .= '...';
+            //   }
+            // }
             $active = '';
             $lazy = 'lazy';
             if(count($onsale_carousel_data) == 0){
@@ -68,12 +71,16 @@
             </picture>
 
             <div class="container">
-              <div class="carousel-caption text-start">
-                <h3 class="carousel-header-font fumacoFont1">{{ $carousel->fumaco_title }}</h3>
-                <div class="text ellipsis">
-                  <p class="carousel-caption-font fumacoFont2 carousel-text-concat" style="text-align: left; text-justify: left; letter-spacing: 1px;">{{ $string }}</p>
+              <div class="carousel-caption text-start carousel-item-container">
+                <h3 class="carousel-header-font fumacoFont1">{!! strip_tags($carousel->fumaco_title) !!}</h3>
+                @if ($carousel->fumaco_caption)
+                  <div class="text ellipsis">
+                    <p class="carousel-caption-font fumacoFont2 carousel-text-concat" style="text-align: left; text-justify: left; letter-spacing: 1px;">{!! strip_tags($carousel->fumaco_caption) !!}</p>
+                  </div>
+                @endif
+                <div style="text-align: {{ $carousel->btn_position }};">
+                  <p><a class="btn btn-lg btn-primary btn-fumaco fum  acoFont_btn" href="{{ $carousel->fumaco_url }}"role="button">{{ $carousel->fumaco_btn_name }}</a></p>
                 </div>
-                <p><a class="btn btn-lg btn-primary btn-fumaco fumacoFont_btn" href="{{ $carousel->fumaco_url }}"role="button">{{ $carousel->fumaco_btn_name }}</a></p>
               </div>
             </div>
           </div>
@@ -173,7 +180,7 @@
                       </div>
                       <p class="card-text fumacoFont_card_price" style="color:#000000 !important; ">
                         @if($bs['is_discounted'] == 1)
-											  {{ $bs['discounted_price'] }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">{{ $bs['default_price'] }}</s>
+											  {{ $bs['discounted_price'] }}&nbsp;<br class="d-block d-xl-none"/><s style="color: #c5c5c5;">{{ $bs['default_price'] }}</s>
 												@else
                         {{ $bs['default_price'] }}
 												@endif
@@ -265,7 +272,7 @@
                       </div>
                       <p class="card-text fumacoFont_card_price" style="color:#000000 !important; min-height: 30px">
                         @if($os['is_discounted'] == 1)
-                          {{ $os['discounted_price'] }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">{{ $os['default_price'] }}</s>
+                          {{ $os['discounted_price'] }}&nbsp;<br class="d-block d-xl-none"/><s style="color: #c5c5c5;">{{ $os['default_price'] }}</s>
                         @else
                           {{ $os['default_price'] }}
                         @endif
@@ -336,7 +343,11 @@
 @section('script')
   <script src="{{ asset('/slick/slick.js') }}" type="text/javascript" charset="utf-8"></script>
   <script type="text/javascript">
-    $('#myCarousel').css('margin-top', $('#navbar').height());
+    if( !/Android|webOS|iPad|iPod|iPhone|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+      $('#myCarousel').css('margin-top', $('#navbar').height());
+    }else{
+      $('#mob-picture').css('margin-top', $('#navbar').height());
+    }
 
     $(document).ready(function() {
       $(".regular").slick({

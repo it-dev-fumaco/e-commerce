@@ -57,9 +57,12 @@
 					<thead>
 						<tr>
 							<th></th>
-							<th>Address</th>
-							<th>Contacts</th>
-							<th>Type</th>
+							<th>
+								<span class="d-none d-md-block">Address</span>
+								<span class="d-block d-md-none">Information</span>
+							</th>
+							<th class="d-none d-sm-table-cell">Contacts</th>
+							<th class="d-none d-sm-table-cell">Type</th>
 							<th>Action</th>
 						</tr>
 					</thead>
@@ -75,9 +78,16 @@
 								@endif
 								</a>
 							</td>
-							<td>{{ $shipping_address->xadd1 .' '. $shipping_address->xadd2 .' '. $shipping_address->xprov }}</td>
-							<td>{{ $shipping_address->xcontactlastname1 .', '.$shipping_address->xcontactname1 }}</td>
-							<td>{{ $shipping_address->add_type }}</td>
+							<td>
+								<span class="d-none d-md-block">{{ $shipping_address->xadd1 .' '. $shipping_address->xadd2 .' '. $shipping_address->xprov }}</span>
+								<span class="d-block d-md-none">
+									{{ $shipping_address->xcontactlastname1 .', '.$shipping_address->xcontactname1 }}<br/>
+									{{ $shipping_address->xadd1 .' '. $shipping_address->xadd2 .' '. $shipping_address->xprov }}<br/>
+									{{ $shipping_address->add_type }}
+								</span>
+							</td>
+							<td class="d-none d-sm-table-cell">{{ $shipping_address->xcontactlastname1 .', '.$shipping_address->xcontactname1 }}</td>
+							<td class="d-none d-sm-table-cell">{{ $shipping_address->add_type }}</td>
 							<td>
 								<button type="button" class="shipping btn btn-success btn-xs {{ $key }}" data-toggle="modal" data-target="#shipping-view{{ $shipping_address->id }}">
 									<i class="fas fa-eye"></i>
@@ -138,15 +148,31 @@
 												<div class="row mt-3">
 													<div class="col-md-4">
 														<label for="Address1_1" class="myprofile-font-form">Contact Number : </label>
-														<input type="text" name="contact" class="form-control caption_1" value="{{ $shipping_address->xcontactnumber1 }}">
+														{{-- <input type="text" name="contact" class="form-control caption_1" value="{{ $shipping_address->xcontactnumber1 }}"> --}}
+														<div class="row">
+															<div class="col-2 col-xl-1" style="display: flex; align-items: center">
+																+63
+															</div>
+															<div class="col-10 col-lg-8 col-xl-11" style="margin-left: -5px">
+																<input type="text" name="contact" class="form-control caption_1" value="{{ $shipping_address->xcontactnumber1 }}">
+															</div>
+														</div>
 													</div>
 													<div class="col-md-4">
 														<label for="Address2_1" class="myprofile-font-form">Mobile Number : <span class="text-danger">*</span></label>
-														<input type="text" name="mobile" class="form-control caption_1" value="{{ $shipping_address->xmobile_number }}" required>
+														{{-- <input type="text" name="mobile" class="form-control caption_1" value="{{ $shipping_address->xmobile_number }}" required> --}}
+														<div class="row">
+															<div class="col-2 col-xl-1" style="display: flex; align-items: center">
+																+63
+															</div>
+															<div class="col-10 col-lg-8 col-xl-11" style="margin-left: -5px">
+																<input type="text" name="mobile" class="form-control caption_1" value="{{ substr($shipping_address->xmobile_number, 2) }}" required>
+															</div>
+														</div>
 													</div>
 													<div class="col-md-4">
 														<label for="Address2_1" class="myprofile-font-form">Contact Email : <span class="text-danger">*</span></label>
-														<input type="text" name="email" class="form-control caption_1" value="{{ $shipping_address->xcontactemail1 }}" required>
+														<input type="text" name="email" class="form-control caption_1" value="{{ substr($shipping_address->xcontactemail1, 2) }}" required>
 													</div>
 												</div>
 												<div class="row">
@@ -238,9 +264,12 @@
 					<thead>
 						<tr>
 							<th></th>
-							<th>Address</th>
-							<th>Contacts</th>
-							<th>Type</th>
+							<th>
+								<span class="d-none d-md-block">Address</span>
+								<span class="d-block d-md-none">Information</span>
+							</th>
+							<th class="d-none d-sm-table-cell">Contacts</th>
+							<th class="d-none d-sm-table-cell">Type</th>
 							<th>Action</th>
 						</tr>
 					</thead>
@@ -256,9 +285,16 @@
 								@endif
 								</a>
 							</td>
-							<td>{{ $billing_address->xadd1 . ' ' . $billing_address->xadd2 .' '. $billing_address->xprov}}</td>
-							<td>{{ $billing_address->xcontactlastname1 . ', ' . $billing_address->xcontactname1 }}</td>
-							<td>{{ $billing_address->add_type }}</td>
+							<td>
+								<span class="d-none d-md-block">{{ $billing_address->xadd1 . ' ' . $billing_address->xadd2 .' '. $billing_address->xprov}}</span>
+								<span class="d-block d-md-none">
+									{{ $billing_address->xcontactlastname1 . ', ' . $billing_address->xcontactname1 }}<br/>
+									{{ $billing_address->xadd1 . ' ' . $billing_address->xadd2 .' '. $billing_address->xprov}}<br/>
+									{{ $billing_address->add_type }}
+								</span>
+							</td>
+							<td class="d-none d-sm-table-cell">{{ $billing_address->xcontactlastname1 . ', ' . $billing_address->xcontactname1 }}</td>
+							<td class="d-none d-sm-table-cell">{{ $billing_address->add_type }}</td>
 							<td>
 								<button type="button" class="billing btn btn-success btn-xs {{ $key }}" data-toggle="modal" data-target="#myadd{{ $billing_address->id }}">
 									<i class="fas fa-eye"></i>
@@ -295,11 +331,27 @@
 												<div class="row mt-3">
 													<div class="col-md-4">
 														<label for="Address1_1" class="myprofile-font-form">Contact Number : </label>
-														<input type="text" class="form-control caption_1" name="contact" value="{{ $billing_address->xcontactnumber1 }}">
+														{{-- <input type="text" class="form-control caption_1" name="contact" value="{{ $billing_address->xcontactnumber1 }}"> --}}
+														<div class="row">
+															<div class="col-2 col-xl-1" style="display: flex; align-items: center">
+																+63
+															</div>
+															<div class="col-10 col-lg-8 col-xl-11" style="margin-left: -5px">
+																<input type="text" class="form-control caption_1" name="contact" value="{{ substr($billing_address->xcontactnumber1, 2) }}">
+															</div>
+														</div>
 													</div>
 													<div class="col-md-4">
 														<label for="Address1_1" class="myprofile-font-form">Mobile Number : <span class="text-danger">*</span></label>
-														<input type="text" class="form-control caption_1" name="mobile" value="{{ $billing_address->xmobile_number }}" required>
+														{{-- <input type="text" class="form-control caption_1" name="mobile" value="{{ substr($billing_address->xmobile_number, 2) }}" required> --}}
+														<div class="row">
+															<div class="col-2 col-xl-1" style="display: flex; align-items: center">
+																+63
+															</div>
+															<div class="col-10 col-lg-8 col-xl-11" style="margin-left: -5px">
+																<input type="text" class="form-control caption_1" name="mobile" value="{{ substr($billing_address->xmobile_number, 2) }}" required>
+															</div>
+														</div>
 													</div>
 													<div class="col-md-4">
 														<label for="Address2_1" class="myprofile-font-form">Contact Email : <span class="text-danger">*</span></label>

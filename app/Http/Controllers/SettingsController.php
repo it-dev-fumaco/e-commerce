@@ -37,6 +37,12 @@ class SettingsController extends Controller
 		return view('backend.settings.google_api_setup', compact('gmap', 'ganalytics'));
 	}
 
+    public function systemLogs(){
+        $logs = DB::table('fumaco_system_logs')->orderBy('last_sync_date', 'desc')->paginate(10);
+
+        return view('backend.system_logs', compact('logs'));
+    }
+
     public function saveApiCredentials(Request $request) {
         DB::beginTransaction();
         try {

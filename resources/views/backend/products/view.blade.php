@@ -27,9 +27,10 @@
 	<!-- Main content -->
 	<section class="content">
 		<div class="container-fluid">
-			<div class="row">
-            <form action="/admin/product/{{ $details->id }}/update" method="POST" enctype="multipart/form-data">
-               @csrf
+         <form action="/admin/product/{{ $details->id }}/update" method="POST" enctype="multipart/form-data">
+            @csrf
+            <div class="row">
+            
                <!-- left column -->
                <div class="col-md-12">
                   @if(session()->has('success'))
@@ -51,20 +52,26 @@
                   @endif
                   <!-- general form elements -->
                   <div class="card">
-                     <div class="card-body">
-                        <h4 class="d-inline-block">Product Information</h4>
-                        <div class="float-right">
-                           <div class="dropdown d-inline-block mr-2">
-                              <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdowncreate" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Create New Product
-                              </button>
-                              <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdowncreate" style="width: 100%;">
-                                 <a class="dropdown-item" href="/admin/product/add/simple_product">Simple Product</a>
-                                 <a class="dropdown-item" href="/admin/product/add/product_bundle">Product Bundle</a>
-                              </div>
+                     <div class="card-header">
+                        <div class="d-flex flex-row align-items-center justify-content-between">
+                           <div>
+                              <h4 class="d-inline-block m-0">Product Information</h4>
+                              <p class="p-0 m-0">Last Sync: {{ $details->last_sync_date ? Carbon\Carbon::parse($details->last_sync_date)->format('M. d, Y h:i A') : '-' }}</p>
                            </div>
-                           <button type="submit" class="btn btn-primary">Update</button>
+                           <div>
+                              <div class="dropdown d-inline-block mr-2">
+                                 <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdowncreate" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Create New Product
+                                 </button>
+                                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdowncreate" style="width: 100%;">
+                                    <a class="dropdown-item" href="/admin/product/add/simple_product">Simple Product</a>
+                                    <a class="dropdown-item" href="/admin/product/add/product_bundle">Product Bundle</a>
+                                 </div>
+                              </div>
+                              <button type="submit" class="btn btn-primary mr-2">Update</button>
+                           </div>
                         </div>
-                        <hr>
+                     </div>
+                     <div class="card-body">
                         <div class="row">
                            <div class="col-md-2">
                               @php
@@ -188,7 +195,7 @@
                            <div class="col-md-4">
                               <div class="form-group">
                                  <label for="warehouse">Warehouse</label>
-                                 <input type="text" class="form-control" id="warehouse" value="{{ $details->f_warehouse }}" readonly required>
+                                 <select class="form-control select2" name="warehouse" id="warehouse" style="width: 100%;" required></select>
                               </div>
                            </div>
                            <div class="col-md-4">
@@ -371,8 +378,8 @@
                   </div>
                <!-- /.card -->
                </div>
-            </form>
-			</div>
+            </div>
+         </form>
 			<!-- /.row -->
 		</div><!-- /.container-fluid -->
 	</section>
@@ -568,6 +575,32 @@
             $("#customFile").prop('disabled', true);
          }
       }
+
+      $('#warehouse').select2({
+         placeholder: 'Search Warehouse',
+         ajax: {
+            url: '/admin/warehouse/search',
+            method: 'GET',
+            dataType: 'json',
+            data: function (data) {
+               return {
+                  q: data.term, // search term
+               };
+            },
+            processResults: function (response) {
+               return {
+                  results: response
+               };
+            },
+            error: function () {
+               console.log('An error occured.');
+            },
+            cache: true
+         }
+      });
+
+      var newOption = new Option('{{ $details->f_warehouse }}', '{{ $details->f_warehouse }}', false, false);
+      $('#warehouse').append(newOption).trigger('change');
    })();
 </script>
 @endsection

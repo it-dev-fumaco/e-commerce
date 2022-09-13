@@ -87,7 +87,7 @@
 								<div class="he1x" style="margin-bottom: 10px !important;">
 									{{ $shipping_address1." ".$shipping_address2.", ".$shipping_brgy.", ".$shipping_city.", ".$shipping_province.", ".$shipping_country." ".$shipping_postal }}
 								</div>
-								<div class="he1x" style="margin-bottom: 5px !important;">Contact Number: {{ $shipping_mobile }}</div>
+								<div class="he1x" style="margin-bottom: 5px !important;">Contact Number: +{{ $shipping_mobile }}</div>
 								<br>
 								<div class="form-check {{ $checkbox }}">
 									<input class="form-check-input" type="checkbox" id="same-address" checked>
@@ -119,7 +119,7 @@
 								<div class="he1x" style="margin-bottom: 10px !important;">
 									{{ ucwords(strtolower($billing_details['address_line1']))." ".ucwords(strtolower($billing_details['address_line2'])).", ".ucwords(strtolower($billing_details['brgy'])).", ".ucwords(strtolower($billing_details['city'])).", ".ucwords(strtolower($billing_details['province'])).", ".ucwords(strtolower($billing_details['country']))." ".$billing_details['postal_code'] }}
 								</div>
-								<div class="he1x" style="margin-bottom: 5px !important;">Contact Number:  {{ $billing_details['mobile_no'] }}</div>
+								<div class="he1x" style="margin-bottom: 5px !important;">Contact Number: +{{ $billing_details['mobile_no'] }}</div>
 							</div>
 						</div>
 						@endif
@@ -212,6 +212,7 @@
 								<div id="voucher-free" class="d-none"></div>
 								@php
 									$sd_exists = false;
+									$shipping_rates_check = collect($shipping_rates)->pluck('shipping_service_name')->toArray();
 									if (in_array('Standard Delivery', array_column($shipping_rates, 'shipping_service_name'))) {
 										$sd_exists = true;
 									}
@@ -219,7 +220,11 @@
 								@forelse ($shipping_rates as $l => $srate)
 								@php
 									if ($sd_exists) {
-										$defaul_selected = ($srate['shipping_service_name'] == 'Standard Delivery') ? 'checked' : '';
+										if(in_array('Free Delivery', $shipping_rates_check)){
+											$defaul_selected = ($srate['shipping_service_name'] == 'Free Delivery') ? 'checked' : '';
+										}else{
+											$defaul_selected = ($srate['shipping_service_name'] == 'Standard Delivery') ? 'checked' : '';
+										}
 									} else {
 										$defaul_selected = ($loop->first) ? 'checked' : '';
 									}
@@ -244,7 +249,13 @@
 											<select id="store-selection" class="form-control no-click-outline formslabelfnt" style="text-align: center;">
 												<option value="">Select Store</option>
 												@foreach ($srate['stores'] as $store)
-												<option value="{{ $store->store_name }}" data-address="{{ $store->address }}" data-available-time="Available Time: <br>{{ date("h:i A", strtotime($store->available_from)) . ' - ' . date("h:i A", strtotime($store->available_to)) }}" data-start="{{ $store->available_from }}" data-end="{{ $store->available_to }}" data-leadtime="{{ $store->allowance_in_hours }}">{{ $store->store_name }}</option>
+												@php
+													$leadtime = $srate['max_lead_time'];
+													if ($srate['max_lead_time'] <= 0) {
+														$leadtime = $store->allowance_in_hours / 24;
+													}
+												@endphp
+												<option value="{{ $store->store_name }}" data-address="{{ $store->address }}" data-available-time="Available Time: <br>{{ date("h:i A", strtotime($store->available_from)) . ' - ' . date("h:i A", strtotime($store->available_to)) }}" data-start="{{ $store->available_from }}" data-end="{{ $store->available_to }}" data-leadtime="{{ $leadtime }}">{{ $store->store_name }}</option>
 												@endforeach
 											</select>
 											<div class="m-1 text-left" id="store-address"></div>
@@ -1131,7 +1142,7 @@
 
 		$('#coupon-code').val('');
 		$("#coupon-code").keyup(function () {  
-            $(this).val($(this).val().toUpperCase());  
+            $(this).val($(this).val().toUpperCase().replace(' ', ''));
         });
 
 		$('#apply-coupon-btn').click(function(e){
@@ -1852,7 +1863,7 @@
 
 			$("#pickup-time").datepicker({
 				showInputs: false,
-				startDate: '+'+ (leadtime/24) +'d',
+				startDate: '+'+ (leadtime) +'d',
 				format: 'D, M. dd, yyyy',
 				autoclose: true,
 				daysOfWeekDisabled: [0],

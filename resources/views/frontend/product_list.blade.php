@@ -97,7 +97,7 @@
 									$filter_values = explode('+', request()->$filter_attr);
 									$status = (in_array($attr_val, $filter_values)) ? 'checked' : '';
 								@endphp
-								<div class="form-check">
+								<div class="form-check" style="word-wrap:break-word !important;">
 									<input type="checkbox" class="form-check-input product-cb-filter" id="{{ 'cb' . $x }}" name="{{ 'attr[' .$filter_attr.'][]' }}" value="{{ $attr_val }}" data-attrname="{{ $filter_attr }}" {{ $status }}>
 									<label class="form-check-label" for="{{ 'cb' . $x }}" style="font-size: 0.8rem;">{{ $attr_val }}</label>
 								</div>

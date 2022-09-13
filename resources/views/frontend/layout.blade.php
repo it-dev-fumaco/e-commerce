@@ -94,6 +94,8 @@
       }(document, 'script', 'facebook-jssdk'));
     </script>
 
+  
+
     @if (in_array($activePage, ['login','checkout_customer_form']))
     <script>
       function statusChangeCallback(response) {  // Called with the results from FB.getLoginStatus().
@@ -157,9 +159,11 @@
     @endif
   </head>
   <body>
-    <div class="spinner-wrapper">
-      <div class="spinner"></div>
-    </div>
+    @if ($activePage != 'product_page')
+      <div class="spinner-wrapper">
+        <div class="spinner"></div>
+      </div>
+    @endif
     <header style="min-height: 1px;">
       <nav id="navbar" class="navbar navbar-expand-lg navbar-light fixed-top bg-light" style="padding-left: 20px; padding-right: 20px; padding-bottom:0px; border-bottom: 1px solid #e4e4e4;">
         <div class="container-fluid">
@@ -310,7 +314,8 @@
             <div class="col-md-12">
               <form action="/" id="mob-search-bar-form" method="GET">
                 <div class="input-group mb-0 searchbar" id="mob-search-bar-form" style="width: 100% !important;">
-                  <input type="text" id='mob-autocomplete-search' placeholder="Search" name="s" value="{{ request()->s }}" class="form-control searchstyle" aria-label="Text input with dropdown button">
+                <input type="text" name="name" style="display: none;">
+                <input type="text" id='mob-autocomplete-search' placeholder="Search" name="s" value="{{ request()->s }}" class="form-control searchstyle" aria-label="Text input with dropdown button">
                     <button class="btn btn-outline-secondary searchstyle" type="submit"><i class="fas fa-search"></i></button>
                     {{-- <div id="mob-search-container" class="border border-danger"></div> --}}
                 </div>

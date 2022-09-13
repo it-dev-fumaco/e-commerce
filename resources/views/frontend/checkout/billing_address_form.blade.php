@@ -157,11 +157,27 @@
 							</div>
 							<div class="col-md-4">
 								<label for="contactnumber1_1" class="formslabelfnt">Mobile Number : <span class="text-danger">*</span></label>
-								<input type="text" class="form-control formslabelfnt" id="ship_mobilenumber1_1" name="ship_mobilenumber1_1" required value="{{ old('ship_mobilenumber1_1') }}"><br class="d-lg-none d-xl-none"/>
+								{{-- <input type="text" class="form-control formslabelfnt d-inline" id="ship_mobilenumber1_1" name="ship_mobilenumber1_1" required value="{{ old('ship_mobilenumber1_1') }}"><br class="d-lg-none d-xl-none"/> --}}
+								<div class="row">
+									<div class="col-2" style="display: flex; align-items: center">
+										+63
+									</div>
+									<div class="col-10" style="margin-left: -20px">
+										<input type="text" class="form-control formslabelfnt d-inline" id="ship_mobilenumber1_1" name="ship_mobilenumber1_1" required value="{{ old('ship_mobilenumber1_1') }}"><br class="d-lg-none d-xl-none"/>
+									</div>
+								</div>
 							</div>
 							<div class="col-md-4">
 								<label for="contactnumber1_1" class="formslabelfnt">Contact Number : </label>
-								<input type="text" class="form-control formslabelfnt" id="contactnumber1_1" name="contactnumber1_1" value="{{ old('contactnumber1_1') }}"><br class="d-lg-none d-xl-none"/>
+								{{-- <input type="text" class="form-control formslabelfnt" id="contactnumber1_1" name="contactnumber1_1" value="{{ old('contactnumber1_1') }}"><br class="d-lg-none d-xl-none"/> --}}
+								<div class="row">
+									<div class="col-2" style="display: flex; align-items: center">
+										+63
+									</div>
+									<div class="col-10" style="margin-left: -20px">
+										<input type="text" class="form-control formslabelfnt" id="contactnumber1_1" name="contactnumber1_1" value="{{ old('contactnumber1_1') }}"><br class="d-lg-none d-xl-none"/>
+									</div>
+								</div>
 							</div>
 						</div>
 						<small style="font-style: italic; font-size: 0.75rem; margin-top: 20px; display: block;">Note: * Required information</small>
@@ -266,7 +282,15 @@
 								</div>
 								<div class="col-md-6">
 									<label for="mobilenumber1_1" class="formslabelfnt">Mobile Number : <span class="text-danger">*</span></label>
-									<input type="text" class="form-control formslabelfnt" id="mobilenumber1_1" name="mobilenumber1_1" value="{{ old('mobilenumber1_1') }}">
+									{{-- <input type="text" class="form-control formslabelfnt" id="mobilenumber1_1" name="mobilenumber1_1" value="{{ old('mobilenumber1_1') }}"> --}}
+									<div class="row">
+										<div class="col-1" style="display: flex; align-items: center">
+											+63
+										</div>
+										<div class="col-11" style="margin-left: -5px">
+											<input type="text" class="form-control formslabelfnt" id="mobilenumber1_1" name="mobilenumber1_1" value="{{ old('mobilenumber1_1') }}">
+										</div>
+									</div>
 								</div>
 							</div>
 							

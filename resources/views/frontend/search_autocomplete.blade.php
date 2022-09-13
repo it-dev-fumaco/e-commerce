@@ -27,7 +27,7 @@
                                 <div class="box">
                                     <span class="search-name">{{ $item['name'] }}</span>
                                     @if ($item['is_discounted'] == 1)
-                                        <br/><span class="search-name">{{ $item['default_price'] }} <del>{{ $item['discounted_price'] }}</del></span> <span style="border-radius: 7px; background-color: #FF0000; color: #fff; padding: 2px; font-size: 10pt;" class="discount-display"><b>{{ $item['discount_display'] }}</b></span>
+                                        <br/><span class="search-name">{{ $item['discounted_price'] }} <del>{{ $item['default_price'] }}</del></span> <span style="border-radius: 7px; background-color: #FF0000; color: #fff; padding: 2px; font-size: 10pt;" class="discount-display"><b>{{ $item['discount_display'] }}</b></span>
                                     @else
                                         <br/><span class="search-name">{{ $item['default_price'] }}</span>
                                     @endif

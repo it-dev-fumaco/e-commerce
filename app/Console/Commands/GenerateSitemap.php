@@ -65,6 +65,16 @@ class GenerateSitemap extends Command
                 $sitemap->add(Url::create('/product/'.$product->slug)->setLastModificationDate(Carbon::parse($product->last_modified_at))->setPriority(1.0));
             }
         }
+
+        $categories = DB::table('fumaco_categories')->where('publish', 1)
+            ->whereNotNull('slug')->where('slug', '!=', '')->select('slug', 'last_modified_at')
+            ->orderBy('last_modified_at', 'desc')->get();
+
+        if (count($categories) > 0) {
+            foreach ($categories as $category) {
+                $sitemap->add(Url::create('/products/'.$category->slug)->setLastModificationDate(Carbon::parse($category->last_modified_at))->setPriority(1.0));
+            }
+        }
         
         $blogs = DB::table('fumaco_blog')->where('blog_enable', 1)
             ->whereNotNull('slug')->where('slug', '!=', '')->orderBy('last_modified_at', 'desc')

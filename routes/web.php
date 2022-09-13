@@ -32,6 +32,10 @@ Route::get('/products/category/lighting-components/208', function() {
     return redirect('/products/led-lamps-and-bulbs');
 });
 
+// https://www.fumaco.com/products/category/luminaires/1469 - Troofers and Luminaires
+Route::get('/products/troffer-luminaires', function() {
+    return redirect('/products/troffers-and-louvers');
+});
 
 Route::namespace('Auth')->group(function(){
     //Login Routes
@@ -176,9 +180,10 @@ Route::prefix('admin')->group(function () {
 
             Route::get('/pages/home', 'HomeCRUDController@home_crud');
             Route::post('/add_carousel', 'HomeCRUDController@add_header_carousel');
-            Route::post('/set_active', 'HomeCRUDController@set_header_active');
-            Route::post('/remove_active', 'HomeCRUDController@remove_header_active');
-            Route::post('/delete_header', 'HomeCRUDController@remove_header');
+            Route::post('/edit_carousel/{id}', 'HomeCRUDController@edit_header_carousel');
+            Route::get('/set_active/{carousel_id}', 'HomeCRUDController@set_header_active');
+            Route::get('/remove_active/{carousel_id}', 'HomeCRUDController@remove_header_active');
+            Route::get('/delete_header/{carousel_id}', 'HomeCRUDController@remove_header');
 
             Route::get('/api_setup/erp', 'SettingsController@erpApiSetup');
             Route::get('/api_setup/payment', 'SettingsController@paymentApiSetup');
@@ -190,6 +195,10 @@ Route::prefix('admin')->group(function () {
             Route::post('/email_setup/save', 'SettingsController@saveEmailSetup');
             Route::post('/email_recipients/save', 'SettingsController@saveEmailRecipients');
 
+            Route::get('/system_logs', 'SettingsController@systemLogs');
+            Route::get('/export_images/{export?}', 'PagesController@exportImagesView');
+            Route::get('/download_images', 'PagesController@download_athena_images');
+
             Route::get('/product/settings', 'ProductController@viewCategoryAttr');
             Route::post('/attribute_status/{cat_id}/update', 'ProductController@updateCategoryAttr');
 
@@ -200,6 +209,7 @@ Route::prefix('admin')->group(function () {
             Route::get('/product/toggle/{id}', 'ProductReviewController@toggleStatus');
 
             Route::get('/product/search', 'ProductController@searchItem');
+            Route::get('/warehouse/search', 'ProductController@searchWarehouse');
             Route::get('/product/{id}/edit', 'ProductController@viewProduct');
             Route::get('/product/{id}/edit_bundle', 'ProductController@viewProduct');
             Route::get('/product/images/{id}', 'ProductController@uploadImagesForm');

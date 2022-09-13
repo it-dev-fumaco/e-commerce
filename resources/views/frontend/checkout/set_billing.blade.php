@@ -128,7 +128,15 @@
 							</div>
 							<div class="col-md-6">
 								<label for="mobilenumber1_1" class="formslabelfnt">Mobile Number : *</label>
-								<input type="text" class="form-control formslabelfnt" id="mobilenumber1_1" name="mobilenumber1_1" required>
+								{{-- <input type="text" class="form-control formslabelfnt" id="mobilenumber1_1" name="mobilenumber1_1" required> --}}
+								<div class="row">
+									<div class="col-1" style="display: flex; align-items: center">
+										+63
+									</div>
+									<div class="col-11" style="margin-left: -5px">
+										<input type="text" class="form-control formslabelfnt" id="mobilenumber1_1" name="mobilenumber1_1" required>
+									</div>
+								</div>
 							</div>
 						</div>
 					</div>					

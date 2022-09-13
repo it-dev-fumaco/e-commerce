@@ -37,10 +37,14 @@ class ProductReviewController extends Controller
                 $email_recipient = DB::table('email_config')->first();
                 $email_recipient = ($email_recipient) ? explode(",", $email_recipient->email_recipients) : [];
                 if (count(array_filter($email_recipient)) > 0) {
-                    Mail::send('emails.new_product_review', ['data' => $data], function($message) use ($email_recipient) {
-                        $message->to($email_recipient);
-                        $message->subject('New Product Review - FUMACO');
-                    });
+                    try {
+                        Mail::send('emails.new_product_review', ['data' => $data], function($message) use ($email_recipient) {
+                            $message->to($email_recipient);
+                            $message->subject('New Product Review - FUMACO');
+                        });
+                    } catch (\Swift_TransportException  $e) {
+                       
+                    }
                 }
         
                 DB::commit();

@@ -148,10 +148,14 @@ class BlogController extends Controller
                 $blog_title = $blog->blogtitle;
     
                 foreach($subscribers as $subscriber){
-                    Mail::send('emails.new_blog', ['blog_title' => $blog_title, 'image' => $blog->blogprimaryimage, 'caption' => $blog->blog_caption, 'slug' => Str::slug($blog->slug, '-')], function($message) use($subscriber, $blog_title){
-                        $message->to(trim($subscriber->email));
-                        $message->subject($blog_title . ' - FUMACO');
-                    });
+                    try {
+                        Mail::send('emails.new_blog', ['blog_title' => $blog_title, 'image' => $blog->blogprimaryimage, 'caption' => $blog->blog_caption, 'slug' => Str::slug($blog->slug, '-')], function($message) use($subscriber, $blog_title){
+                            $message->to(trim($subscriber->email));
+                            $message->subject($blog_title . ' - FUMACO');
+                        });
+                    } catch (\Swift_TransportException $e) {
+                        
+                    }
                 }
             }
 

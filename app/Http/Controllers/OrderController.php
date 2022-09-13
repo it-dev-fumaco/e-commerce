@@ -377,7 +377,7 @@ class OrderController extends Controller
                             'payment' => $total_amount
                         ];
                         $confirmed_bank_deposit_email = $order_details->order_email;
-                       
+
                         Mail::send('emails.order_confirmed_bank_deposit', $order, function($message) use($confirmed_bank_deposit_email){
                             $message->to(trim($confirmed_bank_deposit_email));
                             $message->subject('Order Confirmed - FUMACO');
@@ -436,10 +436,17 @@ class OrderController extends Controller
                 }
 
                 if ($status == 'Out for Delivery') {
-                    Mail::send('emails.out_for_delivery', ['order_details' => $order_details, 'status' => $status, 'items' => $items], function($message) use($order_details, $status){
-                        $message->to(trim($order_details->order_email));
-                        $message->subject($status . ' - FUMACO');
-                    });
+                    
+                    try {
+                        Mail::send('emails.out_for_delivery', ['order_details' => $order_details, 'status' => $status, 'items' => $items], function($message) use($order_details, $status){
+                            $message->to(trim($order_details->order_email));
+                            $message->subject($status . ' - FUMACO');
+                        });
+                    } catch (\Swift_TransportException  $e) {
+                        DB::rollback();
+                        
+                        return redirect()->back()->with('error', 'An error occured. Please try again.');
+                    }
 
                     if(Mail::failures()){
                         DB::rollback();
@@ -451,10 +458,17 @@ class OrderController extends Controller
 
                 if ($status == 'Order Delivered') {
                     $customer_name = $order_details->order_name . ' ' . $order_details->order_lastname;
-                    Mail::send('emails.delivered', ['id' => $order_details->order_number, 'customer_name' => $customer_name], function($message) use($order_details, $status){
-                        $message->to(trim($order_details->order_email));
-                        $message->subject('Order Delivered - FUMACO');
-                    });
+                    
+                    try {
+                        Mail::send('emails.delivered', ['id' => $order_details->order_number, 'customer_name' => $customer_name], function($message) use($order_details, $status){
+                            $message->to(trim($order_details->order_email));
+                            $message->subject('Order Delivered - FUMACO');
+                        });
+                    } catch (\Swift_TransportException  $e) {
+                        DB::rollback();
+                        
+                        return redirect()->back()->with('error', 'An error occured. Please try again.');
+                    }
 
                     if(Mail::failures()){
                         DB::rollback();
@@ -468,6 +482,17 @@ class OrderController extends Controller
                     $message = 'Hi '.$order_details->order_name . ' ' . $order_details->order_lastname.'!, your order '.$request->order_number.' with an amount of P '.number_format($total_amount, 2).' is now ready for pickup. Click '.$sms_short_url.' to track your order.';
                 }
 
+                $phone = null;
+                if($order_details->order_bill_contact || $order_details->order_contact){
+                    $phone = $order_details->order_bill_contact ? $order_details->order_bill_contact : $order_details->order_contact;
+                    $phone = preg_replace("/[^0-9]/", "", $phone);
+                    if($phone[0] == 0){
+                        $phone = '63'.substr($phone, 1);
+                    }else if(substr($phone, 0, 2) != '63' || $phone[0] == '9'){
+                        $phone = '63'.$phone;
+                    }
+                }
+
                 if(in_array($status, ['Order Confirmed', 'Out for Delivery', 'Order Delivered', 'Ready for Pickup'])){
                     $sms_api = DB::table('api_setup')->where('type', 'sms_gateway_api')->first();
                     if ($sms_api and $sms_short_url) {
@@ -478,7 +503,7 @@ class OrderController extends Controller
                             'api_key' => $sms_api->api_key,
                             'api_secret' => $sms_api->api_secret_key,
                             'from' => 'FUMACO',
-                            'to' => $order_details->order_bill_contact[0] == '0' ? '63'.substr($order_details->order_bill_contact, 1) : $order_details->order_bill_contact,
+                            'to' => $phone,
                             'text' => $message
                         ]);
 
@@ -561,8 +586,18 @@ class OrderController extends Controller
 
             $sms_api = DB::table('api_setup')->where('type', 'sms_gateway_api')->first();
             $customer_name = $order_details->order_name.' '.$order_details->order_lastname;
-            $phone = $request->billing_number[0] == '0' ? '63'.substr($request->billing_number, 1) : $request->billing_number;
-            $email = $request->billing_email;
+            // $phone = $request->billing_number[0] == '0' ? '63'.substr($request->billing_number, 1) : $request->billing_number;
+            $phone = null;
+            if($order_details->order_contact){
+                $phone = preg_replace("/[^0-9]/", "", $order_details->order_contact);
+                if($phone[0] == 0){
+                    $phone = '63'.substr($phone, 1);
+                }else if(substr($phone, 0, 2) != '63' || $phone[0] == '9'){
+                    $phone = '63'.$phone;
+                }
+            }
+
+            $email = $order_details->order_email;
 
             $deposit_slip = $request->root().'/upload_deposit_slip/'.$new_token;
             $deposit_slip_url = $this->generateShortUrl($request->root(), $deposit_slip);
@@ -577,7 +612,7 @@ class OrderController extends Controller
                     'api_key' => $sms_api->api_key,
                     'api_secret' => $sms_api->api_secret_key,
                     'from' => 'FUMACO',
-                    'to' => preg_replace("/[^0-9]/", "", $phone),
+                    'to' => $phone,
                     'text' => $sms_message
                 ]);
                 
@@ -590,10 +625,16 @@ class OrderController extends Controller
                 }
             }
             
-            Mail::send('emails.order_success_bank_deposit', $order, function($message) use ($email) {
-                $message->to($email);
-                $message->subject('Order Placed - Bank Deposit - FUMACO');
-            });
+            try {
+                Mail::send('emails.order_success_bank_deposit', $order, function($message) use ($email) {
+                    $message->to($email);
+                    $message->subject('Order Placed - Bank Deposit - FUMACO');
+                });
+            } catch (\Swift_TransportException  $e) {
+                DB::rollback();
+
+                return redirect()->back()->with('error', 'An error occured. Please try again.');
+            }
 
             if(Mail::failures()){
                 DB::rollback();
@@ -1120,6 +1161,10 @@ class OrderController extends Controller
 
                     if ($output['TxnStatus'] != 0) {
                         if($request->is_admin) {
+                            if($payment_method == 'WA') {
+                                return redirect()->back()->with('error', 'Unable to refund for e-Wallet.');
+                            }
+                            
                             return redirect()->back()->with('error', 'Failed to cancel order <b>'.$details->order_number.'</b><br>Error Message: <b>' . $output['TxnMessage'] . '</b>');
                         } else {
                             return redirect()->back()->with('error', 'Failed to cancel order <b>'.$details->order_number.'</b>');
@@ -1171,17 +1216,25 @@ class OrderController extends Controller
 
                     if ($details->order_bill_email) {
                         $customer_email = $details->order_bill_email;
-                        Mail::send('emails.cancelled_order_customer', $order, function($message) use ($customer_email) {
-                            $message->to($customer_email);
-                            $message->subject('Cancelled Order - FUMACO');
-                        });
+                        try {
+                            Mail::send('emails.cancelled_order_customer', $order, function($message) use ($customer_email) {
+                                $message->to($customer_email);
+                                $message->subject('Cancelled Order - FUMACO');
+                            });
+                        } catch (\Swift_TransportException  $e) {
+                            
+                        }
                     }
 
                     if (count(array_filter($email_recipient)) > 0) {
-                        Mail::send('emails.cancelled_order_admin', $order, function($message) use ($email_recipient) {
-                            $message->to($email_recipient);
-                            $message->subject('Cancelled Order - FUMACO');
-                        });
+                        try {
+                            Mail::send('emails.cancelled_order_admin', $order, function($message) use ($email_recipient) {
+                                $message->to($email_recipient);
+                                $message->subject('Cancelled Order - FUMACO');
+                            });
+                        } catch (\Swift_TransportException  $e) {
+                           
+                        }
                     }
 
                     return redirect()->back()->with('success', 'Order <b>'.$details->order_number.'</b> has been cancelled.');
@@ -1248,10 +1301,14 @@ class OrderController extends Controller
             $email_recipient = DB::table('fumaco_admin_user')->where('user_type', 'Accounting Admin')->pluck('username');
             $recipients = collect($email_recipient)->toArray();
             if (count(array_filter($recipients)) > 0) {
-                Mail::send('emails.deposit_slip_notif', $order, function($message) use ($recipients) {
-                    $message->to($recipients);
-                    $message->subject('Awaiting Confirmation - FUMACO');
-                });
+                try {
+                    Mail::send('emails.deposit_slip_notif', $order, function($message) use ($recipients) {
+                        $message->to($recipients);
+                        $message->subject('Awaiting Confirmation - FUMACO');
+                    });
+                } catch (\Swift_TransportException  $e) {
+                    
+                }
             }
         }
 
