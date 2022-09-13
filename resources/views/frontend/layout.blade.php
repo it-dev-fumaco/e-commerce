@@ -164,13 +164,21 @@
       <nav id="navbar" class="navbar navbar-expand-lg navbar-light fixed-top bg-light" style="padding-left: 20px; padding-right: 20px; padding-bottom:0px; border-bottom: 1px solid #e4e4e4;">
         <div class="container-fluid">
           <a class="navbar-brand d-none d-md-block" href="/" id="navbar-brand">
-            <img src="{{ asset('/assets/site-img/logo-sm.png') }}" alt="" width="155" height="54">
+            <picture>
+              <source srcset="{{ asset('/assets/site-img/logo-sm.webp') }}" type="image/webp">
+              <source srcset="{{ asset('/assets/site-img/logo-sm.png') }}" type="image/jpeg">
+              <img src="{{ asset('/assets/site-img/logo-sm.png') }}" alt="Fumaco" width="155" height="54">
+            </picture>
           </a>
           {{-- Mobile Icons --}}
           <div class="row justify-content-between">
             <div class="col d-md-none">
               <a class="navbar-brand" href="/" id="navbar-brand">
-                <img src="{{ asset('/assets/site-img/logo-sm.png') }}" style="width: 100%" />
+                <picture>
+                  <source srcset="{{ asset('/assets/site-img/logo-sm.webp') }}" type="image/webp">
+                  <source srcset="{{ asset('/assets/site-img/logo-sm.png') }}" type="image/jpeg">
+                  <img src="{{ asset('/assets/site-img/logo-sm.png') }}" style="width: 100%" >
+                </picture>
               </a>
             </div>
             <div class="col">
@@ -231,33 +239,57 @@
                   @if(Auth::check())
                   <li>
                     <a class="dropdown-item" style="font-weight: 300 !important;" href="/mywishlist">
-                      <img src="{{ asset('/assets/site-img/icon/nav12.jpg') }}" alt="mywishlist" width="30">&nbsp;&nbsp;Wishlist <span class="badge badge-primary count-wish-items" style="background-color:#186eaa; vertical-align: top;">0</span>
+                      <picture>
+                        <source srcset="{{ asset('/assets/site-img/icon/nav12.webp') }}" type="image/webp">
+                        <source srcset="{{ asset('/assets/site-img/icon/nav12.jpg') }}" type="image/jpeg">
+                        <img src="{{ asset('/assets/site-img/icon/nav12.jpg') }}" alt="myorders" width="30">
+                      </picture>Wishlist <span class="badge badge-primary count-wish-items" style="background-color:#186eaa; vertical-align: top;">0</span>
                     </a>
                   </li>
                   <li>
                     <a class="dropdown-item" style="font-weight: 300 !important;" href="/myorders">
-                      <img src="{{ asset('/assets/site-img/icon/nav13.jpg') }}" alt="myorders" width="30">&nbsp;&nbsp;My Orders
+                      <picture>
+                        <source srcset="{{ asset('/assets/site-img/icon/nav13.webp') }}" type="image/webp">
+                        <source srcset="{{ asset('/assets/site-img/icon/nav13.jpg') }}" type="image/jpeg">
+                        <img src="{{ asset('/assets/site-img/icon/nav13.jpg') }}" alt="myorders" width="30">
+                      </picture>My Orders
                     </a>
                   </li>
                   <li>
                     <a class="dropdown-item" style="font-weight: 300 !important;" href="/myprofile/account_details">
-                      <img src="{{ asset('/assets/site-img/icon/nav14.jpg') }}" alt="myprofile" width="30">&nbsp;&nbsp;My Profile
+                      <picture>
+                        <source srcset="{{ asset('/assets/site-img/icon/nav14.webp') }}" type="image/webp">
+                        <source srcset="{{ asset('/assets/site-img/icon/nav14.jpg') }}" type="image/jpeg">
+                        <img src="{{ asset('/assets/site-img/icon/nav14.jpg') }}" alt="myprofile" width="30">
+                      </picture>My Profile
                     </a>
                   </li>
                   <li>
                     <a class="dropdown-item" style="font-weight: 300 !important;" href="/logout">
-                      <img src="{{ asset('/assets/site-img/icon/nav15.jpg') }}" alt="logout" width="30">&nbsp;&nbsp;Log Out
+                      <picture>
+                        <source srcset="{{ asset('/assets/site-img/icon/nav15.webp') }}" type="image/webp">
+                        <source srcset="{{ asset('/assets/site-img/icon/nav15.jpg') }}" type="image/jpeg">
+                        <img src="{{ asset('/assets/site-img/icon/nav15.jpg') }}" alt="logout" width="30">
+                      </picture>Log Out
                     </a>
                   </li>
                   @else
                   <li>
                     <a class="dropdown-item" style="font-weight: 300 !important;" href="/track_order">
-                      <img src="{{ asset('/assets/site-img/icon/nav13.jpg') }}" alt="trackorder" width="30">&nbsp;&nbsp;Track My Order
+                      <picture>
+                        <source srcset="{{ asset('/assets/site-img/icon/nav13.webp') }}" type="image/webp">
+                        <source srcset="{{ asset('/assets/site-img/icon/nav13.jpg') }}" type="image/jpeg">
+                        <img src="{{ asset('/assets/site-img/icon/nav13.jpg') }}" alt="trackorder" width="30">
+                      </picture>Track My Order
                     </a>
                   </li>
                   <li>
                     <a class="dropdown-item" style="font-weight: 300 !important;" href="/login">
-                      <img src="{{ asset('/assets/site-img/icon/nav15.jpg') }}" alt="login" width="30">&nbsp;&nbsp;Login | Sign Up
+                      <picture>
+                        <source srcset="{{ asset('/assets/site-img/icon/nav15.webp') }}" type="image/webp">
+                        <source srcset="{{ asset('/assets/site-img/icon/nav15.jpg') }}" type="image/jpeg">
+                        <img src="{{ asset('/assets/site-img/icon/nav15.jpg') }}" alt="login" width="30">
+                      </picture>Login | Sign Up
                     </a>
                   </li>
                   @endif
