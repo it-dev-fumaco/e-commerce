@@ -33,7 +33,7 @@
               <picture>
                 <source srcset="{{ asset('/assets/site-img/'. explode(".", $banner_image)[0] .'.webp') }}" type="image/webp" style="object-fit: cover;opacity: 1;">
                 <source srcset="{{ asset('/assets/site-img/'. $banner_image) }}" type="image/jpeg" style="object-fit: cover;opacity: 1;">
-                <img src="{{ asset('/assets/site-img/'. $banner_image) }}" alt="{{ Str::slug(explode(".", $banner_image)[0], '-') }}" style="object-fit: cover;opacity: 1;">
+                <img src="{{ asset('/assets/site-img/'. $banner_image) }}" alt="{{ Str::slug(explode(".", $banner_image)[0], '-') }}" style="object-fit: cover;opacity: 1;" {{ $loop->first ? null : 'loading="lazy"' }}>
               </picture>
             </div>
             @empty
@@ -52,9 +52,11 @@
               $string .= '...';
             }
             $active = '';
+            $lazy = 'loading="lazy"';
             if(count($onsale_carousel_data) == 0){
               if($loop->first){
                 $active = 'active';
+                $lazy = null;
               }
             }
           @endphp
@@ -62,7 +64,7 @@
             <picture>
               <source srcset="{{ asset('/storage/journals/'. explode(".", $carousel->fumaco_image1)[0] .'.webp') }}" type="image/webp" style="object-fit: cover;opacity: 0.6;">
               <source srcset="{{ asset('/storage/journals/'. $carousel->fumaco_image1) }}" type="image/jpeg" style="object-fit: cover;opacity: 0.6;">
-              <img src="{{ asset('/storage/journals/'. $carousel->fumaco_image1) }}" alt="{{ Str::slug(explode(".", $carousel->fumaco_image1)[0], '-') }}" style="object-fit: cover;opacity: 0.6;height: 100% !important; width: 100% !important">
+              <img src="{{ asset('/storage/journals/'. $carousel->fumaco_image1) }}" alt="{{ Str::slug(explode(".", $carousel->fumaco_image1)[0], '-') }}" style="object-fit: cover;opacity: 0.6;height: 100% !important; width: 100% !important" {{ $lazy }}>
             </picture>
 
             <div class="container">
