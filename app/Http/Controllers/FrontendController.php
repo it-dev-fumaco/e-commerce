@@ -22,6 +22,8 @@ use App\Http\Traits\GeneralTrait;
 
 use Illuminate\Pagination\LengthAwarePaginator;
 
+use File;
+
 class FrontendController extends Controller
 {   
     use ProductTrait;
@@ -841,8 +843,23 @@ class FrontendController extends Controller
     // returns an array of product category
     public function getProductCategories() {
         $item_categories = DB::table('fumaco_categories')->where('publish', 1)->select('slug', 'id', 'external_link', 'image', 'name')->get();
+        $cat_array = [];
+        foreach($item_categories as $category){
+            $icon = $category->image;
+            if(File::exists(public_path('/assets/site-img/icon/'.explode('.', $category->image)[0].'.webp'))){
+                $icon = explode('.', $category->image)[0].'.webp';
+            }
 
-        return response()->json($item_categories);
+            $cat_array[] = [
+                'slug' => $category->slug,
+                'id' => $category->id,
+                'external_link' => $category->external_link,
+                'image' => $icon,
+                'name' => $category->name
+            ];
+        }
+
+        return response()->json($cat_array);
     }
 
     public function pagesList(Request $request){
