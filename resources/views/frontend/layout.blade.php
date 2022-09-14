@@ -26,20 +26,38 @@
   <link rel="stylesheet" href="{{ asset('/assets/admin/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css') }}">
     @endif
     <link href="{{ asset('/assets/dist/css/bootstrap.min.css') }}" rel="stylesheet">
-    {{-- <link rel="preconnect" href="https://fonts.gstatic.com"> --}}
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+    {{-- <link rel="preload" href="{{ asset('/assets/dist/css/bootstrap.min.css') }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="{{ asset('/assets/dist/css/bootstrap.min.css') }}"></noscript> --}}
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+    
+    {{-- <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet"> --}}
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap"></noscript>
+
     {{-- <link rel="preconnect" href="https://fonts.googleapis.com"> --}}
     {{-- <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet"> --}}
-    <link href="{{ asset('/assets/fumaco.css') }}" rel="stylesheet">
-    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css">
+
+    {{-- <link href="{{ asset('/assets/fumaco.css') }}" rel="stylesheet"> --}}
+    <link rel="preload" href="{{ asset('/assets/fumaco.css') }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="{{ asset('/assets/fumaco.css') }}"></noscript>
+
     {{-- <link rel="stylesheet" href="https://resources/demos/style.css"> --}}
-    <link rel="stylesheet" type="text/css" href="{{ asset('/page_css/layout.min.css') }}">
+
+    {{-- <link rel="stylesheet" type="text/css" href="{{ asset('/page_css/layout.min.css') }}"> --}}
+    <link rel="preload" href="{{ asset('/page_css/layout.min.css') }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="{{ asset('/page_css/layout.min.css') }}"></noscript>
+
     @yield('style')
+
+    @if (!in_array($activePage, ['homepage']))
+      {{-- <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css"> --}}
+      <link rel="stylesheet" href="{{ asset('assets/minified-css/jquery-ui.min.css') }}">
+    @endif
 
     @if ($activePage != 'error_page')
     <!-- Google Tag Manager -->
-    <script>
+    <script async>
       (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
       new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
       j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
@@ -55,7 +73,7 @@
 <div id="fb-customer-chat" class="fb-customerchat">
 </div>
 
-    <script>
+    <script async>
       var chatbox = document.getElementById('fb-customer-chat');
       chatbox.setAttribute("page_id", "276044345867555");
       chatbox.setAttribute("attribution", "biz_inbox");
@@ -150,13 +168,21 @@
       <nav id="navbar" class="navbar navbar-expand-lg navbar-light fixed-top bg-light" style="padding-left: 20px; padding-right: 20px; padding-bottom:0px; border-bottom: 1px solid #e4e4e4;">
         <div class="container-fluid">
           <a class="navbar-brand d-none d-md-block" href="/" id="navbar-brand">
-            <img src="{{ asset('/assets/site-img/logo-sm.png') }}" alt="" width="155" height="54">
+            <picture>
+              <source srcset="{{ asset('/assets/site-img/logo-sm.webp') }}" type="image/webp">
+              <source srcset="{{ asset('/assets/site-img/logo-sm.png') }}" type="image/jpeg">
+              <img src="{{ asset('/assets/site-img/logo-sm.png') }}" alt="Fumaco" width="155" height="54">
+            </picture>
           </a>
           {{-- Mobile Icons --}}
           <div class="row justify-content-between">
             <div class="col d-md-none">
               <a class="navbar-brand" href="/" id="navbar-brand">
-                <img src="{{ asset('/assets/site-img/logo-sm.png') }}" style="width: 100%" />
+                <picture>
+                  <source srcset="{{ asset('/assets/site-img/logo-sm.webp') }}" type="image/webp">
+                  <source srcset="{{ asset('/assets/site-img/logo-sm.png') }}" type="image/jpeg">
+                  <img src="{{ asset('/assets/site-img/logo-sm.png') }}" style="width: 100%" >
+                </picture>
               </a>
             </div>
             <div class="col">
@@ -217,33 +243,57 @@
                   @if(Auth::check())
                   <li>
                     <a class="dropdown-item" style="font-weight: 300 !important;" href="/mywishlist">
-                      <img src="{{ asset('/assets/site-img/icon/nav12.jpg') }}" alt="mywishlist" width="30">&nbsp;&nbsp;Wishlist <span class="badge badge-primary count-wish-items" style="background-color:#186eaa; vertical-align: top;">0</span>
+                      <picture>
+                        <source srcset="{{ asset('/assets/site-img/icon/nav12.webp') }}" type="image/webp">
+                        <source srcset="{{ asset('/assets/site-img/icon/nav12.jpg') }}" type="image/jpeg">
+                        <img src="{{ asset('/assets/site-img/icon/nav12.jpg') }}" alt="myorders" width="30">
+                      </picture>Wishlist <span class="badge badge-primary count-wish-items" style="background-color:#186eaa; vertical-align: top;">0</span>
                     </a>
                   </li>
                   <li>
                     <a class="dropdown-item" style="font-weight: 300 !important;" href="/myorders">
-                      <img src="{{ asset('/assets/site-img/icon/nav13.jpg') }}" alt="myorders" width="30">&nbsp;&nbsp;My Orders
+                      <picture>
+                        <source srcset="{{ asset('/assets/site-img/icon/nav13.webp') }}" type="image/webp">
+                        <source srcset="{{ asset('/assets/site-img/icon/nav13.jpg') }}" type="image/jpeg">
+                        <img src="{{ asset('/assets/site-img/icon/nav13.jpg') }}" alt="myorders" width="30">
+                      </picture>My Orders
                     </a>
                   </li>
                   <li>
                     <a class="dropdown-item" style="font-weight: 300 !important;" href="/myprofile/account_details">
-                      <img src="{{ asset('/assets/site-img/icon/nav14.jpg') }}" alt="myprofile" width="30">&nbsp;&nbsp;My Profile
+                      <picture>
+                        <source srcset="{{ asset('/assets/site-img/icon/nav14.webp') }}" type="image/webp">
+                        <source srcset="{{ asset('/assets/site-img/icon/nav14.jpg') }}" type="image/jpeg">
+                        <img src="{{ asset('/assets/site-img/icon/nav14.jpg') }}" alt="myprofile" width="30">
+                      </picture>My Profile
                     </a>
                   </li>
                   <li>
                     <a class="dropdown-item" style="font-weight: 300 !important;" href="/logout">
-                      <img src="{{ asset('/assets/site-img/icon/nav15.jpg') }}" alt="logout" width="30">&nbsp;&nbsp;Log Out
+                      <picture>
+                        <source srcset="{{ asset('/assets/site-img/icon/nav15.webp') }}" type="image/webp">
+                        <source srcset="{{ asset('/assets/site-img/icon/nav15.jpg') }}" type="image/jpeg">
+                        <img src="{{ asset('/assets/site-img/icon/nav15.jpg') }}" alt="logout" width="30">
+                      </picture>Log Out
                     </a>
                   </li>
                   @else
                   <li>
                     <a class="dropdown-item" style="font-weight: 300 !important;" href="/track_order">
-                      <img src="{{ asset('/assets/site-img/icon/nav13.jpg') }}" alt="trackorder" width="30">&nbsp;&nbsp;Track My Order
+                      <picture>
+                        <source srcset="{{ asset('/assets/site-img/icon/nav13.webp') }}" type="image/webp">
+                        <source srcset="{{ asset('/assets/site-img/icon/nav13.jpg') }}" type="image/jpeg">
+                        <img src="{{ asset('/assets/site-img/icon/nav13.jpg') }}" alt="trackorder" width="30">
+                      </picture>Track My Order
                     </a>
                   </li>
                   <li>
                     <a class="dropdown-item" style="font-weight: 300 !important;" href="/login">
-                      <img src="{{ asset('/assets/site-img/icon/nav15.jpg') }}" alt="login" width="30">&nbsp;&nbsp;Login | Sign Up
+                      <picture>
+                        <source srcset="{{ asset('/assets/site-img/icon/nav15.webp') }}" type="image/webp">
+                        <source srcset="{{ asset('/assets/site-img/icon/nav15.jpg') }}" type="image/jpeg">
+                        <img src="{{ asset('/assets/site-img/icon/nav15.jpg') }}" alt="login" width="30">
+                      </picture>Login | Sign Up
                     </a>
                   </li>
                   @endif
@@ -340,7 +390,7 @@
                     <div class="d-inline m-2 payment-icons" style="position: relative !important"><picture>
                       <source srcset="{{ asset($image_webp) }}" type="image/webp" style="object-fit: cover;">
                       <source srcset="{{ asset($image) }}" type="image/jpeg" style="object-fit: cover;">
-                      <img src="{{ asset($image) }}" style="object-fit: cover; max-height: 100%;max-width: 90%;width: auto;height: auto;position: absolute;top: 0;bottom: 0;left: 0;right: 0;margin: auto;">
+                      <img src="{{ asset($image) }}" style="object-fit: cover; max-height: 100%;max-width: 90%;width: auto;height: auto;position: absolute;top: 0;bottom: 0;left: 0;right: 0;margin: auto;" loading="lazy">
                     </picture></div>
                   @endforeach
               </div>
@@ -357,8 +407,8 @@
   @if($activePage == 'contact')
   <script src="https://www.google.com/recaptcha/api.js" async defer></script>
   @else
-  <script src="https://www.google.com/recaptcha/api.js?render={{ config('recaptcha.api_site_key') }}"></script>
-  <script> 
+  <script src="https://www.google.com/recaptcha/api.js?render={{ config('recaptcha.api_site_key') }}" defer></script>
+  <script defer> 
     grecaptcha.ready(function() {
       grecaptcha.execute("{{ config('recaptcha.api_site_key') }}", {action: 'homepage'}).then(function(token) {
         if(token) {
@@ -368,16 +418,125 @@
     });
   </script> 
   @endif
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-  <script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.4/Chart.bundle.min.js'></script>
+  {{-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script> --}}
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.4/Chart.bundle.min.js' defer></script>
   <script src="{{ asset('/assets/dist/js/bootstrap.bundle.min.js') }}"></script>
 
-  <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
-  <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.js"></script>
+  @if (!in_array($activePage, ['homepage']))
+  <script src="{{ asset('assets/minified-js/jquery-3.6.0.min.js') }}"></script>
+  <script src="{{ asset('assets/minified-js/jquery-ui.min.js') }}"></script>
+  {{-- <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+  <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.js"></script> --}}
+  @endif
   <script>
     $(document).ready(function() {
-      // $('.autocomplete-search').select2();
+      websiteSettings();
+      productCategories();
+      countCartItems();
+      countWishItems();
+      policyPages();
+      //Preloader
+      preloaderFadeOutTime = 800;
+      function hidePreloader() {
+          var preloader = $('.spinner-wrapper');
+          preloader.fadeOut(preloaderFadeOutTime);
+      }
+      hidePreloader();
 
+      setTimeout(function () {
+          $("#cookieConsent").fadeIn(200);
+      }, 2000);
+
+      // set product category dropdown in navbar and links in dooter
+      function productCategories() {
+        $('#product-category-dropdown').empty();
+        $('#product-category-footer').empty();
+        $.ajax({
+          type:'GET',
+          url:'/categories',
+          success: function (response) {
+            var l = '';
+            var f = '';
+            $(response).each(function(i, d){
+              var slug = "";
+              if(d.slug){
+                slug = d.slug;
+              }else{
+                slug = d.id;
+              }
+              var link = (d.external_link) ? d.external_link : '/products/' + slug ;
+              var target = (d.external_link) ? 'target="_blank"' : '';
+              // for navbar dropdown
+              l += '<li><a class="dropdown-item" style="font-weight: 300 !important;" href="' + link +'" ' + target + '>' +
+              '<img src="{{ asset("assets/site-img/icon/") }}/' + d.image + '" alt="' + d.name +'" width="30" loading="lazy">' + d.name +'</a></li>';
+              // for footer links
+              f += '<tr style="border-style: unset !important;">' +
+                '<td class="tdfooter footer2nd" style="border-style: unset !important;">' +
+                '<a style="text-decoration:none; color: #0062A5;" href="'+ link +'" ' + target + '>' + d.name +'</a>' +
+              '</td></tr>';
+            });
+
+            $('#product-category-footer').append(f);
+            $('#product-category-dropdown').append(l);
+          }
+        });
+      }
+
+      function websiteSettings() {
+        $.ajax({
+          type:'GET',
+          url:'/website_settings',
+          success: function (response) {
+            $('#navbar-brand').attr('href', response.set_value);
+          }
+        });
+      }
+
+      function countCartItems() {
+        $.ajax({
+          type:'GET',
+          url:'/countcartitems',
+          success: function (response) {
+            $('.count-cart-items').text(response);
+          }
+        });
+      }
+
+      function countWishItems() {
+        $.ajax({
+          type:'GET',
+          url:'/countwishlist',
+          success: function (response) {
+            $('.count-wish-items').text(response);
+          }
+        });
+      }
+
+      // policy pages
+      function policyPages() {
+        $('#policy-pages-footer').empty();
+        $.ajax({
+          type:'GET',
+          url:'/policy_pages',
+          success: function (response) {
+            var f = '';
+            $(response).each(function(i, d){
+              var link = '/pages/' + d.slug;
+              // for footer links
+              f += '<tr style="border-style: unset !important;">' +
+                '<td class="tdfooter footer2nd" style="border-style: unset !important;">' +
+                '<a style="text-decoration:none; color: #0062A5;" href="'+ link +'" >' + d.page_title +'</a>' +
+              '</td></tr>';
+            });
+
+
+            $('#policy-pages-footer').append(f);
+          }
+        });
+      }
+
+      // $('#bootstrap-min-css').removeAttr('disabled');
+      
       $(document).on('click', '.remove-cart-btn', function(e){
             e.preventDefault();
             var tr = $(this);
@@ -474,48 +633,6 @@
           });
         });
       @endif
-      websiteSettings();
-      productCategories();
-      countCartItems();
-      countWishItems();
-      policyPages();
-      //Preloader
-      preloaderFadeOutTime = 800;
-      function hidePreloader() {
-          var preloader = $('.spinner-wrapper');
-          preloader.fadeOut(preloaderFadeOutTime);
-      }
-      hidePreloader();
-
-      setTimeout(function () {
-          $("#cookieConsent").fadeIn(200);
-      }, 2000);
-      $("#closeCookieConsent, .cookieConsentOK").click(function() {
-          $("#cookieConsent").fadeOut(200);
-      });
-
-      // policy pages
-      function policyPages() {
-        $('#policy-pages-footer').empty();
-        $.ajax({
-          type:'GET',
-          url:'/policy_pages',
-          success: function (response) {
-            var f = '';
-            $(response).each(function(i, d){
-              var link = '/pages/' + d.slug;
-              // for footer links
-              f += '<tr style="border-style: unset !important;">' +
-                '<td class="tdfooter footer2nd" style="border-style: unset !important;">' +
-                '<a style="text-decoration:none; color: #0062A5;" href="'+ link +'" >' + d.page_title +'</a>' +
-              '</td></tr>';
-            });
-
-
-            $('#policy-pages-footer').append(f);
-          }
-        });
-      }
 
       $('.autocomplete-search').keyup(function(){
         var data = {
@@ -577,70 +694,9 @@
         });
       });
 
-      // set product category dropdown in navbar and links in dooter
-      function productCategories() {
-        $('#product-category-dropdown').empty();
-        $('#product-category-footer').empty();
-        $.ajax({
-          type:'GET',
-          url:'/categories',
-          success: function (response) {
-            var l = '';
-            var f = '';
-            $(response).each(function(i, d){
-              var slug = "";
-              if(d.slug){
-                slug = d.slug;
-              }else{
-                slug = d.id;
-              }
-              var link = (d.external_link) ? d.external_link : '/products/' + slug ;
-              var target = (d.external_link) ? 'target="_blank"' : '';
-              // for navbar dropdown
-              l += '<li><a class="dropdown-item" style="font-weight: 300 !important;" href="' + link +'" ' + target + '>' +
-              '<img src="{{ asset("assets/site-img/icon/") }}/' + d.image + '" alt="' + d.name +'" width="30">' + d.name +'</a></li>';
-              // for footer links
-              f += '<tr style="border-style: unset !important;">' +
-                '<td class="tdfooter footer2nd" style="border-style: unset !important;">' +
-                '<a style="text-decoration:none; color: #0062A5;" href="'+ link +'" ' + target + '>' + d.name +'</a>' +
-              '</td></tr>';
-            });
-
-            $('#product-category-footer').append(f);
-            $('#product-category-dropdown').append(l);
-          }
-        });
-      }
-
-      function websiteSettings() {
-        $.ajax({
-          type:'GET',
-          url:'/website_settings',
-          success: function (response) {
-            $('#navbar-brand').attr('href', response.set_value);
-          }
-        });
-      }
-
-      function countCartItems() {
-        $.ajax({
-          type:'GET',
-          url:'/countcartitems',
-          success: function (response) {
-            $('.count-cart-items').text(response);
-          }
-        });
-      }
-
-      function countWishItems() {
-        $.ajax({
-          type:'GET',
-          url:'/countwishlist',
-          success: function (response) {
-            $('.count-wish-items').text(response);
-          }
-        });
-      }
+      $("#closeCookieConsent, .cookieConsentOK").click(function() {
+          $("#cookieConsent").fadeOut(200);
+      });
     });
   </script>
 

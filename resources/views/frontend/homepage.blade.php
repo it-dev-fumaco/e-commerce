@@ -33,7 +33,7 @@
               <picture>
                 <source srcset="{{ asset('/assets/site-img/'. explode(".", $banner_image)[0] .'.webp') }}" type="image/webp" style="object-fit: cover;opacity: 1;">
                 <source srcset="{{ asset('/assets/site-img/'. $banner_image) }}" type="image/jpeg" style="object-fit: cover;opacity: 1;">
-                <img src="{{ asset('/assets/site-img/'. $banner_image) }}" alt="{{ Str::slug(explode(".", $banner_image)[0], '-') }}" style="object-fit: cover;opacity: 1;">
+                <img src="{{ asset('/assets/site-img/'. $banner_image) }}" alt="{{ Str::slug(explode(".", $banner_image)[0], '-') }}" style="object-fit: cover;opacity: 1;" loading="{{ $loop->first ? 'eager' : 'lazy' }}">
               </picture>
             </div>
             @empty
@@ -55,23 +55,19 @@
             //   }
             // }
             $active = '';
+            $lazy = 'lazy';
             if(count($onsale_carousel_data) == 0){
               if($loop->first){
                 $active = 'active';
+                $lazy = 'eager';
               }
             }
           @endphp
-          <div class="carousel-item {{ $active }}" style="background: #F8F9FA;">
-            <picture class="d-none d-md-block" style="background-color: black !important">
-              <source srcset="{{ asset('/storage/journals/'. explode(".", $carousel->fumaco_image1)[0] .'.webp') }}" type="image/webp" style="object-fit: cover;opacity: 0.6">
-              <source srcset="{{ asset('/storage/journals/'. $carousel->fumaco_image1) }}" type="image/jpeg" style="object-fit: cover;opacity: 0.6">
-              <img src="{{ asset('/storage/journals/'. $carousel->fumaco_image1) }}" alt="{{ Str::slug(explode(".", $carousel->fumaco_image1)[0], '-') }}" style="object-fit: cover;opacity: 0.6;height: 100% !important; margin-left: auto;margin-right: auto;">
-            </picture>
-
-            <picture id="mob-picture" class="d-block d-md-none" style="background-color: black !important">
-              <source srcset="{{ asset('/storage/journals/'. explode(".", $carousel->fumaco_image2)[0] .'.webp') }}" type="image/webp" style="object-fit: cover;opacity: 0.6">
-              <source srcset="{{ asset('/storage/journals/'. $carousel->fumaco_image2) }}" type="image/jpeg" style="object-fit: cover;opacity: 0.6">
-              <img src="{{ asset('/storage/journals/'. $carousel->fumaco_image2) }}" alt="{{ Str::slug(explode(".", $carousel->fumaco_image2)[0], '-') }}" style="object-fit: cover;height: 100% !important; width: 100% !important;opacity: 0.6">
+          <div class="carousel-item {{ $active }}" style="background: black;">
+            <picture>
+              <source srcset="{{ asset('/storage/journals/'. explode(".", $carousel->fumaco_image1)[0] .'.webp') }}" type="image/webp" style="object-fit: cover;opacity: 0.6;">
+              <source srcset="{{ asset('/storage/journals/'. $carousel->fumaco_image1) }}" type="image/jpeg" style="object-fit: cover;opacity: 0.6;">
+              <img src="{{ asset('/storage/journals/'. $carousel->fumaco_image1) }}" alt="{{ Str::slug(explode(".", $carousel->fumaco_image1)[0], '-') }}" style="object-fit: cover;opacity: 0.6;height: 100% !important; width: 100% !important" loading="{{ $lazy }}">
             </picture>
 
             <div class="container">
@@ -112,7 +108,7 @@
               <picture>
                 <source srcset="{{ asset($image_webp) }}" type="image/webp" class="card-img-top">
                 <source srcset="{{ asset($image) }}" type="image/jpeg" class="card-img-top">
-                <img src="{{ asset($image) }}" alt="{{ Str::slug(explode(".", $b->{'blogprimayimage-home'})[0], '-') }}" class="card-img-top hover">
+                <img src="{{ asset($image) }}" alt="{{ Str::slug(explode(".", $b->{'blogprimayimage-home'})[0], '-') }}" class="card-img-top hover" loading="lazy">
               </picture>
               </div>
               
@@ -175,7 +171,7 @@
                       <picture>
                         <source srcset="{{ asset($img_bs_webp) }}" type="image/webp" class="img-responsive" style="width: 100% !important;">
                         <source srcset="{{ asset($img_bs) }}" type="image/jpeg" class="img-responsive" style="width: 100% !important;">
-                        <img src="{{ asset($img_bs) }}" alt="{{ Str::slug(explode(".", $bs['image'])[0], '-') }}" class="img-responsive hover" style="width: 100% !important;">
+                        <img src="{{ asset($img_bs) }}" alt="{{ Str::slug(explode(".", $bs['image'])[0], '-') }}" class="img-responsive hover" style="width: 100% !important;" loading="lazy">
                       </picture>
                     </div>
                     <div class="card-body d-flex flex-column">
@@ -267,7 +263,7 @@
                       <picture>
                         <source srcset="{{ asset($img_os_webp) }}" type="image/webp" class="img-responsive" style="width: 100% !important;">
                         <source srcset="{{ asset($img_os) }}" type="image/jpeg" class="img-responsive" style="width: 100% !important;">
-                        <img src="{{ asset($img_os) }}" alt="{{ Str::slug(explode(".", $os['image'])[0], '-') }}" class="img-responsive hover" style="width: 100% !important;">
+                        <img src="{{ asset($img_os) }}" alt="{{ Str::slug(explode(".", $os['image'])[0], '-') }}" class="img-responsive hover" style="width: 100% !important;" loading="lazy">
                       </picture>
                     </div>
                     <div class="card-body d-flex flex-column">
@@ -331,12 +327,19 @@
 @endsection
 @section('style')
 
-<link rel="stylesheet" type="text/css" href="{{ asset('/page_css/homepage.min.css') }}">
-<link rel="stylesheet" type="text/css" href="{{ asset('/slick/slick.css') }}">
-<link rel="stylesheet" type="text/css" href="{{ asset('/slick/slick-theme.css') }}">
+{{-- <link rel="stylesheet" type="text/css" href="{{ asset('/page_css/homepage.min.css') }}"> --}}
+<link rel="preload" href="{{ asset('/page_css/homepage.min.css') }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="{{ asset('/page_css/homepage.min.css') }}"></noscript>
+
+{{-- <link rel="stylesheet" type="text/css" href="{{ asset('/slick/slick.css') }}"> --}}
+<link rel="preload" href="{{ asset('/slick/slick.css') }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="{{ asset('/slick/slick.css') }}"></noscript>
+
+{{-- <link rel="stylesheet" type="text/css" href="{{ asset('/slick/slick-theme.css') }}"> --}}
+<link rel="preload" href="{{ asset('/slick/slick-theme.css') }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="{{ asset('/slick/slick-theme.css') }}"></noscript>
 
 @endsection
-
 @section('script')
   <script src="{{ asset('/slick/slick.js') }}" type="text/javascript" charset="utf-8"></script>
   <script type="text/javascript">
@@ -347,19 +350,6 @@
     }
 
     $(document).ready(function() {
-      setTimeout(function() {
-        $('#multiple-accounts-msg').fadeOut();
-      }, 5000);
-
-      $('#close-accounts-msg').click(function(){
-        $('#multiple-accounts-msg').fadeOut();
-      });
-
-      // Product Image Hover
-      $('.hover-container').hover(function(){
-        $(this).children('.btn-container').slideToggle('fast');
-      });
-
       $(".regular").slick({
         dots: false,
         infinite: true,
@@ -398,6 +388,19 @@
           }
         }
       ]
+      });
+
+      setTimeout(function() {
+        $('#multiple-accounts-msg').fadeOut();
+      }, 5000);
+
+      $('#close-accounts-msg').click(function(){
+        $('#multiple-accounts-msg').fadeOut();
+      });
+
+      // Product Image Hover
+      $('.hover-container').hover(function(){
+        $(this).children('.btn-container').slideToggle('fast');
       });
     });
   </script>

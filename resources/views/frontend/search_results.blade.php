@@ -643,14 +643,14 @@
 	}
 	
 	.btn-container{
-    width: 100%;
-    position: absolute; 
-    top: 50%; 
-    left: 0; 
-    z-index: 9; 
-    display: none; 
-    text-align: center;
-  }
+		width: 100%;
+		position: absolute; 
+		top: 50%; 
+		left: 0; 
+		z-index: 9; 
+		display: none; 
+		text-align: center;
+	}
 
 	.view-products-btn{
 		z-index: 2;
@@ -666,31 +666,25 @@
 	}
 
 	.view-products-btn:hover{
-		/* color: #fff;
-		background-color: #000; */
 		background-color: #f8b878; 
-    color: black;
+    	color: black;
 	}
 
 	.product-card:hover .overlay-bg{ 
 		transition:all .15s ease-in !important;
 		opacity: 1 !important;
 	}
-
-	.hover-container:hover img{
-		-ms-transform: scale(0.95); /* IE 9 */
-      	-webkit-transform: scale(0.95); /* Safari 3-8 */
-      	transform: scale(0.95); 
-	}
+	
 	.hover{
       transition: .5s;
     }
 
-    .hover:hover {
+    .hover:hover, .hover-container:hover img {
       -ms-transform: scale(0.95); /* IE 9 */
       -webkit-transform: scale(0.95); /* Safari 3-8 */
       transform: scale(0.95); 
     }
+
 	#search-page-container{
         position: absolute !important;
         background-color: #fff;
@@ -698,7 +692,6 @@
         z-index: 999 !important;
 		width: 100% !important;
     }
-
 	
 	.modal .modal-dialog {
 		position: fixed;

@@ -296,16 +296,12 @@
         display: block;
         padding-top:10px;
         color:lightseagreen;
-        /* text-decoration: none !important;
-        text-transform: none !important;
-        color: #000; */
     }
 
     #logreg-form .lines{
         width:200px;
         border:1px solid red;
     }
-
 
     #logreg-forms button[type="submit"]{ margin-top:10px; }
 
@@ -327,10 +323,6 @@
     /* Mobile */
 
     @media screen and (max-width:500px){
-        #logreg-forms{
-
-        }
-
         #logreg-forms  .social-login{
             width:200px;
             margin:0 auto;
@@ -357,102 +349,71 @@
         #logreg-forms  .google-btn:after{
             content:'Google+';
         }
-
     }
     .products-head {
-      margin-top: 10px !important;
-      padding-left: 40px !important;
-      padding-right: 40px !important;
-      }
-      .he1 {
+        margin-top: 10px !important;
+        padding-left: 40px !important;
+        padding-right: 40px !important;
+    }
+
+    .he1 {
         font-weight: 300 !important;
         font-size: 12px !important;
-      }
-      .he2 {
-        font-weight: 200 !important;
-        font-size: 10px !important;
-      }
-      .btmp {
-            margin-bottom: 15px !important;
-      }
+    }
 
-      .caption_1 {
+    .btmp {
+        margin-bottom: 15px !important;
+    }
+
+    .caption_1 {
         font-weight: 400 !important;
         font-size: 14px !important;
-      }
+    }
 
-      .caption_2 {
+    .caption_2, .order-font-sub, .he2{
         font-weight: 200 !important;
         font-size: 10px !important;
-      }
+    }
 
-
-
-      .order-font {
-
+    .order-font {
         font-weight: 200 !important;
         font-size: 14px !important;
+    }
 
+    .order-font-sub-b {
+        font-weight: 300 !important;
+        font-size: 14px !important;
+    }
 
-        }
+    .tbls{
+        vertical-align: center !important;
+    }
 
+    .login_1 {
+        font-weight: 500 !important;
+        font-size: 13px !important;
+    }
 
-        .order-font-sub {
+    .login_2 {
+        font-weight: 400 !important;
+        font-size: 14px !important;
+        color: #655f5f !important;
+    }
 
-          font-weight: 200 !important;
-          font-size: 10px !important;
+    .active {
+        border-bottom: 3px solid #dc6f12;
+    }
 
+    .forgot-1 {
+        font-weight: 500 !important;
+        font-size: 13px !important;
+        color: #655f5f !important;
+    }
 
-          }
-
-
-
-          .order-font-sub-b {
-
-            font-weight: 300 !important;
-            font-size: 14px !important;
-
-
-            }
-
-            .tbls{
-
-              vertical-align: center !important;
-
-            }
-
-
-            .login_1 {
-              font-weight: 500 !important;
-              font-size: 13px !important;
-            }
-
-
-            .login_2 {
-              font-weight: 400 !important;
-              font-size: 14px !important;
-              color: #655f5f !important;
-            }
-
-
-            .active {
-              border-bottom: 3px solid #dc6f12;
-            }
-
-
-            .forgot-1 {
-              font-weight: 500 !important;
-              font-size: 13px !important;
-              color: #655f5f !important;
-            }
-
-
-            .status-1{
-              font-weight: 200 !important;
-              font-size: 16px !important;
-              color: red !important;
-            }
-
-
-      </style>
+    .status-1{
+        font-weight: 200 !important;
+        font-size: 16px !important;
+        color: red !important;
+    }
+    </style>
 @endsection

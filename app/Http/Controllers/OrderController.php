@@ -106,7 +106,8 @@ class OrderController extends Controller
                 'store' => $o->store_location,
                 'order_status' => $order_status,
                 'deposit_slip_image' => $o->deposit_slip_image,
-                'payment_status' => $o->payment_status
+                // 'payment_status' => $o->payment_status,
+                // 'erp_sales_order' => $o->erp_sales_order
             ];
         }
 
@@ -375,19 +376,12 @@ class OrderController extends Controller
                             'payment' => $total_amount
                         ];
                         $confirmed_bank_deposit_email = $order_details->order_email;
-
                         $customer_name = $order_details->order_name . ' ' . $order_details->order_lastname;
-                        
-                        try {
-                            Mail::send('emails.order_confirmed_bank_deposit', $order, function($message) use($confirmed_bank_deposit_email){
-                                $message->to(trim($confirmed_bank_deposit_email));
-                                $message->subject('Order Confirmed - FUMACO');
-                            });
-                        } catch (\Swift_TransportException  $e) {
-                            DB::rollback();
-                            
-                            return redirect()->back()->with('error', 'An error occured. Please try again.');
-                        }
+
+                        Mail::send('emails.order_confirmed_bank_deposit', $order, function($message) use($confirmed_bank_deposit_email){
+                            $message->to(trim($confirmed_bank_deposit_email));
+                            $message->subject('Order Confirmed - FUMACO');
+                        });
 
                         if(Mail::failures()){
                             DB::rollback();
@@ -397,6 +391,48 @@ class OrderController extends Controller
                         DB::table('fumaco_order')->where('order_number', $request->order_number)->update(['amount_paid' => $total_amount]);
                     }
 
+                    // $erp_so_ref_no = null;
+                    // $erp_api = DB::table('api_setup')->where('type', 'erp_api')->first();
+                    // if ($erp_api) {
+                    //     $headers = [
+                    //         'Content-Type' => 'application/json',
+                    //         'Authorization' => 'token '. $erp_api->api_key. ':' . $erp_api->api_secret_key . '',
+                    //         'Accept-Language' => 'en'
+                    //     ];
+
+                    //     $sales_order_items = [];
+                    //     foreach ($ordered_items as $n => $soi) {
+                    //         $sales_order_items[] = [
+                    //             'item_code' => $soi->item_code,
+                    //             'qty' => $soi->item_qty,
+                    //             'rate' => $soi->item_price
+                    //         ];
+                    //     }
+    
+                    //     $sales_order_details = [
+                    //         'company' => 'FUMACO Inc.',
+                    //         'customer' => $customer_name,
+                    //         'transaction_date' => Carbon::now()->toDateTimeString(),
+                    //         'delivery_date' => Carbon::now()->toDateTimeString(),
+                    //         'order_type' => 'Sales',
+                    //         'sales_type' => 'Regular Sales',
+                    //         'sales_person' => 'Plant 2',
+                    //         'po_no' => $order_details->order_number,
+                    //         'status' => 'Draft',
+                    //         'order_type_1' => 'Vatable',
+                    //         'taxes_and_charges' => 'E-Commerce Sales Taxes and Charges - FI',
+                    //         'items' => $sales_order_items,
+                    //     ];
+
+                    //     $sales_order_response = Http::withHeaders($headers)
+                    //         ->post($erp_api->base_url . '/api/resource/Sales Order', ($sales_order_details));
+
+                    //     if ($sales_order_response->successful()) {
+                    //         $erp_so_ref_no = $sales_order_response['data']['name'];
+                    //     }
+                    // }
+
+                    // DB::table('fumaco_order')->where('order_number', $request->order_number)->update(['erp_sales_order' => $erp_so_ref_no]);
                 }
 
                 if ($status == 'Out for Delivery') {
@@ -1283,4 +1319,48 @@ class OrderController extends Controller
         session()->flash('for_confirmation', $request->order_number);
         return redirect('/admin/order/order_lists/');
     }
+
+    // public function getErpSalesOrderStatus($sales_order, Request $request) {
+    //     if($request->ajax()) {
+    //         $erp_api = DB::table('api_setup')->where('type', 'erp_api')->first();
+    //         if ($erp_api) {
+    //             $headers = [
+    //                 'Content-Type' => 'application/json',
+    //                 'Authorization' => 'token '. $erp_api->api_key. ':' . $erp_api->api_secret_key . '',
+    //                 'Accept-Language' => 'en'
+    //             ];
+    
+    //             $sales_order_response = Http::withHeaders($headers)
+    //                 ->get($erp_api->base_url . '/api/resource/Sales Order/' . $sales_order);
+    
+    //             if ($sales_order_response->successful()) {
+    //                 $status = $sales_order_response['data']['status'];
+    //                 if (in_array($status, ['Draft', 'Cancelled'])) {
+    //                     $badge = 'badge-danger';
+    //                 }
+
+    //                 if (in_array($status, ['To Deliver and Bill', 'To Bill', 'To Deliver'])) {
+    //                     $badge = 'badge-warning';
+    //                 }
+
+    //                 if (in_array($status, ['Completed'])) {
+    //                     $badge = 'badge-success';
+    //                 }
+    //             } else {
+    //                 $status = 'Not Found';
+    //                 $badge = 'badge-danger';
+    //             }
+
+    //             return [
+    //                 'status' => $status,
+    //                 'badge' => $badge
+    //             ];
+    //         }
+
+    //         return [
+    //             'status' => 'Not Found',
+    //             'badge' => 'badge-danger'
+    //         ];
+    //     }
+    // }
 }

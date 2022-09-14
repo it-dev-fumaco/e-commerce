@@ -318,8 +318,7 @@
   .slick-current, .slick-slide  {
     opacity: 1;
   }
-</style>
-<style>
+
     .text{
       position: relative;
       font-size: 16px !important;
@@ -377,10 +376,8 @@
 	}
 
 	.view-products-btn:hover{
-		/* color: #fff;
-		background-color: #000; */
-    background-color: #f8b878;
-    color: black;
+        background-color: #f8b878;
+        color: black;
 	}
 
 	.product-card:hover .overlay-bg{
@@ -388,17 +385,11 @@
 		opacity: 1 !important;
 	}
 
-	.hover-container:hover img{
-		-ms-transform: scale(0.95); /* IE 9 */
-      	-webkit-transform: scale(0.95); /* Safari 3-8 */
-      	transform: scale(0.95);
-	}
-
     .hover{
       transition: .5s;
     }
 
-    .hover:hover {
+    .hover:hover, .hover-container:hover img {
       -ms-transform: scale(0.95); /* IE 9 */
       -webkit-transform: scale(0.95); /* Safari 3-8 */
       transform: scale(0.95);

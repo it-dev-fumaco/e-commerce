@@ -75,29 +75,17 @@
 		font-weight: 300 !important;
 		font-size: 12px !important;
 	}
-	.he2 {
-		font-weight: 200 !important;
-		font-size: 10px !important;
-	}
 	.btmp {
 		margin-bottom: 15px !important;
 	}
-	.caption_1 {
+	.caption_1, .order-font {
 		font-weight: 200 !important;
 		font-size: 14px !important;
 	}
-	.caption_2 {
+	.caption_2, .he2, .order-font-sub {
 		font-weight: 200 !important;
 		font-size: 10px !important;
 	}
-	.order-font {
-		font-weight: 200 !important;
-		font-size: 14px !important;
-  }
-  .order-font-sub {
-		font-weight: 200 !important;
-		font-size: 10px !important;
-  }
 	.order-font-sub-b {
 		font-weight: 300 !important;
 		font-size: 14px !important;
