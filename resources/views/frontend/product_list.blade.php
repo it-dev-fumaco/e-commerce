@@ -15,7 +15,7 @@
 	@endif
 @endsection
 @section('content')
-	<main style="background-color:#0062A5;">
+	<main class="pt-5 pt-lg-0" style="background-color:#0062A5;">
 		<div id="myCarousel" class="carousel slide" data-bs-ride="carousel">
 			<div class="carousel-inner">
 				<div class="carousel-item active" style="height: 13rem !important;">

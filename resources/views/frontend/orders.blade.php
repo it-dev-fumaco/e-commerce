@@ -24,12 +24,12 @@
 			<div class="row">
 				<div class="container">
 					<!-- Nav tabs -->
-					<ul class="nav nav-tabs" role="tablist">
+					<ul class="nav nav-tabs" id="tabs" role="tablist">
 						<li class="nav-item">
-							<a class="nav-link active" data-toggle="tab" href="#current">Current Order(s)</a>
+							<a class="nav-link active" data-toggle="tab" data-target="current">Current Order(s)</a>
 						</li>
 						<li class="nav-item">
-							<a class="nav-link" data-toggle="tab" href="#history">Order History</a>
+							<a class="nav-link" data-toggle="tab" data-target="history">Order History</a>
 						</li>
 					</ul>
 				  
@@ -388,7 +388,7 @@
 								@endforelse
 							</div>
 						</div>
-						<div id="history" class="container tab-pane fade">
+						<div id="history" class="container tab-pane">
 							<br>
 							<center><h3 class="h3">Order History</h3></center>
 							<br><br/>
@@ -944,5 +944,24 @@
 .list-group.vertical-steps .list-group-item.completed:last-child{
   border-left:3px solid transparent;
 }
+
+.nav-link{
+	cursor: pointer;
+}
 </style>
+@endsection
+
+@section('script')
+	<script>
+		$(document).ready(function(){
+			$(document).on('click', '.nav-link', function(){
+				var target = $(this).data('target');
+				$('.nav-link').removeClass('active');
+				$(this).addClass('active');
+
+				$('.tab-pane').removeClass('active');
+				$('#' + target).addClass('active');
+			})
+		});
+	</script>
 @endsection
