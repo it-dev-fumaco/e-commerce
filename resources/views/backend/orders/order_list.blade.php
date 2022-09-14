@@ -107,7 +107,8 @@
 											<td class="text-center"><span class="badge badge-{{ $badge }}" style="font-size: 11pt; {{ ($order['status'] == 'Delivered') ? "background-color: #fd6300 !important; color: #fff;" : '' }}">{{ $order['status'] }}</span></td>
 											<td>
 												<div class="text-center">
-													<button type="button" class="btn btn-primary btn-sm view-order-btn" data-toggle="modal" data-target="#order-{{ $order['order_no']}}" data-so-status="#sostatus{{ $order['order_no']}}" data-so="{{ $order['erp_sales_order'] }}">View Orders</button>
+													{{-- <button type="button" class="btn btn-primary btn-sm view-order-btn" data-toggle="modal" data-target="#order-{{ $order['order_no']}}" data-so-status="#sostatus{{ $order['order_no']}}" data-so="{{ $order['erp_sales_order'] }}">View Orders</button> --}}
+													<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#order-{{ $order['order_no']}}">View Orders</button>
 												</div>
 												<div class="modal fade" id="order-{{ $order['order_no'] }}" role="dialog">
 													<div class="modal-dialog modal-xl" style="min-width: 70%;">
@@ -263,11 +264,11 @@
 																			@endif
 																			<strong>Order Date : </strong> {{ $order['date'] }} <br>
 																			<strong>Status : </strong> <span class="badge badge-{{ $badge }}" style="font-size: 1rem;">{{ $order['status'] }}</span>
-																			@if ($order['erp_sales_order'] && $order['status'] == 'Order Confirmed')
+																			{{-- @if ($order['erp_sales_order'] && $order['status'] == 'Order Confirmed')
 																			<span class="d-block mt-2">
 																				<b>ERP Sales Order : </b>{{ $order['erp_sales_order'] }} <span class="badge" id="sostatus{{ $order['order_no']}}" style="font-size: 11pt;"></span>
 																			</span>
-																			@endif 
+																			@endif  --}}
 																		</p>
 																	</div>
 																	<div class="col-md-4">

@@ -404,7 +404,7 @@ Route::prefix('admin')->group(function () {
             Route::post('/bank_account/save', 'BankAccountController@save');
             Route::put('/bank_account/{id}/update', 'BankAccountController@update');
             Route::delete('/bank_account/{id}/delete', 'BankAccountController@delete'); 
-            Route::get('/erp_sales_order_status/{sales_order}', 'OrderController@getErpSalesOrderStatus');
+            // Route::get('/erp_sales_order_status/{sales_order}', 'OrderController@getErpSalesOrderStatus');
         });
     });
 });
