@@ -702,6 +702,34 @@ class ProductController extends Controller
                     'Accept-Language' => 'en'
                 ];
 
+                // get item dimension
+                $fields = '?fields=["item_code","package_weight","package_width","package_length","package_height","package_dimension_uom"]';
+                $filter = '&filters=[["item_code","=","' . $item_code . '"]]';
+        
+                $params = $fields . '' . $filter;
+                
+                $response = Http::withHeaders($api_header)->get($erp_api->base_url . '/api/resource/Item' . $params);
+
+                if ($response->successful()) {
+                    $package_length = $package_width = $package_height = $package_weight = $package_d_uom = null;
+                    if (isset($response['data'])) {
+                        $package_d_uom = $response['data'][0]['package_dimension_uom'];
+                        $package_length = $response['data'][0]['package_length'];
+                        $package_width = $response['data'][0]['package_width'];
+                        $package_height = $response['data'][0]['package_height'];
+                        $package_weight = $response['data'][0]['package_weight'];
+                    }
+
+                    DB::table('fumaco_items')->where('id', $id)->update([
+                        'f_package_d_uom' => $package_d_uom,
+                        'f_package_length' => $package_length ? (double)$package_length : 0,
+                        'f_package_width' => $package_width ? (double)$package_width : 0,
+                        'f_package_height' => $package_height ? (double)$package_height : 0,
+                        'f_package_weight' => $package_weight ? (double)$package_weight : 0,
+                        'last_sync_date' => Carbon::now()->toDateTimeString()
+                    ]);
+                }
+
                 // get stock quantity of selected item code
                 $fields = '?fields=["item_code","warehouse","actual_qty","website_reserved_qty"]';
                 $filter = '&filters=[["item_code","=","' . $item_code . '"],["warehouse","=","' .$warehouse .'"]]';
