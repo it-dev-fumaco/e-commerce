@@ -147,7 +147,7 @@
 								<tr style="font-size: 0.8rem;">
 									<td class="text-center">
 										<picture>
-											<source srcset="{{ asset($img_webp) }}" type="image/webp">
+											<source srcset="{{ asset($webp) }}" type="image/webp">
 											<source srcset="{{ asset($src) }}" type="image/jpeg">
 											<img src="{{ $src }}" class="img-responsive" alt="" width="55" height="55">
 										</picture>
