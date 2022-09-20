@@ -204,7 +204,7 @@
                                                     <picture>
                                                         <source srcset="{{ asset($img_webp) }}" type="image/webp" class="img-responsive" style="width: 100% !important;">
                                                         <source srcset="{{ asset($img) }}" type="image/jpeg" class="img-responsive" style="width: 100% !important;">
-                                                        <img src="{{ asset($img) }}" alt="{{ Str::slug(explode(".", $cs['image'])[0], '-') }}" class="img-responsive hover" style="width: 100% !important;">
+                                                        <img src="{{ asset($img) }}" alt="{{ Str::slug(explode(".", $cs['image'])[0], '-') }}" class="img-responsive hover" style="width: 100% !important;" loading="lazy">
                                                     </picture>
                                                 </div>
                                                 <div class="col-12" style="position: relative">

@@ -224,7 +224,7 @@
 						</form>
 
 						<div class="row animated animatedFade1InUp fadeInUp mx-auto">
-							@forelse ($products_arr as $product)
+							@forelse ($products_arr as $loop_count => $product)
 							<div class="col-md-4 mb-3 btmp mb-pad">
 								<div class="card">
 									<div class="equal-column-content">
@@ -259,7 +259,7 @@
 											<picture>
 												<source srcset="{{ asset($image_webp) }}" type="image/webp" class="card-img-top">
 												<source srcset="{{ asset($image) }}" type="image/jpeg" class="card-img-top">
-												<img src="{{ asset($image) }}" alt="{{ Str::slug(explode(".", $product['image'])[0], '-') }}" class="card-img-top hover" style="min-height: 230px">
+												<img src="{{ asset($image) }}" alt="{{ Str::slug(explode(".", $product['image'])[0], '-') }}" class="card-img-top hover" style="min-height: 230px" loading="{{ $loop_count > 2 ? 'lazy' : 'eager' }}">
 											</picture>
 										</div>
 										<div class="card-body d-flex flex-column">

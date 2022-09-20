@@ -46,8 +46,17 @@
 							@foreach ($items as $item)
 							<tr style="font-size: 10pt;">
                         <td class="text-center">{{ $item['order_number'] }}</td>
-								<td>
-									<img src="{{ asset('/storage/item_images/'.$item['item_code'].'/gallery/preview/'.$item['image']) }}" class="img-responsive" alt="" width="55" height="55">
+						<td>
+							@php
+								$img = '/storage/item_images/'.$item['item_code'].'/gallery/preview/'.$item['image'];
+								$webp = '/storage/item_images/'. $item['item_code'] .'/gallery/preview/'.explode('.', $item['image'])[0].'.webp';
+							@endphp
+							<picture>
+								<source srcset="{{ asset($webp) }}" type="image/webp">
+								<source srcset="{{ asset($img) }}" type="image/jpeg">
+								<img src="{{ asset('/storage/item_images/'.$item['item_code'].'/gallery/preview/'.$item['image']) }}" class="img-responsive" alt="" width="55" height="55" loading="lazy">
+							</picture>
+							{{-- <img src="{{ asset('/storage/item_images/'.$item['item_code'].'/gallery/preview/'.$item['image']) }}" class="img-responsive" alt="" width="55" height="55"> --}}
                         </td>
                         <td>{{ $item['item_name'] }}</td>
                         <td class="text-center">{{ $item['quantity'] }}</td>

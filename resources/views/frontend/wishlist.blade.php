@@ -52,7 +52,16 @@
 						@forelse ($wishlist_arr as $wishlist)
 						<tr class="order-font">
 							<td class="text-center">
-								<img src="{{ asset('/storage/item_images/'.$wishlist['item_code'].'/gallery/preview/'.$wishlist['image']) }}" class="img-responsive" alt="" width="55" height="55">
+								@php
+									$img = '/storage/item_images/'.$wishlist['item_code'].'/gallery/preview/'.$wishlist['image'];
+									$webp = '/storage/item_images/'. $wishlist['item_code'] .'/gallery/preview/'.explode('.', $wishlist['image'])[0].'.webp';
+								@endphp
+								<picture>
+									<source srcset="{{ asset($webp) }}" type="image/webp">
+									<source srcset="{{ asset($img) }}" type="image/jpeg">
+									<img src="{{ asset('/storage/item_images/'.$wishlist['item_code'].'/gallery/preview/'.$wishlist['image']) }}" class="img-responsive" alt="" width="55" height="55" loading='lazy'>
+								</picture>
+								{{-- <img src="{{ asset('/storage/item_images/'.$wishlist['item_code'].'/gallery/preview/'.$wishlist['image']) }}" class="img-responsive" alt="" width="55" height="55"> --}}
 							</td>
 							<td class="tbls">{{ $wishlist['item_name'] }}<br/>&nbsp;
 							<p class="d-lg-none d-xl-none"><b>Price:</b> P {{ number_format($wishlist['item_price'], 2) }}</p>

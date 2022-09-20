@@ -250,7 +250,7 @@
 										<picture>
 											<source srcset="{{ asset($image_webp) }}" type="image/webp" class="card-img-top">
 											<source srcset="{{ asset($image) }}" type="image/jpeg" class="card-img-top"> 
-											<img src="{{ asset($image) }}" alt="{{ $item['item_code'] }}" class="card-img-top hover">
+											<img src="{{ asset($image) }}" alt="{{ $item['item_code'] }}" class="card-img-top hover" loading="lazy">
 										</picture>
 									</div>
 									<div class="col-8">
@@ -323,7 +323,7 @@
 									<picture>
 										<source srcset="{{ asset($image_webp) }}" type="image/webp" class="card-img-top">
 										<source srcset="{{ asset($image) }}" type="image/jpeg" class="card-img-top"> 
-										<img src="{{ asset($image) }}" alt="{{ $item['item_code'] }}" class="card-img-top hover">
+										<img src="{{ asset($image) }}" alt="{{ $item['item_code'] }}" class="card-img-top hover" loading='lazy'>
 									</picture>
 								</div>
 								
@@ -397,7 +397,7 @@
 										<picture>
 											<source srcset="{{ asset($image_webp) }}" type="image/webp" class="card-img-top">
 											<source srcset="{{ asset($image) }}" type="image/jpeg" class="card-img-top"> 
-											<img src="{{ asset($image) }}" alt="{{ $product['item_code'] }}" class="card-img-top hover">
+											<img src="{{ asset($image) }}" alt="{{ $product['item_code'] }}" class="card-img-top hover" loading="lazy">
 										</picture>
 									</div>
 									<div class="col-8">
@@ -468,7 +468,7 @@
 									<picture>
 										<source srcset="{{ asset($image_webp) }}" type="image/webp" class="card-img-top">
 										<source srcset="{{ asset($image) }}" type="image/jpeg" class="card-img-top"> 
-										<img src="{{ asset($image) }}" alt="{{ $product['item_code'] }}" class="card-img-top hover">
+										<img src="{{ asset($image) }}" alt="{{ $product['item_code'] }}" class="card-img-top hover" loading="lazy">
 									</picture>
 								</div>
 								
@@ -528,7 +528,7 @@
 						<picture>
 							<source srcset="{{ asset($image_webp) }}" type="image/webp" class="card-img-top">
 							<source srcset="{{ asset($image) }}" type="image/jpeg" class="card-img-top">
-							<img src="{{ asset($image) }}" alt="{{ Str::slug(explode(".", $blog['image'])[0], '-') }}" class="card-img-top">
+							<img src="{{ asset($image) }}" alt="{{ Str::slug(explode(".", $blog['image'])[0], '-') }}" class="card-img-top" loading='lazy'>
 						</picture>
 						<div class="card-body align-items-stretch p-2">
 							<a href="blog/{{ $blog['blog_slug'] ? $blog['blog_slug'] : $blog['id'] }}" style="text-decoration: none !important;">
