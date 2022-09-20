@@ -15,20 +15,10 @@
 	@endif
 @endsection
 @section('content')
-	<main class="pt-5 pt-lg-0" style="background-color:#0062A5;">
-		<div id="myCarousel" class="carousel slide" data-bs-ride="carousel">
-			<div class="carousel-inner">
-				<div class="carousel-item active" style="height: 13rem !important;">
-					<img src="{{ asset('/assets/site-img/header3-sm.png') }}" alt="" style="position: absolute; bottom: 0 !important;left: 0;min-width: 100%; height: 100% !important;">
-					<div class="container">
-						<div class="carousel-caption text-start mx-auto" style="bottom: 1rem !important;">
-							<center><h3 class="carousel-header-font">{{ $product_category->name }}</h3></center>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</main>
+	@php
+		$page_title = $product_category->name;
+	@endphp
+	@include('frontend.header')
 
 	<main style="background-color:#ffffff;" class="products-head">
 		<nav>

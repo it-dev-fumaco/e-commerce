@@ -4,20 +4,10 @@
 ])
 
 @section('content')
-<main style="background-color:#0062A5;">
-	<div id="myCarousel" class="carousel slide p-0 m-0" data-bs-ride="carousel">
-		<div class="carousel-inner custom-margin">
-			<div class="carousel-item active p-0 m-0" style="height: 13rem !important;">
-				<img src="{{ asset('/assets/site-img/header3-sm.png') }}" alt="" style="position: absolute; top: 0;left: 0;min-width: 100%; height: unset !important;">
-				<div class="container-fluid p-0 m-0">
-					<div class="carousel-caption text-start p-0 m-0" style="bottom: 1rem !important;">
-						<h3 class="carousel-header-font text-center">UPLOAD DEPOSIT SLIP / PROOF OF PAYMENT</h3>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-</main>
+@php
+    $page_title = 'UPLOAD DEPOSIT SLIP / PROOF OF PAYMENT';
+@endphp
+@include('frontend.header')
 <main style="background-color:#ffffff; min-height: 500px;" class="products-head">
     <div class="container"><br/>&nbsp;
         <div class="row">

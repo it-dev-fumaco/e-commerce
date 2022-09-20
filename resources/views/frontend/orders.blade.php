@@ -4,20 +4,10 @@
 ])
 
 @section('content')
-	<main style="background-color:#0062A5;">
-		<div id="myCarousel" class="carousel slide" data-bs-ride="carousel">
-			<div class="carousel-inner">
-				<div class="carousel-item active" style="height: 13rem !important;">
-					<img src="{{ asset('/assets/site-img/header3-sm.png') }}" alt="" style="position: absolute; top: 0;left: 0;min-width: 100%; height: 100% !important;">
-					<div class="container">
-						<div class="carousel-caption text-start" style="bottom: 1rem !important; right: 25% !important; left: 25%; !important;">
-							<center><h3 class="carousel-header-font">MY ORDERS</h3></center>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</main>
+@php
+    $page_title = 'MY ORDERS';
+@endphp
+@include('frontend.header')
 
 	<main style="background-color:#ffffff; min-height: 500px;" class="products-head">
 		<div class="container">
@@ -57,14 +47,21 @@
 							<div class="accordion" id="orderAccordion">
 								@forelse ($new_orders_arr as $i => $order)
 								@php
-									if($order['status'] == "Order Placed"){
-										$badge = '#ffc107';
-									}else if($order['status'] == "Delivered" or $order['status'] == 'Order Completed'){
-										$badge = '#fd6300';
-									}else if($order['status'] == "Out for Delivery" or $order['status'] == 'Ready for Pickup'){
-										$badge = '#28a745';
-									}else{
-										$badge = '#007bff';
+									switch ($order['status']) {
+										case 'Order Placed':
+											$badge = '#ffc107';
+											break;
+										case 'Delivered':
+										case 'Order Completed':
+											$badge = '#fd6300';
+											break;
+										case 'Out for Delivery':
+										case 'Ready for Pickup':
+											$badge = '#28a745';
+											break;
+										default:
+											$badge = '#007bff';
+											break;
 									}
 								@endphp
 								<div class="accordion-item border-bottom">
@@ -109,16 +106,22 @@
 													<th style="width: 20%;" class="table-text text-center">Price</th>
 												</tr>
 												@foreach ($order['items'] as $item)
+												@php
+													$img = '/storage/item_images/'.$item['item_code'].'/gallery/preview/'.$item['image'];
+													$webp = '/storage/item_images/'.$item['item_code'].'/gallery/preview/'.explode('.', $item['image'])[0].'.webp';
+													$orig_price = number_format($item['orig_price'], 2);
+													$price = number_format($item['price'], 2);
+												@endphp
 												<tr>
 													<td class="text-center">
-														<img src="{{ asset('/storage/item_images/'.$item['item_code'].'/gallery/preview/'.$item['image']) }}" class="img-responsive" alt="" width="55" height="55">
+														<picture>
+															<source srcset="{{ asset($webp) }}" type="image/webp">
+															<source srcset="{{ asset($img) }}" type="image/jpeg">
+															<img src="{{ asset('/storage/item_images/'.$item['item_code'].'/gallery/preview/'.$item['image']) }}" class="img-responsive" alt="" width="55" height="55" loading="{{ $i > 0 ? 'lazy' : 'eager' }}">
+														</picture>
 													</td>
 													<td class="table-text">{{ $item['item_name'] }}</td>
 													<td class="table-text text-center">{{ $item['qty'] }}</td>
-													@php
-														$orig_price = number_format($item['orig_price'], 2);
-														$price = number_format($item['price'], 2);
-													@endphp
 													<td class="table-text">
 														<p class="d-block d-lg-none" style="text-align: right; padding-right: 10px;">
 															@if($item['discount'] > 0)
@@ -208,13 +211,17 @@
 												</div>
 											</div>
 											<div class="m-3">
-												<button class="btn btn-primary table-text" data-toggle="modal" data-target="#{{ $order['order_number'] }}-Modal">Track Order</button>
+												<button class="btn btn-primary table-text open-modal" data-toggle="modal" data-target="#{{ $order['order_number'] }}-Modal">Track Order</button>
 												@php
 													$dt = \Carbon\Carbon::now();
 													$dt2 = \Carbon\Carbon::parse($order['order_date']);
 													$is_same_day = ($dt->isSameDay($dt2));
+													$disabled = null;
+													if(!$is_same_day || $order['status'] != "Order Placed"){
+														$disabled = 'disabled';
+													}
 												@endphp	
-												<button class="btn btn-secondary table-text" data-toggle="modal" data-target="#cancel-order{{ $i }}-modal" {{ !$is_same_day ? 'disabled' : '' }} {{ ($order['status'] != "Order Placed") ? 'disabled' : '' }}>Cancel Order</button>
+												<button class="btn btn-secondary table-text open-modal" data-toggle="modal" data-target="#cancel-order{{ $i }}-modal" {{ $disabled }}>Cancel Order</button>
 											</div>
 									  	</div>
 									</div>
@@ -228,7 +235,7 @@
 											<div class="modal-content">
 												<div class="modal-header">
 													<h5 class="modal-title">Cancel Order</h5>
-													<button type="button" class="close clear-bg" data-dismiss="modal" aria-label="Close">
+													<button type="button" class="close clear-bg close-modal" data-target="#cancel-order{{ $i }}-modal" aria-label="Close">
 														<span aria-hidden="true">&times;</span>
 													</button>
 												</div>
@@ -237,7 +244,7 @@
 												</div>
 												<div class="modal-footer">
 													<button type="submit" class="btn btn-primary">Confirm</button>
-													<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+													<button type="button" class="btn btn-secondary close-modal" data-target="#cancel-order{{ $i }}-modal">Close</button>
 												</div>
 											</div>
 										</form>
@@ -250,7 +257,7 @@
 										<div class="modal-content">
 											<div class="modal-header">
 												<h5 class="modal-title">Track {{ $order['order_number'] }}</h5>
-												<button type="button" class="close clear-bg" data-dismiss="modal" aria-label="Close">
+												<button type="button" class="close clear-bg close-modal" data-target="#{{ $order['order_number'] }}-Modal" aria-label="Close">
 													<span aria-hidden="true">&times;</span>
 												</button>
 											</div>
@@ -338,13 +345,20 @@
 																	$icon_display = 'active';
 																}
 																
-																$icon = '';
-																if($name->status == "Order Confirmed"){
-																	$icon = 'user';
-																}else if($name->status == "Out for Delivery" or $name->status == "Ready for Pickup"){
-																	$icon = 'truck';
-																}else if($name->status == "Order Delivered" or $name->status == "Order Completed"){
-																	$icon = 'shopping-bag';
+																switch ($name->status) {
+																	case 'Order Confirmed':
+																		$icon = 'user';
+																		break;
+																	case 'Out for Delivery':
+																	case 'Ready for Pickup':
+																		$icon = 'truck';
+																		break;
+																	case 'Order Delivered':
+																	case 'Order Completed':
+																		$icon = 'shopping-bag';
+																	default:
+																		$icon = 'shopping-bag';
+																		break;
 																}
 
 																$order_step_color = null;
@@ -378,7 +392,7 @@
 												</div>
 											</div>
 											<div class="modal-footer">
-												<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+												<button type="button" class="btn btn-secondary close-modal" data-target="#{{ $order['order_number'] }}-Modal">Close</button>
 											</div>
 										</div>
 									</div>
@@ -407,23 +421,31 @@
 								<tbody>
 									@forelse ($orders_arr as $order)
 									@php
-										if($order['status'] == "Order Placed"){
-											$badge = '#ffc107';
-										}else if($order['status'] == "Cancelled"){
-											$badge = '#6c757d';
-										}else if($order['status'] == "Delivered" or $order['status'] == "Order Completed" or $order['status'] == "Order Delivered"){
-											$badge = '#fd6300';
-										}else if($order['status'] == "Out for Delivery"){
-											$badge = '#28a745';
-										}else{
-											$badge = '#007bff';
+										switch ($order['status']) {
+											case 'Order Placed':
+												$badge = '#ffc107';
+												break;
+											case 'Cancelled':
+												$badge = '#6c757d';
+												break;
+											case 'Delivered':
+											case 'Order Completed':
+											case 'Order Delivered':
+												$badge = '#fd6300';
+												break;
+											case 'Out for Delivery':
+												$badge = '#28a745';
+												break;
+											default:
+												$badge = '#007bff';
+												break;
 										}
 									@endphp
 									<tr>
 										<td class="text-center align-middle d-none d-lg-table-cell">{{ $order['order_number'] }}</td>
 										<td class="text-center align-middle table-text">{{ $order['date'] }}</td>
 										<td class="text-center align-middle">
-											<a href="#" class="table-text" data-toggle="modal" data-target="#{{ $order['order_number'] }}-Modal">Item Purchase</a>
+											<a href="#" class="table-text open-modal" data-target="#{{ $order['order_number'] }}-Modal">Item Purchase</a>
 
 											<!-- Modal -->
 											<div class="modal fade" id="{{ $order['order_number'] }}-Modal" tabindex="-1" role="dialog" aria-labelledby="{{ $order['order_number'] }}-ModalLabel" aria-hidden="true">
@@ -431,7 +453,7 @@
 													<div class="modal-content">
 														<div class="modal-header">
 															<h5 class="modal-title">{{ $order['order_number'] }}</h5>
-															<button type="button" class="close clear-bg" data-dismiss="modal" aria-label="Close">
+															<button type="button" class="close clear-bg close-modal" data-target="#{{ $order['order_number'] }}-Modal" aria-label="Close">
 																<span aria-hidden="true">&times;</span>
 															</button>
 														</div>
@@ -446,7 +468,16 @@
 																@foreach ($order['items'] as $item)
 																	<tr>
 																		<td>
-																			<img src="{{ asset('/storage/item_images/'.$item['item_code'].'/gallery/preview/'.$item['image']) }}" class="img-responsive" alt="" width="55" height="55">
+																			@php
+																				$img = '/storage/item_images/'.$item['item_code'].'/gallery/preview/'.$item['image'];
+																				$webp = '/storage/item_images/'.$item['item_code'].'/gallery/preview/'.explode('.', $item['image'])[0].'.webp';
+																			@endphp
+																			<picture>
+																				<source srcset="{{ asset($webp) }}" type="image/webp" class="img-responsive" style="width: 100% !important;">
+																				<source srcset="{{ asset($img) }}" type="image/jpeg" class="img-responsive" style="width: 100% !important;">
+																				<img src="{{ asset('/storage/item_images/'.$item['item_code'].'/gallery/preview/'.$item['image']) }}" class="img-responsive" alt="" width="55" height="55" loading='lazy'>
+																			</picture>
+																			{{-- <img src="{{ asset('/storage/item_images/'.$item['item_code'].'/gallery/preview/'.$item['image']) }}" class="img-responsive" alt="" width="55" height="55"> --}}
 																		</td>
 																		<td style="text-align: left;">{{ $item['item_name'] }}</td>
 																		<td>{{ $item['qty'] }}</td>
@@ -526,7 +557,7 @@
 															</div>
 														</div>
 														<div class="modal-footer">
-															<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+															<button type="button" class="btn btn-secondary close-modal" data-target="#{{ $order['order_number'] }}-Modal">Close</button>
 														</div>
 													</div>
 												</div>
@@ -559,7 +590,9 @@
 											@endif
 										</td>
 										<td class="text-center align-middle d-none d-lg-table-cell"><span class="badge text-dark" style="background-color: {{ $badge }}; font-size: 0.9rem; color: #fff !important;">{{ $order['status'] }}</span></td>
-										<td class="text-center align-middle d-none d-lg-table-cell"><button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#reorder{{ $order['order_number'] }}Modal" {{ $order['status'] == 'Cancelled' ? 'disabled' : '' }}>Re-Order</button></td>
+										<td class="text-center align-middle d-none d-lg-table-cell">
+											<button class="btn btn-sm btn-primary open-modal" data-target="#reorder{{ $order['order_number'] }}Modal" {{ $order['status'] == 'Cancelled' ? 'disabled' : '' }}>Re-Order</button>
+										</td>
 
 										<!-- Re-Order Modal -->
 										<div class="modal fade" id="reorder{{ $order['order_number'] }}Modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -567,7 +600,7 @@
 												<div class="modal-content">
 													<div class="modal-header">
 														<h5 class="modal-title" id="exampleModalLabel">Re-Order Item</h5>
-														<button type="button" class="close clear-bg" data-dismiss="modal" aria-label="Close">
+														<button type="button" class="close clear-bg close-modal" data-target="#reorder{{ $order['order_number'] }}Modal" aria-label="Close">
 															<span aria-hidden="true">&times;</span>
 														</button>
 													</div>
@@ -962,6 +995,16 @@
 				$('.tab-pane').removeClass('active');
 				$('#' + target).addClass('active');
 			})
+
+			$(document).on('click', '.open-modal', function (){
+				var target = $(this).data('target');
+				$(target).modal('show');
+			});
+
+			$(document).on('click', '.close-modal', function (){
+				var target = $(this).data('target');
+				$(target).modal('hide');
+			});
 		});
 	</script>
 @endsection

@@ -142,10 +142,16 @@
 								@forelse ($items as $item)
 								@php
 								$src = ($item['image']) ? '/storage/item_images/'. $item['item_code'].'/gallery/preview/'. $item['image'] : '/storage/no-photo-available.png';
+								$webp = ($item['image']) ? '/storage/item_images/'. $item['item_code'].'/gallery/preview/'. explode('.', $item['image'])[0].'.webp' : '/storage/no-photo-available.webp';
 								@endphp
 								<tr style="font-size: 0.8rem;">
 									<td class="text-center">
-										<img src="{{ $src }}" class="img-responsive" alt="" width="55" height="55">
+										<picture>
+											<source srcset="{{ asset($img_webp) }}" type="image/webp">
+											<source srcset="{{ asset($src) }}" type="image/jpeg">
+											<img src="{{ $src }}" class="img-responsive" alt="" width="55" height="55">
+										</picture>
+										{{-- <img src="{{ $src }}" class="img-responsive" alt="" width="55" height="55"> --}}
 									</td>
 									<td>{{ $item['item_name'] }}
 									{{-- for mobile --}}
