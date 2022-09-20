@@ -804,6 +804,8 @@ class CheckoutController extends Controller
 
 			$loggedin = ($temp->xusernamex) ? $temp->xusernamex : $temp->xemail_shipping;
 
+			$phone = $temp->xmobile;
+
 			$items = [];
 			foreach($order_items as $row) {
 				$image = DB::table('fumaco_items_image_v1')->where('idcode', $row->item_code)->first();
@@ -946,8 +948,6 @@ class CheckoutController extends Controller
 				if($payment_method == 'Bank Deposit'){
 					$default_payment_status = DB::table('fumaco_payment_status')->where('status_sequence', 1)->pluck('status')->first();
 				}
-
-				$phone = $temp->xmobile;
 
 				DB::table('fumaco_order')->insert([
 					'order_number' => $temp->xlogs,
