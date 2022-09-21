@@ -63,14 +63,21 @@
                                     </div>
                                     <br/>
                                     <div class="row">
-                                        <div class="col-md-6">
+                                        <div class="col-md-4">
                                             <label>Primary Image:</label>
                                             <div class="custom-file mb-3">
                                                 <input type="file" class="custom-file-input" id="customFile" name="img_primary" required>
                                                 <label class="custom-file-label" for="customFile">Choose File</label>
                                             </div>
                                         </div>
-                                        <div class="col-md-6">
+                                        <div class="col-md-4">
+                                            <label>Tablet Image:</label>
+                                            <div class="custom-file mb-3">
+                                                <input type="file" class="custom-file-input" id="customFile" name="img_tab" required>
+                                                <label class="custom-file-label" for="customFile">Choose File</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
                                             <label>Mobile Image:</label>
                                             <div class="custom-file mb-3">
                                                 <input type="file" class="custom-file-input" id="customFile" name="img_mb" required>

@@ -40,20 +40,6 @@
           @endforelse
         @foreach ($carousel_data as $carousel)
           @php
-            // $string = null;
-            // if($carousel->fumaco_caption){
-            //   $string = strip_tags($carousel->fumaco_caption);
-            //   if (strlen($string) > 250) {
-
-            //     // truncate string
-            //     $stringCut = substr($string, 0, 180);
-            //     $endPoint = strrpos($stringCut, ' ');
-
-            //     //if the string doesn't contain any space then it will cut without word basis.
-            //     $string = $endPoint? substr($stringCut, 0, $endPoint) : substr($stringCut, 0);
-            //     $string .= '...';
-            //   }
-            // }
             $active = '';
             $lazy = 'lazy';
             if(count($onsale_carousel_data) == 0){
@@ -62,12 +48,19 @@
                 $lazy = 'eager';
               }
             }
+
+            $carousel_image = $carousel->fumaco_image1;
+            if((new \Jenssegers\Agent\Agent())->isTablet()){
+              $carousel_image = $carousel->fumaco_image3 ? $carousel->fumaco_image3 : $carousel->fumaco_image1;
+            }else if((new \Jenssegers\Agent\Agent())->isMobile()){
+              $carousel_image = $carousel->fumaco_image2 ? $carousel->fumaco_image2 : $carousel->fumaco_image1;
+            }
           @endphp
           <div class="carousel-item {{ $active }}" style="background: black;">
             <picture>
-              <source srcset="{{ asset('/storage/journals/'. explode(".", $carousel->fumaco_image1)[0] .'.webp') }}" type="image/webp" style="object-fit: cover;opacity: 0.6;">
-              <source srcset="{{ asset('/storage/journals/'. $carousel->fumaco_image1) }}" type="image/jpeg" style="object-fit: cover;opacity: 0.6;">
-              <img src="{{ asset('/storage/journals/'. $carousel->fumaco_image1) }}" alt="{{ Str::slug(explode(".", $carousel->fumaco_image1)[0], '-') }}" style="object-fit: cover;opacity: 0.6;height: 100% !important; width: 100% !important" loading="{{ $lazy }}">
+              <source srcset="{{ asset('/storage/journals/'. explode(".", $carousel_image)[0] .'.webp') }}" type="image/webp">
+              <source srcset="{{ asset('/storage/journals/'. $carousel_image) }}" type="image/jpeg">
+              <img src="{{ asset('/storage/journals/'. $carousel_image) }}" alt="{{ Str::slug(explode(".", $carousel_image)[0], '-') }}" style="object-fit: cover;opacity: 0.6;height: 100% !important; width: 100% !important" loading="{{ $lazy }}">
             </picture>
 
             <div class="container">

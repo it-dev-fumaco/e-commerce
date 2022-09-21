@@ -124,8 +124,8 @@
                                     @csrf
                                     <div class="card-body">
                                         <div class="row">
-                                            <div class="col-md-6">
-                                                <label>Primary Image: (1920 x 720)</label>
+                                            <div class="col-md-4">
+                                                <label>Primary Image: (1920p x 720p)</label>
                                                 <div class="custom-file mb-3">
                                                     <input type="file" class="custom-file-input" id="customFile" name="img_primary" {{ $blog->blogprimaryimage ? '' : 'required' }}>
                                                     <label class="custom-file-label" for="customFile">{{ $blog->blogprimaryimage ? $blog->blogprimaryimage : 'Choose File' }}</label>
@@ -155,8 +155,39 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="col-md-6">
-                                                <label>Mobile Image: (1920 x 720)</label>
+                                            <div class="col-md-4">
+                                                <label>Tablet Image: (1024p x 768p)</label>
+                                                <div class="custom-file mb-3">
+                                                    <input type="file" class="custom-file-input" id="customFile" name="img_tab" {{ $blog->{'blogprimayimage-tab'} ? '' : 'required' }}>
+                                                    <label class="custom-file-label" for="customFile">{{ $blog->{'blogprimayimage-tab'} ? $blog->{'blogprimayimage-tab'} : 'Choose File' }}</label>
+                                                </div>
+                                                @if($blog->{'blogprimayimage-tab'})
+                                                    <p>Saved image: <b>{{ $blog->{'blogprimayimage-tab'} }}</b><button type="button" class="btn btn-sm btn-danger ml-3" data-toggle="modal" data-target="#deletePrimaryImageModal">Delete</button></p>
+                                                @else
+                                                    <p>No saved image</p>
+                                                @endif
+                                                <div class="modal fade" id="deletePrimaryImageModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                    <div class="modal-dialog" role="document">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title" id="exampleModalLabel">{{ $blog->{'blogprimayimage-tab'} }}</h5>
+                                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                    <span aria-hidden="true">&times;</span>
+                                                                </button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                Delete Primary Image?
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                                <a href="/admin/blog/images/img-delete/{{ $id }}/blogprimayimage-tab" type="button" class="btn btn-danger">Delete</a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label>Mobile Image: (360p x 420)</label>
                                                 <div class="custom-file mb-3">
                                                     <input type="file" class="custom-file-input" id="customFile" name="img_mb" {{ $blog->{'blogprimayimage-mob'} ? '' : 'required' }}>
                                                     <label class="custom-file-label" for="customFile">{{ $blog->{'blogprimayimage-mob'} ? $blog->{'blogprimayimage-mob'} : 'Choose File' }}</label>

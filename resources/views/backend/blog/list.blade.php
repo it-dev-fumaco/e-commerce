@@ -109,7 +109,7 @@
                                                                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
                                                                     <a href="/admin/blog/edit/form/{{ $b->id }}" class="dropdown-item">View Details</a>
                                                                     <a href="/admin/blog/set_active/{{ $b->id }}" class="dropdown-item"><small>Set Active</small></a>
-                                                                    <a href="/blog/{{ $b->slug ? $b->slug : $b->id }}" class="dropdown-item"><small>Preview</small></a>
+                                                                    <a href="/blog/{{ $b->slug ? $b->slug : $b->id }}" target="_blank" class="dropdown-item"><small>Preview</small></a>
                                                                     <a href="#" class="dropdown-item" data-toggle="modal" data-target="#deleteBlog-{{ $b->id }}"><small>Delete</small></a>
                                                                 </div>
                                                             </div>

@@ -26,6 +26,7 @@ class BlogController extends Controller
         DB::beginTransaction();
         try {
             $img_primary = $request->file('img_primary');
+            $img_tablet = $request->file('img_tab');
             $img_mb = $request->file('img_mb');
             $img_home = $request->file('img_home');
             $img_journals = $request->file('img_journals');
@@ -39,6 +40,9 @@ class BlogController extends Controller
             $name_primary = pathinfo($img_primary->getClientOriginalName(), PATHINFO_FILENAME);
 			$ext_primary = pathinfo($img_primary->getClientOriginalName(), PATHINFO_EXTENSION);
 
+            $name_tablet = pathinfo($img_tablet->getClientOriginalName(), PATHINFO_FILENAME);
+			$ext_tablet = pathinfo($img_tablet->getClientOriginalName(), PATHINFO_EXTENSION);
+
             $name_mb = pathinfo($img_mb->getClientOriginalName(), PATHINFO_FILENAME);
 			$ext_mb = pathinfo($img_mb->getClientOriginalName(), PATHINFO_EXTENSION);
 
@@ -49,11 +53,13 @@ class BlogController extends Controller
 			$ext_journals = pathinfo($img_journals->getClientOriginalName(), PATHINFO_EXTENSION);
 
 			$name_primary = Str::slug($name_primary, '-');
+			$name_tablet = Str::slug($name_tablet, '-');
 			$name_mb = Str::slug($name_mb, '-');
 			$name_home = Str::slug($name_home, '-');
 			$name_journals = Str::slug($name_journals, '-');
 
 			$primary_image_name = $name_primary.".".$ext_primary;
+			$tablet_image_name = $name_tablet.".".$ext_tablet;
 			$mb_image_name = $name_mb.".".$ext_mb;
 			$home_image_name = $name_home.".".$ext_home;
 			$journals_image_name = $name_journals.".".$ext_journals;
@@ -66,8 +72,9 @@ class BlogController extends Controller
 			}
 
             $allowed_extensions = array('jpg', 'png', 'jpeg', 'gif');
+            $extension_checker = array_diff([$ext_primary, $ext_tablet, $ext_mb, $ext_home, $ext_journals], $allowed_extensions);
 
-            if(!in_array($ext_primary, $allowed_extensions) or !in_array($ext_mb, $allowed_extensions) or !in_array($ext_home, $allowed_extensions) or !in_array($ext_journals, $allowed_extensions)){
+            if($extension_checker){
                 $image_error = "Sorry, only JPG, JPEG, PNG and GIF files are allowed.";
 				return redirect()->back()->with('image_error', $image_error);
             }
@@ -95,6 +102,7 @@ class BlogController extends Controller
                 'blog_status' => 1,
                 'blogprimaryimage' => $primary_image_name,
                 'blogprimayimage-mob' => $mb_image_name,
+                'blogprimayimage-tab' => $tablet_image_name,
                 'blogprimayimage-main' => $primary_image_name,
                 'blogprimayimage-journal' => $journals_image_name,
                 'blogprimayimage-home' => $home_image_name,
@@ -104,6 +112,7 @@ class BlogController extends Controller
             ];
 
             $webp_pr = Webp::make($request->file('img_primary'));
+            $webp_tb = Webp::make($request->file('img_tab'));
             $webp_mb = Webp::make($request->file('img_mb'));
             $webp_hm = Webp::make($request->file('img_home'));
             $webp_jr = Webp::make($request->file('img_journals'));
@@ -112,6 +121,10 @@ class BlogController extends Controller
 
 			if ($webp_pr->save(storage_path('/app/public/journals/'.$name_primary.'.webp'))) {
 				$img_primary->move($destinationPath, $primary_image_name);
+			}
+
+            if ($webp_tb->save(storage_path('/app/public/journals/'.$name_tablet.'.webp'))) {
+				$img_tablet->move($destinationPath, $tablet_image_name);
 			}
 
             if ($webp_mb->save(storage_path('/app/public/journals/'.$name_mb.'.webp'))) {
@@ -257,6 +270,8 @@ class BlogController extends Controller
 
             $destinationPath = storage_path('/app/public/journals/');
 
+            $update = ['last_modified_by' => Auth::user()->username];
+
             if($request->hasFile('img_primary')){
                 $img_primary = $request->file('img_primary');
 
@@ -277,7 +292,32 @@ class BlogController extends Controller
                     $img_primary->move($destinationPath, $primary_image_name);
                 }
 
-                DB::table('fumaco_blog')->where('id', $id)->update(['blogprimaryimage' => $primary_image_name, 'last_modified_by' => Auth::user()->username]);
+                // DB::table('fumaco_blog')->where('id', $id)->update(['blogprimaryimage' => $primary_image_name, 'last_modified_by' => Auth::user()->username]);
+                $update['blogprimaryimage'] = $primary_image_name;
+            }
+
+            if($request->hasFile('img_tab')){
+                $img_tab = $request->file('img_tab');
+
+                $name_tab = pathinfo($img_tab->getClientOriginalName(), PATHINFO_FILENAME);
+			    $ext_tab = pathinfo($img_tab->getClientOriginalName(), PATHINFO_EXTENSION);
+
+                $name_tab = Str::slug($name_tab, '-');
+
+                $tab_image_name = $name_tab.".".$ext_tab;
+
+                if(!in_array($ext_tab, $allowed_extensions)){
+                    return redirect()->back()->with('image_error', $extension_error);
+                }
+
+                $webp_tb = Webp::make($request->file('img_tab'));
+
+                if ($webp_tb->save(storage_path('/app/public/journals/'.$name_tab.'.webp'))) {
+                    $img_tab->move($destinationPath, $tab_image_name);
+                }
+
+                // DB::table('fumaco_blog')->where('id', $id)->update(['blogprimayimage-tab' => $tab_image_name, 'last_modified_by' => Auth::user()->username]);
+                $update['blogprimayimage-tab'] = $tab_image_name;
             }
 
             if($request->hasFile('img_mb')){
@@ -300,7 +340,8 @@ class BlogController extends Controller
                     $img_mb->move($destinationPath, $mb_image_name);
                 }
                 
-                DB::table('fumaco_blog')->where('id', $id)->update(['blogprimayimage-mob' => $mb_image_name, 'last_modified_by' => Auth::user()->username]);
+                // DB::table('fumaco_blog')->where('id', $id)->update(['blogprimayimage-mob' => $mb_image_name, 'last_modified_by' => Auth::user()->username]);
+                $update['blogprimayimage-mob'] = $mb_image_name;
             }
 
             if($request->hasFile('img_home')){
@@ -323,7 +364,8 @@ class BlogController extends Controller
                     $img_home->move($destinationPath, $home_image_name);
                 }
                 
-                DB::table('fumaco_blog')->where('id', $id)->update(['blogprimayimage-home' => $home_image_name, 'last_modified_by' => Auth::user()->username]);
+                // DB::table('fumaco_blog')->where('id', $id)->update(['blogprimayimage-home' => $home_image_name, 'last_modified_by' => Auth::user()->username]);
+                $update['blogprimayimage-home'] = $home_image_name;
             }
 
             if($request->hasFile('img_journals')){
@@ -346,15 +388,18 @@ class BlogController extends Controller
                     $img_journals->move($destinationPath, $journals_image_name);
                 }
 
-                DB::table('fumaco_blog')->where('id', $id)->update(['blogprimayimage-journal' => $journals_image_name, 'last_modified_by' => Auth::user()->username]);
+                // DB::table('fumaco_blog')->where('id', $id)->update(['blogprimayimage-journal' => $journals_image_name, 'last_modified_by' => Auth::user()->username]);
+                $update['blogprimayimage-journal'] = $journals_image_name;
             }
 
             // check if blog has images
             $blog_check = DB::table('fumaco_blog')->where('id', $id)->where('blogprimaryimage', '!=', '')->where('blogprimayimage-mob', '!=', '')->where('blogprimayimage-home', '!=', '')->where('blogprimayimage-journal', '!=', '')->count();
             if($blog_check > 0){
-                DB::table('fumaco_blog')->where('id', $id)->update(['blog_status' => 1]);
+                // DB::table('fumaco_blog')->where('id', $id)->update(['blog_status' => 1]);
+                $update['blog_status'] = 1;
             }
 
+            DB::table('fumaco_blog')->where('id', $id)->update($update);
             DB::commit();
             return redirect()->back()->with('success', 'Blog Updated.');
         } catch (Exception $e) {

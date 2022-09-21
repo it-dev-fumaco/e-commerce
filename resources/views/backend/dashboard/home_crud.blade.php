@@ -93,7 +93,7 @@
                                                                 <input type="text" class="form-control" id="url" name="url" value="" required>
                                                             </div>
 
-                                                            <div class="col-6 mb-2">
+                                                            <div class="col-4 mb-2">
                                                                 <label>Desktop Image (1920p x 720p) *</label>
                                                                 <div class="input-group">
                                                                     <div class="input-group-prepend">
@@ -106,7 +106,20 @@
                                                                 </div>
                                                             </div>
 
-                                                            <div class="col-6 mb-2">
+                                                            <div class="col-4 mb-2">
+                                                                <label>Tablet Image (1024p x 768p) *</label>
+                                                                <div class="input-group">
+                                                                    <div class="input-group-prepend">
+                                                                      <span class="input-group-text" id="inputGroupFileAddon01">Upload</span>
+                                                                    </div>
+                                                                    <div class="custom-file">
+                                                                      <input type="file" class="custom-file-input" name="tablet_image" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01" required>
+                                                                      <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-4 mb-2">
                                                                 <label>Mobile Image (360p x 420p) *</label>
                                                                 <div class="input-group">
                                                                     <div class="input-group-prepend">
@@ -149,21 +162,38 @@
                                         <tr>
                                             <td style="width: 10%">
                                                 <a href="#" data-toggle="modal" data-target="#image-preview-Modal{{ $carousel['id'] }}">
-                                                    <img src="{{ asset('/storage/journals/'.$carousel['lg_img']) }}" class="img-thumbnail" alt="{{ Str::slug(explode(".", $carousel['lg_img'])[0], '-') }}">
+                                                    <img src="{{ asset('/storage/journals/'.$carousel['xl_img']) }}" class="img-thumbnail" alt="{{ Str::slug(explode(".", $carousel['xl_img'])[0], '-') }}">
                                                 </a>
 
                                                 <div class="modal fade" id="image-preview-Modal{{ $carousel['id'] }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                                     <div class="modal-dialog modal-xl" role="document">
                                                         <div class="modal-content">
                                                             <div class="modal-body">
-                                                                <div class="row">
-                                                                    <div class="col-3">
-                                                                        <label>Mobile Image</label>
-                                                                        <img src="{{ asset('/storage/journals/'.$carousel['sm_img']) }}" class="img-thumbnail w-100" alt="{{ Str::slug(explode(".", $carousel['sm_img'])[0], '-') }}">
-                                                                    </div>
-                                                                    <div class="col-9">
-                                                                        <label>Desktop Image</label>
-                                                                        <img src="{{ asset('/storage/journals/'.$carousel['lg_img']) }}" class="img-thumbnail w-100" alt="{{ Str::slug(explode(".", $carousel['lg_img'])[0], '-') }}">
+                                                                <div class="container-fluid">
+                                                                    <ul class="nav nav-tabs" id="tabs" role="tablist">
+                                                                        <li class="nav-item">
+                                                                            <a class="nav-link  nav-{{ $carousel['id'] }}-link active" data-target="#desktop-{{ $carousel['id'] }}" data-id="{{ $carousel['id'] }}">Desktop</a>
+                                                                        </li>
+                                                                        <li class="nav-item">
+                                                                            <a class="nav-link  nav-{{ $carousel['id'] }}-link" data-target="#tablet-{{ $carousel['id'] }}" data-id="{{ $carousel['id'] }}">Tablet</a>
+                                                                        </li>
+                                                                        <li class="nav-item">
+                                                                            <a class="nav-link  nav-{{ $carousel['id'] }}-link" data-target="#mobile-{{ $carousel['id'] }}" data-id="{{ $carousel['id'] }}">Mobile</a>
+                                                                        </li>
+                                                                    </ul>
+                                                                    <!-- Tab panes -->
+                                                                    <div class="tab-content"> 
+                                                                        <div id="desktop-{{ $carousel['id'] }}" class="container tab-pane nav-{{ $carousel['id'] }}-tab nav-desktop-{{ $carousel['id'] }}-tabs active" style="padding: 8px 0 0 0;">
+                                                                            <img src="{{ asset('/storage/journals/'.$carousel['xl_img']) }}" class="img-thumbnail w-100" alt="{{ Str::slug(explode(".", $carousel['xl_img'])[0], '-') }}">
+                                                                        </div>
+                                                                        <div id="tablet-{{ $carousel['id'] }}" class="container tab-pane nav-{{ $carousel['id'] }}-tab nav-tablet-{{ $carousel['id'] }}-tabs" style="padding: 8px 0 0 0;">
+                                                                            <img src="{{ asset('/storage/journals/'.$carousel['lg_img']) }}" class="img-thumbnail w-100" alt="{{ Str::slug(explode(".", $carousel['lg_img'])[0], '-') }}">
+                                                                        </div>
+                                                                        <div id="mobile-{{ $carousel['id'] }}" class="container tab-pane nav-{{ $carousel['id'] }}-tab nav-mobile-{{ $carousel['id'] }}-tabs" style="padding: 8px 0 0 0;">
+                                                                            <div class="col-6 mx-auto">
+                                                                                <img src="{{ asset('/storage/journals/'.$carousel['sm_img']) }}" class="img-thumbnail" alt="{{ Str::slug(explode(".", $carousel['sm_img'])[0], '-') }}">
+                                                                            </div>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -239,7 +269,7 @@
                                                                             <div class="col-6 mb-2">
                                                                                 <div class="row">
                                                                                     <div class="col-4">
-                                                                                        <img src="{{ asset('/storage/journals/'.$carousel['lg_img']) }}" class="img-thumbnail" alt="{{ Str::slug(explode(".", $carousel['lg_img'])[0], '-') }}">
+                                                                                        <img src="{{ asset('/storage/journals/'.$carousel['xl_img']) }}" class="img-thumbnail" alt="{{ Str::slug(explode(".", $carousel['xl_img'])[0], '-') }}">
                                                                                     </div>
                                                                                     <div class="col-8">
                                                                                         <label>Desktop Image (1920p x 720p) *</label>
@@ -252,7 +282,32 @@
                                                                                             <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
                                                                                             </div>
                                                                                         </div><br>
-                                                                                        <label>Saved Image: {{ $carousel['lg_img'] }}</label>
+                                                                                        @if ($carousel['xl_img'])
+                                                                                            <label>Saved Image: {{ $carousel['xl_img'] }}</label>
+                                                                                        @endif
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+
+                                                                            <div class="col-6 mb-2">
+                                                                                <div class="row">
+                                                                                    <div class="col-4">
+                                                                                        <img src="{{ asset('/storage/journals/'.$carousel['lg_img']) }}" class="img-thumbnail" alt="{{ Str::slug(explode(".", $carousel['lg_img'])[0], '-') }}">
+                                                                                    </div>
+                                                                                    <div class="col-8">
+                                                                                        <label>Tablet Image (1024p x 768p) *</label>
+                                                                                        <div class="input-group">
+                                                                                            <div class="input-group-prepend">
+                                                                                            <span class="input-group-text" id="inputGroupFileAddon01">Upload</span>
+                                                                                            </div>
+                                                                                            <div class="custom-file">
+                                                                                            <input type="file" class="custom-file-input" name="tablet_image" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01">
+                                                                                            <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
+                                                                                            </div>
+                                                                                        </div><br>
+                                                                                        @if ($carousel['lg_img'])
+                                                                                            <label>Saved Image: {{ $carousel['lg_img'] }}</label>
+                                                                                        @endif
                                                                                     </div>
                                                                                 </div>
                                                                             </div>
@@ -273,7 +328,9 @@
                                                                                             <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
                                                                                             </div>
                                                                                         </div><br>
-                                                                                        <label>Saved Image: {{ $carousel['sm_img'] }}</label>
+                                                                                        @if ($carousel['sm_img'])
+                                                                                            <label>Saved Image: {{ $carousel['sm_img'] }}</label>
+                                                                                        @endif
                                                                                     </div>
                                                                                 </div>
                                                                             </div>
@@ -433,6 +490,15 @@
     $(".custom-file-input").change(function() {
         var fileName = $(this).val().split("\\").pop();
         $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+    });
+
+    $(document).on('click', '.nav-link', function(){
+        var target = $(this).data('target');
+        var id = $(this).data('id');
+        $('.nav-' + id + '-tab').removeClass('active');
+        $('.nav-' + id + '-link').removeClass('active');
+        $(target).addClass('active');
+        $(this).addClass('active');
     });
 </script>
 @endsection
