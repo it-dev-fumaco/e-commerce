@@ -68,7 +68,7 @@
               <img src="{{ asset('/storage/journals/'. $carousel_image) }}" alt="{{ Str::slug(explode(".", $carousel_image)[0], '-') }}" class="{{ $loop->first ? 'test' : null }}" style="object-fit: cover;opacity: 0.6;height: 100% !important; width: 100% !important" loading="{{ $lazy }}">
             </picture>
 
-            <div class="container d-none">
+            <div class="container">
               <div class="carousel-caption text-start carousel-item-container">
                 <h3 class="carousel-header-font fumacoFont1">{!! strip_tags($carousel->fumaco_title) !!}</h3>
                 @if ($carousel->fumaco_caption)
