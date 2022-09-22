@@ -28,16 +28,16 @@
       </ol>
 
       <div class="carousel-inner">
-          @forelse($onsale_carousel_data as $banner_image)
-            <div class="carousel-item {{ $loop->first ? "active" : ""}}" style="background: black;">
-              <picture>
-                <source srcset="{{ asset('/assets/site-img/'. explode(".", $banner_image)[0] .'.webp') }}" type="image/webp" style="object-fit: cover;opacity: 1;">
-                <source srcset="{{ asset('/assets/site-img/'. $banner_image) }}" type="image/jpeg" style="object-fit: cover;opacity: 1;">
-                <img src="{{ asset('/assets/site-img/'. $banner_image) }}" alt="{{ Str::slug(explode(".", $banner_image)[0], '-') }}" style="object-fit: cover;opacity: 1;" loading="{{ $loop->first ? 'eager' : 'lazy' }}">
-              </picture>
-            </div>
-            @empty
-          @endforelse
+        @forelse($onsale_carousel_data as $banner_image)
+          <div class="carousel-item {{ $loop->first ? "active" : ""}}" style="background: black;">
+            <picture>
+              <source srcset="{{ asset('/assets/site-img/'. explode(".", $banner_image)[0] .'.webp') }}" type="image/webp" style="object-fit: cover;opacity: 1;">
+              <source srcset="{{ asset('/assets/site-img/'. $banner_image) }}" type="image/jpeg" style="object-fit: cover;opacity: 1;">
+              <img src="{{ asset('/assets/site-img/'. $banner_image) }}" alt="{{ Str::slug(explode(".", $banner_image)[0], '-') }}" style="object-fit: cover;opacity: 1;" loading="{{ $loop->first ? 'eager' : 'lazy' }}">
+            </picture>
+          </div>
+          @empty
+        @endforelse
         @foreach ($carousel_data as $carousel)
           @php
             $active = '';
@@ -50,20 +50,25 @@
             }
 
             $carousel_image = $carousel->fumaco_image1;
+            $width = '1920px';
+            $height = '720px';
             if((new \Jenssegers\Agent\Agent())->isTablet()){
               $carousel_image = $carousel->fumaco_image3 ? $carousel->fumaco_image3 : $carousel->fumaco_image1;
+              $width = '1024px';
             }else if((new \Jenssegers\Agent\Agent())->isMobile()){
               $carousel_image = $carousel->fumaco_image2 ? $carousel->fumaco_image2 : $carousel->fumaco_image1;
+              $width = '420px';
+              $height = '640px';
             }
           @endphp
           <div class="carousel-item {{ $active }}" style="background: black;">
-            <picture>
+            <picture style="width: {{ $width }} !important; height: {{ $height }} !important;">
               <source srcset="{{ asset('/storage/journals/'. explode(".", $carousel_image)[0] .'.webp') }}" type="image/webp">
               <source srcset="{{ asset('/storage/journals/'. $carousel_image) }}" type="image/jpeg">
-              <img src="{{ asset('/storage/journals/'. $carousel_image) }}" alt="{{ Str::slug(explode(".", $carousel_image)[0], '-') }}" style="object-fit: cover;opacity: 0.6;height: 100% !important; width: 100% !important" loading="{{ $lazy }}">
+              <img src="{{ asset('/storage/journals/'. $carousel_image) }}" alt="{{ Str::slug(explode(".", $carousel_image)[0], '-') }}" class="{{ $loop->first ? 'test' : null }}" style="object-fit: cover;opacity: 0.6;height: 100% !important; width: 100% !important" loading="{{ $lazy }}">
             </picture>
 
-            <div class="container">
+            <div class="container d-none">
               <div class="carousel-caption text-start carousel-item-container">
                 <h3 class="carousel-header-font fumacoFont1">{!! strip_tags($carousel->fumaco_title) !!}</h3>
                 @if ($carousel->fumaco_caption)
@@ -162,8 +167,8 @@
                       </div>
   
                       <picture>
-                        <source srcset="{{ asset($img_bs_webp) }}" type="image/webp" class="img-responsive" style="width: 100% !important;">
-                        <source srcset="{{ asset($img_bs) }}" type="image/jpeg" class="img-responsive" style="width: 100% !important;">
+                        <source srcset="{{ asset($img_bs_webp) }}" type="image/webp">
+                        <source srcset="{{ asset($img_bs) }}" type="image/jpeg">
                         <img src="{{ asset($img_bs) }}" alt="{{ Str::slug(explode(".", $bs['image'])[0], '-') }}" class="img-responsive hover" style="width: 100% !important;" loading="lazy">
                       </picture>
                     </div>
@@ -336,11 +341,11 @@
 @section('script')
   <script src="{{ asset('/slick/slick.js') }}" type="text/javascript" charset="utf-8"></script>
   <script type="text/javascript">
-    if( !/Android|webOS|iPad|iPod|iPhone|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
-      $('#myCarousel').css('margin-top', $('#navbar').height());
-    }else{
-      $('#mob-picture').css('margin-top', $('#navbar').height());
-    }
+    // if( !/Android|webOS|iPad|iPod|iPhone|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+    //   $('#myCarousel').css('margin-top', $('#navbar').height());
+    // }else{
+    //   $('#mob-picture').css('margin-top', $('#navbar').height());
+    // }
 
     $(document).ready(function() {
       $(".regular").slick({

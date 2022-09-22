@@ -107,7 +107,7 @@
                                                             </div>
 
                                                             <div class="col-4 mb-2">
-                                                                <label>Tablet Image (1024p x 768p) *</label>
+                                                                <label>Tablet Image (1024p x 720p) *</label>
                                                                 <div class="input-group">
                                                                     <div class="input-group-prepend">
                                                                       <span class="input-group-text" id="inputGroupFileAddon01">Upload</span>
@@ -120,7 +120,7 @@
                                                             </div>
 
                                                             <div class="col-4 mb-2">
-                                                                <label>Mobile Image (360p x 420p) *</label>
+                                                                <label>Mobile Image (420p x 640p) *</label>
                                                                 <div class="input-group">
                                                                     <div class="input-group-prepend">
                                                                       <span class="input-group-text" id="inputGroupFileAddon01">Upload</span>
@@ -295,7 +295,7 @@
                                                                                         <img src="{{ asset('/storage/journals/'.$carousel['lg_img']) }}" class="img-thumbnail" alt="{{ Str::slug(explode(".", $carousel['lg_img'])[0], '-') }}">
                                                                                     </div>
                                                                                     <div class="col-8">
-                                                                                        <label>Tablet Image (1024p x 768p) *</label>
+                                                                                        <label>Tablet Image (1024p x 720p) *</label>
                                                                                         <div class="input-group">
                                                                                             <div class="input-group-prepend">
                                                                                             <span class="input-group-text" id="inputGroupFileAddon01">Upload</span>
@@ -318,7 +318,7 @@
                                                                                         <img src="{{ asset('/storage/journals/'.$carousel['sm_img']) }}" class="img-thumbnail" alt="{{ Str::slug(explode(".", $carousel['sm_img'])[0], '-') }}">
                                                                                     </div>
                                                                                     <div class="col-8">
-                                                                                        <label>Mobile Image (360p x 420p) *</label>
+                                                                                        <label>Mobile Image (420p x 640p) *</label>
                                                                                         <div class="input-group">
                                                                                             <div class="input-group-prepend">
                                                                                             <span class="input-group-text" id="inputGroupFileAddon01">Upload</span>
