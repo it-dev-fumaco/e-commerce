@@ -124,7 +124,7 @@
                                     @csrf
                                     <div class="card-body">
                                         <div class="row">
-                                            <div class="col-md-4">
+                                            <div class="col-md-6">
                                                 <label>Primary Image: (1920 x 720)</label>
                                                 <div class="custom-file mb-3">
                                                     <input type="file" class="custom-file-input" id="customFile" name="img_primary" {{ $blog->blogprimaryimage ? '' : 'required' }}>
@@ -155,7 +155,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="col-md-4">
+                                            <div class="col-md-6">
                                                 <label>Tablet Image: (1024 x 720)</label>
                                                 <div class="custom-file mb-3">
                                                     <input type="file" class="custom-file-input" id="customFile" name="img_tab" {{ $blog->{'blogprimayimage-tab'} ? '' : 'required' }}>
@@ -186,7 +186,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="col-md-4">
+                                            <div class="col-md-6">
                                                 <label>Mobile Image: (420 x 640)</label>
                                                 <div class="custom-file mb-3">
                                                     <input type="file" class="custom-file-input" id="customFile" name="img_mb" {{ $blog->{'blogprimayimage-mob'} ? '' : 'required' }}>
@@ -217,9 +217,7 @@
                                                     </div>
                                                 </div>
                                             </div> 
-                                        </div>
-                                        <br/>
-                                        <div class="row">
+                                        
                                             <div class="col-md-6">
                                                 <label>Homepage Image: (420 x 231)</label>
                                                 <div class="custom-file mb-3">
