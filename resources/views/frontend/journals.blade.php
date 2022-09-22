@@ -27,25 +27,27 @@
                     }
                 @endphp
                 <div class="carousel-item {{ $loop->first ? "active" : "" }}">
-
                   @php
-                    $image = ($carousel->blogprimaryimage) ? '/storage/journals/'.$carousel->blogprimaryimage : '/storage/no-photo-available.png';
-                    $image_webp = ($carousel->blogprimaryimage) ? '/storage/journals/'.explode(".", $carousel->blogprimaryimage)[0] .'.webp' : '/storage/no-photo-available.png';
+                    $carousel_image = $carousel->blogprimaryimage ? '/storage/journals/'.$carousel->blogprimaryimage : '/storage/no-photo-available.png';
+                    if((new \Jenssegers\Agent\Agent())->isTablet()){
+                      $carousel_image = $carousel->{'blogprimayimage-tab'} ? '/storage/journals/'.$carousel->{'blogprimayimage-tab'} : $carousel_image;
+                    }else if((new \Jenssegers\Agent\Agent())->isMobile()){
+                      $carousel_image = $carousel->{'blogprimayimage-mob'} ? '/storage/journals/'.$carousel->{'blogprimayimage-mob'} : $carousel_image;
+                    }
                   @endphp
-              
                   <picture>
-                    <source srcset="{{ asset($image_webp) }}" type="image/webp" style="object-fit: cover; opacity: 0.6;">
-                    <source srcset="{{ asset($image) }}" type="image/jpeg" style="object-fit: cover; opacity: 0.6;">
-                    <img src="{{ asset($image) }}" alt="{{ Str::slug(explode(".", $carousel->blogprimaryimage)[0], '-') }}" style="object-fit: cover; opacity: 0.6; width: 100%; height: 100% !important">
-                   </picture>
+                    <source srcset="{{ asset(explode('.', $carousel_image)[0].'.webp') }}" type="image/webp">
+                    <source srcset="{{ asset($carousel_image) }}" type="image/jpeg">
+                    <img src="{{ asset($carousel_image) }}" alt="{{ Str::slug(explode(".", $carousel_image)[0], '-') }}" style="object-fit: cover; opacity: 0.6; width: 100%; height: 100% !important" loading="{{ $loop->first ? 'eager' : 'lazy' }}">
+                  </picture>
                    
-                    <div class="container">
-                        <div class="carousel-caption text-start">
-                            <h3 class="fumacoFont1" style="font-family: 'poppins', sans-serif !important;">{{ $carousel->blogtitle }}</h3>
-                            <p class="abt_standard fumacoFont2" style="text-align: left; text-justify: inter-word;">{{ $string }}</p>
-                            <p><a class="abt_standard btn btn-lg btn-primary btn-fumaco fumacoFont_btn" href="/blog/{{ $carousel->slug ? $carousel->id : $carousel->id }}" role="button">Read More</a></p>
-                        </div>
-                    </div>
+                  <div class="container">
+                      <div class="carousel-caption text-start">
+                          <h3 class="fumacoFont1" style="font-family: 'poppins', sans-serif !important;">{{ $carousel->blogtitle }}</h3>
+                          <p class="abt_standard fumacoFont2" style="text-align: left; text-justify: inter-word;">{{ $string }}</p>
+                          <p><a class="abt_standard btn btn-lg btn-primary btn-fumaco fumacoFont_btn" href="/blog/{{ $carousel->slug ? $carousel->id : $carousel->id }}" role="button">Read More</a></p>
+                      </div>
+                  </div>
                 </div>
             @endforeach
         </div>

@@ -180,6 +180,7 @@ return [
         App\Providers\MailConfigServiceProvider::class,
         App\Providers\GoogleApiServiceProvider::class,
         Shivella\Bitly\BitlyServiceProvider::class,
+        Jenssegers\Agent\AgentServiceProvider::class,
     ],
 
     /*
@@ -236,6 +237,7 @@ return [
         'GoogleMaps' => GoogleMaps\Facade\GoogleMapsFacade::class,
         'Webp' => Buglinjo\LaravelWebp\Facades\Webp::class,
         'Bitly' => Shivella\Bitly\Facade\Bitly::class,
+        'Agent' => Jenssegers\Agent\Facades\Agent::class,
     ],
 
 ];

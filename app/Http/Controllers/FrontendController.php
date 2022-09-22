@@ -462,12 +462,12 @@ class FrontendController extends Controller
         }
 
         $carousel_data = DB::table('fumaco_header')->where('fumaco_status', 1)
-            ->select('fumaco_title', 'fumaco_caption', 'fumaco_image1', 'fumaco_image2', 'text_color', 'btn_position', 'fumaco_url', 'fumaco_btn_name')
+            ->select('fumaco_title', 'fumaco_caption', 'fumaco_image1', 'fumaco_image2', 'fumaco_image3', 'text_color', 'btn_position', 'fumaco_url', 'fumaco_btn_name')
             ->orderBy('fumaco_active', 'desc')->get();
 
         $onsale_carousel_data = DB::table('fumaco_on_sale')
             ->where('status', 1)->where('banner_image', '!=', null)
-            ->where('start_date', '<=', Carbon::now())->where('end_date', '>=', Carbon::now())
+            ->whereDate('start_date', '<=', Carbon::now()->startOfDay())->whereDate('end_date', '>=', Carbon::now()->endOfDay())
             ->pluck('banner_image');
 
         $blogs = DB::table('fumaco_blog')->where('blog_featured', 1)
@@ -1066,7 +1066,7 @@ class FrontendController extends Controller
     public function viewJournalsPage(Request $request) {
         $blog_carousel = DB::table('fumaco_blog')->where('blog_enable', 1)
             ->where('blog_featured', 1)->orderBy('blog_active', 'desc')
-            ->select('blog_caption', 'blogprimaryimage', 'blogtitle', 'slug', 'id')->get();
+            ->select('blog_caption', 'blogprimaryimage', 'blogprimayimage-mob', 'blogprimayimage-tab', 'blogtitle', 'slug', 'id')->get();
 
         $blog_counts = DB::table('fumaco_blog')->where('blog_enable', 1)
             ->selectRaw('blogtype, COUNT(id) as count')
@@ -1080,13 +1080,11 @@ class FrontendController extends Controller
             'products' => (array_key_exists('Products', $blog_counts)) ? $blog_counts['Products'] : 0
         ];
 
-        if($request->type != ''){
-            $blog_list = DB::table('fumaco_blog')->where('blog_enable', 1)->where('blogtype', $request->type)
-                ->select('id', 'blogprimayimage-journal', 'datepublish', 'blogtitle', 'blog_caption', 'blogtype', 'slug')->get()->toArray();
-        }else{
-            $blog_list = DB::table('fumaco_blog')->where('blog_enable', 1)
-                ->select('id', 'blogprimayimage-journal', 'datepublish', 'blogtitle', 'blog_caption', 'blogtype', 'slug')->get()->toArray();
-        }
+        $blog_list = DB::table('fumaco_blog')->where('blog_enable', 1)
+            ->when($request->type, function ($q) use ($request){
+                $q->where('blogtype', $request->type);
+            })
+            ->select('id', 'blogprimayimage-journal', 'datepublish', 'blogtitle', 'blog_caption', 'blogtype', 'slug')->get()->toArray();
 
         $blog_ids = array_column($blog_list, 'id');
         $blog_comments = DB::table('fumaco_comments')->whereIn('blog_id', $blog_ids)->where('blog_status', 1)

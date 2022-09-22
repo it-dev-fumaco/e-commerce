@@ -181,7 +181,7 @@
                 <picture>
                   <source srcset="{{ asset('/assets/site-img/logo-sm.webp') }}" type="image/webp">
                   <source srcset="{{ asset('/assets/site-img/logo-sm.png') }}" type="image/jpeg">
-                  <img src="{{ asset('/assets/site-img/logo-sm.png') }}" style="width: 100%" >
+                  <img src="{{ asset('/assets/site-img/logo-sm.png') }}" alt="Fumaco" style="width: 100%; height: 100%" >
                 </picture>
               </a>
             </div>
@@ -402,8 +402,8 @@
       <br>
     </main>
   </footer>
-  <script src="https://kit.fontawesome.com/ec0415ab92.js"></script>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://kit.fontawesome.com/ec0415ab92.js"></script> 
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> 
   @if($activePage == 'contact')
   <script src="https://www.google.com/recaptcha/api.js" async defer></script>
   @else
@@ -697,6 +697,28 @@
       $("#closeCookieConsent, .cookieConsentOK").click(function() {
           $("#cookieConsent").fadeOut(200);
       });
+
+      // Fix for "Does not use passive listeners to improve scrolling performance"
+      jQuery.event.special.touchstart = {
+          setup: function( _, ns, handle ) {
+              this.addEventListener("touchstart", handle, { passive: !ns.includes("noPreventDefault") });
+          }
+      };
+      jQuery.event.special.touchmove = {
+          setup: function( _, ns, handle ) {
+              this.addEventListener("touchmove", handle, { passive: !ns.includes("noPreventDefault") });
+          }
+      };
+      jQuery.event.special.wheel = {
+          setup: function( _, ns, handle ){
+              this.addEventListener("wheel", handle, { passive: true });
+          }
+      };
+      jQuery.event.special.mousewheel = {
+          setup: function( _, ns, handle ){
+              this.addEventListener("mousewheel", handle, { passive: true });
+          }
+      };
     });
   </script>
 

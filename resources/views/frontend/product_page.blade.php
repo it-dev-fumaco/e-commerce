@@ -45,7 +45,18 @@
 								<br><br>
 								<div class="xzoom-thumbs">
 									@foreach ($product_images as $image)
-									<a href="{{ asset('/storage/item_images/'. $image->idcode.'/gallery/original/'. $image->imgoriginalx) }}"><img class="xzoom-gallery4" width="60" src="{{ asset('/storage/item_images/'. $image->idcode.'/gallery/preview/'. $image->imgprimayx) }}" alt="{{ Str::slug(explode(".", $image->imgprimayx)[0], '-') }}" /></a>
+									@php
+										$th_img = '/storage/item_images/'. $image->idcode.'/gallery/preview/'. $image->imgprimayx;
+										$th_webp = '/storage/item_images/'. $image->idcode.'/gallery/preview/'. explode('.', $image->imgprimayx)[0]. '.webp';
+									@endphp
+									<a href="{{ asset('/storage/item_images/'. $image->idcode.'/gallery/original/'. $image->imgoriginalx) }}">
+										<picture>
+											<source srcset="{{ asset($th_webp) }}" type="image/webp">
+											<source srcset="{{ asset($th_img) }}" type="image/jpeg">
+											<img class="xzoom-gallery4" width="60" src="{{ asset('/storage/item_images/'. $image->idcode.'/gallery/preview/'. $image->imgprimayx) }}" alt="{{ Str::slug(explode(".", $image->imgprimayx)[0], '-') }}" loading='lazy' />
+										</picture>
+										{{-- <img class="xzoom-gallery4" width="60" src="{{ asset('/storage/item_images/'. $image->idcode.'/gallery/preview/'. $image->imgprimayx) }}" alt="{{ Str::slug(explode(".", $image->imgprimayx)[0], '-') }}" loading='lazy' /> --}}
+									</a>
 									@endforeach
 								</div>
 							</div>
@@ -238,7 +249,7 @@
 										<picture>
 											<source srcset="{{ asset($f_img_webp) }}" type="image/webp" class="img-responsive" style="width: 100% !important;">
 											<source srcset="{{ asset($f_img) }}" type="image/jpeg" class="img-responsive" style="width: 100% !important;">
-											<img src="{{ asset($f_img) }}" alt="{{ Str::slug(explode(".", $product_details->f_featured_image)[0], '-') }}" class="img-responsive" style="width: 100% !important;">
+											<img src="{{ asset($f_img) }}" alt="{{ Str::slug(explode(".", $product_details->f_featured_image)[0], '-') }}" class="img-responsive" style="width: 100% !important;" loading="lazy">
 										</picture>
 									</div>
 									@endif
@@ -404,7 +415,7 @@
 											<picture>
 												<source srcset="{{ asset($compare_img_webp) }}" type="image/webp" class="img-responsive" style="width: 100% !important;">
 												<source srcset="{{ asset($compare_img) }}" type="image/jpeg" class="img-responsive" style="width: 100% !important;">
-												<img src="{{ asset($compare_img) }}" alt="{{ Str::slug(explode(".", $compare_product['image'])[0], '-') }}" class="img-responsive hover" style="width: 100%" />
+												<img src="{{ asset($compare_img) }}" alt="{{ Str::slug(explode(".", $compare_product['image'])[0], '-') }}" class="img-responsive hover" style="width: 100%" loading="lazy"/>
 											</picture>
 										</div>
 										<span class="comparison-description d-block mb-3">{{ $compare_product['item_name'] }}</span>
@@ -493,7 +504,7 @@
 														<picture>
 															<source srcset="{{ asset($img_webp) }}" type="image/webp" class="img-responsive" style="width: 100% !important;">
 															<source srcset="{{ asset($img) }}" type="image/jpeg" class="img-responsive" style="width: 100% !important;">
-															<img src="{{ asset($img) }}" alt="{{ Str::slug(explode(".", $rp['image'])[0], '-') }}" class="img-responsive hover" style="width: 100% !important;">
+															<img src="{{ asset($img) }}" alt="{{ Str::slug(explode(".", $rp['image'])[0], '-') }}" class="img-responsive hover" style="width: 100% !important;" loading="lazy">
 														</picture>
 													</div>
 													<div class="card-body d-flex flex-column">
@@ -577,7 +588,7 @@
 														<picture>
 															<source srcset="{{ asset($img_webp) }}" type="image/webp" class="img-responsive" style="width: 100% !important;">
 															<source srcset="{{ asset($img) }}" type="image/jpeg" class="img-responsive" style="width: 100% !important;">
-															<img src="{{ asset($img) }}" alt="{{ Str::slug(explode(".", $recommended_item['image'])[0], '-') }}" class="img-responsive hover" style="width: 100% !important;">
+															<img src="{{ asset($img) }}" alt="{{ Str::slug(explode(".", $recommended_item['image'])[0], '-') }}" class="img-responsive hover" style="width: 100% !important;" loading='lazy'>
 														</picture>
 													</div>
 													<div class="card-body d-flex flex-column">

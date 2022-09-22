@@ -52,7 +52,7 @@
                 <div class="row">
                     <div class="col-sm-3 animated animatedFadeInUp fadeInUp" style="text-align: center;">
                         <p class="abt_standard font1color about-number">
-                            <img src="{{ asset('/storage/about/30plus.png') }}" alt="" class="responsive">
+                            <img src="{{ asset('/storage/about/30plus.png') }}" alt="" class="responsive" loading="lazy">
                         </p>
                     </div>
                     <div class="col-sm-8 animated animatedFadeInUp fadeInUp">
@@ -65,7 +65,7 @@
                 <div class="row">
                     <div class="col-sm-3 animated animatedFadeInUp fadeInUp" style="text-align: center;">
                         <p class="abt_standard font1color about-number">
-                            <img src="{{ asset('/storage/about/7companies.png') }}" alt="" class="responsive">
+                            <img src="{{ asset('/storage/about/7companies.png') }}" alt="" class="responsive" loading="lazy">
                         </p>
                     </div>
                     <div class="col-sm-8 animated animatedFadeInUp fadeInUp">
@@ -117,7 +117,7 @@
                 <div class="row">
                     <div class="col-sm-3 animated animatedFadeInUp fadeInUp" style="text-align: center;">
                         <p class="abt_standard font1color about-number">
-                            <img src="{{ asset('/storage/about/28percent.png') }}" alt="" class="responsive">
+                            <img src="{{ asset('/storage/about/28percent.png') }}" alt="" class="responsive" loading="lazy">
                         </p>
                     </div>
                     <div class="col-sm-8 animated animatedFadeInUp fadeInUp">
@@ -171,7 +171,7 @@
                 </div>
                 <div class="row">
                     <div class="col-sm-3 animated animatedFadeInUp fadeInUp" style="text-align: center;">
-                        <p class="abt_standard font1color about-number"><img src="{{ asset('/storage/about/13companies.png') }}" alt="" class="responsive"></p>
+                        <p class="abt_standard font1color about-number"><img src="{{ asset('/storage/about/13companies.png') }}" alt="" class="responsive" loading="lazy"></p>
                     </div>
                     <div class="col-sm-8 animated animatedFadeInUp fadeInUp">
                         <p class="abt_standard font1color fumacoFont_about_caption" style="vertical-align: baseline; padding: 30px 0;">{!! $about_data->{'3_year_1_details'} !!}</p>
@@ -234,7 +234,7 @@
                         <picture>
                             <source srcset="{{ asset($image_webp) }}" type="image/webp">
                             <source srcset="{{ asset($image) }}" type="image/jpeg">
-                            <img src="{{ asset($image) }}" alt="{{ Str::slug(explode(".", $partner->image)[0], '-') }}" class="img-thumbnail">
+                            <img src="{{ asset($image) }}" alt="{{ Str::slug(explode(".", $partner->image)[0], '-') }}" class="img-thumbnail" loading="lazy">
 
                         </picture>
                     </div>

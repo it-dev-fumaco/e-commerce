@@ -3,21 +3,10 @@
 	'activePage' => 'track_order'
 ])
 @section('content')
-	<main style="background-color:#0062A5;">
-		<div id="myCarousel" class="carousel slide" data-bs-ride="carousel">
-			<div class="carousel-inner">
-				<div class="carousel-item active" style="height: 13rem !important;">
-					<img src="{{ asset('/assets/site-img/header3-sm.png') }}" alt="" style="position: absolute; bottom: 0 !important;left: 0;min-width: 100%; height: 100% !important;">
-					<div class="container">
-						<div class="carousel-caption text-start" style="bottom: 1rem !important; right: 25% !important; left: 25%; !important;">
-							<center><h3 class="carousel-header-font">TRACK ORDER</h3></center>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</main>
-
+@php
+    $page_title = 'TRACK ORDER';
+@endphp
+@include('frontend.header')
 	<main style="background-color:#ffffff; min-height: 550px;" class="products-head">
 		<div class="container-fluid">
 			<div class="row">
@@ -156,7 +145,16 @@
 												@forelse ($items as $item)
 												<tr style="font-size: 11pt;">
 													<td class="text-center">
-														<img src="{{ asset('/storage/item_images/'. $item['item_code'] .'/gallery/preview/'.$item['image']) }}" class="img-responsive" alt="" width="50" height="50">
+														@php
+															$img = '/storage/item_images/'. $item['item_code'] .'/gallery/preview/'.$item['image'];
+															$webp = '/storage/item_images/'. $item['item_code'] .'/gallery/preview/'.explode('.', $item['image'])[0].'.webp';
+														@endphp
+														<picture>
+															<source srcset="{{ asset($webp) }}" type="image/webp">
+															<source srcset="{{ asset($img) }}" type="image/jpeg">
+															<img src="{{ asset('/storage/item_images/'. $item['item_code'] .'/gallery/preview/'.$item['image']) }}" class="img-responsive" alt="" width="50" height="50" loading='lazy'>
+														</picture>
+														{{-- <img src="{{ asset('/storage/item_images/'. $item['item_code'] .'/gallery/preview/'.$item['image']) }}" class="img-responsive" alt="" width="50" height="50"> --}}
 													</td>
 													<td>{{ $item['item_name'] }}</td>
 													<td class="text-center">{{ $item['quantity'] }}</td>
@@ -356,7 +354,16 @@
 									@forelse ($items as $item)
 									<tr style="font-size: 11pt;">
 										<td class="text-center">
-											<img src="{{ asset('/storage/item_images/'. $item['item_code'] .'/gallery/preview/'.$item['image']) }}" class="img-responsive" alt="" width="55" height="55">
+											@php
+												$img = '/storage/item_images/'. $item['item_code'] .'/gallery/preview/'.$item['image'];
+												$webp = '/storage/item_images/'. $item['item_code'] .'/gallery/preview/'.explode('.', $item['image'])[0].'.webp';
+											@endphp
+											<picture>
+												<source srcset="{{ asset($webp) }}" type="image/webp">
+												<source srcset="{{ asset($img) }}" type="image/jpeg">
+												<img src="{{ asset('/storage/item_images/'. $item['item_code'] .'/gallery/preview/'.$item['image']) }}" class="img-responsive" alt="" width="55" height="55" loading="lazy">
+											</picture>
+											{{-- <img src="{{ asset('/storage/item_images/'. $item['item_code'] .'/gallery/preview/'.$item['image']) }}" class="img-responsive" alt="" width="55" height="55"> --}}
 										</td>
 										<td>{{ $item['item_name'] }}</td>
 										<td class="text-center">{{ $item['quantity'] }}</td>

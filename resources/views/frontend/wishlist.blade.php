@@ -4,20 +4,10 @@
 ])
 
 @section('content')
-<main style="background-color:#0062A5;">
-	<div id="myCarousel" class="carousel slide" data-bs-ride="carousel">
-		<div class="carousel-inner">
-			<div class="carousel-item active" style="height: 13rem !important;">
-				<img src="{{ asset('/assets/site-img/header3-sm.png') }}" alt="" style="position: absolute; bottom: 0 !important;left: 0;min-width: 100%; height: 100% !important;">
-				<div class="container">
-					<div class="carousel-caption text-start" style="bottom: 1rem !important; right: 25% !important; left: 25%; !important;">
-						<center><h3 class="carousel-header-font">WISHLIST</h3></center>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-</main>
+@php
+	$page_title = 'WISHLIST';
+@endphp
+@include('frontend.header')
 <main style="background-color:#ffffff; min-height: 600px;" class="products-head">
 	<div class="container-fluid">
 		<div class="row">
@@ -52,7 +42,16 @@
 						@forelse ($wishlist_arr as $wishlist)
 						<tr class="order-font">
 							<td class="text-center">
-								<img src="{{ asset('/storage/item_images/'.$wishlist['item_code'].'/gallery/preview/'.$wishlist['image']) }}" class="img-responsive" alt="" width="55" height="55">
+								@php
+									$img = '/storage/item_images/'.$wishlist['item_code'].'/gallery/preview/'.$wishlist['image'];
+									$webp = '/storage/item_images/'. $wishlist['item_code'] .'/gallery/preview/'.explode('.', $wishlist['image'])[0].'.webp';
+								@endphp
+								<picture>
+									<source srcset="{{ asset($webp) }}" type="image/webp">
+									<source srcset="{{ asset($img) }}" type="image/jpeg">
+									<img src="{{ asset('/storage/item_images/'.$wishlist['item_code'].'/gallery/preview/'.$wishlist['image']) }}" class="img-responsive" alt="" width="55" height="55" loading='lazy'>
+								</picture>
+								{{-- <img src="{{ asset('/storage/item_images/'.$wishlist['item_code'].'/gallery/preview/'.$wishlist['image']) }}" class="img-responsive" alt="" width="55" height="55"> --}}
 							</td>
 							<td class="tbls">{{ $wishlist['item_name'] }}<br/>&nbsp;
 							<p class="d-lg-none d-xl-none"><b>Price:</b> P {{ number_format($wishlist['item_price'], 2) }}</p>
