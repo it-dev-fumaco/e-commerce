@@ -65,7 +65,7 @@
             <picture style="width: {{ $width }} !important; height: {{ $height }} !important;">
               <source srcset="{{ asset('/storage/journals/'. explode(".", $carousel_image)[0] .'.webp') }}" type="image/webp">
               <source srcset="{{ asset('/storage/journals/'. $carousel_image) }}" type="image/jpeg">
-              <img src="{{ asset('/storage/journals/'. $carousel_image) }}" alt="{{ Str::slug(explode(".", $carousel_image)[0], '-') }}" class="{{ $loop->first ? 'test' : null }}" style="object-fit: cover;opacity: 0.6;height: 100% !important; width: 100% !important" loading="{{ $lazy }}">
+              <img src="{{ asset('/storage/journals/'. $carousel_image) }}" alt="{{ Str::slug(explode(".", $carousel_image)[0], '-') }}" style="object-fit: cover;opacity: 0.6;height: 100% !important; width: 100% !important" loading="{{ $lazy }}">
             </picture>
 
             <div class="container">
@@ -106,7 +106,7 @@
               <picture>
                 <source srcset="{{ asset($image_webp) }}" type="image/webp" class="card-img-top">
                 <source srcset="{{ asset($image) }}" type="image/jpeg" class="card-img-top">
-                <img src="{{ asset($image) }}" alt="{{ Str::slug(explode(".", $b->{'blogprimayimage-home'})[0], '-') }}" class="card-img-top hover" loading="lazy">
+                <img src="{{ asset($image) }}" alt="{{ Str::slug(explode(".", $b->{'blogprimayimage-home'})[0], '-') }}" class="card-img-top hover" style="width: 100% !important; height: 100% !important" loading="lazy">
               </picture>
               </div>
               
@@ -169,7 +169,7 @@
                       <picture>
                         <source srcset="{{ asset($img_bs_webp) }}" type="image/webp">
                         <source srcset="{{ asset($img_bs) }}" type="image/jpeg">
-                        <img src="{{ asset($img_bs) }}" alt="{{ Str::slug(explode(".", $bs['image'])[0], '-') }}" class="img-responsive hover" style="width: 100% !important;" loading="lazy">
+                        <img src="{{ asset($img_bs) }}" alt="{{ Str::slug(explode(".", $bs['image'])[0], '-') }}" class="img-responsive hover" style="width: 100% !important; height: 100% !important" loading="lazy">
                       </picture>
                     </div>
                     <div class="card-body d-flex flex-column">
@@ -259,9 +259,9 @@
                       </div>
                       <div class="overlay-bg"></div>
                       <picture>
-                        <source srcset="{{ asset($img_os_webp) }}" type="image/webp" class="img-responsive" style="width: 100% !important;">
-                        <source srcset="{{ asset($img_os) }}" type="image/jpeg" class="img-responsive" style="width: 100% !important;">
-                        <img src="{{ asset($img_os) }}" alt="{{ Str::slug(explode(".", $os['image'])[0], '-') }}" class="img-responsive hover" style="width: 100% !important;" loading="lazy">
+                        <source srcset="{{ asset($img_os_webp) }}" type="image/webp" class="img-responsive">
+                        <source srcset="{{ asset($img_os) }}" type="image/jpeg" class="img-responsive">
+                        <img src="{{ asset($img_os) }}" alt="{{ Str::slug(explode(".", $os['image'])[0], '-') }}" class="img-responsive hover" style="width: 100% !important; height: 100% !important" loading="lazy">
                       </picture>
                     </div>
                     <div class="card-body d-flex flex-column">
