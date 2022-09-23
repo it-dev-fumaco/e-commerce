@@ -5,7 +5,7 @@
 
 @section('content')
 @php
-    $page_title = 'VERIFY EMAIL ADDRESS';
+    $page_title = 'SIGN IN';
 @endphp
 @include('frontend.header')
 
