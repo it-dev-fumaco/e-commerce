@@ -597,7 +597,7 @@ class OrderController extends Controller
                 }
             }
 
-            $email = $order_details->order_email;
+            $email = $order_details->order_bill_email;
 
             $deposit_slip = $request->root().'/upload_deposit_slip/'.$new_token;
             $deposit_slip_url = $this->generateShortUrl($request->root(), $deposit_slip);
@@ -632,7 +632,6 @@ class OrderController extends Controller
                 });
             } catch (\Swift_TransportException  $e) {
                 DB::rollback();
-
                 return redirect()->back()->with('error', 'An error occured. Please try again.');
             }
 
