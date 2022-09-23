@@ -407,8 +407,8 @@
   @if($activePage == 'contact')
   <script src="https://www.google.com/recaptcha/api.js" async defer></script>
   @else
-  <script src="https://www.google.com/recaptcha/api.js?render={{ config('recaptcha.api_site_key') }}" defer></script>
-  <script defer> 
+  <script src="https://www.google.com/recaptcha/api.js?render={{ config('recaptcha.api_site_key') }}"></script>
+  <script> 
     grecaptcha.ready(function() {
       grecaptcha.execute("{{ config('recaptcha.api_site_key') }}", {action: 'homepage'}).then(function(token) {
         if(token) {
