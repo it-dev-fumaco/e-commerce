@@ -1,6 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html lang="en">
   <head>
+    <title>{{ $namePage }}</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     @hasSection('meta')
@@ -10,7 +11,6 @@
       <meta name="keywords" content="FUMACO, Lighting, Philippines, Philippine, Leading, Luminaire, Manufacturing, ISO, Quality, light"  />
     @endif
     <meta name="author" content="Fumaco Website">
-    <title>{{ $namePage }}</title>
     @if (Str::startsWith($current = url()->current(), 'https://www'))
       <link rel="canonical" href="{{ $current }}">
     @else
