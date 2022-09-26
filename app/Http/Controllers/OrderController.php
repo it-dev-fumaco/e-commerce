@@ -24,16 +24,25 @@ class OrderController extends Controller
 
         $orders = DB::table('fumaco_order')->where('order_number', 'LIKE', '%'.$search_id.'%')->where('order_status', 'LIKE', '%'.$order_status.'%')->whereNotIn('order_status', $exluded_status)->orderBy('id', 'desc')->paginate(10);
 
+        $order_items = DB::table('fumaco_order_items')->whereIn('order_number', collect($orders->items())->pluck('order_number'))->get();
+        $item_codes = collect($order_items)->pluck('item_code');
+        $order_items = collect($order_items)->groupBy('order_number');
+
         $orders_arr = [];
+
+        $item_images = DB::table('fumaco_items_image_v1')->whereIn('idcode', $item_codes)->get();
+        $item_image = collect($item_images)->groupBy('idcode');
 
         foreach($orders as $o){
             $items_arr = [];
-            $items = DB::table('fumaco_order_items')->where('order_number', $o->order_number)->get();
+            // $items = DB::table('fumaco_order_items')->where('order_number', $o->order_number)->get();
+            $items = isset($order_items[$o->order_number]) ? $order_items[$o->order_number] : [];
             foreach($items as $i){
-
                 $bundle_items = DB::table('fumaco_product_bundle_item')->where('parent_item_code', $i->item_code)->get();
                 $items_arr[] = [
                     'order_number' => $i->order_number,
+                    'image' => isset($item_image[$i->item_code]) ? $item_image[$i->item_code][0]->imgprimayx : null,
+                    'orig' => isset($item_image[$i->item_code]) ? $item_image[$i->item_code][0]->imgoriginalx : null,
                     'item_code' => $i->item_code,
                     'item_name' => $i->item_name,
                     'item_qty' => $i->item_qty,
@@ -51,10 +60,10 @@ class OrderController extends Controller
 			}
 
             $order_status = DB::table('order_status as s')
-            ->join('order_status_process as p', 's.order_status_id', 'p.order_status_id')
-            ->where('shipping_method', $o->order_shipping)
-            ->orderBy('order_sequence', 'asc')
-            ->get();
+                ->join('order_status_process as p', 's.order_status_id', 'p.order_status_id')
+                ->where('shipping_method', $o->order_shipping)
+                ->orderBy('order_sequence', 'asc')
+                ->get();
 
             $orders_arr[] = [
                 'order_id' => $o->id,
@@ -118,13 +127,24 @@ class OrderController extends Controller
         $search_id = ($request->search) ? $request->search : '';
         $orders = DB::table('fumaco_order')->where('order_number', 'LIKE', '%'.$search_id.'%')->where('order_status', 'Cancelled')->orderBy('id', 'desc')->paginate(10);
 
+        $order_items = DB::table('fumaco_order_items')->whereIn('order_number', collect($orders->items())->pluck('order_number'))->get();
+        $item_codes = collect($order_items)->pluck('item_code');
+        $order_items = collect($order_items)->groupBy('order_number');
+
+        $orders_arr = [];
+
+        $item_images = DB::table('fumaco_items_image_v1')->whereIn('idcode', $item_codes)->get();
+        $item_image = collect($item_images)->groupBy('idcode');
+
         $orders_arr = [];
 
         foreach($orders as $o){
             $items_arr = [];
-            $items = DB::table('fumaco_order_items')->where('order_number', $o->order_number)->get();
+            $items = isset($order_items[$o->order_number]) ? $order_items[$o->order_number] : [];
             foreach($items as $i){
                 $items_arr[] = [
+                    'image' => isset($item_image[$i->item_code]) ? $item_image[$i->item_code][0]->imgprimayx : null,
+                    'orig' => isset($item_image[$i->item_code]) ? $item_image[$i->item_code][0]->imgoriginalx : null,
                     'item_code' => $i->item_code,
                     'item_name' => $i->item_name,
                     'item_qty' => $i->item_qty,
@@ -180,13 +200,24 @@ class OrderController extends Controller
             ->whereNotIn('order_status', ['Order Placed', 'Order Confirmed', 'Out for Delivery', 'Ready for Pickup', 'Cancelled'])
             ->orderBy('id', 'desc')->paginate(10);
 
+        $order_items = DB::table('fumaco_order_items')->whereIn('order_number', collect($orders->items())->pluck('order_number'))->get();
+        $item_codes = collect($order_items)->pluck('item_code');
+        $order_items = collect($order_items)->groupBy('order_number');
+
+        $orders_arr = [];
+
+        $item_images = DB::table('fumaco_items_image_v1')->whereIn('idcode', $item_codes)->get();
+        $item_image = collect($item_images)->groupBy('idcode');
+
         $orders_arr = [];
 
         foreach($orders as $o){
             $items_arr = [];
-            $items = DB::table('fumaco_order_items')->where('order_number', $o->order_number)->get();
+            $items = isset($order_items[$o->order_number]) ? $order_items[$o->order_number] : [];
             foreach($items as $i){
                 $items_arr[] = [
+                    'image' => isset($item_image[$i->item_code]) ? $item_image[$i->item_code][0]->imgprimayx : null,
+                    'orig' => isset($item_image[$i->item_code]) ? $item_image[$i->item_code][0]->imgoriginalx : null,
                     'item_code' => $i->item_code,
                     'item_name' => $i->item_name,
                     'item_qty' => $i->item_qty,
