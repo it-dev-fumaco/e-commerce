@@ -247,9 +247,9 @@
 											</div>
 											<div class="overlay-bg"></div>
 											<picture>
-												<source srcset="{{ asset($image_webp) }}" type="image/webp" class="card-img-top">
-												<source srcset="{{ asset($image) }}" type="image/jpeg" class="card-img-top">
-												<img src="{{ asset($image) }}" alt="{{ Str::slug(explode(".", $product['image'])[0], '-') }}" class="card-img-top hover" style="min-height: 230px" loading="{{ $loop_count > 2 ? 'lazy' : 'eager' }}">
+												<source srcset="{{ asset($image_webp) }}" type="image/webp">
+												<source srcset="{{ asset($image) }}" type="image/jpeg">
+												<img src="{{ asset($image) }}" alt="{{ Str::slug($product['alt'], '-') }}" class="card-img-top hover" style="min-height: 230px" loading="{{ $loop_count > 2 ? 'lazy' : 'eager' }}">
 											</picture>
 										</div>
 										<div class="card-body d-flex flex-column">

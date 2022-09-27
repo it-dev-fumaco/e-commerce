@@ -38,7 +38,7 @@
                   <picture>
                     <source srcset="{{ asset(explode('.', $carousel_image)[0].'.webp') }}" type="image/webp">
                     <source srcset="{{ asset($carousel_image) }}" type="image/jpeg">
-                    <img src="{{ asset($carousel_image) }}" alt="{{ Str::slug(explode(".", $carousel_image)[0], '-') }}" style="object-fit: cover; opacity: 0.6; width: 100%; height: 100% !important" loading="{{ $loop->first ? 'eager' : 'lazy' }}">
+                    <img src="{{ asset($carousel_image) }}" alt="{{ Str::slug($carousel->blogtitle, '-') }}" style="object-fit: cover; opacity: 0.6; width: 100%; height: 100% !important" loading="{{ $loop->first ? 'eager' : 'lazy' }}">
                   </picture>
                    
                   <div class="container">
@@ -105,27 +105,28 @@
                 <div class="col-lg-4 d-flex align-items-stretch animated animatedFadeInUp fadeInUp">
                     <div class="card" style="border: 0px solid rgba(0, 0, 0, 0.125) !important; padding: 20px !important">
                       @php
-											$image = ($blogs['image']) ? '/storage/journals/'.$blogs['image'] : '/storage/no-photo-available.png';
-											$image_webp = ($blogs['image']) ? '/storage/journals/'.explode(".", $blogs['image'])[0] .'.webp' : '/storage/no-photo-available.png';
-										@endphp
+                        $image = ($blogs['image']) ? '/storage/journals/'.$blogs['image'] : '/storage/no-photo-available.png';
+                        $image_webp = ($blogs['image']) ? '/storage/journals/'.explode(".", $blogs['image'])[0] .'.webp' : '/storage/no-photo-available.webp';
+                      @endphp
 									
 											<picture>
 												<source srcset="{{ asset($image_webp) }}" type="image/webp" class="card-img-top">
 												<source srcset="{{ asset($image) }}" type="image/jpeg" class="card-img-top">
-												<img src="{{ asset($image) }}" alt="{{ Str::slug(explode(".", $blogs['image'])[0], '-') }}" class="card-img-top">
-											 </picture>
+												<img src="{{ asset($image) }}" alt="{{ Str::slug($blogs['title'], '-') }}" class="card-img-top">
+                      </picture>
 
-                        <div class="card-body align-items-stretch">
-                            <a href="blog/{{ $blogs['slug'] ? $blogs['slug'] : $blogs['id'] }}" style="text-decoration: none !important;">
-                                <p style="color:#373b3e !important;" class="abt_standard fumacoFont_card_title">{{ $blogs['title'] }}</p></a>
+                      <div class="card-body align-items-stretch">
+                        <a href="blog/{{ $blogs['slug'] ? $blogs['slug'] : $blogs['id'] }}" style="text-decoration: none !important;">
+                          <p style="color:#373b3e !important;" class="abt_standard fumacoFont_card_title">{{ $blogs['title'] }}</p>
+                        </a>
 
-                          <div class="text ellipsis">
-                            <p class="text-concat abt_standard">{{ $blogs['caption'] }}</p>
-                          </div>
-
-                          <a href="/blog/{{ $blogs['slug'] ? $blogs['slug'] : $blogs['id'] }}" class="text-concat mx-auto read-more">Read More</a>
+                        <div class="text ellipsis">
+                          <p class="text-concat abt_standard">{{ $blogs['caption'] }}</p>
                         </div>
+
+                        <a href="/blog/{{ $blogs['slug'] ? $blogs['slug'] : $blogs['id'] }}" class="text-concat mx-auto read-more">Read More</a>
                       </div>
+                    </div>
                 </div>
             @endforeach
             

@@ -53,7 +53,15 @@
                         @forelse ($cart_arr as $cart)
                         <tr class="he2x2">
                             <td class="tbl-qtr">
-                                <img src="{{ asset('/storage/item_images/'.$cart['item_code'].'/gallery/preview/'.$cart['item_image']) }}" class="img-responsive" alt="{{ Str::slug(explode(".", $cart['item_image'])[0], '-') }}" width="55" height="55">
+                                {{-- <img src="{{ asset('/storage/item_images/'.$cart['item_code'].'/gallery/preview/'.$cart['item_image']) }}" class="img-responsive" alt="{{ Str::slug(explode(".", $cart['item_image'])[0], '-') }}" width="55" height="55"> --}}
+                                @php
+                                    $c_src = '/storage/item_images/'.$cart['item_code'].'/gallery/preview/'.$cart['item_image'];
+                                @endphp
+                                <picture>
+                                    <source srcset="{{ asset(explode('.', $c_src)[0].'.webp') }}" type="image/webp">
+                                    <source srcset="{{ asset($c_src) }}" type="image/jpeg"> 
+                                    <img src="{{ asset('/storage/item_images/'.$cart['item_code'].'/gallery/preview/'.$cart['item_image']) }}" class="img-responsive" alt="{{ Str::slug($cart['alt'], '-') }}" width="55" height="55">
+                                </picture>
                             </td>
                             <td class="tbls tbl-half" style="width:37% !important;"><a href="/product/{{ $cart['slug'] }}" style="text-decoration: none !important; color: #000;">{{ $cart['item_description'] }}</a>
                                 <br/>{{-- for mobile --}}
@@ -192,9 +200,9 @@
                                                     </div>
 
                                                     <picture>
-                                                        <source srcset="{{ asset($img_webp) }}" type="image/webp" class="img-responsive" style="width: 100% !important;">
-                                                        <source srcset="{{ asset($img) }}" type="image/jpeg" class="img-responsive" style="width: 100% !important;">
-                                                        <img src="{{ asset($img) }}" alt="{{ Str::slug(explode(".", $cs['image'])[0], '-') }}" class="img-responsive hover" style="width: 100% !important;" loading="lazy">
+                                                        <source srcset="{{ asset($img_webp) }}" type="image/webp">
+                                                        <source srcset="{{ asset($img) }}" type="image/jpeg">
+                                                        <img src="{{ asset($img) }}" alt="{{ Str::slug($cs['alt'], '-') }}" class="img-responsive hover" style="width: 100% !important;" loading="lazy">
                                                     </picture>
                                                 </div>
                                                 <div class="col-12" style="position: relative">

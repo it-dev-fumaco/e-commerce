@@ -11,9 +11,9 @@
             $img_webp = ($cart['item_image']) ? '/storage/item_images/'. $cart['item_code'] .'/gallery/preview/'. explode(".", $cart['item_image'])[0] . '.webp' : '/storage/no-photo-available.png';
         @endphp
         <picture>
-            <source srcset="{{ asset($img_webp) }}" type="image/webp" class="img-responsive" width="55" height="55">
-            <source srcset="{{ asset($img) }}" type="image/jpeg" class="img-responsive" width="55" height="55">
-            <img src="{{ asset($img) }}" alt="{{ Str::slug(explode(".", $cart['item_image'])[0], '-') }}" class="img-responsive" width="55" height="55">
+            <source srcset="{{ asset($img_webp) }}" type="image/webp">
+            <source srcset="{{ asset($img) }}" type="image/jpeg">
+            <img src="{{ asset($img) }}" alt="{{ Str::slug(explode(".", $cart['alt'])[0], '-') }}" class="img-responsive" width="55" height="55">
         </picture>
         <span class="item-name">{{ $cart['item_description'] }}</span>
         <span class="item-price">₱ {{ number_format($cart['amount'], 2, '.', ',') }}</span>

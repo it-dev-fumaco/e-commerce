@@ -140,7 +140,15 @@
 										<tr>
 											<td class="col-md-2" style="width: 10%">
 												<center>
-													<img src="{{ asset('/storage/item_images/'.$cart['item_code'].'/gallery/preview/'.$cart['item_image']) }}" class="img-responsive" alt="{{ Str::slug(explode(".", $cart['item_image'])[0], '-') }}" width="55" height="55">
+													@php
+														$img = '/storage/item_images/'.$cart['item_code'].'/gallery/preview/'.$cart['item_image'];
+													@endphp
+													<picture>
+														<source srcset="{{ asset(explode('.', $img)[0].'.webp') }}" type="image/webp">
+														<source srcset="{{ asset($img) }}" type="image/jpeg">
+														<img src="{{ asset('/storage/item_images/'.$cart['item_code'].'/gallery/preview/'.$cart['item_image']) }}" class="img-responsive" alt="{{ Str::slug($cart['alt'], '-') }}" width="55" height="55">
+													</picture>
+													{{-- <img src="{{ asset('/storage/item_images/'.$cart['item_code'].'/gallery/preview/'.$cart['item_image']) }}" class="img-responsive" alt="{{ Str::slug(explode(".", $cart['item_image'])[0], '-') }}" width="55" height="55"> --}}
 												</center>
 											</td>
 											<td>
