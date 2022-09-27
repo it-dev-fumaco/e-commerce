@@ -78,6 +78,10 @@
 				</tbody>
 				<tfoot>
 					<tr style="font-size: 0.8rem; text-align: right;">
+						<td class="pb-1 pt-1" style="padding: 6px;" colspan="{{ $colspan }}">Payment Method</td>
+						<td class="pb-1 pt-1" style="padding: 6px; white-space: nowrap !important">{{ $order_details->order_payment_method }}</td>
+					</tr>
+					<tr style="font-size: 0.8rem; text-align: right;">
 						<td class="pb-1 pt-1" style="padding: 6px;" colspan="{{ $colspan }}">Subtotal</td>
 						<td class="pb-1 pt-1" style="padding: 6px; white-space: nowrap !important">₱ {{ number_format(str_replace(",","",$order_details->order_subtotal), 2) }}</td>
 					</tr>
