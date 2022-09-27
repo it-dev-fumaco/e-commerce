@@ -309,9 +309,8 @@
 																			@endphp
 																			<thead>
 																				<tr>
-																					<th class="text-center" style="width: 5%;"></th>
 																					<th class="text-center" style="width: 10%;">ITEM CODE</th>
-																					<th class="text-center" style="width: 45%;">DESCRIPTION</th>
+																					<th class="text-center" style="width: 50%;">DESCRIPTION</th>
 																					<th class="text-center" style="width: 10%;">QTY</th>
 																					<th class="text-center" style="width: 10%;">PRICE</th>
 																					@if ($sum_discount > 0)
@@ -323,51 +322,56 @@
 																			<tbody>
 																				@foreach ($order['ordered_items'] as $item)
 																				<tr>
-																					<td class="text-center p-1">
-																						@php
-																							$src = $item['image'] ? '/storage/item_images/'.$item['item_code'].'/gallery/preview/'. $item['image'] : '/storage/no-photo-available.png';
-																							$orig = $item['image'] ? '/storage/item_images/'.$item['item_code'].'/gallery/original/'. $item['orig'] : '/storage/no-photo-available.png';
-																						@endphp
+																					<td class="text-center">{{ $item['item_code'] }}</td>
+																					<td>
+																						<div class="row">
+																							<div class="col-1 p-0">
+																								@php
+																									$src = $item['image'] ? '/storage/item_images/'.$item['item_code'].'/gallery/preview/'. $item['image'] : '/storage/no-photo-available.png';
+																									$orig = $item['image'] ? '/storage/item_images/'.$item['item_code'].'/gallery/original/'. $item['orig'] : '/storage/no-photo-available.png';
+																								@endphp
 
-																						<a data-toggle="modal" data-target="#image-{{ $order['order_id'].'-'.$item['item_code'] }}">
-																							<picture>
-																								<source srcset="{{ asset(explode('.', $src)[0].'.webp') }}" type="image/webp">
-																								<source srcset="{{ asset($src) }}" type="image/jpeg">
-																								<img class="img-thumbnail w-100" src="{{ asset($src) }}" loading='lazy'/>
-																							</picture>
-																						</a>
-																						  
-																						  <!-- Modal -->
-																						<div class="modal fade" id="image-{{ $order['order_id'].'-'.$item['item_code'] }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-																							<div class="modal-dialog" role="document">
-																								<div class="modal-content">
-																									<div class="modal-header">
-																										<h5 class="modal-title" id="exampleModalLabel">{{ $item['item_code'] }}</h5>
-																									</div>
-																									<div class="modal-body">
-																										<picture>
-																											<source srcset="{{ asset(explode('.', $orig)[0].'.webp') }}" type="image/webp">
-																											<source srcset="{{ asset($orig) }}" type="image/jpeg">
-																											<img class="img-thumbnail w-100" src="{{ asset($orig) }}" loading='lazy'/>
-																										</picture>
+																								<a data-toggle="modal" data-target="#image-{{ $order['order_id'].'-'.$item['item_code'] }}">
+																									<picture>
+																										<source srcset="{{ asset(explode('.', $src)[0].'.webp') }}" type="image/webp">
+																										<source srcset="{{ asset($src) }}" type="image/jpeg">
+																										<img class="img-thumbnail w-100" src="{{ asset($src) }}" loading='lazy'/>
+																									</picture>
+																								</a>
+																								
+																								<!-- Modal -->
+																								<div class="modal fade" id="image-{{ $order['order_id'].'-'.$item['item_code'] }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+																									<div class="modal-dialog" role="document">
+																										<div class="modal-content">
+																											<div class="modal-header">
+																												<h5 class="modal-title" id="exampleModalLabel">{{ $item['item_code'] }}</h5>
+																											</div>
+																											<div class="modal-body">
+																												<picture>
+																													<source srcset="{{ asset(explode('.', $orig)[0].'.webp') }}" type="image/webp">
+																													<source srcset="{{ asset($orig) }}" type="image/jpeg">
+																													<img class="img-thumbnail w-100" src="{{ asset($orig) }}" loading='lazy'/>
+																												</picture>
+																											</div>
+																										</div>
 																									</div>
 																								</div>
 																							</div>
+																							<div class="col-11">
+																								{{ $item['item_name'] }}
+																								@if (count($item['bundle']) > 0)
+																								<br>
+																								<ul>
+																									@foreach ($item['bundle'] as $bundle)
+																									<li style="font-size: 10pt;">
+																										<b>{{ $bundle->item_code }}</b> {!! $bundle->item_description !!}
+																										<span class="d-block text-muted font-italic">x{{ $bundle->qty . ' ' . $bundle->uom }}</span>
+																									</li>
+																									@endforeach
+																								</ul>
+																								@endif
+																							</div>
 																						</div>
-																					</td>
-																					<td class="text-center">{{ $item['item_code'] }}</td>
-																					<td>{{ $item['item_name'] }}
-																						@if (count($item['bundle']) > 0)
-																						<br>
-																						<ul>
-																							@foreach ($item['bundle'] as $bundle)
-																							<li style="font-size: 10pt;">
-																								<b>{{ $bundle->item_code }}</b> {!! $bundle->item_description !!}
-																								<span class="d-block text-muted font-italic">x{{ $bundle->qty . ' ' . $bundle->uom }}</span>
-																							</li>
-																							@endforeach
-																						</ul>
-																						@endif
 																					</td>
 																					<td class="text-center">{{ $item['item_qty'] }}</td>
 																					<td class="text-right">₱ {{ number_format(str_replace(",","",$item['item_price']), 2) }}</td>
