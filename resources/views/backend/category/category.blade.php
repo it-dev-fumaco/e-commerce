@@ -40,6 +40,9 @@
 									{{ session()->get('error') }}
 								</div>
 								@endif
+								@php
+									$category_icons = ['nav1.jpg','nav2.jpg','nav3.jpg','nav4.jpg','nav5.jpg','nav6.jpg','nav7.jpg','nav8.jpg','nav9.jpg','nav10.jpg','nav11.jpg','nav12.jpg','nav13.jpg','nav14.jpg','nav16.jpg','nav17.jpg','nav18.jpg','nav19.jpg','icons_27_Fumaco-Water.jpg','icons_26_Wall-lights.jpg','icons_25_Tracklights.jpg','icons_24_Striplights.jpg','icons_23_Bollard.jpg','icons_22_Downlight-Recessed.jpg','icons_21_Electrical-Boxes.jpg','icons_20_Sockets.jpg','icons_19_Switches.jpg','icons_18_Panel-Board.jpg','icons_17_Circuit-Breaker.jpg','icons_16_Batten Type.jpg','icons_15_IP-rated-Luminaire.jpg'];
+								@endphp
 								<table id="example2" data-pagination="true" class="table table-bordered table-hover">
 									<thead>
 										<tr>
@@ -55,7 +58,22 @@
 										@foreach ($categories as $c)
 										<tr>
 											<td>{{ $c->id }}</td>
-											<td>{{ $c->name }}</td>
+											<td>
+												@php
+													$is_new = 0;
+													if($c->new > 0){
+														if($c->new_tag_start && $c->new_tag_end){
+															$start = Carbon\Carbon::parse($c->new_tag_start)->startOfDay();
+															$end = Carbon\Carbon::parse($c->new_tag_end)->endOfDay();
+
+															if(Carbon\Carbon::now() > $start && Carbon\Carbon::now() < $end){
+																$is_new = 1;
+															}
+														}
+													}
+												@endphp
+												{{ $c->name }} <span class="badge badge-primary {{ $is_new == 0 ? 'd-none' : null }}">New</span>
+											</td>
 											<td><img src="{{ asset('assets/site-img/icon/')."/".$c->image }}" width="30" ></td>
 											<td>{{ $c->slug }}</td>
 											<td>
@@ -82,130 +100,12 @@
 																							<div class="form-group">
 																								<label for="x2">Image : </label>
 																								<br>
-																								<div class="form-check form-check-inline">
-																									<input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="nav1.jpg" required {{ ($c->image == "nav1.jpg") ? 'checked' : '' }}>
-																									<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/nav1.jpg') }}" width="30" ></label>
-																								</div>
-																								<div class="form-check form-check-inline">
-																									<input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="nav2.jpg" required {{ ($c->image == "nav2.jpg") ? 'checked' : '' }}>
-																									<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/nav2.jpg') }}" width="30"></label>
-																								</div>
-																								<div class="form-check form-check-inline">
-																									<input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="nav3.jpg" required {{ ($c->image == "nav3.jpg") ? 'checked' : '' }}>
-																									<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/nav3.jpg') }}" width="30"></label>
-																								</div>
-																								<div class="form-check form-check-inline">
-																									<input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="nav4.jpg" required {{ ($c->image == "nav4.jpg") ? 'checked' : '' }}>
-																									<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/nav4.jpg') }}" width="30"></label>
-																								</div>
-																								<div class="form-check form-check-inline">
-																									<input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="nav5.jpg" required {{ ($c->image == "nav5.jpg") ? 'checked' : '' }}>
-																									<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/nav5.jpg') }}" width="30"></label>
-																								</div>
-																								<div class="form-check form-check-inline">
-																									<input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="nav6.jpg" required {{ ($c->image == "nav6.jpg") ? 'checked' : '' }}>
-																									<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/nav6.jpg') }}" width="30"></label>
-																								</div>
-																								<div class="form-check form-check-inline">
-																									<input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="nav7.jpg" required {{ ($c->image =="nav7.jpg" ) ? 'checked' : '' }}>
-																									<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/nav7.jpg') }}" width="30"></label>
-																								</div>
-																								<div class="form-check form-check-inline">
-																									<input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="nav8.jpg" required {{ ($c->image == "nav8.jpg" ) ? 'checked' : '' }}>
-																									<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/nav8.jpg') }}" width="30"></label>
-																								</div>
-																								<div class="form-check form-check-inline">
-																									<input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="nav9.jpg" required {{ ($c->image =="nav9.jpg" ) ? 'checked' : '' }}>
-																									<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/nav9.jpg') }}" width="30"></label>
-																								</div>
-																								<div class="form-check form-check-inline">
-																									<input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="nav10.jpg" required {{ ($c->image == "nav10.jpg") ? 'checked' : '' }}>
-																									<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/nav10.jpg') }}" width="30"></label>
-																								</div>
-																								<div class="form-check form-check-inline">
-																									<input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="nav11.jpg" required {{ ($c->image == "nav11.jpg") ? 'checked' : '' }}>
-																									<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/nav11.jpg') }}" width="30"></label>
-																								</div>
-																								<div class="form-check form-check-inline">
-																									<input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="nav12.jpg" required {{ ($c->image == "nav12.jpg") ? 'checked' : '' }}>
-																									<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/nav12.jpg') }}" width="30"></label>
-																								</div>
-																								<div class="form-check form-check-inline">
-																									<input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="nav13.jpg" required {{ ($c->image == "nav13.jpg") ? 'checked' : '' }}>
-																									<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/nav13.jpg') }}" width="30"></label>
-																								</div>
-																								<div class="form-check form-check-inline">
-																									<input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="nav14.jpg" required {{ ($c->image == "nav14.jpg") ? 'checked' : '' }}>
-																									<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/nav14.jpg') }}" width="30"></label>
-																								</div>
-																								<div class="form-check form-check-inline">
-																									<input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="nav16.jpg" required {{ ($c->image == "nav16.jpg") ? 'checked' : '' }}>
-																									<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/nav16.jpg') }}" width="30"></label>
-																								</div>
-																								<div class="form-check form-check-inline">
-																									<input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="nav17.jpg" required {{ ($c->image == "nav17.jpg") ? 'checked' : '' }}>
-																									<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/nav17.jpg') }}" width="30"></label>
-																								</div>
-																								<div class="form-check form-check-inline">
-																									<input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="nav18.jpg" required {{ ($c->image == "nav18.jpg") ? 'checked' : '' }}>
-																									<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/nav18.jpg') }}" width="30"></label>
-																								</div>
-																								<div class="form-check form-check-inline">
-																									<input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="nav19.jpg" required {{ ($c->image == "nav19.jpg") ? 'checked' : '' }}>
-																									<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/nav19.jpg') }}" width="30"></label>
-																								</div>
-																								<div class="form-check form-check-inline">
-																									<input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="icons_27_Fumaco-Water.jpg" required {{ ($c->image == "icons_27_Fumaco-Water.jpg") ? 'checked' : '' }}>
-																									<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/icons_27_Fumaco-Water.jpg') }}" width="30"></label>
-																								</div>
-																								<div class="form-check form-check-inline">
-																									<input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="icons_26_Wall-lights.jpg" required {{ ($c->image == "icons_26_Wall-lights.jpg") ? 'checked' : '' }}>
-																									<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon//icons_26_Wall-lights.jpg') }}" width="30"></label>
-																								</div>
-																								<div class="form-check form-check-inline">
-																									<input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="icons_25_Tracklights.jpg" required {{ ($c->image == "icons_25_Tracklights.jpg") ? 'checked' : '' }}>
-																									<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/icons_25_Tracklights.jpg') }}" width="30"></label>
-																								</div>
-																								<div class="form-check form-check-inline">
-																									<input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="icons_24_Striplights.jpg" required {{ ($c->image == "icons_24_Striplights.jpg") ? 'checked' : '' }}>
-																									<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/icons_24_Striplights.jpg') }}" width="30"></label>
-																								</div>
-																								<div class="form-check form-check-inline">
-																									<input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="icons_23_Bollard.jpg" required {{ ($c->image == "icons_23_Bollard.jpg") ? 'checked' : '' }}>
-																									<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/icons_23_Bollard.jpg') }}" width="30"></label>
-																								</div>
-																								<div class="form-check form-check-inline">
-																									<input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="icons_22_Downlight-Recessed.jpg" required {{ ($c->image == "icons_22_Downlight-Recessed.jpg") ? 'checked' : '' }}>
-																									<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/icons_22_Downlight-Recessed.jpg') }}" width="30"></label>
-																								</div>
-																								<div class="form-check form-check-inline">
-																									<input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="icons_21_Electrical-Boxes.jpg" required {{ ($c->image == "icons_21_Electrical-Boxes.jpg") ? 'checked' : '' }}>
-																									<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/icons_21_Electrical-Boxes.jpg') }}" width="30"></label>
-																								</div>
-																								<div class="form-check form-check-inline">
-																									<input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="icons_20_Sockets.jpg" required {{ ($c->image == "icons_20_Sockets.jpg") ? 'checked' : '' }}>
-																									<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/icons_20_Sockets.jpg') }}" width="30"></label>
-																								</div>
-																								<div class="form-check form-check-inline">
-																									<input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="icons_19_Switches.jpg" required {{ ($c->image == "icons_19_Switches.jpg") ? 'checked' : '' }}>
-																									<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/icons_19_Switches.jpg') }}" width="30"></label>
-																								</div>
-																								<div class="form-check form-check-inline">
-																									<input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="icons_18_Panel-Board.jpg" required {{ ($c->image == "icons_18_Panel-Board.jpg") ? 'checked' : '' }}>
-																									<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/icons_18_Panel-Board.jpg') }}" width="30"></label>
-																								</div>
-																								<div class="form-check form-check-inline">
-																									<input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="icons_17_Circuit-Breaker.jpg" required {{ ($c->image == "icons_17_Circuit-Breaker.jpg") ? 'checked' : '' }}>
-																									<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/icons_17_Circuit-Breaker.jpg') }}" width="30"></label>
-																								</div>
-																								<div class="form-check form-check-inline">
-																									<input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="icons_16_Batten Type.jpg" required {{ ($c->image == "icons_16_Batten Type.jpg") ? 'checked' : '' }}>
-																									<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon//icons_16_Batten Type.jpg') }}" width="30"></label>
-																								</div>
-																								<div class="form-check form-check-inline">
-																									<input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="icons_15_IP-rated-Luminaire.jpg" required {{ ($c->image == "icons_15_IP-rated-Luminaire.jpg") ? 'checked' : '' }}>
-																									<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/icons_15_IP-rated-Luminaire.jpg') }}" width="30"></label>
-																								</div>
+																								@foreach ($category_icons as $icon1)
+																									<div class="form-check form-check-inline">
+																										<input class="form-check-input" type="radio" name="edit_cat_icon" id="x2" value="{{ $icon1 }}" {{ $icon1 == $c->image ? 'checked' : null }} required>
+																										<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/'.$icon1) }}" width="30" ></label>
+																									</div>
+																								@endforeach
 																							</div>
 																							<div class="form-check mt-4 mb-3">
 																								<input type="checkbox" class="form-check-input edit_is_external_link" id="externalLink{{ $c->id }}" name="edit_is_external_link" value="1" {{ ($c->external_link) ? 'checked' : '' }} data-tid="external-link{{ $c->id }}">
@@ -214,6 +114,15 @@
 																							<div class="form-group {{ (!$c->external_link) ? 'd-none' : '' }}">
 																								<label for="external-link{{ $c->id }}">External Link : </label>
 																								<input type="text" class="form-control" id="external-link{{ $c->id }}" name="external_link" value="{{ $c->external_link }}">
+																							</div>
+																							<div class="form-check">
+																								<input type="checkbox" name="set_as_new" class="form-check-input set_as_new" data-target="{{ $c->id }}" {{ $is_new == 1 ? 'checked' : null }}><label class="form-check-label">
+																									Set as "New"
+																									@if($c->new > 0 && $c->new_tag_start && $c->new_tag_end)
+																										({{ Carbon\Carbon::parse($c->new_tag_start)->format('M d, Y').' - '.Carbon\Carbon::parse($c->new_tag_end)->format('M d, Y') }})
+																									@endif
+																								</label> <br>
+																								<input type="text" id="d-{{ $c->id }}" class="new-duration w-100 form-control" name="new_tag_duration" style="display: {{ $is_new == 1 ? 'block' : 'none' }}">
 																							</div>
 																							<div class="form-group text-right">
 																								<input class="form-check-input" name="hide_na" type="checkbox" {{ ($c->hide_none == 1) ? 'checked' : '' }}/>
@@ -289,131 +198,17 @@
 											<div class="form-group">
 												<label for="x2">Image : </label>
 												<br/>
-												<div class="form-check form-check-inline">
-													<input class="form-check-input" type="radio" name="add_cat_icon" id="x2" value="nav1.jpg" required>
-													<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/nav1.jpg') }}" width="30" ></label>
-												</div>
-												<div class="form-check form-check-inline">
-													<input class="form-check-input" type="radio" name="add_cat_icon" id="x2" value="nav2.jpg" required>
-													<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/nav2.jpg') }}" width="30"></label>
-												</div>
-												<div class="form-check form-check-inline">
-													<input class="form-check-input" type="radio" name="add_cat_icon" id="x2" value="nav3.jpg" required>
-													<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/nav3.jpg') }}" width="30"></label>
-												</div>
-												<div class="form-check form-check-inline">
-													<input class="form-check-input" type="radio" name="add_cat_icon" id="x2" value="nav4.jpg" required>
-													<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/nav4.jpg') }}" width="30"></label>
-												</div>
-												<div class="form-check form-check-inline">
-													<input class="form-check-input" type="radio" name="add_cat_icon" id="x2" value="nav5.jpg" required>
-													<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/nav5.jpg') }}" width="30"></label>
-												</div>
-												<div class="form-check form-check-inline">
-													<input class="form-check-input" type="radio" name="add_cat_icon" id="x2" value="nav6.jpg" required>
-													<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/nav6.jpg') }}" width="30"></label>
-												</div>
-												<div class="form-check form-check-inline">
-													<input class="form-check-input" type="radio" name="add_cat_icon" id="x2" value="nav7.jpg" required>
-													<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/nav7.jpg') }}" width="30"></label>
-												</div>
-												<div class="form-check form-check-inline">
-													<input class="form-check-input" type="radio" name="add_cat_icon" id="x2" value="nav8.jpg" required>
-													<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/nav8.jpg') }}" width="30"></label>
-												</div>
-												<div class="form-check form-check-inline">
-													<input class="form-check-input" type="radio" name="add_cat_icon" id="x2" value="nav9.jpg" required>
-													<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/nav9.jpg') }}" width="30"></label>
-												</div>
-												<div class="form-check form-check-inline">
-													<input class="form-check-input" type="radio" name="add_cat_icon" id="x2" value="nav10.jpg" required>
-													<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/nav10.jpg') }}" width="30"></label>
-												</div>
-												<div class="form-check form-check-inline">
-													<input class="form-check-input" type="radio" name="add_cat_icon" id="x2" value="nav11.jpg" required>
-													<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/nav11.jpg') }}" width="30"></label>
-												</div>
-												<div class="form-check form-check-inline">
-													<input class="form-check-input" type="radio" name="add_cat_icon" id="x2" value="nav12.jpg" required>
-													<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/nav12.jpg') }}" width="30"></label>
-												</div>
-												<div class="form-check form-check-inline">
-													<input class="form-check-input" type="radio" name="add_cat_icon" id="x2" value="nav13.jpg">
-													<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/nav13.jpg') }}" width="30"></label>
-												</div>
-												<div class="form-check form-check-inline">
-													<input class="form-check-input" type="radio" name="add_cat_icon" id="x2" value="nav14.jpg">
-													<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/nav14.jpg') }}" width="30"></label>
-												</div>
-												<div class="form-check form-check-inline">
-													<input class="form-check-input" type="radio" name="add_cat_icon" id="x2" value="nav16.jpg" required>
-													<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/nav16.jpg') }}" width="30"></label>
-												</div>
-												<div class="form-check form-check-inline">
-													<input class="form-check-input" type="radio" name="add_cat_icon" id="x2" value="nav17.jpg" required>
-													<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/nav17.jpg') }}" width="30"></label>
-												</div>
-												<div class="form-check form-check-inline">
-													<input class="form-check-input" type="radio" name="add_cat_icon" id="x2" value="nav18.jpg" required>
-													<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/nav18.jpg') }}" width="30"></label>
-												</div>
-												<div class="form-check form-check-inline">
-													<input class="form-check-input" type="radio" name="add_cat_icon" id="x2" value="nav19.jpg" required>
-													<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/nav19.jpg') }}" width="30"></label>
-												</div>
-												<div class="form-check form-check-inline">
-													<input class="form-check-input" type="radio" name="add_cat_icon" id="x2" value="icons_27_Fumaco-Water.jpg" required>
-													<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/icons_27_Fumaco-Water.jpg') }}" width="30"></label>
-												</div>
-												<div class="form-check form-check-inline">
-													<input class="form-check-input" type="radio" name="add_cat_icon" id="x2" value="icons_26_Wall-lights.jpg" required>
-													<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon//icons_26_Wall-lights.jpg') }}" width="30"></label>
-												</div>
-												<div class="form-check form-check-inline">
-													<input class="form-check-input" type="radio" name="add_cat_icon" id="x2" value="icons_25_Tracklights.jpg" required>
-													<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/icons_25_Tracklights.jpg') }}" width="30"></label>
-												</div>
-												<div class="form-check form-check-inline">
-													<input class="form-check-input" type="radio" name="add_cat_icon" id="x2" value="icons_24_Striplights.jpg" required>
-													<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/icons_24_Striplights.jpg') }}" width="30"></label>
-												</div>
-												<div class="form-check form-check-inline">
-													<input class="form-check-input" type="radio" name="add_cat_icon" id="x2" value="icons_23_Bollard.jpg" required>
-													<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/icons_23_Bollard.jpg') }}" width="30"></label>
-												</div>
-												<div class="form-check form-check-inline">
-													<input class="form-check-input" type="radio" name="add_cat_icon" id="x2" value="icons_22_Downlight-Recessed.jpg" required>
-													<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/icons_22_Downlight-Recessed.jpg') }}" width="30"></label>
-												</div>
-												<div class="form-check form-check-inline">
-													<input class="form-check-input" type="radio" name="add_cat_icon" id="x2" value="icons_21_Electrical-Boxes.jpg" required>
-													<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/icons_21_Electrical-Boxes.jpg') }}" width="30"></label>
-												</div>
-												<div class="form-check form-check-inline">
-													<input class="form-check-input" type="radio" name="add_cat_icon" id="x2" value="icons_20_Sockets.jpg" required>
-													<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/icons_20_Sockets.jpg') }}" width="30"></label>
-												</div>
-												<div class="form-check form-check-inline">
-													<input class="form-check-input" type="radio" name="add_cat_icon" id="x2" value="icons_19_Switches.jpg" required>
-													<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/icons_19_Switches.jpg') }}" width="30"></label>
-												</div>
-												<div class="form-check form-check-inline">
-													<input class="form-check-input" type="radio" name="add_cat_icon" id="x2" value="icons_18_Panel-Board.jpg" required>
-													<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/icons_18_Panel-Board.jpg') }}" width="30"></label>
-												</div>
-												<div class="form-check form-check-inline">
-													<input class="form-check-input" type="radio" name="add_cat_icon" id="x2" value="icons_17_Circuit-Breaker.jpg" required>
-													<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/icons_17_Circuit-Breaker.jpg') }}" width="30"></label>
-												</div>
-												<div class="form-check form-check-inline">
-													<input class="form-check-input" type="radio" name="add_cat_icon" id="x2" value="icons_16_Batten Type.jpg" required>
-													<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon//icons_16_Batten Type.jpg') }}" width="30"></label>
-												</div>
-												<div class="form-check form-check-inline">
-													<input class="form-check-input" type="radio" name="add_cat_icon" id="x2" value="icons_15_IP-rated-Luminaire.jpg" required>
-													<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/icons_15_IP-rated-Luminaire.jpg') }}" width="30"></label>
-												</div>
+												@foreach ($category_icons as $icon2)
+													<div class="form-check form-check-inline">
+														<input class="form-check-input" type="radio" name="add_cat_icon" id="x2" value="{{ $icon2 }}" required>
+														<label class="form-check-label" for="inlineRadio1"><img src="{{ asset('assets/site-img/icon/'.$icon2) }}" width="30" ></label>
+													</div>
+												@endforeach
 												<br>
+											</div>
+											<div class="form-group">
+												<label>"New" Tag Duration</label> <br>
+												<input type="text" name="new_tag_duration" class="form-control new-duration">
 											</div>
 										</div>
 										<div class="col-md-6">
@@ -531,7 +326,6 @@
 
 	  $(document).on('click', '.edit_is_external_link', function(){
 		  var tid = $(this).data('tid');
-		  console.log(tid);
 		  if ($(this).prop('checked')) {
 			  $('#' + tid).closest('.form-group').removeClass('d-none');
 			  $('#' + tid).attr('required', true);
@@ -547,7 +341,6 @@
         'cat_id': $(this).val(),
         '_token': "{{ csrf_token() }}",
       }
-      // console.log(data);
       $.ajax({
           type:'POST',
           url:'/admin/category/publish',
@@ -559,6 +352,25 @@
               alert('An error occured.');
           }
       });
+    });
+
+	$('.new-duration').daterangepicker({
+    	opens: 'left',
+		startDate: moment(),
+		endDate: moment().add(7, 'days'),
+		minDate: moment(),
+		locale: {
+			format: 'MMM DD, YYYY'
+		}
+  	});
+
+	$(document).on('click', ".set_as_new", function(){
+		var target = $(this).data('target');
+		if($(this).is(':checked')){
+			$('#d-' + target).slideDown();
+		}else{
+			$('#d-' + target).slideUp();
+		}
     });
   });
 </script>

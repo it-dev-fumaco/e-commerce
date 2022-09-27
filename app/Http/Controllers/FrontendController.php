@@ -861,12 +861,24 @@ class FrontendController extends Controller
 
     // returns an array of product category
     public function getProductCategories() {
-        $item_categories = DB::table('fumaco_categories')->where('publish', 1)->select('slug', 'id', 'external_link', 'image', 'name')->get();
+        $item_categories = DB::table('fumaco_categories')->where('publish', 1)->select('slug', 'id', 'external_link', 'image', 'name', 'new', 'new_tag_start', 'new_tag_end')->get();
         $cat_array = [];
+
         foreach($item_categories as $category){
             $icon = $category->image;
             if(File::exists(public_path('/assets/site-img/icon/'.explode('.', $category->image)[0].'.webp'))){
                 $icon = explode('.', $category->image)[0].'.webp';
+            }
+            $is_new = 0;
+            $start = $end = null;
+            if($category->new == 1){
+                if($category->new_tag_start && $category->new_tag_end){
+                    $start = Carbon::parse($category->new_tag_start)->startOfDay();
+                    $end = Carbon::parse($category->new_tag_end)->endOfDay();
+                    if(Carbon::now() > $start && Carbon::now() < $end){
+                        $is_new = 1;
+                    }
+                }
             }
 
             $cat_array[] = [
@@ -874,7 +886,8 @@ class FrontendController extends Controller
                 'id' => $category->id,
                 'external_link' => $category->external_link,
                 'image' => $icon,
-                'name' => $category->name
+                'name' => $category->name,
+                'is_new' => $is_new
             ];
         }
 
