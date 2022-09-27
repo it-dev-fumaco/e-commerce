@@ -40,13 +40,14 @@
 								@php
 									$src = (count($product_images) > 0) ? '/storage/item_images/'. $product_images[0]->idcode.'/gallery/preview/'. $product_images[0]->imgprimayx : '/storage/no-photo-available.png';
 									$xoriginal = (count($product_images) > 0)  ? '/storage/item_images/'. $product_images[0]->idcode.'/gallery/original/'. $product_images[0]->imgoriginalx : '/storage/no-photo-available.png';
+									$alt = $product_details->image_alt ? $product_details->image_alt : $product_details->f_item_name;
 								@endphp
-								<img style="width: 100% !important;" alt="{{ isset($product_images[0]) ? Str::slug($product_details->f_item_name, '-') : '' }}" class="xzoom4 imgx" id="xzoom-fancy" src="{{ asset($src) }}" xoriginal="{{ asset($xoriginal) }}" />
+								<img style="width: 100% !important;" alt="{{ isset($product_images[0]) ? Str::slug($alt, '-') : '' }}" class="xzoom4 imgx" id="xzoom-fancy" src="{{ asset($src) }}" xoriginal="{{ asset($xoriginal) }}" />
 								<br><br>
 								<div class="xzoom-thumbs">
 									@foreach ($product_images as $image)
 									<a href="{{ asset('/storage/item_images/'. $image->idcode.'/gallery/original/'. $image->imgoriginalx) }}">
-										<img class="xzoom-gallery4" width="60" src="{{ asset('/storage/item_images/'. $image->idcode.'/gallery/preview/'. $image->imgprimayx) }}" alt="{{ Str::slug($product_details->f_item_name, '-') }}" loading='lazy' />
+										<img class="xzoom-gallery4" width="60" src="{{ asset('/storage/item_images/'. $image->idcode.'/gallery/preview/'. $image->imgprimayx) }}" alt="{{ Str::slug($alt, '-') }}" loading='lazy' />
 									</a>
 									@endforeach
 								</div>

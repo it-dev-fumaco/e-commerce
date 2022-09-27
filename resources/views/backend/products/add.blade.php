@@ -251,6 +251,10 @@
                   <input type="text" class="form-control" id="product-slug" name="slug" value="{{ old('slug') }}">
                 </div>
                 <div class="form-group">
+                  <label for="img-alt">Image Alt</label>
+                  <input type="text" class="form-control" id="img-alt" name="alt" value="{{ old('alt') }}">
+                </div>
+                <div class="form-group">
                   <label for="product-meta-description">Meta Description</label>
                   <textarea class="form-control" rows="3" id="product-meta-description" name="meta_description">{{ old('meta_description') }}</textarea>
                 </div>

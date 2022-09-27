@@ -34,11 +34,12 @@
                     }else if((new \Jenssegers\Agent\Agent())->isMobile()){
                       $carousel_image = $carousel->{'blogprimayimage-mob'} ? '/storage/journals/'.$carousel->{'blogprimayimage-mob'} : $carousel_image;
                     }
+                    $alt = $carousel->image_alt ? $carousel->image_alt : $carousel->blogtitle;
                   @endphp
                   <picture>
                     <source srcset="{{ asset(explode('.', $carousel_image)[0].'.webp') }}" type="image/webp">
                     <source srcset="{{ asset($carousel_image) }}" type="image/jpeg">
-                    <img src="{{ asset($carousel_image) }}" alt="{{ Str::slug($carousel->blogtitle, '-') }}" style="object-fit: cover; opacity: 0.6; width: 100%; height: 100% !important" loading="{{ $loop->first ? 'eager' : 'lazy' }}">
+                    <img src="{{ asset($carousel_image) }}" alt="{{ Str::slug($alt, '-') }}" style="object-fit: cover; opacity: 0.6; width: 100%; height: 100% !important" loading="{{ $loop->first ? 'eager' : 'lazy' }}">
                   </picture>
                    
                   <div class="container">
@@ -112,7 +113,7 @@
 											<picture>
 												<source srcset="{{ asset($image_webp) }}" type="image/webp" class="card-img-top">
 												<source srcset="{{ asset($image) }}" type="image/jpeg" class="card-img-top">
-												<img src="{{ asset($image) }}" alt="{{ Str::slug($blogs['title'], '-') }}" class="card-img-top">
+												<img src="{{ asset($image) }}" alt="{{ Str::slug($blogs['alt'], '-') }}" class="card-img-top">
                       </picture>
 
                       <div class="card-body align-items-stretch">

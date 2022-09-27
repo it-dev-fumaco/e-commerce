@@ -95,6 +95,7 @@ class BlogController extends Controller
             $blogs_insert = [
                 'blogtitle' => $request->blog_title,
                 'slug' => Str::slug($request->slug, '-'),
+                'image_alt' => $request->alt ? Str::slug($request->alt, '-') : null,
                 'blogtype' => $request->blog_type,
                 'blog_caption' => $request->blog_caption,
                 'blogcontent' => $request->blog_content,
@@ -222,6 +223,7 @@ class BlogController extends Controller
             $blogs_update = [
                 'blogtitle' => $request->blog_title,
                 'slug' => Str::slug($request->slug, '-'),
+                'image_alt' => $request->alt ? Str::slug($request->alt, '-') : null,
                 'blogtype' => $request->blog_type,
                 'blog_caption' => $request->blog_caption,
                 'blogcontent' => $request->blog_content,
