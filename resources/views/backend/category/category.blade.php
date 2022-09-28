@@ -206,7 +206,7 @@
 												@endforeach
 												<br>
 											</div>
-											<div class="form-check border border-secondary">
+											<div class="form-check">
 												<label><input type="checkbox" class="form-check-input set_as_new" data-target="duration" name="is_new"> "New" Tag Duration</label>
 												<input type="text" name="new_tag_duration" class="form-control new-duration" id="d-duration" style="display: none">
 											</div>
