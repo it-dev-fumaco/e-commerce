@@ -57,14 +57,21 @@ class CategoryController extends Controller
         DB::beginTransaction();
         try {
             $date = explode(' - ', $request->new_tag_duration);
+            $is_new = 0;
+            $start = $end = null;
+            if(isset($request->is_new)){
+                $is_new = 1;
+                $start = Carbon::parse($date[0]);
+                $end = Carbon::parse($date[1]);
+            }
             $add = [
                 'name' => $request->add_cat_name,
                 'image' => $request->add_cat_icon,
                 'slug' => $request->add_cat_slug,
                 'code' => " ",
-                'new' => 1,
-                'new_tag_start' => Carbon::parse($date[0]),
-                'new_tag_end' => Carbon::parse($date[1]),
+                'new' => $is_new,
+                'new_tag_start' => $start,
+                'new_tag_end' => $end,
                 'external_link' => ($request->is_external_link) ? $request->external_link : null,
                 'created_by' => Auth::user()->username,
                 'last_modified_by' => Auth::user()->username,
