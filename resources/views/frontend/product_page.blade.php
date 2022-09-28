@@ -46,7 +46,7 @@
 								<br><br>
 								<div class="xzoom-thumbs">
 									@foreach ($product_images as $image)
-									<a href="{{ asset('/storage/item_images/'. $image->idcode.'/gallery/original/'. $image->imgoriginalx) }}">
+									<a href="{{ asset('/storage/item_images/'. $image->idcode.'/gallery/original/'. $image->imgoriginalx) }}" style="text-transform: none !important; text-decoration: none !important;">
 										<img class="xzoom-gallery4" width="60" src="{{ asset('/storage/item_images/'. $image->idcode.'/gallery/preview/'. $image->imgprimayx) }}" alt="{{ Str::slug($alt, '-') }}" loading='lazy' />
 									</a>
 									@endforeach
@@ -76,7 +76,7 @@
 									</div>
 									<div class="d-flex flex-row p-0">
 										<div style="font-size: 16pt; padding: 3px 8px;">
-											<a target="_blank" href="mailto:?subject=Check this out!&body=Hi, I found this product and thought you might like it {{ \Request::fullUrl() }}" class="m-0" style=" color: #f49332;"><i class="far fa-envelope m-0"></i></a>
+											<a target="_blank" href="mailto:?subject=Check this out!&body=Hi, I found this product and thought you might like it {{ \Request::fullUrl() }}" class="m-0" style="color: #f49332;"><i class="far fa-envelope m-0"></i></a>
 										</div>
 										<div class="pt-2">
 											<script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v12.0&appId=435536724607670&autoLogAppEvents=1" nonce="oVFop3CH"></script>
