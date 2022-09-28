@@ -116,7 +116,7 @@
                                                             </div>
                                                             </div>
                                                         </div>
-                                                        @elseif ($sale['apply_discount_to'] == 'Per Customer Group')
+                                                        {{-- @elseif ($sale['apply_discount_to'] == 'Per Customer Group')
                                                           <!-- Modal -->
                                                           <div class="modal fade" id="sale{{ $sale['id'] }}Modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                                             <div class="modal-dialog modal-xl" role="document">
@@ -163,14 +163,29 @@
                                                                 </div>
                                                             </div>
                                                             </div>
-                                                        </div>
+                                                        </div> --}}
                                                     @else                                                      
                                                         <!-- Modal -->
                                                         <div class="modal fade" id="sale{{ $sale['id'] }}Modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                            @php
+                                                                switch ($sale['apply_discount_to']) {
+                                                                    case 'Per Category':
+                                                                        $apply_to = 'Category';
+                                                                        break;
+                                                                    case 'Per Customer Group':
+                                                                        $apply_to = 'Customer Group';
+                                                                        break;
+                                                                    case 'Per Shipping Service':
+                                                                        $apply_to = 'Shipping Service';
+                                                                    default:
+                                                                        $apply_to = 'All Items';
+                                                                        break;
+                                                                }
+                                                            @endphp
                                                             <div class="modal-dialog modal-xl" role="document">
                                                             <div class="modal-content">
                                                                 <div class="modal-header">
-                                                                    <h5 class="modal-title" id="exampleModalLabel">Categories</h5>
+                                                                    <h5 class="modal-title" id="exampleModalLabel">{{ $apply_to }}</h5>
                                                                 </div>
                                                                 <div class="modal-body">
                                                                     <center>
@@ -183,24 +198,24 @@
                                                                         <table class="table-hover table-bordered">
                                                                             <tr>
                                                                                 <th class="text-center">ID</th>
-                                                                                <th class="text-center">Category Name</th>
+                                                                                <th class="text-center">{{ $apply_to }} Name</th>
                                                                                 <th class="text-center">Discount Type</th>
                                                                                 <th class="text-center">Discount Amount/Rate</th>
                                                                                 <th class="text-center">Capped Amount</th>
                                                                             </tr>
-                                                                            @foreach ($sale['categories'] as $category)
+                                                                            @foreach ($sale['child_arr'] as $child_sale)
                                                                                 <tr>
-                                                                                    <td class="text-center">{{ $category['category_id'] }}</td>
-                                                                                    <td class="text-center">{{ $category['category_name'] }}</td>
-                                                                                    <td class="text-center">{{ $category['discount_type'] }}</td>
+                                                                                    <td class="text-center">{{ $child_sale['id'] }}</td>
+                                                                                    <td class="text-center">{{ $child_sale['name'] }}</td>
+                                                                                    <td class="text-center">{{ $child_sale['discount_type'] }}</td>
                                                                                     <td class="text-center">
-                                                                                        @if ($category['discount_type'] == 'Fixed Amount')
-                                                                                            ₱ {{ number_format($category['discount_rate'], 2, '.', ',') }}
-                                                                                        @elseif($category['discount_type'] == 'By Percentage')
-                                                                                            {{ $category['discount_rate'] }}%
+                                                                                        @if ($child_sale['discount_type'] == 'Fixed Amount')
+                                                                                            ₱ {{ number_format($child_sale['discount_rate'], 2, '.', ',') }}
+                                                                                        @elseif($child_sale['discount_type'] == 'By Percentage')
+                                                                                            {{ $child_sale['discount_rate'] }}%
                                                                                         @endif
                                                                                     </td>
-                                                                                    <td class="text-center">{{ $category['capped_amount'] ? '₱ '.number_format($category['capped_amount'], 2, '.', ',') : '' }}</td>
+                                                                                    <td class="text-center">{{ $child_sale['capped_amount'] ? '₱ '.number_format($child_sale['capped_amount'], 2, '.', ',') : '' }}</td>
                                                                                 </tr>
                                                                             @endforeach
                                                                         </table>
