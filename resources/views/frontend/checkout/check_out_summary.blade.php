@@ -169,6 +169,10 @@
 								<div class="d-flex justify-content-between align-items-center" style="padding: 7px 0 7px 5px; border-bottom: 1px solid #8c8c8cd0;">
 									Total Amount <small class="text-muted stylecap he1x">₱ {{ number_format(collect($cart_arr)->sum('subtotal'), 2, '.', ',') }}</small>
 								</div>
+								<div class="d-flex justify-content-between align-items-center d-none" style="padding: 7px 0 7px 5px; border-bottom: 1px solid #8c8c8cd0;" id="shipping-discount-div">
+									<p class="m-0" id="shipping-name">Shipping Service Discount</p>
+									<small class="text-danger stylecap he1x">- ₱ <span id="shipping-discount-amount">0.00</span></small>
+								</div>
 								<div class="d-flex justify-content-between align-items-center d-none" style="padding: 7px 0 7px 5px; border-bottom: 1px solid #8c8c8cd0;" id="discount-div">
 									<p class="m-0">Discount <span id="voucher-code" class="text-white d-none" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833;">Voucher Applied</span></p>
 									<small class="text-danger stylecap he1x">- ₱ <span id="discount-amount">0.00</span></small>
@@ -226,15 +230,54 @@
 									} else {
 										$defaul_selected = ($loop->first) ? 'checked' : '';
 									}
+
+									$shipping_discount_name = null;
+									$shipping_discount_type = 'none';
+									$shipping_discount_rate = 0;
+									$shipping_capped_amount = 0;
+									$shipping_cost = $srate['shipping_cost'];
+									if(isset($shipping_service_discount[$srate['shipping_service_name']])){
+										$shipping_discount = $shipping_service_discount[$srate['shipping_service_name']][0];
+										$shipping_discount_name = $shipping_discount->sale_name;
+										$shipping_discount_type = $shipping_discount->discount_type;
+										$shipping_discount_rate = $shipping_discount->discount_rate;
+										$shipping_capped_amount = $shipping_discount->capped_amount;
+
+										switch ($shipping_discount_type) {
+											case 'Fixed Amount':
+												$new_shipping_cost = $srate['shipping_cost'] - $shipping_discount_rate;
+												$shipping_cost = $new_shipping_cost > 0 ? $new_shipping_cost : 0;
+												break;
+											case 'By Percentage':
+												$shipping_discount_rate = $shipping_discount_rate / 100;
+												$shipping_discount = $srate['shipping_cost'] * $shipping_discount_rate;
+												$shipping_discount = $shipping_discount < $shipping_capped_amount ? $shipping_discount : $shipping_capped_amount;
+
+												$new_shipping_cost = $srate['shipping_cost'] - $shipping_discount;
+												$shipping_cost = $new_shipping_cost > 0 ? $new_shipping_cost : 0;
+												break;
+											default:
+												break;
+										}
+									}
 								@endphp
 								<div class="d-flex justify-content-between" style="padding: 0 15px 0 15px;">
 									<div class="form-check">
-										<input class="form-check-input" type="radio" name="shipping_fee" id="{{ 'sr' . $l }}" value="{{ $srate['shipping_cost'] }}" data-sname="{{ $srate['shipping_service_name'] }}" data-est="{{ $srate['expected_delivery_date'] }}" data-pickup="{{ $srate['pickup'] }}" required {{ $defaul_selected }} data-lead="{{ $srate['max_lead_time'] }}">
+										<input class="form-check-input" type="radio" name="shipping_fee" id="{{ 'sr' . $l }}" value="{{ $shipping_cost }}" data-sname="{{ $srate['shipping_service_name'] }}" data-est="{{ $srate['expected_delivery_date'] }}" data-pickup="{{ $srate['pickup'] }}" required {{ $defaul_selected }} data-lead="{{ $srate['max_lead_time'] }}" data-discount-type="{{ $shipping_discount_type }}" data-discount-rate={{ $shipping_discount_rate }} data-capped-amount='{{ $shipping_capped_amount }}' data-discount-name="{{ $shipping_discount_name }}">
 										<label class="form-check-label" for="{{ 'sr' . $l }}">{{ $srate['shipping_service_name'] }} <br class="d-xl-none"/>
 											@if (count($srate['stores']) <= 0)<small class="fst-italic">({{ $srate['min_lead_time'] . " - ". $srate['max_lead_time'] . " Days" }})</small>@endif</label>
 									</div>
 									@if ($srate['shipping_cost'] > 0)
-									<small class="text-muted stylecap he1x" style="white-space: nowrap !important">₱ {{ number_format($srate['shipping_cost'], 2, '.', ',') }}</small>
+										@if ($new_shipping_cost > 0)
+											<small class="text-muted stylecap he1x" style="white-space: nowrap !important;">
+												<span>₱ {{ number_format($new_shipping_cost, 2, '.', ',') }}</span>
+												<span style="text-decoration: line-through; font-size: 9pt;">
+													₱ {{ number_format($srate['shipping_cost'], 2, '.', ',') }}
+												</span>
+											</small>
+										@else
+											<small class="text-muted stylecap he1x" style="white-space: nowrap !important;">₱ {{ number_format($srate['shipping_cost'], 2, '.', ',') }}</small>
+										@endif
 									@else
 									<small class="text-muted stylecap he1x" style="white-space: nowrap !important">FREE</small>
 									@endif
@@ -1352,6 +1395,40 @@
 
 			subtotal = (isNaN(subtotal)) ? 0 : subtotal;
 
+			var shipping_discount_name = $("input[name='shipping_fee']:checked").data('discount-name');
+			var shipping_discount_type = $("input[name='shipping_fee']:checked").data('discount-type');
+			var shipping_discount_rate = $("input[name='shipping_fee']:checked").data('discount-rate');
+			var shipping_capped_amount = $("input[name='shipping_fee']:checked").data('capped-amount');
+
+			var shipping_fee = $("input[name='shipping_fee']:checked").val();
+			shipping_fee = (isNaN(shipping_fee)) ? 0 : shipping_fee;
+
+			if($("input[name='shipping_fee']:checked").data('pickup')){
+				switch (shipping_discount_type) {
+					case 'Fixed Amount':
+						shipping_discount = shipping_discount_rate;
+						subtotal = subtotal - shipping_discount;
+						subtotal = subtotal > 0 ? subtotal : 0;
+						break;
+					case 'By Percentage':
+						shipping_discount = subtotal * shipping_discount_rate;
+						shipping_discount = shipping_discount < shipping_capped_amount ? shipping_discount : shipping_capped_amount;
+						subtotal = subtotal - shipping_discount;
+						subtotal = subtotal > 0 ? subtotal : 0;
+						break;
+					default:
+						break;
+				}
+
+				$('#shipping-name').removeClass('d-none').text(shipping_discount_name);
+				$('#shipping-discount-div').removeClass('d-none');
+				$('#shipping-discount-amount').text(shipping_discount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,"));
+			}else{
+				$('#shipping-name').addClass('d-none').text('');
+				$('#shipping-discount-div').addClass('d-none');
+				$('#shipping-discount-amount').text('0.00');
+			}
+
 			var voucher_discount = parseFloat($('#discount-amount').text().replace(/,/g , ''));
 			voucher_discount = (isNaN(voucher_discount)) ? 0 : voucher_discount;
 
@@ -1359,8 +1436,6 @@
 
 			$('#cart-subtotal').text('₱ ' + subtotal.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,"));
 
-			var shipping_fee = $("input[name='shipping_fee']:checked").val();
-			shipping_fee = (isNaN(shipping_fee)) ? 0 : shipping_fee;
 			var total = parseFloat(shipping_fee) + subtotal;
 
 			var estimated_del = $("input[name='shipping_fee']:checked").data('est');
