@@ -138,16 +138,21 @@
 						</td>
 					</tr>
 					@php
-						$discount = $order_details->voucher_code ? $order_details->discount_amount : 0;
-						$grand_total = $order_details->order_shipping_amount + ($order_details->order_subtotal - $discount);
+						$discount = $order_details->discount_amount;
+						$grand_total = ($order_details->order_shipping_amount + $order_details->order_subtotal) - $discount;
+
+						$amount_paid = 0;
+						if($order_details->order_payment_method != 'Bank Deposit'){
+							$amount_paid = $order_details->order_shipping_amount + $order_details->amount_paid;
+						}
 					@endphp
 					<tr style="font-size: 0.9rem; text-align: right; border-top: 2px solid;">
 						<td class="pb-1 pt-1" style="padding: 8px;" colspan="{{ $colspan }}"><b>Grand Total</b></td>
-						<td class="pb-1 pt-1" style="padding: 8px; white-space: nowrap !important"><b>₱ {{ number_format(str_replace(",","",($grand_total)), 2) }}</b></td>
+						<td class="pb-1 pt-1" style="padding: 8px; white-space: nowrap !important"><b>₱ {{ number_format($grand_total, 2) }}</b></td>
 					</tr>
 					<tr style="font-size: 0.9rem; text-align: right;">
 						<td class="pb-1 pt-1" style="padding: 8px;" colspan="{{ $colspan }}"><b>Amount Paid</b></td>
-						<td class="pb-1 pt-1" style="padding: 8px; white-space: nowrap !important"><b>₱ {{ number_format(str_replace(",","",($order_details->amount_paid)), 2) }}</b></td>
+						<td class="pb-1 pt-1" style="padding: 8px; white-space: nowrap !important"><b>₱ {{ number_format($amount_paid, 2) }}</b></td>
 					</tr>
 				</tfoot>
 			</table>
