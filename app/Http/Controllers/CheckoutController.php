@@ -787,8 +787,29 @@ class CheckoutController extends Controller
 					}
 				}
 			}
+
+			// Store Pickup Discount
+			$shipping_discount = [];
+			$shipping_discount_amount = 0;
+			if($temp->shipping_name == 'Store Pickup'){
+				$shipping_discount = $this->getSalePerShippingService($temp->shipping_name);
+
+				// return collect($shipping_discount);
+				if($shipping_discount){
+					switch ($shipping_discount->discount_type) {
+						case 'Fixed Amount':
+							$shipping_discount_amount = $shipping_discount->discount_rate;
+							break;
+						case 'By Percentage':
+							$shipping_discount_amount = ($shipping_discount->discount_rate / 100) * $amount;
+							break;
+						default:
+							break;
+					}
+				}
+			}
 	
-			$grand_total = $amount - $discount;
+			$grand_total = $amount - ($discount + $shipping_discount_amount);
 			$grand_total = $grand_total + $temp->shipping_amount;
 
 			return view('frontend.checkout.eghl_form', compact('temp', 'api', 'grand_total'));
