@@ -33,12 +33,6 @@ class OrderController extends Controller
         $item_images = DB::table('fumaco_items_image_v1')->whereIn('idcode', $item_codes)->get();
         $item_image = collect($item_images)->groupBy('idcode');
 
-        $shipping_discount = DB::table('fumaco_on_sale as p')
-            ->join('fumaco_on_sale_shipping_service as c', 'p.id', 'c.sale_id')->whereIn('c.shipping_service', collect($orders->items())->pluck('order_shipping')->unique())
-            ->where('status', 1)->where('p.apply_discount_to', 'Per Shipping Service')->whereDate('p.start_date', '<', collect($orders->items())->min('order_date'))->whereDate('p.end_date', '>', collect($orders->items())->max('order_date'))
-            ->get();
-        $shipping_discount = collect($shipping_discount)->groupBy('shipping_service');
-
         $voucher_details = DB::table('fumaco_voucher')->whereIn('code', collect($orders->items())->pluck('voucher_code')->unique())->get();
         $voucher_details = collect($voucher_details)->groupBy('code');
 
@@ -61,6 +55,11 @@ class OrderController extends Controller
                     'bundle' => $bundle_items
                 ];
             }
+
+            $shipping_discount = DB::table('fumaco_on_sale as p')
+                ->join('fumaco_on_sale_shipping_service as c', 'p.id', 'c.sale_id')->where('c.shipping_service', $o->order_shipping)
+                ->where('status', 1)->where('p.apply_discount_to', 'Per Shipping Service')->whereDate('p.start_date', '<=', $o->order_date)->whereDate('p.end_date', '>=', $o->order_date)
+                ->first();
 
             $store_address = null;
 			if($o->order_shipping == 'Store Pickup') {
@@ -118,7 +117,7 @@ class OrderController extends Controller
                 'billing_business_name' => $o->billing_business_name,
                 'voucher_code' => $o->voucher_code,
                 'voucher_details' => isset($voucher_details[$o->voucher_code]) ? $voucher_details[$o->voucher_code][0] : [],
-                'shipping_discount' => isset($shipping_discount[$o->order_shipping]) ? $shipping_discount[$o->order_shipping][0] : [],
+                'shipping_discount' => $shipping_discount ? $shipping_discount : [],
                 'discount_amount' => $o->discount_amount,
                 'shipping_business_name' => $o->shipping_business_name,
                 'pickup_date' => Carbon::parse($o->pickup_date)->format('M d, Y'),
@@ -147,12 +146,6 @@ class OrderController extends Controller
         $item_images = DB::table('fumaco_items_image_v1')->whereIn('idcode', $item_codes)->get();
         $item_image = collect($item_images)->groupBy('idcode');
 
-        $shipping_discount = DB::table('fumaco_on_sale as p')
-            ->join('fumaco_on_sale_shipping_service as c', 'p.id', 'c.sale_id')->whereIn('c.shipping_service', collect($orders->items())->pluck('order_shipping')->unique())
-            ->where('status', 1)->where('p.apply_discount_to', 'Per Shipping Service')->whereDate('p.start_date', '<', collect($orders->items())->min('order_date'))->whereDate('p.end_date', '>', collect($orders->items())->max('order_date'))
-            ->get();
-        $shipping_discount = collect($shipping_discount)->groupBy('shipping_service');
-
         $voucher_details = DB::table('fumaco_voucher')->whereIn('code', collect($orders->items())->pluck('voucher_code')->unique())->get();
         $voucher_details = collect($voucher_details)->groupBy('code');
 
@@ -173,6 +166,12 @@ class OrderController extends Controller
                     'item_total' => $i->item_total_price,
                 ];
             }
+
+            $shipping_discount = DB::table('fumaco_on_sale as p')
+                ->join('fumaco_on_sale_shipping_service as c', 'p.id', 'c.sale_id')->where('c.shipping_service', $o->order_shipping)
+                ->where('status', 1)->where('p.apply_discount_to', 'Per Shipping Service')->whereDate('p.start_date', '<=', $o->order_date)->whereDate('p.end_date', '>=', $o->order_date)
+                ->first();
+
             $orders_arr[] = [
                 'order_no' => $o->order_number,
                 'first_name' => $o->order_name,
@@ -206,7 +205,7 @@ class OrderController extends Controller
                 'estimated_delivery_date' => $o->estimated_delivery_date,
                 'voucher_code' => $o->voucher_code,
                 'voucher_details' => isset($voucher_details[$o->voucher_code]) ? $voucher_details[$o->voucher_code][0] : [],
-                'shipping_discount' => isset($shipping_discount[$o->order_shipping]) ? $shipping_discount[$o->order_shipping][0] : [],
+                'shipping_discount' => $shipping_discount ? $shipping_discount : [],
                 'discount_amount' => $o->discount_amount,
                 'payment_id' => $o->payment_id,
                 'payment_method' => $o->order_payment_method,
@@ -233,12 +232,6 @@ class OrderController extends Controller
         $item_images = DB::table('fumaco_items_image_v1')->whereIn('idcode', $item_codes)->get();
         $item_image = collect($item_images)->groupBy('idcode');
 
-        $shipping_discount = DB::table('fumaco_on_sale as p')
-            ->join('fumaco_on_sale_shipping_service as c', 'p.id', 'c.sale_id')->whereIn('c.shipping_service', collect($orders->items())->pluck('order_shipping')->unique())
-            ->where('status', 1)->where('p.apply_discount_to', 'Per Shipping Service')->whereDate('p.start_date', '<', collect($orders->items())->min('order_date'))->whereDate('p.end_date', '>', collect($orders->items())->max('order_date'))
-            ->get();
-        $shipping_discount = collect($shipping_discount)->groupBy('shipping_service');
-
         $voucher_details = DB::table('fumaco_voucher')->whereIn('code', collect($orders->items())->pluck('voucher_code')->unique())->get();
         $voucher_details = collect($voucher_details)->groupBy('code');
 
@@ -259,6 +252,12 @@ class OrderController extends Controller
                     'item_total' => $i->item_total_price,
                 ];
             }
+
+            $shipping_discount = DB::table('fumaco_on_sale as p')
+                ->join('fumaco_on_sale_shipping_service as c', 'p.id', 'c.sale_id')->where('c.shipping_service', $o->order_shipping)
+                ->where('status', 1)->where('p.apply_discount_to', 'Per Shipping Service')->whereDate('p.start_date', '<=', $o->order_date)->whereDate('p.end_date', '>=', $o->order_date)
+                ->first();
+
             $orders_arr[] = [
                 'order_no' => $o->order_number,
                 'first_name' => $o->order_name,
@@ -292,7 +291,7 @@ class OrderController extends Controller
                 'estimated_delivery_date' => $o->estimated_delivery_date,
                 'voucher_code' => $o->voucher_code,
                 'voucher_details' => isset($voucher_details[$o->voucher_code]) ? $voucher_details[$o->voucher_code][0] : [],
-                'shipping_discount' => isset($shipping_discount[$o->order_shipping]) ? $shipping_discount[$o->order_shipping][0] : [],
+                'shipping_discount' => $shipping_discount ? $shipping_discount : [],
                 'discount_amount' => $o->discount_amount,
                 'date_delivered' => $o->date_delivered,
                 'payment_id' => $o->payment_id,

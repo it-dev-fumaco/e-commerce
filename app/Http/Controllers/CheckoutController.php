@@ -558,7 +558,7 @@ class CheckoutController extends Controller
 
 			$check_shipping_service_discount = DB::table('fumaco_on_sale as p')
 				->join('fumaco_on_sale_shipping_service as c', 'p.id', 'c.sale_id')
-				->where('status', 1)->where('p.apply_discount_to', 'Per Shipping Service')->whereDate('p.start_date', '<', Carbon::now())->whereDate('p.end_date', '>', Carbon::now())
+				->where('status', 1)->where('p.apply_discount_to', 'Per Shipping Service')->whereDate('p.start_date', '<=', Carbon::now())->whereDate('p.end_date', '>=', Carbon::now())
 				->get();
 
 			$shipping_service_discount = collect($check_shipping_service_discount)->groupBy('shipping_service');
@@ -1196,7 +1196,6 @@ class CheckoutController extends Controller
 			}
 
 			session()->forget('fumOrderNo');
-
 			DB::commit();
 
 			return view($view, compact('order_details', 'items', 'loggedin', 'store_address', 'bank_accounts', 'shipping_discount', 'voucher_details'));

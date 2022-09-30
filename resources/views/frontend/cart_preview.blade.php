@@ -58,29 +58,41 @@
 @endphp
 <div class="d-flex flex-row justify-content-between">
     <div class="p-1 col">
-        <a href="/cart" class="btn btn-outline-primary fumacoFont_card_readmore btn-sm mx-auto" role="button" style="width: 100% !important; padding: 5px 15px;"><i class="fas fa-shopping-cart"></i> Checkout</a>
+        <a href="/cart" class="cart-btn btn btn-outline-primary fumacoFont_card_readmore btn-sm mx-auto" role="button" style="width: 100% !important; padding: 5px 15px;"><i class="fas fa-shopping-cart"></i> Checkout</a>
     </div>
 </div>
 @if (Auth::check())
 <div class="d-flex flex-row justify-content-between">
     <div class="p-1 col text-center">
-        <a href="/myorders" class="fumacoFont_card_readmore mx-auto" role="button" style="width: 100% !important;"><i class="fas fa-box" style="margin-right: 2%;"></i> My Orders</a>
+        <a href="/myorders" class="cart-btn fumacoFont_card_readmore mx-auto" role="button" style="width: 100% !important;"><i class="fas fa-box" style="margin-right: 2%;"></i> My Orders</a>
     </div>
 </div>
 @else
 <div class="d-flex flex-row justify-content-between">
     <div class="p-1 col text-center">
-       <a href="/track_order" class="fumacoFont_card_readmore mx-auto" role="button" style="width: 100% !important; font-size: 10pt !important;"><i class="fas fa-box" style="margin-right: 2%;"></i> Track Order</a>
+       <a href="/track_order" class="cart-btn fumacoFont_card_readmore mx-auto" role="button" style="width: 100% !important; font-size: 10pt !important;"><i class="fas fa-box" style="margin-right: 2%;"></i> Track Order</a>
     </div>
 </div>
 @endif
 
 <style>
+.cart-btn{
+    border: none !important;
+    box-shadow: 1px solid rgba(0,0,0,0) !important;
+    outline: none !important;
+}
+.cart-btn:focus {
+    border: none !important;
+    box-shadow: 1px solid rgba(0,0,0,0) !important;
+    outline: none !important;
+}
 .co-btn:disabled,
 .co-btn[disabled]{
     border: 1px solid #999999 !important;
+    box-shadow: 1px solid rgba(0,0,0,0) !important;
     background-color: #cccccc !important;
     color: #404040 !important;
     cursor: not-allowed !important;
+    outline: none !important;
 }
 </style>

@@ -1400,30 +1400,36 @@
 			var shipping_discount_type = $("input[name='shipping_fee']:checked").data('discount-type');
 			var shipping_discount_rate = $("input[name='shipping_fee']:checked").data('discount-rate');
 			var shipping_capped_amount = $("input[name='shipping_fee']:checked").data('capped-amount');
+			var shipping_discount = 0;
 
 			var shipping_fee = $("input[name='shipping_fee']:checked").val();
 			shipping_fee = (isNaN(shipping_fee)) ? 0 : shipping_fee;
 
-			if($("input[name='shipping_fee']:checked").data('pickup')){
+			if($("input[name='shipping_fee']:checked").data('pickup') && shipping_discount_type != 'none'){
 				switch (shipping_discount_type) {
 					case 'Fixed Amount':
 						shipping_discount = shipping_discount_rate;
 						subtotal = subtotal - shipping_discount;
 						subtotal = subtotal > 0 ? subtotal : 0;
+						// var is_discounted = 1;
 						break;
 					case 'By Percentage':
 						shipping_discount = subtotal * shipping_discount_rate;
 						shipping_discount = shipping_discount < shipping_capped_amount ? shipping_discount : shipping_capped_amount;
 						subtotal = subtotal - shipping_discount;
 						subtotal = subtotal > 0 ? subtotal : 0;
+						// var is_discounted = 1;
 						break;
 					default:
+						// var is_discounted = 0;
 						break;
 				}
 
-				$('#shipping-name').removeClass('d-none').text(shipping_discount_name);
-				$('#shipping-discount-div').removeClass('d-none');
-				$('#shipping-discount-amount').text(shipping_discount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,"));
+				// if(is_discounted == 1){
+					$('#shipping-name').removeClass('d-none').text(shipping_discount_name);
+					$('#shipping-discount-div').removeClass('d-none');
+					$('#shipping-discount-amount').text(shipping_discount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,"));
+				// }
 			}else{
 				$('#shipping-name').addClass('d-none').text('');
 				$('#shipping-discount-div').addClass('d-none');
