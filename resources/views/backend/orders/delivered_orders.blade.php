@@ -191,14 +191,17 @@
 																							break;
 																						case 'By Percentage':
 																							$shipping_discount_amount = ($shipping_discount->discount_rate / 100) * $order['subtotal'];
+																							$shipping_discount_amount = $shipping_discount_amount > $shipping_discount->capped_amount ? $shipping_discount->capped_amount : $shipping_discount_amount;
 																							break;
 																						default:
 																							$shipping_discount_amount = 0;
 																							break;
 																					}
 																				@endphp
-																				<dt class="col-sm-10 text-right">{{ $shipping_discount->sale_name }}</dt>
-																				<dd class="col-sm-2 text-right">₱ {{ number_format($shipping_discount_amount, 2) }}</dd>
+																				@if ($shipping_discount_amount < $order['subtotal'])
+																					<dt class="col-sm-10 text-right">{{ $shipping_discount->sale_name }}</dt>
+																					<dd class="col-sm-2 text-right">₱ {{ number_format($shipping_discount_amount, 2) }}</dd>
+																				@endif
 																			@endif
 																			@if ($order['voucher_code'])
 																				@php
