@@ -215,11 +215,11 @@ class CartController extends Controller
         if(Auth::check()) {
             $cart_items = DB::table('fumaco_items as a')->join('fumaco_cart as b', 'a.f_idcode', 'b.item_code')
                 ->where('user_type', 'member')->where('user_email', Auth::user()->username)
-                ->select('f_idcode', 'f_default_price', 'f_onsale', 'b.qty', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'slug', 'f_name_name', 'f_qty', 'f_reserved_qty')->get();
+                ->select('f_idcode', 'f_default_price', 'f_onsale', 'b.qty', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'slug', 'f_name_name', 'f_item_name', 'f_qty', 'f_reserved_qty')->get();
         } else {
             $cart_items = DB::table('fumaco_items as a')->join('fumaco_cart as b', 'a.f_idcode', 'b.item_code')
                 ->where('user_type', 'guest')->where('transaction_id', $order_no)
-                ->select('f_idcode', 'f_default_price', 'f_onsale', 'b.qty', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'slug', 'f_name_name', 'f_qty', 'f_reserved_qty')->get();
+                ->select('f_idcode', 'f_default_price', 'f_onsale', 'b.qty', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'slug', 'f_name_name', 'f_item_name', 'f_qty', 'f_reserved_qty')->get();
         }
 
         if (count($cart_items) > 0) {
@@ -293,6 +293,7 @@ class CartController extends Controller
                 'item_code' => $item->f_idcode,
                 'slug' => $item->slug,
                 'item_description' => $item->f_name_name,
+                'alt' => $item->f_item_name,
                 'price' => $item_price_data['discounted_price'],
                 'amount' => ($item_price_data['discounted_price'] * $item->qty),
                 'quantity' => $item->qty,
@@ -307,7 +308,7 @@ class CartController extends Controller
 
         $cross_sell_products = DB::table('fumaco_items_cross_sell as cs')->join('fumaco_items as i', 'cs.item_code_cross_sell', 'i.f_idcode')
             ->whereIn('cs.item_code', $cart_item_codes)->whereNotIn('cs.item_code_cross_sell', $cart_item_codes)
-            ->select('f_idcode', 'f_default_price', 'f_onsale', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'slug', 'f_name_name', 'f_qty', 'f_reserved_qty')->get();
+            ->select('f_idcode', 'f_default_price', 'f_onsale', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'slug', 'f_name_name', 'f_item_name', 'f_qty', 'f_reserved_qty')->get();
 
         $cross_selling_item_codes = array_column($cross_sell_products->toArray(), 'f_idcode');
 
@@ -354,6 +355,7 @@ class CartController extends Controller
             $cross_sell_arr[] = [
                 'item_code' => $cs->f_idcode,
                 'item_name' => $cs->f_name_name,
+                'alt' => $cs->f_item_name,
                 'default_price' => '₱ ' . number_format($item_price_data['item_price'], 2, '.', ','),
                 'is_discounted' => ($item_price_data['discount_rate'] > 0) ? $item_price_data['is_on_sale'] : 0,
                 'on_stock' => ($cs->f_qty - $cs->f_reserved_qty) > 0 ? 1 : 0,

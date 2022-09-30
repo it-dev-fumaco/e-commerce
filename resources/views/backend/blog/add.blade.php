@@ -52,13 +52,23 @@
                                             <input type="text" class="form-control" name="slug" placeholder="Slug" >
                                         </div>
                                         <div class="col-md-6">
+                                            @php
+                                                $types = ['In Applications', 'Solutions', 'Products'];
+                                            @endphp
                                             <label for="blog_type">Blog Type</label>
                                             <select class="form-control" name="blog_type" required>
                                                 <option disabled value="">Select Blog Type</option>
-                                                <option value="In Applications">In Applications</option>
-                                                <option value="Solutions">Solutions</option>
-                                                <option value="Products">Products</option>
+                                                @foreach ($types as $type)
+                                                    <option value="{{ $type }}">{{ $type }}</option>
+                                                @endforeach
                                             </select>
+                                        </div>
+                                    </div>
+                                    <br>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <label for="blog_title">Image Alt</label>
+                                            <input type="text" class="form-control" name="alt" placeholder="Image Alt" value="">
                                         </div>
                                     </div>
                                     <br/>

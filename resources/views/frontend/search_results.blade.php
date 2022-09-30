@@ -245,12 +245,12 @@
 									<div class="col-4">
 										@php
 											$image = ($item['image']) ? '/storage/item_images/'.$item['item_code'].'/gallery/preview/'.$item['image'] : '/storage/no-photo-available.png';
-											$image_webp = ($item['image']) ? '/storage/item_images/'.$item['item_code'].'/gallery/preview/'.explode(".", $item['image'])[0] .'.webp' : '/storage/no-photo-available.png';
+											$image_webp = ($item['image']) ? '/storage/item_images/'.$item['item_code'].'/gallery/preview/'.explode(".", $item['image'])[0] .'.webp' : '/storage/no-photo-available.webp';
 										@endphp              
 										<picture>
-											<source srcset="{{ asset($image_webp) }}" type="image/webp" class="card-img-top">
-											<source srcset="{{ asset($image) }}" type="image/jpeg" class="card-img-top"> 
-											<img src="{{ asset($image) }}" alt="{{ $item['item_code'] }}" class="card-img-top hover" loading="lazy">
+											<source srcset="{{ asset($image_webp) }}" type="image/webp">
+											<source srcset="{{ asset($image) }}" type="image/jpeg"> 
+											<img src="{{ asset($image) }}" alt="{{ Str::slug($item['item_name'], '-') }}" class="card-img-top hover" loading="lazy">
 										</picture>
 									</div>
 									<div class="col-8">
@@ -318,12 +318,12 @@
 									</div>
 									@php
 									$image = ($item['image']) ? '/storage/item_images/'.$item['item_code'].'/gallery/preview/'.$item['image'] : '/storage/no-photo-available.png';
-									$image_webp = ($item['image']) ? '/storage/item_images/'.$item['item_code'].'/gallery/preview/'.explode(".", $item['image'])[0] .'.webp' : '/storage/no-photo-available.png';
+									$image_webp = ($item['image']) ? '/storage/item_images/'.$item['item_code'].'/gallery/preview/'.explode(".", $item['image'])[0] .'.webp' : '/storage/no-photo-available.webp';
 									@endphp              
 									<picture>
-										<source srcset="{{ asset($image_webp) }}" type="image/webp" class="card-img-top">
-										<source srcset="{{ asset($image) }}" type="image/jpeg" class="card-img-top"> 
-										<img src="{{ asset($image) }}" alt="{{ $item['item_code'] }}" class="card-img-top hover" loading='lazy'>
+										<source srcset="{{ asset($image_webp) }}" type="image/webp">
+										<source srcset="{{ asset($image) }}" type="image/jpeg"> 
+										<img src="{{ asset($image) }}" alt="{{ Str::slug($item['item_name'], '-') }}" class="card-img-top hover" loading='lazy'>
 									</picture>
 								</div>
 								
@@ -392,12 +392,12 @@
 									<div class="col-4">
 										@php
 											$image = ($product['image']) ? '/storage/item_images/'.$product['item_code'].'/gallery/preview/'.$product['image'] : '/storage/no-photo-available.png';
-											$image_webp = ($product['image']) ? '/storage/item_images/'.$product['item_code'].'/gallery/preview/'.explode(".", $product['image'])[0] .'.webp' : '/storage/no-photo-available.png';
+											$image_webp = ($product['image']) ? '/storage/item_images/'.$product['item_code'].'/gallery/preview/'.explode(".", $product['image'])[0] .'.webp' : '/storage/no-photo-available.webp';
 										@endphp              
 										<picture>
-											<source srcset="{{ asset($image_webp) }}" type="image/webp" class="card-img-top">
-											<source srcset="{{ asset($image) }}" type="image/jpeg" class="card-img-top"> 
-											<img src="{{ asset($image) }}" alt="{{ $product['item_code'] }}" class="card-img-top hover" loading="lazy">
+											<source srcset="{{ asset($image_webp) }}" type="image/webp">
+											<source srcset="{{ asset($image) }}" type="image/jpeg"> 
+											<img src="{{ asset($image) }}" alt="{{ Str::slug($product['alt'], '-') }}" class="card-img-top hover" loading="lazy">
 										</picture>
 									</div>
 									<div class="col-8">
@@ -463,12 +463,12 @@
 									</div>
 									@php
 										$image = ($product['image']) ? '/storage/item_images/'.$product['item_code'].'/gallery/preview/'.$product['image'] : '/storage/no-photo-available.png';
-										$image_webp = ($product['image']) ? '/storage/item_images/'.$product['item_code'].'/gallery/preview/'.explode(".", $product['image'])[0] .'.webp' : '/storage/no-photo-available.png';
+										$image_webp = ($product['image']) ? '/storage/item_images/'.$product['item_code'].'/gallery/preview/'.explode(".", $product['image'])[0] .'.webp' : '/storage/no-photo-available.webp';
 									@endphp              
 									<picture>
-										<source srcset="{{ asset($image_webp) }}" type="image/webp" class="card-img-top">
-										<source srcset="{{ asset($image) }}" type="image/jpeg" class="card-img-top"> 
-										<img src="{{ asset($image) }}" alt="{{ $product['item_code'] }}" class="card-img-top hover" loading="lazy">
+										<source srcset="{{ asset($image_webp) }}" type="image/webp">
+										<source srcset="{{ asset($image) }}" type="image/jpeg"> 
+										<img src="{{ asset($image) }}" alt="{{ Str::slug($product['alt'], '-') }}" class="card-img-top hover" loading="lazy">
 									</picture>
 								</div>
 								
@@ -522,13 +522,13 @@
 					<div class="card mb-4" style="border: 0px solid rgba(0, 0, 0, 0.125) !important;">
 						@php
 							$image = ($blog['image']) ? '/storage/journals/'.$blog['image'] : '/storage/no-photo-available.png';
-							$image_webp = ($blog['image']) ? '/storage/journals/'.explode(".", $blog['image'])[0] .'.webp' : '/storage/no-photo-available.png';
+							$image_webp = ($blog['image']) ? '/storage/journals/'.explode(".", $blog['image'])[0] .'.webp' : '/storage/no-photo-available.webp';
 						@endphp
 					
 						<picture>
-							<source srcset="{{ asset($image_webp) }}" type="image/webp" class="card-img-top">
-							<source srcset="{{ asset($image) }}" type="image/jpeg" class="card-img-top">
-							<img src="{{ asset($image) }}" alt="{{ Str::slug(explode(".", $blog['image'])[0], '-') }}" class="card-img-top" loading='lazy'>
+							<source srcset="{{ asset($image_webp) }}" type="image/webp">
+							<source srcset="{{ asset($image) }}" type="image/jpeg">
+							<img src="{{ asset($image) }}" alt="{{ Str::slug($blog['title'], '-') }}" class="card-img-top" loading='lazy'>
 						</picture>
 						<div class="card-body align-items-stretch p-2">
 							<a href="blog/{{ $blog['blog_slug'] ? $blog['blog_slug'] : $blog['id'] }}" style="text-decoration: none !important;">

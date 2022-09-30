@@ -365,6 +365,13 @@
                            <input type="text" class="form-control" id="product-url" name="slug" value="{{ old('slug') }}{{ $details->slug }}">
                          </div>
                          <div class="form-group">
+                           @php
+                               $alt = $details->image_alt ? $details->image_alt : Str::slug($details->f_item_name, '-');
+                           @endphp
+                           <label for="img-alt">Image Alt</label>
+                           <input type="text" class="form-control" id="img-alt" name="alt" value="{{ old('alt') }}{{ $alt }}">
+                         </div>
+                         <div class="form-group">
                            <label for="product-meta-description">Meta Description</label>
                            <textarea class="form-control" rows="3" id="product-meta-description" name="meta_description">{{ old('meta_description') }}{{ $details->meta_description }}</textarea>
                          </div>

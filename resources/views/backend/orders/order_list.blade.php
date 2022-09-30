@@ -323,18 +323,55 @@
 																				@foreach ($order['ordered_items'] as $item)
 																				<tr>
 																					<td class="text-center">{{ $item['item_code'] }}</td>
-																					<td>{{ $item['item_name'] }}
-																						@if (count($item['bundle']) > 0)
-																						<br>
-																						<ul>
-																							@foreach ($item['bundle'] as $bundle)
-																							<li style="font-size: 10pt;">
-																								<b>{{ $bundle->item_code }}</b> {!! $bundle->item_description !!}
-																								<span class="d-block text-muted font-italic">x{{ $bundle->qty . ' ' . $bundle->uom }}</span>
-																							</li>
-																							@endforeach
-																						</ul>
-																						@endif
+																					<td>
+																						<div class="row">
+																							<div class="col-1 p-0">
+																								@php
+																									$src = $item['image'] ? '/storage/item_images/'.$item['item_code'].'/gallery/preview/'. $item['image'] : '/storage/no-photo-available.png';
+																									$orig = $item['image'] ? '/storage/item_images/'.$item['item_code'].'/gallery/original/'. $item['orig'] : '/storage/no-photo-available.png';
+																								@endphp
+
+																								<a data-toggle="modal" data-target="#image-{{ $order['order_id'].'-'.$item['item_code'] }}">
+																									<picture>
+																										<source srcset="{{ asset(explode('.', $src)[0].'.webp') }}" type="image/webp">
+																										<source srcset="{{ asset($src) }}" type="image/jpeg">
+																										<img class="img-thumbnail w-100" src="{{ asset($src) }}" loading='lazy'/>
+																									</picture>
+																								</a>
+																								
+																								<!-- Modal -->
+																								<div class="modal fade" id="image-{{ $order['order_id'].'-'.$item['item_code'] }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+																									<div class="modal-dialog" role="document">
+																										<div class="modal-content">
+																											<div class="modal-header">
+																												<h5 class="modal-title" id="exampleModalLabel">{{ $item['item_code'] }}</h5>
+																											</div>
+																											<div class="modal-body">
+																												<picture>
+																													<source srcset="{{ asset(explode('.', $orig)[0].'.webp') }}" type="image/webp">
+																													<source srcset="{{ asset($orig) }}" type="image/jpeg">
+																													<img class="img-thumbnail w-100" src="{{ asset($orig) }}" loading='lazy'/>
+																												</picture>
+																											</div>
+																										</div>
+																									</div>
+																								</div>
+																							</div>
+																							<div class="col-11">
+																								{{ $item['item_name'] }}
+																								@if (count($item['bundle']) > 0)
+																								<br>
+																								<ul>
+																									@foreach ($item['bundle'] as $bundle)
+																									<li style="font-size: 10pt;">
+																										<b>{{ $bundle->item_code }}</b> {!! $bundle->item_description !!}
+																										<span class="d-block text-muted font-italic">x{{ $bundle->qty . ' ' . $bundle->uom }}</span>
+																									</li>
+																									@endforeach
+																								</ul>
+																								@endif
+																							</div>
+																						</div>
 																					</td>
 																					<td class="text-center">{{ $item['item_qty'] }}</td>
 																					<td class="text-right">₱ {{ number_format(str_replace(",","",$item['item_price']), 2) }}</td>
@@ -351,9 +388,44 @@
 																		<dl class="row">
 																			<dt class="col-sm-10 text-right">Subtotal</dt>
 																			<dd class="col-sm-2 text-right">₱ {{ number_format(str_replace(",","",$order['subtotal']), 2) }}</dd>
+																			@if ($order['shipping_discount'])
+																				@php
+																					$shipping_discount = $order['shipping_discount'];
+																					switch ($shipping_discount->discount_type) {
+																						case 'Fixed Amount':
+																							$shipping_discount_amount = $shipping_discount->discount_rate;
+																							break;
+																						case 'By Percentage':
+																							$shipping_discount_amount = ($shipping_discount->discount_rate / 100) * $order['subtotal'];
+																							break;
+																						default:
+																							$shipping_discount_amount = 0;
+																							break;
+																					}
+																				@endphp
+																				<dt class="col-sm-10 text-right">{{ $shipping_discount->sale_name }}</dt>
+																				<dd class="col-sm-2 text-right">- ₱ {{ number_format(str_replace(",","",$shipping_discount_amount), 2) }}</dd>
+																			@endif
 																			@if ($order['voucher_code'])
-																			<dt class="col-sm-10 text-right">Discount <span class="text-white" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833;">{{ $order['voucher_code'] }}</span></dt>
-																			<dd class="col-sm-2 text-right">- ₱ {{ number_format(str_replace(",","",$order['discount_amount']), 2) }}</dd>
+																				@php
+																					$voucher_details = $order['voucher_details'];
+																					$voucher_discount_amount = 0;
+																					if($voucher_details){
+																						switch ($voucher_details->discount_type) {
+																							case 'Fixed Amount':
+																								$voucher_discount_amount = $voucher_details->discount_rate;
+																								break;
+																							case 'By Percentage':
+																								$voucher_discount_amount = ($voucher_details->discount_rate / 100) * $order['subtotal'];
+																								break;
+																							default:
+																								$voucher_discount_amount = 0;
+																								break;
+																						}
+																					}
+																				@endphp
+																				<dt class="col-sm-10 text-right">Discount <span class="text-white" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833;">{{ $order['voucher_code'] }}</span></dt>
+																				<dd class="col-sm-2 text-right">- ₱ {{ number_format(str_replace(",","",$voucher_discount_amount), 2) }}</dd>
 																			@endif
 																			<dt class="col-sm-10 text-right">
 																				@if ($order['shipping_name'])
@@ -491,7 +563,7 @@
 		</div>
 	</div>
 	<style>
-	.confirm-modal, .payment-modal{
+	.modal{
 		background: rgba(0, 0, 0, .7);
 	}
 	.stat-label {

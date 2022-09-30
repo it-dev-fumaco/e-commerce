@@ -332,11 +332,11 @@ class CheckoutController extends Controller
 			if(Auth::check()) {
 				$cart_items = DB::table('fumaco_items as a')->join('fumaco_cart as b', 'a.f_idcode', 'b.item_code')
 					->where('user_type', 'member')->where('user_email', Auth::user()->username)
-					->select('f_idcode', 'f_default_price', 'f_onsale', 'b.qty', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'slug', 'f_name_name', 'f_qty', 'f_reserved_qty', 'f_item_type')->get();
+					->select('f_idcode', 'f_default_price', 'f_onsale', 'b.qty', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'slug', 'f_name_name', 'f_item_name', 'f_qty', 'f_reserved_qty', 'f_item_type')->get();
 			} else {
 				$cart_items = DB::table('fumaco_items as a')->join('fumaco_cart as b', 'a.f_idcode', 'b.item_code')
 					->where('user_type', 'guest')->where('transaction_id', $order_no)
-					->select('f_idcode', 'f_default_price', 'f_onsale', 'b.qty', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'slug', 'f_name_name', 'f_qty', 'f_reserved_qty', 'f_item_type')->get();
+					->select('f_idcode', 'f_default_price', 'f_onsale', 'b.qty', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'slug', 'f_name_name', 'f_item_name', 'f_qty', 'f_reserved_qty', 'f_item_type')->get();
 			}
 
 			if(count($cart_items) <= 0) {
@@ -401,6 +401,7 @@ class CheckoutController extends Controller
 				$cart_arr[] = [
 					'item_code' => $item->f_idcode,
 					'item_description' => $item->f_name_name,
+					'alt' => $item->f_item_name,
 					'price' => $price,
 					'subtotal' => ($total_amount),
 					'original_price' => $item_price_data['item_price'],
@@ -555,12 +556,19 @@ class CheckoutController extends Controller
 
 			$shipping_rates = $shipping_rates['shipping_offer_rates'];
 
+			$check_shipping_service_discount = DB::table('fumaco_on_sale as p')
+				->join('fumaco_on_sale_shipping_service as c', 'p.id', 'c.sale_id')
+				->where('status', 1)->where('p.apply_discount_to', 'Per Shipping Service')->whereDate('p.start_date', '<', Carbon::now())->whereDate('p.end_date', '>', Carbon::now())
+				->get();
+
+			$shipping_service_discount = collect($check_shipping_service_discount)->groupBy('shipping_service');
+
 			$payment_methods = DB::table('fumaco_payment_method')->where('is_enabled', 1)
 				->select('payment_method_name', 'payment_type', 'issuing_bank', 'show_image', 'image')->get();
 
 			DB::commit();
 
-			return view('frontend.checkout.check_out_summary', compact('shipping_details', 'billing_details', 'shipping_rates', 'order_no', 'cart_arr', 'shipping_add', 'billing_add', 'shipping_zones', 'payment_methods', 'free_shipping_remarks'));
+			return view('frontend.checkout.check_out_summary', compact('shipping_details', 'billing_details', 'shipping_rates', 'order_no', 'cart_arr', 'shipping_add', 'billing_add', 'shipping_zones', 'payment_methods', 'free_shipping_remarks', 'shipping_service_discount'));
 		}catch(Exception $e){
 			DB::rollback();
 			return redirect()->back()->with('error', 'An error occured. Please try again.');
@@ -779,8 +787,29 @@ class CheckoutController extends Controller
 					}
 				}
 			}
+
+			// Store Pickup Discount
+			$shipping_discount = [];
+			$shipping_discount_amount = 0;
+			if($temp->shipping_name == 'Store Pickup'){
+				$shipping_discount = $this->getSalePerShippingService($temp->shipping_name);
+
+				// return collect($shipping_discount);
+				if($shipping_discount){
+					switch ($shipping_discount->discount_type) {
+						case 'Fixed Amount':
+							$shipping_discount_amount = $shipping_discount->discount_rate;
+							break;
+						case 'By Percentage':
+							$shipping_discount_amount = ($shipping_discount->discount_rate / 100) * $amount;
+							break;
+						default:
+							break;
+					}
+				}
+			}
 	
-			$grand_total = $amount - $discount;
+			$grand_total = $amount - ($discount + $shipping_discount_amount);
 			$grand_total = $grand_total + $temp->shipping_amount;
 
 			return view('frontend.checkout.eghl_form', compact('temp', 'api', 'grand_total'));
@@ -949,6 +978,25 @@ class CheckoutController extends Controller
 					$default_payment_status = DB::table('fumaco_payment_status')->where('status_sequence', 1)->pluck('status')->first();
 				}
 
+				// Store Pickup Discount
+				$shipping_discount = [];
+				$shipping_discount_amount = 0;
+				if($temp->shipping_name == 'Store Pickup'){
+					$shipping_discount = $this->getSalePerShippingService($temp->shipping_name);
+					if($shipping_discount){
+						switch ($shipping_discount->discount_type) {
+							case 'Fixed Amount':
+								$shipping_discount_amount = $shipping_discount->discount_rate;
+								break;
+							case 'By Percentage':
+								$shipping_discount_amount = ($shipping_discount->discount_rate / 100) * $subtotal;
+								break;
+							default:
+								break;
+						}
+					}
+				}
+
 				DB::table('fumaco_order')->insert([
 					'order_number' => $temp->xlogs,
 					'order_account' => $temp->xuser_id, // account number of logged user
@@ -1001,7 +1049,7 @@ class CheckoutController extends Controller
 					'pickup_date' => $temp->xpickup_date,
 					'pickup_time' => $temp->xpickup_time,
 					'voucher_code' => ($is_voucher_valid) ? $temp->voucher_code : null,
-					'discount_amount' => $discount,
+					'discount_amount' => $discount + $shipping_discount_amount,
 					'deposit_slip_token' => $payment_method == 'Bank Deposit' ? hash('sha256', Carbon::now()->toDateTimeString()) : null,
 					'deposit_slip_token_date_created' => $payment_method == 'Bank Deposit' ? Carbon::now()->toDateTimeString() : null,
 				]);
@@ -1036,12 +1084,15 @@ class CheckoutController extends Controller
 				$store = DB::table('fumaco_store')->where('store_name', $order_details->store_location)->first();
 				$store_address = ($store) ? $store->address : null;
 			}
+			$voucher_details = DB::table('fumaco_voucher')->where('code', $order_details->voucher_code)->first();
 
 			$order = [
 				'order_details' => $order_details,
 				'items' => $items,
 				'store_address' => $store_address,
-				'new_token' => null
+				'new_token' => null,
+				'voucher_details' => $voucher_details,
+				'shipping_discount' => $shipping_discount
 			];
 
 			// // send email to customer / client
@@ -1148,7 +1199,7 @@ class CheckoutController extends Controller
 
 			DB::commit();
 
-			return view($view, compact('order_details', 'items', 'loggedin', 'store_address', 'bank_accounts'));
+			return view($view, compact('order_details', 'items', 'loggedin', 'store_address', 'bank_accounts', 'shipping_discount', 'voucher_details'));
 		} catch (Exception $e) {
 			DB::rollback();
 

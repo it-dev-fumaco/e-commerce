@@ -106,4 +106,11 @@ trait ProductTrait {
             ->select('fumaco_on_sale_customer_group.discount_type', 'fumaco_on_sale_customer_group.discount_rate')
             ->first();
     }
+
+    public function getSalePerShippingService($shipping_service){
+        return DB::table('fumaco_on_sale as p')
+            ->join('fumaco_on_sale_shipping_service as c', 'p.id', 'c.sale_id')->where('c.shipping_service', $shipping_service)
+            ->where('status', 1)->where('p.apply_discount_to', 'Per Shipping Service')->whereDate('p.start_date', '<', Carbon::now())->whereDate('p.end_date', '>', Carbon::now())
+            ->first();
+    }
 }

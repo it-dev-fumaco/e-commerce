@@ -466,9 +466,11 @@
               }
               var link = (d.external_link) ? d.external_link : '/products/' + slug ;
               var target = (d.external_link) ? 'target="_blank"' : '';
+              var is_new = d.is_new == 1 ? '' : 'd-none';
               // for navbar dropdown
               l += '<li><a class="dropdown-item" style="font-weight: 300 !important;" href="' + link +'" ' + target + '>' +
-              '<img src="{{ asset("assets/site-img/icon/") }}/' + d.image + '" alt="' + d.name +'" width="30" loading="lazy">' + d.name +'</a></li>';
+              '<img src="{{ asset("assets/site-img/icon/") }}/' + d.image + '" alt="' + d.name +'" width="30" loading="lazy">' + d.name +
+              '&nbsp;<span class="badge alert-primary ' + is_new + '" style="font-size: 8pt !important;">New</span></a></li>';
               // for footer links
               f += '<tr style="border-style: unset !important;">' +
                 '<td class="tdfooter footer2nd" style="border-style: unset !important;">' +

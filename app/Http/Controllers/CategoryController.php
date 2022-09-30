@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use DB;
 use Auth;
+use Carbon\Carbon;
 
 class CategoryController extends Controller
 {
@@ -25,6 +26,9 @@ class CategoryController extends Controller
                     return redirect()->back()->with('error', 'Slug must be unique.');
                 }
             }
+
+            $date = explode(' - ', $request->new_tag_duration);
+
             $cat_edit = [
                 'name' => $request->edit_cat_name,
                 'image' => $request->edit_cat_icon,
@@ -33,6 +37,9 @@ class CategoryController extends Controller
                 'external_link' => ($request->edit_is_external_link) ? $request->external_link : null,
                 'meta_keywords' => $request->cat_meta_keywords,
                 'meta_description' => $request->cat_meta_desc,
+                'new' => isset($request->set_as_new) ? 1 : 0,
+                'new_tag_start' => isset($request->set_as_new) ? Carbon::parse($date[0]) : null,
+                'new_tag_end' => isset($request->set_as_new) ? Carbon::parse($date[1]) : null,
                 'last_modified_by' => Auth::user()->username,
             ];
 
@@ -49,11 +56,22 @@ class CategoryController extends Controller
     public function addCategory(Request $request){
         DB::beginTransaction();
         try {
+            $date = explode(' - ', $request->new_tag_duration);
+            $is_new = 0;
+            $start = $end = null;
+            if(isset($request->is_new)){
+                $is_new = 1;
+                $start = Carbon::parse($date[0]);
+                $end = Carbon::parse($date[1]);
+            }
             $add = [
                 'name' => $request->add_cat_name,
                 'image' => $request->add_cat_icon,
                 'slug' => $request->add_cat_slug,
                 'code' => " ",
+                'new' => $is_new,
+                'new_tag_start' => $start,
+                'new_tag_end' => $end,
                 'external_link' => ($request->is_external_link) ? $request->external_link : null,
                 'created_by' => Auth::user()->username,
                 'last_modified_by' => Auth::user()->username,
@@ -145,7 +163,7 @@ class CategoryController extends Controller
         try {
             DB::table('fumaco_categories')->where('id', $request->cat_id)->update(['publish' => $request->publish, 'last_modified_by' => Auth::user()->username]);
             DB::commit();
-            return response()->json(['status' => 1, 'message' => 'Test']);
+            return response()->json(['status' => 1, 'message' => 'Category Updated.']);
         } catch (Exception $e) {
             DB::rollback();
             return redirect()->back()->with('error', 'An error occured. Please try again.');

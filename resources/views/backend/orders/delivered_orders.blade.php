@@ -130,7 +130,43 @@
 																				@foreach ($order['ordered_items'] as $item)
 																				<tr>
 																					<td class="text-center">{{ $item['item_code'] }}</td>
-																					<td>{{ $item['item_name'] }}</td>
+																					<td>
+																						<div class="row">
+																							<div class="col-1 p-0">
+																								@php
+																									$src = $item['image'] ? '/storage/item_images/'.$item['item_code'].'/gallery/preview/'. $item['image'] : '/storage/no-photo-available.png';
+																									$orig = $item['image'] ? '/storage/item_images/'.$item['item_code'].'/gallery/original/'. $item['orig'] : '/storage/no-photo-available.png';
+																								@endphp
+		
+																								<a data-toggle="modal" data-target="#image-{{ $order['order_no'].'-'.$item['item_code'] }}">
+																									<picture>
+																										<source srcset="{{ asset(explode('.', $src)[0].'.webp') }}" type="image/webp">
+																										<source srcset="{{ asset($src) }}" type="image/jpeg">
+																										<img class="img-thumbnail w-100" src="{{ asset($src) }}" loading='lazy'/>
+																									</picture>
+																								</a>
+																								
+																								<!-- Modal -->
+																								<div class="modal fade" id="image-{{ $order['order_no'].'-'.$item['item_code'] }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+																									<div class="modal-dialog" role="document">
+																										<div class="modal-content">
+																											<div class="modal-header">
+																												<h5 class="modal-title" id="exampleModalLabel">{{ $item['item_code'] }}</h5>
+																											</div>
+																											<div class="modal-body">
+																												<picture>
+																													<source srcset="{{ asset(explode('.', $orig)[0].'.webp') }}" type="image/webp">
+																													<source srcset="{{ asset($orig) }}" type="image/jpeg">
+																													<img class="img-thumbnail w-100" src="{{ asset($orig) }}" loading='lazy'/>
+																												</picture>
+																											</div>
+																										</div>
+																									</div>
+																								</div>
+																							</div>
+																							<div class="col-11">{{ $item['item_name'] }}</div>
+																						</div>
+																					</td>
 																					<td class="text-center">{{ $item['item_qty'] }}</td>
 																					<td class="text-right">₱ {{ number_format(str_replace(",","",$item['item_price']), 2) }}</td>
 																					@if ($sum_discount > 0)
@@ -145,7 +181,46 @@
 																	<div class="col-md-8 offset-md-4 mb-4">
 																		<dl class="row">
 																			<dt class="col-sm-10 text-right">Subtotal</dt>
-																			<dd class="col-sm-2 text-right">₱ {{ number_format(str_replace(",","",$order['subtotal']), 2) }}</dd>
+																			<dd class="col-sm-2 text-right">₱ {{ number_format(str_replace(",","",$order['subtotal'] - $order['discount_amount']), 2) }}</dd>
+																			@if ($order['shipping_discount'])
+																				@php
+																					$shipping_discount = $order['shipping_discount'];
+																					switch ($shipping_discount->discount_type) {
+																						case 'Fixed Amount':
+																							$shipping_discount_amount = $shipping_discount->discount_rate;
+																							break;
+																						case 'By Percentage':
+																							$shipping_discount_amount = ($shipping_discount->discount_rate / 100) * $order['subtotal'];
+																							break;
+																						default:
+																							$shipping_discount_amount = 0;
+																							break;
+																					}
+																				@endphp
+																				<dt class="col-sm-10 text-right">{{ $shipping_discount->sale_name }}</dt>
+																				<dd class="col-sm-2 text-right">₱ {{ number_format($shipping_discount_amount, 2) }}</dd>
+																			@endif
+																			@if ($order['voucher_code'])
+																				@php
+																					$voucher_discount_amount = 0;
+																					$voucher_details = $order['voucher_details'];
+																					if($voucher_details){
+																						switch ($voucher_details->discount_type) {
+																							case 'Fixed Amount':
+																								$voucher_discount_amount = $voucher_details->discount_rate;
+																								break;
+																							case 'By Percentage':
+																								$voucher_discount_amount = ($voucher_details->discount_rate / 100) * $order['subtotal'];
+																								break;
+																							default:
+																								$voucher_discount_amount = 0;
+																								break;
+																						}
+																					}
+																				@endphp
+																				<dt class="col-sm-10 text-right">Discount <span class="text-white" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833;">{{ $order['voucher_code'] }}</span></dt>
+																				<dd class="col-sm-2 text-right">₱ {{ number_format($voucher_discount_amount, 2) }}</dd>
+																			@endif
 																			<dt class="col-sm-10 text-right">{{ $order['shipping_name'] }}</dt>
 																			<dd class="col-sm-2 text-right">
 																				@if ($order['shipping_amount'] > 0)
@@ -155,7 +230,7 @@
 																				@endif
 																			</dd>
 																			<dt class="col-sm-10 text-right">Grand Total</dt>
-																			<dd class="col-sm-2 text-right">₱ {{ number_format(str_replace(",","",$order['grand_total']), 2) }}</dd>
+																			<dd class="col-sm-2 text-right">₱ {{ number_format(str_replace(",","",$order['grand_total'] - $order['discount_amount']), 2) }}</dd>
 																		</dl>
 																	</div>
 
@@ -196,4 +271,9 @@
 </section>
 </div>
 </div>
+<style>
+	.modal{
+		background: rgba(0, 0, 0, .7);
+	}
+</style>
 @endsection

@@ -80,7 +80,7 @@ class FrontendController extends Controller
             if ($request->s == null) {
                 if (in_array($search_by, ['products', 'all', ''])) {
                     $product_list = DB::table('fumaco_items')->where('f_status', 1)->where('f_featured', 1)
-                        ->select('f_idcode', 'f_default_price', 'f_onsale', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'f_qty', 'f_reserved_qty', 'slug', 'f_name_name', 'f_category', 'id')->get();
+                        ->select('f_idcode', 'f_default_price', 'f_onsale', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'f_qty', 'f_reserved_qty', 'slug', 'f_name_name', 'f_item_name', 'f_category', 'id', 'image_alt')->get();
                 }
 
                 if (in_array($search_by, ['blogs', 'all', ''])) {
@@ -94,6 +94,7 @@ class FrontendController extends Controller
                         ->orWhere('f_parent_code', 'LIKE', "%".$search_str."%")
                         ->orWhere('f_category', 'LIKE', "%".$search_str."%")
                         ->orWhere('f_name_name', 'LIKE', "%".$search_str."%")
+                        ->orWhere('f_item_name', 'LIKE', "%".$search_str."%")
                         ->orWhere(function($q) use ($search_str) {
                             $search_strs = explode(" ", $search_str);
                             foreach ($search_strs as $str) {
@@ -105,7 +106,7 @@ class FrontendController extends Controller
                                 ->orWhere('keywords', 'LIKE', '%'.$search_str.'%');
                         })
                         ->where('f_status', 1)->where('f_status', 1)
-                        ->select('f_idcode', 'f_default_price', 'f_onsale', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'f_qty', 'f_reserved_qty', 'slug', 'f_name_name', 'f_category', 'id')
+                        ->select('f_idcode', 'f_default_price', 'f_onsale', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'f_qty', 'f_reserved_qty', 'slug', 'f_name_name', 'f_item_name', 'f_category', 'id', 'image_alt')
                         ->orderBy($sortby, $orderby)->get();
 
                     if(count($request_data) > 0 or count($brand_filter) > 0){
@@ -166,6 +167,7 @@ class FrontendController extends Controller
                     'id' => $row->id,
                     'item_code' => $row->f_idcode,
                     'item_name' => $row->f_name_name,
+                    'alt' => $row->image_alt ? $row->image_alt : $row->f_item_name,
                     'category' => $row->f_category,
                     'category_id' => $row->f_cat_id,
                     'default_price' => $row->f_default_price,
@@ -283,6 +285,7 @@ class FrontendController extends Controller
                         'id' => $result['id'],
                         'item_code' => $result['item_code'],
                         'item_name' => $result['item_name'],
+                        'alt' => $result['alt'],
                         'default_price' => '₱ ' . number_format($item_price_data['item_price'], 2, '.', ','),
                         'is_discounted' => ($item_price_data['discount_rate'] > 0) ? $item_price_data['is_on_sale'] : 0,
                         'on_stock' => $result['on_stock'],
@@ -476,7 +479,7 @@ class FrontendController extends Controller
 
         // get best selling items
         $best_selling_query = DB::table('fumaco_items')->where('f_status', 1)->where('f_featured', 1)
-            ->select('f_idcode', 'f_default_price', 'f_onsale', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'f_qty', 'f_reserved_qty', 'slug', 'f_name_name')->get();
+            ->select('f_idcode', 'f_default_price', 'f_onsale', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'f_qty', 'f_reserved_qty', 'slug', 'f_name_name', 'f_item_name', 'image_alt')->get();
 
         $best_selling_item_codes = array_column($best_selling_query->toArray(), 'f_idcode');
 
@@ -489,7 +492,7 @@ class FrontendController extends Controller
         }
 
         $on_sale_query = DB::table('fumaco_items')->where('f_status', 1)->where('f_onsale', 1)
-            ->select('f_idcode', 'f_default_price', 'f_onsale', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'f_qty', 'f_reserved_qty', 'slug', 'f_name_name')
+            ->select('f_idcode', 'f_default_price', 'f_onsale', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'f_qty', 'f_reserved_qty', 'slug', 'f_name_name', 'f_item_name', 'image_alt')
             ->get();
 
         $sale_per_category = [];
@@ -531,6 +534,7 @@ class FrontendController extends Controller
             $best_selling_arr[] = [
                 'item_code' => $row->f_idcode,
                 'item_name' => $row->f_name_name,
+                'alt' => $row->image_alt ? $row->image_alt : $row->f_item_name,
                 'default_price' => '₱ ' . number_format($item_price_data['item_price'], 2, '.', ','),
                 'is_discounted' => ($item_price_data['discount_rate'] > 0) ? $item_price_data['is_on_sale'] : 0,
                 'on_stock' => ($row->f_qty - $row->f_reserved_qty) > 0 ? 1 : 0,
@@ -579,6 +583,7 @@ class FrontendController extends Controller
             $on_sale_arr[] = [
                 'item_code' => $row->f_idcode,
                 'item_name' => $row->f_name_name,
+                'alt' => $row->image_alt ? $row->image_alt : $row->f_item_name,
                 'default_price' => '₱ ' . number_format($item_price_data['item_price'], 2, '.', ','),
                 'is_discounted' => ($item_price_data['discount_rate'] > 0) ? $item_price_data['is_on_sale'] : 0,
                 'on_stock' => ($row->f_qty - $row->f_reserved_qty) > 0 ? 1 : 0,
@@ -856,12 +861,24 @@ class FrontendController extends Controller
 
     // returns an array of product category
     public function getProductCategories() {
-        $item_categories = DB::table('fumaco_categories')->where('publish', 1)->select('slug', 'id', 'external_link', 'image', 'name')->get();
+        $item_categories = DB::table('fumaco_categories')->where('publish', 1)->select('slug', 'id', 'external_link', 'image', 'name', 'new', 'new_tag_start', 'new_tag_end')->get();
         $cat_array = [];
+
         foreach($item_categories as $category){
             $icon = $category->image;
             if(File::exists(public_path('/assets/site-img/icon/'.explode('.', $category->image)[0].'.webp'))){
                 $icon = explode('.', $category->image)[0].'.webp';
+            }
+            $is_new = 0;
+            $start = $end = null;
+            if($category->new == 1){
+                if($category->new_tag_start && $category->new_tag_end){
+                    $start = Carbon::parse($category->new_tag_start)->startOfDay();
+                    $end = Carbon::parse($category->new_tag_end)->endOfDay();
+                    if(Carbon::now() > $start && Carbon::now() < $end){
+                        $is_new = 1;
+                    }
+                }
             }
 
             $cat_array[] = [
@@ -869,7 +886,8 @@ class FrontendController extends Controller
                 'id' => $category->id,
                 'external_link' => $category->external_link,
                 'image' => $icon,
-                'name' => $category->name
+                'name' => $category->name,
+                'is_new' => $is_new
             ];
         }
 
@@ -1066,7 +1084,7 @@ class FrontendController extends Controller
     public function viewJournalsPage(Request $request) {
         $blog_carousel = DB::table('fumaco_blog')->where('blog_enable', 1)
             ->where('blog_featured', 1)->orderBy('blog_active', 'desc')
-            ->select('blog_caption', 'blogprimaryimage', 'blogprimayimage-mob', 'blogprimayimage-tab', 'blogtitle', 'slug', 'id')->get();
+            ->select('blog_caption', 'blogprimaryimage', 'blogprimayimage-mob', 'blogprimayimage-tab', 'blogtitle', 'slug', 'id', 'image_alt')->get();
 
         $blog_counts = DB::table('fumaco_blog')->where('blog_enable', 1)
             ->selectRaw('blogtype, COUNT(id) as count')
@@ -1100,7 +1118,8 @@ class FrontendController extends Controller
                 'title' => $blogs->blogtitle,
                 'caption' => $blogs->blog_caption,
                 'type' => $blogs->blogtype,
-                'slug' => $blogs->slug
+                'slug' => $blogs->slug,
+                'alt' => $blogs->image_alt ? $blogs->image_alt : $blogs->blogtitle
             ];
         }
 
@@ -1404,7 +1423,7 @@ class FrontendController extends Controller
                 $c->whereIn('f_idcode', $filtered_items);
             })
             ->where('f_status', 1)->orderBy($sortby, $orderby)
-            ->select('id', 'f_idcode', 'f_default_price', 'f_onsale', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'f_qty', 'f_reserved_qty', 'slug', 'f_name_name')->paginate(15);
+            ->select('id', 'f_idcode', 'f_default_price', 'f_onsale', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'f_qty', 'f_reserved_qty', 'slug', 'f_name_name', 'f_item_name', 'image_alt')->paginate(15);
 
          // get sitewide sale
          $sale = DB::table('fumaco_on_sale')
@@ -1460,6 +1479,7 @@ class FrontendController extends Controller
                 'id' => $product->id,
                 'item_code' => $product->f_idcode,
                 'item_name' => $product->f_name_name,
+                'alt' => $product->image_alt ? $product->image_alt : $product->f_item_name,
                 'default_price' => '₱ ' . number_format($item_price_data['item_price'], 2, '.', ','),
                 'is_discounted' => ($item_price_data['discount_rate'] > 0) ? $item_price_data['is_on_sale'] : 0,
                 'on_stock' => ($product->f_qty - $product->f_reserved_qty) > 0 ? 1 : 0,
@@ -1478,7 +1498,7 @@ class FrontendController extends Controller
 
     public function viewProduct($slug) { // Product Page
         $product_details = DB::table('fumaco_items')->where('slug', $slug)->orWhere('f_idcode', $slug)
-            ->select('f_parent_code', 'f_idcode', 'f_default_price', 'f_onsale', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'f_qty', 'f_reserved_qty', 'slug', 'f_name_name', 'id', 'meta_description', 'keywords', 'f_description', 'f_category', 'f_brand', 'f_caption', 'f_featured_image', 'f_full_description', 'url_title')->first();
+            ->select('f_parent_code', 'f_idcode', 'f_default_price', 'f_onsale', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'f_qty', 'f_reserved_qty', 'slug', 'f_name_name', 'f_item_name', 'id', 'meta_description', 'keywords', 'f_description', 'f_category', 'f_brand', 'f_caption', 'f_featured_image', 'f_full_description', 'url_title', 'image_alt')->first();
         if (!$product_details) {
             return redirect('/');
         }
@@ -1621,7 +1641,7 @@ class FrontendController extends Controller
     
             $product_reviews = $this->getProductRating($products_to_compare_item_codes);
             $products_to_compare = DB::table('fumaco_items')->whereIn('f_idcode', $products_to_compare_item_codes)
-                ->select('f_idcode', 'f_default_price', 'f_onsale', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'f_qty', 'f_reserved_qty', 'slug', 'f_name_name')->get();
+                ->select('f_idcode', 'f_default_price', 'f_onsale', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'f_qty', 'f_reserved_qty', 'slug', 'f_name_name', 'f_item_name', 'image_alt')->get();
             
             $sale_per_category = [];
             if (!$sale && !Auth::check()) {
@@ -1659,6 +1679,7 @@ class FrontendController extends Controller
                 $compare_arr[] = [
                     'item_code' => $item_details->f_idcode,
                     'item_name' => $item_details->f_name_name,
+                    'alt' => $item_details->image_alt ? $item_details->image_alt : $item_details->f_item_name,
                     'default_price' => '₱ ' . number_format($item_price_data['item_price'], 2, '.', ','),
                     'is_discounted' => ($item_price_data['discount_rate'] > 0) ? $item_price_data['is_on_sale'] : 0,
                     'on_stock' => ($item_details->f_qty - $item_details->f_reserved_qty) > 0 ? 1 : 0,
@@ -1684,7 +1705,7 @@ class FrontendController extends Controller
         }
         
         $recommended_item_codes_query = DB::table('fumaco_items')->whereIn('f_idcode', $recommended_item_codes)
-            ->select('f_idcode', 'f_default_price', 'f_onsale', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'f_qty', 'f_reserved_qty', 'slug', 'f_name_name', 'id')->get();
+            ->select('f_idcode', 'f_default_price', 'f_onsale', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'f_qty', 'f_reserved_qty', 'slug', 'f_name_name', 'f_item_name', 'id', 'image_alt')->get();
 
         $recommended_item_codes = array_column($recommended_item_codes_query->toArray(), 'f_idcode'); 
 
@@ -1737,6 +1758,7 @@ class FrontendController extends Controller
                 'id' => $row->id,
                 'item_code' => $row->f_idcode,
                 'item_name' => $row->f_name_name,
+                'alt' => $row->image_alt ? $row->image_alt : $row->f_item_name,
                 'default_price' => '₱ ' . number_format($item_price_data['item_price'], 2, '.', ','),
                 'is_discounted' => ($item_price_data['discount_rate'] > 0) ? $item_price_data['is_on_sale'] : 0,
                 'on_stock' => ($row->f_qty - $row->f_reserved_qty) > 0 ? 1 : 0,
@@ -1755,7 +1777,7 @@ class FrontendController extends Controller
         $related_products_query = DB::table('fumaco_items as a')
             ->join('fumaco_items_relation as b', 'a.f_idcode', 'b.related_item_code')
             ->where('b.item_code', $product_details->f_idcode)->where('a.f_status', 1)
-            ->select('a.id', 'a.f_idcode', 'a.f_default_price','a.f_stock_uom', 'a.f_onsale', 'a.f_name_name', 'a.slug', 'a.f_qty', 'a.f_reserved_qty', 'a.f_new_item', 'a.f_new_item_start', 'a.f_new_item_end', 'a.f_discount_rate', 'a.f_category', 'a.f_cat_id', 'a.f_discount_type')
+            ->select('a.id', 'a.f_idcode', 'a.f_default_price','a.f_stock_uom', 'a.f_onsale', 'a.f_name_name', 'a.f_item_name', 'a.slug', 'a.f_qty', 'a.f_reserved_qty', 'a.f_new_item', 'a.f_new_item_start', 'a.f_new_item_end', 'a.f_discount_rate', 'a.f_category', 'a.f_cat_id', 'a.f_discount_type', 'a.image_alt')
             ->get();
 
         $related_item_codes = array_column($related_products_query->toArray(), 'f_idcode');
@@ -1806,6 +1828,7 @@ class FrontendController extends Controller
                 'id' => $row->id,
                 'item_code' => $row->f_idcode,
                 'item_name' => $row->f_name_name,
+                'alt' => $row->image_alt ? $row->image_alt : $row->f_item_name,
                 'default_price' => '₱ ' . number_format($item_price_data['item_price'], 2, '.', ','),
                 'is_discounted' => ($item_price_data['discount_rate'] > 0) ? $item_price_data['is_on_sale'] : 0,
                 'on_stock' => ($row->f_qty - $row->f_reserved_qty) > 0 ? 1 : 0,
