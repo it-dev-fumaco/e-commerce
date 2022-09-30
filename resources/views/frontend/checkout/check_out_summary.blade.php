@@ -236,6 +236,7 @@
 									$shipping_discount_rate = 0;
 									$shipping_capped_amount = 0;
 									$shipping_cost = $srate['shipping_cost'];
+									$new_shipping_cost = 0;
 									if(isset($shipping_service_discount[$srate['shipping_service_name']])){
 										$shipping_discount = $shipping_service_discount[$srate['shipping_service_name']][0];
 										$shipping_discount_name = $shipping_discount->sale_name;
