@@ -802,12 +802,15 @@ class CheckoutController extends Controller
 							break;
 						case 'By Percentage':
 							$shipping_discount_amount = ($shipping_discount->discount_rate / 100) * $amount;
+							$shipping_discount_amount = $shipping_discount_amount > $shipping_discount->capped_amount ? $shipping_discount->capped_amount : $shipping_discount_amount;
 							break;
 						default:
 							break;
 					}
 				}
 			}
+
+			$shipping_discount_amount = $shipping_discount_amount > $amount ? 0 : $shipping_discount_amount;
 	
 			$grand_total = $amount - ($discount + $shipping_discount_amount);
 			$grand_total = $grand_total + $temp->shipping_amount;
@@ -990,12 +993,15 @@ class CheckoutController extends Controller
 								break;
 							case 'By Percentage':
 								$shipping_discount_amount = ($shipping_discount->discount_rate / 100) * $subtotal;
+								$shipping_discount_amount = $shipping_discount_amount > $shipping_discount->capped_amount ? $shipping_discount->capped_amount : $shipping_discount_amount;
 								break;
 							default:
 								break;
 						}
 					}
 				}
+
+				$shipping_discount_amount = $subtotal > $shipping_discount_amount ? $shipping_discount_amount : 0;
 
 				DB::table('fumaco_order')->insert([
 					'order_number' => $temp->xlogs,

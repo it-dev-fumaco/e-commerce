@@ -148,19 +148,22 @@
 											break;
 										case 'By Percentage':
 											$shipping_discount_amount = ($shipping_discount->discount_rate / 100) * $order_details->order_subtotal;
+											$shipping_discount_amount = $shipping_discount_amount > $shipping_discount->capped_amount ? $shipping_discount->capped_amount : $shipping_discount_amount;
 											break;
 										default:
 											$shipping_discount_amount = 0;
 											break;
 									}
 								@endphp
-								<tr style="font-size: 0.8rem; text-align: right; border-top: 0;">
-									<td class="pb-1 pt-1 d-none d-sm-table-cell" colspan="{{ $colspan }}">{{ $shipping_discount->sale_name }}
-									</td>
-									<td class="pb-1 pt-1 d-md-none">{{ $shipping_discount->sale_name }}
-									</td>
-									<td class="pb-1 pt-1" style="white-space: nowrap !important;">- ₱ {{ number_format(str_replace(",","",$shipping_discount_amount), 2) }}</td>
-								</tr>
+									@if ($shipping_discount_amount < $order_details->order_subtotal)
+										<tr style="font-size: 0.8rem; text-align: right; border-top: 0;">
+											<td class="pb-1 pt-1 d-none d-sm-table-cell" colspan="{{ $colspan }}">{{ $shipping_discount->sale_name }}
+											</td>
+											<td class="pb-1 pt-1 d-md-none">{{ $shipping_discount->sale_name }}
+											</td>
+											<td class="pb-1 pt-1" style="white-space: nowrap !important;">- ₱ {{ number_format(str_replace(",","",$shipping_discount_amount), 2) }}</td>
+										</tr>
+									@endif
 								@endif
 								@if ($order_details->voucher_code)
 								@php
