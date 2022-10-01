@@ -1102,7 +1102,7 @@ class FrontendController extends Controller
             ->when($request->type, function ($q) use ($request){
                 $q->where('blogtype', $request->type);
             })
-            ->select('id', 'blogprimayimage-journal', 'datepublish', 'blogtitle', 'blog_caption', 'blogtype', 'slug')->get()->toArray();
+            ->select('id', 'blogprimayimage-journal', 'datepublish', 'blogtitle', 'blog_caption', 'blogtype', 'slug', 'image_alt')->get()->toArray();
 
         $blog_ids = array_column($blog_list, 'id');
         $blog_comments = DB::table('fumaco_comments')->whereIn('blog_id', $blog_ids)->where('blog_status', 1)
