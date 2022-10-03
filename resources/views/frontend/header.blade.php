@@ -1,4 +1,4 @@
-<main style="background-color:#0062A5;">
+<main class="page-header" style="background-color:#0062A5;">
     <div id="myCarousel" class="carousel slide" data-bs-ride="carousel">
         <div class="carousel-inner">
             <div class="carousel-item active" style="height: 13rem !important;">
@@ -19,3 +19,17 @@
         </div>
     </div>
 </main>
+<style>
+      @media (max-width: 575.98px) {
+        .page-header{
+            margin-top: 50px;
+        }
+      }
+      @media (max-width: 767.98px) {
+        .page-header{
+            margin-top: 50px;
+        }
+      }
+
+    
+</style>
