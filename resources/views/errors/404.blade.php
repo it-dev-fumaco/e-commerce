@@ -4,23 +4,10 @@
 ])
 
 @section('content')
-<main style="background-color:#0062A5;">
-  <div id="myCarousel" class="carous1el slide" data-bs-ride="carousel">
-    <div class="carousel-inner">
-      <div class="carousel-item active" style="height: 13rem !important;">
-        <img src="{{ asset('/assets/site-img/header3-sm.png') }}" alt="" style="position: absolute; top: 0;left: 0;min-width: 100%; height: unset !important; ">
-        <div class="container">
-          <div class="carousel-caption text-start"
-            style="bottom: 1rem !important; right: 25% !important; left: 25%; !important;">
-            <center>
-              <h3 class="carousel-header-font">PAGE NOT FOUND</h3>
-            </center>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</main>
+@php
+	$page_title = 'Page not found';
+@endphp
+@include('frontend.header')
 
 <main style="background-color:#ffffff; min-height: 500px;" class="products-head">
 	<div class="container">
