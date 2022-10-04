@@ -170,7 +170,7 @@
 									Total Amount <small class="text-muted stylecap he1x">₱ {{ number_format(collect($cart_arr)->sum('subtotal'), 2, '.', ',') }}</small>
 								</div>
 								<div class="d-flex justify-content-between align-items-center d-none" style="padding: 7px 0 7px 5px; border-bottom: 1px solid #8c8c8cd0;" id="shipping-discount-div">
-									<p class="m-0" id="shipping-name">Shipping Service Discount</p>
+									<p class="m-0" id="shipping-name" style='font-weight: 700 !important'>Shipping Service Discount</p>
 									<small class="text-danger stylecap he1x">- ₱ <span id="shipping-discount-amount">0.00</span></small>
 								</div>
 								<div class="d-flex justify-content-between align-items-center d-none" style="padding: 7px 0 7px 5px; border-bottom: 1px solid #8c8c8cd0;" id="discount-div">
