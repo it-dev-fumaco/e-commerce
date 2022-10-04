@@ -3,7 +3,7 @@
 @extends('emails.template', [
     'namePage' => 'Welcome Email'
 ])
-
+@section('content')
   <table class="table" bgcolor="#ffffff" style="margin: 0 auto 0 auto;">
     <tr>
         <td class="h2" style="padding: 5% 0 0 5%;">
