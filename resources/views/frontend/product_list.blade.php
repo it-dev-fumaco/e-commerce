@@ -108,14 +108,14 @@
 				<div class="col-lg-10">
 					<div class="row g-6">
 						<form id="sortForm" class="d-inline-block">
-							<a class="btn d-md-block d-lg-none filter-btn" data-toggle="modal" data-target="#filterModal2" style="font-size: 0.75rem !important; float: left !important">
+							<a class="btn d-md-block d-lg-none filter-btn open-modal" data-target="#filterModal2" style="font-size: 0.75rem !important; float: left !important">
 								<i class="fas fa-filter"></i>&nbsp; Filters
 							</a>
 							<div class="col-md-4 offset-md-8">
 								
 								<div class="d-flex justify-content-end prod-sort">
 									<div>
-										<a class="btn d-sm-block d-md-none" data-toggle="modal" data-target="#filterModal2" style="font-size: 0.75rem !important; float: left !important; margin-top: 6%">
+										<a class="btn d-sm-block d-md-none open-modal" data-target="#filterModal2" style="font-size: 0.75rem !important; float: left !important; margin-top: 6%">
 											<i class="fas fa-filter"></i>&nbsp; Filters
 										</a>
 									</div>

@@ -721,6 +721,10 @@
               this.addEventListener("mousewheel", handle, { passive: true });
           }
       };
+
+      $(document).on('click', '.open-modal', function (){
+        $($(this).data('target')).modal('show');
+      });
     });
   </script>
 

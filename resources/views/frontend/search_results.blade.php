@@ -45,7 +45,7 @@
 				<div class="col-md-6 mt-4 mb-2">
 					<div class="d-flex justify-content-end">
 						<div>
-							<a class="btn {{ count($products) > 0 ? 'd-sm-block d-lg-none' : 'd-none' }}" data-toggle="modal" data-target="#rightModal" style="font-size: 0.75rem !important; float: left !important; margin-top: 6%; white-space: nowrap !important;">
+							<a class="btn {{ count($products) > 0 ? 'd-sm-block d-lg-none' : 'd-none' }} open-modal" data-target="#rightModal" style="font-size: 0.75rem !important; float: left !important; margin-top: 6%; white-space: nowrap !important;">
 								<i class="fas fa-filter"></i>&nbsp; Filters
 							</a>
 						</div>
