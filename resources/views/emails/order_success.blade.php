@@ -41,7 +41,7 @@
         </td>
      </tr>
      <tr>
-        <td class="bodycopy" style="padding: 3% 5%;">
+        <td class="bodycopy">
 			<table border="0" style="width: 100%; border-collapse: collapse;">
 				@php
 					$sum_discount = collect($order['items'])->sum('discount');
@@ -65,7 +65,7 @@
 					@endphp
 					<tr style="font-size: 0.8rem;">
 						<td class="text-center" style="padding: 3px;">
-							<img src="{{ asset($src) }}" class="img-responsive" alt="" width="50" height="50">
+							<img src="{{ asset($src) }}" style="width: 50px !important; height: 50px !important;">
 						</td>
 						<td style="padding: 8px;">{{ $item['item_name'] }}</td>
 						<td class="text-center" style="padding: 8px;">{{ $item['qty'] }}</td>
@@ -155,8 +155,8 @@
         </td>
      </tr>
 	 <tr>
-        <td class="button borderbottom" style="padding: 6% 5% 6% 5%; text-align: left;">
-            <a href="{{ route('track_order', [$order['order_details']->order_number]) }}" style="background: #e05443; padding: 2% 5%;">Track my Order</a>
+        <td class="button borderbottom track-order-cell" colspan="2">
+            <a href="{{ route('track_order', [$order['order_details']->order_number]) }}" class="track-order-btn">Track my Order</a>
         </td>
      </tr>
 

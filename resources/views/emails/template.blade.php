@@ -21,6 +21,22 @@
 			.footer {padding: 20px 30px 15px 30px;}
 			.footercopy {font-family: 'poppins',sans-serif; font-size: 12px;}
 			.footercopy a {; text-decoration: underline;}
+			.track-order-btn{
+				background: #e05443;
+				padding: 2% 5%;
+			}
+			.track-order-cell{
+				padding: 6% 5% 6% 5%;
+				text-align: left;
+			}
+
+			.d-des{
+				display: block;
+			}
+
+			.d-mob{
+				display: none;
+			}
 
 			@media only screen and (max-width: 550px), screen and (max-device-width: 550px) {
 				body[yahoo] .hide {display: none!important;}
@@ -28,6 +44,50 @@
 				body[yahoo] .button {padding: 0px!important;}
 				body[yahoo] .button a {background-color: #e05443; padding: 15px 15px 13px!important;}
 				body[yahoo] .unsubscribe {display: block; margin-top: 20px; padding: 10px 50px; background: #2f3942; border-radius: 5px; text-decoration: none!important; font-weight: bold;}
+				.track-order-btn{
+					width: 100% !important;
+				}
+				.track-order-cell{
+					text-align: center;
+				}
+				.d-des{
+					display: none;
+				}
+
+				.d-mob{
+					display: block;
+				}
+			}
+
+			@media (max-width: 575.98px) {
+				.track-order-btn{
+					width: 100% !important;
+				}
+				.track-order-cell{
+					text-align: center;
+				}
+				.d-des{
+					display: none;
+				}
+
+				.d-mob{
+					display: block;
+				}
+			}
+			@media (max-width: 767.98px) {
+				.track-order-btn{
+					width: 100% !important;
+				}
+				.track-order-cell{
+					text-align: center;
+				}
+				.d-des{
+					display: none;
+				}
+
+				.d-mob{
+					display: block;
+				}
 			}
       </style>
    </head>
