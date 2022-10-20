@@ -94,6 +94,7 @@ Route::get('/search', 'FrontendController@getAutoCompleteData');
 Route::get('/testing', 'FrontendController@testing');
 
 Route::get('/policy_pages', 'FrontendController@pagesList');
+Route::get('/contact_information', 'FrontendController@contactInformation');
 Route::get('/pages/{slug}', 'FrontendController@viewPage')->name('pages');
 
 Route::get('/myprofile/verify/email', 'FrontendController@emailVerify');

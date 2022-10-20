@@ -742,9 +742,9 @@ class FrontendController extends Controller
                 ]
             ]);
 
-            $checker = DB::table('fumaco_subscribe')->where('email', $request->email)->count();
+            $checker = DB::table('fumaco_subscribe')->where('email', $request->email)->exists();
 
-            if($checker > 0){
+            if($checker){
                 return redirect()->back()->with('error_subscribe', 'Email already subscribed!');
             }
 
@@ -852,6 +852,7 @@ class FrontendController extends Controller
             return redirect('/thankyou');
         }catch(Exception $e){
             DB::rollback();
+            return redirect()->back()->with('error', 'An error occured. Please try again.');
         }
     }
 
@@ -901,7 +902,15 @@ class FrontendController extends Controller
 
             return response()->json($pages);
         }
-    
+    }
+
+    public function contactInformation(Request $request){
+        if($request->ajax()){
+            $contact = DB::table('fumaco_contact')->select('office_phone', 'office_email')->first();
+            $contact = $contact ? $contact : [];
+
+            return response()->json($contact);
+        }
     }
 
     public function viewPage($slug){
