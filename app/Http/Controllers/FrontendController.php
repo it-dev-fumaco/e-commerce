@@ -860,6 +860,32 @@ class FrontendController extends Controller
         return view('frontend.subscribe_thankyou');
     }
 
+    public function notifyMe(Request $request){
+        DB::beginTransaction();
+        try {
+            if(!Auth::check()){
+                return redirect('/login');
+            }
+
+            $checker = DB::table('product_notifications')->where('owner', Auth::user()->username)->where('item_code', $request->item_code)->exists();
+
+            if(!$checker){
+                DB::table('product_notifications')->insert([
+                    'owner' => Auth::user()->username,
+                    'item_code' => $request->item_code,
+                    'created_by' => Auth::user()->username
+                ]);
+            }
+
+            DB::commit();
+            return response()->json(['success' => 'You will be notified when this product is available.']);
+        } catch (\Throwable $th) {
+            //throw $th;
+            DB::rollback();
+            return response()->json(['error' => 'An error occured. Please try again later']);
+        }
+    }
+
     // returns an array of product category
     public function getProductCategories() {
         $item_categories = DB::table('fumaco_categories')->where('publish', 1)->select('slug', 'id', 'external_link', 'image', 'name', 'new', 'new_tag_start', 'new_tag_end')->get();

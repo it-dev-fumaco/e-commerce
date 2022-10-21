@@ -212,12 +212,12 @@
 				<!--sidebar-->
 			</div>
 			@endif
-
 			@php
 				$mx_auto = '';
 				if($filter_count == 0 and count($filters['Brand']) < 2){
 					$mx_auto = 'mx-auto';
 				}
+				$col = '4';
 			@endphp
 			<div class="col-lg-9 col-xl-8 {{ $mx_auto }}">
 				<div class="row">
@@ -226,19 +226,109 @@
 						<h4 class="mt-4 mb-3 fw-light bestsellinghead fumacoFont1 animated animatedFadeInUp fadeInUp results-head" style="color:#000000 !important;">RECENTLY ADDED PRODUCT(S)</h4>
 					</div>
 					@foreach ($recently_added_arr as $item)
-					<!-- Mobile view Start -->
-					<div class="d-block d-md-none animated animatedFadeInUp fadeInUp">
+						<!-- Mobile view Start -->
+						<div class="d-block d-md-none animated animatedFadeInUp fadeInUp">
+							<div class="card">
+								<div class="pt-2" style="position: absolute; top: 0; left: 0; z-index: 10;">
+									<div class="col-12">
+										@if ($item['is_discounted'])
+											<div class="col-12">
+												<span class="text-center" style="background-color: #FF0000; font-size: 9pt; border-radius: 0 20px 20px 0; color: #fff; min-width: 80px; padding: 2px">
+													&nbsp;<b>{{ $item['discount_display'] }}</b>&nbsp;
+												</span>
+											</div>
+										@endif
+									</div>
+								</div>
+								<div class="card-body">
+									<div class="row">
+										<div class="col-4">
+											@php
+												$image = ($item['image']) ? '/storage/item_images/'.$item['item_code'].'/gallery/preview/'.$item['image'] : '/storage/no-photo-available.png';
+												$image_webp = ($item['image']) ? '/storage/item_images/'.$item['item_code'].'/gallery/preview/'.explode(".", $item['image'])[0] .'.webp' : '/storage/no-photo-available.webp';
+											@endphp              
+											<picture>
+												<source srcset="{{ asset($image_webp) }}" type="image/webp">
+												<source srcset="{{ asset($image) }}" type="image/jpeg"> 
+												<img src="{{ asset($image) }}" alt="{{ Str::slug($item['item_name'], '-') }}" class="card-img-top hover" loading="lazy">
+											</picture>
+										</div>
+										<div class="col-8">
+											<div class="text ellipsis mb-1">
+												<a href="/product/{{ $item['slug'] ? $item['slug'] : $item['item_code'] }}" class="card-text mob-prod-text-concat" style="text-transform: none !important; text-decoration: none !important; color:#0062A5 !important; font-weight: 500 !important">{{ $item['item_name'] }}</a>
+											</div>
+											<p class="card-text fumacoFont_card_price" style="color:#000000 !important; font-size: 7pt">
+												@if($item['is_discounted'])
+													{{ $item['discounted_price'] }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">{{ $item['default_price'] }}</s>
+												@else
+												{{ $item['default_price'] }}
+												@endif
+											</p>
+											<div class="d-flex justify-content-between align-items-center">
+												<div class="btn-group stylecap">
+													@for ($i = 0; $i < 5; $i++)
+														@if ($item['overall_rating'] <= $i)
+															<span class="fa fa-star starcolorgrey"></span>
+														@else
+															<span class="fa fa-star" style="color: #FFD600;"></span>
+														@endif
+													@endfor
+												</div>
+												<small class="text-muted stylecap" style="color:#c4cad0 !important; font-weight:100 !important;">( {{ $item['total_reviews'] }} Reviews )</small>
+											</div>
+											<br/>
+											@if ($item['on_stock'] == 1)
+												<a href="#" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto add-to-cart" role="button" style="width: 100% !important;" data-item-code="{{ $item['item_code'] }}">
+													Add to Cart
+												</a>
+											@else
+												<center>
+													<span class="mb-2" style="font-weight: 600; color: #F50000">Out of Stock</span>
+												</center>
+												<a href="#" class="btn btn-outline-primary text-center w-100 p-2 notify-me" role="button" style="font-weight: 600; font-size: 10pt; margin-bottom: 5px;" data-logged="{{ Auth::check() ? 1 : 0 }}" data-item-code="{{ $item['item_code'] }}">
+													Notify me
+												</a>
+												<a href="/login" class="btn btn-outline-primary mx-auto {{ Auth::check() ? 'add-to-wishlist' : '' }}" role="button" style="width: 100% !important;" data-item-code="{{ $item['item_code'] }}">
+													Add to Wishlist
+												</a>
+											@endif
+										</div>
+									</div>								
+								</div>
+							</div>
+						</div>
+						<!-- Mobile view end -->
+
+						<!-- Desktop/Tablet view start -->
+						<div class="d-none d-md-block">
+							@include('frontend.product_details_card')
+						</div>
+						<!-- Desktop/Tablet view end -->
+					@endforeach
+				@endif
+
+				<div class="col-12 text-center">
+					<h4 class="mt-4 mb-3 fw-light bestsellinghead fumacoFont1 animated animatedFadeInUp fadeInUp results-head" style="color:#000000 !important;">{{ request()->s == null ? 'FEATURED PRODUCT(S)' : 'PRODUCT(S)' }}</h4>
+				</div>
+				@foreach ($products as $item)
+					<!-- Mobile view start -->
+					<div class="d-block d-md-none animated animatedFadeInUp fadeInUp mb-2">
 						<div class="card">
 							<div class="pt-2" style="position: absolute; top: 0; left: 0; z-index: 10;">
-								<div class="col-12">
-									@if ($item['is_discounted'])
-										<div class="col-12">
-											<span class="text-center" style="background-color: #FF0000; font-size: 9pt; border-radius: 0 20px 20px 0; color: #fff; min-width: 80px; padding: 2px">
-												&nbsp;<b>{{ $item['discount_display'] }}</b>&nbsp;
-											</span>
-										</div>
-									@endif
+								@if($item['is_new_item'])
+								<div class="col-12 mb-1 {{ $item['is_new_item'] == 1 ? '' : 'd-none' }}">
+									<span class="text-center" style="background-color: #438539; font-size: 9pt; border-radius: 0 20px 20px 0; color: #fff; min-width: 80px !important; padding: 2px">
+									&nbsp;<b>New</b>&nbsp;
+									</span>
 								</div>
+								@endif
+								@if ($item['is_discounted'])
+								<div class="col-12">
+									<span class="text-center" style="background-color: #FF0000; font-size: 9pt; border-radius: 0 20px 20px 0; color: #fff; min-width: 80px !important; padding: 2px">
+										&nbsp;<b>{{ $item['discount_display'] }}</b>&nbsp;
+									</span>
+								</div>
+								@endif
 							</div>
 							<div class="card-body">
 								<div class="row">
@@ -250,7 +340,7 @@
 										<picture>
 											<source srcset="{{ asset($image_webp) }}" type="image/webp">
 											<source srcset="{{ asset($image) }}" type="image/jpeg"> 
-											<img src="{{ asset($image) }}" alt="{{ Str::slug($item['item_name'], '-') }}" class="card-img-top hover" loading="lazy">
+											<img src="{{ asset($image) }}" alt="{{ Str::slug($item['alt'], '-') }}" class="card-img-top hover" loading="lazy">
 										</picture>
 									</div>
 									<div class="col-8">
@@ -259,7 +349,7 @@
 										</div>
 										<p class="card-text fumacoFont_card_price" style="color:#000000 !important; font-size: 7pt">
 											@if($item['is_discounted'])
-												{{ $item['discounted_price'] }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">{{ $item['default_price'] }}</s>
+											{{ $item['discounted_price'] }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">{{ $item['default_price'] }}</s>
 											@else
 											{{ $item['default_price'] }}
 											@endif
@@ -268,153 +358,6 @@
 											<div class="btn-group stylecap">
 												@for ($i = 0; $i < 5; $i++)
 													@if ($item['overall_rating'] <= $i)
-														<span class="fa fa-star starcolorgrey"></span>
-													@else
-														<span class="fa fa-star" style="color: #FFD600;"></span>
-													@endif
-												@endfor
-											</div>
-											<small class="text-muted stylecap" style="color:#c4cad0 !important; font-weight:100 !important;">( {{ $item['total_reviews'] }} Reviews )</small>
-										</div>
-										<br/>
-										@if ($item['on_stock'] == 1)
-											<a href="#" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto add-to-cart" role="button" style="width: 100% !important;" data-item-code="{{ $item['item_code'] }}"><i class="fas fa-shopping-cart d-inline-block" style="margin-right: 3%;"></i> Add to Cart</a>
-										@else
-											<a href="/login" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto {{ Auth::check() ? 'add-to-wishlist' : '' }}" role="button" style="width: 100% !important;" data-item-code="{{ $item['item_code'] }}"><i class="far fa-heart d-inline-block" style="margin-right: 3%;"></i> Add to Wishlist</a>
-										@endif
-									</div>
-								</div>								
-							</div>
-						</div>
-					</div>
-					<!-- Mobile view end -->
-
-					<!-- Desktop/Tablet view start -->
-					<div class="d-none d-md-block col-4 animated animatedFadeInUp fadeInUp equal-height-columns">
-						<div class="card mb-4">
-							<div class="equal-column-content">
-								<div class="hover-container product-card" style="position: relative;">
-									<div class="pt-2" style="position: absolute; top: 0; right: 0; z-index: 10;">
-										@if ($item['is_new_item'])
-										<div class="col-12 mb-2">
-											<span class="p-1 text-center" style="background-color: #438539; font-size: 9pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
-											&nbsp;<b>New</b>&nbsp;
-											</span>
-										</div>
-										<br />
-										@endif
-										
-										@if ($item['is_discounted'])
-											<div class="col-12">
-												<span class="p-1 text-center" style="background-color: #FF0000; font-size: 9pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
-													&nbsp;<b>{{ $item['discount_display'] }}</b>&nbsp;
-												</span>
-											</div>
-										@endif
-									</div>
-									<div class="overlay-bg"></div>
-									<div class="btn-container">
-										<a href="/product/{{ $item['slug'] ? $item['slug'] : $item['item_code'] }}" class="view-products-btn btn" role="button"><i class="fas fa-search"></i>&nbsp;View Product</a>
-									</div>
-									@php
-									$image = ($item['image']) ? '/storage/item_images/'.$item['item_code'].'/gallery/preview/'.$item['image'] : '/storage/no-photo-available.png';
-									$image_webp = ($item['image']) ? '/storage/item_images/'.$item['item_code'].'/gallery/preview/'.explode(".", $item['image'])[0] .'.webp' : '/storage/no-photo-available.webp';
-									@endphp              
-									<picture>
-										<source srcset="{{ asset($image_webp) }}" type="image/webp">
-										<source srcset="{{ asset($image) }}" type="image/jpeg"> 
-										<img src="{{ asset($image) }}" alt="{{ Str::slug($item['item_name'], '-') }}" class="card-img-top hover" loading='lazy'>
-									</picture>
-								</div>
-								
-								<div class="card-body d-flex flex-column">
-									<div class="text ellipsis">
-										<a href="/product/{{ $item['slug'] ? $item['slug'] : $item['item_code'] }}" class="card-text product-head fumacoFont_card_title text-concat prod_desc" style="text-transform: none !important; text-decoration: none !important; color:#0062A5 !important;  min-height: 98px; font-weight: 500 !important">{{ $item['item_name'] }}</a>
-									</div>
-									<p class="card-text fumacoFont_card_price" style="color:#000000 !important;">
-										@if($item['is_discounted'])
-											{{ $item['discounted_price'] }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">{{ $item['default_price'] }}</s>
-										@else
-										{{ $item['default_price'] }}
-										@endif
-									</p>
-									<div class="d-flex justify-content-between align-items-center">
-										<div class="btn-group stylecap">
-											@for ($i = 0; $i < 5; $i++)
-												@if ($item['overall_rating'] <= $i)
-													<span class="fa fa-star starcolorgrey"></span>
-												@else
-													<span class="fa fa-star" style="color: #FFD600;"></span>
-												@endif
-											@endfor
-										</div>
-										<small class="text-muted stylecap" style="color:#c4cad0 !important; font-weight:100 !important;">( {{ $item['total_reviews'] }} Reviews )</small>
-									</div>
-								</div>
-							</div>
-							<br/>
-							@if ($item['on_stock'] == 1)
-								<a href="#" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto add-to-cart" role="button" style="width: 90% !important; margin-bottom: 20px" data-item-code="{{ $item['item_code'] }}"><i class="fas fa-shopping-cart d-inline-block" style="margin-right: 3%;"></i> Add to Cart</a>
-							@else
-								<a href="/login" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto {{ Auth::check() ? 'add-to-wishlist' : '' }}" role="button" style="width: 90% !important; margin-bottom: 20px" data-item-code="{{ $item['item_code'] }}"><i class="far fa-heart d-inline-block" style="margin-right: 3%;"></i> Add to Wishlist</a>
-							@endif
-						</div>
-					</div>
-					<!-- Desktop/Tablet view end -->
-					@endforeach
-				@endif
-
-				<div class="col-12 text-center">
-					<h4 class="mt-4 mb-3 fw-light bestsellinghead fumacoFont1 animated animatedFadeInUp fadeInUp results-head" style="color:#000000 !important;">{{ request()->s == null ? 'FEATURED PRODUCT(S)' : 'PRODUCT(S)' }}</h4>
-				</div>
-				@foreach ($products as $product)
-					<!-- Mobile view start -->
-					<div class="d-block d-md-none animated animatedFadeInUp fadeInUp mb-2">
-						<div class="card">
-							<div class="pt-2" style="position: absolute; top: 0; left: 0; z-index: 10;">
-								@if($product['is_new_item'])
-								<div class="col-12 mb-1 {{ $product['is_new_item'] == 1 ? '' : 'd-none' }}">
-									<span class="text-center" style="background-color: #438539; font-size: 9pt; border-radius: 0 20px 20px 0; color: #fff; min-width: 80px !important; padding: 2px">
-									&nbsp;<b>New</b>&nbsp;
-									</span>
-								</div>
-								@endif
-								@if ($product['is_discounted'])
-								<div class="col-12">
-									<span class="text-center" style="background-color: #FF0000; font-size: 9pt; border-radius: 0 20px 20px 0; color: #fff; min-width: 80px !important; padding: 2px">
-										&nbsp;<b>{{ $product['discount_display'] }}</b>&nbsp;
-									</span>
-								</div>
-								@endif
-							</div>
-							<div class="card-body">
-								<div class="row">
-									<div class="col-4">
-										@php
-											$image = ($product['image']) ? '/storage/item_images/'.$product['item_code'].'/gallery/preview/'.$product['image'] : '/storage/no-photo-available.png';
-											$image_webp = ($product['image']) ? '/storage/item_images/'.$product['item_code'].'/gallery/preview/'.explode(".", $product['image'])[0] .'.webp' : '/storage/no-photo-available.webp';
-										@endphp              
-										<picture>
-											<source srcset="{{ asset($image_webp) }}" type="image/webp">
-											<source srcset="{{ asset($image) }}" type="image/jpeg"> 
-											<img src="{{ asset($image) }}" alt="{{ Str::slug($product['alt'], '-') }}" class="card-img-top hover" loading="lazy">
-										</picture>
-									</div>
-									<div class="col-8">
-										<div class="text ellipsis mb-1">
-											<a href="/product/{{ $product['slug'] ? $product['slug'] : $product['item_code'] }}" class="card-text mob-prod-text-concat" style="text-transform: none !important; text-decoration: none !important; color:#0062A5 !important; font-weight: 500 !important">{{ $product['item_name'] }}</a>
-										</div>
-										<p class="card-text fumacoFont_card_price" style="color:#000000 !important; font-size: 7pt">
-											@if($product['is_discounted'])
-											{{ $product['discounted_price'] }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">{{ $product['default_price'] }}</s>
-											@else
-											{{ $product['default_price'] }}
-											@endif
-										</p>
-										<div class="d-flex justify-content-between align-items-center">
-											<div class="btn-group stylecap">
-												@for ($i = 0; $i < 5; $i++)
-													@if ($product['overall_rating'] <= $i)
 													<span class="fa fa-star starcolorgrey"></span>
 													@else
 													<span class="fa fa-star" style="color: #FFD600;"></span>
@@ -422,13 +365,21 @@
 													@endfor
 											
 											</div>
-											<small class="text-muted stylecap" style="color:#c4cad0 !important; font-weight:100 !important;">( {{ $product['total_reviews'] }} Reviews )</small>
+											<small class="text-muted stylecap" style="color:#c4cad0 !important; font-weight:100 !important;">( {{ $item['total_reviews'] }} Reviews )</small>
 										</div>
 										<br/>
-										@if ($product['on_stock'] == 1)
-											<a href="#" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto add-to-cart" role="button" style="width: 100% !important;" data-item-code="{{ $product['item_code'] }}"><i class="fas fa-shopping-cart d-inline-block" style="margin-right: 3%;"></i> Add to Cart</a>
+										@if ($item['on_stock'] == 1)
+											<a href="#" class="btn btn-outline-primary text-center w-100 p-2 add-to-cart" role="button" style="font-weight: 600; margin-bottom: 20px; font-size: 10pt;" data-item-code="{{ $item['item_code'] }}">Add to Cart</a>
 										@else
-											<a href="/login" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto {{ Auth::check() ? 'add-to-wishlist' : '' }}" role="button" style="width: 100% !important;" data-item-code="{{ $product['item_code'] }}"><i class="far fa-heart d-inline-block" style="margin-right: 3%;"></i> Add to Wishlist</a>
+											<center>
+												<span style="font-weight: 600; color: #F50000">Out of Stock</span>
+											</center>
+											<a href="#" class="btn btn-outline-primary text-center w-100 p-2 notify-me" role="button" style="font-weight: 600; font-size: 10pt; margin-bottom: 5px;" data-logged="{{ Auth::check() ? 1 : 0 }}" data-item-code="{{ $item['item_code'] }}">
+												Notify me
+											</a>
+											<a href="/login" class="btn w-100 text-center w-100 p-2 {{ Auth::check() ? 'add-to-wishlist' : '' }} btn-hover" role="button" data-item-code="{{ $item['item_code'] }}" style="background-color: #E6F0F8; color: #0F6EB5; font-weight: 600; font-size: 10pt;">
+												Add to Wishlist
+											</a>
 										@endif
 									</div>
 								</div>								
@@ -438,72 +389,8 @@
 					<!-- Mobile view end --> 
 
 					<!-- Desktop/Tablet view start -->
-					<div class="d-none d-md-inline col-4 animated animatedFadeInUp fadeInUp equal-height-columns">
-						<div class="card mb-4">
-							<div class="equal-column-content">
-								<div class="hover-container product-card" style="position: relative;">
-									<div class="pt-2" style="position: absolute; top: 0; right: 0; z-index: 10;">
-										<div class="col-12 mb-2 {{ $product['is_new_item'] == 1 ? '' : 'd-none' }}">
-										<span class="p-1 text-center" style="background-color: #438539; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
-										&nbsp;<b>New</b>&nbsp;
-										</span>
-									</div><br class="{{ $product['is_new_item'] == 1 ? '' : 'd-none' }}"/>
-										@if ($product['is_discounted'])
-											<div class="col-12">
-												<span class="p-1 text-center" style="background-color: #FF0000; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
-													&nbsp;<b>{{ $product['discount_display'] }}</b>&nbsp;
-												</span>
-											</div>
-											@endif
-										
-									</div>
-									<div class="overlay-bg"></div>
-									<div class="btn-container">
-										<a href="/product/{{ $product['slug'] ? $product['slug'] : $product['item_code'] }}" class="view-products-btn btn" role="button"><i class="fas fa-search"></i>&nbsp;View Product</a>
-									</div>
-									@php
-										$image = ($product['image']) ? '/storage/item_images/'.$product['item_code'].'/gallery/preview/'.$product['image'] : '/storage/no-photo-available.png';
-										$image_webp = ($product['image']) ? '/storage/item_images/'.$product['item_code'].'/gallery/preview/'.explode(".", $product['image'])[0] .'.webp' : '/storage/no-photo-available.webp';
-									@endphp              
-									<picture>
-										<source srcset="{{ asset($image_webp) }}" type="image/webp">
-										<source srcset="{{ asset($image) }}" type="image/jpeg"> 
-										<img src="{{ asset($image) }}" alt="{{ Str::slug($product['alt'], '-') }}" class="card-img-top hover" loading="lazy">
-									</picture>
-								</div>
-								
-								<div class="card-body d-flex flex-column">
-									<div class="text ellipsis">
-										<a href="/product/{{ $product['slug'] ? $product['slug'] : $product['item_code'] }}" class="card-text product-head fumacoFont_card_title text-concat prod_desc" style="text-transform: none !important; text-decoration: none !important; color:#0062A5 !important;  min-height: 98px; font-weight: 500 !important">{{ $product['item_name'] }}</a>
-									</div>
-									<p class="card-text fumacoFont_card_price" style="color:#000000 !important;">
-										@if($product['is_discounted'])
-										{{ $product['discounted_price'] }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">{{ $product['default_price'] }}</s>
-										@else
-										{{ $product['default_price'] }}
-										@endif
-									</p>
-									<div class="d-flex justify-content-between align-items-center">
-										<div class="btn-group stylecap">
-											@for ($i = 0; $i < 5; $i++)
-											@if ($product['overall_rating'] <= $i)
-											<span class="fa fa-star starcolorgrey"></span>
-											@else
-											<span class="fa fa-star" style="color: #FFD600;"></span>
-											@endif
-											@endfor
-										</div>
-										<small class="text-muted stylecap" style="color:#c4cad0 !important; font-weight:100 !important;">( {{ $product['total_reviews'] }} Reviews )</small>
-									</div>
-								</div>
-							</div>
-							<br/>
-							@if ($product['on_stock'] == 1)
-							<a href="#" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto add-to-cart" role="button" style="width: 90% !important; margin-bottom: 20px" data-item-code="{{ $product['item_code'] }}"><i class="fas fa-shopping-cart d-inline-block" style="margin-right: 3%;"></i> Add to Cart</a>
-							@else
-							<a href="/login" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto {{ Auth::check() ? 'add-to-wishlist' : '' }}" role="button" style="width: 90% !important; margin-bottom: 20px" data-item-code="{{ $product['item_code'] }}"><i class="far fa-heart d-inline-block" style="margin-right: 3%;"></i> Add to Wishlist</a>
-							@endif
-						</div>
+					<div class="d-none d-md-block">
+						@include('frontend.product_details_card')
 					</div>
 					<!-- Desktop/Tablet view end -->
 				@endforeach
@@ -643,14 +530,21 @@
 	}
 	
 	.btn-container{
-		width: 100%;
-		position: absolute; 
-		top: 50%; 
-		left: 0; 
-		z-index: 9; 
-		display: none; 
-		text-align: center;
+		position:absolute;
+		bottom:40%;
+		left:0;
+		right:0;
+		background-color:rgba(0,0,0,0);
+		overflow:hidden;
+		width:100%;
+		height:0;
+		transition:.5s;
+		display:flex;
+		justify-content:center;
+		align-items:center
 	}
+
+	.hover-container:hover .btn-container{height:50px}
 
 	.view-products-btn{
 		z-index: 2;
@@ -663,6 +557,7 @@
 		padding:8px 20px;
 		font-weight:400;
 		transition:all .15s ease-in;
+		position: absolute;
 	}
 
 	.view-products-btn:hover{
@@ -779,11 +674,6 @@
    });
 
   })();
-
-  // Product Image Hover
-  $('.hover-container').hover(function(){
-      $(this).children('.btn-container').slideToggle('fast');
-    });
 
 	$('.search-page-autocomplete').keyup(function(){
         var data = {

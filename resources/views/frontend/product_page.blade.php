@@ -466,72 +466,8 @@
 							<div class="album py-5" style="position: relative">
 								<div class="container related-prod">
 									<section class="regular slider">
-										@foreach($related_products as $rp)
-										<div class="col-md-4 col-lg-3 animated animatedFadeInUp fadeInUp equal-height-columns mb-3 related-products-card">
-											<div class="card shadow-sm border" style="border: 1px solid  #d5dbdb !important; background-color: #fff;">
-												<div class="equal-column-content">
-													@php
-														$img = ($rp['image']) ? '/storage/item_images/'. $rp['item_code'] .'/gallery/preview/'. $rp['image'] : '/storage/no-photo-available.png';
-														$img_webp = ($rp['image']) ? '/storage/item_images/'. $rp['item_code'] .'/gallery/preview/'. explode(".", $rp['image'])[0] .'.webp' : '/storage/no-photo-available.png';
-													@endphp
-													<div class="hover-container product-card" style="position: relative">
-														<div class="pt-2" style="position: absolute; top: 0; right: 0; z-index: 10;">
-															<div class="col-12 mb-2 {{ $rp['is_new_item'] == 1 ? '' : 'd-none' }}">
-																<span class="p-1 text-center" style="background-color: #438539; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
-																&nbsp;<b>New</b>&nbsp;
-																</span>
-															</div><br class="{{ $rp['is_new_item'] == 1 ? '' : 'd-none' }}"/>
-															@if ($rp['is_discounted'] == 1)
-															<div class="col-12">
-																<span class="p-1 text-center" style="background-color: #FF0000; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
-																	&nbsp;<b>{{ $rp['discount_display'] }}</b>&nbsp;
-																</span>
-															</div>
-															@endif
-														</div>
-														<div class="overlay-bg"></div>
-														<div class="btn-container">
-															<a href="/product/{{ ($rp['slug']) ? $rp['slug'] : $rp['item_code'] }}" class="view-products-btn btn" role="button"><i class="fas fa-search"></i>&nbsp;View Product</a>
-														</div>
-														<picture>
-															<source srcset="{{ asset($img_webp) }}" type="image/webp" class="img-responsive" style="width: 100% !important;">
-															<source srcset="{{ asset($img) }}" type="image/jpeg" class="img-responsive" style="width: 100% !important;">
-															<img src="{{ asset($img) }}" alt="{{ Str::slug($rp['alt'], '-') }}" class="img-responsive hover" style="width: 100% !important;" loading="lazy">
-														</picture>
-													</div>
-													<div class="card-body d-flex flex-column">
-														<div class="text ellipsis">
-															<a href="/product/{{ ($rp['slug']) ? $rp['slug'] : $rp['item_code'] }}" class="card-text product-head fumacoFont_card_title text-concat prod_desc" style="text-decoration: none !important; text-transform: none !important; color:#0062A5 !important;  min-height: 100px;">{{ $rp['item_name'] }}</a>
-														</div>
-														<p class="card-text fumacoFont_card_price" style="color:#000000 !important; ">
-															@if ($rp['is_discounted'] == 1)
-															<span style="white-space: nowrap !important;">{{ $rp['discounted_price'] }}</span><br class="d-lg-none"/><s style="color: #c5c5c5; white-space: nowrap !important;">{{ $rp['default_price'] }}</s>
-															@else
-															{{ $rp['default_price'] }}
-															@endif
-														</p>
-														<div class="d-flex justify-content-between align-items-center">
-															<div class="btn-group stylecap">
-																@for ($i = 0; $i < 5; $i++)
-																@if ($rp['overall_rating'] <= $i)
-																<span class="fa fa-star starcolorgrey"></span>
-																@else
-																<span class="fa fa-star" style="color: #FFD600;"></span>
-																@endif
-																@endfor
-															</div>
-															<small class="text-muted stylecap" style="color:#c4cad0 !important; font-weight:100 !important;">( {{ $rp['total_reviews'] }} Reviews )</small>
-														</div>
-														<br>
-													</div>
-												</div><br/>&nbsp;
-												@if ($rp['on_stock'] == 1)
-												<a href="#" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto add-to-cart" role="button" style="width: 90% !important; margin-bottom: 20px" data-item-code="{{ $rp['item_code'] }}"><i class="fas fa-shopping-cart d-inline-block" style="margin-right: 3%;"></i> Add to Cart</a>
-												@else
-												<a href="/login" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto {{ Auth::check() ? 'add-to-wishlist' : '' }}" role="button" style="width: 90% !important; margin-bottom: 20px" data-item-code="{{ $rp['item_code'] }}"><i class="far fa-heart d-inline-block" style="margin-right: 3%;"></i> Add to Wishlist</a>
-												@endif
-											</div>
-										</div>
+										@foreach($related_products as $item)
+											@include('frontend.product_details_card')
 										@endforeach
 									</section>
 								</div>
@@ -548,74 +484,8 @@
 							<div class="album py-5" style="position: relative">
 								<div class="container related-prod">
 									<section class="regular slider">
-										@foreach ($recommended_items as $recommended_item)
-										<div class="col-md-4 col-lg-3 animated animatedFadeInUp fadeInUp equal-height-columns mb-3 related-products-card">
-											<div class="card shadow-sm border" style="border: 1px solid  #d5dbdb !important; background-color: #fff;">
-												<div class="equal-column-content">
-													@php
-														$img = ($recommended_item['image']) ? '/storage/item_images/'. $recommended_item['item_code'] .'/gallery/preview/'. $recommended_item['image'] : '/storage/no-photo-available.png';
-														$img_webp = ($recommended_item['image']) ? '/storage/item_images/'. $recommended_item['item_code'] .'/gallery/preview/'. explode(".", $recommended_item['image'])[0] .'.webp' : '/storage/no-photo-available.png';
-													@endphp
-													<div class="hover-container product-card" style="position: relative">
-														<div class="pt-2" style="position: absolute; top: 0; right: 0; z-index: 10;">
-															@if ($recommended_item['is_new_item'])
-															<div class="col-12 mb-2">
-																<span class="p-1 text-center" style="background-color: #438539; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
-																&nbsp;<b>New</b>&nbsp;
-																</span>
-															</div><br />
-															@endif
-															@if ($recommended_item['is_discounted'] == 1)
-															<div class="col-12">
-																<span class="p-1 text-center" style="background-color: #FF0000; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
-																	&nbsp;<b>{{ $recommended_item['discount_display'] }}</b>&nbsp;
-																</span>
-															</div>
-															@endif
-														</div>
-														<div class="overlay-bg"></div>
-														<div class="btn-container">
-															<a href="/product/{{ ($recommended_item['slug']) ? $recommended_item['slug'] : $recommended_item['item_code'] }}" class="view-products-btn btn" role="button"><i class="fas fa-search"></i>&nbsp;View Product</a>
-														</div>
-														<picture>
-															<source srcset="{{ asset($img_webp) }}" type="image/webp" class="img-responsive" style="width: 100% !important;">
-															<source srcset="{{ asset($img) }}" type="image/jpeg" class="img-responsive" style="width: 100% !important;">
-															<img src="{{ asset($img) }}" alt="{{ Str::slug($recommended_item['alt'], '-') }}" class="img-responsive hover" style="width: 100% !important;" loading='lazy'>
-														</picture>
-													</div>
-													<div class="card-body d-flex flex-column">
-														<div class="text ellipsis">
-															<a href="/product/{{ ($recommended_item['slug']) ? $recommended_item['slug'] : $recommended_item['item_code'] }}" class="card-text product-head fumacoFont_card_title text-concat prod_desc" style="text-decoration: none !important; text-transform: none !important; color:#0062A5 !important;  min-height: 100px;">{{ $recommended_item['item_name'] }}</a>
-														</div>
-														<p class="card-text fumacoFont_card_price d-sm-block d-md-none d-lg-block" style="color:#000000 !important; ">
-															@if ($recommended_item['is_discounted'])
-															<span style="white-space: nowrap !important">{{ $recommended_item['discounted_price'] }}</span>&nbsp;<br class="d-lg-none"/><s style="color: #c5c5c5;">{{ $recommended_item['default_price'] }}</s>
-															@else
-															{{ $recommended_item['default_price'] }}
-															@endif
-														</p>
-														<div class="d-flex justify-content-between align-items-center">
-															<div class="btn-group stylecap">
-																@for ($i = 0; $i < 5; $i++)
-																@if ($recommended_item['overall_rating'] <= $i)
-																<span class="fa fa-star starcolorgrey"></span>
-																@else
-																<span class="fa fa-star" style="color: #FFD600;"></span>
-																@endif
-																@endfor
-															</div>
-															<small class="text-muted stylecap" style="color:#c4cad0 !important; font-weight:100 !important;">( {{ $recommended_item['total_reviews'] }} Reviews )</small>
-														</div>
-														<br>
-													</div>
-												</div><br/>&nbsp;
-												@if ($recommended_item['on_stock'] == 1)
-												<a href="#" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto add-to-cart" role="button" style="width: 90% !important; margin-bottom: 20px" data-item-code="{{ $recommended_item['item_code'] }}"><i class="fas fa-shopping-cart d-inline-block" style="margin-right: 3%;"></i> Add to Cart</a>
-												@else
-												<a href="/login" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto {{ Auth::check() ? 'add-to-wishlist' : '' }}" role="button" style="width: 90% !important; margin-bottom: 20px" data-item-code="{{ $recommended_item['item_code'] }}"><i class="far fa-heart d-inline-block" style="margin-right: 3%;"></i> Add to Wishlist</a>
-												@endif
-											</div>
-										</div>
+										@foreach ($recommended_items as $item)
+											@include('frontend.product_details_card')
 										@endforeach
 									</section>
 								</div>
@@ -640,7 +510,6 @@
 
 	<link rel="stylesheet" type="text/css" href="{{ asset('/slick/slick.css') }}">
 	<link rel="stylesheet" type="text/css" href="{{ asset('/slick/slick-theme.css') }}">
-
 @endsection
 
 @section('script')
@@ -685,24 +554,27 @@
   	})();
 
 	$(document).ready(function() {
-		// Product Image Hover
-		$('.hover-container').hover(function(){
-			$(this).children('.btn-container').slideToggle('fast');
-		});
-
 		$(".regular").slick({
-			dots: false,
+			dots: true,
+			customPaging: function(slider, i) {
+				return '<a href="#"><i class="fas fa-circle"></i></a>';
+			},
+			arrows: false,
 			infinite: true,
 			slidesToShow: 4,
 			slidesToScroll: 1,
 			touchMove: true,
-			responsive: [{
+			responsive: [
+			{
 				breakpoint: 1024,
 				settings: {
 					slidesToShow: 3,
 					slidesToScroll: 1,
 					infinite: true,
-					dots: false
+					dots: true,
+					customPaging: function(slider, i) {
+						return '<a href="#"><i class="fas fa-circle"></i></a>';
+					}
 				}
 			},
 			{

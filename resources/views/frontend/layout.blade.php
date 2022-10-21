@@ -442,11 +442,9 @@
   <script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.4/Chart.bundle.min.js' defer></script>
   <script src="{{ asset('/assets/dist/js/bootstrap.bundle.min.js') }}"></script>
 
-  @if (!in_array($activePage, ['homepage']))
+  @if (!in_array($activePage, ['homepage', 'product_page']))
   <script src="{{ asset('assets/minified-js/jquery-3.6.0.min.js') }}"></script>
   <script src="{{ asset('assets/minified-js/jquery-ui.min.js') }}"></script>
-  {{-- <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
-  <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.js"></script> --}}
   @endif
   <script>
     $(document).ready(function() {
@@ -636,7 +634,8 @@
             data: data,
             success:function(response){
               setTimeout(function() {
-                btn.addClass('add-to-cart').html('<i class="fas fa-shopping-cart"></i> Add to Cart');
+                // btn.addClass('add-to-cart').html('<i class="fas fa-shopping-cart"></i> Add to Cart');
+                btn.addClass('add-to-cart').html('Add to Cart');
               }, 1800);
 
               countCartItems();
@@ -661,10 +660,29 @@
             data: data,
             success:function(response){
               setTimeout(function() {
-                btn.addClass('add-to-wishlist').html('<i class="far fa-heart"></i> Add to Wishlist');
+                btn.addClass('add-to-wishlist').html('Add to Wishlist');
               }, 1800);
             }
           });
+        });
+
+        $(document).on('click', '.notify-me', function() {
+          var btn = $(this);
+          $(this).html('Adding...');
+          if($(this).data('logged')){
+            $.ajax({
+              type:'get',
+              url:'/notify_me',
+              data: {
+                item_code: $(this).data('item-code')
+              },
+              success: function (response) {
+                btn.html('Notify me');
+              }
+            });
+          }else{
+            window.location.href = '/login';
+          }
         });
       @endif
 
