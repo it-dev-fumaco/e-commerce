@@ -146,7 +146,7 @@
                 <div class="row">
                     <div class="col-md-6 d-none d-md-block">
                         <div class="card-body col-md-8 mx-auto">
-                            <a href="/" class="btn btn-secondary" style="width:100% !important;" role="button"><span style="font-size: 12pt; font-weight: 700">˂ </span> CONTINUE SHOPPING</a>
+                            <a href="/" class="btn btn-secondary" style="width:100% !important;" role="button"><i class="fas fa-angle-left"></i> CONTINUE SHOPPING</a>
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -156,7 +156,7 @@
                     </div>
                     <div class="col-md-6 d-md-none">
                         <div class="card-body col-md-8 mx-auto">
-                            <a href="/" class="btn btn-secondary" style="width:100% !important;" role="button"><span style="font-size: 12pt; font-weight: 700">˂ </span> CONTINUE SHOPPING</a>
+                            <a href="/" class="btn btn-secondary" style="width:100% !important;" role="button"><i class="fas fa-angle-left"></i> CONTINUE SHOPPING</a>
                         </div>
                     </div>
                 </div>
