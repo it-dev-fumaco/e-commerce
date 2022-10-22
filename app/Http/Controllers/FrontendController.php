@@ -1588,14 +1588,22 @@ class FrontendController extends Controller
             $bundle_items = DB::table('fumaco_product_bundle_item')->where('parent_item_code', explode("-", $product_details->f_idcode)[0])->orderBy('idx', 'asc')->get();
         }
 
-        $variant_attr_arr = [];
+        $variant_attr_array = $variant_attr_arr = [];
         if (count($variant_items) > 1) {
             foreach ($variant_attributes as $attr => $value) {
                 $values = collect($value)->groupBy('attribute_value')->map(function($d, $i) {
                     return array_unique(array_column($d->toArray(), 'idcode'));
                 });
 
-                $variant_attr_arr[$attr] = $values;
+                $variant_attr_array[$attr] = $values;
+            }
+
+            $attribs = [];
+            foreach ($variant_attr_array as $key => $value) {
+                $attribs = collect(array_keys($value->toArray()))->sortBy(null, SORT_NATURAL)->values();
+                foreach($attribs as $a){
+                    $variant_attr_arr[$key][$a] = isset($value[$a]) ? $value[$a] : [];
+                }
             }
         }
 
