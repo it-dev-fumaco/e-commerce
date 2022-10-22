@@ -41,7 +41,7 @@
         </div>
         <p class="card-text fumacoFont_card_price" style="color:#000000 !important; ">
           @if($item['is_discounted'] == 1)
-          {{ $item['discounted_price'] }}&nbsp;<br class="d-block d-xl-none"/><s style="color: #c5c5c5;">{{ $item['default_price'] }}</s>
+          {{ $item['discounted_price'] }}&nbsp;<s style="color: #c5c5c5;">{{ $item['default_price'] }}</s>
           @else
           {{ $item['default_price'] }}
           @endif
