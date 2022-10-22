@@ -468,7 +468,13 @@ class FrontendController extends Controller
             $filter_count = count($filters);
 
             $filters['Brand'] = $brands;
-            
+
+            $filters_arr = $filters;
+            $filters = [];
+            foreach($filters_arr as $key => $filter){
+                $filters[$key] = collect($filter)->sortBy(null, SORT_NATURAL)->values();
+            }
+
             return view('frontend.search_results', compact('results', 'blogs', 'products', 'recently_added_arr' ,'filters', 'filter_count', 'request_brand'));
         }
 
@@ -1431,6 +1437,12 @@ class FrontendController extends Controller
             });
 
             $filters = array_merge($filters->toArray(), $selected_attr->toArray());
+        }
+
+        $filters_arr = $filters;
+        $filters = [];
+        foreach($filters_arr as $key => $filter){
+            $filters[$key] = collect($filter)->sortBy(null, SORT_NATURAL)->values();
         }
 
         // get sorting value 
