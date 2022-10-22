@@ -22,12 +22,12 @@
 <style>
       @media (max-width: 575.98px) {
         .page-header{
-            margin-top: 50px;
+            margin-top: 60px;
         }
       }
       @media (max-width: 767.98px) {
         .page-header{
-            margin-top: 50px;
+            margin-top: 60px;
         }
       }
 

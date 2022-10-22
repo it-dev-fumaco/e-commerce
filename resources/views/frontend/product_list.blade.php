@@ -40,11 +40,11 @@
 				<!--sidebar-->
 				<div class="col-lg-2 checkersxx d-none d-lg-block">
 					<div class="row">
-						<div class="col-6 p-0">
+						<div class="col-lg-12 col-xl-6 p-0">
 							<h5 style="color: #221E1F">Filter Results</h5>
 							<span style="font-size: 9pt; color: #606166; font-weight: 600;">Results {{ $products->lastItem() }} (Out of {{ $products->total() }})</span>
 						</div>
-						<div class="col-6">
+						<div class="col-lg-12 col-xl-6">
 							<div class="row p-0">
 								<div class="col-9 d-flex flex-row justify-content-center align-items-center p-0">
 									<select name="sortby" class="form-control form-control-sm pt-2 pb-2" style="font-size: 0.75rem; display: inline-block; color: #000">
@@ -166,22 +166,22 @@
 														</button>
 													</div>
 													<div class="row">
-														<div class="col-6">
+														<div class="col-6 col-md-12">
 															<h5 style="color: #221E1F">Filter Results</h5>
 															<span style="font-size: 9pt; color: #606166; font-weight: 600;">
 																Results {{ $products->lastItem() }} (Out of {{ $products->total() }})
 															</span>
 														</div>
-														<div class="col-6">
+														<div class="col-6 col-md-12">
 															<div class="row p-0">
-																<div class="col-9 d-flex flex-row justify-content-center align-items-center p-0">
+																<div class="col-9 d-flex flex-row justify-content-center align-items-center p-0 p-md-3">
 																	<select name="sortby" class="form-control form-control-sm" style="font-size: 11pt; font-weight: 400; display: inline-block; color: #000; padding-top: 15px; padding-bottom: 15px;">
 																		<option value="Position" data-loc="{{ request()->fullUrlWithQuery(['sortby' => 'Position']) }}" {{ (request()->sortby == 'Position') ? 'selected' : '' }}>Recommended&nbsp;</option>
 																		<option value="Product Name" data-loc="{{ request()->fullUrlWithQuery(['sortby' => 'Product Name']) }}" {{ (request()->sortby == 'Product Name') ? 'selected' : '' }}>Product Name</option>
 																		<option value="Price" data-loc="{{ request()->fullUrlWithQuery(['sortby' => 'Price']) }}" {{ (request()->sortby == 'Price') ? 'selected' : '' }}>Price</option>
 																	</select>
 																</div>
-																<div class="col-3 p-0">
+																<div class="col-3 p-0 p-md-3">
 																	<div class="p-2" style="font-size: 1.3rem;">
 																		@if ((request()->order == 'desc'))
 																		<a href="{{ request()->fullUrlWithQuery(['order' => 'asc']) }}" style="color: #000;">
