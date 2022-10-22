@@ -746,6 +746,11 @@
         });
       });
 
+      $(document).on('click', '.close-modal', function (){
+        var modal = $(this).data('target');
+        $(modal).modal('hide');
+      });
+
       $("#closeCookieConsent, .cookieConsentOK").click(function() {
           $("#cookieConsent").fadeOut(200);
       });

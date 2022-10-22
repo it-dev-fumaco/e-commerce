@@ -49,15 +49,15 @@
 								<i class="fas fa-filter"></i>&nbsp; Filters
 							</a>
 						</div>
-						<div class="p-2"><label class="mt-1 mb-1 mr-0" style="font-size: 0.75rem; white-space: nowrap !important">Sort By</label></div>
-						<div class="p-2 {{ count($products) > 0 ? null : 'd-none' }}">
+						<div class="p-2 d-none d-md-inline"><label class="mt-1 mb-1 mr-0" style="font-size: 0.75rem; white-space: nowrap !important">Sort By</label></div>
+						<div class="p-2 {{ count($products) > 0 ? null : 'd-none' }} d-none d-md-inline">
 							<select name="sortby" class="form-control form-control-sm" style="font-size: 0.75rem; display: inline-block;">
 								<option value="Position" data-loc="{{ request()->fullUrlWithQuery(['sortby' => 'Position']) }}" {{ (request()->sortby == 'Position') ? 'selected' : '' }}>Recommended</option>
 								<option value="Product Name" data-loc="{{ request()->fullUrlWithQuery(['sortby' => 'Product Name']) }}" {{ (request()->sortby == 'Product Name') ? 'selected' : '' }}>Product Name</option>
 								<option value="Price" data-loc="{{ request()->fullUrlWithQuery(['sortby' => 'Price']) }}" {{ (request()->sortby == 'Price') ? 'selected' : '' }}>Price</option>
 							</select>
 						</div>
-						<div class="p-2" style="font-size: 1.3rem;">
+						<div class="p-2 d-none d-md-inline" style="font-size: 1.3rem;">
 							@if ((request()->order == 'desc'))
 								<a href="{{ request()->fullUrlWithQuery(['order' => 'asc']) }}">
 									<i class="fas fa-sort-amount-down-alt"></i>
@@ -69,7 +69,7 @@
 							@endif
 						</div>
 					  </div>
-				</div>		
+				</div>
 			</div>
 			<div class="row">
 				<div class="d-inline-block">
@@ -78,61 +78,111 @@
 						<div class="modal-dialog" role="document">
 							<div class="modal-content">
 								<div class="modal-body">
-									<div class="d-flex justify-content-between align-items-center" style="font-weight: 500 !important;  margin: 20px !important"><b>Filter Results</b>
-										<a href="/?s={{ request()->s }}" style="text-decoration: none;">
-											<small class="stylecap he2 text-dark" style="font-weight:400 !important;">Clear All</small>
-										</a>
+									<div class="col-1 offset-11">
+										<button type="button" class="btn close-modal" data-target="#rightModal">
+											<i class="fa fa-remove" style="color: #BDBDBD;"></i>
+										</button>
 									</div>
-									<hr>
-									@php
-										$a = 0;
-										$x = 0;
-									@endphp
-									@if (count($filters['Brand']) > 1)
-										<div class="card mb-3">
-											<div class="card-header text-white font-weight-bold" style="font-size: 0.75rem; background-color: rgb(0, 98, 165);">BRAND</div>
-											<div class="card-body">
-												@foreach ($filters['Brand'] as $brand)
-													@php
-														$a++;
-														$filter_attr = Str::slug('brand', '-');
-														$filter_values = request()->brand ? request()->brand : [];
-														$status = (in_array($brand, $filter_values)) ? 'checked' : '';
-													@endphp
-													<div class="form-check">
-														<input type="checkbox" class="form-check-input product-cb-filter attrib-checkbox" id="{{ 'cbb' . $a }}" name="{{ 'attr[' .$filter_attr.'][]' }}" value="{{ $brand }}" data-attrname="{{ $filter_attr }}" {{ $status }}>
-														<label class="form-check-label" for="{{ 'cbb' . $a }}" style="font-size: 0.8rem;">{{ $brand }}</label>
-													</div>
-												@endforeach
+									<form action="/" method="get">
+										<div class="row">
+											<div class="d-none">
+												<input type="text" class="d-none" name="s" value="{{ request()->s ? request()->s : null }}">
 											</div>
-										</div>
-									@endif
-									@foreach ($filters as $id => $row)
-										@php
-											$filter_attr = Str::slug($id, '-');
-										@endphp
-										@if ($id != 'Brand')
-											@if (count($row) > 1 || request()->$filter_attr)
-											<div class="card mb-3">
-												<div class="card-header text-white font-weight-bold" style="font-size: 0.75rem; background-color: rgb(0, 98, 165);">{{ strtoupper($id) }}</div>
-												<div class="card-body">
-													@foreach ($row as $attr_val)
-														@php
-															$x++;
-															$filter_values = explode('+', request()->$filter_attr);
-															$status = (in_array($attr_val, $filter_values)) ? 'checked' : '';
-															$fullUrl = request()->fullUrlWithQuery([ $filter_attr => $attr_val]);
-														@endphp
-														<div class="form-check">
-															<input type="checkbox" class="form-check-input product-cb-filter attrib-checkbox" id="{{ 'cb' . $x }}" name="{{ 'attr[' .$filter_attr.'][]' }}" value="{{ $attr_val }}" data-attrname="{{ $filter_attr }}" {{ $status }}/>
-															<label class="form-check-label" for="{{ 'cb' . $x }}" style="font-size: 0.8rem;">{{ $attr_val }}</label>
+											<div class="col-6">
+												<h5 style="color: #221E1F">Filter Results</h5>
+												<span style="font-size: 9pt; color: #606166; font-weight: 600;">
+													Results {{ $results->lastItem() }} (Out of {{ $results->total() }})
+												</span>
+											</div>
+											<div class="col-6">
+												<div class="row p-0">
+													<div class="col-9 d-flex flex-row justify-content-center align-items-center p-0">
+														<select name="sortby" class="form-control form-control-sm" style="font-size: 11pt; font-weight: 400; display: inline-block; color: #000; padding-top: 15px; padding-bottom: 15px;">
+															<option value="Position" data-loc="{{ request()->fullUrlWithQuery(['sortby' => 'Position']) }}" {{ (request()->sortby == 'Position') ? 'selected' : '' }}>Recommended</option>
+															<option value="Product Name" data-loc="{{ request()->fullUrlWithQuery(['sortby' => 'Product Name']) }}" {{ (request()->sortby == 'Product Name') ? 'selected' : '' }}>Product Name</option>
+															<option value="Price" data-loc="{{ request()->fullUrlWithQuery(['sortby' => 'Price']) }}" {{ (request()->sortby == 'Price') ? 'selected' : '' }}>Price</option>
+														</select>
+													</div>
+													<div class="col-3 p-0">
+														<div class="p-2" style="font-size: 1.3rem;">
+															@if ((request()->order == 'desc'))
+															<a href="{{ request()->fullUrlWithQuery(['order' => 'asc']) }}" style="color: #000;">
+																<i class="fas fa-sort-amount-down-alt"></i>
+															</a>
+															@else
+															<a href="{{ request()->fullUrlWithQuery(['order' => 'desc']) }}" style="color: #000;">
+																<i class="fas fa-sort-amount-up-alt"></i>
+															</a>
+															@endif
 														</div>
-													@endforeach
+													</div>
 												</div>
 											</div>
-											@endif
-										@endif
-									@endforeach
+											<div class="col-12 p-0">
+												<div id="accordion" class="container-fluid p-0">
+													@if (count($filters['Brand']) > 1)
+														<div class="container p-2 filter-id collapse-btn" style="border-bottom: 1px solid #C9C9CB" data-target="#filter-brand2">
+															<span style="font-weight: 600; font-size: 10pt;">Brand</span>
+														</div>
+						
+														<div id="filter-brand2" class="collapse show">
+															<div class="card-body">
+																@foreach ($filters['Brand'] as $brand)
+																	@php
+																		$request_brand = isset(request()->attr['brand']) ? request()->attr['brand'] : [];
+																		$status = (in_array($brand, $request_brand)) ? 'checked' : '';
+																	@endphp
+																	<div class="form-check">
+																		<input class="form-check-input filter-check" type="checkbox" name="attr[brand][]" value="{{ $brand }}" data-attr="brand" {{ $status }}>
+																		<label class="form-check-label" style="font-size: 10pt; font-weight: 500">
+																			{{ $brand }}
+																		</label>
+																	</div>
+																@endforeach
+															</div>
+														</div>
+													@endif
+													@foreach ($filters as $id => $filter)
+														@php
+															$filter_attr = Str::slug($id, '-');
+															$collapse = null;
+						
+															if(count($filters['Brand']) <= 1 && $loop->first || isset(request()->attr[$filter_attr])){
+																$collapse = 'show';
+															}
+														@endphp
+														@if ($id != 'Brand')
+															<div class="card text-left" style="border: none;">
+																<div class="container p-2 filter-id collapse-btn" style="border-bottom: 1px solid #C9C9CB" data-target="#filter-{{ $filter_attr }}2">
+																	<span style="font-weight: 600; font-size: 10pt;">{{ $id }}</span>
+																</div>
+															
+																<div id="filter-{{ $filter_attr }}2" class="collapse {{ $collapse }}">
+																	<div class="card-body">
+																		@foreach ($filter as $value)
+																			@php
+																				$request_filters = isset(request()->attr[$filter_attr]) ? request()->attr[$filter_attr] : [];
+																				$status = (in_array($value, $request_filters)) ? 'checked' : '';
+																			@endphp
+																			<div class="form-check">
+																				<input class="form-check-input filter-check" type="checkbox" name="{{ 'attr[' .$filter_attr.'][]' }}" value="{{ $value }}" data-attr="{{ $filter_attr }}" {{ $status }}>
+																				<label class="form-check-label" style="font-size: 10pt; font-weight: 500">
+																					{{ $value }}
+																				</label>
+																			</div>
+																		@endforeach
+																	</div>
+																</div>
+															</div>
+														@endif
+													@endforeach
+												</div>
+												<input type="hidden" name="sortby" value="{{ request()->sortby }}">
+												<input type="hidden" name="sel_attr" value="{{ request()->sel_attr }}">
+												<button type="submit" class="btn btn-outline-primary w-100 mt-3" style="font-size: 10pt; font-weight: 600;">Save</button>
+											</div>
+										</div>
+									</form>
 								</div>
 							</div>
 						</div>
@@ -148,73 +198,83 @@
 		@endif
 		@if(count($products) > 0)
 		<div class="row">
-			@if ($filter_count > 0 or count($filters['Brand']) > 1)
+			@if ($filter_count > 0 or count($request_brand) > 1)
 			<div class="d-none {{ request()->s == '' ? '' : 'd-xl-block' }} col-1">&nbsp;</div>
 			<div class="d-none col-lg-3 col-xl-2 {{ request()->s == '' ? '' : 'd-lg-block' }}">
 				<!--sidebar-->
-				<div class="col-12 checkersxx">
-					<div class="d-flex justify-content-between align-items-center he1" style="font-weight: 500 !important"><b>Filter Results</b>
-						<a href="/?s={{ request()->s }}" style="text-decoration: none;">
-							<small class="stylecap he2 text-dark" style="font-weight:400 !important;">Clear All</small>
-						</a>
-					</div>
-					<hr>
-					@php
-						$a = 0;
-						$x = 0;
-					@endphp
-					@if (count($filters['Brand']) > 1)
-						<div class="card mb-3">
-							<div class="card-header text-white font-weight-bold" style="font-size: 0.75rem; background-color: rgb(0, 98, 165);">BRAND</div>
-							<div class="card-body">
-								@foreach ($filters['Brand'] as $brand)
-									@php
-										$a++;
-										$filter_attr = Str::slug('brand', '-');
-										$filter_values = request()->brand ? request()->brand : [];
-										$status = (in_array($brand, $filter_values)) ? 'checked' : '';
-									@endphp
-									<div class="form-check">
-										<input type="checkbox" class="form-check-input product-cb-filter attrib-checkbox" id="{{ 'cbb' . $a }}" name="{{ 'attr[' .$filter_attr.'][]' }}" value="{{ $brand }}" data-attrname="{{ $filter_attr }}" {{ $status }}>
-										<label class="form-check-label" for="{{ 'cbb' . $a }}" style="font-size: 0.8rem;">{{ $brand }}</label>
-									</div>
-								@endforeach
-							</div>
-						</div>
-					@endif
-					@foreach ($filters as $id => $row)
-						@php
-							$filter_attr = Str::slug($id, '-');
-						@endphp
-						@if ($id != 'Brand')
-							@if (count($row) > 1 || request()->$filter_attr)
-							<div class="card mb-3">
-								<div class="card-header text-white font-weight-bold" style="font-size: 0.75rem; background-color: rgb(0, 98, 165);">{{ strtoupper($id) }}</div>
-								<div class="card-body">
-									@foreach ($row as $attr_val)
-										@php
-											$x++;
-											$filter_values = explode('+', request()->$filter_attr);
-											$status = (in_array($attr_val, $filter_values)) ? 'checked' : '';
-											$fullUrl = request()->fullUrlWithQuery([ $filter_attr => $attr_val]);
-										@endphp
-										<div class="form-check">
-											<input type="checkbox" class="form-check-input product-cb-filter attrib-checkbox" id="{{ 'cb' . $x }}" name="{{ 'attr[' .$filter_attr.'][]' }}" value="{{ $attr_val }}" data-attrname="{{ $filter_attr }}" {{ $status }}/>
-											<label class="form-check-label" for="{{ 'cb' . $x }}" style="font-size: 0.8rem;">{{ $attr_val }}</label>
-										</div>
-									@endforeach
+				<form action="/" method="get">
+					<input type="text" class="d-none" name="s" value="{{ request()->s ? request()->s : null }}">
+					<div class="col-12 p-0">
+						<div id="accordion" class="container-fluid p-0">
+							@if (count($filters['Brand']) > 1)
+								<div class="container p-2 filter-id collapse-btn" style="border-bottom: 1px solid #C9C9CB" data-target="#filter-brand">
+									<span style="font-weight: 600; font-size: 10pt;">Brand</span>
 								</div>
-							</div>
+
+								<div id="filter-brand" class="collapse show">
+									<div class="card-body">
+										@foreach ($filters['Brand'] as $brand)
+											@php
+												$request_brand = isset(request()->attr['brand']) ? request()->attr['brand'] : [];
+												// $filter_values = explode('+', $request_brand);
+												$status = (in_array($brand, $request_brand)) ? 'checked' : '';
+											@endphp
+											<div class="form-check">
+												<input class="form-check-input filter-check" type="checkbox" name="attr[brand][]" value="{{ $brand }}" data-attr="brand" {{ $status }}>
+												<label class="form-check-label" style="font-size: 10pt; font-weight: 500">
+													{{ $brand }}
+												</label>
+											</div>
+										@endforeach
+									</div>
+								</div>
 							@endif
-						@endif
-					@endforeach
-				</div>
+							@foreach ($filters as $id => $filter)
+								@php
+									$filter_attr = Str::slug($id, '-');
+									$collapse = null;
+
+									if(count($filters['Brand']) <= 1 && $loop->first || isset(request()->attr[$filter_attr])){
+										$collapse = 'show';
+									}
+								@endphp
+								@if ($id != 'Brand')
+									<div class="card text-left" style="border: none;">
+										<div class="container p-2 filter-id collapse-btn" style="border-bottom: 1px solid #C9C9CB" data-target="#filter-{{ $filter_attr }}">
+											<span style="font-weight: 600; font-size: 10pt;">{{ $id }}</span>
+										</div>
+									
+										<div id="filter-{{ $filter_attr }}" class="collapse {{ $collapse }}">
+											<div class="card-body">
+												@foreach ($filter as $value)
+													@php
+														$request_filters = isset(request()->attr[$filter_attr]) ? request()->attr[$filter_attr] : [];
+														$status = (in_array($value, $request_filters)) ? 'checked' : '';
+													@endphp
+													<div class="form-check">
+														<input class="form-check-input filter-check" type="checkbox" name="{{ 'attr[' .$filter_attr.'][]' }}" value="{{ $value }}" data-attr="{{ $filter_attr }}" {{ $status }}>
+														<label class="form-check-label" style="font-size: 10pt; font-weight: 500">
+															{{ $value }}
+														</label>
+													</div>
+												@endforeach
+											</div>
+										</div>
+									</div>
+								@endif
+							@endforeach
+						</div>
+						<input type="hidden" name="sortby" value="{{ request()->sortby }}">
+						<input type="hidden" name="sel_attr" value="{{ request()->sel_attr }}">
+						<button type="submit" class="btn btn-outline-primary w-100 mt-3" style="font-size: 10pt; font-weight: 600;">Save</button>
+					</div>
+				</form>
 				<!--sidebar-->
 			</div>
 			@endif
 			@php
 				$mx_auto = '';
-				if($filter_count == 0 and count($filters['Brand']) < 2){
+				if($filter_count == 0 and count($request_brand) < 2){
 					$mx_auto = 'mx-auto';
 				}
 				$col = '4';
@@ -594,7 +654,7 @@
 	.modal .modal-dialog {
 		position: fixed;
 		margin: auto;
-		width: 80%;
+		width: 100%;
 		height: 100%;
 		transform: translate3d(0%, 0, 0);
 	}
@@ -626,6 +686,19 @@
 	.results-banner{
 		height: 17rem !important;
 	}
+
+	.filter-id{
+		cursor: pointer;
+	}
+	.form-check-input:checked{
+		background-color: green !important;
+		border: 0;
+	}
+	.form-check-input:focus, .label::after, label.form-check-label:focus, .form-check-input::after, .form-check-input:not(:disabled):not(.disabled):active:focus {
+		color: black;
+		border: 1px solid #BFBFBF;
+	}
+
 	@media (max-width: 575.98px) {
 		.results-count{
 			text-align: center !important;
@@ -709,6 +782,10 @@
 
 	$('body').on('scroll', function (e){
 		$("#search-page-container").hide();
+	});
+
+	$(document).on('click', '.collapse-btn', function (){
+		$($(this).data('target')).collapse('toggle');
 	});
 
 	$('.attrib-checkbox').change(function(){

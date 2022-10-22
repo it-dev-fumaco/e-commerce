@@ -62,15 +62,23 @@ class FrontendController extends Controller
             $product_list = [];
             $blogs = [];
 
-            $request_data = $request->except(['page', 'sel_attr', 'sortby', 'brand', 'order', 'fbclid', 's']);
+            $excluded_requests = ['page', 'sel_attr', 'sortby', 'brand', 'order', 'fbclid', 's'];
+            $request_data = $request->attr ? $request->attr : [];
+            foreach ($excluded_requests as $value) {
+                unset($request_data[$value]);
+            }
+
+            $request_brand = isset($request->attr['brand']) ? $request->attr['brand'] : [];
+
             $search_string = $request->s;
-            $attribute_name_filter = array_keys($request_data);
+            $attribute_name_filter = $request_data ? array_keys($request_data) : [];
             $attribute_value_filter = [];
-            $brand_filter = $request->brand ? $request->brand : [];
+            $brand_filter = $request->brand ? array_filter(explode('+', $request->brand)) : [];
             foreach($request_data as $data) {
-                foreach (explode('+', $data) as $value) {
-                    $attribute_value_filter[] = $value;
-                }
+                $attribute_value_filter[] = $data;
+                // foreach (explode('+', $data) as $value) {
+                //     $attribute_value_filter[] = $value;
+                // }
             }
 
             // get items based on filters
@@ -461,7 +469,7 @@ class FrontendController extends Controller
 
             $filters['Brand'] = $brands;
             
-            return view('frontend.search_results', compact('results', 'blogs', 'products', 'recently_added_arr' ,'filters', 'filter_count'));
+            return view('frontend.search_results', compact('results', 'blogs', 'products', 'recently_added_arr' ,'filters', 'filter_count', 'request_brand'));
         }
 
         $carousel_data = DB::table('fumaco_header')->where('fumaco_status', 1)
@@ -1322,6 +1330,7 @@ class FrontendController extends Controller
     }
 
     public function viewProducts($category_id, Request $request) {
+            // return $request->all();
         if(request()->isMethod('post')) {
             $variables = [];
             if ($request->attr) {
@@ -1342,7 +1351,7 @@ class FrontendController extends Controller
             return view('error');
         }
         // get requested filters
-        $request_data = $request->except(['page', 'sel_attr', 'sortby', 'brand', 'order', 'fbclid']);
+        $request_data = $request->except(['_token', 'page', 'sel_attr', 'sortby', 'brand', 'order', 'fbclid']);
         $attribute_name_filter = array_keys($request_data);
         $attribute_value_filter = [];
         $brand_filter = $request->brand;
