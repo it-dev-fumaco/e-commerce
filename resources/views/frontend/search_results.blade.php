@@ -389,7 +389,10 @@
 					<!-- Mobile view end --> 
 
 					<!-- Desktop/Tablet view start -->
-					<div class="d-none d-md-block">
+					<div class="col-4 d-none d-md-inline">
+						@php
+							$col = '12';
+						@endphp
 						@include('frontend.product_details_card')
 					</div>
 					<!-- Desktop/Tablet view end -->
