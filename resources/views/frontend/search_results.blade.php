@@ -121,24 +121,27 @@
 											<div class="col-12 p-0">
 												<div id="accordion" class="container-fluid p-0">
 													@if (count($filters['Brand']) > 1)
-														<div class="container p-2 filter-id collapse-btn" style="border-bottom: 1px solid #C9C9CB" data-target="#filter-brand2">
-															<span style="font-weight: 600; font-size: 10pt;">Brand</span>
-														</div>
-						
-														<div id="filter-brand2" class="collapse show">
-															<div class="card-body">
-																@foreach ($filters['Brand'] as $brand)
-																	@php
-																		$request_brand = isset(request()->attr['brand']) ? request()->attr['brand'] : [];
-																		$status = (in_array($brand, $request_brand)) ? 'checked' : '';
-																	@endphp
-																	<div class="form-check">
-																		<input class="form-check-input filter-check" type="checkbox" name="attr[brand][]" value="{{ $brand }}" data-attr="brand" {{ $status }}>
-																		<label class="form-check-label" style="font-size: 10pt; font-weight: 500">
-																			{{ $brand }}
-																		</label>
-																	</div>
-																@endforeach
+														<div class="card text-left" style="border: none;">
+															<div class="container p-2 filter-id collapse-btn" style="border-bottom: 1px solid #C9C9CB" data-target="#filter-brand2">
+																<span class="panel-title" style="font-weight: 600; font-size: 10pt;">Brand</span>
+																<i id="filter-brand2-arrow" class="fas fa-caret-up" style="position: absolute; right: 0;"></i>
+															</div>
+							
+															<div id="filter-brand2" class="collapse show">
+																<div class="card-body">
+																	@foreach ($filters['Brand'] as $brand)
+																		@php
+																			$request_brand = isset(request()->attr['brand']) ? request()->attr['brand'] : [];
+																			$status = (in_array($brand, $request_brand)) ? 'checked' : '';
+																		@endphp
+																		<div class="form-check">
+																			<input class="form-check-input filter-check" type="checkbox" name="attr[brand][]" value="{{ $brand }}" data-attr="brand" {{ $status }}>
+																			<label class="form-check-label" style="font-size: 10pt; font-weight: 500">
+																				{{ $brand }}
+																			</label>
+																		</div>
+																	@endforeach
+																</div>
 															</div>
 														</div>
 													@endif
@@ -146,15 +149,18 @@
 														@php
 															$filter_attr = Str::slug($id, '-');
 															$collapse = null;
+															$arrow = 'down';
 						
 															if(count($filters['Brand']) <= 1 && $loop->first || isset(request()->attr[$filter_attr])){
 																$collapse = 'show';
+																$arrow = 'up';
 															}
 														@endphp
 														@if ($id != 'Brand')
 															<div class="card text-left" style="border: none;">
 																<div class="container p-2 filter-id collapse-btn" style="border-bottom: 1px solid #C9C9CB" data-target="#filter-{{ $filter_attr }}2">
-																	<span style="font-weight: 600; font-size: 10pt;">{{ $id }}</span>
+																	<span class="panel-title" style="font-weight: 600; font-size: 10pt;">{{ $id }}</span>
+																	<i id="filter-{{ $filter_attr }}2-arrow" class="fas fa-caret-{{ $arrow }}" style="position: absolute; right: 0;"></i>
 																</div>
 															
 																<div id="filter-{{ $filter_attr }}2" class="collapse {{ $collapse }}">
@@ -207,25 +213,27 @@
 					<div class="col-12 p-0">
 						<div id="accordion" class="container-fluid p-0">
 							@if (count($filters['Brand']) > 1)
-								<div class="container p-2 filter-id collapse-btn" style="border-bottom: 1px solid #C9C9CB" data-target="#filter-brand">
-									<span style="font-weight: 600; font-size: 10pt;">Brand</span>
-								</div>
+								<div class="card text-left" style="border: none;">
+									<div class="container p-2 filter-id collapse-btn" style="border-bottom: 1px solid #C9C9CB" data-target="#filter-brand">
+										<span class="panel-title" style="font-weight: 600; font-size: 10pt;">Brand</span>
+										<i id="filter-brand-arrow" class="fas fa-caret-up" style="position: absolute; right: 0;"></i>
+									</div>
 
-								<div id="filter-brand" class="collapse show">
-									<div class="card-body">
-										@foreach ($filters['Brand'] as $brand)
-											@php
-												$request_brand = isset(request()->attr['brand']) ? request()->attr['brand'] : [];
-												// $filter_values = explode('+', $request_brand);
-												$status = (in_array($brand, $request_brand)) ? 'checked' : '';
-											@endphp
-											<div class="form-check">
-												<input class="form-check-input filter-check" type="checkbox" name="attr[brand][]" value="{{ $brand }}" data-attr="brand" {{ $status }}>
-												<label class="form-check-label" style="font-size: 10pt; font-weight: 500">
-													{{ $brand }}
-												</label>
-											</div>
-										@endforeach
+									<div id="filter-brand" class="collapse show">
+										<div class="card-body">
+											@foreach ($filters['Brand'] as $brand)
+												@php
+													$request_brand = isset(request()->attr['brand']) ? request()->attr['brand'] : [];
+													$status = (in_array($brand, $request_brand)) ? 'checked' : '';
+												@endphp
+												<div class="form-check">
+													<input class="form-check-input filter-check" type="checkbox" name="attr[brand][]" value="{{ $brand }}" data-attr="brand" {{ $status }}>
+													<label class="form-check-label" style="font-size: 10pt; font-weight: 500">
+														{{ $brand }}
+													</label>
+												</div>
+											@endforeach
+										</div>
 									</div>
 								</div>
 							@endif
@@ -233,15 +241,18 @@
 								@php
 									$filter_attr = Str::slug($id, '-');
 									$collapse = null;
+									$arrow = 'down';
 
 									if(count($filters['Brand']) <= 1 && $loop->first || isset(request()->attr[$filter_attr])){
 										$collapse = 'show';
+										$arrow = 'up';
 									}
 								@endphp
 								@if ($id != 'Brand')
 									<div class="card text-left" style="border: none;">
 										<div class="container p-2 filter-id collapse-btn" style="border-bottom: 1px solid #C9C9CB" data-target="#filter-{{ $filter_attr }}">
-											<span style="font-weight: 600; font-size: 10pt;">{{ $id }}</span>
+											<span class="panel-title" style="font-weight: 600; font-size: 10pt;">{{ $id }}</span>
+											<i id="filter-{{ $filter_attr }}-arrow" class="fas fa-caret-{{ $arrow }}" style="position: absolute; right: 0;"></i>
 										</div>
 									
 										<div id="filter-{{ $filter_attr }}" class="collapse {{ $collapse }}">
@@ -785,7 +796,10 @@
 	});
 
 	$(document).on('click', '.collapse-btn', function (){
-		$($(this).data('target')).collapse('toggle');
+		var target = $(this).data('target');
+		$(target + "-arrow").toggleClass('flip');
+
+		$(target).collapse('toggle');
 	});
 
 	$('.attrib-checkbox').change(function(){

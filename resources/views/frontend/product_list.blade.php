@@ -44,54 +44,33 @@
 							<h5 style="color: #221E1F">Filter Results</h5>
 							<span style="font-size: 9pt; color: #606166; font-weight: 600;">Results {{ $products->lastItem() }} (Out of {{ $products->total() }})</span>
 						</div>
-						<div class="col-lg-12 col-xl-6">
-							<div class="row p-0">
-								<div class="col-9 d-flex flex-row justify-content-center align-items-center p-0">
-									<select name="sortby" class="form-control form-control-sm pt-2 pb-2" style="font-size: 0.75rem; display: inline-block; color: #000">
-										<option value="Position" data-loc="{{ request()->fullUrlWithQuery(['sortby' => 'Position']) }}" {{ (request()->sortby == 'Position') ? 'selected' : '' }}>Recommended&nbsp;</option>
-										<option value="Product Name" data-loc="{{ request()->fullUrlWithQuery(['sortby' => 'Product Name']) }}" {{ (request()->sortby == 'Product Name') ? 'selected' : '' }}>Product Name</option>
-										<option value="Price" data-loc="{{ request()->fullUrlWithQuery(['sortby' => 'Price']) }}" {{ (request()->sortby == 'Price') ? 'selected' : '' }}>Price</option>
-									</select>
-								</div>
-								<div class="col-3 p-0">
-									<div class="p-2" style="font-size: 1.3rem; color: #000;">
-										@if ((request()->order == 'desc'))
-										<a href="{{ request()->fullUrlWithQuery(['order' => 'asc']) }}" style="color: #000">
-											<i class="fas fa-sort-amount-down-alt"></i>
-										</a>
-										@else
-										<a href="{{ request()->fullUrlWithQuery(['order' => 'desc']) }}" style="color: #000">
-											<i class="fas fa-sort-amount-up-alt"></i>
-										</a>
-										@endif
-									</div>
-								</div>
-							</div>
-						</div>
 
 						<div class="col-12 p-0">
 							<form action="/products/{{ ($product_category->slug) ? $product_category->slug : $product_category->id }}" method="POST" id="filter-form">
 								@csrf
 								<div id="accordion" class="container-fluid p-0">
 									@if (count($filters['Brand']) > 1)
-										<div class="container p-2 filter-id collapse-btn" style="border-bottom: 1px solid #C9C9CB" data-target="#filter-brand">
-											<span style="font-weight: 600; font-size: 10pt;">Brand</span>
-										</div>
-		
-										<div id="filter-brand" class="collapse show">
-											<div class="card-body">
-												@foreach ($filters['Brand'] as $brand)
-													@php
-														$filter_values = explode('+', request()->brand);
-														$status = (in_array($brand, $filter_values)) ? 'checked' : '';
-													@endphp
-													<div class="form-check">
-														<input class="form-check-input" type="checkbox" name="attr[brand][]" value="{{ $brand }}" {{ $status }}>
-														<label class="form-check-label" style="font-size: 10pt; font-weight: 500">
-															{{ $brand }}
-														</label>
-													</div>
-												@endforeach
+										<div class="card text-left" style="border: none;">
+											<div class="container p-2 filter-id collapse-btn" style="border-bottom: 1px solid #C9C9CB" data-target="#filter-brand">
+												<span class="panel-title" style="font-weight: 600; font-size: 10pt;">Brand</span>
+												<i id="filter-brand-arrow" class="fas fa-caret-up" style="position: absolute; right: 0;"></i>
+											</div>
+			
+											<div id="filter-brand" class="collapse show">
+												<div class="card-body">
+													@foreach ($filters['Brand'] as $brand)
+														@php
+															$filter_values = explode('+', request()->brand);
+															$status = (in_array($brand, $filter_values)) ? 'checked' : '';
+														@endphp
+														<div class="form-check">
+															<input class="form-check-input" type="checkbox" name="attr[brand][]" value="{{ $brand }}" {{ $status }}>
+															<label class="form-check-label" style="font-size: 10pt; font-weight: 500">
+																{{ $brand }}
+															</label>
+														</div>
+													@endforeach
+												</div>
 											</div>
 										</div>
 									@endif
@@ -99,15 +78,18 @@
 										@php
 											$filter_attr = Str::slug($id, '-');
 											$collapse = null;
+											$arrow = 'down';
 		
 											if(count($filters['Brand']) <= 1 && $loop->first || request()->$filter_attr){
 												$collapse = 'show';
+												$arrow = 'up';
 											}
 										@endphp
 										@if ($id != 'Brand')
 											<div class="card text-left" style="border: none;">
 												<div class="container p-2 filter-id collapse-btn" style="border-bottom: 1px solid #C9C9CB" data-target="#filter-{{ $filter_attr }}">
-													<span style="font-weight: 600; font-size: 10pt;">{{ $id }}</span>
+													<span class="panel-title" style="font-weight: 600; font-size: 10pt;">{{ $id }}</span>
+													<i id="filter-{{ $filter_attr }}-arrow" class="fas fa-caret-{{ $arrow }}" style="position: absolute; right: 0;"></i>
 												</div>
 											
 												<div id="filter-{{ $filter_attr }}" class="collapse {{ $collapse }}">
@@ -154,7 +136,26 @@
 											<i class="fas fa-filter"></i>&nbsp; Filters
 										</a>
 									</div>
+									<div class="p-2"><label class="mt-1 mb-1 mr-0 sort-by" style="font-size: 0.75rem;">Sort By</label></div>
+									<div class="p-2">
+										<select name="sortby" class="form-control form-control-sm" style="font-size: 0.75rem; display: inline-block;">
+											<option value="Position" data-loc="{{ request()->fullUrlWithQuery(['sortby' => 'Position']) }}" {{ (request()->sortby == 'Position') ? 'selected' : '' }}>Recommended&nbsp;</option>
+											<option value="Product Name" data-loc="{{ request()->fullUrlWithQuery(['sortby' => 'Product Name']) }}" {{ (request()->sortby == 'Product Name') ? 'selected' : '' }}>Product Name</option>
+											<option value="Price" data-loc="{{ request()->fullUrlWithQuery(['sortby' => 'Price']) }}" {{ (request()->sortby == 'Price') ? 'selected' : '' }}>Price</option>
+										</select></div>
+									<div class="p-2" style="font-size: 1.3rem;">
+										@if ((request()->order == 'desc'))
+										<a href="{{ request()->fullUrlWithQuery(['order' => 'asc']) }}">
+											<i class="fas fa-sort-amount-down-alt"></i>
+										</a>
+										@else
+										<a href="{{ request()->fullUrlWithQuery(['order' => 'desc']) }}">
+											<i class="fas fa-sort-amount-up-alt"></i>
+										</a>
+										@endif
+									</div>
 								</div>
+								
 								<div class="row mb-2">
 									<div class="modal right fade" id="filterModal2" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel2" aria-hidden="true">
 										<div class="modal-dialog modal-dialog-slideout modal-sm" role="document">
@@ -172,53 +173,32 @@
 																Results {{ $products->lastItem() }} (Out of {{ $products->total() }})
 															</span>
 														</div>
-														<div class="col-6 col-md-12">
-															<div class="row p-0">
-																<div class="col-9 d-flex flex-row justify-content-center align-items-center p-0 p-md-3">
-																	<select name="sortby" class="form-control form-control-sm" style="font-size: 11pt; font-weight: 400; display: inline-block; color: #000; padding-top: 15px; padding-bottom: 15px;">
-																		<option value="Position" data-loc="{{ request()->fullUrlWithQuery(['sortby' => 'Position']) }}" {{ (request()->sortby == 'Position') ? 'selected' : '' }}>Recommended&nbsp;</option>
-																		<option value="Product Name" data-loc="{{ request()->fullUrlWithQuery(['sortby' => 'Product Name']) }}" {{ (request()->sortby == 'Product Name') ? 'selected' : '' }}>Product Name</option>
-																		<option value="Price" data-loc="{{ request()->fullUrlWithQuery(['sortby' => 'Price']) }}" {{ (request()->sortby == 'Price') ? 'selected' : '' }}>Price</option>
-																	</select>
-																</div>
-																<div class="col-3 p-0 p-md-3">
-																	<div class="p-2" style="font-size: 1.3rem;">
-																		@if ((request()->order == 'desc'))
-																		<a href="{{ request()->fullUrlWithQuery(['order' => 'asc']) }}" style="color: #000;">
-																			<i class="fas fa-sort-amount-down-alt"></i>
-																		</a>
-																		@else
-																		<a href="{{ request()->fullUrlWithQuery(['order' => 'desc']) }}" style="color: #000;">
-																			<i class="fas fa-sort-amount-up-alt"></i>
-																		</a>
-																		@endif
-																	</div>
-																</div>
-															</div>
-														</div>
 														<div class="col-12">
 															<form action="/products/{{ ($product_category->slug) ? $product_category->slug : $product_category->id }}" method="POST" id="filter-form2">
 																@csrf
 																<div id="accordion2" class="container-fluid p-0">
 																	@if (count($filters['Brand']) > 1)
-																		<div class="container p-2 filter-id collapse-btn" style="border-bottom: 1px solid #C9C9CB" data-target="#filter-brand2">
-																			<span style="font-weight: 600; font-size: 10pt;">Brand</span>
-																		</div>
-										
-																		<div id="filter-brand2" class="collapse show">
-																			<div class="card-body">
-																				@foreach ($filters['Brand'] as $brand)
-																					@php
-																						$filter_values = explode('+', request()->brand);
-																						$status = (in_array($brand, $filter_values)) ? 'checked' : '';
-																					@endphp
-																					<div class="form-check">
-																						<input class="form-check-input" type="checkbox" name="attr[brand][]" value="{{ $brand }}" {{ $status }}>
-																						<label class="form-check-label" style="font-size: 10pt; font-weight: 500">
-																							{{ $brand }}
-																						</label>
-																					</div>
-																				@endforeach
+																		<div class="card text-left" style="border: none;">
+																			<div class="container p-2 filter-id collapse-btn" style="border-bottom: 1px solid #C9C9CB" data-target="#filter-brand2">
+																				<span style="font-weight: 600; font-size: 10pt;">Brand</span>
+																				<i id="filter-brand2-arrow" class="fas fa-caret-up" style="position: absolute; right: 0;"></i>
+																			</div>
+											
+																			<div id="filter-brand2" class="collapse show">
+																				<div class="card-body">
+																					@foreach ($filters['Brand'] as $brand)
+																						@php
+																							$filter_values = explode('+', request()->brand);
+																							$status = (in_array($brand, $filter_values)) ? 'checked' : '';
+																						@endphp
+																						<div class="form-check">
+																							<input class="form-check-input" type="checkbox" name="attr[brand][]" value="{{ $brand }}" {{ $status }}>
+																							<label class="form-check-label" style="font-size: 10pt; font-weight: 500">
+																								{{ $brand }}
+																							</label>
+																						</div>
+																					@endforeach
+																				</div>
 																			</div>
 																		</div>
 																	@endif
@@ -226,15 +206,18 @@
 																		@php
 																			$filter_attr = Str::slug($id, '-');
 																			$collapse = null;
+																			$arrow = 'down';
 										
 																			if(count($filters['Brand']) <= 1 && $loop->first || request()->$filter_attr){
 																				$collapse = 'show';
+																				$arrow = 'up';
 																			}
 																		@endphp
 																		@if ($id != 'Brand')
 																			<div class="card text-left" style="border: none;">
 																				<div class="container p-2 filter-id collapse-btn" style="border-bottom: 1px solid #C9C9CB" data-target="#filter-{{ $filter_attr }}2">
 																					<span style="font-weight: 600; font-size: 10pt;">{{ $id }}</span>
+																					<i id="filter-{{ $filter_attr }}2-arrow" class="fas fa-caret-{{ $arrow }}" style="position: absolute; right: 0;"></i>
 																				</div>
 																			
 																				<div id="filter-{{ $filter_attr }}2" class="collapse {{ $collapse }}">
@@ -325,7 +308,10 @@
 		});
 
 		$(document).on('click', '.collapse-btn', function (){
-			$($(this).data('target')).collapse('toggle');
+			var target = $(this).data('target');
+			$(target + "-arrow").toggleClass('flip');
+			
+			$(target).collapse('toggle');
 		});
 	})();
 </script>
