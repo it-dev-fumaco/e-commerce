@@ -412,6 +412,7 @@
         border: none;
         background-color: rgba(0,0,0,0);
     }
+    .slick-slide{margin:0 20px}.slick-slide img{width:100%}.slick-slide{transition:all ease-in-out .3s;opacity:.2}.slick-active,.slick-active i{opacity:1;color:#0062A5!important}.slick-current,.slick-slide{opacity:1}
 	@keyframes rotate {
 		0% {
 			transform: rotate(0deg);
