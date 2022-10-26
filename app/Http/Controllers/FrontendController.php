@@ -62,15 +62,23 @@ class FrontendController extends Controller
             $product_list = [];
             $blogs = [];
 
-            $request_data = $request->except(['page', 'sel_attr', 'sortby', 'brand', 'order', 'fbclid', 's']);
+            $excluded_requests = ['page', 'sel_attr', 'sortby', 'brand', 'order', 'fbclid', 's'];
+            $request_data = $request->attr ? $request->attr : [];
+            foreach ($excluded_requests as $value) {
+                unset($request_data[$value]);
+            }
+
+            $request_brand = isset($request->attr['brand']) ? $request->attr['brand'] : [];
+
             $search_string = $request->s;
-            $attribute_name_filter = array_keys($request_data);
+            $attribute_name_filter = $request_data ? array_keys($request_data) : [];
             $attribute_value_filter = [];
-            $brand_filter = $request->brand ? $request->brand : [];
+            $brand_filter = $request->brand ? array_filter(explode('+', $request->brand)) : [];
             foreach($request_data as $data) {
-                foreach (explode('+', $data) as $value) {
-                    $attribute_value_filter[] = $value;
-                }
+                $attribute_value_filter[] = $data;
+                // foreach (explode('+', $data) as $value) {
+                //     $attribute_value_filter[] = $value;
+                // }
             }
 
             // get items based on filters
@@ -460,8 +468,14 @@ class FrontendController extends Controller
             $filter_count = count($filters);
 
             $filters['Brand'] = $brands;
-            
-            return view('frontend.search_results', compact('results', 'blogs', 'products', 'recently_added_arr' ,'filters', 'filter_count'));
+
+            $filters_arr = $filters;
+            $filters = [];
+            foreach($filters_arr as $key => $filter){
+                $filters[$key] = collect($filter)->sortBy(null, SORT_NATURAL)->values();
+            }
+
+            return view('frontend.search_results', compact('results', 'blogs', 'products', 'recently_added_arr' ,'filters', 'filter_count', 'request_brand'));
         }
 
         $carousel_data = DB::table('fumaco_header')->where('fumaco_status', 1)
@@ -742,9 +756,9 @@ class FrontendController extends Controller
                 ]
             ]);
 
-            $checker = DB::table('fumaco_subscribe')->where('email', $request->email)->count();
+            $checker = DB::table('fumaco_subscribe')->where('email', $request->email)->exists();
 
-            if($checker > 0){
+            if($checker){
                 return redirect()->back()->with('error_subscribe', 'Email already subscribed!');
             }
 
@@ -852,11 +866,38 @@ class FrontendController extends Controller
             return redirect('/thankyou');
         }catch(Exception $e){
             DB::rollback();
+            return redirect()->back()->with('error', 'An error occured. Please try again.');
         }
     }
 
     public function subscribeThankyou(){
         return view('frontend.subscribe_thankyou');
+    }
+
+    public function notifyMe(Request $request){
+        DB::beginTransaction();
+        try {
+            if(!Auth::check()){
+                return redirect('/login');
+            }
+
+            $checker = DB::table('product_notifications')->where('owner', Auth::user()->username)->where('item_code', $request->item_code)->exists();
+
+            if(!$checker){
+                DB::table('product_notifications')->insert([
+                    'owner' => Auth::user()->username,
+                    'item_code' => $request->item_code,
+                    'created_by' => Auth::user()->username
+                ]);
+            }
+
+            DB::commit();
+            return response()->json(['success' => 'You will be notified when this product is available.']);
+        } catch (\Throwable $th) {
+            //throw $th;
+            DB::rollback();
+            return response()->json(['error' => 'An error occured. Please try again later']);
+        }
     }
 
     // returns an array of product category
@@ -901,7 +942,15 @@ class FrontendController extends Controller
 
             return response()->json($pages);
         }
-    
+    }
+
+    public function contactInformation(Request $request){
+        if($request->ajax()){
+            $contact = DB::table('fumaco_contact')->select('office_phone', 'office_email')->first();
+            $contact = $contact ? $contact : [];
+
+            return response()->json($contact);
+        }
     }
 
     public function viewPage($slug){
@@ -1287,6 +1336,7 @@ class FrontendController extends Controller
     }
 
     public function viewProducts($category_id, Request $request) {
+            // return $request->all();
         if(request()->isMethod('post')) {
             $variables = [];
             if ($request->attr) {
@@ -1307,7 +1357,7 @@ class FrontendController extends Controller
             return view('error');
         }
         // get requested filters
-        $request_data = $request->except(['page', 'sel_attr', 'sortby', 'brand', 'order', 'fbclid']);
+        $request_data = $request->except(['_token', 'page', 'sel_attr', 'sortby', 'brand', 'order', 'fbclid']);
         $attribute_name_filter = array_keys($request_data);
         $attribute_value_filter = [];
         $brand_filter = $request->brand;
@@ -1387,6 +1437,12 @@ class FrontendController extends Controller
             });
 
             $filters = array_merge($filters->toArray(), $selected_attr->toArray());
+        }
+
+        $filters_arr = $filters;
+        $filters = [];
+        foreach($filters_arr as $key => $filter){
+            $filters[$key] = collect($filter)->sortBy(null, SORT_NATURAL)->values();
         }
 
         // get sorting value 
@@ -1544,14 +1600,22 @@ class FrontendController extends Controller
             $bundle_items = DB::table('fumaco_product_bundle_item')->where('parent_item_code', explode("-", $product_details->f_idcode)[0])->orderBy('idx', 'asc')->get();
         }
 
-        $variant_attr_arr = [];
+        $variant_attr_array = $variant_attr_arr = [];
         if (count($variant_items) > 1) {
             foreach ($variant_attributes as $attr => $value) {
                 $values = collect($value)->groupBy('attribute_value')->map(function($d, $i) {
                     return array_unique(array_column($d->toArray(), 'idcode'));
                 });
 
-                $variant_attr_arr[$attr] = $values;
+                $variant_attr_array[$attr] = $values;
+            }
+
+            $attribs = [];
+            foreach ($variant_attr_array as $key => $value) {
+                $attribs = collect(array_keys($value->toArray()))->sortBy(null, SORT_NATURAL)->values();
+                foreach($attribs as $a){
+                    $variant_attr_arr[$key][$a] = isset($value[$a]) ? $value[$a] : [];
+                }
             }
         }
 

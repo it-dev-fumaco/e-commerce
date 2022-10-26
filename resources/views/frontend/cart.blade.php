@@ -53,7 +53,6 @@
                         @forelse ($cart_arr as $cart)
                         <tr class="he2x2">
                             <td class="tbl-qtr">
-                                {{-- <img src="{{ asset('/storage/item_images/'.$cart['item_code'].'/gallery/preview/'.$cart['item_image']) }}" class="img-responsive" alt="{{ Str::slug(explode(".", $cart['item_image'])[0], '-') }}" width="55" height="55"> --}}
                                 @php
                                     $c_src = '/storage/item_images/'.$cart['item_code'].'/gallery/preview/'.$cart['item_image'];
                                 @endphp
@@ -147,7 +146,7 @@
                 <div class="row">
                     <div class="col-md-6 d-none d-md-block">
                         <div class="card-body col-md-8 mx-auto">
-                            <a href="/" class="btn btn-secondary" style="width:100% !important;" role="button"><span style="font-size: 12pt; font-weight: 700">˂ </span> CONTINUE SHOPPING</a>
+                            <a href="/" class="btn btn-secondary" style="width:100% !important;" role="button"><i class="fas fa-angle-left"></i> CONTINUE SHOPPING</a>
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -157,98 +156,18 @@
                     </div>
                     <div class="col-md-6 d-md-none">
                         <div class="card-body col-md-8 mx-auto">
-                            <a href="/" class="btn btn-secondary" style="width:100% !important;" role="button"><span style="font-size: 12pt; font-weight: 700">˂ </span> CONTINUE SHOPPING</a>
+                            <a href="/" class="btn btn-secondary" style="width:100% !important;" role="button"><i class="fas fa-angle-left"></i> CONTINUE SHOPPING</a>
                         </div>
                     </div>
                 </div>
                 <br><br><br>
                 @if($cross_sell_arr)
-                    <div class="container mb-3">
+                    <div class="container-fluid p-0 mb-3">
                         <h4>Frequently Bought Together</h4>
                         <br/>
                         <div class="row regular" style="min-height: 300px">
-                            @foreach($cross_sell_arr as $cs)
-                                <div class="col-3">
-                                    <div class="card card-primary">
-                                        <div class="card-body">
-                                            <div class="row">
-                                                @php
-                                                $img = ($cs['image']) ? '/storage/item_images/'. $cs['item_code'] .'/gallery/preview/'. $cs['image'] : '/storage/no-photo-available.png';
-                                                $img_webp = ($cs['image']) ? '/storage/item_images/'. $cs['item_code'] .'/gallery/preview/'. explode(".", $cs['image'])[0] . '.webp' : '/storage/no-photo-available.png';
-                                                @endphp
-                                                <div class="hover-container product-card" style="position: relative">
-                                                    <div class="pt-2" style="position: absolute; top: 0; right: 0; z-index: 10;">
-                                                        @if ($cs['is_new_item'])
-                                                        <div class="col-12 mb-2">
-                                                            <span class="p-1 text-center" style="background-color: #438539; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px !important">
-                                                            &nbsp;<b>New</b>&nbsp;
-                                                            </span>
-                                                        </div><br />
-                                                        @endif
-                                                        @if ($cs['is_discounted'] == 1)
-                                                            <div class="col-12">
-                                                                <span class="p-1 text-center" style="background-color: #FF0000; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; width: 100%">
-                                                                &nbsp;<b>{{ $cs['discount_display'] }}</b>&nbsp;
-                                                                </span>
-                                                            </div>
-                                                        @endif
-                                                    </div>
-
-                                                    <div class="overlay-bg"></div>
-                                                    <div class="btn-container">
-                                                        <a href="/product/{{ ($cs['slug']) ? $cs['slug'] : $cs['item_code'] }}" class="view-products-btn btn" role="button"><i class="fas fa-search"></i>&nbsp;View Product</a>
-                                                    </div>
-
-                                                    <picture>
-                                                        <source srcset="{{ asset($img_webp) }}" type="image/webp">
-                                                        <source srcset="{{ asset($img) }}" type="image/jpeg">
-                                                        <img src="{{ asset($img) }}" alt="{{ Str::slug($cs['alt'], '-') }}" class="img-responsive hover" style="width: 100% !important;" loading="lazy">
-                                                    </picture>
-                                                </div>
-                                                <div class="col-12" style="position: relative">
-                                                    <div class="text ellipsis">
-                                                        <a href="/product/{{ ($cs['slug']) ? $cs['slug'] : $cs['item_code'] }}" class="card-text product-head fumacoFont_card_title text-concat prod_desc" style="text-decoration: none !important; text-transform: none !important; color:#0062A5 !important; min-height: 80px">{{ $cs['item_name'] }}</a>
-                                                    </div>
-                                                    <p class="card-text fumacoFont_card_price" style="color:#000000 !important; ">
-                                                        @if ($cs['is_discounted'] == 1)
-                                                            {{ $cs['discounted_price'] }}&nbsp;<s style="color: #c5c5c5;">{{ $cs['default_price'] }}</s>
-                                                        @else
-                                                            {{ $cs['default_price'] }}
-                                                        @endif
-                                                    </p>
-                                                    <div class="d-flex justify-content-between align-items-center">
-                                                        <div class="btn-group stylecap">
-                                                            @for ($i = 0; $i < 5; $i++)
-                                                                @if ($cs['overall_rating'] <= $i)
-                                                                    <span class="fa fa-star starcolorgrey"></span>
-                                                                @else
-                                                                    <span class="fa fa-star" style="color: #FFD600;"></span>
-                                                                @endif
-                                                            @endfor
-                                                        </div>
-                                                        <small class="stylecap" style="color:#c4cad0 !important; font-weight:400 !important;">( {{ $cs['total_reviews'] }} Reviews )</small>
-                                                    </div>
-                                                    <br/>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                @if ($cs['on_stock'] == 1)
-                                                    <form action="/product_actions" method="post">
-                                                        @csrf
-                                                        <div class="d-none">
-                                                            <input type="text" name="item_code" value="{{ $cs['item_code'] }}">
-                                                            <input type="text" name="addtocart" value="1">
-                                                            <input type="text" name="quantity" value="1">
-                                                        </div>
-                                                        <button type="submit" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto btn-sm" id="reloadpage" role="button" style="width: 100% !important; margin-bottom: 20px" data-item-code="{{ $cs['item_code'] }}"><i class="fas fa-shopping-cart d-inline-block"></i> Add to Cart</button>
-                                                    </form>
-                                                @else
-                                                    <a href="/login" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto {{ Auth::check() ? 'add-to-wishlist' : '' }} btn-sm" id="reloadpage" role="button" style="width: 95% !important; margin-bottom: 20px" data-item-code="{{ $cs['item_code'] }}"><i class="far fa-heart d-inline-block" style="margin-right: 3%;"></i> Add to Wishlist</a>
-                                                @endif
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                            @foreach($cross_sell_arr as $item)
+                                @include('frontend.product_details_card')
                             @endforeach
                         </div>
                     </div>
@@ -350,15 +269,22 @@
 		transition:all .15s ease-in !important;
 	}
 
-  .btn-container{
-    width: 100%;
-    position: absolute;
-    top: 50%;
-    left: 0;
-    z-index: 9;
-    display: none;
-    text-align: center;
-  }
+    .btn-container{
+        position:absolute;
+        bottom:40%;
+        left:0;
+        right:0;
+        background-color:rgba(0,0,0,0);
+        overflow:hidden;
+        width:100%;
+        height:0;
+        transition:.5s;
+        display:flex;
+        justify-content:center;
+        align-items:center
+    }
+		
+    .hover-container:hover .btn-container{height:50px}
 
 	.view-products-btn{
 		z-index: 2;
@@ -371,6 +297,7 @@
 		padding:8px 20px;
 		font-weight:400;
 		transition:all .15s ease-in;
+        position: absolute;
 	}
 
 	.view-products-btn:hover{
@@ -724,19 +651,26 @@
 
 
         $(".regular").slick({
-            dots: false,
+            dots: true,
+            customPaging: function(slider, i) {
+                return '<a href="#"><i class="fas fa-circle"></i></a>';
+            },
+            arrows: false,
             infinite: true,
             slidesToShow: 4,
             slidesToScroll: 1,
             touchMove: true,
             responsive: [
-                {
-                    breakpoint: 1024,
-                    settings: {
+            {
+                breakpoint: 1024,
+                settings: {
                     slidesToShow: 3,
                     slidesToScroll: 1,
                     infinite: true,
-                    dots: false
+                    dots: true,
+                    customPaging: function(slider, i) {
+                            return '<a href="#"><i class="fas fa-circle"></i></a>';
+                        },
                     }
                 },
                 {

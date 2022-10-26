@@ -88,12 +88,14 @@ Route::get('/categories', 'FrontendController@getProductCategories');
 Route::get('/website_settings', 'FrontendController@websiteSettings');
 Route::post('/getvariantcode', 'FrontendController@getVariantItemCode');
 Route::post('/subscribe', 'FrontendController@newsletterSubscription');
+Route::get('/notify_me', 'FrontendController@notifyMe');
 Route::get('/thankyou', 'FrontendController@subscribeThankyou');
 Route::get('/search', 'FrontendController@getAutoCompleteData');
 
 Route::get('/testing', 'FrontendController@testing');
 
 Route::get('/policy_pages', 'FrontendController@pagesList');
+Route::get('/contact_information', 'FrontendController@contactInformation');
 Route::get('/pages/{slug}', 'FrontendController@viewPage')->name('pages');
 
 Route::get('/myprofile/verify/email', 'FrontendController@emailVerify');

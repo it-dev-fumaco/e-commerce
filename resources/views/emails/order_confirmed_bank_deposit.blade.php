@@ -150,8 +150,8 @@
         </td>
      </tr>
 	 <tr>
-        <td class="button borderbottom" style="padding: 6% 5% 6% 5%; text-align: left;">
-            <a href="{{ route('track_order', [$order_details->order_number]) }}" style="background: #e05443; padding: 2% 5%;">Track my Order</a>
+        <td class="button borderbottom track-order-cell">
+            <a href="{{ route('track_order', [$order_details->order_number]) }}" class="track-order-btn">Track my Order</a>
         </td>
      </tr>
 

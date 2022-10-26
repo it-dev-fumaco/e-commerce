@@ -317,7 +317,6 @@
                 <input type="text" name="name" style="display: none;">
                 <input type="text" id='mob-autocomplete-search' placeholder="Search" name="s" value="{{ request()->s }}" class="form-control searchstyle" aria-label="Text input with dropdown button">
                     <button class="btn btn-outline-secondary searchstyle" type="submit"><i class="fas fa-search"></i></button>
-                    {{-- <div id="mob-search-container" class="border border-danger"></div> --}}
                 </div>
               <div id="mob-search-container" class="container"></div>
               <div class="col-12">&nbsp;</div>
@@ -332,75 +331,96 @@
 
   @yield('content')
   <footer>
-    <main style="background-color:#0062A5;"><br></main>
     @include('cookieConsent::index')
-    <main style="background-color:#000000;">
+    <main style="background-color:#0C0C0C;">
       <div class="container marketing">
-        <section class="py-5 text-center container" style="padding-top: 0rem !important; padding-bottom: 3rem !important;">
-        </section>
-        <div class="row">
-          <div class="col-6 col-lg-3" style="text-align: left !important;">
-            <h6 class="footer1st" style="color:#ffffff !important;">ABOUT FUMACO</h6>
+        <div class="row p-4">
+          <div class="col-12 col-md-2">
+            <picture>
+              <source srcset="{{ asset('/assets/site-img/logo-sm.webp') }}" type="image/webp">
+              <source srcset="{{ asset('/assets/site-img/logo-sm.png') }}" type="image/jpeg">
+              <img src="{{ asset('/assets/site-img/logo-sm.png') }}" alt="Fumaco" class="d-md-none" width="90">
+              <img src="{{ asset('/assets/site-img/logo-sm.png') }}" alt="Fumaco" class="d-none d-md-inline" width="140">
+            </picture>
+            <br>
+            <div id="contact-container">
+              <span class="d-block mb-2" style="color: #9B999B; font-size: 10pt;"><i class="fa fa-envelope" style="color: #0062A5"></i> &nbsp;<span id="contact-email"></span></span>
+              <span class="d-block mb-2" style="color: #9B999B; font-size: 10pt;"><i class="fa fa-phone-alt" style="color: #0062A5"></i> &nbsp;<span id="contact-phone"></span></span>
+            </div>
+          </div>
+
+          <div class="col-12 col-md-2 mt-4 mt-md-2" style="text-align: left !important;">
+            <h6 class="footer1st font-weight-bold" style="color:#ffffff !important; font-weight: 500 !important;">ABOUT FUMACO</h6>
             <table class="table" style="border-style: unset !important;">
               <tbody style="font-size: 12px; color: #ffffff; border-style: unset !important;">
                 <tr>
-                  <td class="tdfooter footer2nd" style="border-style: unset !important;"><a href="/about" style="text-decoration: none; color: #0062A5;">Company Info</a></td>
+                  <td class="tdfooter footer2nd" style="border-style: unset !important;"><a href="/about" style="text-decoration: none; color: #9B999B;">Company Info</a></td>
                   <td class="tdfooter footer2nd" style="border-style: unset !important;">&nbsp;</td>
                 </tr>
                 <tr>
-                  <td class="tdfooter footer2nd" style="border-style: unset !important;"><a href="/journals" style="text-decoration: none; color: #0062A5;">News</a></td>
+                  <td class="tdfooter footer2nd" style="border-style: unset !important;"><a href="/journals" style="text-decoration: none; color: #9B999B;">News</a></td>
                   <td class="tdfooter footer2nd" style="border-style: unset !important;">&nbsp;</td>
                 </tr>
                 <tr id="policy-pages-footer"></tr>{{-- Policy Pages --}}
               </tbody>
             </table>
           </div>
-          <div class="col-6 col-lg-5" style="text-align: left !important;">
-            <h6 class="footer1st" style="color:#ffffff !important;">PRODUCTS</h6>
+
+          <div class="col-12 col-md-3 mt-4 mt-md-2" style="text-align: left !important;">
+            <h6 class="footer1st font-weight-bold" style="color:#ffffff !important; font-weight: 500 !important;">PRODUCTS</h6>
             <table class="table" style="border-style: unset !important;">
               <tbody style="font-size: 12px; color: #ffffff; border-style: unset !important;" id="product-category-footer"></tbody>
             </table>
           </div>
-          <div class="col-lg-4">
-            <div class="col-md-12" style="text-align: right !important;">
-              <h6 class="footer1st" style="color:#ffffff !important;">SUBSCRIBE TO OUR NEWSLETTER</h6>
-              <form action="/subscribe" method="POST">
-                @csrf
-                <div class="input-group mb-3">
-                  <input type="hidden" name="g-recaptcha-response" id="recaptcha_v3-subscribe">
-                  <input type="email" class="form-control" name="email" placeholder="Email Address" aria-label="Recipient's username" aria-describedby="basic-addon2" required>
-                  <button class="input-group-text" id="basic-addon2">Subscribe</button>
+
+          <div class="col-12 col-md-5 mt-md-2">
+            <h6 class="footer1st d-md-none" style="color:#ffffff !important; text-align: left; font-weight: 500 !important">SUBSCRIBE TO NEWSLETTER</h6>
+            <h6 class="footer1st d-none d-md-block" style="color:#ffffff !important; text-align: right; font-weight: 500 !important">SUBSCRIBE TO NEWSLETTER</h6>
+            <form action="/subscribe" method="POST">
+              @csrf
+              <div class="input-group mb-3">
+                <input type="hidden" name="g-recaptcha-response" id="recaptcha_v3-subscribe">
+                <div class="input-group-prepend">
+                  <span class="input-group-text p-md-3" id="basic-addon1" style="height: 100% !important; border-radius: 0 !important"><i class="fas fa-envelope-open" style="color: #0062A5; font-size: 20px;"></i></span>
                 </div>
-              </form>
-            </div>
-            <br/>
-            <br/>
-            <br/>
-            <div class="col-md-12" style="text-align: left !important;">
-              <h6 class="footer1st" style="color:#ffffff !important;">WE ACCEPT</h6>
+                <input type="email" name="email" class="form-control" placeholder="Email Address" aria-label="Username" aria-describedby="basic-addon1" required>
+                <div class="input-group-append">
+                  <button type="submit" class="input-group-text p-md-3" id="basic-addon2" style="height: 100% !important; border-radius: 0 !important">Subscribe</button>
+                </div>
+              </div>
+            </form>
+
+            <div class="col-md-12 mt-4" style="text-align: left !important;">
+              <h6 class="footer1st" style="color:#ffffff !important; font-weight: 500 !important;">WE ACCEPT</h6>
               <div class="row" style="padding-left:1% !important">
+                @php
+                  $payment_method = array('mastercard2', 'visa', 'gcash2', 'grabpay2');
+                @endphp
+                @foreach($payment_method as $img)
                   @php
-                    $payment_method = array('mastercard2', 'visa', 'gcash2', 'grabpay2');
+                    $image = '/storage/payment_method/'.$img.'.png';
+                    $image_webp = '/storage/payment_method/'.$img.'.webp';
                   @endphp
-                  @foreach($payment_method as $img)
-                    @php
-                      $image = '/storage/payment_method/'.$img.'.png';
-                      $image_webp = '/storage/payment_method/'.$img.'.webp';
-                    @endphp
-                    <div class="d-inline m-2 payment-icons" style="position: relative !important"><picture>
+                  <div class="d-inline m-2 payment-icons" style="position: relative !important">
+                    <picture>
                       <source srcset="{{ asset($image_webp) }}" type="image/webp" style="object-fit: cover;">
                       <source srcset="{{ asset($image) }}" type="image/jpeg" style="object-fit: cover;">
                       <img src="{{ asset($image) }}" style="object-fit: cover; max-height: 100%;max-width: 90%;width: auto;height: auto;position: absolute;top: 0;bottom: 0;left: 0;right: 0;margin: auto;" loading="lazy">
-                    </picture></div>
-                  @endforeach
+                    </picture>
+                  </div>
+                @endforeach
               </div>
             </div>
           </div>
         </div>
       </div>
       <br>
-      <br>
     </main>
+    <div class="container-fluid text-center p-2" style="background-color: #252525;">
+      <span style="font-size: 10pt; color: #9B999B;">
+        Fumaco Lights &copy; 2021
+      </span>
+    </div>
   </footer>
   <script src="https://kit.fontawesome.com/ec0415ab92.js"></script> 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> 
@@ -422,11 +442,9 @@
   <script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.4/Chart.bundle.min.js' defer></script>
   <script src="{{ asset('/assets/dist/js/bootstrap.bundle.min.js') }}"></script>
 
-  @if (!in_array($activePage, ['homepage']))
+  @if (!in_array($activePage, ['homepage', 'product_page']))
   <script src="{{ asset('assets/minified-js/jquery-3.6.0.min.js') }}"></script>
   <script src="{{ asset('assets/minified-js/jquery-ui.min.js') }}"></script>
-  {{-- <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
-  <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.js"></script> --}}
   @endif
   <script>
     $(document).ready(function() {
@@ -435,6 +453,7 @@
       countCartItems();
       countWishItems();
       policyPages();
+      contactInfo();
       //Preloader
       preloaderFadeOutTime = 800;
       function hidePreloader() {
@@ -474,7 +493,7 @@
               // for footer links
               f += '<tr style="border-style: unset !important;">' +
                 '<td class="tdfooter footer2nd" style="border-style: unset !important;">' +
-                '<a style="text-decoration:none; color: #0062A5;" href="'+ link +'" ' + target + '>' + d.name +'</a>' +
+                '<a style="text-decoration:none; color: #9B999B;" href="'+ link +'" ' + target + '>' + d.name +'</a>' +
               '</td></tr>';
             });
 
@@ -527,18 +546,29 @@
               // for footer links
               f += '<tr style="border-style: unset !important;">' +
                 '<td class="tdfooter footer2nd" style="border-style: unset !important;">' +
-                '<a style="text-decoration:none; color: #0062A5;" href="'+ link +'" >' + d.page_title +'</a>' +
+                '<a style="text-decoration:none; color: #9B999B;" href="'+ link +'" >' + d.page_title +'</a>' +
               '</td></tr>';
             });
-
 
             $('#policy-pages-footer').append(f);
           }
         });
       }
 
-      // $('#bootstrap-min-css').removeAttr('disabled');
-      
+      // contact info
+      function contactInfo() {
+        $.ajax({
+          type:'GET',
+          url:'/contact_information',
+          success: function (response) {
+            if(response){
+              $('#contact-email').text(response.office_email);
+              $('#contact-phone').text(response.office_phone);
+            }
+          }
+        });
+      }
+
       $(document).on('click', '.remove-cart-btn', function(e){
             e.preventDefault();
             var tr = $(this);
@@ -604,7 +634,8 @@
             data: data,
             success:function(response){
               setTimeout(function() {
-                btn.addClass('add-to-cart').html('<i class="fas fa-shopping-cart"></i> Add to Cart');
+                // btn.addClass('add-to-cart').html('<i class="fas fa-shopping-cart"></i> Add to Cart');
+                btn.addClass('add-to-cart').html('Add to Cart');
               }, 1800);
 
               countCartItems();
@@ -629,10 +660,29 @@
             data: data,
             success:function(response){
               setTimeout(function() {
-                btn.addClass('add-to-wishlist').html('<i class="far fa-heart"></i> Add to Wishlist');
+                btn.addClass('add-to-wishlist').html('Add to Wishlist');
               }, 1800);
             }
           });
+        });
+
+        $(document).on('click', '.notify-me', function() {
+          var btn = $(this);
+          $(this).html('Adding...');
+          if($(this).data('logged')){
+            $.ajax({
+              type:'get',
+              url:'/notify_me',
+              data: {
+                item_code: $(this).data('item-code')
+              },
+              success: function (response) {
+                btn.html('Notify me');
+              }
+            });
+          }else{
+            window.location.href = '/login';
+          }
         });
       @endif
 
@@ -694,6 +744,11 @@
             }
           }
         });
+      });
+
+      $(document).on('click', '.close-modal', function (){
+        var modal = $(this).data('target');
+        $(modal).modal('hide');
       });
 
       $("#closeCookieConsent, .cookieConsentOK").click(function() {

@@ -49,15 +49,15 @@
 								<i class="fas fa-filter"></i>&nbsp; Filters
 							</a>
 						</div>
-						<div class="p-2"><label class="mt-1 mb-1 mr-0" style="font-size: 0.75rem; white-space: nowrap !important">Sort By</label></div>
-						<div class="p-2 {{ count($products) > 0 ? null : 'd-none' }}">
+						<div class="p-2 d-none d-md-inline"><label class="mt-1 mb-1 mr-0" style="font-size: 0.75rem; white-space: nowrap !important">Sort By</label></div>
+						<div class="p-2 {{ count($products) > 0 ? null : 'd-none' }} d-none d-md-inline">
 							<select name="sortby" class="form-control form-control-sm" style="font-size: 0.75rem; display: inline-block;">
 								<option value="Position" data-loc="{{ request()->fullUrlWithQuery(['sortby' => 'Position']) }}" {{ (request()->sortby == 'Position') ? 'selected' : '' }}>Recommended</option>
 								<option value="Product Name" data-loc="{{ request()->fullUrlWithQuery(['sortby' => 'Product Name']) }}" {{ (request()->sortby == 'Product Name') ? 'selected' : '' }}>Product Name</option>
 								<option value="Price" data-loc="{{ request()->fullUrlWithQuery(['sortby' => 'Price']) }}" {{ (request()->sortby == 'Price') ? 'selected' : '' }}>Price</option>
 							</select>
 						</div>
-						<div class="p-2" style="font-size: 1.3rem;">
+						<div class="p-2 d-none d-md-inline" style="font-size: 1.3rem;">
 							@if ((request()->order == 'desc'))
 								<a href="{{ request()->fullUrlWithQuery(['order' => 'asc']) }}">
 									<i class="fas fa-sort-amount-down-alt"></i>
@@ -69,7 +69,7 @@
 							@endif
 						</div>
 					  </div>
-				</div>		
+				</div>
 			</div>
 			<div class="row">
 				<div class="d-inline-block">
@@ -78,61 +78,111 @@
 						<div class="modal-dialog" role="document">
 							<div class="modal-content">
 								<div class="modal-body">
-									<div class="d-flex justify-content-between align-items-center" style="font-weight: 500 !important;  margin: 20px !important"><b>Filter Results</b>
-										<a href="/?s={{ request()->s }}" style="text-decoration: none;">
-											<small class="stylecap he2 text-dark" style="font-weight:400 !important;">Clear All</small>
-										</a>
+									<div class="col-1 offset-11">
+										<button type="button" class="btn close-modal" data-target="#rightModal">
+											<i class="fa fa-remove" style="color: #BDBDBD;"></i>
+										</button>
 									</div>
-									<hr>
-									@php
-										$a = 0;
-										$x = 0;
-									@endphp
-									@if (count($filters['Brand']) > 1)
-										<div class="card mb-3">
-											<div class="card-header text-white font-weight-bold" style="font-size: 0.75rem; background-color: rgb(0, 98, 165);">BRAND</div>
-											<div class="card-body">
-												@foreach ($filters['Brand'] as $brand)
-													@php
-														$a++;
-														$filter_attr = Str::slug('brand', '-');
-														$filter_values = request()->brand ? request()->brand : [];
-														$status = (in_array($brand, $filter_values)) ? 'checked' : '';
-													@endphp
-													<div class="form-check">
-														<input type="checkbox" class="form-check-input product-cb-filter attrib-checkbox" id="{{ 'cbb' . $a }}" name="{{ 'attr[' .$filter_attr.'][]' }}" value="{{ $brand }}" data-attrname="{{ $filter_attr }}" {{ $status }}>
-														<label class="form-check-label" for="{{ 'cbb' . $a }}" style="font-size: 0.8rem;">{{ $brand }}</label>
-													</div>
-												@endforeach
+									<form action="/" method="get">
+										<div class="row">
+											<div class="d-none">
+												<input type="text" class="d-none" name="s" value="{{ request()->s ? request()->s : null }}">
 											</div>
-										</div>
-									@endif
-									@foreach ($filters as $id => $row)
-										@php
-											$filter_attr = Str::slug($id, '-');
-										@endphp
-										@if ($id != 'Brand')
-											@if (count($row) > 1 || request()->$filter_attr)
-											<div class="card mb-3">
-												<div class="card-header text-white font-weight-bold" style="font-size: 0.75rem; background-color: rgb(0, 98, 165);">{{ strtoupper($id) }}</div>
-												<div class="card-body">
-													@foreach ($row as $attr_val)
-														@php
-															$x++;
-															$filter_values = explode('+', request()->$filter_attr);
-															$status = (in_array($attr_val, $filter_values)) ? 'checked' : '';
-															$fullUrl = request()->fullUrlWithQuery([ $filter_attr => $attr_val]);
-														@endphp
-														<div class="form-check">
-															<input type="checkbox" class="form-check-input product-cb-filter attrib-checkbox" id="{{ 'cb' . $x }}" name="{{ 'attr[' .$filter_attr.'][]' }}" value="{{ $attr_val }}" data-attrname="{{ $filter_attr }}" {{ $status }}/>
-															<label class="form-check-label" for="{{ 'cb' . $x }}" style="font-size: 0.8rem;">{{ $attr_val }}</label>
+											<div class="col-6">
+												<h5 style="color: #221E1F">Filter Results</h5>
+												<span style="font-size: 9pt; color: #606166; font-weight: 600;">
+													Results {{ $results->lastItem() }} (Out of {{ $results->total() }})
+												</span>
+											</div>
+											<div class="col-6">
+												<div class="row p-0">
+													<div class="col-9 d-flex flex-row justify-content-center align-items-center p-0">
+														<select name="sortby" class="form-control form-control-sm" style="font-size: 11pt; font-weight: 400; display: inline-block; color: #000; padding-top: 15px; padding-bottom: 15px;">
+															<option value="Position" data-loc="{{ request()->fullUrlWithQuery(['sortby' => 'Position']) }}" {{ (request()->sortby == 'Position') ? 'selected' : '' }}>Recommended</option>
+															<option value="Product Name" data-loc="{{ request()->fullUrlWithQuery(['sortby' => 'Product Name']) }}" {{ (request()->sortby == 'Product Name') ? 'selected' : '' }}>Product Name</option>
+															<option value="Price" data-loc="{{ request()->fullUrlWithQuery(['sortby' => 'Price']) }}" {{ (request()->sortby == 'Price') ? 'selected' : '' }}>Price</option>
+														</select>
+													</div>
+													<div class="col-3 p-0">
+														<div class="p-2" style="font-size: 1.3rem;">
+															@if ((request()->order == 'desc'))
+															<a href="{{ request()->fullUrlWithQuery(['order' => 'asc']) }}" style="color: #000;">
+																<i class="fas fa-sort-amount-down-alt"></i>
+															</a>
+															@else
+															<a href="{{ request()->fullUrlWithQuery(['order' => 'desc']) }}" style="color: #000;">
+																<i class="fas fa-sort-amount-up-alt"></i>
+															</a>
+															@endif
 														</div>
-													@endforeach
+													</div>
 												</div>
 											</div>
-											@endif
-										@endif
-									@endforeach
+											<div class="col-12 p-0">
+												<div id="accordion" class="container-fluid p-0">
+													@if (count($filters['Brand']) > 1)
+														<div class="container p-2 filter-id collapse-btn" style="border-bottom: 1px solid #C9C9CB" data-target="#filter-brand2">
+															<span style="font-weight: 600; font-size: 10pt;">Brand</span>
+														</div>
+						
+														<div id="filter-brand2" class="collapse show">
+															<div class="card-body">
+																@foreach ($filters['Brand'] as $brand)
+																	@php
+																		$request_brand = isset(request()->attr['brand']) ? request()->attr['brand'] : [];
+																		$status = (in_array($brand, $request_brand)) ? 'checked' : '';
+																	@endphp
+																	<div class="form-check">
+																		<input class="form-check-input filter-check" type="checkbox" name="attr[brand][]" value="{{ $brand }}" data-attr="brand" {{ $status }}>
+																		<label class="form-check-label" style="font-size: 10pt; font-weight: 500">
+																			{{ $brand }}
+																		</label>
+																	</div>
+																@endforeach
+															</div>
+														</div>
+													@endif
+													@foreach ($filters as $id => $filter)
+														@php
+															$filter_attr = Str::slug($id, '-');
+															$collapse = null;
+						
+															if(count($filters['Brand']) <= 1 && $loop->first || isset(request()->attr[$filter_attr])){
+																$collapse = 'show';
+															}
+														@endphp
+														@if ($id != 'Brand')
+															<div class="card text-left" style="border: none;">
+																<div class="container p-2 filter-id collapse-btn" style="border-bottom: 1px solid #C9C9CB" data-target="#filter-{{ $filter_attr }}2">
+																	<span style="font-weight: 600; font-size: 10pt;">{{ $id }}</span>
+																</div>
+															
+																<div id="filter-{{ $filter_attr }}2" class="collapse {{ $collapse }}">
+																	<div class="card-body">
+																		@foreach ($filter as $value)
+																			@php
+																				$request_filters = isset(request()->attr[$filter_attr]) ? request()->attr[$filter_attr] : [];
+																				$status = (in_array($value, $request_filters)) ? 'checked' : '';
+																			@endphp
+																			<div class="form-check">
+																				<input class="form-check-input filter-check" type="checkbox" name="{{ 'attr[' .$filter_attr.'][]' }}" value="{{ $value }}" data-attr="{{ $filter_attr }}" {{ $status }}>
+																				<label class="form-check-label" style="font-size: 10pt; font-weight: 500">
+																					{{ $value }}
+																				</label>
+																			</div>
+																		@endforeach
+																	</div>
+																</div>
+															</div>
+														@endif
+													@endforeach
+												</div>
+												<input type="hidden" name="sortby" value="{{ request()->sortby }}">
+												<input type="hidden" name="sel_attr" value="{{ request()->sel_attr }}">
+												<button type="submit" class="btn btn-outline-primary w-100 mt-3" style="font-size: 10pt; font-weight: 600;">Save</button>
+											</div>
+										</div>
+									</form>
 								</div>
 							</div>
 						</div>
@@ -148,76 +198,86 @@
 		@endif
 		@if(count($products) > 0)
 		<div class="row">
-			@if ($filter_count > 0 or count($filters['Brand']) > 1)
+			@if ($filter_count > 0 or count($request_brand) > 1)
 			<div class="d-none {{ request()->s == '' ? '' : 'd-xl-block' }} col-1">&nbsp;</div>
 			<div class="d-none col-lg-3 col-xl-2 {{ request()->s == '' ? '' : 'd-lg-block' }}">
 				<!--sidebar-->
-				<div class="col-12 checkersxx">
-					<div class="d-flex justify-content-between align-items-center he1" style="font-weight: 500 !important"><b>Filter Results</b>
-						<a href="/?s={{ request()->s }}" style="text-decoration: none;">
-							<small class="stylecap he2 text-dark" style="font-weight:400 !important;">Clear All</small>
-						</a>
-					</div>
-					<hr>
-					@php
-						$a = 0;
-						$x = 0;
-					@endphp
-					@if (count($filters['Brand']) > 1)
-						<div class="card mb-3">
-							<div class="card-header text-white font-weight-bold" style="font-size: 0.75rem; background-color: rgb(0, 98, 165);">BRAND</div>
-							<div class="card-body">
-								@foreach ($filters['Brand'] as $brand)
-									@php
-										$a++;
-										$filter_attr = Str::slug('brand', '-');
-										$filter_values = request()->brand ? request()->brand : [];
-										$status = (in_array($brand, $filter_values)) ? 'checked' : '';
-									@endphp
-									<div class="form-check">
-										<input type="checkbox" class="form-check-input product-cb-filter attrib-checkbox" id="{{ 'cbb' . $a }}" name="{{ 'attr[' .$filter_attr.'][]' }}" value="{{ $brand }}" data-attrname="{{ $filter_attr }}" {{ $status }}>
-										<label class="form-check-label" for="{{ 'cbb' . $a }}" style="font-size: 0.8rem;">{{ $brand }}</label>
-									</div>
-								@endforeach
-							</div>
-						</div>
-					@endif
-					@foreach ($filters as $id => $row)
-						@php
-							$filter_attr = Str::slug($id, '-');
-						@endphp
-						@if ($id != 'Brand')
-							@if (count($row) > 1 || request()->$filter_attr)
-							<div class="card mb-3">
-								<div class="card-header text-white font-weight-bold" style="font-size: 0.75rem; background-color: rgb(0, 98, 165);">{{ strtoupper($id) }}</div>
-								<div class="card-body">
-									@foreach ($row as $attr_val)
-										@php
-											$x++;
-											$filter_values = explode('+', request()->$filter_attr);
-											$status = (in_array($attr_val, $filter_values)) ? 'checked' : '';
-											$fullUrl = request()->fullUrlWithQuery([ $filter_attr => $attr_val]);
-										@endphp
-										<div class="form-check">
-											<input type="checkbox" class="form-check-input product-cb-filter attrib-checkbox" id="{{ 'cb' . $x }}" name="{{ 'attr[' .$filter_attr.'][]' }}" value="{{ $attr_val }}" data-attrname="{{ $filter_attr }}" {{ $status }}/>
-											<label class="form-check-label" for="{{ 'cb' . $x }}" style="font-size: 0.8rem;">{{ $attr_val }}</label>
-										</div>
-									@endforeach
+				<form action="/" method="get">
+					<input type="text" class="d-none" name="s" value="{{ request()->s ? request()->s : null }}">
+					<div class="col-12 p-0">
+						<div id="accordion" class="container-fluid p-0">
+							@if (count($filters['Brand']) > 1)
+								<div class="container p-2 filter-id collapse-btn" style="border-bottom: 1px solid #C9C9CB" data-target="#filter-brand">
+									<span style="font-weight: 600; font-size: 10pt;">Brand</span>
 								</div>
-							</div>
+
+								<div id="filter-brand" class="collapse show">
+									<div class="card-body">
+										@foreach ($filters['Brand'] as $brand)
+											@php
+												$request_brand = isset(request()->attr['brand']) ? request()->attr['brand'] : [];
+												// $filter_values = explode('+', $request_brand);
+												$status = (in_array($brand, $request_brand)) ? 'checked' : '';
+											@endphp
+											<div class="form-check">
+												<input class="form-check-input filter-check" type="checkbox" name="attr[brand][]" value="{{ $brand }}" data-attr="brand" {{ $status }}>
+												<label class="form-check-label" style="font-size: 10pt; font-weight: 500">
+													{{ $brand }}
+												</label>
+											</div>
+										@endforeach
+									</div>
+								</div>
 							@endif
-						@endif
-					@endforeach
-				</div>
+							@foreach ($filters as $id => $filter)
+								@php
+									$filter_attr = Str::slug($id, '-');
+									$collapse = null;
+
+									if(count($filters['Brand']) <= 1 && $loop->first || isset(request()->attr[$filter_attr])){
+										$collapse = 'show';
+									}
+								@endphp
+								@if ($id != 'Brand')
+									<div class="card text-left" style="border: none;">
+										<div class="container p-2 filter-id collapse-btn" style="border-bottom: 1px solid #C9C9CB" data-target="#filter-{{ $filter_attr }}">
+											<span style="font-weight: 600; font-size: 10pt;">{{ $id }}</span>
+										</div>
+									
+										<div id="filter-{{ $filter_attr }}" class="collapse {{ $collapse }}">
+											<div class="card-body">
+												@foreach ($filter as $value)
+													@php
+														$request_filters = isset(request()->attr[$filter_attr]) ? request()->attr[$filter_attr] : [];
+														$status = (in_array($value, $request_filters)) ? 'checked' : '';
+													@endphp
+													<div class="form-check">
+														<input class="form-check-input filter-check" type="checkbox" name="{{ 'attr[' .$filter_attr.'][]' }}" value="{{ $value }}" data-attr="{{ $filter_attr }}" {{ $status }}>
+														<label class="form-check-label" style="font-size: 10pt; font-weight: 500">
+															{{ $value }}
+														</label>
+													</div>
+												@endforeach
+											</div>
+										</div>
+									</div>
+								@endif
+							@endforeach
+						</div>
+						<input type="hidden" name="sortby" value="{{ request()->sortby }}">
+						<input type="hidden" name="sel_attr" value="{{ request()->sel_attr }}">
+						<button type="submit" class="btn btn-outline-primary w-100 mt-3" style="font-size: 10pt; font-weight: 600;">Save</button>
+					</div>
+				</form>
 				<!--sidebar-->
 			</div>
 			@endif
-
 			@php
 				$mx_auto = '';
-				if($filter_count == 0 and count($filters['Brand']) < 2){
+				if($filter_count == 0 and count($request_brand) < 2){
 					$mx_auto = 'mx-auto';
 				}
+				$col = '4';
 			@endphp
 			<div class="col-lg-9 col-xl-8 {{ $mx_auto }}">
 				<div class="row">
@@ -226,19 +286,109 @@
 						<h4 class="mt-4 mb-3 fw-light bestsellinghead fumacoFont1 animated animatedFadeInUp fadeInUp results-head" style="color:#000000 !important;">RECENTLY ADDED PRODUCT(S)</h4>
 					</div>
 					@foreach ($recently_added_arr as $item)
-					<!-- Mobile view Start -->
-					<div class="d-block d-md-none animated animatedFadeInUp fadeInUp">
+						<!-- Mobile view Start -->
+						<div class="d-block d-md-none animated animatedFadeInUp fadeInUp">
+							<div class="card">
+								<div class="pt-2" style="position: absolute; top: 0; left: 0; z-index: 10;">
+									<div class="col-12">
+										@if ($item['is_discounted'])
+											<div class="col-12">
+												<span class="text-center" style="background-color: #FF0000; font-size: 9pt; border-radius: 0 20px 20px 0; color: #fff; min-width: 80px; padding: 2px">
+													&nbsp;<b>{{ $item['discount_display'] }}</b>&nbsp;
+												</span>
+											</div>
+										@endif
+									</div>
+								</div>
+								<div class="card-body">
+									<div class="row">
+										<div class="col-4">
+											@php
+												$image = ($item['image']) ? '/storage/item_images/'.$item['item_code'].'/gallery/preview/'.$item['image'] : '/storage/no-photo-available.png';
+												$image_webp = ($item['image']) ? '/storage/item_images/'.$item['item_code'].'/gallery/preview/'.explode(".", $item['image'])[0] .'.webp' : '/storage/no-photo-available.webp';
+											@endphp              
+											<picture>
+												<source srcset="{{ asset($image_webp) }}" type="image/webp">
+												<source srcset="{{ asset($image) }}" type="image/jpeg"> 
+												<img src="{{ asset($image) }}" alt="{{ Str::slug($item['item_name'], '-') }}" class="card-img-top hover" loading="lazy">
+											</picture>
+										</div>
+										<div class="col-8">
+											<div class="text ellipsis mb-1">
+												<a href="/product/{{ $item['slug'] ? $item['slug'] : $item['item_code'] }}" class="card-text mob-prod-text-concat" style="text-transform: none !important; text-decoration: none !important; color:#0062A5 !important; font-weight: 500 !important">{{ $item['item_name'] }}</a>
+											</div>
+											<p class="card-text fumacoFont_card_price" style="color:#000000 !important; font-size: 7pt">
+												@if($item['is_discounted'])
+													{{ $item['discounted_price'] }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">{{ $item['default_price'] }}</s>
+												@else
+												{{ $item['default_price'] }}
+												@endif
+											</p>
+											<div class="d-flex justify-content-between align-items-center">
+												<div class="btn-group stylecap">
+													@for ($i = 0; $i < 5; $i++)
+														@if ($item['overall_rating'] <= $i)
+															<span class="fa fa-star starcolorgrey"></span>
+														@else
+															<span class="fa fa-star" style="color: #FFD600;"></span>
+														@endif
+													@endfor
+												</div>
+												<small class="text-muted stylecap" style="color:#c4cad0 !important; font-weight:100 !important;">( {{ $item['total_reviews'] }} Reviews )</small>
+											</div>
+											<br/>
+											@if ($item['on_stock'] == 1)
+												<a href="#" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto add-to-cart" role="button" style="width: 100% !important;" data-item-code="{{ $item['item_code'] }}">
+													Add to Cart
+												</a>
+											@else
+												<center>
+													<span class="mb-2" style="font-weight: 600; color: #F50000">Out of Stock</span>
+												</center>
+												<a href="#" class="btn btn-outline-primary text-center w-100 p-2 notify-me" role="button" style="font-weight: 600; font-size: 10pt; margin-bottom: 5px;" data-logged="{{ Auth::check() ? 1 : 0 }}" data-item-code="{{ $item['item_code'] }}">
+													Notify me
+												</a>
+												<a href="/login" class="btn btn-outline-primary mx-auto {{ Auth::check() ? 'add-to-wishlist' : '' }}" role="button" style="width: 100% !important;" data-item-code="{{ $item['item_code'] }}">
+													Add to Wishlist
+												</a>
+											@endif
+										</div>
+									</div>								
+								</div>
+							</div>
+						</div>
+						<!-- Mobile view end -->
+
+						<!-- Desktop/Tablet view start -->
+						<div class="d-none d-md-block">
+							@include('frontend.product_details_card')
+						</div>
+						<!-- Desktop/Tablet view end -->
+					@endforeach
+				@endif
+
+				<div class="col-12 text-center">
+					<h4 class="mt-4 mb-3 fw-light bestsellinghead fumacoFont1 animated animatedFadeInUp fadeInUp results-head" style="color:#000000 !important;">{{ request()->s == null ? 'FEATURED PRODUCT(S)' : 'PRODUCT(S)' }}</h4>
+				</div>
+				@foreach ($products as $item)
+					<!-- Mobile view start -->
+					<div class="d-block d-md-none animated animatedFadeInUp fadeInUp mb-2">
 						<div class="card">
 							<div class="pt-2" style="position: absolute; top: 0; left: 0; z-index: 10;">
-								<div class="col-12">
-									@if ($item['is_discounted'])
-										<div class="col-12">
-											<span class="text-center" style="background-color: #FF0000; font-size: 9pt; border-radius: 0 20px 20px 0; color: #fff; min-width: 80px; padding: 2px">
-												&nbsp;<b>{{ $item['discount_display'] }}</b>&nbsp;
-											</span>
-										</div>
-									@endif
+								@if($item['is_new_item'])
+								<div class="col-12 mb-1 {{ $item['is_new_item'] == 1 ? '' : 'd-none' }}">
+									<span class="text-center" style="background-color: #438539; font-size: 9pt; border-radius: 0 20px 20px 0; color: #fff; min-width: 80px !important; padding: 2px">
+									&nbsp;<b>New</b>&nbsp;
+									</span>
 								</div>
+								@endif
+								@if ($item['is_discounted'])
+								<div class="col-12">
+									<span class="text-center" style="background-color: #FF0000; font-size: 9pt; border-radius: 0 20px 20px 0; color: #fff; min-width: 80px !important; padding: 2px">
+										&nbsp;<b>{{ $item['discount_display'] }}</b>&nbsp;
+									</span>
+								</div>
+								@endif
 							</div>
 							<div class="card-body">
 								<div class="row">
@@ -250,7 +400,7 @@
 										<picture>
 											<source srcset="{{ asset($image_webp) }}" type="image/webp">
 											<source srcset="{{ asset($image) }}" type="image/jpeg"> 
-											<img src="{{ asset($image) }}" alt="{{ Str::slug($item['item_name'], '-') }}" class="card-img-top hover" loading="lazy">
+											<img src="{{ asset($image) }}" alt="{{ Str::slug($item['alt'], '-') }}" class="card-img-top hover" loading="lazy">
 										</picture>
 									</div>
 									<div class="col-8">
@@ -259,7 +409,7 @@
 										</div>
 										<p class="card-text fumacoFont_card_price" style="color:#000000 !important; font-size: 7pt">
 											@if($item['is_discounted'])
-												{{ $item['discounted_price'] }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">{{ $item['default_price'] }}</s>
+											{{ $item['discounted_price'] }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">{{ $item['default_price'] }}</s>
 											@else
 											{{ $item['default_price'] }}
 											@endif
@@ -268,153 +418,6 @@
 											<div class="btn-group stylecap">
 												@for ($i = 0; $i < 5; $i++)
 													@if ($item['overall_rating'] <= $i)
-														<span class="fa fa-star starcolorgrey"></span>
-													@else
-														<span class="fa fa-star" style="color: #FFD600;"></span>
-													@endif
-												@endfor
-											</div>
-											<small class="text-muted stylecap" style="color:#c4cad0 !important; font-weight:100 !important;">( {{ $item['total_reviews'] }} Reviews )</small>
-										</div>
-										<br/>
-										@if ($item['on_stock'] == 1)
-											<a href="#" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto add-to-cart" role="button" style="width: 100% !important;" data-item-code="{{ $item['item_code'] }}"><i class="fas fa-shopping-cart d-inline-block" style="margin-right: 3%;"></i> Add to Cart</a>
-										@else
-											<a href="/login" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto {{ Auth::check() ? 'add-to-wishlist' : '' }}" role="button" style="width: 100% !important;" data-item-code="{{ $item['item_code'] }}"><i class="far fa-heart d-inline-block" style="margin-right: 3%;"></i> Add to Wishlist</a>
-										@endif
-									</div>
-								</div>								
-							</div>
-						</div>
-					</div>
-					<!-- Mobile view end -->
-
-					<!-- Desktop/Tablet view start -->
-					<div class="d-none d-md-block col-4 animated animatedFadeInUp fadeInUp equal-height-columns">
-						<div class="card mb-4">
-							<div class="equal-column-content">
-								<div class="hover-container product-card" style="position: relative;">
-									<div class="pt-2" style="position: absolute; top: 0; right: 0; z-index: 10;">
-										@if ($item['is_new_item'])
-										<div class="col-12 mb-2">
-											<span class="p-1 text-center" style="background-color: #438539; font-size: 9pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
-											&nbsp;<b>New</b>&nbsp;
-											</span>
-										</div>
-										<br />
-										@endif
-										
-										@if ($item['is_discounted'])
-											<div class="col-12">
-												<span class="p-1 text-center" style="background-color: #FF0000; font-size: 9pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
-													&nbsp;<b>{{ $item['discount_display'] }}</b>&nbsp;
-												</span>
-											</div>
-										@endif
-									</div>
-									<div class="overlay-bg"></div>
-									<div class="btn-container">
-										<a href="/product/{{ $item['slug'] ? $item['slug'] : $item['item_code'] }}" class="view-products-btn btn" role="button"><i class="fas fa-search"></i>&nbsp;View Product</a>
-									</div>
-									@php
-									$image = ($item['image']) ? '/storage/item_images/'.$item['item_code'].'/gallery/preview/'.$item['image'] : '/storage/no-photo-available.png';
-									$image_webp = ($item['image']) ? '/storage/item_images/'.$item['item_code'].'/gallery/preview/'.explode(".", $item['image'])[0] .'.webp' : '/storage/no-photo-available.webp';
-									@endphp              
-									<picture>
-										<source srcset="{{ asset($image_webp) }}" type="image/webp">
-										<source srcset="{{ asset($image) }}" type="image/jpeg"> 
-										<img src="{{ asset($image) }}" alt="{{ Str::slug($item['item_name'], '-') }}" class="card-img-top hover" loading='lazy'>
-									</picture>
-								</div>
-								
-								<div class="card-body d-flex flex-column">
-									<div class="text ellipsis">
-										<a href="/product/{{ $item['slug'] ? $item['slug'] : $item['item_code'] }}" class="card-text product-head fumacoFont_card_title text-concat prod_desc" style="text-transform: none !important; text-decoration: none !important; color:#0062A5 !important;  min-height: 98px; font-weight: 500 !important">{{ $item['item_name'] }}</a>
-									</div>
-									<p class="card-text fumacoFont_card_price" style="color:#000000 !important;">
-										@if($item['is_discounted'])
-											{{ $item['discounted_price'] }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">{{ $item['default_price'] }}</s>
-										@else
-										{{ $item['default_price'] }}
-										@endif
-									</p>
-									<div class="d-flex justify-content-between align-items-center">
-										<div class="btn-group stylecap">
-											@for ($i = 0; $i < 5; $i++)
-												@if ($item['overall_rating'] <= $i)
-													<span class="fa fa-star starcolorgrey"></span>
-												@else
-													<span class="fa fa-star" style="color: #FFD600;"></span>
-												@endif
-											@endfor
-										</div>
-										<small class="text-muted stylecap" style="color:#c4cad0 !important; font-weight:100 !important;">( {{ $item['total_reviews'] }} Reviews )</small>
-									</div>
-								</div>
-							</div>
-							<br/>
-							@if ($item['on_stock'] == 1)
-								<a href="#" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto add-to-cart" role="button" style="width: 90% !important; margin-bottom: 20px" data-item-code="{{ $item['item_code'] }}"><i class="fas fa-shopping-cart d-inline-block" style="margin-right: 3%;"></i> Add to Cart</a>
-							@else
-								<a href="/login" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto {{ Auth::check() ? 'add-to-wishlist' : '' }}" role="button" style="width: 90% !important; margin-bottom: 20px" data-item-code="{{ $item['item_code'] }}"><i class="far fa-heart d-inline-block" style="margin-right: 3%;"></i> Add to Wishlist</a>
-							@endif
-						</div>
-					</div>
-					<!-- Desktop/Tablet view end -->
-					@endforeach
-				@endif
-
-				<div class="col-12 text-center">
-					<h4 class="mt-4 mb-3 fw-light bestsellinghead fumacoFont1 animated animatedFadeInUp fadeInUp results-head" style="color:#000000 !important;">{{ request()->s == null ? 'FEATURED PRODUCT(S)' : 'PRODUCT(S)' }}</h4>
-				</div>
-				@foreach ($products as $product)
-					<!-- Mobile view start -->
-					<div class="d-block d-md-none animated animatedFadeInUp fadeInUp mb-2">
-						<div class="card">
-							<div class="pt-2" style="position: absolute; top: 0; left: 0; z-index: 10;">
-								@if($product['is_new_item'])
-								<div class="col-12 mb-1 {{ $product['is_new_item'] == 1 ? '' : 'd-none' }}">
-									<span class="text-center" style="background-color: #438539; font-size: 9pt; border-radius: 0 20px 20px 0; color: #fff; min-width: 80px !important; padding: 2px">
-									&nbsp;<b>New</b>&nbsp;
-									</span>
-								</div>
-								@endif
-								@if ($product['is_discounted'])
-								<div class="col-12">
-									<span class="text-center" style="background-color: #FF0000; font-size: 9pt; border-radius: 0 20px 20px 0; color: #fff; min-width: 80px !important; padding: 2px">
-										&nbsp;<b>{{ $product['discount_display'] }}</b>&nbsp;
-									</span>
-								</div>
-								@endif
-							</div>
-							<div class="card-body">
-								<div class="row">
-									<div class="col-4">
-										@php
-											$image = ($product['image']) ? '/storage/item_images/'.$product['item_code'].'/gallery/preview/'.$product['image'] : '/storage/no-photo-available.png';
-											$image_webp = ($product['image']) ? '/storage/item_images/'.$product['item_code'].'/gallery/preview/'.explode(".", $product['image'])[0] .'.webp' : '/storage/no-photo-available.webp';
-										@endphp              
-										<picture>
-											<source srcset="{{ asset($image_webp) }}" type="image/webp">
-											<source srcset="{{ asset($image) }}" type="image/jpeg"> 
-											<img src="{{ asset($image) }}" alt="{{ Str::slug($product['alt'], '-') }}" class="card-img-top hover" loading="lazy">
-										</picture>
-									</div>
-									<div class="col-8">
-										<div class="text ellipsis mb-1">
-											<a href="/product/{{ $product['slug'] ? $product['slug'] : $product['item_code'] }}" class="card-text mob-prod-text-concat" style="text-transform: none !important; text-decoration: none !important; color:#0062A5 !important; font-weight: 500 !important">{{ $product['item_name'] }}</a>
-										</div>
-										<p class="card-text fumacoFont_card_price" style="color:#000000 !important; font-size: 7pt">
-											@if($product['is_discounted'])
-											{{ $product['discounted_price'] }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">{{ $product['default_price'] }}</s>
-											@else
-											{{ $product['default_price'] }}
-											@endif
-										</p>
-										<div class="d-flex justify-content-between align-items-center">
-											<div class="btn-group stylecap">
-												@for ($i = 0; $i < 5; $i++)
-													@if ($product['overall_rating'] <= $i)
 													<span class="fa fa-star starcolorgrey"></span>
 													@else
 													<span class="fa fa-star" style="color: #FFD600;"></span>
@@ -422,13 +425,21 @@
 													@endfor
 											
 											</div>
-											<small class="text-muted stylecap" style="color:#c4cad0 !important; font-weight:100 !important;">( {{ $product['total_reviews'] }} Reviews )</small>
+											<small class="text-muted stylecap" style="color:#c4cad0 !important; font-weight:100 !important;">( {{ $item['total_reviews'] }} Reviews )</small>
 										</div>
 										<br/>
-										@if ($product['on_stock'] == 1)
-											<a href="#" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto add-to-cart" role="button" style="width: 100% !important;" data-item-code="{{ $product['item_code'] }}"><i class="fas fa-shopping-cart d-inline-block" style="margin-right: 3%;"></i> Add to Cart</a>
+										@if ($item['on_stock'] == 1)
+											<a href="#" class="btn btn-outline-primary text-center w-100 p-2 add-to-cart" role="button" style="font-weight: 600; margin-bottom: 20px; font-size: 10pt;" data-item-code="{{ $item['item_code'] }}">Add to Cart</a>
 										@else
-											<a href="/login" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto {{ Auth::check() ? 'add-to-wishlist' : '' }}" role="button" style="width: 100% !important;" data-item-code="{{ $product['item_code'] }}"><i class="far fa-heart d-inline-block" style="margin-right: 3%;"></i> Add to Wishlist</a>
+											<center>
+												<span style="font-weight: 600; color: #F50000">Out of Stock</span>
+											</center>
+											<a href="#" class="btn btn-outline-primary text-center w-100 p-2 notify-me" role="button" style="font-weight: 600; font-size: 10pt; margin-bottom: 5px;" data-logged="{{ Auth::check() ? 1 : 0 }}" data-item-code="{{ $item['item_code'] }}">
+												Notify me
+											</a>
+											<a href="/login" class="btn w-100 text-center w-100 p-2 {{ Auth::check() ? 'add-to-wishlist' : '' }} btn-hover" role="button" data-item-code="{{ $item['item_code'] }}" style="background-color: #E6F0F8; color: #0F6EB5; font-weight: 600; font-size: 10pt;">
+												Add to Wishlist
+											</a>
 										@endif
 									</div>
 								</div>								
@@ -438,72 +449,11 @@
 					<!-- Mobile view end --> 
 
 					<!-- Desktop/Tablet view start -->
-					<div class="d-none d-md-inline col-4 animated animatedFadeInUp fadeInUp equal-height-columns">
-						<div class="card mb-4">
-							<div class="equal-column-content">
-								<div class="hover-container product-card" style="position: relative;">
-									<div class="pt-2" style="position: absolute; top: 0; right: 0; z-index: 10;">
-										<div class="col-12 mb-2 {{ $product['is_new_item'] == 1 ? '' : 'd-none' }}">
-										<span class="p-1 text-center" style="background-color: #438539; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
-										&nbsp;<b>New</b>&nbsp;
-										</span>
-									</div><br class="{{ $product['is_new_item'] == 1 ? '' : 'd-none' }}"/>
-										@if ($product['is_discounted'])
-											<div class="col-12">
-												<span class="p-1 text-center" style="background-color: #FF0000; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
-													&nbsp;<b>{{ $product['discount_display'] }}</b>&nbsp;
-												</span>
-											</div>
-											@endif
-										
-									</div>
-									<div class="overlay-bg"></div>
-									<div class="btn-container">
-										<a href="/product/{{ $product['slug'] ? $product['slug'] : $product['item_code'] }}" class="view-products-btn btn" role="button"><i class="fas fa-search"></i>&nbsp;View Product</a>
-									</div>
-									@php
-										$image = ($product['image']) ? '/storage/item_images/'.$product['item_code'].'/gallery/preview/'.$product['image'] : '/storage/no-photo-available.png';
-										$image_webp = ($product['image']) ? '/storage/item_images/'.$product['item_code'].'/gallery/preview/'.explode(".", $product['image'])[0] .'.webp' : '/storage/no-photo-available.webp';
-									@endphp              
-									<picture>
-										<source srcset="{{ asset($image_webp) }}" type="image/webp">
-										<source srcset="{{ asset($image) }}" type="image/jpeg"> 
-										<img src="{{ asset($image) }}" alt="{{ Str::slug($product['alt'], '-') }}" class="card-img-top hover" loading="lazy">
-									</picture>
-								</div>
-								
-								<div class="card-body d-flex flex-column">
-									<div class="text ellipsis">
-										<a href="/product/{{ $product['slug'] ? $product['slug'] : $product['item_code'] }}" class="card-text product-head fumacoFont_card_title text-concat prod_desc" style="text-transform: none !important; text-decoration: none !important; color:#0062A5 !important;  min-height: 98px; font-weight: 500 !important">{{ $product['item_name'] }}</a>
-									</div>
-									<p class="card-text fumacoFont_card_price" style="color:#000000 !important;">
-										@if($product['is_discounted'])
-										{{ $product['discounted_price'] }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">{{ $product['default_price'] }}</s>
-										@else
-										{{ $product['default_price'] }}
-										@endif
-									</p>
-									<div class="d-flex justify-content-between align-items-center">
-										<div class="btn-group stylecap">
-											@for ($i = 0; $i < 5; $i++)
-											@if ($product['overall_rating'] <= $i)
-											<span class="fa fa-star starcolorgrey"></span>
-											@else
-											<span class="fa fa-star" style="color: #FFD600;"></span>
-											@endif
-											@endfor
-										</div>
-										<small class="text-muted stylecap" style="color:#c4cad0 !important; font-weight:100 !important;">( {{ $product['total_reviews'] }} Reviews )</small>
-									</div>
-								</div>
-							</div>
-							<br/>
-							@if ($product['on_stock'] == 1)
-							<a href="#" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto add-to-cart" role="button" style="width: 90% !important; margin-bottom: 20px" data-item-code="{{ $product['item_code'] }}"><i class="fas fa-shopping-cart d-inline-block" style="margin-right: 3%;"></i> Add to Cart</a>
-							@else
-							<a href="/login" class="btn btn-outline-primary fumacoFont_card_readmore mx-auto {{ Auth::check() ? 'add-to-wishlist' : '' }}" role="button" style="width: 90% !important; margin-bottom: 20px" data-item-code="{{ $product['item_code'] }}"><i class="far fa-heart d-inline-block" style="margin-right: 3%;"></i> Add to Wishlist</a>
-							@endif
-						</div>
+					<div class="col-4 d-none d-md-inline">
+						@php
+							$col = '12';
+						@endphp
+						@include('frontend.product_details_card')
 					</div>
 					<!-- Desktop/Tablet view end -->
 				@endforeach
@@ -643,14 +593,21 @@
 	}
 	
 	.btn-container{
-		width: 100%;
-		position: absolute; 
-		top: 50%; 
-		left: 0; 
-		z-index: 9; 
-		display: none; 
-		text-align: center;
+		position:absolute;
+		bottom:40%;
+		left:0;
+		right:0;
+		background-color:rgba(0,0,0,0);
+		overflow:hidden;
+		width:100%;
+		height:0;
+		transition:.5s;
+		display:flex;
+		justify-content:center;
+		align-items:center
 	}
+
+	.hover-container:hover .btn-container{height:50px}
 
 	.view-products-btn{
 		z-index: 2;
@@ -663,6 +620,7 @@
 		padding:8px 20px;
 		font-weight:400;
 		transition:all .15s ease-in;
+		position: absolute;
 	}
 
 	.view-products-btn:hover{
@@ -696,7 +654,7 @@
 	.modal .modal-dialog {
 		position: fixed;
 		margin: auto;
-		width: 80%;
+		width: 100%;
 		height: 100%;
 		transform: translate3d(0%, 0, 0);
 	}
@@ -728,6 +686,19 @@
 	.results-banner{
 		height: 17rem !important;
 	}
+
+	.filter-id{
+		cursor: pointer;
+	}
+	.form-check-input:checked{
+		background-color: green !important;
+		border: 0;
+	}
+	.form-check-input:focus, .label::after, label.form-check-label:focus, .form-check-input::after, .form-check-input:not(:disabled):not(.disabled):active:focus {
+		color: black;
+		border: 1px solid #BFBFBF;
+	}
+
 	@media (max-width: 575.98px) {
 		.results-count{
 			text-align: center !important;
@@ -780,11 +751,6 @@
 
   })();
 
-  // Product Image Hover
-  $('.hover-container').hover(function(){
-      $(this).children('.btn-container').slideToggle('fast');
-    });
-
 	$('.search-page-autocomplete').keyup(function(){
         var data = {
           'search_term': $(this).val(),
@@ -816,6 +782,10 @@
 
 	$('body').on('scroll', function (e){
 		$("#search-page-container").hide();
+	});
+
+	$(document).on('click', '.collapse-btn', function (){
+		$($(this).data('target')).collapse('toggle');
 	});
 
 	$('.attrib-checkbox').change(function(){
