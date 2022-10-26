@@ -648,54 +648,6 @@
         $('.hover-container').hover(function(){
             $(this).children('.btn-container').slideToggle('fast');
         });
-
-
-        $(".regular").slick({
-            dots: true,
-            customPaging: function(slider, i) {
-                return '<a href="#"><i class="fas fa-circle"></i></a>';
-            },
-            arrows: false,
-            infinite: true,
-            slidesToShow: 4,
-            slidesToScroll: 1,
-            touchMove: true,
-            responsive: [
-            {
-                breakpoint: 1024,
-                settings: {
-                    slidesToShow: 3,
-                    slidesToScroll: 1,
-                    infinite: true,
-                    dots: true,
-                    customPaging: function(slider, i) {
-                            return '<a href="#"><i class="fas fa-circle"></i></a>';
-                        },
-                    }
-                },
-                {
-                    breakpoint: 600,
-                    settings: {
-                    slidesToShow: 2,
-                    slidesToScroll: 1
-                    }
-                },
-                {
-                    breakpoint: 480,
-                    settings: {
-                    slidesToShow: 1,
-                    slidesToScroll: 1
-                    }
-                },
-                {
-                    breakpoint: 575.98,
-                    settings: {
-                    slidesToShow: 1,
-                    slidesToScroll: 1
-                    }
-                }
-            ]
-        });
     });
 </script>
 @endsection
