@@ -484,6 +484,7 @@
               slidesToShow: 3,
               slidesToScroll: 1,
               infinite: true,
+              touchMove: true,
               dots: true,
               arrows: false,
               customPaging: function(slider, i) {

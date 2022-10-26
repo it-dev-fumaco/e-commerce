@@ -26,7 +26,7 @@
         </div>
         <div class="overlay-bg"></div>
         <div class="btn-container">
-          <a href="/product/{{ ($item['slug']) ? $item['slug'] : $item['item_code'] }}" class="view-products-btn btn" role="button"><i class="fas fa-search"></i>&nbsp;View Product</a>
+          <a href="/product/{{ ($item['slug']) ? $item['slug'] : $item['item_code'] }}" class="view-products-btn btn" role="button"><i class="fas fa-search" style="color: inherit !important"></i>&nbsp;View Product</a>
         </div>
 
         <picture>
