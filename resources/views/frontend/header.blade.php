@@ -9,7 +9,7 @@
                 </picture>
                 <div class="container">
                     <div class="carousel-caption text-start"
-                    style="bottom: 1rem !important; right: 25% !important; left: 25%; !important;">
+                    style="bottom: 1rem !important; right: 20% !important; left: 20%; !important;">
                     <center>
                         <h3 class="carousel-header-font" style="text-transform: uppercase">{{ $page_title }}</h3>
                     </center>
@@ -30,6 +30,4 @@
             margin-top: 50px;
         }
       }
-
-    
 </style>
