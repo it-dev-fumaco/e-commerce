@@ -381,11 +381,11 @@
               <div class="input-group mb-3">
                 <input type="hidden" name="g-recaptcha-response" id="recaptcha_v3-subscribe">
                 <div class="input-group-prepend">
-                  <span class="input-group-text p-md-3" id="basic-addon1" style="height: 100% !important; border-radius: 0 !important"><i class="fas fa-envelope-open" style="color: #0062A5; font-size: 20px;"></i></span>
+                  <span class="input-group-text" id="basic-addon1" style="height: 100% !important; border-radius: 0 !important"><i class="fas fa-envelope-open" style="color: #0062A5; font-size: 20px;"></i></span>
                 </div>
                 <input type="email" name="email" class="form-control" placeholder="Email Address" aria-label="Username" aria-describedby="basic-addon1" required>
                 <div class="input-group-append">
-                  <button type="submit" class="input-group-text p-md-3" id="basic-addon2" style="height: 100% !important; border-radius: 0 !important">Subscribe</button>
+                  <button type="submit" class="input-group-text" id="basic-addon2" style="height: 100% !important; border-radius: 0 !important">Subscribe</button>
                 </div>
               </div>
             </form>
