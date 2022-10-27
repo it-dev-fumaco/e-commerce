@@ -206,6 +206,11 @@
       $('#close-accounts-msg').click(function(){
         $('#multiple-accounts-msg').fadeOut();
       });
+      
+      // Product Image Hover
+      $('.hover-container').hover(function(){
+        $(this).children('.btn-container').slideToggle('fast');
+      });
     });
   </script>
 @endsection
