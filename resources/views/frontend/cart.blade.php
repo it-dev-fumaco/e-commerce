@@ -412,6 +412,7 @@
         border: none;
         background-color: rgba(0,0,0,0);
     }
+    .slick-slide{margin:0 20px}.slick-slide img{width:100%}.slick-slide{transition:all ease-in-out .3s;opacity:.2}.slick-active,.slick-active i{opacity:1;color:#0062A5!important}.slick-current,.slick-slide{opacity:1}
 	@keyframes rotate {
 		0% {
 			transform: rotate(0deg);
@@ -647,54 +648,6 @@
         // Product Image Hover
         $('.hover-container').hover(function(){
             $(this).children('.btn-container').slideToggle('fast');
-        });
-
-
-        $(".regular").slick({
-            dots: true,
-            customPaging: function(slider, i) {
-                return '<a href="#"><i class="fas fa-circle"></i></a>';
-            },
-            arrows: false,
-            infinite: true,
-            slidesToShow: 4,
-            slidesToScroll: 1,
-            touchMove: true,
-            responsive: [
-            {
-                breakpoint: 1024,
-                settings: {
-                    slidesToShow: 3,
-                    slidesToScroll: 1,
-                    infinite: true,
-                    dots: true,
-                    customPaging: function(slider, i) {
-                            return '<a href="#"><i class="fas fa-circle"></i></a>';
-                        },
-                    }
-                },
-                {
-                    breakpoint: 600,
-                    settings: {
-                    slidesToShow: 2,
-                    slidesToScroll: 1
-                    }
-                },
-                {
-                    breakpoint: 480,
-                    settings: {
-                    slidesToShow: 1,
-                    slidesToScroll: 1
-                    }
-                },
-                {
-                    breakpoint: 575.98,
-                    settings: {
-                    slidesToShow: 1,
-                    slidesToScroll: 1
-                    }
-                }
-            ]
         });
     });
 </script>

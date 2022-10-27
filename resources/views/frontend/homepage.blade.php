@@ -135,7 +135,7 @@
         <div class="container">
             <section class="regular slider">
               @foreach($best_selling_arr as $item)
-              @include('frontend.product_details_card')
+                @include('frontend.product_details_card')
               @endforeach
             </section>
         </div>
@@ -156,7 +156,7 @@
       <div class="container">
           <section class="regular slider">
             @foreach($on_sale_arr as $item)
-            @include('frontend.product_details_card')
+              @include('frontend.product_details_card')
             @endforeach
           </section>
       </div>
@@ -199,53 +199,6 @@
   <script src="{{ asset('/slick/slick.js') }}" type="text/javascript" charset="utf-8"></script>
   <script type="text/javascript">
     $(document).ready(function() {
-      $(".regular").slick({
-        dots: true,
-        customPaging: function(slider, i) {
-          return '<a href="#"><i class="fas fa-circle"></i></a>';
-        },
-        arrows: false,
-        infinite: true,
-        slidesToShow: 4,
-        slidesToScroll: 1,
-        touchMove: true,
-        responsive: [
-        {
-          breakpoint: 1024,
-          settings: {
-            slidesToShow: 3,
-            slidesToScroll: 1,
-            infinite: true,
-            dots: true,
-            customPaging: function(slider, i) {
-              return '<a href="#"><i class="fas fa-circle"></i></a>';
-            },
-          }
-        },
-        {
-          breakpoint: 600,
-          settings: {
-            slidesToShow: 2,
-            slidesToScroll: 1
-          }
-        },
-        {
-          breakpoint: 480,
-          settings: {
-            slidesToShow: 1,
-            slidesToScroll: 1
-          }
-        },
-        {
-          breakpoint: 575.98,
-          settings: {
-            slidesToShow: 1,
-            slidesToScroll: 1
-          }
-        }
-      ]
-      });
-
       setTimeout(function() {
         $('#multiple-accounts-msg').fadeOut();
       }, 5000);

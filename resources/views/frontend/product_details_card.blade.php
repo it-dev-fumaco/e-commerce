@@ -26,13 +26,13 @@
         </div>
         <div class="overlay-bg"></div>
         <div class="btn-container">
-          <a href="/product/{{ ($item['slug']) ? $item['slug'] : $item['item_code'] }}" class="view-products-btn btn" role="button"><i class="fas fa-search"></i>&nbsp;View Product</a>
+          <a href="/product/{{ ($item['slug']) ? $item['slug'] : $item['item_code'] }}" class="view-products-btn btn" role="button"><i class="fas fa-search" style="color: inherit !important"></i>&nbsp;View Product</a>
         </div>
 
         <picture>
           <source srcset="{{ asset($img_webp) }}" type="image/webp">
           <source srcset="{{ asset($img) }}" type="image/jpeg">
-          <img src="{{ asset($img) }}" alt="{{ Str::slug($item['alt'], '-') }}" class="img-responsive hover" style="width: 100% !important; height: 100% !important" loading="lazy">
+          <img src="{{ asset($img) }}" alt="{{ Str::slug($item['alt'], '-') }}" class="img-responsive hover products-card-img" style="width: 100% !important;" loading="lazy">
         </picture>
       </div>
       <div class="card-body d-flex flex-column">

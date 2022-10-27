@@ -441,7 +441,6 @@
   {{-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script> --}}
   <script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.4/Chart.bundle.min.js' defer></script>
   <script src="{{ asset('/assets/dist/js/bootstrap.bundle.min.js') }}"></script>
-
   @if (!in_array($activePage, ['homepage', 'product_page']))
   <script src="{{ asset('assets/minified-js/jquery-3.6.0.min.js') }}"></script>
   <script src="{{ asset('assets/minified-js/jquery-ui.min.js') }}"></script>
@@ -465,6 +464,64 @@
       setTimeout(function () {
           $("#cookieConsent").fadeIn(200);
       }, 2000);
+
+      @if (in_array($activePage, ['product_page', 'homepage', 'cart']))
+      $(".regular").slick({
+        dots: true,
+        customPaging: function(slider, i) {
+          return '<a href="#"><i class="fas fa-circle" style="font-size: 8pt !important; color: rgba(0,0,0,0);-webkit-text-stroke:.5px #0062A5!important;"></i></a>';
+        },
+        arrows: true,
+        infinite: true,
+        dots: false,
+        slidesToShow: 4,
+        slidesToScroll: 1,
+        touchMove: true,
+        responsive: [
+          {
+            breakpoint: 1024,
+            settings: {
+              slidesToShow: 3,
+              slidesToScroll: 1,
+              infinite: true,
+              touchMove: true,
+              dots: true,
+              arrows: false,
+              customPaging: function(slider, i) {
+                return '<a href="#"><i class="fas fa-circle" style="font-size: 1pt !important; color: rgba(0,0,0,0);-webkit-text-stroke:.5px #0062A5!important;"></i></a>';
+              },
+            }
+          },
+          {
+            breakpoint: 600,
+            settings: {
+              slidesToShow: 2,
+              slidesToScroll: 1,
+              dots: true,
+              arrows: false
+            }
+          },
+          {
+            breakpoint: 480,
+            settings: {
+              slidesToShow: 1,
+              slidesToScroll: 1,
+              dots: true,
+              arrows: false
+            }
+          },
+          {
+            breakpoint: 575.98,
+            settings: {
+              slidesToShow: 1,
+              slidesToScroll: 1,
+              dots: true,
+              arrows: false
+            }
+          }
+        ]
+      });
+      @endif
 
       // set product category dropdown in navbar and links in dooter
       function productCategories() {

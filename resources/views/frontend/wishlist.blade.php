@@ -20,25 +20,22 @@
 					<col style="width: 15%;">
 					<thead>
 						<tr>
-							<th class="order-font-sub-b">Products</th>
-							<th class="order-font-sub-b">&nbsp;&nbsp;</th>
+							<th class="order-font-sub-b" colspan=2>Products</th>
 							<th class="order-font-sub-b text-center d-none d-sm-table-cell">Price</th>
 							<th class="order-font-sub-b text-center">Action</th>
 						</tr>
 					</thead>
 					<tbody>
 						@if(session()->has('success'))
-                        <div class="alert alert-success alert-dismissible fade show" role="alert">
-                            {{ session()->get('success') }}
-                        </div>
-                    @endif
-
-						  @if(session()->has('error'))
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            {{ session()->get('error') }}
-                        </div>
-                    @endif
-
+							<div class="alert alert-success alert-dismissible fade show" role="alert">
+								{{ session()->get('success') }}
+							</div>
+						@endif
+						@if(session()->has('error'))
+							<div class="alert alert-danger alert-dismissible fade show" role="alert">
+								{{ session()->get('error') }}
+							</div>
+						@endif
 						@forelse ($wishlist_arr as $wishlist)
 						<tr class="order-font">
 							<td class="text-center">
@@ -51,7 +48,6 @@
 									<source srcset="{{ asset($img) }}" type="image/jpeg">
 									<img src="{{ asset('/storage/item_images/'.$wishlist['item_code'].'/gallery/preview/'.$wishlist['image']) }}" class="img-responsive" alt="" width="55" height="55" loading='lazy'>
 								</picture>
-								{{-- <img src="{{ asset('/storage/item_images/'.$wishlist['item_code'].'/gallery/preview/'.$wishlist['image']) }}" class="img-responsive" alt="" width="55" height="55"> --}}
 							</td>
 							<td class="tbls">{{ $wishlist['item_name'] }}<br/>&nbsp;
 							<p class="d-lg-none d-xl-none"><b>Price:</b> P {{ number_format($wishlist['item_price'], 2) }}</p>
@@ -60,29 +56,29 @@
 							<td class="tbls text-center">
 								<a href="/product/{{ $wishlist['item_code'] }}" class="btn btn-success d-none d-lg-inline d-xl-inline" role="button" style="color: #fff; background-color: #1a6ea9; border-color: #1a6ea9; border-radius: 0rem;">View</a>&nbsp;
 								<a href="/product/{{ $wishlist['item_code'] }}" class="btn btn-success d-lg-none d-xl-none" role="button" style="color: #fff; background-color: #1a6ea9; border-color: #1a6ea9; border-radius: 0rem;"><i class="fas fa-eye"></i></a>&nbsp;
-								<button type="button" class="btn btn-danger rounded-0" data-toggle="modal" data-target="#rmw{{ $wishlist['wishlist_id'] }}">
+								<button type="button" class="btn btn-danger rounded-0 open-modal" data-target="#rmw{{ $wishlist['wishlist_id'] }}">
 									<i class="fas fa-trash-alt"></i>
 								</button>
 								<!-- Modal -->
 								<div class="modal fade" id="rmw{{ $wishlist['wishlist_id'] }}" tabindex="-1" role="dialog" aria-labelledby="removeFromWishlistModal" aria-hidden="true">
 									<form action="/mywishlist/{{ $wishlist['wishlist_id'] }}/delete" method="POST">
-									@csrf
-									@method('delete')
-									<div class="modal-dialog" role="document">
-									<div class="modal-content">
-										<div class="modal-header">
-										<h5 class="modal-title" id="removeFromWishlistModal">Remove from Wishlist</h5>
+										@csrf
+										@method('delete')
+										<div class="modal-dialog" role="document">
+											<div class="modal-content">
+												<div class="modal-header">
+													<h5 class="modal-title" id="removeFromWishlistModal">Remove from Wishlist</h5>
+												</div>
+												<div class="modal-body">
+													<p>Remove <b><i>{{ $wishlist['item_name'] }}</i></b> from your wishlist?</p>
+												</div>
+												<div class="modal-footer">
+													<button type="submit" class="btn btn-primary">Confirm</button>
+													<button type="button" class="btn btn-secondary close-modal" data-target="#rmw{{ $wishlist['wishlist_id'] }}">Close</button>
+												</div>
+											</div>
 										</div>
-										<div class="modal-body">
-										<p>Remove <b><i>{{ $wishlist['item_name'] }}</i></b> from your wishlist?</p>
-										</div>
-										<div class="modal-footer">
-										<button type="submit" class="btn btn-primary">Confirm</button>
-										<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-										</div>
-									</div>
-									</div>
-								</form>
+									</form>
 								</div>
 							</td>
 						</tr>
