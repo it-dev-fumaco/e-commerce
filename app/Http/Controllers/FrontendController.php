@@ -62,23 +62,14 @@ class FrontendController extends Controller
             $product_list = [];
             $blogs = [];
 
-            $excluded_requests = ['page', 'sel_attr', 'sortby', 'brand', 'order', 'fbclid', 's'];
-            $request_data = $request->attr ? $request->attr : [];
-            foreach ($excluded_requests as $value) {
-                unset($request_data[$value]);
-            }
-
-            $request_brand = isset($request->attr['brand']) ? $request->attr['brand'] : [];
+            $request_data = $request->attr ? array_diff_key($request->attr, array_flip(['brand'])) : [];
 
             $search_string = $request->s;
             $attribute_name_filter = $request_data ? array_keys($request_data) : [];
             $attribute_value_filter = [];
-            $brand_filter = $request->brand ? array_filter(explode('+', $request->brand)) : [];
+            $brand_filter = isset($request->attr['brand']) ? $request->attr['brand'] : [];
             foreach($request_data as $data) {
                 $attribute_value_filter[] = $data;
-                // foreach (explode('+', $data) as $value) {
-                //     $attribute_value_filter[] = $value;
-                // }
             }
 
             // get items based on filters
@@ -135,13 +126,16 @@ class FrontendController extends Controller
 
                         $filtered_item_codes = collect($filtered_items)->pluck('f_idcode');
 
-                        $include_bulk_item_codes = DB::table('fumaco_items')->where(function($q) use ($filtered_item_codes){
-                            foreach($filtered_item_codes as $items){
-                                $q->orWhere('f_idcode', 'like', '%'.$items.'%');
-                            }
-                        })->pluck('f_idcode');
+                        $include_bulk_item_codes = [];
+                        if($filtered_item_codes){
+                            $include_bulk_item_codes = DB::table('fumaco_items')->where(function($q) use ($filtered_item_codes){
+                                foreach($filtered_item_codes as $items){
+                                    $q->orWhere('f_idcode', 'like', '%'.$items.'%');
+                                }
+                            })->pluck('f_idcode');
 
-                        $filtered_item_codes = collect($include_bulk_item_codes);
+                            $filtered_item_codes = collect($include_bulk_item_codes);
+                        }
 
                         $product_list = $product_list->whereIn('f_idcode', $filtered_item_codes);
                     }
@@ -219,7 +213,7 @@ class FrontendController extends Controller
                 ];
             }
 
-           $recently_added_items = collect($product_list)->where('f_new_item', 1)->pluck('f_idcode');
+            $recently_added_items = collect($product_list)->where('f_new_item', 1)->pluck('f_idcode');
 
             // Get current page form url e.x. &page=1
             $currentPage = LengthAwarePaginator::resolveCurrentPage();
@@ -404,41 +398,10 @@ class FrontendController extends Controller
 
                     $sale = $customer_group_sale ? $customer_group_sale : $sale;
                 }
-    
-                // foreach($recently_added_items_query as $item_details){
-                //     $item_code = $item_details->f_idcode;
-                
-                //     $image = null;
-                //     if (array_key_exists($item_code, $recently_added_items_images)) {
-                //         $image = $recently_added_items_images[$item_code][0]->imgprimayx;
-                //     }
 
-                //     $item_price = $item_details->f_default_price;
-                //     $item_on_sale = $item_details->f_onsale;
-                    
-                //     $is_new_item = 1;
-          
-                //     // get item price, discounted price and discount rate
-                //     $item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $item_details->f_cat_id, $sale, $item_price, $item_code, $item_details->f_discount_type, $item_details->f_discount_rate, $item_details->f_stock_uom, $sale_per_category);
-                //     // get product reviews
-                //     $total_reviews = array_key_exists($item_code, $product_reviews) ? $product_reviews[$item_code]['total_reviews'] : 0;
-                //     $overall_rating = array_key_exists($item_code, $product_reviews) ? $product_reviews[$item_code]['overall_rating'] : 0;
-
-                //     $recently_added_arr[] = [
-                //         'item_code' => $item_code,
-                //         'item_name' => $item_details->f_name_name,
-                //         'image' => $image,
-                //         'default_price' => '₱ ' . number_format($item_price_data['item_price'], 2, '.', ','),
-                //         'is_discounted' => ($item_price_data['discount_rate'] > 0) ? $item_price_data['is_on_sale'] : 0,
-                //         'on_stock' => ($item_details->f_qty - $item_details->f_reserved_qty) > 0 ? 1 : 0,
-                //         'discounted_price' => '₱ ' . number_format($item_price_data['discounted_price'], 2, '.', ','),
-                //         'discount_display' => $item_price_data['discount_display'],
-                //         'slug' => $item_details->slug,
-                //         'is_new_item' => $is_new_item,
-                //         'overall_rating' => $overall_rating,
-                //         'total_reviews' => $total_reviews,
-                //     ];
-                // }
+                if($request->ajax()){
+                    return view('frontend.search_results_list', compact('products', 'blogs', 'recently_added_arr', 'results'));
+                }
             }
 
             // Filters
@@ -475,7 +438,7 @@ class FrontendController extends Controller
                 $filters[$key] = collect($filter)->sortBy(null, SORT_NATURAL)->values();
             }
 
-            return view('frontend.search_results', compact('results', 'blogs', 'products', 'recently_added_arr' ,'filters', 'filter_count', 'request_brand'));
+            return view('frontend.search_results', compact('results', 'blogs', 'products', 'recently_added_arr' ,'filters', 'filter_count', 'brand_filter'));
         }
 
         $carousel_data = DB::table('fumaco_header')->where('fumaco_status', 1)
@@ -1336,7 +1299,7 @@ class FrontendController extends Controller
     }
 
     public function viewProducts($category_id, Request $request) {
-            // return $request->all();
+        // return $request->all();
         if(request()->isMethod('post')) {
             $variables = [];
             if ($request->attr) {
@@ -1357,17 +1320,15 @@ class FrontendController extends Controller
             return view('error');
         }
         // get requested filters
-        $request_data = $request->except(['_token', 'page', 'sel_attr', 'sortby', 'brand', 'order', 'fbclid']);
-        $attribute_name_filter = array_keys($request_data);
+        $request_data = $request->attr ? array_diff_key($request->attr, array_flip(['brand'])) : [];
+        $attribute_name_filter = $request_data ? array_keys($request_data) : [];
         $attribute_value_filter = [];
-        $brand_filter = $request->brand;
+        $brand_filter = isset($request->attr['brand']) ? $request->attr['brand'] : [];
         foreach($request_data as $data) {
-            foreach (explode('+', $data) as $value) {
+            foreach ($data as $value) {
                 $attribute_value_filter[] = $value;
             }
         }
-
-        $brand_filter = ($brand_filter) ? array_values(explode('+', $brand_filter)) : [];
 
         // get items based on filters
         $filtered_items = DB::table('fumaco_items as a')
@@ -1390,11 +1351,15 @@ class FrontendController extends Controller
 
         $filtered_items = array_keys(array_filter($filtered_items->toArray()));
 
-        $include_bulk_item_codes = DB::table('fumaco_items')->where(function($q) use ($filtered_items){
-            foreach($filtered_items as $items){
-                $q->orWhere('f_idcode', 'like', '%'.$items.'%');
-            }
-        })->pluck('f_idcode');
+        $include_bulk_item_codes = [];
+
+        if($filtered_items){
+            $include_bulk_item_codes = DB::table('fumaco_items')->where(function($q) use ($filtered_items){
+                foreach($filtered_items as $items){
+                    $q->orWhere('f_idcode', 'like', '%'.$items.'%');
+                }
+            })->pluck('f_idcode');
+        }
         
         $filtered_items = collect($include_bulk_item_codes);
 
@@ -1402,7 +1367,7 @@ class FrontendController extends Controller
         $filters = DB::table('fumaco_items as a')
             ->join('fumaco_items_attributes as b', 'a.f_idcode', 'b.idcode')
             ->join('fumaco_attributes_per_category as c', 'c.id', 'b.attribute_name_id')
-            ->when(count($request_data) > 0, function($c) use ($filtered_items) {
+            ->when(count($request_data) > 0 || $brand_filter, function($c) use ($filtered_items) {
                 $c->whereIn('a.f_idcode', $filtered_items);
             })
             ->where('a.f_cat_id', $product_category->id)->where('a.f_status', 1)
@@ -1415,7 +1380,7 @@ class FrontendController extends Controller
 
         // get distinct brands for filtering
         $brands = DB::table('fumaco_items')->where('f_cat_id', $product_category->id)
-            ->when(count($request_data) > 0, function($c) use ($filtered_items) {
+            ->when(count($request_data) > 0 || $brand_filter, function($c) use ($filtered_items) {
                 $c->whereIn('f_idcode', $filtered_items);
             })
             ->where('f_status', 1)->whereNotNull('f_brand')->distinct('f_brand')->pluck('f_brand');
@@ -1475,7 +1440,7 @@ class FrontendController extends Controller
 
         // get items based on category id
         $products = DB::table('fumaco_items')->where('f_cat_id', $product_category->id)
-            ->when(count($request->except(['page', 'sel_attr', 'sortby', 'order'])) > 0, function($c) use ($filtered_items) {
+            ->when(count($request_data) > 0 || $brand_filter, function($c) use ($filtered_items) {
                 $c->whereIn('f_idcode', $filtered_items);
             })
             ->where('f_status', 1)->orderBy($sortby, $orderby)
@@ -1510,7 +1475,6 @@ class FrontendController extends Controller
 
         $products_arr = [];
         foreach ($products as $product) {
-            // $image = DB::table('fumaco_items_image_v1')->where('idcode', $product->f_idcode)->first();
             $image = null;
             if (array_key_exists($product->f_idcode, $item_images)) {
                 $image = $item_images[$product->f_idcode][0]->imgprimayx;
@@ -1549,7 +1513,11 @@ class FrontendController extends Controller
             ];
         }
 
-        return view('frontend.product_list', compact('product_category', 'products_arr', 'products', 'filters', 'image_for_sharing'));
+        if($request->ajax()){
+            return view('frontend.product_list_card', compact('products', 'products_arr'));
+        }
+
+        return view('frontend.product_list', compact('product_category', 'products_arr', 'products', 'filters', 'image_for_sharing', 'category_id'));
     }
 
     public function viewProduct($slug) { // Product Page

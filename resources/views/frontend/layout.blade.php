@@ -26,34 +26,29 @@
   <link rel="stylesheet" href="{{ asset('/assets/admin/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css') }}">
     @endif
     <link href="{{ asset('/assets/dist/css/bootstrap.min.css') }}" rel="stylesheet">
-    {{-- <link rel="preload" href="{{ asset('/assets/dist/css/bootstrap.min.css') }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="{{ asset('/assets/dist/css/bootstrap.min.css') }}"></noscript> --}}
-
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
     
-    {{-- <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet"> --}}
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap"></noscript>
 
-    {{-- <link rel="preconnect" href="https://fonts.googleapis.com"> --}}
-    {{-- <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet"> --}}
-
-    {{-- <link href="{{ asset('/assets/fumaco.css') }}" rel="stylesheet"> --}}
     <link rel="preload" href="{{ asset('/assets/fumaco.css') }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="{{ asset('/assets/fumaco.css') }}"></noscript>
 
-    {{-- <link rel="stylesheet" href="https://resources/demos/style.css"> --}}
-
-    {{-- <link rel="stylesheet" type="text/css" href="{{ asset('/page_css/layout.min.css') }}"> --}}
     <link rel="preload" href="{{ asset('/page_css/layout.min.css') }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="{{ asset('/page_css/layout.min.css') }}"></noscript>
 
     @yield('style')
 
     @if (!in_array($activePage, ['homepage']))
-      {{-- <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css"> --}}
       <link rel="stylesheet" href="{{ asset('assets/minified-css/jquery-ui.min.css') }}">
     @endif
+
+    <style>
+      .slick-dots li.slick-active,.slick-active,.slick-active i{opacity:1;color:#0062A5!important}
+      .slick-dots li{position:relative;display:inline-block;width:7px!important;height:7px!important;margin:0 5px;padding:0;cursor:pointer}
+      .slick-dots li button{width:7px!important;height:7px!important;padding:5px;color:transparent;border:0;background:0 0}
+      .flip{transform:rotate(-180deg)!important;-moz-transform:rotate(180deg)!important;-webkit-transform:rotate(180deg)!important;-o-transform:rotate(180deg)!important;-ms-transform:rotate(180deg)!important}
+    </style>
 
     @if ($activePage != 'error_page')
     <!-- Google Tag Manager -->
@@ -66,7 +61,6 @@
     </script>
     <!-- End Google Tag Manager -->
     @endif
-    {{-- <script id="mcjs">!function(c,h,i,m,p){m=c.createElement(h),p=c.getElementsByTagName(h)[0],m.async=1,m.src=i,p.parentNode.insertBefore(m,p)}(document,"script","https://chimpstatic.com/mcjs-connected/js/users/06324f99c542d92175851a098/05784f2333237fc2fda7515b8.js");</script> --}}
             <!-- Messenger Chat Plugin Code -->
 <div id="fb-root"></div>
 <!-- Your Chat Plugin code -->
@@ -381,11 +375,11 @@
               <div class="input-group mb-3">
                 <input type="hidden" name="g-recaptcha-response" id="recaptcha_v3-subscribe">
                 <div class="input-group-prepend">
-                  <span class="input-group-text p-md-3" id="basic-addon1" style="height: 100% !important; border-radius: 0 !important"><i class="fas fa-envelope-open" style="color: #0062A5; font-size: 20px;"></i></span>
+                  <span class="input-group-text" id="basic-addon1" style="height: 100% !important; border-radius: 0 !important"><i class="fas fa-envelope-open" style="color: #0062A5; font-size: 20px;"></i></span>
                 </div>
                 <input type="email" name="email" class="form-control" placeholder="Email Address" aria-label="Username" aria-describedby="basic-addon1" required>
                 <div class="input-group-append">
-                  <button type="submit" class="input-group-text p-md-3" id="basic-addon2" style="height: 100% !important; border-radius: 0 !important">Subscribe</button>
+                  <button type="submit" class="input-group-text" id="basic-addon2" style="height: 100% !important; border-radius: 0 !important">Subscribe</button>
                 </div>
               </div>
             </form>
