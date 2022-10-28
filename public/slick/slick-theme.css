@@ -113,7 +113,6 @@
 }
 .slick-dots li.slick-active button:before,
 .slick-dots li.slick-active,
-.slick-dots li .slick-active,
 .slick-active,
 .slick-active i{
     opacity:1;
