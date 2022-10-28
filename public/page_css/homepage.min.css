@@ -164,27 +164,3 @@ html,body{
 *{
     box-sizing:border-box
 }
-.slick-slide img{
-    width:100%
-}
-.slick-prev:before,.slick-next:before{
-    background-color:rgba(255,255,255,0);
-    border-radius:50%;
-    color:rgba(0,0,0,.4);
-    transition:.4s
-}
-.slick-slide{
-    margin:0 20px;
-    transition:all ease-in-out .3s;
-    opacity:.2
-}
-.slick-current,.slick-slide{
-    opacity:1
-}
-.slick-slide img{
-    width:100%
-}
-.slick-active,.slick-active i{
-    opacity:1;
-    color:#0062A5!important
-}
