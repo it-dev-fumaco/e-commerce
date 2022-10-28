@@ -1,6 +1,7 @@
 @extends('frontend.layout', [
     'namePage' => $product_category->name,
-    'activePage' => 'product_list'
+    'activePage' => 'product_list',
+	'category_id' => $category_id
 ])
 @section('meta')
 <meta name="description" content="{{ $product_category->meta_description }}">
@@ -34,7 +35,7 @@
 		<hr class="singleline">
 	</main>
 
-	<main style="background-color:#ffffff;" class="products-head prod-list-pad">
+	<main style="background-color:#ffffff; min-height: 80vh !important" class="products-head prod-list-pad">
 		<div class="container" style="max-width: 100% !important;">
 			<div class="row">
 				<!--sidebar-->
@@ -296,7 +297,6 @@
 			loadProducts(page);
 		});
 
-		loadProducts(1);
         function loadProducts(page) {
 			$.ajax({
 				type: "GET",

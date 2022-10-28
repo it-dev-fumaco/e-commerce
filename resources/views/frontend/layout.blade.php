@@ -453,7 +453,42 @@
           var preloader = $('.spinner-wrapper');
           preloader.fadeOut(preloaderFadeOutTime);
       }
-      hidePreloader();
+
+      if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) { // mobile/tablet
+        var filter_form = '#filter-form2';
+      }else{ // desktop
+        var filter_form = '#filter-form';
+      }
+
+      @if ($activePage == 'product_list')
+        loadProducts(1);
+        function loadProducts(page) {
+          $.ajax({
+            type: "GET",
+            url: "/products/{{ $category_id }}?page=" + page,
+              data: $(filter_form).serialize(),
+            success: function (response) {
+              $('#products-list').html(response);
+              hidePreloader();
+            }
+          });
+        }
+      @elseif($activePage == 'search_result')
+        loadProducts(1);
+        function loadProducts(page) {
+          $.ajax({
+            type: "GET",
+            url: "/?s={{ request()->s }}&page=" + page,
+            data: $(filter_form).serialize(),
+            success: function (response) {
+              $('#products-list').html(response);
+              hidePreloader();
+            }
+          });
+        }
+      @else
+        hidePreloader();
+      @endif
 
       setTimeout(function () {
           $("#cookieConsent").fadeIn(200);

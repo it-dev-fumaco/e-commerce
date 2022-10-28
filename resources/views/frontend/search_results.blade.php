@@ -30,7 +30,7 @@
 		</div>
 	</div>
 </main>
-<main style="background-color:#ffffff; min-height: 600px; width: 100% !important;" class="products-head">
+<main style="background-color:#ffffff; min-height: 600px; width: 100% !important; min-height: 80vh !important" class="products-head">
 	<div class="col-10 mx-auto">
 		<div id="search-page-container" class="container"></div>
 	</div>
@@ -612,7 +612,7 @@
 		loadProducts(page);
 	});
 
-	loadProducts(1);
+	// loadProducts(1);
 	function loadProducts(page) {
 		$.ajax({
 			type: "GET",

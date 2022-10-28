@@ -90,7 +90,7 @@
 <div class="col-12 text-center">
 <h4 class="mt-4 mb-3 fw-light bestsellinghead fumacoFont1 animated animatedFadeInUp fadeInUp results-head" style="color:#000000 !important;">{{ request()->s == null ? 'FEATURED PRODUCT(S)' : 'PRODUCT(S)' }}</h4>
 </div>
-@foreach ($products as $item)
+@forelse ($products as $item)
 <!-- Mobile view start -->
 <div class="d-block d-md-none animated animatedFadeInUp fadeInUp mb-2">
     <div class="card">
@@ -176,7 +176,9 @@
     @include('frontend.product_details_card')
 </div>
 <!-- Desktop/Tablet view end -->
-@endforeach
+@empty
+    <h4 class="text-center text-muted p-5 text-uppercase">No products found</h4>
+@endforelse
 
 @if (count($blogs) > 0)
 <div class="container">
