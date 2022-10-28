@@ -48,6 +48,7 @@
       .slick-dots li{position:relative;display:inline-block;width:7px!important;height:7px!important;margin:0 5px;padding:0;cursor:pointer}
       .slick-dots li button{width:7px!important;height:7px!important;padding:5px;color:transparent;border:0;background:0 0}
       .flip{transform:rotate(-180deg)!important;-moz-transform:rotate(180deg)!important;-webkit-transform:rotate(180deg)!important;-o-transform:rotate(180deg)!important;-ms-transform:rotate(180deg)!important}
+      button:focus,a,button,input:focus{outline:0!important;-webkit-box-shadow:none!important;box-shadow:none!important}
     </style>
 
     @if ($activePage != 'error_page')
@@ -460,35 +461,8 @@
         var filter_form = '#filter-form';
       }
 
-      @if ($activePage == 'product_list')
-        loadProducts(1);
-        function loadProducts(page) {
-          $.ajax({
-            type: "GET",
-            url: "/products/{{ $category_id }}?page=" + page,
-              data: $(filter_form).serialize(),
-            success: function (response) {
-              $('#products-list').html(response);
-              hidePreloader();
-            }
-          });
-        }
-      @elseif($activePage == 'search_result')
-        loadProducts(1);
-        function loadProducts(page) {
-          $.ajax({
-            type: "GET",
-            url: "/?s={{ request()->s }}&page=" + page,
-            data: $(filter_form).serialize(),
-            success: function (response) {
-              $('#products-list').html(response);
-              hidePreloader();
-            }
-          });
-        }
-      @else
-        hidePreloader();
-      @endif
+      
+      hidePreloader();
 
       setTimeout(function () {
           $("#cookieConsent").fadeIn(200);

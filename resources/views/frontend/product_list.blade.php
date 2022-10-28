@@ -40,7 +40,7 @@
 			<div class="row">
 				<!--sidebar-->
 				<div class="col-lg-2 checkersxx d-none d-lg-block">
-					<div class="row">
+					<div class="row d-none" id="side-filter">
 						<div class="col-12 p-0">
 							<h5 style="color: #221E1F">Filter Results</h5>
 							<span style="font-size: 9pt; color: #606166; font-weight: 600;">Results {{ $products->lastItem() }} (Out of {{ $products->total() }})</span>
@@ -297,6 +297,7 @@
 			loadProducts(page);
 		});
 
+		loadProducts();
         function loadProducts(page) {
 			$.ajax({
 				type: "GET",
@@ -304,6 +305,7 @@
                 data: $(filter_form).serialize(),
 				success: function (response) {
                     $('#products-list').html(response);
+					$('#side-filter').removeClass('d-none');
 				}
 			});
 		}
