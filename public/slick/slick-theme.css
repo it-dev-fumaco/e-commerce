@@ -117,4 +117,5 @@
 .slick-active i{
     opacity:1;
     color:#0062A5!important;
+    -webkit-text-fill-color:red!important;
 }
