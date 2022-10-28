@@ -55,6 +55,15 @@
       <link rel="stylesheet" href="{{ asset('assets/minified-css/jquery-ui.min.css') }}">
     @endif
 
+    <style>
+      .slick-dots li.slick-active,.slick-active,.slick-active i{
+        opacity:1;
+        color:#0062A5!important
+      }
+      .slick-dots li{position:relative;display:inline-block;width:7px!important;height:7px!important;margin:0 5px;padding:0;cursor:pointer}
+      .slick-dots li button{width:7px!important;height:7px!important;padding:5px;color:transparent;border:0;background:0 0}
+    </style>
+
     @if ($activePage != 'error_page')
     <!-- Google Tag Manager -->
     <script async>
