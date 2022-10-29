@@ -16,6 +16,12 @@
 @endsection
 
 @section('content')
+
+<style>
+  .slick-slide {
+    margin: 0 20px;
+  }
+</style>
   <main style="background-color:#0062A5;">
     <div id="myCarousel" class="carousel slide" data-bs-ride="carousel">
       <ol class="carousel-indicators">
