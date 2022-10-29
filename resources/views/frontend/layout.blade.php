@@ -48,6 +48,7 @@
       .slick-dots li{position:relative;display:inline-block;width:7px!important;height:7px!important;margin:0 5px;padding:0;cursor:pointer}
       .slick-dots li button{width:7px!important;height:7px!important;padding:5px;color:transparent;border:0;background:0 0}
       .flip{transform:rotate(-180deg)!important;-moz-transform:rotate(180deg)!important;-webkit-transform:rotate(180deg)!important;-o-transform:rotate(180deg)!important;-ms-transform:rotate(180deg)!important}
+      button:focus,a,button,input:focus{outline:0!important;-webkit-box-shadow:none!important;box-shadow:none!important}
     </style>
 
     @if ($activePage != 'error_page')
@@ -453,6 +454,14 @@
           var preloader = $('.spinner-wrapper');
           preloader.fadeOut(preloaderFadeOutTime);
       }
+
+      if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) { // mobile/tablet
+        var filter_form = '#filter-form2';
+      }else{ // desktop
+        var filter_form = '#filter-form';
+      }
+
+      
       hidePreloader();
 
       setTimeout(function () {

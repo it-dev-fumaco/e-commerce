@@ -8,8 +8,7 @@
                     <img src="{{ asset('/assets/site-img/header3-sm.png') }}" alt="" style="position: absolute; bottom: 0 !important;left: 0;min-width: 100%; height: 100% !important;">
                 </picture>
                 <div class="container">
-                    <div class="carousel-caption text-start"
-                    style="bottom: 1rem !important; right: 20% !important; left: 20%; !important;">
+                    <div class="carousel-caption text-start" style="bottom: 1rem !important; right: 15% !important; left: 15%; !important;">
                     <center>
                         <h3 class="carousel-header-font" style="text-transform: uppercase">{{ $page_title }}</h3>
                     </center>
@@ -22,12 +21,12 @@
 <style>
       @media (max-width: 575.98px) {
         .page-header{
-            margin-top: 60px;
+            margin-top: 70px;
         }
       }
       @media (max-width: 767.98px) {
         .page-header{
-            margin-top: 60px;
+            margin-top: 70px;
         }
       }
 </style>

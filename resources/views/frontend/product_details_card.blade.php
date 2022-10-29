@@ -1,7 +1,7 @@
 <div class="col-md-4 col-lg-{{ isset($col) ? $col : '3' }} animated animatedFadeInUp fadeInUp equal-height-columns mb-3 best-selling-card">
   <!-- {{ $item['item_code'] }} -->
-  <div class="card shadow-sm">
-    <div class="equal-column-content">
+  <div class="card shadow-sm w-100">
+    <div class="equal-column-content w-100">
       @php
       $img = ($item['image']) ? '/storage/item_images/'. $item['item_code'] .'/gallery/preview/'. $item['image'] : '/storage/no-photo-available.png';
       $img_webp = ($item['image']) ? '/storage/item_images/'. $item['item_code'] .'/gallery/preview/'. explode(".", $item['image'])[0] . '.webp' : '/storage/no-photo-available.png';

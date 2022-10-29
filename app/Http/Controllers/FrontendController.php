@@ -1446,8 +1446,8 @@ class FrontendController extends Controller
             ->where('f_status', 1)->orderBy($sortby, $orderby)
             ->select('id', 'f_idcode', 'f_default_price', 'f_onsale', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'f_qty', 'f_reserved_qty', 'slug', 'f_name_name', 'f_item_name', 'image_alt')->paginate(15);
 
-         // get sitewide sale
-         $sale = DB::table('fumaco_on_sale')
+        // get sitewide sale
+        $sale = DB::table('fumaco_on_sale')
             ->whereDate('start_date', '<=', Carbon::now()->toDateString())
             ->whereDate('end_date', '>=', Carbon::today()->toDateString())
             ->where('status', 1)->where('apply_discount_to', 'All Items')
@@ -1494,7 +1494,7 @@ class FrontendController extends Controller
             // get product reviews
             $total_reviews = array_key_exists($product->f_idcode, $product_reviews) ? $product_reviews[$product->f_idcode]['total_reviews'] : 0;
             $overall_rating = array_key_exists($product->f_idcode, $product_reviews) ? $product_reviews[$product->f_idcode]['overall_rating'] : 0;
-          
+        
             $products_arr[] = [
                 'id' => $product->id,
                 'item_code' => $product->f_idcode,
