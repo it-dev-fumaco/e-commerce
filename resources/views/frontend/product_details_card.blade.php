@@ -70,7 +70,7 @@
       <div class="row col-11 mx-auto text-center">
         <span class="mt-2 mb-2" style="font-weight: 600; color: #F50000">Out of Stock</span>
         <div class="col-5 p-1">
-          <a href="#" class="btn btn-outline-primary text-center w-100 p-2 notify-me" role="button" style="font-weight: 600; margin-bottom: 14px; margin-top: 3px; font-size: 10pt;" data-logged="{{ Auth::check() ? 1 : 0 }}" data-item-code="{{ $item['item_code'] }}">Notify me</a>
+          <a href="#" class="btn btn-outline-primary border-0 text-center w-100 p-2 notify-me" role="button" style="font-weight: 600; margin-bottom: 14px; margin-top: 3px; font-size: 10pt;" data-logged="{{ Auth::check() ? 1 : 0 }}" data-item-code="{{ $item['item_code'] }}">Notify me</a>
         </div>
         <div class="col-7 p-1">
           <a href="/login" class="btn w-100 text-center w-100 p-2 {{ Auth::check() ? 'add-to-wishlist' : '' }} btn-hover" role="button" data-item-code="{{ $item['item_code'] }}" style="background-color: #E6F0F8; color: #0F6EB5; margin-bottom: 14px; margin-top: 3px; font-weight: 600; font-size: 10pt;">
