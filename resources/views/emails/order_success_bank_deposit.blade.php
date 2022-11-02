@@ -75,7 +75,7 @@
 						<td style="padding: 8px;">{{ $item['item_name'] }}</td>
 						<td class="text-center" style="padding: 8px;">{{ $item['qty'] }}</td>
 						@if ($sum_discount > 0)
-						<td class="text-center" style="padding: 8px;">{{ $item['discount'] . '%' }}</td>
+						<td class="text-center" style="padding: 8px;">{{ $item['discount'] ? $item['discount'] . '%' : '-' }}</td>
 						@endif
 						<td class="text-right" style="text-align: right; padding: 8px; white-space: nowrap !important">₱ {{ number_format(str_replace(",","",$item['price']), 2) }}</td>
 						<td class="text-right" style="text-align: right; padding: 8px; white-space: nowrap !important">₱ {{ number_format(str_replace(",","",$item['amount']), 2) }}</td>
