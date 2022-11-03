@@ -386,6 +386,9 @@
 			<div class="modal-content">
 				<div class="modal-header">
 					<h5 class="modal-title">Shipping Address</h5>
+					<button type="button" class="close close-modal" data-target="#selectShippingModal">
+						<span aria-hidden="true">&times;</span>
+					</button>
 				</div>
 				<div class="modal-body">
 					<table class="table">
@@ -414,10 +417,10 @@
 								<td class="addressModal">{{ $shipping_address->xcontactlastname1 .', '.$shipping_address->xcontactname1 }}</td>
 								<td class="addressModal">{{ $shipping_address->add_type }}</td>
 								<td class="addressModal">
-									<button type="button" class="btn btn-success btn-xs shipping {{ $key }}" data-toggle="modal" data-target="#shipping-view{{ $shipping_address->id }}">
+									<button type="button" class="btn btn-success btn-xs shipping {{ $key }} open-modal" data-toggle="modal" data-target="#shipping-view{{ $shipping_address->id }}">
 										<i class="fas fa-eye"></i>
 									</button>
-									<button type="button" class="btn btn-danger btn-xs" data-toggle="modal" data-target="#shipping-del{{ $shipping_address->id }}">
+									<button type="button" class="btn btn-danger btn-xs open-modal" data-toggle="modal" data-target="#shipping-del{{ $shipping_address->id }}">
 										<i class="fas fa-trash-alt"></i>
 									</button>
 									<div id="shipping-del{{ $shipping_address->id }}" class="modal fade" role="dialog">
@@ -434,18 +437,18 @@
 													</div>
 													<div class="modal-footer">
 														<button type="submit" class="btn btn-primary btn-xs">Confirm</button>
-														<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+														<button type="button" class="btn btn-secondary close-modal" data-target="#shipping-del{{ $shipping_address->id }}">Close</button>
 													</div>
 												</div>
 											</div>
 										</form>
 									</div>
 									<div id="shipping-view{{ $shipping_address->id }}" class="modal fade" role="dialog">
-										<div class="modal-dialog" style="max-width: 80% !important;">
+										<div class="modal-dialog">
 											<div class="modal-content">
 												<div class="modal-header">
 													<h4 class="modal-title">Shipping Information</h4>
-													<a type="button" class="close clear-btn" data-dismiss="modal" aria-label="Close">
+													<a type="button" class="close clear-btn close-modal" data-target="#shipping-view{{ $shipping_address->id }}">
 														<span aria-hidden="true">&times;</span>
 													</a>
 												</div>
@@ -564,9 +567,9 @@
 						</tbody>
 					</table>
 
-					<a href="#" class="btn btn-primary" data-target="#addShippingModal" data-toggle="modal">Add New Shipping Address</a>
+					<a href="#" class="btn btn-primary open-modal" data-target="#addShippingModal">Add New Shipping Address</a>
 					@if ($shipping_details['same_as_billing'] == 1)
-						<a href="#" class="btn btn-primary" data-target="#addBillingModal" data-toggle="modal">Add New Billing Address</a>
+						<a href="#" class="btn btn-primary open-modal" data-target="#addBillingModal">Add New Billing Address</a>
 					@endif
 				</div>
 			</div>
@@ -577,6 +580,9 @@
 			<div class="modal-content">
 				<div class="modal-header">
 					<h5 class="modal-title">Billing Address</h5>
+					<button type="button" class="close close-modal" data-target="#selectBillingModal">
+						<span aria-hidden="true">&times;</span>
+					</button>
 				</div>
 				<div class="modal-body">
 					<table class="table">
@@ -605,7 +611,7 @@
 							<td class="addressModal">{{ $billing_address->xcontactlastname1 . ', ' . $billing_address->xcontactname1 }}</td>
 							<td class="addressModal">{{ $billing_address->add_type }}</td>
 							<td class="addressModal">
-								<button type="button" class="btn btn-success btn-xs billing {{ $key }}" data-toggle="modal" data-target="#myadd{{ $billing_address->id }}">
+								<button type="button" class="btn btn-success btn-xs billing {{ $key }} open-modal" data-toggle="modal" data-target="#myadd{{ $billing_address->id }}">
 									<i class="fas fa-eye"></i>
 								</button>
 								
@@ -614,7 +620,7 @@
 										<div class="modal-content">
 											<div class="modal-header">
 												<h4 class="modal-title">Billing Information</h4>
-												<a type="button" class="close clear-btn" data-dismiss="modal" aria-label="Close">
+												<a type="button" class="close clear-btn close-modal" data-target="#myadd{{ $billing_address->id }}">
 													<span aria-hidden="true">&times;</span>
 												</a>
 											</div>
@@ -724,7 +730,7 @@
 									</div>
 								</div>
 
-								<button type="button" class="btn btn-danger btn-xs" data-toggle="modal" data-target="#myDelete{{ $billing_address->id }}">
+								<button type="button" class="btn btn-danger btn-xs open-modal" data-toggle="modal" data-target="#myDelete{{ $billing_address->id }}">
 									<i class="fas fa-trash-alt"></i>
 								</button>
 
@@ -742,7 +748,7 @@
 												</div>
 												<div class="modal-footer">
 													<button type="submit" class="btn btn-primary btn-xs">Confirm</button>
-													<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+													<button type="button" class="btn btn-secondary close-modal" data-target="#myDelete{{ $billing_address->id }}">Close</button>
 												</div>
 											</div>
 										</div>
@@ -759,7 +765,7 @@
 					</tbody>
 				</table>
 
-					<a href="#" class="btn btn-primary" data-target="#addBillingModal" data-toggle="modal">Add New Billing Address</a>
+					<a href="#" class="btn btn-primary open-modal" data-target="#addBillingModal">Add New Billing Address</a>
 				</div>
 			</div>
 		</div>
@@ -771,6 +777,9 @@
 			<div class="modal-content">
 				<div class="modal-header">
 					<h5 class="modal-title">New Shipping Address</h5>
+					<button type="button" class="close close-modal" data-target="#addShippingModal">
+						<span aria-hidden="true">&times;</span>
+					</button>
 				</div>
 				<form action="/checkout/update_shipping" method="POST">
 					@csrf
@@ -889,6 +898,9 @@
 			<div class="modal-content">
 				<div class="modal-header">
 					<h5 class="modal-title">New Billing Address</h5>
+					<button type="button" class="close close-modal" data-target="#addBillingModal">
+						<span aria-hidden="true">&times;</span>
+					</button>
 				</div>
 				<form action="/checkout/update_billing" method="POST">
 					@csrf
