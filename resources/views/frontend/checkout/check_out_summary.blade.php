@@ -386,7 +386,7 @@
 			<div class="modal-content">
 				<div class="modal-header">
 					<h5 class="modal-title">Shipping Address</h5>
-					<button type="button" class="close close-modal" data-target="#selectShippingModal">
+					<button type="button" class="close clear-btn close-modal" data-target="#selectShippingModal">
 						<span aria-hidden="true">&times;</span>
 					</button>
 				</div>
@@ -444,7 +444,7 @@
 										</form>
 									</div>
 									<div id="shipping-view{{ $shipping_address->id }}" class="modal fade" role="dialog">
-										<div class="modal-dialog">
+										<div class="modal-dialog modal-xl">
 											<div class="modal-content">
 												<div class="modal-header">
 													<h4 class="modal-title">Shipping Information</h4>
@@ -580,7 +580,7 @@
 			<div class="modal-content">
 				<div class="modal-header">
 					<h5 class="modal-title">Billing Address</h5>
-					<button type="button" class="close close-modal" data-target="#selectBillingModal">
+					<button type="button" class="close clear-btn close-modal" data-target="#selectBillingModal">
 						<span aria-hidden="true">&times;</span>
 					</button>
 				</div>
@@ -616,7 +616,7 @@
 								</button>
 								
 								<div id="myadd{{ $billing_address->id }}" class="modal fade" role="dialog">
-									<div class="modal-dialog" style="max-width: 80% !important;">
+									<div class="modal-dialog modal-xl">
 										<div class="modal-content">
 											<div class="modal-header">
 												<h4 class="modal-title">Billing Information</h4>
@@ -777,7 +777,7 @@
 			<div class="modal-content">
 				<div class="modal-header">
 					<h5 class="modal-title">New Shipping Address</h5>
-					<button type="button" class="close close-modal" data-target="#addShippingModal">
+					<button type="button" class="close clear-btn close-modal" data-target="#addShippingModal">
 						<span aria-hidden="true">&times;</span>
 					</button>
 				</div>
@@ -898,7 +898,7 @@
 			<div class="modal-content">
 				<div class="modal-header">
 					<h5 class="modal-title">New Billing Address</h5>
-					<button type="button" class="close close-modal" data-target="#addBillingModal">
+					<button type="button" class="close clear-btn close-modal" data-target="#addBillingModal">
 						<span aria-hidden="true">&times;</span>
 					</button>
 				</div>
@@ -1028,6 +1028,9 @@
 		border-radius: 4px;
 		width: 100%;
 		height: 100%;
+	}
+	.modal{
+		background-color: rgba(0,0,0,.4);
 	}
 	#available-time {
 		font-weight: normal;
