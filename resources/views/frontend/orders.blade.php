@@ -460,14 +460,14 @@
 														<div class="modal-body">
 															<table class="table" style="width: 100% !important;">
 																<tr>
-																	<th class="col-sm-1"></th>
-																	<th class="col-sm-3">Item Name</th>
+																	<th {{ (new \Jenssegers\Agent\Agent())->isMobile() ? "colspan=2" : null }} class="col-sm-1"></th>
+																	<th class="d-none d-sm-table-cell" class="col-sm-3">Item Name</th>
 																	<th class="col-sm-2">Quantity</th>
 																	<th class="col-sm-2">Price</th>
 																</tr>
 																@foreach ($order['items'] as $item)
 																	<tr>
-																		<td>
+																		<td {{ (new \Jenssegers\Agent\Agent())->isMobile() ? "colspan=2" : null }}>
 																			@php
 																				$img = '/storage/item_images/'.$item['item_code'].'/gallery/preview/'.$item['image'];
 																				$webp = '/storage/item_images/'.$item['item_code'].'/gallery/preview/'.explode('.', $item['image'])[0].'.webp';
@@ -477,9 +477,10 @@
 																				<source srcset="{{ asset($img) }}" type="image/jpeg" class="img-responsive" style="width: 100% !important;">
 																				<img src="{{ asset('/storage/item_images/'.$item['item_code'].'/gallery/preview/'.$item['image']) }}" class="img-responsive" alt="" width="55" height="55" loading='lazy'>
 																			</picture>
-																			{{-- <img src="{{ asset('/storage/item_images/'.$item['item_code'].'/gallery/preview/'.$item['image']) }}" class="img-responsive" alt="" width="55" height="55"> --}}
 																		</td>
-																		<td style="text-align: left;">{{ $item['item_name'] }}</td>
+																		<td class="d-none d-sm-table-cell" style="text-align: left;">
+																			{{ $item['item_name'] }}
+																		</td>
 																		<td>{{ $item['qty'] }}</td>
 																		@php
 																			$orig_price = number_format($item['orig_price'], 2);
@@ -491,6 +492,11 @@
 																			@else
 																				<p>₱ {{ $price }}</p>
 																			@endif
+																		</td>
+																	</tr>
+																	<tr class="d-md-none">
+																		<td colspan=4 style="text-align: justify !important; font-size: 9pt;'">
+																			{{ $item['item_name'] }}
 																		</td>
 																	</tr>
 																@endforeach

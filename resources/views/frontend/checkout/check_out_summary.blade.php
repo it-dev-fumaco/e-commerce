@@ -60,7 +60,7 @@
 									<div class="p-0"><b>Shipping{{ $ship_text }} Address</b></div>
 									<div class="p-0">
 										@if (Auth::check())
-										<a href="#" style="font-size: 14px; width:100%; text-decoration: none;" role="button" data-toggle="modal" data-target="#selectShippingModal">Edit Address</a>
+										<a href="#" style="font-size: 14px; width:100%; text-decoration: none;" role="button" class="open-modal" data-target="#selectShippingModal">Edit Address</a>
 										@endif
 									</div>
 								</div>
@@ -92,7 +92,7 @@
 									<div class="p-0">	<b>Billing Address</b></div>
 									<div class="p-0">
 										@if (Auth::check())
-										<a href="#" style="font-size: 14px; width:100%; text-decoration: none;" role="button"  data-toggle="modal" data-target="#selectBillingModal">Edit Address</a>
+										<a href="#" style="font-size: 14px; width:100%; text-decoration: none;" role="button" class="open-modal" data-target="#selectBillingModal">Edit Address</a>
 										@endif
 									</div>
 								</div>

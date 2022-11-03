@@ -34,7 +34,7 @@
 				display: block;
 			}
 
-			.d-mob{
+			.d-mob, .d-mob-row{
 				display: none;
 			}
 
@@ -57,6 +57,9 @@
 				.d-mob{
 					display: block;
 				}
+				.d-mob-row{
+					display: contents;
+				}
 			}
 
 			@media (max-width: 575.98px) {
@@ -73,6 +76,9 @@
 				.d-mob{
 					display: block;
 				}
+				.d-mob-row{
+					display: contents;
+				}
 			}
 			@media (max-width: 767.98px) {
 				.track-order-btn{
@@ -87,6 +93,9 @@
 
 				.d-mob{
 					display: block;
+				}
+				.d-mob-row{
+					display: contents;
 				}
 			}
       </style>

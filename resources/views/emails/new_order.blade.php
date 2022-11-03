@@ -62,14 +62,23 @@
 						<td class="text-center" style="padding: 3px;">
 							<img src="{{ asset($src) }}" class="img-responsive" alt="" width="50" height="50">
 						</td>
-						<td style="padding: 8px;">{!! $item['item_name'] !!}</td>
+						<td style="padding: 8px;">
+							<span class="d-des">
+								{!! $item['item_name'] !!}
+							</span>
+						</td>
 						<td class="text-center" style="padding: 8px; white-space: nowrap">{{ $item['qty'] }}</td>
 						@if ($sum_discount > 0)
-						<td class="text-center" style="padding: 8px;">{{ $item['discount'] . '%' }}</td>
+						<td class="text-center" style="padding: 8px;">{{ $item['discount'] ? $item['discount'] . '%' : '-' }}</td>
 						@endif
 						<td class="text-right" style="text-align: right; padding: 8px; white-space: nowrap !important">₱ {{ number_format(str_replace(",","",$item['price']), 2) }}</td>
 						<td class="text-right" style="text-align: right; padding: 8px; white-space: nowrap !important">₱ {{ number_format(str_replace(",","",$item['amount']), 2) }}</td>
 					 </tr>
+					 <tr class="d-mob-row" style="font-size: 0.8rem;">
+						<td colspan=6>
+						  {!! $item['item_name'] !!}
+						</td>
+					  </tr>
 					@empty
 					<tr>
 						<td colspan="6" class="text-center text-muted">No items found.</td>
