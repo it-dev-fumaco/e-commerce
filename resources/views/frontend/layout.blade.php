@@ -50,6 +50,11 @@
       .flip{transform:rotate(-180deg)!important;-moz-transform:rotate(180deg)!important;-webkit-transform:rotate(180deg)!important;-o-transform:rotate(180deg)!important;-ms-transform:rotate(180deg)!important}
       button:focus,a,button,input:focus{outline:0!important;-webkit-box-shadow:none!important;box-shadow:none!important}
       .no-border{border:none!important}
+      .products-card-img{min-height:300px!important}
+      .slick-dots {bottom:-40px;}
+      @media (max-width: 575.98px){
+        .products-card-img{min-height:320px!important}
+      }
     </style>
 
     @if ($activePage != 'error_page')

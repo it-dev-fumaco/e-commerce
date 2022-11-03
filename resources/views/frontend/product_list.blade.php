@@ -49,6 +49,9 @@
 						<div class="col-12 p-0">
 							<form action="/products/{{ ($product_category->slug) ? $product_category->slug : $product_category->id }}" method="POST" id="filter-form">
 								@csrf
+								@php
+									$a = 0;
+								@endphp
 								<div id="accordion" class="container-fluid p-0">
 									@if (count($filters['Brand']) > 1)
 										<div class="card text-left" style="border: none;">
@@ -80,8 +83,21 @@
 											$filter_attr = Str::slug($id, '-');
 											$collapse = null;
 											$arrow = 'down';
+											$a++;
 		
-											if(count($filters['Brand']) <= 1 && $loop->first || request()->$filter_attr){
+											if(count($filters['Brand']) > 1){
+												if($loop->first){
+													$collapse = 'show';
+													$arrow = 'up';
+												}
+											}else{
+												if($a < 3){
+													$collapse = 'show';
+													$arrow = 'up';
+												}
+											}
+
+											if(request()->$filter_attr){
 												$collapse = 'show';
 												$arrow = 'up';
 											}
