@@ -159,17 +159,17 @@
 											<div class="row p-0">
 												@if ($product_details_array['on_stock'])
 													<div class="col-12 col-xl-3 p-0">
-														<button type="submit" class="btn btn-lg btn-outline-primary fumacoFont_card_readmore product-btn w-100" name="addtocart" value="1"><i class="fas fa-shopping-cart"></i> Add to Cart</button>
+														<button type="submit" class="btn btn-lg btn-outline-primary fumacoFont_card_readmore product-btn no-border w-100" name="addtocart" value="1"><i class="fas fa-shopping-cart"></i> Add to Cart</button>
 													</div>
 													<div class="col-12 col-xl-3 p-0 pt-2 p-xl-2 pt-xl-0">
-														<button type="submit" class="btn btn-lg btn-outline-primary fumacoFont_card_readmore product-btn w-100" name="buynow" value="1"><i class="fas fa-wallet"></i> Buy Now</button>
+														<button type="submit" class="btn btn-lg btn-outline-primary fumacoFont_card_readmore product-btn no-border w-100" name="buynow" value="1"><i class="fas fa-wallet"></i> Buy Now</button>
 													</div>
 												@else
 													<div class="col-12 col-xl-3 p-0">
-														<button type="button" class="btn btn-lg btn-outline-primary fumacoFont_card_readmore product-btn notify-me w-100" data-logged="{{ Auth::check() ? 1 : 0 }}" data-item-code="{{ $product_details_array['item_code'] }}">Notify Me</button>
+														<button type="button" class="btn btn-lg btn-outline-primary fumacoFont_card_readmore product-btn no-border notify-me w-100" data-logged="{{ Auth::check() ? 1 : 0 }}" data-item-code="{{ $product_details_array['item_code'] }}">Notify Me</button>
 													</div>
 													<div class="col-12 col-xl-3 p-0 pt-2 p-xl-2 pt-xl-0">
-														<button type="submit" class="btn btn-lg btn-outline-primary fumacoFont_card_readmore product-btn w-100" name="addtowishlist" value="1"><i class="fas fa-heart"></i> Add to Wish List</button>
+														<button type="submit" class="btn btn-lg btn-outline-primary fumacoFont_card_readmore product-btn no-border w-100" name="addtowishlist" value="1"><i class="fas fa-heart"></i> Add to Wish List</button>
 													</div>
 												@endif
 											</div>

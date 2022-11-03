@@ -49,6 +49,7 @@
       .slick-dots li button{width:7px!important;height:7px!important;padding:5px;color:transparent;border:0;background:0 0}
       .flip{transform:rotate(-180deg)!important;-moz-transform:rotate(180deg)!important;-webkit-transform:rotate(180deg)!important;-o-transform:rotate(180deg)!important;-ms-transform:rotate(180deg)!important}
       button:focus,a,button,input:focus{outline:0!important;-webkit-box-shadow:none!important;box-shadow:none!important}
+      .no-border{border:none!important}
     </style>
 
     @if ($activePage != 'error_page')

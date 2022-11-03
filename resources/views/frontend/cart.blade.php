@@ -77,7 +77,7 @@
                                     <span class="input-group-btn">
                                         <a href="#" class="quantity-right-plus btn btn-number" style="background-color: #ccc !important; height: 100% !important; border-radius: 0px !important;"> + </a>
                                     </span>
-                                    @if ($cart['insufficient_stock'])
+                                    @if ($cart['insufficient_stock'] || $cart['quantity'] > $cart['stock_qty'])
                                         <small class="text-danger d-block m-2 stock-status">Insufficient Stock</small>
                                     @else
                                         <small class="text-success d-block m-2 stock-status">Available :  {{ $cart['stock_qty'] }}</small>
@@ -98,15 +98,15 @@
                                         <a href="#" class="quantity-right-plus btn btn-number" style="background-color: #ccc !important; height: 100% !important; border-radius: 0px !important;"> + </a>
                                     </span>
                                 </div>
-                                @if ($cart['insufficient_stock'])
+                                @if ($cart['insufficient_stock'] || $cart['quantity'] > $cart['stock_qty'])
                                 <small class="text-danger d-block m-2 stock-status">Insufficient Stock</small>
                                 @else
-                                <small class="text-success d-block m-2 stock-status">Available :  {{ $cart['stock_qty'] }}</small>
+                                <small class="text-success d-block m-2 stock-status">Available :  {{  $cart['quantity'].$cart['stock_qty'] }}</small>
                                 @endif
                             </td>
                             <td class="tbls d-none d-sm-table-cell"><p style="white-space: nowrap !important;">₱ <span class="formatted-amount">{{ number_format($cart['amount'], 2, '.', ',') }}</span></p><span class="amount d-none">{{ $cart['amount'] }}</span></td>
                             <td class="tbls tbl-qtr">
-                                <a class="btn btn-sm btn-outline-primary remove-from-cart-btn" href="#" role="button" data-id="{{ $cart['item_code'] }}">&#x2715;</a>
+                                <a class="btn btn-sm btn-outline-primary remove-from-cart-btn no-border" href="#" role="button" data-id="{{ $cart['item_code'] }}">&#x2715;</a>
                             </td>
                         </tr>
                         @empty
@@ -146,17 +146,17 @@
                 <div class="row">
                     <div class="col-md-6 d-none d-md-block">
                         <div class="card-body col-md-8 mx-auto">
-                            <a href="/" class="btn btn-secondary" style="width:100% !important;" role="button"><i class="fas fa-angle-left"></i> CONTINUE SHOPPING</a>
+                            <a href="/" class="btn btn-secondary no-border" style="width:100% !important;" role="button"><i class="fas fa-angle-left"></i> CONTINUE SHOPPING</a>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="card-body col-md-8 mx-auto">
-                            <button id="checkout-btn" class="btn btn-outline-primary" role="button" style="width:100% !important;" {{ (count($cart_arr) > 0) ? '' : 'disabled' }}>PROCEED TO CHECKOUT</button>
+                            <button id="checkout-btn" class="btn btn-outline-primary no-border" role="button" style="width:100% !important;" {{ (count($cart_arr) > 0) ? '' : 'disabled' }}>PROCEED TO CHECKOUT</button>
                         </div>
                     </div>
                     <div class="col-md-6 d-md-none">
                         <div class="card-body col-md-8 mx-auto">
-                            <a href="/" class="btn btn-secondary" style="width:100% !important;" role="button"><i class="fas fa-angle-left"></i> CONTINUE SHOPPING</a>
+                            <a href="/" class="btn btn-secondary no-border" style="width:100% !important;" role="button"><i class="fas fa-angle-left"></i> CONTINUE SHOPPING</a>
                         </div>
                     </div>
                 </div>
