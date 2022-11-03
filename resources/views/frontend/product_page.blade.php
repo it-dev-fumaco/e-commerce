@@ -110,10 +110,10 @@
 									<input type="hidden" name="item_code" value="{{ $product_details->f_idcode }}">
 									<p class="card-text">QTY&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;   <input type="number" value="1" id="quantity" name="quantity" min="1" max="{{ ($product_details->f_qty > 0) ? $product_details->f_qty : 1 }}" style="width: 70px;"> <span class="d-inline-block" style="margin-left: 10px;">{{ $product_details->f_stock_uom  }}</span></p>
 									<p class="card-text">
-										@if($product_details->f_qty < 1)
-										<span style='color:red;';>Not Available</span>
+										@if ($product_details_array['on_stock'])
+											<span style='color:green;'>Available</span>
 										@else
-										<span style='color:green;';>Available</span>
+											<span style='color:red;'>Not Available</span>
 										@endif
 										&nbsp;&nbsp; <i class="fas fa-bell"></i>
 									</p>
@@ -155,26 +155,24 @@
 									@endif
 									@endforeach
 									<div class="row mt-5" id="product_details">
-										<div class="col-xs-6 d-none d-md-block">
-											<button type="submit" class="btn btn-lg btn-outline-primary fumacoFont_card_readmore product-btn" name="addtocart" style=" {{ ($product_details->f_qty < 1) ? 'display: none;' : '' }}" value="1"><i class="fas fa-shopping-cart"></i> Add to Cart</button>
-											<button type="submit" class="btn btn-lg btn-outline-primary fumacoFont_card_readmore product-btn" name="buynow" style=" {{ ($product_details->f_qty < 1) ? 'display: none;' : '' }}"  value="1"><i class="fas fa-wallet"></i> Buy Now</button>
-											@if($product_details->f_qty < 1)
-											<button type="submit" class="btn btn-lg btn-outline-primary fumacoFont_card_readmore product-btn" style="" name="addtowishlist" value="1"><i class="fas fa-heart"></i> Add to Wish List</button>
-											@endif
-										</div>
-
-										<div class="col-xs-6 d-md-none">
-											<div class="col-sm-12">
-												<button type="submit" class="btn btn-lg btn-outline-primary fumacoFont_card_readmore product-btn col-sm-12" name="addtocart" style=" {{ ($product_details->f_qty < 1) ? 'display: none;' : '' }}; width: 100% !important" value="1"><i class="fas fa-shopping-cart"></i> Add to Cart</button>
-											</div><br/>
-											<div class="col-md-12">
-												<button type="submit" class="btn btn-lg btn-outline-primary fumacoFont_card_readmore product-btn col-sm-12" name="buynow" style=" {{ ($product_details->f_qty < 1) ? 'display: none;' : '' }}; width: 100% !important"  value="1"><i class="fas fa-wallet"></i> Buy Now</button>
+										<div class="col-xs-6">
+											<div class="row p-0">
+												@if ($product_details_array['on_stock'])
+													<div class="col-12 col-xl-3 p-0">
+														<button type="submit" class="btn btn-lg btn-outline-primary fumacoFont_card_readmore product-btn w-100" name="addtocart" value="1"><i class="fas fa-shopping-cart"></i> Add to Cart</button>
+													</div>
+													<div class="col-12 col-xl-3 p-0 pt-2 p-xl-2 pt-xl-0">
+														<button type="submit" class="btn btn-lg btn-outline-primary fumacoFont_card_readmore product-btn w-100" name="buynow" value="1"><i class="fas fa-wallet"></i> Buy Now</button>
+													</div>
+												@else
+													<div class="col-12 col-xl-3 p-0">
+														<button type="button" class="btn btn-lg btn-outline-primary fumacoFont_card_readmore product-btn notify-me w-100" data-logged="{{ Auth::check() ? 1 : 0 }}" data-item-code="{{ $product_details_array['item_code'] }}">Notify Me</button>
+													</div>
+													<div class="col-12 col-xl-3 p-0 pt-2 p-xl-2 pt-xl-0">
+														<button type="submit" class="btn btn-lg btn-outline-primary fumacoFont_card_readmore product-btn w-100" name="addtowishlist" value="1"><i class="fas fa-heart"></i> Add to Wish List</button>
+													</div>
+												@endif
 											</div>
-											@if($product_details->f_qty < 1)
-											<div class="col-md-12">
-												<button type="submit" class="btn btn-lg btn-outline-primary fumacoFont_card_readmore product-btn col-sm-12" style=" width: 100% !important" name="addtowishlist" value="1"><i class="fas fa-heart"></i> Add to Wish List</button>
-											</div>
-											@endif
 										</div>
 										<div class="row"><br></div>
 									</div>
