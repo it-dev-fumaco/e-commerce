@@ -258,7 +258,7 @@
 								@endphp
 								@include('frontend.product_details_card')
 							@empty
-							<h4 class="text-center text-muted p-5 text-uppercase">No products found</h4>
+							  <h4 class="text-center text-muted p-5 text-uppercase">No products found</h4>
 							@endforelse
 						</div>
 					</div>
