@@ -462,6 +462,13 @@
 							</div>
 							<!-- Desktop/Tablet view end -->
 						@endforeach
+						<div class="row">
+							<div class="col-md-12">
+								<div style="float: right;" id="products-list-pagination">
+									{{ $results->withQueryString()->links('pagination::bootstrap-4') }}
+								</div>
+							</div>
+						</div>
 						</div>
 					</div>
 				</div>
@@ -497,7 +504,7 @@
 								</div>
 							</div>
 						</div>
-						@endforeach
+					@endforeach
 			</div>
 		</div>
 		@endif
