@@ -276,6 +276,11 @@
 							@empty
 							  <h4 class="text-center text-muted p-5 text-uppercase">No products found</h4>
 							@endforelse
+							<div class="container" style="max-width: 100% !important;">
+								<div class="row" id="products-list-pagination">
+									{{ $products->withQueryString()->links('frontend.product_pagination') }}
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
