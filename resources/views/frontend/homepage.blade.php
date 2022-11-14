@@ -138,13 +138,25 @@
       </div>
     </section>
       <div class="album py-5">
-        <div class="container">
-            <section class="regular slider">
-              @foreach($best_selling_arr as $item)
-                @include('frontend.product_details_card')
-              @endforeach
-            </section>
+        <!-- Mobile -->
+        <div class="container-fluid d-block d-md-none p-0">
+          <div class="d-flex flex-row flex-nowrap overflow-auto">
+            @foreach($best_selling_arr as $item)
+              @include('frontend.product_details_slide')
+            @endforeach
+          </div>
         </div>
+        <!-- Mobile -->
+
+        <!-- Desktop/Tablet -->
+        <div class="container d-none d-md-block">
+          <section class="regular slider">
+            @foreach($best_selling_arr as $item)
+              @include('frontend.product_details_card')
+            @endforeach
+          </section>
+        </div>
+        <!-- Desktop/Tablet -->
       </div>
   </div>
   @endif
@@ -159,18 +171,30 @@
     </section>
 
     <div class="album py-5">
-      <div class="container">
-          <section class="regular slider">
-            @foreach($on_sale_arr as $item)
-              @include('frontend.product_details_card')
-            @endforeach
-          </section>
+      <!-- Mobile -->
+      <div class="container-fluid d-block d-md-none p-0">
+        <div class="d-flex flex-row flex-nowrap overflow-auto">
+          @foreach($on_sale_arr as $item)
+            @include('frontend.product_details_slide')
+          @endforeach
+        </div>
       </div>
+      <!-- Mobile -->
+
+      <!-- Desktop/Tablet -->
+      <div class="container d-none d-md-block">
+        <section class="regular slider">
+          @foreach($on_sale_arr as $item)
+            @include('frontend.product_details_card')
+          @endforeach
+        </section>
+      </div>
+      <!-- Desktop/Tablet -->
     </div>
   </div>
   @endif
   @if (Session::has('accounts'))
-    @php
+    @php 
       $accounts = Session::get('accounts');
     @endphp
     @if ($accounts)
@@ -212,7 +236,7 @@
       $('#close-accounts-msg').click(function(){
         $('#multiple-accounts-msg').fadeOut();
       });
-      
+
       // Product Image Hover
       $('.hover-container').hover(function(){
         $(this).children('.btn-container').slideToggle('fast');

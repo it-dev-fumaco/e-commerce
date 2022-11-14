@@ -52,8 +52,12 @@
       .no-border{border:none!important}
       .products-card-img{min-height:300px!important}
       .slick-dots {bottom:-40px;}
+      .out-of-stock-container{width:100%;position:absolute;top:50%;left:0;z-index:9;text-align:center;font-weight:700;color:#9B999B;}
       @media (max-width: 575.98px){
         .products-card-img{min-height:320px!important}
+      }
+      @media (max-width: 1199.98px) {
+        .products-card-img{min-height:200px!important}
       }
     </style>
 
@@ -494,7 +498,7 @@
               slidesToScroll: 1,
               infinite: true,
               touchMove: true,
-              dots: true,
+              dots: false,
               arrows: false,
               customPaging: function(slider, i) {
                 return '<a href="#"><i class="fas fa-circle" style="font-size: 1pt !important; color: rgba(0,0,0,0);-webkit-text-stroke:.5px #0062A5!important;"></i></a>';
@@ -506,8 +510,8 @@
             settings: {
               slidesToShow: 2,
               slidesToScroll: 1,
-              dots: true,
-              arrows: false
+              dots: false,
+              arrows: true
             }
           },
           {
@@ -515,7 +519,7 @@
             settings: {
               slidesToShow: 1,
               slidesToScroll: 1,
-              dots: true,
+              dots: false,
               arrows: false
             }
           },
@@ -524,7 +528,7 @@
             settings: {
               slidesToShow: 1,
               slidesToScroll: 1,
-              dots: true,
+              dots: false,
               arrows: false
             }
           }
@@ -712,7 +716,14 @@
         $(document).on('click', '.add-to-wishlist', function(e){
           e.preventDefault();
           var btn = $(this);
-          btn.removeClass('add-to-wishlist').text('Adding . . .');
+          if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) { // mobile/tablet
+            var btn_fill = '<i class="fas fa-heart"><i>';
+            var loading = '<div class="spinner-border spinner-border-sm text-primary"></div>';
+          }else{ // desktop
+            var loading = 'Adding...';
+            var btn_fill = 'Add to Wishlist';
+          }
+          btn.removeClass('add-to-wishlist').html(loading);
           var data = {
             'item_code': $(this).data('item-code'),
             'quantity': 1,
@@ -726,7 +737,7 @@
             data: data,
             success:function(response){
               setTimeout(function() {
-                btn.addClass('add-to-wishlist').html('Add to Wishlist');
+                btn.addClass('add-to-wishlist').html(btn_fill);
               }, 1800);
             }
           });
@@ -734,7 +745,14 @@
 
         $(document).on('click', '.notify-me', function() {
           var btn = $(this);
-          $(this).html('Adding...');
+          if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) { // mobile/tablet
+            var btn_fill = '<i class="fas fa-bell" style="color: #fff !important;"><i>';
+            var loading = '<div class="spinner-border spinner-border-sm"></div>';
+          }else{ // desktop
+            var loading = 'Adding...';
+            var btn_fill = 'Notify Me';
+          }
+          $(this).html(loading);
           if($(this).data('logged')){
             $.ajax({
               type:'get',
@@ -743,7 +761,8 @@
                 item_code: $(this).data('item-code')
               },
               success: function (response) {
-                btn.html('Notify me');
+                var btn_fill = "{!! !(new \Jenssegers\Agent\Agent())->isDesktop() ? '<i class=\'fas fa-bell\'><i>' : 'Notify Me' !!}";
+                btn.html(btn_fill);
               }
             });
           }else{
