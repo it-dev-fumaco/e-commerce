@@ -28,7 +28,7 @@
 
           @if (!$item['on_stock'])
             <div class="out-of-stock-container">
-                <span style="font-size: 9pt; text-shadow: 1px 1px 1px #000;">Out of Stock</span>
+                <span style="font-size: 9pt;">Out of Stock</span>
             </div>
           @endif
   

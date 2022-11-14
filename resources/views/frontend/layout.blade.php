@@ -52,7 +52,7 @@
       .no-border{border:none!important}
       .products-card-img{min-height:300px!important}
       .slick-dots {bottom:-40px;}
-      .out-of-stock-container{width:100%;position:absolute;top:50%;left:0;z-index:9;text-align:center;font-weight:700;color:#9B999B;}
+      .out-of-stock-container{width:100%;position:absolute;top:50%;left:0;z-index:9;text-align:center;font-weight:700;color:#000;}
       @media (max-width: 575.98px){
         .products-card-img{min-height:320px!important}
       }
