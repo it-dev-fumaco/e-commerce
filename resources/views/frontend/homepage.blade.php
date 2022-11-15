@@ -128,31 +128,35 @@
       </div>
     </div>
   </main>
-  <div class="container marketing">
-    <section class="py-5 text-center container" style="padding-bottom: 0rem !important;">
-      <div class="row py-lg-5">
-        <div class="container-fluid mx-auto">
-          <h4 class="fw-light bestsellinghead fumacoFont1 animated animatedFadeInUp fadeInUp" style="color:#000000 !important; text-transform: uppercase;">Our Brands</h4>
-          <div class="col-10 col-lg-12 mx-auto">
-            <section class="brand-slide slider">
-              @foreach($brands as $brand)
-                <div class="col">
-                  @php
-                    $image = ($brand) ? '/storage/sponsors/'.$brand : '/storage/no-photo-available.png';
-                    $image_webp = ($brand) ? '/storage/sponsors/'.explode(".", $brand)[0] .'.webp' : '/storage/no-photo-available.webp';
-                  @endphp
-                  <picture>
-                    <source srcset="{{ asset($image_webp) }}" type="image/webp">
-                    <source srcset="{{ asset($image) }}" type="image/jpeg">
-                    <img src="{{ asset($image) }}" alt="{{ Str::slug(explode(".", $brand)[0], '-') }}" class="brand-slide-container" loading="lazy">
-                  </picture>
-                </div>
-              @endforeach
-            </section>
+  <div class="container-fluid" style="background-color: #F7FAFC !important">
+    <div class="container marketing">
+      <section class="py-5 text-center container" style="padding-bottom: 0rem !important;">
+        <div class="row py-lg-5">
+          <div class="col-lg-6 col-md-8 mx-auto">
+            <h4 class="fw-light bestsellinghead fumacoFont1 animated animatedFadeInUp fadeInUp" style="color:#000000 !important; text-transform: uppercase;">Our Brands</h4>
           </div>
         </div>
+      </section>
+      <div class="album py-3">
+        <div class="col-10 col-lg-10 mx-auto">
+          <section class="brand-slide slider">
+            @foreach($brands as $brand)
+              <div class="col">
+                @php
+                  $image = ($brand) ? '/storage/sponsors/'.$brand : '/storage/no-photo-available.png';
+                  $image_webp = ($brand) ? '/storage/sponsors/'.explode(".", $brand)[0] .'.webp' : '/storage/no-photo-available.webp';
+                @endphp
+                <picture>
+                  <source srcset="{{ asset($image_webp) }}" type="image/webp">
+                  <source srcset="{{ asset($image) }}" type="image/jpeg">
+                  <img src="{{ asset($image) }}" alt="{{ Str::slug(explode(".", $brand)[0], '-') }}" class="brand-slide-container" loading="lazy">
+                </picture>
+              </div>
+            @endforeach
+          </section>
+        </div>
       </div>
-    </section>
+    </div>
   </div>
   @if(count($best_selling_arr) > 0)
   <div class="container marketing" style=" position: relative !important">
@@ -163,7 +167,7 @@
         </div>
       </div>
     </section>
-    <div class="album py-5">
+    <div class="album py-3">
       <!-- Mobile -->
       <div class="container-fluid d-block d-md-none p-0">
         <div class="d-flex flex-row flex-nowrap overflow-auto">
@@ -196,7 +200,7 @@
       </div>
     </section>
 
-    <div class="album py-5">
+    <div class="album py-3">
       <!-- Mobile -->
       <div class="container-fluid d-block d-md-none p-0">
         <div class="d-flex flex-row flex-nowrap overflow-auto">
