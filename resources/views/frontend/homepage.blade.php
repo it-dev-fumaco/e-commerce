@@ -128,6 +128,32 @@
       </div>
     </div>
   </main>
+  <div class="container marketing">
+    <section class="py-5 text-center container" style="padding-bottom: 0rem !important;">
+      <div class="row py-lg-5">
+        <div class="container-fluid mx-auto">
+          <h4 class="fw-light bestsellinghead fumacoFont1 animated animatedFadeInUp fadeInUp" style="color:#000000 !important; text-transform: uppercase;">Our Brands</h4>
+          <div class="col-10 col-lg-12 mx-auto">
+            <section class="brand-slide slider">
+              @foreach($brands as $brand)
+                <div class="col">
+                  @php
+                    $image = ($brand) ? '/storage/sponsors/'.$brand : '/storage/no-photo-available.png';
+                    $image_webp = ($brand) ? '/storage/sponsors/'.explode(".", $brand)[0] .'.webp' : '/storage/no-photo-available.webp';
+                  @endphp
+                  <picture>
+                    <source srcset="{{ asset($image_webp) }}" type="image/webp">
+                    <source srcset="{{ asset($image) }}" type="image/jpeg">
+                    <img src="{{ asset($image) }}" alt="{{ Str::slug(explode(".", $brand)[0], '-') }}" class="brand-slide-container" loading="lazy">
+                  </picture>
+                </div>
+              @endforeach
+            </section>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
   @if(count($best_selling_arr) > 0)
   <div class="container marketing" style=" position: relative !important">
     <section class="py-5 text-center container" style="padding-bottom: 0rem !important;">
@@ -137,15 +163,27 @@
         </div>
       </div>
     </section>
-      <div class="album py-5">
-        <div class="container">
-            <section class="regular slider">
-              @foreach($best_selling_arr as $item)
-                @include('frontend.product_details_card')
-              @endforeach
-            </section>
+    <div class="album py-5">
+      <!-- Mobile -->
+      <div class="container-fluid d-block d-md-none p-0">
+        <div class="d-flex flex-row flex-nowrap overflow-auto">
+          @foreach($best_selling_arr as $item)
+            @include('frontend.product_details_slide')
+          @endforeach
         </div>
       </div>
+      <!-- Mobile -->
+
+      <!-- Desktop/Tablet -->
+      <div class="container d-none d-md-block">
+        <section class="regular slider">
+          @foreach($best_selling_arr as $item)
+            @include('frontend.product_details_card')
+          @endforeach
+        </section>
+      </div>
+      <!-- Desktop/Tablet -->
+    </div>
   </div>
   @endif
   @if(count($on_sale_arr) > 0)
@@ -159,18 +197,30 @@
     </section>
 
     <div class="album py-5">
-      <div class="container">
-          <section class="regular slider">
-            @foreach($on_sale_arr as $item)
-              @include('frontend.product_details_card')
-            @endforeach
-          </section>
+      <!-- Mobile -->
+      <div class="container-fluid d-block d-md-none p-0">
+        <div class="d-flex flex-row flex-nowrap overflow-auto">
+          @foreach($on_sale_arr as $item)
+            @include('frontend.product_details_slide')
+          @endforeach
+        </div>
       </div>
+      <!-- Mobile -->
+
+      <!-- Desktop/Tablet -->
+      <div class="container d-none d-md-block">
+        <section class="regular slider">
+          @foreach($on_sale_arr as $item)
+            @include('frontend.product_details_card')
+          @endforeach
+        </section>
+      </div>
+      <!-- Desktop/Tablet -->
     </div>
   </div>
   @endif
   @if (Session::has('accounts'))
-    @php
+    @php 
       $accounts = Session::get('accounts');
     @endphp
     @if ($accounts)
@@ -212,10 +262,70 @@
       $('#close-accounts-msg').click(function(){
         $('#multiple-accounts-msg').fadeOut();
       });
-      
+
       // Product Image Hover
       $('.hover-container').hover(function(){
         $(this).children('.btn-container').slideToggle('fast');
+      });
+
+      $(".brand-slide").slick({
+        dots: true,
+        customPaging: function(slider, i) {
+          return '<a href="#"><i class="fas fa-circle" style="font-size: 8pt !important; color: rgba(0,0,0,0);-webkit-text-stroke:.5px #0062A5!important;"></i></a>';
+        },
+        arrows: true,
+        infinite: true,
+        dots: false,
+        slidesToShow: 4,
+        slidesToScroll: 1,
+        touchMove: true,
+        autoplay: true,
+        responsive: [
+          {
+            breakpoint: 1024,
+            settings: {
+              slidesToShow: 3,
+              slidesToScroll: 1,
+              infinite: true,
+              touchMove: true,
+              dots: false,
+              arrows: false,
+              customPaging: function(slider, i) {
+                return '<a href="#"><i class="fas fa-circle" style="font-size: 1pt !important; color: rgba(0,0,0,0);-webkit-text-stroke:.5px #0062A5!important;"></i></a>';
+              },
+            }
+          },
+          {
+            breakpoint: 600,
+            settings: {
+              slidesToShow: 2,
+              slidesToScroll: 1,
+              dots: false,
+              touchMove: true,
+              arrows: false
+            }
+          },
+          {
+            breakpoint: 575.98,
+            settings: {
+              slidesToShow: 3,
+              slidesToScroll: 1,
+              dots: false,
+              touchMove: true,
+              arrows: false,
+            }
+          },
+          {
+            breakpoint: 480,
+            settings: {
+              slidesToShow: 3,
+              slidesToScroll: 1,
+              dots: false,
+              touchMove: true,
+              arrows: false,
+            }
+          }
+        ]
       });
     });
   </script>

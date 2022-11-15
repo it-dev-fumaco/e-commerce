@@ -227,7 +227,7 @@
                     @foreach ($partners as $partner)
                     @php
                         $image = ($partner->image) ? '/storage/sponsors/'.$partner->image : '/storage/no-photo-available.png';
-                        $image_webp = ($partner->image) ? '/storage/sponsors/'.explode(".", $partner->image)[0] .'.webp' : '/storage/no-photo-available.png';
+                        $image_webp = ($partner->image) ? '/storage/sponsors/'.explode(".", $partner->image)[0] .'.webp' : '/storage/no-photo-available.webp';
                     @endphp
 
                     <div class="col-md-2" style="padding-bottom: 20px;">
@@ -235,7 +235,6 @@
                             <source srcset="{{ asset($image_webp) }}" type="image/webp">
                             <source srcset="{{ asset($image) }}" type="image/jpeg">
                             <img src="{{ asset($image) }}" alt="{{ Str::slug(explode(".", $partner->image)[0], '-') }}" class="img-thumbnail" loading="lazy">
-
                         </picture>
                     </div>
                     @endforeach

@@ -52,8 +52,50 @@
       .no-border{border:none!important}
       .products-card-img{min-height:300px!important}
       .slick-dots {bottom:-40px;}
+      .out-of-stock-container{width:100%;position:absolute;top:50%;left:0;z-index:9;text-align:center;font-weight:700;color:#000;}
+      .brand-slide-container{min-height:170px!important;}
+      .brand-slide .slick-slide {
+        margin: 0 50px !important;
+      }
+      .brand-slide .slick-list {
+        margin: 0 -50px !important;
+      }
+      .brand-slide .slick-next{
+        right:-95px!important
+      }
+      .brand-slide .slick-prev{
+        left:-95px!important
+      }
+      @media (max-width: 1199.98px) {
+        .products-card-img{min-height:200px!important}
+        .brand-slide .slick-next, .slick-next{
+            right:-45px!important
+        }
+        .brand-slide .slick-prev, .slick-prev{
+            left:-45px!important
+        }
+        .brand-slide .slick-slide {
+          margin: 0 10px !important;
+        }
+        .brand-slide .slick-list {
+          margin: 0 -10px !important;
+        }
+      }
       @media (max-width: 575.98px){
-        .products-card-img{min-height:320px!important}
+        .products-card-img{min-height:175px!important}
+        .brand-slide-container{min-height:90px!important;}
+        .brand-slide .slick-next, .slick-next{
+            right:-45px!important
+        }
+        .brand-slide .slick-prev, .slick-prev{
+            left:-45px!important
+        }
+        .brand-slide .slick-slide {
+          margin: 0 10px !important;
+        }
+        .brand-slide .slick-list {
+          margin: 0 -10px !important;
+        }
       }
     </style>
 
@@ -334,9 +376,9 @@
   <footer>
     @include('cookieConsent::index')
     <main style="background-color:#0C0C0C;">
-      <div class="container marketing">
+      <div class="col-12 col-xl-10 mx-auto marketing">
         <div class="row p-4">
-          <div class="col-12 col-md-2">
+          <div class="col-12 col-md-3 col-xl-2">
             <picture>
               <source srcset="{{ asset('/assets/site-img/logo-sm.webp') }}" type="image/webp">
               <source srcset="{{ asset('/assets/site-img/logo-sm.png') }}" type="image/jpeg">
@@ -374,7 +416,7 @@
             </table>
           </div>
 
-          <div class="col-12 col-md-5 mt-md-2">
+          <div class="col-12 col-md-4 col-xl-5 mt-md-2">
             <h6 class="footer1st d-md-none" style="color:#ffffff !important; text-align: left; font-weight: 500 !important">SUBSCRIBE TO NEWSLETTER</h6>
             <h6 class="footer1st d-none d-md-block" style="color:#ffffff !important; text-align: right; font-weight: 500 !important">SUBSCRIBE TO NEWSLETTER</h6>
             <form action="/subscribe" method="POST">
@@ -494,8 +536,8 @@
               slidesToScroll: 1,
               infinite: true,
               touchMove: true,
-              dots: true,
-              arrows: false,
+              dots: false,
+              arrows: true,
               customPaging: function(slider, i) {
                 return '<a href="#"><i class="fas fa-circle" style="font-size: 1pt !important; color: rgba(0,0,0,0);-webkit-text-stroke:.5px #0062A5!important;"></i></a>';
               },
@@ -506,17 +548,8 @@
             settings: {
               slidesToShow: 2,
               slidesToScroll: 1,
-              dots: true,
-              arrows: false
-            }
-          },
-          {
-            breakpoint: 480,
-            settings: {
-              slidesToShow: 1,
-              slidesToScroll: 1,
-              dots: true,
-              arrows: false
+              dots: false,
+              arrows: true
             }
           },
           {
@@ -524,8 +557,17 @@
             settings: {
               slidesToShow: 1,
               slidesToScroll: 1,
-              dots: true,
-              arrows: false
+              dots: false,
+              arrows: true,
+            }
+          },
+          {
+            breakpoint: 480,
+            settings: {
+              slidesToShow: 1,
+              slidesToScroll: 1,
+              dots: false,
+              arrows: true,
             }
           }
         ]
@@ -712,7 +754,14 @@
         $(document).on('click', '.add-to-wishlist', function(e){
           e.preventDefault();
           var btn = $(this);
-          btn.removeClass('add-to-wishlist').text('Adding . . .');
+          if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) { // mobile/tablet
+            var btn_fill = '<i class="fas fa-heart"><i>';
+            var loading = '<div class="spinner-border spinner-border-sm text-primary"></div>';
+          }else{ // desktop
+            var loading = 'Adding...';
+            var btn_fill = 'Add to Wishlist';
+          }
+          btn.removeClass('add-to-wishlist').html(loading);
           var data = {
             'item_code': $(this).data('item-code'),
             'quantity': 1,
@@ -726,7 +775,7 @@
             data: data,
             success:function(response){
               setTimeout(function() {
-                btn.addClass('add-to-wishlist').html('Add to Wishlist');
+                btn.addClass('add-to-wishlist').html(btn_fill);
               }, 1800);
             }
           });
@@ -734,7 +783,14 @@
 
         $(document).on('click', '.notify-me', function() {
           var btn = $(this);
-          $(this).html('Adding...');
+          if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) { // mobile/tablet
+            var btn_fill = '<i class="fas fa-bell" style="color: #fff !important;"><i>';
+            var loading = '<div class="spinner-border spinner-border-sm"></div>';
+          }else{ // desktop
+            var loading = 'Adding...';
+            var btn_fill = 'Notify Me';
+          }
+          $(this).html(loading);
           if($(this).data('logged')){
             $.ajax({
               type:'get',
@@ -743,7 +799,7 @@
                 item_code: $(this).data('item-code')
               },
               success: function (response) {
-                btn.html('Notify me');
+                btn.html(btn_fill);
               }
             });
           }else{
