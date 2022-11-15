@@ -583,7 +583,9 @@ class FrontendController extends Controller
 
         $page_meta = DB::table('fumaco_pages')->where('is_homepage', 1)->select('page_title', 'meta_description', 'meta_keywords', 'page_name')->first();
 
-        return view('frontend.homepage', compact('carousel_data', 'onsale_carousel_data', 'blogs', 'best_selling_arr', 'on_sale_arr', 'page_meta', 'image_for_sharing'));
+        $brands = DB::table('fumaco_about_partners')->where('xstatus', 1)->orderBy('partners_sort', 'asc')->pluck('image');
+
+        return view('frontend.homepage', compact('carousel_data', 'onsale_carousel_data', 'blogs', 'best_selling_arr', 'on_sale_arr', 'page_meta', 'image_for_sharing', 'brands'));
     }
 
     public function getAutoCompleteData(Request $request){
@@ -1076,8 +1078,7 @@ class FrontendController extends Controller
     public function viewAboutPage() {
         $about_data = DB::table('fumaco_about')->first();
 
-        $partners = DB::table('fumaco_about_partners')->where('xstatus', 1)
-            ->select('image')->orderBy('partners_sort', 'asc')->get();
+        $partners = DB::table('fumaco_about_partners')->where('xstatus', 1)->select('image')->orderBy('partners_sort', 'asc')->get();
 
         $bg1 = explode('.',$about_data->background_1);
         $bg2 = explode('.',$about_data->background_2);

@@ -65,7 +65,7 @@
                 </a>
             </div>
             <div class="col-6 col-md-7 p-1">
-                <a href="/login" class="btn w-100 text-center w-100 p-2 border-0 {{ Auth::check() ? 'add-to-wishlist' : '' }} btn-hover" role="button" data-item-code="{{ $item['item_code'] }}" style="background-color: #E6F0F8; color: #0F6EB5; font-weight: 600; font-size: 10pt; border-radius: 0 !important;">
+                <a href="/login" class="btn w-100 text-center w-100 p-2 {{ Auth::check() ? 'add-to-wishlist' : '' }} btn-hover" role="button" data-item-code="{{ $item['item_code'] }}" style="background-color: #E6F0F8; color: #0F6EB5; font-weight: 600; font-size: 10pt; border-radius: 0 !important;">
                     <i class="fas fa-heart"></i>
                 </a>
             </div>
