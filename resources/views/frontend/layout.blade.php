@@ -54,48 +54,24 @@
       .slick-dots {bottom:-40px;}
       .out-of-stock-container{width:100%;position:absolute;top:50%;left:0;z-index:9;text-align:center;font-weight:700;color:#000;}
       .brand-slide-container{min-height:170px!important;}
-      .brand-slide .slick-slide {
-        margin: 0 50px !important;
-      }
-      .brand-slide .slick-list {
-        margin: 0 -50px !important;
-      }
-      .brand-slide .slick-next{
-        right:-95px!important
-      }
-      .brand-slide .slick-prev{
-        left:-95px!important
-      }
+      .brand-slide .slick-slide {margin: 0 60px !important;}
+      .brand-slide .slick-list {margin: 0 -60px !important;}
+      .brand-slide .slick-next{right:-95px!important}
+      .brand-slide .slick-prev{left:-95px!important}
       @media (max-width: 1199.98px) {
         .products-card-img{min-height:200px!important}
-        .brand-slide .slick-next, .slick-next{
-            right:-45px!important
-        }
-        .brand-slide .slick-prev, .slick-prev{
-            left:-45px!important
-        }
-        .brand-slide .slick-slide {
-          margin: 0 10px !important;
-        }
-        .brand-slide .slick-list {
-          margin: 0 -10px !important;
-        }
+        .brand-slide .slick-next, .slick-next{right:-45px!important}
+        .brand-slide .slick-prev, .slick-prev{left:-45px!important}
+        .brand-slide .slick-slide {margin: 0 10px !important;}
+        .brand-slide .slick-list {margin: 0 -10px !important;}
       }
       @media (max-width: 575.98px){
         .products-card-img{min-height:175px!important}
         .brand-slide-container{min-height:90px!important;}
-        .brand-slide .slick-next, .slick-next{
-            right:-45px!important
-        }
-        .brand-slide .slick-prev, .slick-prev{
-            left:-45px!important
-        }
-        .brand-slide .slick-slide {
-          margin: 0 10px !important;
-        }
-        .brand-slide .slick-list {
-          margin: 0 -10px !important;
-        }
+        .brand-slide .slick-next, .slick-next{right:-45px!important}
+        .brand-slide .slick-prev, .slick-prev{left:-45px!important}
+        .brand-slide .slick-slide {margin: 0 10px !important;}
+        .brand-slide .slick-list {margin: 0 -10px !important;}
       }
     </style>
 
