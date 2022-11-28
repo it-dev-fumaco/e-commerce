@@ -165,11 +165,25 @@
                     <div class="container-fluid p-0 mb-3">
                         <h4>Frequently Bought Together</h4>
                         <br/>
-                        <div class="row regular" style="min-height: 300px">
-                            @foreach($cross_sell_arr as $item)
-                                @include('frontend.product_details_card')
-                            @endforeach
-                        </div>
+                        <!-- Mobile -->
+                            <div class="container-fluid d-block d-md-none p-0">
+                                <div class="d-flex flex-row flex-nowrap overflow-auto">
+                                @foreach($cross_sell_arr as $item)
+                                    @include('frontend.product_details_slide')
+                                @endforeach
+                                </div>
+                            </div>
+                        <!-- Mobile -->
+
+                        <!-- Desktop/Tablet -->
+                            <div class="container d-none d-md-block">
+                                <div class="row regular" style="min-height: 300px">
+                                    @foreach($cross_sell_arr as $item)
+                                        @include('frontend.product_details_card')
+                                    @endforeach
+                                </div>
+                            </div>
+                        <!-- Desktop/Tablet -->
                     </div>
                 @endif
             </div>
@@ -421,6 +435,22 @@
 			transform: rotate(360deg);
 		}
 	}
+    @media (max-width: 767.98px) {
+        .tbl-qtr{
+            width: 20% !important;
+        }
+        .tbl-half{
+            width: 60% !important;
+        }
+        .breadcrumb{
+            font-size: 8pt !important;
+            font-weight: 500;
+        }
+        .font-responsive, .prod_desc{
+            font-size: 10pt !important;
+        }
+    }
+
     @media (max-width: 575.98px) {
         .tbl-qtr{
             width: 20% !important;
@@ -437,21 +467,13 @@
         }
     }
 
-    @media (max-width: 767.98px) {
-        .tbl-qtr{
-            width: 20% !important;
-        }
-        .tbl-half{
-            width: 60% !important;
-        }
-        .breadcrumb{
-            font-size: 8pt !important;
-            font-weight: 500;
-        }
-        .font-responsive{
-            font-size: 10pt !important;
+    @media (max-width:360px) {
+        .products-card-img {
+            min-height: 250px !important
         }
     }
+
+    
 </style>
 @endsection
 
