@@ -463,11 +463,25 @@
 							</section>
 							<div class="album py-5" style="position: relative">
 								<div class="container related-prod">
-									<section class="regular slider">
-										@foreach($related_products as $item)
-											@include('frontend.product_details_card')
-										@endforeach
-									</section>
+									<!-- Mobile -->
+										<div class="container-fluid d-block d-md-none p-0">
+											<div class="d-flex flex-row flex-nowrap overflow-auto">
+											@foreach($related_products as $item)
+												@include('frontend.product_details_slide')
+											@endforeach
+											</div>
+										</div>
+									<!-- Mobile -->
+
+									<!-- Desktop/Tablet -->
+										<div class="container d-none d-md-block">
+											<section class="regular slider">
+												@foreach($related_products as $item)
+													@include('frontend.product_details_card')
+												@endforeach
+											</section>
+										</div>
+									<!-- Desktop/Tablet -->
 								</div>
 							</div>
 							@endif
@@ -481,11 +495,25 @@
 							</section>
 							<div class="album py-5" style="position: relative">
 								<div class="container related-prod">
-									<section class="regular slider">
-										@foreach ($recommended_items as $item)
-											@include('frontend.product_details_card')
-										@endforeach
-									</section>
+									<!-- Mobile -->
+										<div class="container-fluid d-block d-md-none p-0">
+											<div class="d-flex flex-row flex-nowrap overflow-auto">
+											@foreach($recommended_items as $item)
+												@include('frontend.product_details_slide')
+											@endforeach
+											</div>
+										</div>
+									<!-- Mobile -->
+
+									<!-- Desktop/Tablet -->
+										<div class="container d-none d-md-block">
+											<section class="regular slider">
+												@foreach($recommended_items as $item)
+													@include('frontend.product_details_card')
+												@endforeach
+											</section>
+										</div>
+									<!-- Desktop/Tablet -->
 								</div>
 							</div>
 							@endif
