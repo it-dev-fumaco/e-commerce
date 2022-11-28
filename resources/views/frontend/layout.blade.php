@@ -72,6 +72,8 @@
         .brand-slide .slick-prev, .slick-prev{left:-45px!important}
         .brand-slide .slick-slide {margin: 0 10px !important;}
         .brand-slide .slick-list {margin: 0 -10px !important;}
+        #product-category-dropdown{max-height: 180px;}
+        .category-menu{font-size: 9pt !important;}
       }
     </style>
 
@@ -228,7 +230,7 @@
             <ul class="navbar-nav me-auto mb-2 mb-md-0 navbar-header">
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDarkDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">PRODUCTS</a>
-                <ul class="dropdown-menu dropdown-menu-light navbar-header" style="font-weight: 300 !important;" aria-labelledby="navbarDarkDropdownMenuLink" id="product-category-dropdown">
+                <ul class="dropdown-menu dropdown-menu-light navbar-header overflow-auto" style="font-weight: 300 !important;" aria-labelledby="navbarDarkDropdownMenuLink" id="product-category-dropdown">
                 </ul>
               </li>
               <li class="nav-item">
@@ -571,7 +573,7 @@
               var target = (d.external_link) ? 'target="_blank"' : '';
               var is_new = d.is_new == 1 ? '' : 'd-none';
               // for navbar dropdown
-              l += '<li><a class="dropdown-item" style="font-weight: 300 !important;" href="' + link +'" ' + target + '>' +
+              l += '<li><a class="dropdown-item category-menu" style="font-weight: 300 !important;" href="' + link +'" ' + target + '>' +
               '<img src="{{ asset("assets/site-img/icon/") }}/' + d.image + '" alt="' + d.name +'" width="30" loading="lazy">' + d.name +
               '&nbsp;<span class="badge alert-primary ' + is_new + '" style="font-size: 8pt !important;">New</span></a></li>';
               // for footer links
