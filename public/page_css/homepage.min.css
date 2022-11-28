@@ -185,6 +185,12 @@
     }
 }
 
+@media (max-width:360px) {
+    .products-card-img {
+        min-height: 250px !important
+    }
+}
+
 body,
 html {
     margin: 0;
