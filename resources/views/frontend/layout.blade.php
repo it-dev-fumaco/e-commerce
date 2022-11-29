@@ -72,7 +72,7 @@
         .brand-slide .slick-prev, .slick-prev{left:-45px!important}
         .brand-slide .slick-slide {margin: 0 10px !important;}
         .brand-slide .slick-list {margin: 0 -10px !important;}
-        #product-category-dropdown{max-height: 180px;}
+        #product-category-dropdown{max-height: 45vh !important;}
         .category-menu{font-size: 9pt !important;}
       }
     	@media (max-width: 369.98px){ /* extra small screens (J2, etc.) */
