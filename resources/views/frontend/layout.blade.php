@@ -65,7 +65,7 @@
         .brand-slide .slick-slide {margin: 0 10px !important;}
         .brand-slide .slick-list {margin: 0 -10px !important;}
       }
-      @media (max-width: 575.98px){
+      @media (max-width: 575.98px){ /* normal mobile */
         .products-card-img{min-height:175px!important}
         .brand-slide-container{min-height:90px!important;}
         .brand-slide .slick-next, .slick-next{right:-45px!important}
@@ -75,6 +75,10 @@
         #product-category-dropdown{max-height: 180px;}
         .category-menu{font-size: 9pt !important;}
       }
+    	@media (max-width: 369.98px){ /* extra small screens (J2, etc.) */
+        .mob-srch{padding-top: 10px;}
+      }
+
     </style>
 
     @if ($activePage != 'error_page')

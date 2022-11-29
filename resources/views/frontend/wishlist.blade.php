@@ -49,8 +49,9 @@
 									<img src="{{ asset('/storage/item_images/'.$wishlist['item_code'].'/gallery/preview/'.$wishlist['image']) }}" class="img-responsive" alt="" width="55" height="55" loading='lazy'>
 								</picture>
 							</td>
-							<td class="tbls">{{ $wishlist['item_name'] }}<br/>&nbsp;
-							<p class="d-lg-none d-xl-none"><b>Price:</b> P {{ number_format($wishlist['item_price'], 2) }}</p>
+							<td class="tbls">
+								{{ $wishlist['item_name'] }}<br/>&nbsp;
+								<p class="d-lg-none d-xl-none"><b>Price: </b> ₱ {{ number_format($wishlist['item_price'], 2) }}</p>
 							</td>
 							<td class="tbls text-center d-none d-sm-table-cell">P {{ number_format($wishlist['item_price'], 2) }}</td>
 							<td class="tbls text-center">
@@ -130,6 +131,11 @@
 	}
 	.tbls{
 		vertical-align: center !important;
+	}
+	@media (max-width: 369.98px){
+		.products-head{
+			padding: 0 !important;
+		}
 	}
 </style>
 @endsection
