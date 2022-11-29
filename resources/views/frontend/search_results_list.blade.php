@@ -24,17 +24,22 @@
                             $image = ($item['image']) ? '/storage/item_images/'.$item['item_code'].'/gallery/preview/'.$item['image'] : '/storage/no-photo-available.png';
                             $image_webp = ($item['image']) ? '/storage/item_images/'.$item['item_code'].'/gallery/preview/'.explode(".", $item['image'])[0] .'.webp' : '/storage/no-photo-available.webp';
                         @endphp              
-                        <picture>
-                            <source srcset="{{ asset($image_webp) }}" type="image/webp">
-                            <source srcset="{{ asset($image) }}" type="image/jpeg"> 
-                            <img src="{{ asset($image) }}" alt="{{ Str::slug($item['item_name'], '-') }}" class="card-img-top hover" loading="lazy">
-                        </picture>
+                        <div style="position: relative;">
+                            @if (!$item['on_stock'])
+                                <div class="overlay" style="display: flex; justify-content: center; align-items: center">Out of Stock</div>
+                            @endif
+                            <picture>
+                                <source srcset="{{ asset($image_webp) }}" type="image/webp">
+                                <source srcset="{{ asset($image) }}" type="image/jpeg"> 
+                                <img src="{{ asset($image) }}" alt="{{ Str::slug($item['alt'], '-') }}" class="card-img-top hover" loading="lazy">
+                            </picture>
+                        </div>
                     </div>
                     <div class="col-8">
                         <div class="text ellipsis mb-1">
-                            <a href="/product/{{ $item['slug'] ? $item['slug'] : $item['item_code'] }}" class="card-text mob-prod-text-concat" style="text-transform: none !important; text-decoration: none !important; color:#0062A5 !important; font-weight: 500 !important">{{ $item['item_name'] }}</a>
+                            <a href="/product/{{ $item['slug'] ? $item['slug'] : $item['item_code'] }}" class="card-text mob-prod-text-concat" style="text-transform: none !important; text-decoration: none !important; color:#0062A5 !important; font-weight: 500 !important; font-size: 9pt;">{{ $item['item_name'] }}</a>
                         </div>
-                        <p class="card-text fumacoFont_card_price" style="color:#000000 !important; font-size: 7pt">
+                        <p class="card-text fumacoFont_card_price" style="color:#000000 !important; font-size: 9pt !important">
                             @if($item['is_discounted'])
                                 {{ $item['discounted_price'] }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">{{ $item['default_price'] }}</s>
                             @else
@@ -59,9 +64,6 @@
                                 Add to Cart
                             </a>
                         @else
-                            <center>
-                                <span class="mb-2" style="font-weight: 600; color: #F50000">Out of Stock</span>
-                            </center>
                             <a href="#" class="btn btn-outline-primary text-center w-100 p-2 notify-me border-0" role="button" style="font-weight: 600; font-size: 10pt; margin-bottom: 5px;" data-logged="{{ Auth::check() ? 1 : 0 }}" data-item-code="{{ $item['item_code'] }}">
                                 Notify me
                             </a>
@@ -116,18 +118,23 @@
                     @php
                         $image = ($item['image']) ? '/storage/item_images/'.$item['item_code'].'/gallery/preview/'.$item['image'] : '/storage/no-photo-available.png';
                         $image_webp = ($item['image']) ? '/storage/item_images/'.$item['item_code'].'/gallery/preview/'.explode(".", $item['image'])[0] .'.webp' : '/storage/no-photo-available.webp';
-                    @endphp              
-                    <picture>
-                        <source srcset="{{ asset($image_webp) }}" type="image/webp">
-                        <source srcset="{{ asset($image) }}" type="image/jpeg"> 
-                        <img src="{{ asset($image) }}" alt="{{ Str::slug($item['alt'], '-') }}" class="card-img-top hover" loading="lazy">
-                    </picture>
+                    @endphp
+                    <div style="position: relative;">
+                        @if (!$item['on_stock'])
+                            <div class="overlay" style="display: flex; justify-content: center; align-items: center">Out of Stock</div>
+                        @endif
+                        <picture>
+                            <source srcset="{{ asset($image_webp) }}" type="image/webp">
+                            <source srcset="{{ asset($image) }}" type="image/jpeg"> 
+                            <img src="{{ asset($image) }}" alt="{{ Str::slug($item['alt'], '-') }}" class="card-img-top hover" loading="lazy">
+                        </picture>
+                    </div>
                 </div>
                 <div class="col-8">
                     <div class="text ellipsis mb-1">
-                        <a href="/product/{{ $item['slug'] ? $item['slug'] : $item['item_code'] }}" class="card-text mob-prod-text-concat" style="text-transform: none !important; text-decoration: none !important; color:#0062A5 !important; font-weight: 500 !important">{{ $item['item_name'] }}</a>
+                        <a href="/product/{{ $item['slug'] ? $item['slug'] : $item['item_code'] }}" class="card-text mob-prod-text-concat" style="text-transform: none !important; text-decoration: none !important; color:#0062A5 !important; font-size: 9pt; font-weight: 500 !important">{{ $item['item_name'] }}</a>
                     </div>
-                    <p class="card-text fumacoFont_card_price" style="color:#000000 !important; font-size: 7pt">
+                    <p class="card-text fumacoFont_card_price" style="color:#000000 !important; font-size: 9pt !important">
                         @if($item['is_discounted'])
                         {{ $item['discounted_price'] }}&nbsp;<br class="d-none d-md-block d-lg-none"/><s style="color: #c5c5c5;">{{ $item['default_price'] }}</s>
                         @else
@@ -142,7 +149,7 @@
                                 @else
                                 <span class="fa fa-star" style="color: #FFD600;"></span>
                                 @endif
-                                @endfor
+                            @endfor
                         
                         </div>
                         <small class="text-muted stylecap" style="color:#c4cad0 !important; font-weight:100 !important;">( {{ $item['total_reviews'] }} Reviews )</small>
@@ -151,9 +158,6 @@
                     @if ($item['on_stock'] == 1)
                         <a href="#" class="btn btn-outline-primary text-center w-100 p-2 add-to-cart" role="button" style="font-weight: 600; margin-bottom: 20px; font-size: 10pt;" data-item-code="{{ $item['item_code'] }}">Add to Cart</a>
                     @else
-                        <center>
-                            <span style="font-weight: 600; color: #F50000">Out of Stock</span>
-                        </center>
                         <a href="#" class="btn btn-outline-primary text-center w-100 p-2 notify-me border-0" role="button" style="font-weight: 600; font-size: 10pt; margin-bottom: 5px;" data-logged="{{ Auth::check() ? 1 : 0 }}" data-item-code="{{ $item['item_code'] }}">
                             Notify me
                         </a>
@@ -215,10 +219,13 @@
     </div>
 </div>
 @endif
-<div class="row">
-    <div class="col-md-12">
-        <div style="float: right;" id="products-list-pagination">
+<div class="row p-0">
+    <div class="container-fluid d-none d-md-block">
+        <div style="float: right;" class="products-list-pagination">
             {{ $results->withQueryString()->links('pagination::bootstrap-4') }}
         </div>
+    </div>
+    <div style="font-size: 9pt;" class="products-list-pagination d-md-none">
+        {{ $results->withQueryString()->onEachSide(1)->links('pagination::bootstrap-4') }}
     </div>
 </div>
