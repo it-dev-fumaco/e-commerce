@@ -148,7 +148,6 @@
 														<source srcset="{{ asset($img) }}" type="image/jpeg">
 														<img src="{{ asset('/storage/item_images/'.$cart['item_code'].'/gallery/preview/'.$cart['item_image']) }}" class="img-responsive" alt="{{ Str::slug($cart['alt'], '-') }}" width="55" height="55">
 													</picture>
-													{{-- <img src="{{ asset('/storage/item_images/'.$cart['item_code'].'/gallery/preview/'.$cart['item_image']) }}" class="img-responsive" alt="{{ Str::slug(explode(".", $cart['item_image'])[0], '-') }}" width="55" height="55"> --}}
 												</center>
 											</td>
 											<td>
@@ -396,8 +395,8 @@
 							<tr>
 								<th></th>
 								<th class="addressModal">Address</th>
-								<th class="addressModal">Contacts</th>
-								<th class="addressModal">Type</th>
+								<th class="addressModal d-none d-sm-table-cell">Contacts</th>
+								<th class="addressModal d-none d-sm-table-cell">Type</th>
 								<th class="addressModal">Action</th>
 							</tr>
 						</thead>
@@ -413,16 +412,37 @@
 									@endif
 									</a>
 								</td>
-								<td class="addressModal">{{ $shipping_address->xadd1 .' '. $shipping_address->xadd2 .' '. $shipping_address->xprov }}</td>
-								<td class="addressModal">{{ $shipping_address->xcontactlastname1 .', '.$shipping_address->xcontactname1 }}</td>
-								<td class="addressModal">{{ $shipping_address->add_type }}</td>
 								<td class="addressModal">
-									<button type="button" class="btn btn-success btn-xs shipping {{ $key }} open-modal" data-toggle="modal" data-target="#shipping-view{{ $shipping_address->id }}">
-										<i class="fas fa-eye"></i>
-									</button>
-									<button type="button" class="btn btn-danger btn-xs open-modal" data-toggle="modal" data-target="#shipping-del{{ $shipping_address->id }}">
-										<i class="fas fa-trash-alt"></i>
-									</button>
+									{{ $shipping_address->xadd1 .' '. $shipping_address->xadd2 .' '. $shipping_address->xprov }}
+									<div class="d-md-none">
+										<b>Contact:</b> {{ $shipping_address->xcontactlastname1 .', '.$shipping_address->xcontactname1 }}<br>
+										<b>Type: </b> {{ $shipping_address->add_type }}
+									</div>
+								</td>
+								<td class="addressModal d-none d-sm-table-cell">{{ $shipping_address->xcontactlastname1 .', '.$shipping_address->xcontactname1 }}</td>
+								<td class="addressModal d-none d-sm-table-cell">{{ $shipping_address->add_type }}</td>
+								<td class="addressModal">
+									<!-- Desktop -->
+									<div class="d-none d-md-block">
+										<button type="button" class="btn btn-success btn-xs shipping {{ $key }} open-modal" data-toggle="modal" data-target="#shipping-view{{ $shipping_address->id }}">
+											<i class="fas fa-eye"></i>
+										</button>
+										<button type="button" class="btn btn-danger btn-xs open-modal" data-toggle="modal" data-target="#shipping-del{{ $shipping_address->id }}">
+											<i class="fas fa-trash-alt"></i>
+										</button>
+									</div>
+									<!-- Desktop -->
+									<!-- Mobile -->
+									<div class="d-md-none">
+										<button type="button" class="btn btn-success btn-xs shipping {{ $key }} open-modal w-100" data-toggle="modal" data-target="#shipping-view{{ $shipping_address->id }}">
+											<i class="fas fa-eye"></i>
+										</button>
+										<button type="button" class="btn btn-danger btn-xs open-modal w-100" data-toggle="modal" data-target="#shipping-del{{ $shipping_address->id }}">
+											<i class="fas fa-trash-alt"></i>
+										</button>
+									</div>
+									<!-- Mobile -->
+
 									<div id="shipping-del{{ $shipping_address->id }}" class="modal fade" role="dialog">
 										<form action="/myprofile/address/{{ $shipping_address->id }}/shipping/delete" method="POST">
 											@csrf
@@ -590,8 +610,8 @@
 						<tr>
 							<th></th>
 							<th class="addressModal">Address</th>
-							<th class="addressModal">Contacts</th>
-							<th class="addressModal">Type</th>
+							<th class="addressModal d-none d-sm-table-cell">Contacts</th>
+							<th class="addressModal d-none d-sm-table-cell">Type</th>
 							<th class="addressModal">Action</th>
 						</tr>
 					</thead>
@@ -607,13 +627,38 @@
 								@endif
 								</a>
 							</td>
-							<td class="addressModal">{{ $billing_address->xadd1 . ' ' . $billing_address->xadd2 .' '. $billing_address->xprov}}</td>
-							<td class="addressModal">{{ $billing_address->xcontactlastname1 . ', ' . $billing_address->xcontactname1 }}</td>
-							<td class="addressModal">{{ $billing_address->add_type }}</td>
 							<td class="addressModal">
-								<button type="button" class="btn btn-success btn-xs billing {{ $key }} open-modal" data-toggle="modal" data-target="#myadd{{ $billing_address->id }}">
-									<i class="fas fa-eye"></i>
-								</button>
+								{{ $billing_address->xadd1 . ' ' . $billing_address->xadd2 .' '. $billing_address->xprov}}
+								<div class="d-md-none">
+									<b>Contact: </b>{{ $billing_address->xcontactlastname1 . ', ' . $billing_address->xcontactname1 }} <br>
+									<b>Type: </b>{{ $billing_address->add_type }}
+								</div>
+							</td>
+							<td class="addressModal d-none d-sm-table-cell">{{ $billing_address->xcontactlastname1 . ', ' . $billing_address->xcontactname1 }}</td>
+							<td class="addressModal d-none d-sm-table-cell">{{ $billing_address->add_type }}</td>
+							<td class="addressModal">
+								<!-- Desktop -->
+								<div class="d-none d-md-block">
+									<button type="button" class="btn btn-success btn-xs billing {{ $key }} open-modal" data-toggle="modal" data-target="#myadd{{ $billing_address->id }}">
+										<i class="fas fa-eye"></i>
+									</button>
+
+									<button type="button" class="btn btn-danger btn-xs open-modal" data-toggle="modal" data-target="#myDelete{{ $billing_address->id }}">
+										<i class="fas fa-trash-alt"></i>
+									</button>
+								</div>
+								<!-- Desktop -->
+								<!-- Mobile -->
+								<div class="d-md-none">
+									<button type="button" class="btn btn-success btn-xs billing {{ $key }} open-modal w-100" data-toggle="modal" data-target="#myadd{{ $billing_address->id }}">
+										<i class="fas fa-eye"></i>
+									</button>
+
+									<button type="button" class="btn btn-danger btn-xs open-modal w-100" data-toggle="modal" data-target="#myDelete{{ $billing_address->id }}">
+										<i class="fas fa-trash-alt"></i>
+									</button>
+								</div>
+								<!-- Mobile -->
 								
 								<div id="myadd{{ $billing_address->id }}" class="modal fade" role="dialog">
 									<div class="modal-dialog modal-xl">
@@ -729,10 +774,6 @@
 										</div>
 									</div>
 								</div>
-
-								<button type="button" class="btn btn-danger btn-xs open-modal" data-toggle="modal" data-target="#myDelete{{ $billing_address->id }}">
-									<i class="fas fa-trash-alt"></i>
-								</button>
 
 								<div id="myDelete{{ $billing_address->id }}" class="modal fade" role="dialog">
 									<form action="/myprofile/address/{{ $billing_address->id }}/billing/delete" method="POST">
@@ -1142,23 +1183,34 @@
 			transform: rotate(360deg);
 		}
 	}
-	@media (max-width: 575.98px) {
-		.breadcrumb{
-			font-size: 8pt !important;
-			font-weight: 500;
-		}
-	}
 
 	@media (max-width: 767.98px) {
 		.breadcrumb{
 			font-size: 8pt !important;
 			font-weight: 500;
 		}
+		.addressModal{
+			font-size: 10pt !important;
+		}
 	}
 
 	@media only screen and (max-width: 600px) {
-  .products-head {
-		padding: 0 3% 0 3% !important;
+		.products-head {
+			padding: 0 3% 0 3% !important;
+		}
+		.addressModal{
+			font-size: 10pt !important;
+		}
+	}
+
+	@media (max-width: 575.98px) {
+		.breadcrumb{
+			font-size: 8pt !important;
+			font-weight: 500;
+		}
+		.addressModal, .addressModal-icon{
+			font-size: 10pt !important;
+		}
 	}
 }
 

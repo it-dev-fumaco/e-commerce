@@ -40,7 +40,7 @@
         </div>
         <div class="card-body d-flex flex-column">
           <div class="text ellipsis">
-            <span class="card-text product-head fumacoFont_card_title text-concat prod_desc" style="text-transform: none !important; text-decoration: none !important; color:#0062A5 !important;  min-height: 100px;">{{ $item['item_name'] }}</span>
+            <span class="card-text product-head fumacoFont_card_title text-concat prod_desc" style="text-transform: none !important; text-decoration: none !important; color:#0062A5 !important;  min-height: 85px;">{{ $item['item_name'] }}</span>
           </div>
           <p class="card-text fumacoFont_card_price" style="color:#000000 !important; font-size: 10pt !important;">
             @if($item['is_discounted'] == 1)

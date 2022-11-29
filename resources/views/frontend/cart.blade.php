@@ -62,28 +62,41 @@
                                     <img src="{{ asset('/storage/item_images/'.$cart['item_code'].'/gallery/preview/'.$cart['item_image']) }}" class="img-responsive" alt="{{ Str::slug($cart['alt'], '-') }}" width="55" height="55">
                                 </picture>
                             </td>
-                            <td class="tbls tbl-half" style="width:37% !important;"><a href="/product/{{ $cart['slug'] }}" style="text-decoration: none !important; color: #000;">{{ $cart['item_description'] }}</a>
-                                <br/>{{-- for mobile --}}
-                            <span class="formatted-price d-md-none d-lg-none d-xl-none"><br/><b>₱ {{ number_format($cart['price'], 2, '.', ',') }}</b></span>
-                            <br/><br/>
-                            <span class="d-md-none d-lg-none d-xl-none">Quantity<br/>
-                                <div class="input-group">
-                                    <span class="input-group-btn">
-                                        <a href="#" class="quantity-left-minus btn btn-number" style="background-color: #ccc !important; height: 100% !important; border-radius: 0px !important;"> - </a>
-                                    </span>
-                                    <div>&nbsp;</div>
-                                    <input type="text" name="res_quantity[]" class="form-control input-number mobile-quantity" value="{{ $cart['quantity'] }}" min="1" max="{{ $cart['stock_qty'] }}" style="width: 5px !important; text-align: center !important;" data-id="{{ $cart['item_code'] }}" onkeypress="return /[0-9a-zA-Z]/i.test(event.key)">
-                                    <div>&nbsp;</div>
-                                    <span class="input-group-btn">
-                                        <a href="#" class="quantity-right-plus btn btn-number" style="background-color: #ccc !important; height: 100% !important; border-radius: 0px !important;"> + </a>
-                                    </span>
-                                    @if ($cart['insufficient_stock'] || $cart['quantity'] > $cart['stock_qty'])
-                                        <small class="text-danger d-block m-2 stock-status">Insufficient Stock</small>
-                                    @else
-                                        <small class="text-success d-block m-2 stock-status">Available :  {{ $cart['stock_qty'] }}</small>
-                                    @endif
+                            <td class="tbls tbl-half p-0" style="width:37% !important; padding-top: 0 !important; padding-bottom: 0 !important">
+                                <!-- Mobile -->
+                                <div class="d-md-none pt-1 text-center">
+                                    <span class="formatted-price"><b>₱ {{ number_format($cart['price'], 2, '.', ',') }}</b></span>
+                                    <br/>
+                                    <div class="container-fluid p-0 mb-2" style="text-align: justify !important;">
+                                        <a href="/product/{{ $cart['slug'] }}" style="text-decoration: none !important; color: #000;">{{ $cart['item_description'] }}</a>
+                                    </div>
+                                    <div class="col-8 mx-auto">
+                                        <div class="input-group">
+                                            <span class="input-group-btn">
+                                                <a href="#" class="quantity-left-minus btn btn-number btn-sm" style="background-color: #ccc !important; height: 100% !important; border-radius: 0px !important; padding: 6px; font-size: 9pt !important"> - </a>
+                                            </span>
+                                            <div>&nbsp;</div>
+                                            <input type="text" name="res_quantity[]" class="form-control input-number mobile-quantity" value="{{ $cart['quantity'] }}" min="1" max="{{ $cart['stock_qty'] }}" style="width: 5px !important; text-align: center !important; font-size: 9pt !important" data-id="{{ $cart['item_code'] }}" onkeypress="return /[0-9a-zA-Z]/i.test(event.key)">
+                                            <div>&nbsp;</div>
+                                            <span class="input-group-btn">
+                                                <a href="#" class="quantity-right-plus btn btn-number btn-sm" style="background-color: #ccc !important; height: 100% !important; border-radius: 0px !important; padding: 6px; font-size: 9pt !important"> + </a>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="container-fluid">
+                                        @if ($cart['insufficient_stock'] || $cart['quantity'] > $cart['stock_qty'])
+                                            <small class="text-danger d-block m-2 stock-status">Insufficient Stock</small>
+                                        @else
+                                            <small class="text-success d-block m-2 stock-status" style="white-space: nowrap;">Available:  {{ $cart['stock_qty'] }}</small>
+                                        @endif
+                                    </div>
+                                    
+                                    {{-- <a href="/product/{{ $cart['slug'] }}" style="text-decoration: none !important; color: #000;">{{ $cart['item_description'] }}</a><br> --}}
                                 </div>
-                            </span>{{-- for mobile --}}
+                                <!-- Mobile -->
+                                <div class="container-fluid d-none d-md-block" style="padding-bottom: 25px !important; padding-top: 25px !important;">
+                                    <a href="/product/{{ $cart['slug'] }}" style="text-decoration: none !important; color: #000;">{{ $cart['item_description'] }}</a>
+                                </div>
                             </td>
                             <td class="tbls d-none d-sm-table-cell"><p style="white-space: nowrap !important;">₱ <span class="formatted-price">{{ number_format($cart['price'], 2, '.', ',') }}</span></p><span class="price d-none">{{ $cart['price'] }}</span></td>
                             <td class="tbls d-none d-sm-table-cell text-center">
@@ -92,7 +105,7 @@
                                         <a href="#" class="quantity-left-minus btn btn-number" style="background-color: #ccc !important; height: 100% !important; border-radius: 0px !important;"> - </a>
                                     </span>
                                     <div>&nbsp;</div>
-                                    <input type="text" name="quantity[]" class="form-control input-number " value="{{ $cart['quantity'] }}" min="1" max="{{ $cart['stock_qty'] }}" style="width: 4px !important; text-align: center !important;" data-id="{{ $cart['item_code'] }}" onkeypress="return /[0-9a-zA-Z]/i.test(event.key)">
+                                    <input type="text" name="quantity[]" class="form-control input-number" value="{{ $cart['quantity'] }}" min="1" max="{{ $cart['stock_qty'] }}" style="width: 4px !important; text-align: center !important;" data-id="{{ $cart['item_code'] }}" onkeypress="return /[0-9a-zA-Z]/i.test(event.key)">
                                     <div>&nbsp;</div>
                                     <span class="input-group-btn">
                                         <a href="#" class="quantity-right-plus btn btn-number" style="background-color: #ccc !important; height: 100% !important; border-radius: 0px !important;"> + </a>
@@ -104,11 +117,17 @@
                                 <small class="text-success d-block m-2 stock-status">Available :  {{  $cart['quantity'].$cart['stock_qty'] }}</small>
                                 @endif
                             </td>
-                            <td class="tbls d-none d-sm-table-cell"><p style="white-space: nowrap !important;">₱ <span class="formatted-amount">{{ number_format($cart['amount'], 2, '.', ',') }}</span></p><span class="amount d-none">{{ $cart['amount'] }}</span></td>
+                            <td class="tbls d-none d-sm-table-cell"><p style="white-space: nowrap !important;">₱ <span class="formatted-amount">{{ number_format($cart['amount'], 2, '.', ',') }}</span></p><span class="amount d-none">{{ $cart['amount'] }}</span>
+                            </td>
                             <td class="tbls tbl-qtr">
                                 <a class="btn btn-sm btn-outline-primary remove-from-cart-btn no-border" href="#" role="button" data-id="{{ $cart['item_code'] }}">&#x2715;</a>
                             </td>
                         </tr>
+                        {{-- <tr>
+                            <td class="d-md-none" colspan=6 style="font-size: 9pt;">
+                                <a href="/product/{{ $cart['slug'] }}" style="text-decoration: none !important; color: #000;">{{ $cart['item_description'] }}</a>
+                            </td> 
+                        </tr> --}}
                         @empty
                         <tr>
                             <td style="border-bottom: 0; padding: 10px 0;" colspan="7">
@@ -161,23 +180,43 @@
                     </div>
                 </div>
                 <br><br><br>
+                <!-- Desktop/Tablet -->
                 @if($cross_sell_arr)
-                    <div class="container-fluid p-0 mb-3">
+                    <div class="container-fluid d-none d-md-block p-0 mb-3">
                         <h4>Frequently Bought Together</h4>
                         <br/>
-                        <div class="row regular" style="min-height: 300px">
-                            @foreach($cross_sell_arr as $item)
-                                @include('frontend.product_details_card')
-                            @endforeach
-                        </div>
+                            <div class="container d-none d-md-block">
+                                <div class="row regular" style="min-height: 300px">
+                                    @foreach($cross_sell_arr as $item)
+                                        @include('frontend.product_details_card')
+                                    @endforeach
+                                </div>
+                            </div>
                     </div>
                 @endif
+                <!-- Desktop/Tablet -->
             </div>
-            <div class="col-lg-12">&nbsp;&nbsp;</div>
         </div>
     </div>
+    
 </main>
-
+<!-- Mobile -->
+<div class="col-lg-12 d-md-none">
+    @if($cross_sell_arr)
+        <div class="container-fluid mb-3">
+            <h4>Frequently Bought Together</h4>
+            <br/>
+            <div class="container-fluid d-block d-md-none p-0">
+                <div class="d-flex flex-row flex-nowrap overflow-auto">
+                @foreach($cross_sell_arr as $item)
+                    @include('frontend.product_details_slide')
+                @endforeach
+                </div>
+            </div>
+        </div>
+    @endif
+</div>
+<!-- Mobile -->
 <div id="custom-overlay" style="display: none;">
 	<div class="custom-spinner"></div>
 	<br/>
@@ -421,6 +460,22 @@
 			transform: rotate(360deg);
 		}
 	}
+    @media (max-width: 767.98px) {
+        .tbl-qtr{
+            width: 20% !important;
+        }
+        .tbl-half{
+            width: 60% !important;
+        }
+        .breadcrumb{
+            font-size: 8pt !important;
+            font-weight: 500;
+        }
+        .font-responsive, .prod_desc{
+            font-size: 10pt !important;
+        }
+    }
+
     @media (max-width: 575.98px) {
         .tbl-qtr{
             width: 20% !important;
@@ -437,21 +492,13 @@
         }
     }
 
-    @media (max-width: 767.98px) {
-        .tbl-qtr{
-            width: 20% !important;
-        }
-        .tbl-half{
-            width: 60% !important;
-        }
-        .breadcrumb{
-            font-size: 8pt !important;
-            font-weight: 500;
-        }
-        .font-responsive{
-            font-size: 10pt !important;
+    @media (max-width:360px) {
+        .products-card-img {
+            min-height: 250px !important
         }
     }
+
+    
 </style>
 @endsection
 
