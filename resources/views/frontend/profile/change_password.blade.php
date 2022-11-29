@@ -10,7 +10,7 @@
 @include('frontend.header')
     <main style="background-color:#ffffff;" class="products-head">
         <div class="container-fluid">
-            <div class="row" style="padding-left: 15%; padding-right: 0%; padding-top: 25px;">
+            <div class="row acc-container" style="padding-left: 15%; padding-right: 0%; padding-top: 25px;">
                 <div class="col-lg-2">
                     <p class="caption_2"><a href="/myprofile/account_details" style="text-decoration: none; color: #000000;">Account Details</a></p>
                     <hr>
@@ -111,5 +111,16 @@
     .tbls{
         vertical-align: center !important;
     }
+    @media(max-width: 575.98px){
+		.products-head, .acc-container{
+			padding-left: 10px !important;
+			padding-right: 10px !important;
+		}
+	}
+	@media (max-width: 369.98px){
+		.products-head, .acc-container{
+			padding: 0 !important;
+		}
+	}
 </style>
 @endsection
