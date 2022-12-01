@@ -120,7 +120,7 @@
 															<img src="{{ asset('/storage/item_images/'.$item['item_code'].'/gallery/preview/'.$item['image']) }}" class="img-responsive" alt="" width="55" height="55" loading="{{ $i > 0 ? 'lazy' : 'eager' }}">
 														</picture>
 													</td>
-													<td class="table-text">{{ $item['item_name'] }}</td>
+													<td class="table-text table-item-description">{{ $item['item_name'] }}</td>
 													<td class="table-text text-center">{{ $item['qty'] }}</td>
 													<td class="table-text">
 														<p class="d-block d-lg-none" style="text-align: right; padding-right: 10px;">
@@ -410,7 +410,7 @@
 								<thead>
 									<tr>
 										<th class="text-center d-none d-lg-table-cell">Order No.</th>
-										<th class="text-center table-text">Date</th>
+										<th class="text-center d-none d-lg-table-cell table-text">Date</th>
 										<th class="text-center table-text">Details</th>
 										<th class="text-center d-none d-lg-table-cell">Shipping</th>
 										<th class="text-center d-none d-lg-table-cell">Delivery Date</th>
@@ -443,9 +443,9 @@
 									@endphp
 									<tr>
 										<td class="text-center align-middle d-none d-lg-table-cell">{{ $order['order_number'] }}</td>
-										<td class="text-center align-middle table-text">{{ $order['date'] }}</td>
+										<td class="text-center align-middle d-none d-lg-table-cell table-text">{{ $order['date'] }}</td>
 										<td class="text-center align-middle">
-											<a href="#" class="table-text open-modal" data-target="#{{ $order['order_number'] }}-Modal">Item Purchase</a>
+											<a href="#" class="d-none d-lg-inline table-text open-modal" data-target="#{{ $order['order_number'] }}-Modal">Item Purchase</a>
 
 											<!-- Modal -->
 											<div class="modal fade" id="{{ $order['order_number'] }}-Modal" tabindex="-1" role="dialog" aria-labelledby="{{ $order['order_number'] }}-ModalLabel" aria-hidden="true">
@@ -481,14 +481,18 @@
 																		<td class="d-none d-sm-table-cell" style="text-align: left;">
 																			{{ $item['item_name'] }}
 																		</td>
-																		<td>{{ $item['qty'] }}</td>
+																		<td class="price-text">{{ $item['qty'] }}</td>
 																		@php
 																			$orig_price = number_format($item['orig_price'], 2);
 																			$price = number_format($item['price'], 2);
 																		@endphp
-																		<td>
+																		<td class="price-text" style="white-space: nowrap !important">
 																			@if($item['discount'] > 0)
-																				<p><span style="text-decoration: line-through; font-size: 9pt;">₱ {{ $orig_price }}</span><br/><b>₱ {{ $price }}</b></p>
+																				<p>
+																					<b>₱ {{ $price }}</b>
+																					<br/>
+																					<span style="text-decoration: line-through; font-size: 9pt;">₱ {{ $orig_price }}</span>
+																				</p>
 																			@else
 																				<p>₱ {{ $price }}</p>
 																			@endif
@@ -500,64 +504,41 @@
 																		</td>
 																	</tr>
 																@endforeach
-																<tr class="d-lg-none d-xl-none" style="border-bottom: rgba(0,0,0,0) !important">
-																	<td></td>
-																	<td colspan=2 style="text-align: right;">Subtotal: </td>
-																	<td style="text-align: right; white-space: nowrap !important">₱ {{ number_format($order['subtotal'], 2) }}</td>
-																</tr>
-																@if ($order['voucher_code'])
-																<tr class="d-lg-none d-xl-none" style="border-bottom: rgba(0,0,0,0) !important">
-																	<td></td>
-																	<td colspan=2 class="table-text" style="text-align: right;">Discount: <span class="text-white" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833;">{{ $order['voucher_code'] }}</span>
-																		</td>
-																	<td class="table-text" style="text-align: right; white-space: nowrap !important">₱ {{ number_format($order['discount_amount'], 2) }}</td>
-																</tr>
-																@endif
-																<tr class="d-lg-none d-xl-none" style="border-bottom: rgba(0,0,0,0) !important">
-																	<td></td>
-																	<td colspan=2 style="text-align: right;">{{ $order['shipping_name'] }}: </td>
-																	<td style="text-align: right; white-space: nowrap !important">₱ {{ number_format($order['shipping_fee'], 2) }}</td>
-																</tr>
-																<tr class="d-lg-none d-xl-none" style="border-bottom: rgba(0,0,0,0) !important; font-weight: 700 !important">
-																	<td></td>
-																	<td colspan=2 style="text-align: right;">Grand Total: </td>
-																	<td style="text-align: right; white-space: nowrap !important">₱ {{ number_format($order['grand_total'], 2) }}</td>
-																</tr>
 															</table>
-															<div class="d-none d-xl-block">
+															<div class="">
 																<div class="row m-1">
-																	<div class="col-md-10" style="text-align: right;">
+																	<div class="price-text col-8 col-md-10" style="text-align: right;">
 																		<span>Subtotal: </span>
 																	</div>
-																	<div class="col-md-2" style="text-align: right;">
+																	<div class="price-text col-4 col-md-2" style="text-align: right;">
 																		<span>₱ {{ number_format($order['subtotal'], 2) }}</span>
 																	</div>
 																</div>
 																@if ($order['voucher_code'])
 																<div class="row m-1">
-																	<div class="col-md-10" style="text-align: right;">
+																	<div class="price-text col-8 col-md-10" style="text-align: right;">
 																		<span>Discount:  <span class="text-white" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833;">{{ $order['voucher_code'] }}</span>
 																		</span>
 																	</div>
-																	<div class="col-md-2" style="text-align: right;">
+																	<div class="price-text col-4 col-md-2" style="text-align: right;">
 																		<span>₱ {{ number_format($order['discount_amount'], 2) }}</span>
 																	</div>
 																</div>
 																@endif
 																<div class="row m-1">
-																	<div class="col-md-10" style="text-align: right;">
+																	<div class="price-text col-8 col-md-10" style="text-align: right;">
 																		<span>{{ $order['shipping_name'] }}: </span>
 																	</div>
-																	<div class="col-md-2" style="text-align: right;">
+																	<div class="price-text col-4 col-md-2" style="text-align: right;">
 																		<span>₱ {{ number_format($order['shipping_fee'], 2) }}</span>
 																	</div>
 																</div>
 																<div class="row m-1">
-																	<div class="col-md-10" style="text-align: right;">
+																	<div class="price-text col-8 col-md-10" style="text-align: right;">
 																		<span style="font-weight: 700">Grand Total: </span>
 																	</div>
-																	<div class="col-md-2" style="text-align: right;">
-																		<span style="font-weight: 700">₱ {{ number_format($order['grand_total'], 2) }}</span>
+																	<div class="price-text col-4 col-md-2" style="text-align: right;">
+																		<span style="font-weight: 700; white-space: nowrap !important">₱ {{ number_format($order['grand_total'], 2) }}</span>
 																	</div><br/>&nbsp;
 																</div>
 															</div>
@@ -569,20 +550,23 @@
 												</div>
 											</div>
 											<div class="d-lg-none table-text" style="text-align: left;">
-												<br/>
-												<b>Order Number:</b><br/>{{ $order['order_number'] }}<br/><br/>
+												<b>{{ $order['order_number'] }}</b> <span class="badge text-dark" style="background-color: {{ $badge }}; font-size: 8pt; color: #fff !important;">{{ $order['status'] }}</span><br/>
 												<b>Shipping Name:</b> {{ $order['shipping_name'] }}<br/>
+												<b>Transaction Date: </b>{{ $order['date'] }} <br/>
 												@if ($order['status'] != 'Cancelled')
 													@if ($order['shipping_name'] != 'Store Pickup')
-														<br/>
 														<b>Delivery Date:</b> {{ $order['date_delivered'] ? date('M d, Y', strtotime($order['date_delivered'])) : null }}<br/>
 													@else
-														<br/>
 														<b>Date Completed:</b> {{ $order['pickup_date'] ? date('M d, Y', strtotime($order['pickup_date'])) : null }}<br/>
 													@endif
 												@endif
-												<p><span class="badge text-dark" style="background-color: {{ $badge }}; font-size: 0.9rem; color: #fff !important;">{{ $order['status'] }}</span></p>
-												<button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#reorder{{ $order['order_number'] }}Modal" {{ $order['status'] == 'Cancelled' ? 'disabled' : '' }}>Re-Order</button>
+												<br>
+												<center>
+													<div class="btn-group" role="group" aria-label="Basic example">
+														<button class="btn btn-sm btn-primary open-modal" data-target="#reorder{{ $order['order_number'] }}Modal" {{ $order['status'] == 'Cancelled' ? 'disabled' : '' }}>Re-Order</button>
+														<button type="button" class="btn btn-sm btn-secondary open-modal" data-target="#{{ $order['order_number'] }}-Modal">View Items</button>
+													</div>
+												</center>
 											</div>
 										</td>
 										<td class="text-center align-middle d-none d-lg-table-cell">{{ $order['shipping_name'] }}</td>
@@ -858,6 +842,32 @@
 	.track-container{
 		min-height: 120px
 	}
+
+	@media (max-width: 1199.98px) {
+		.track-container{
+			min-height: 200px
+		}
+	}
+
+	@media (max-width: 767.98px) {
+		.products-head{
+			padding-left: 0 !important;
+			padding-right: 0 !important;
+		}
+		.table-text{
+			font-size: 14px;
+		}
+		.status-text{
+			font-size: 12px;
+		}
+		.track-container{
+			min-height: 200px
+		}
+		.price-text{
+			font-size: 10pt;
+		}
+    }
+
 	@media (max-width: 575.98px) {
 		.products-head{
 			padding-left: 0 !important;
@@ -874,24 +884,9 @@
 		}
     }
 
-    @media (max-width: 767.98px) {
-		.products-head{
-			padding-left: 0 !important;
-			padding-right: 0 !important;
-		}
-		.table-text{
-			font-size: 14px;
-		}
-		.status-text{
-			font-size: 12px;
-		}
-		.track-container{
-			min-height: 200px
-		}
-    }
-	@media (max-width: 1199.98px) {
-		.track-container{
-			min-height: 200px
+	@media (max-width: 369.98px){ /* extra small screens (J2, etc.) */
+		.table-item-description{
+			font-size: 8pt;
 		}
 	}
 

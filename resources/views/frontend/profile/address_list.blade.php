@@ -11,7 +11,7 @@
 
 <main style="background-color:#ffffff;" class="products-head">
 	<div class="container-fluid">
-		<div class="row" style="padding-left: 0%; padding-right: 0%; padding-top: 25px;">
+		<div class="row acc-container" style="padding-left: 0%; padding-right: 0%; padding-top: 25px;">
 			<div class="col-lg-2">
 				<p class="caption_2"><a href="/myprofile/account_details" style="text-decoration: none; color: #000000;">Account Details</a></p>
 				<hr>
@@ -41,19 +41,29 @@
 					</div>
 				</div>
 				@endif
-				<strong><h4>Shipping Address : </h4></strong>
-				<br>
+				<div class="d-none d-md-block">
+					<strong><h4>Shipping Address : </h4></strong>
+					<br>
+				</div>
+				<div class="row d-md-none">
+					<div class="col-8">
+						<b><h5>Shipping Address</h6></b>
+					</div>
+					<div class="col-4">
+						<a href="/myprofile/address/shipping/new" class="btn btn-primary" role="button" style="font-size: 9pt;"><i class="fa fa-plus"></i> Add New</a>
+					</div>
+				</div>
 				<table class="table">
 					<thead>
 						<tr>
 							<th></th>
-							<th>
+							<th class="mob-main">
 								<span class="d-none d-md-block">Address</span>
 								<span class="d-block d-md-none">Information</span>
 							</th>
 							<th class="d-none d-sm-table-cell">Contacts</th>
 							<th class="d-none d-sm-table-cell">Type</th>
-							<th>Action</th>
+							<th class="d-none d-sm-table-cell">Action</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -61,28 +71,31 @@
 						<tr>
 							<td>
 								<a href="/myprofile/address/{{ $shipping_address->id }}/shipping/change_default">
-								@if($shipping_address->xdefault)
-								<i class="fas fa-check-circle" style="font-size: 24px;"></i>
-								@else
-								<i class="far fa-check-circle" style="font-size: 24px; color:#ada8a8;"></i>
-								@endif
+									@if($shipping_address->xdefault)
+										<i class="fas fa-check-circle" style="font-size: 24px;"></i>
+									@else
+										<i class="far fa-check-circle" style="font-size: 24px; color:#ada8a8;"></i>
+									@endif
 								</a>
 							</td>
 							<td>
 								<span class="d-none d-md-block">{{ $shipping_address->xadd1 .' '. $shipping_address->xadd2 .' '. $shipping_address->xprov }}</span>
-								<span class="d-block d-md-none">
-									{{ $shipping_address->xcontactlastname1 .', '.$shipping_address->xcontactname1 }}<br/>
+								<span class="d-md-none" style="font-size: 10pt;">
+									<b>Contact: </b>{{ $shipping_address->xcontactlastname1 .', '.$shipping_address->xcontactname1 }}<br/>
+									<b>Type: </b>{{ $shipping_address->add_type }}<br/>
 									{{ $shipping_address->xadd1 .' '. $shipping_address->xadd2 .' '. $shipping_address->xprov }}<br/>
-									{{ $shipping_address->add_type }}
+									<br>
+									<span class="text-success open-modal" data-target="#shipping-view{{ $shipping_address->id }}" style="cursor: pointer;">Edit</span> | <span class="text-danger open-modal" data-target="#shipping-del{{ $shipping_address->id }}" style="cursor: pointer;">Remove</span>
 								</span>
 							</td>
 							<td class="d-none d-sm-table-cell">{{ $shipping_address->xcontactlastname1 .', '.$shipping_address->xcontactname1 }}</td>
 							<td class="d-none d-sm-table-cell">{{ $shipping_address->add_type }}</td>
 							<td>
-								<button type="button" class="shipping btn btn-success btn-xs {{ $key }}" data-toggle="modal" data-target="#shipping-view{{ $shipping_address->id }}">
+								<button type="button" class="d-none d-md-inline shipping btn btn-success btn-xs open-modal" data-target="#shipping-view{{ $shipping_address->id }}">
 									<i class="fas fa-eye"></i>
 								</button>
-								<button type="button" class="btn btn-danger btn-xs" data-toggle="modal" data-target="#shipping-del{{ $shipping_address->id }}">
+
+								<button type="button" class="btn btn-danger btn-xs d-none d-md-inline open-modal" data-target="#shipping-del{{ $shipping_address->id }}">
 									<i class="fas fa-trash-alt"></i>
 								</button>
 
@@ -100,7 +113,7 @@
 												</div>
 												<div class="modal-footer">
 													<button type="submit" class="btn btn-primary btn-xs">Confirm</button>
-													<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+													<button type="button" class="btn btn-secondary close-modal" data-target="#shipping-del{{ $shipping_address->id }}">Close</button>
 												</div>
 											</div>
 										</div>
@@ -112,7 +125,7 @@
 										<div class="modal-content">
 											<div class="modal-header">
 												<h4 class="modal-title">Shipping Information</h4>
-												<a type="button" class="close clear-btn" data-dismiss="modal" aria-label="Close">
+												<a type="button" class="close clear-btn close-modal" data-target="#shipping-view{{ $shipping_address->id }}" data-dismiss="modal" aria-label="Close">
 													<span aria-hidden="true">&times;</span>
 												</a>
 											</div>
@@ -246,21 +259,33 @@
 					</tbody>
 				</table>
 				<br>
-				<a href="/myprofile/address/shipping/new" class="btn btn-primary" role="button">Add New Shipping Address</a>
-				<br><br><br>
-				<strong><h4>Billing Address : </h4></strong>
-				<br>
+				<a href="/myprofile/address/shipping/new" class="btn btn-primary d-none d-md-inline" role="button">Add New Shipping Address</a>
+				<div class="d-none d-md-block">
+					<br><br><br>
+				</div>
+				<div class="d-none d-md-block">
+					<strong><h4>Billing Address : </h4></strong>
+					<br>
+				</div>
+				<div class="row d-md-none">
+					<div class="col-8">
+						<b><h5>Billing Address</h6></b>
+					</div>
+					<div class="col-4">
+						<a href="/myprofile/address/billing/new" class="btn btn-primary" role="button" style="font-size: 9pt;"><i class="fa fa-plus"></i> Add New</a>
+					</div>
+				</div>
 				<table class="table">
 					<thead>
 						<tr>
 							<th></th>
-							<th>
+							<th class="mob-main">
 								<span class="d-none d-md-block">Address</span>
 								<span class="d-block d-md-none">Information</span>
 							</th>
 							<th class="d-none d-sm-table-cell">Contacts</th>
 							<th class="d-none d-sm-table-cell">Type</th>
-							<th>Action</th>
+							<th class="d-none d-sm-table-cell">Action</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -277,17 +302,23 @@
 							</td>
 							<td>
 								<span class="d-none d-md-block">{{ $billing_address->xadd1 . ' ' . $billing_address->xadd2 .' '. $billing_address->xprov}}</span>
-								<span class="d-block d-md-none">
-									{{ $billing_address->xcontactlastname1 . ', ' . $billing_address->xcontactname1 }}<br/>
-									{{ $billing_address->xadd1 . ' ' . $billing_address->xadd2 .' '. $billing_address->xprov}}<br/>
-									{{ $billing_address->add_type }}
+								<span class="d-md-none" style="font-size: 10pt;">
+									<b>Contact: </b> {{ $billing_address->xcontactlastname1 . ', ' . $billing_address->xcontactname1 }}<br/>
+									<b>Type: </b>{{ $billing_address->add_type }}<br/>
+									{{ $billing_address->xadd1 . ' ' . $billing_address->xadd2 .' '. $billing_address->xprov}}
+									<br><br>
+									<span class="text-success" data-target="#myadd{{ $billing_address->id }}" style="cursor: pointer">Edit</span> | <span class="text-danger open-modal" data-target="#myDelete{{ $billing_address->id }}" style="cursor: pointer">Remove</span>
 								</span>
 							</td>
 							<td class="d-none d-sm-table-cell">{{ $billing_address->xcontactlastname1 . ', ' . $billing_address->xcontactname1 }}</td>
 							<td class="d-none d-sm-table-cell">{{ $billing_address->add_type }}</td>
 							<td>
-								<button type="button" class="billing btn btn-success btn-xs {{ $key }}" data-toggle="modal" data-target="#myadd{{ $billing_address->id }}">
+								<button type="button" class="billing btn btn-success btn-xs d-none d-md-inline open-modal" data-target="#myadd{{ $billing_address->id }}">
 									<i class="fas fa-eye"></i>
+								</button>
+
+								<button type="button" class="btn btn-danger btn-xs d-none d-md-inline open-modal" data-target="#myDelete{{ $billing_address->id }}">
+									<i class="fas fa-trash-alt"></i>
 								</button>
 								
 								<div id="myadd{{ $billing_address->id }}" class="modal fade" role="dialog">
@@ -295,7 +326,7 @@
 										<div class="modal-content">
 											<div class="modal-header">
 												<h4 class="modal-title">Billing Information</h4>
-												<a type="button" class="close clear-btn" data-dismiss="modal" aria-label="Close">
+												<a type="button" class="close clear-btn close-modal" data-target="#myadd{{ $billing_address->id }}" data-dismiss="modal" aria-label="Close">
 													<span aria-hidden="true">&times;</span>
 												</a>
 											</div>
@@ -420,10 +451,6 @@
 									</div>
 								</div>
 
-								<button type="button" class="btn btn-danger btn-xs" data-toggle="modal" data-target="#myDelete{{ $billing_address->id }}">
-									<i class="fas fa-trash-alt"></i>
-								</button>
-
 								<div id="myDelete{{ $billing_address->id }}" class="modal fade" role="dialog">
 									<form action="/myprofile/address/{{ $billing_address->id }}/billing/delete" method="POST">
 										@csrf
@@ -438,7 +465,7 @@
 												</div>
 												<div class="modal-footer">
 													<button type="submit" class="btn btn-primary btn-xs">Confirm</button>
-													<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+													<button type="button" class="btn btn-secondary close-modal" data-target="#myDelete{{ $billing_address->id }}">Close</button>
 												</div>
 											</div>
 										</div>
@@ -455,9 +482,10 @@
 					</tbody>
 				</table>
 				<br>
-				<a href="/myprofile/address/billing/new" class="btn btn-primary" role="button">Add New Billing Address</a>
-				<br><br><br>
-				
+				<a href="/myprofile/address/billing/new" class="btn btn-primary d-none d-md-inline" role="button">Add New Billing Address</a>
+				<div class="d-none d-md-block">
+					<br><br><br>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -517,6 +545,20 @@
 	}
 	.clear-btn:hover{
 		color: #000;
+	}
+	@media(max-width: 575.98px){
+		.products-head, .acc-container{
+			padding-left: 10px !important;
+			padding-right: 10px !important;
+		}
+		i{
+			font-size: 10pt;
+		}
+	}
+	@media (max-width: 369.98px){
+		.products-head, .acc-container{
+			padding: 0 !important;
+		}
 	}
 </style>
 @endsection

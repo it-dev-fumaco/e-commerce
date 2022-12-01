@@ -288,6 +288,11 @@
 	.tbls{
 		vertical-align: center !important;
 	}
+	@media (max-width: 369.98px){
+		.products-head, .acc-container{
+			padding: 0 !important;
+		}
+	}
 </style>
 
 @endsection
