@@ -38,7 +38,7 @@
                     {!! session()->get('error') !!}
                     </div>
                 @endif
-                <table class="table animated animatedFadeInUp fadeInUp" id="cart-items">
+                <table class="table animated animatedFadeInUp fadeInUp mb-0" id="cart-items">
                     <thead>
                         <tr>
                             <th class="he1x">Product</th>
@@ -67,8 +67,8 @@
                                     <!-- Mobile -->
                                     <div class="col-8 d-md-none">
                                         <a href="/product/{{ $cart['slug'] }}" style="text-decoration: none !important; color: #000; font-size: 8pt;">{{ $cart['item_description'] }}</a>
-                                        <div class="row p-0">
-                                            <div class="col-6 mt-2">
+                                        <div class="row pt-2">
+                                            <div class="col-6">
                                                 <div class="input-group">
                                                     <span class="input-group-btn">
                                                         <a href="#" class="quantity-left-minus btn btn-number btn-sm" style="border: 1px solid #9F9B9B; height: 100% !important; border-radius: 5px !important; padding: 6px; font-size: 9pt !important"
@@ -90,6 +90,9 @@
                                                     </span>
                                                 </div>
                                             </div>
+                                            <div class="col-6" style="display: flex; justify-content: center; align-items: center; white-space: nowrap">
+                                                <span class="formatted-price"><b>₱ {{ number_format($cart['price'], 2, '.', ',') }}</b></span>
+                                            </div>
                                         </div>
                                         <div class="row p-0">
                                             <div class="col-6" style="display: flex; justify-content: center; align-items: center;">
@@ -98,9 +101,6 @@
                                                 @else
                                                     <small class="text-success d-block m-2 stock-status" style="white-space: nowrap;">Available:  {{ $cart['stock_qty'] }}</small>
                                                 @endif
-                                            </div>
-                                            <div class="col-6" style="display: flex; justify-content: center; align-items: center; white-space: nowrap">
-                                                <span class="formatted-price"><b>₱ {{ number_format($cart['price'], 2, '.', ',') }}</b></span>
                                             </div>
                                         </div>
                                     </div>
@@ -151,10 +151,10 @@
                 </table>
                 <table class="table">
                     <tr>
-                        <td class="col-md-8">&nbsp;</td>
-                        <td class="col-md-2">Total</td>
-                        <td><small class="text-muted stylecap he1x" id="cart-subtotal">₱ {{ number_format(collect($cart_arr)->sum('amount'), 2, '.', ',') }}</small></td>
-                    </tr>
+                        <td class="col-6 col-md-8">&nbsp;</td>
+                        <td class="col-3 col-md-2">Total</td>
+                        <td><small class="text-muted stylecap he1x" id="cart-subtotal" style="white-space: nowrap">₱ {{ number_format(collect($cart_arr)->sum('amount'), 2, '.', ',') }}</small></td>
+                    </tr> 
                 </table>
                 <br/>
                 @php
@@ -175,19 +175,14 @@
                     }
                 @endphp
                 <div class="row">
-                    <div class="col-md-6 d-none d-md-block">
+                    <div class="col-md-6 order-last order-md-first">
                         <div class="card-body col-md-8 mx-auto">
-                            <a href="/" class="btn btn-secondary no-border" style="width:100% !important;" role="button"><i class="fas fa-angle-left"></i> CONTINUE SHOPPING</a>
+                            <a href="/" class="btn btn-secondary no-border" style="width:100% !important; border-radius: 0 !important" role="button"><i class="fas fa-angle-left"></i> CONTINUE SHOPPING</a>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-6 order-first order-md-last">
                         <div class="card-body col-md-8 mx-auto">
                             <button id="checkout-btn" class="btn btn-outline-primary no-border" role="button" style="width:100% !important;" {{ (count($cart_arr) > 0) ? '' : 'disabled' }}>PROCEED TO CHECKOUT</button>
-                        </div>
-                    </div>
-                    <div class="col-md-6 d-md-none">
-                        <div class="card-body col-md-8 mx-auto">
-                            <a href="/" class="btn btn-secondary no-border" style="width:100% !important;" role="button"><i class="fas fa-angle-left"></i> CONTINUE SHOPPING</a>
                         </div>
                     </div>
                 </div>
@@ -540,6 +535,9 @@
         .products-head{
 			padding: 0 !important;
 		}
+        nav{
+            padding: 15px;
+        }
     }
 </style>
 @endsection
