@@ -884,6 +884,8 @@
       $(document).on('click', '.open-modal', function (){
         $($(this).data('target')).modal('show');
       });
+
+      $('#header-filler').css('margin-top', $('#navbar').height() + 'px');
     });
   </script>
 
