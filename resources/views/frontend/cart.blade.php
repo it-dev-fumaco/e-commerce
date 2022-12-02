@@ -38,63 +38,77 @@
                     {!! session()->get('error') !!}
                     </div>
                 @endif
-                <table class="table animated animatedFadeInUp fadeInUp" id="cart-items">
+                <table class="table animated animatedFadeInUp fadeInUp mb-0" id="cart-items">
                     <thead>
                         <tr>
                             <th class="he1x">Product</th>
-                            <th class="he1x"></th>
+                            <th class="he1x d-none d-sm-table-cell"></th>
                             <th class="he1x d-none d-sm-table-cell">Price</th>
                             <th class="he1x d-none d-sm-table-cell">Quantity</th>
                             <th class="he1x d-none d-sm-table-cell">Total</th>
-                            <th class="he1x" style="width: 5px !important"></th>
+                            <th class="he1x d-none d-sm-table-cell" style="width: 5px !important"></th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse ($cart_arr as $cart)
-                        <tr class="he2x2">
+                        @php
+                            $c_src = '/storage/item_images/'.$cart['item_code'].'/gallery/preview/'.$cart['item_image'];
+                        @endphp
+                        <tr id="row-{{ $cart['item_code'] }}" class="he2x2">
                             <td class="tbl-qtr">
-                                @php
-                                    $c_src = '/storage/item_images/'.$cart['item_code'].'/gallery/preview/'.$cart['item_image'];
-                                @endphp
-                                <picture>
-                                    <source srcset="{{ asset(explode('.', $c_src)[0].'.webp') }}" type="image/webp">
-                                    <source srcset="{{ asset($c_src) }}" type="image/jpeg"> 
-                                    <img src="{{ asset('/storage/item_images/'.$cart['item_code'].'/gallery/preview/'.$cart['item_image']) }}" class="img-responsive" alt="{{ Str::slug($cart['alt'], '-') }}" width="55" height="55">
-                                </picture>
-                            </td>
-                            <td class="tbls tbl-half p-0" style="width:37% !important; padding-top: 0 !important; padding-bottom: 0 !important">
-                                <!-- Mobile -->
-                                <div class="d-md-none pt-1 text-center">
-                                    <span class="formatted-price"><b>₱ {{ number_format($cart['price'], 2, '.', ',') }}</b></span>
-                                    <br/>
-                                    <div class="container-fluid p-0 mb-2" style="text-align: justify !important;">
-                                        <a href="/product/{{ $cart['slug'] }}" style="text-decoration: none !important; color: #000;">{{ $cart['item_description'] }}</a>
+                                <div class="row">
+                                    <div class="col-4 col-md-12">
+                                        <picture>
+                                            <source srcset="{{ asset(explode('.', $c_src)[0].'.webp') }}" type="image/webp">
+                                            <source srcset="{{ asset($c_src) }}" type="image/jpeg"> 
+                                            <img src="{{ asset('/storage/item_images/'.$cart['item_code'].'/gallery/preview/'.$cart['item_image']) }}" class="img-responsive img-container" alt="{{ Str::slug($cart['alt'], '-') }}">
+                                        </picture>
                                     </div>
-                                    <div class="col-8 mx-auto">
-                                        <div class="input-group">
-                                            <span class="input-group-btn">
-                                                <a href="#" class="quantity-left-minus btn btn-number btn-sm" style="background-color: #ccc !important; height: 100% !important; border-radius: 0px !important; padding: 6px; font-size: 9pt !important"> - </a>
-                                            </span>
-                                            <div>&nbsp;</div>
-                                            <input type="text" name="res_quantity[]" class="form-control input-number mobile-quantity" value="{{ $cart['quantity'] }}" min="1" max="{{ $cart['stock_qty'] }}" style="width: 5px !important; text-align: center !important; font-size: 9pt !important" data-id="{{ $cart['item_code'] }}" onkeypress="return /[0-9a-zA-Z]/i.test(event.key)">
-                                            <div>&nbsp;</div>
-                                            <span class="input-group-btn">
-                                                <a href="#" class="quantity-right-plus btn btn-number btn-sm" style="background-color: #ccc !important; height: 100% !important; border-radius: 0px !important; padding: 6px; font-size: 9pt !important"> + </a>
-                                            </span>
+                                    <!-- Mobile -->
+                                    <div class="col-8 d-md-none">
+                                        <a href="/product/{{ $cart['slug'] }}" style="text-decoration: none !important; color: #000; font-size: 8pt;">{{ $cart['item_description'] }}</a>
+                                        <div class="row pt-2">
+                                            <div class="col-6">
+                                                <div class="input-group">
+                                                    <span class="input-group-btn">
+                                                        <a href="#" class="quantity-left-minus btn btn-number btn-sm" style="border: 1px solid #9F9B9B; height: 100% !important; border-radius: 5px !important; padding: 6px; font-size: 9pt !important"
+                                                        data-item-description="{{ $cart['item_description'] }}"
+                                                        data-id="{{ $cart['item_code'] }}"
+                                                        data-row="#row-{{ $cart['item_code'] }}"
+                                                        > - </a>
+                                                    </span>
+                                                    <div>&nbsp;</div>
+                                                    <input type="text" name="res_quantity[]" 
+                                                    class="form-control input-number mobile-quantity" 
+                                                    value="{{ $cart['quantity'] }}" 
+                                                    min="1" max="{{ $cart['stock_qty'] }}" 
+                                                    style="width: 5px !important; text-align: center !important; font-size: 9pt !important; border: none !important;" 
+                                                    data-id="{{ $cart['item_code'] }}" onkeypress="return /[0-9a-zA-Z]/i.test(event.key)">
+                                                    <div>&nbsp;</div>
+                                                    <span class="input-group-btn">
+                                                        <a href="#" class="quantity-right-plus btn btn-number btn-sm" style="border: 1px solid #9F9B9B; height: 100% !important; border-radius: 5px !important; padding: 6px; font-size: 9pt !important"> + </a>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="col-6" style="display: flex; justify-content: center; align-items: center; white-space: nowrap">
+                                                <span class="formatted-price"><b>₱ {{ number_format($cart['price'], 2, '.', ',') }}</b></span>
+                                            </div>
+                                        </div>
+                                        <div class="row p-0">
+                                            <div class="col-6" style="display: flex; justify-content: center; align-items: center;">
+                                                @if ($cart['insufficient_stock'] || $cart['quantity'] > $cart['stock_qty'])
+                                                    <small class="text-danger d-block m-2 stock-status">Insufficient Stock</small>
+                                                @else
+                                                    <small class="text-success d-block m-2 stock-status" style="white-space: nowrap;">Available:  {{ $cart['stock_qty'] }}</small>
+                                                @endif
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="container-fluid">
-                                        @if ($cart['insufficient_stock'] || $cart['quantity'] > $cart['stock_qty'])
-                                            <small class="text-danger d-block m-2 stock-status">Insufficient Stock</small>
-                                        @else
-                                            <small class="text-success d-block m-2 stock-status" style="white-space: nowrap;">Available:  {{ $cart['stock_qty'] }}</small>
-                                        @endif
-                                    </div>
-                                    
-                                    {{-- <a href="/product/{{ $cart['slug'] }}" style="text-decoration: none !important; color: #000;">{{ $cart['item_description'] }}</a><br> --}}
+                                    <!-- Mobile -->
                                 </div>
-                                <!-- Mobile -->
-                                <div class="container-fluid d-none d-md-block" style="padding-bottom: 25px !important; padding-top: 25px !important;">
+                            </td>
+                            <td class="tbls tbl-half p-0 d-none d-sm-table-cell" style="width:37% !important; padding-top: 0 !important; padding-bottom: 0 !important">
+                                <div class="container-fluid" style="padding-bottom: 25px !important; padding-top: 25px !important;">
                                     <a href="/product/{{ $cart['slug'] }}" style="text-decoration: none !important; color: #000;">{{ $cart['item_description'] }}</a>
                                 </div>
                             </td>
@@ -119,15 +133,13 @@
                             </td>
                             <td class="tbls d-none d-sm-table-cell"><p style="white-space: nowrap !important;">₱ <span class="formatted-amount">{{ number_format($cart['amount'], 2, '.', ',') }}</span></p><span class="amount d-none">{{ $cart['amount'] }}</span>
                             </td>
-                            <td class="tbls tbl-qtr">
-                                <a class="btn btn-sm btn-outline-primary remove-from-cart-btn no-border" href="#" role="button" data-id="{{ $cart['item_code'] }}">&#x2715;</a>
+                            <td class="tbls tbl-qtr d-none d-sm-table-cell">
+                                <a class="btn btn-sm btn-outline-primary remove-from-cart-btn no-border" href="#" role="button" 
+                                data-id="{{ $cart['item_code'] }}"
+                                data-row="#row-{{ $cart['item_code'] }}"
+                                >&#x2715;</a>
                             </td>
                         </tr>
-                        {{-- <tr>
-                            <td class="d-md-none" colspan=6 style="font-size: 9pt;">
-                                <a href="/product/{{ $cart['slug'] }}" style="text-decoration: none !important; color: #000;">{{ $cart['item_description'] }}</a>
-                            </td> 
-                        </tr> --}}
                         @empty
                         <tr>
                             <td style="border-bottom: 0; padding: 10px 0;" colspan="7">
@@ -139,10 +151,10 @@
                 </table>
                 <table class="table">
                     <tr>
-                        <td class="col-md-8">&nbsp;</td>
-                        <td class="col-md-2">Total</td>
-                        <td><small class="text-muted stylecap he1x" id="cart-subtotal">₱ {{ number_format(collect($cart_arr)->sum('amount'), 2, '.', ',') }}</small></td>
-                    </tr>
+                        <td class="col-6 col-md-8">&nbsp;</td>
+                        <td class="col-3 col-md-2">Total</td>
+                        <td><small class="text-muted stylecap he1x" id="cart-subtotal" style="white-space: nowrap">₱ {{ number_format(collect($cart_arr)->sum('amount'), 2, '.', ',') }}</small></td>
+                    </tr> 
                 </table>
                 <br/>
                 @php
@@ -163,19 +175,14 @@
                     }
                 @endphp
                 <div class="row">
-                    <div class="col-md-6 d-none d-md-block">
+                    <div class="col-md-6 order-last order-md-first">
                         <div class="card-body col-md-8 mx-auto">
-                            <a href="/" class="btn btn-secondary no-border" style="width:100% !important;" role="button"><i class="fas fa-angle-left"></i> CONTINUE SHOPPING</a>
+                            <a href="/" class="btn btn-secondary no-border" style="width:100% !important; border-radius: 0 !important" role="button"><i class="fas fa-angle-left"></i> CONTINUE SHOPPING</a>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-6 order-first order-md-last">
                         <div class="card-body col-md-8 mx-auto">
                             <button id="checkout-btn" class="btn btn-outline-primary no-border" role="button" style="width:100% !important;" {{ (count($cart_arr) > 0) ? '' : 'disabled' }}>PROCEED TO CHECKOUT</button>
-                        </div>
-                    </div>
-                    <div class="col-md-6 d-md-none">
-                        <div class="card-body col-md-8 mx-auto">
-                            <a href="/" class="btn btn-secondary no-border" style="width:100% !important;" role="button"><i class="fas fa-angle-left"></i> CONTINUE SHOPPING</a>
                         </div>
                     </div>
                 </div>
@@ -236,6 +243,25 @@
             <p>Desired quantity exceeds available stocks.</p>
         </div>
       </div>
+    </div>
+</div>
+
+<div class="modal fade" id="removeItemModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title" id="exampleModalLabel">Remove Item</h6>
+                <button type="button" class="close clear-btn close-modal" data-target="#removeItemModal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body p-4" style="font-size: 9pt;">
+                Remove <span id="item-to-be-removed" style="font-weight: 600;"></span> from your cart?
+            </div>
+            <div class="modal-footer p-1">
+                <button type="button" id="remove-item-btn" class="btn btn-danger remove-from-cart-btn" data-id="" data-row="" style="font-size: 9pt;">Remove</button>
+            </div>
+        </div>
     </div>
 </div>
 @endsection
@@ -391,6 +417,9 @@
         padding-bottom: 25px !important;
         padding-top: 25px !important;
     }
+    .img-container{
+        width: 55px;
+    }
     /* Animation */
     @keyframes fadeInUp {
         from {
@@ -462,7 +491,7 @@
 	}
     @media (max-width: 767.98px) {
         .tbl-qtr{
-            width: 20% !important;
+            width: 30% !important;
         }
         .tbl-half{
             width: 60% !important;
@@ -478,7 +507,7 @@
 
     @media (max-width: 575.98px) {
         .tbl-qtr{
-            width: 20% !important;
+            width: 30% !important;
         }
         .tbl-half{
             width: 60% !important;
@@ -490,15 +519,26 @@
         .font-responsive{
             font-size: 10pt !important;
         }
+        .products-head{
+			padding-left: 10px !important;
+			padding-right: 10px !important;
+		}
+        .img-container{
+            width: 100%;
+        }
     }
 
     @media (max-width:360px) {
         .products-card-img {
             min-height: 250px !important
         }
+        .products-head{
+			padding: 0 !important;
+		}
+        nav{
+            padding: 15px;
+        }
     }
-
-    
 </style>
 @endsection
 
@@ -530,6 +570,12 @@
                 res_input_name.val(current_qty);
                 updateAmount(row);
                 updateCart('decrement', id, current_qty);
+            }else{
+                $('#removeItemModal').modal('show');
+                $('#item-to-be-removed').text($(this).data('item-description'));
+
+                $('#remove-item-btn').data('id', $(this).data('id'));
+                $('#remove-item-btn').data('row', '#row-' + $(this).data('id'));
             }
 
             if (parseInt(current_qty) > parseInt(max)) {
@@ -570,9 +616,16 @@
 
         $(document).on('click', '.remove-from-cart-btn', function(e){
             e.preventDefault();
-            var tr = $(this);
+            var item_code = $(this).data('id');
+            var row = $(this).data('row');
+
+            removeItemFromCart(item_code, row);
+            $('#removeItemModal').modal('hide');
+        });
+
+        function removeItemFromCart(item_code, row){
             var data = {
-                'id': $(this).data('id'),
+                'id': item_code,
                 '_token': "{{ csrf_token() }}",
             }
 
@@ -581,7 +634,7 @@
                 url:'/removefromcart',
                 data: data,
                 success: function (response) {
-                    tr.closest("tr").remove();
+                    $(row).remove();
                     var countTr = $('#cart-items tbody tr').length;
                     if(countTr < 1) {
                         tr = '<tr>' +
@@ -598,7 +651,7 @@
                     updateTotal();
                 }
             });
-        });
+        }
 
         $('#checkout-btn').click(function(e){
             e.preventDefault();
@@ -659,8 +712,8 @@
             total = (isNaN(total)) ? 0 : total;
             subtotal = (isNaN(subtotal)) ? 0 : subtotal;
 
-            $('#cart-subtotal').text('P ' + subtotal.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,"));
-            $('#grand-total').text('P ' + total.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,"));
+            $('#cart-subtotal').text('₱ ' + subtotal.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,"));
+            $('#grand-total').text('₱ ' + total.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,"));
         }
 
         function updateAmount(row, type) {

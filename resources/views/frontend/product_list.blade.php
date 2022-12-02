@@ -147,8 +147,8 @@
 							
 							<div class="d-flex justify-content-end prod-sort">
 								<div>
-									<a class="btn d-sm-block d-md-none open-modal" data-target="#filterModal2" style="font-size: 0.75rem !important; float: left !important; margin-top: 6%">
-										<i class="fas fa-filter"></i>&nbsp; Filters
+									<a class="btn d-sm-block d-md-none open-modal" data-target="#filterModal2" style="font-size: 0.76rem !important; margin-top: 7%; float: left !important; white-space: nowrap !important;">
+										<i class="fas fa-filter"></i>&nbsp;Filters
 									</a>
 								</div>
 								<div class="p-2"><label class="mt-1 mb-1 mr-0 sort-by" style="font-size: 0.75rem;">Sort By</label></div>
