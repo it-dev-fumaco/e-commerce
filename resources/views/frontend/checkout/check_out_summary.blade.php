@@ -306,7 +306,7 @@
 									<div class="col-md-6 offset-md-3 bootstrap-timepicker">
 										<div class="form-group">
 											<label for="pickup-time">Pickup by</label>
-											<input type="text" class="form-control no-click-outline" id="pickup-time" style="text-align: center;" placeholder="Choose a date">
+											<input type="text" class="form-control no-click-outline" id="pickup-time" style="text-align: center;" placeholder="Choose a date" readonly>
 										</div>
 									</div>
 									<div class="col-md-6 offset-md-3">
