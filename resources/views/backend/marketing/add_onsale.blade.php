@@ -1,253 +1,280 @@
 @extends('backend.layout', [
-'namePage' => 'On Sale',
-'activePage' => 'on_sale_list'
+    'namePage' => 'On Sale',
+    'activePage' => 'on_sale_list'
 ])
 
 @section('content')
-    <div class="wrapper">
-        <div class="content-wrapper">
-            <section class="content-header">
-                <div class="container-fluid">
-                    <div class="row mb-2">
-                        <div class="col-sm-6">
-                            <h1>Add On Sale Page</h1>
-                        </div>
-                        <div class="col-sm-6">
-                            <ol class="breadcrumb float-sm-right">
-                                <li class="breadcrumb-item"><a href="/admin/dashboard">Home</a></li>
-                                <li class="breadcrumb-item active">Add On Sale Page</li>
-                            </ol>
-                        </div>
+<div class="wrapper">
+    <div class="content-wrapper">
+        <section class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1>Add On Sale Page</h1>
                     </div>
-                </div><!-- /.container-fluid -->
-            </section>
-            <section class="content">
-                <div class="container-fluid">
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="card card-primary">
-                                @if(session()->has('success'))
-                                    <div class="alert alert-success fade show" role="alert">
-                                        {{ session()->get('success') }}
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a href="/admin/dashboard">Home</a></li>
+                            <li class="breadcrumb-item active">Add On Sale Page</li>
+                        </ol>
+                    </div>
+                </div>
+            </div><!-- /.container-fluid -->
+        </section>
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card card-primary">
+                            @if(session()->has('success'))
+                            <div class="alert alert-success fade show" role="alert">{{ session()->get('success') }}</div>
+                            @endif
+                            @if(session()->has('error'))
+                            <div class="alert alert-warning fade show" role="alert">{{ session()->get('error') }}</div>
+                            @endif
+                            <div class="card-body">
+                                <form action="/admin/marketing/on_sale/add" method="post" enctype="multipart/form-data">
+                                    @csrf
+                                    <div class="row">
+                                        <div class="col-9"><h4>On Sale Details</h4></div>
+                                        <div class="col-3 text-right">
+                                            <button class="btn btn-primary">Submit</button>
+                                        </div>
                                     </div>
-                                @endif
-                                @if(session()->has('error'))
-                                    <div class="alert alert-warning fade show" role="alert">
-                                        {{ session()->get('error') }}
-                                    </div>
-                                @endif
-                                <div class="card-body">
-                                    <form action="/admin/marketing/on_sale/add" method="post" enctype="multipart/form-data">
-                                        @csrf
-                                        <div class="row">
-                                            <div class="col-9"><h4>On Sale</h4></div>
-                                            <div class="col-3 text-right">
-                                                <button class="btn btn-primary">Submit</button>
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <label>Sale Name <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" name="sale_name" placeholder="Sale Name" required>
+                                            <div class="form-check mt-1">
+                                                <input type="checkbox" class="form-check-input" id="is-clearance-sale" name="is_clearance_sale" value="1">
+                                                <label class="form-check-label" for="is-clearance-sale">Is Clearance Sale</label>
                                             </div>
                                         </div>
-                                        <div class="row">
-                                            <div class="col-6">
-                                                <label>Sale Name *</label>
-                                                <input type="text" class="form-control" name="sale_name" placeholder="Sale Name" required>
-                                            </div>
-                                            <div class="col-6">
-                                                <label>Set Sale Duration</label>
-                                                <input type="text" class="form-control set_duration" id="daterange" name="sale_duration" required/>
-                                            </div>
+                                        <div class="col-6">
+                                            <label>Set Sale Duration <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control set_duration" id="daterange" name="sale_duration" required/>
                                         </div>
-                                        <br/>
-                                        <div class="row">
-                                            <div class="col-6">
-                                                @php
-                                                    $types = ['Per Customer Group', 'Per Shipping Service', 'Per Category', 'All Items'];
-                                                @endphp
-                                                <label>Apply Discount To *</label>
-                                                <select class="form-control" name="apply_discount_to" id="apply_discount_to" required>
-                                                    <option disabled selected value="">Apply Discount To</option>
-                                                    @foreach ($types as $type)
-                                                        <option value="{{ $type }}">{{ $type }}</option>
-                                                    @endforeach
-                                                </select>
-                                                <div id="for_all_items">
-                                                    <br/>&nbsp;
-                                                    <label>Discount Type *</label>
-                                                    @php
-                                                        $discount_type = array('Fixed Amount', 'By Percentage');
-                                                    @endphp
-                                                    <select class="form-control" name="discount_type" id="discount_type">
-                                                        <option disabled selected value="">Discount Type</option>
-                                                        @foreach ($discount_type as $discount)
+                                    </div>
+                                    <div class="row mt-3">
+                                        <div class="col-6">
+                                            @php
+                                                $types = ['Per Customer Group', 'Per Shipping Service', 'Per Category', 'Selected Items', 'All Items'];
+                                            @endphp
+                                            <label>Apply Discount To <span class="text-danger">*</span></label>
+                                            <select class="form-control" name="apply_discount_to" id="apply_discount_to" required>
+                                                <option disabled selected value="">Apply Discount To</option>
+                                                @foreach ($types as $type)
+                                                <option value="{{ $type }}">{{ $type }}</option>
+                                                @endforeach
+                                            </select>
+                                            <div id="for_all_items">
+                                                <div class="row mt-4">
+                                                    <div class="col-12">
+                                                        <label>Discount Type <span class="text-danger">*</span></label>
+                                                        @php
+                                                            $discount_type = array('Fixed Amount', 'By Percentage');
+                                                        @endphp
+                                                        <select class="form-control" name="discount_type" id="discount_type">
+                                                            <option disabled selected value="">Discount Type</option>
+                                                            @foreach ($discount_type as $discount)
                                                             <option value="{{ $discount }}">{{ $discount }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                    <div id="fixed_amount">
-                                                        <br>&nbsp;
-                                                        <label>Amount *</label>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="row mt-4" id="fixed_amount">
+                                                    <div class="col-6">
+                                                        <label>Amount <span class="text-danger">*</span></label>
                                                         <input type="text" class="form-control" id="discount_amount" name="discount_amount" placeholder="Amount">
                                                     </div>
-                                                    <div id="percentage" style="display: none">
-                                                        <br>
-                                                        <label>Percentage *</label>
+                                                </div>
+                                                <div class="row mt-4" id="percentage" style="display: none;">
+                                                    <div class="col-6">
+                                                        <label>Percentage <span class="text-danger">*</span></label>
                                                         <input type="text" class="form-control" id="discount_percentage" name="discount_percentage" placeholder="Percentage">
-                                                        <br/>
+                                                    </div>
+                                                    <div class="col-6">
                                                         <label>Capped Amount</label>
-                                                        <input type="text" class="form-control" name="capped_amount" id="capped_amount" placeholder="Capped Amount"/>
-                                                    </div>
-                                                </div>
-                                                <br/>
-                                            </div>
-                                            <div class="col-6">
-                                                <label>Banner Image</label>
-                                                <div class="custom-file mb-3">
-                                                    <input type="file" class="custom-file-input" id="customFile" name="banner_img">
-                                                    <label class="custom-file-label" for="customFile">Choose File</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="row" id="categories">
-                                            <div class="col-12">
-                                                <div class="row">
-                                                    <select class="d-none form-control" name="category_select" id="category_select">
-                                                        <option disabled selected value="">Select a Category</option>
-                                                        @foreach ($categories as $cat)
-                                                            <option value="{{ $cat->id }}">{{ $cat->name }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                    <select class="d-none form-control" name="discount_type_select" id="discount_type_select">
-                                                        <option disabled selected value="">Select Discount Type</option>
-                                                        @foreach ($discount_type as $discount)
-                                                            <option value="{{ $discount }}">{{ $discount }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                    <div class="col-8 mx-auto">
-                                                        <br/>
-                                                        <table class="table table-bordered" id="categories-table">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th style="width: 20%;" scope="col" class="text-center">Category Name</th>
-                                                                    <th style="width: 20%;" scope="col" class="text-center">Discount Type</th>
-                                                                    <th style="width: 25%;" scope="col" class="text-center">Amount/Rate</th>
-                                                                    <th style="width: 25%;" scope="col" class="text-center capped_amount">Capped Amount</th>
-                                                                    <th class="text-center" style="width: 10%;">
-                                                                        <button type="button" class="add-row-btn btn btn-outline-primary btn-sm" id="add-categories-btn" data-table="#categories-table" data-select="#category_select">Add</button>
-                                                                    </th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-    
-                                                            </tbody>
-                                                        </table>
+                                                    <input type="text" class="form-control" name="capped_amount" id="capped_amount" placeholder="Capped Amount"/>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                        
-                                        <div class="row" id="customer-groups">
-                                            <div class="col-12">
-                                                <div class="row">
-                                                    <select class="d-none form-control" id="customer-group-select">
-                                                        <option disabled selected value="">Select Customer Group</option>
-                                                        @foreach ($customer_groups as $cg)
-                                                            <option value="{{ $cg->id }}">{{ $cg->customer_group_name }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                    <div class="col-8 mx-auto">
-                                                        <br/>
-                                                        <table class="table table-bordered" id="customer-group-table">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th style="width: 20%;" scope="col" class="text-center">Customer Group</th>
-                                                                    <th style="width: 20%;" scope="col" class="text-center">Discount Type</th>
-                                                                    <th style="width: 25%;" scope="col" class="text-center">Amount/Rate</th>
-                                                                    <th style="width: 25%;" scope="col" class="text-center capped_amount">Capped Amount</th>
-                                                                    <th class="text-center" style="width: 10%;">
-                                                                        <button type="button" class="add-row-btn btn btn-outline-primary btn-sm" id="add-customer-group-btn" data-table="#customer-group-table" data-select="#customer-group-select">Add</button>
-                                                                    </th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-    
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                </div>
+                                        <div class="col-6">
+                                            <label>Banner Image</label>
+                                            <div class="custom-file mb-3">
+                                                <input type="file" class="custom-file-input" id="customFile" name="banner_img">
+                                                <label class="custom-file-label" for="customFile">Choose File</label>
                                             </div>
                                         </div>
-
-                                        <div class="row" id="shipping-service">
-                                            <div class="col-12">
-                                                <div class="row">
-                                                    <select class="d-none form-control" name="shipping_select" id="shipping_select">
-                                                        <option disabled selected value="">Select a Shipping Service</option>
-                                                        @foreach ($shipping_services as $shipping_service)
-                                                            <option value="{{ $shipping_service }}">{{ $shipping_service }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                    <div class="col-8 mx-auto">
-                                                        <br/>
-                                                        <table class="table table-bordered" id="shipping-table">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th style="width: 20%;" scope="col" class="text-center">Shipping Service Name</th>
-                                                                    <th style="width: 20%;" scope="col" class="text-center">Discount Type</th>
-                                                                    <th style="width: 25%;" scope="col" class="text-center">Amount/Rate</th>
-                                                                    <th style="width: 25%;" scope="col" class="text-center capped_amount">Capped Amount</th>
-                                                                    <th class="text-center" style="width: 10%;">
-                                                                        <button type="button" class="btn btn-outline-primary btn-sm add-row-btn" id="add-shipping-btn" data-table="#shipping-table" data-select="#shipping_select">Add</button>
-                                                                    </th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-    
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="row">
-                                            <div class="col-12">
-                                                <h4>Email Notification</h4>
-                                            </div>
-                                            <div class="col-4">
-                                                <label>Email Template</label>
-                                                <select class="form-control" name="email_template" required>
-                                                    <option disabled selected value="">Select Template</option>
-                                                    @foreach ($templates as $template)
-                                                        @if (!$template['template_id'] or $template['template_type'] != 'user')
-                                                            @continue
-                                                        @endif
-                                                        <option value="{{ $template['template_id'] }}">{{ $template['template_name'] }}</option>
+                                    </div>
+                                    <div class="row mt-3" id="categories">
+                                        <div class="col-12">
+                                            <div class="row">
+                                                <select class="d-none form-control" name="category_select" id="category_select">
+                                                    <option disabled selected value="">Select a Category</option>
+                                                    @foreach ($categories as $cat)
+                                                    <option value="{{ $cat->id }}">{{ $cat->name }}</option>
                                                     @endforeach
                                                 </select>
-                                            </div>
-                                            <div class="col-4">
-                                                <label>Tag</label>
-                                                <select class="form-control" name="email_tag" required>
-                                                    <option disabled selected value="">Select a Tag</option>
-                                                    @foreach ($tags as $tag)
-                                                        @if (!$tag['list_id'])
-                                                            @continue
-                                                        @endif
-                                                        <option value="{{ $tag['list_id'] }}">{{ $tag['list_name'] }}</option>
+                                                <select class="d-none form-control" name="discount_type_select" id="discount_type_select">
+                                                    <option disabled selected value="">Select Discount Type</option>
+                                                    @foreach ($discount_type as $discount)
+                                                    <option value="{{ $discount }}">{{ $discount }}</option>
                                                     @endforeach
                                                 </select>
-                                            </div>
-                                            <div class="col-4">
-                                                <label>Email Notification Schedule</label>
-                                                <input type="text" class="form-control" id="notif-schedule" name="notif_schedule" required/>
+                                                <div class="col-8 mx-auto">
+                                                    <table class="table table-bordered" id="categories-table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th style="width: 20%;" scope="col" class="text-center p-2 align-middle">Category Name</th>
+                                                                <th style="width: 20%;" scope="col" class="text-center p-2 align-middle">Discount Type</th>
+                                                                <th style="width: 25%;" scope="col" class="text-center p-2 align-middle">Amount/Rate</th>
+                                                                <th style="width: 25%;" scope="col" class="text-center p-2 align-middle capped_amount">Capped Amount</th>
+                                                                <th style="width: 10%;" scope="col" class="text-center p-2 align-middle">
+                                                                    <button type="button" class="add-row-btn btn btn-outline-primary btn-sm" id="add-categories-btn" data-table="#categories-table" data-select="#category_select">Add Row</button>
+                                                                </th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody></tbody>
+                                                    </table>
+                                                </div>
                                             </div>
                                         </div>
-                                    </form>
-                                </div>
+                                    </div>
+                                    <div class="row mt-3" id="customer-groups">
+                                        <div class="col-12">
+                                            <div class="row">
+                                                <select class="d-none form-control" id="customer-group-select">
+                                                    <option disabled selected value="">Select Customer Group</option>
+                                                    @foreach ($customer_groups as $cg)
+                                                        <option value="{{ $cg->id }}">{{ $cg->customer_group_name }}</option>
+                                                    @endforeach
+                                                </select>
+                                                <div class="col-8 mx-auto">
+                                                    <table class="table table-bordered" id="customer-group-table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th style="width: 20%;" scope="col" class="text-center p-2 align-middle">Customer Group</th>
+                                                                <th style="width: 20%;" scope="col" class="text-center p-2 align-middle">Discount Type</th>
+                                                                <th style="width: 25%;" scope="col" class="text-center p-2 align-middle">Amount/Rate</th>
+                                                                <th style="width: 25%;" scope="col" class="text-center p-2 align-middle capped_amount">Capped Amount</th>
+                                                                <th style="width: 10%;" scope="col" class="text-center p-2 align-middle">
+                                                                    <button type="button" class="add-row-btn btn btn-outline-primary btn-sm" id="add-customer-group-btn" data-table="#customer-group-table" data-select="#customer-group-select">Add Row</button>
+                                                                </th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody></tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-3" id="shipping-service">
+                                        <div class="col-12">
+                                            <div class="row">
+                                                <select class="d-none form-control" name="shipping_select" id="shipping_select">
+                                                    <option disabled selected value="">Select a Shipping Service</option>
+                                                    @foreach ($shipping_services as $shipping_service)
+                                                        <option value="{{ $shipping_service }}">{{ $shipping_service }}</option>
+                                                    @endforeach
+                                                </select>
+                                                <div class="col-8 mx-auto">
+                                                    <table class="table table-bordered" id="shipping-table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th style="width: 20%;" scope="col" class="text-center p-2 align-middle">Shipping Service Name</th>
+                                                                <th style="width: 20%;" scope="col" class="text-center p-2 align-middle">Discount Type</th>
+                                                                <th style="width: 25%;" scope="col" class="text-center p-2 align-middle">Amount/Rate</th>
+                                                                <th style="width: 25%;" scope="col" class="text-center p-2 align-middle capped_amount">Capped Amount</th>
+                                                                <th style="width: 10%;" scope="col" class="text-center p-2 align-middle">
+                                                                    <button type="button" class="btn btn-outline-primary btn-sm add-row-btn" id="add-shipping-btn" data-table="#shipping-table" data-select="#shipping_select">Add Row</button>
+                                                                </th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody></tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-3" id="selected-items">
+                                        <div class="col-12">
+                                            <div class="row">
+                                                <select class="d-none form-control" name="item_code_select" id="item_code_select">
+                                                    <option disabled selected value="">Select Item</option>
+                                                    @foreach ($items as $item)
+                                                    <option value="{{ $item->f_idcode }}">{{ $item->f_idcode }}</option>
+                                                    @endforeach
+                                                </select>
+                                                <select class="d-none form-control" name="discount_type_select" id="discount_type_select">
+                                                    <option disabled selected value="">Select Discount Type</option>
+                                                    @foreach ($discount_type as $discount)
+                                                    <option value="{{ $discount }}">{{ $discount }}</option>
+                                                    @endforeach
+                                                </select>
+                                                <div class="col-8 mx-auto">
+                                                    <table class="table table-bordered" id="selected-items-table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th style="width: 20%;" scope="col" class="text-center p-2 align-middle">Item Code</th>
+                                                                <th style="width: 20%;" scope="col" class="text-center p-2 align-middle">Discount Type</th>
+                                                                <th style="width: 25%;" scope="col" class="text-center p-2 align-middle">Amount/Rate</th>
+                                                                <th style="width: 25%;" scope="col" class="text-center p-2 align-middle capped_amount">Capped Amount</th>
+                                                                <th style="width: 10%;" scope="col" class="text-center p-2 align-middle">
+                                                                    <button type="button" class="add-row-btn btn btn-outline-primary btn-sm" id="add-selected-items-btn" data-table="#selected-items-table" data-select="#item_code_select">Add Row</button>
+                                                                </th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody></tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <div class="row mt-3">
+                                        <div class="col-12">
+                                            <h4>Email Notification</h4>
+                                        </div>
+                                        <div class="col-4">
+                                            <label>Email Template</label>
+                                            <select class="form-control" name="email_template" required>
+                                                <option disabled selected value="">Select Template</option>
+                                                @foreach ($templates as $template)
+                                                    @if (!$template['template_id'] or $template['template_type'] != 'user')
+                                                        @continue
+                                                    @endif
+                                                    <option value="{{ $template['template_id'] }}">{{ $template['template_name'] }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="col-4">
+                                            <label>Tag</label>
+                                            <select class="form-control" name="email_tag" required>
+                                                <option disabled selected value="">Select a Tag</option>
+                                                @foreach ($tags as $tag)
+                                                    @if (!$tag['list_id'])
+                                                        @continue
+                                                    @endif
+                                                    <option value="{{ $tag['list_id'] }}">{{ $tag['list_name'] }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="col-4">
+                                            <label>Email Notification Schedule</label>
+                                            <input type="text" class="form-control" id="notif-schedule" name="notif_schedule" required/>
+                                        </div>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     </div>
                 </div>
-            </section>
-        </div>
+            </div>
+        </section>
     </div>
+</div>
 @endsection
 @section('script')
 <script>
@@ -327,12 +354,14 @@
                 $('#for_all_items').slideDown();
                 $('#customer-groups').slideUp();
                 $('#categories').slideUp();
+                $('#selected-items').slideUp();
                 $('#shipping-service').slideUp();
                 $('#discount_type').prop('required', true);
             }else if($('#apply_discount_to').val() == 'Per Category'){
                 $('#for_all_items').slideUp();
                 $('#customer-groups').slideUp();
                 $('#categories').slideDown();
+                $('#selected-items').slideUp();
                 $('#shipping-service').slideUp();
                 $('#discount_type').prop('required', false);
                 $('#discount_rate').prop('required', false);
@@ -340,6 +369,7 @@
             }else if($('#apply_discount_to').val() == 'Per Customer Group'){
                 $('#for_all_items').slideUp();
                 $('#categories').slideUp();
+                $('#selected-items').slideUp();
                 $('#customer-groups').slideDown();
                 $('#shipping-service').slideUp();
                 $('#discount_type').prop('required', false);
@@ -348,8 +378,18 @@
             }else if($('#apply_discount_to').val() == 'Per Shipping Service'){
                 $('#for_all_items').slideUp();
                 $('#categories').slideUp();
+                $('#selected-items').slideUp();
                 $('#customer-groups').slideUp();
                 $('#shipping-service').slideDown();
+                $('#discount_type').prop('required', false);
+                $('#discount_rate').prop('required', false);
+                $('#capped_amount').prop('required', false);
+            }else if($('#apply_discount_to').val() == 'Selected Items'){
+                $('#for_all_items').slideUp();
+                $('#categories').slideUp();
+                $('#customer-groups').slideUp();
+                $('#shipping-service').slideUp();
+                $('#selected-items').slideDown();
                 $('#discount_type').prop('required', false);
                 $('#discount_rate').prop('required', false);
                 $('#capped_amount').prop('required', false);
@@ -358,6 +398,7 @@
                 $('#categories').slideUp();
                 $('#customer-groups').slideUp();
                 $('#shipping-service').slideUp();
+                $('#selected-items').slideUp();
                 $('#discount_type').prop('required', false);
                 $('#discount_rate').prop('required', false);
                 $('#capped_amount').prop('required', false);

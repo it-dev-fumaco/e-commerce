@@ -1071,16 +1071,22 @@ class ProductController extends Controller
             $child_arr = [];
             switch ($sale->apply_discount_to) {
                 case 'Per Category':
-                    $child_sale_arr = DB::table('fumaco_on_sale_categories as sc')->join('fumaco_categories as c', 'sc.category_id', 'c.id')->where('sc.sale_id', $sale->id)
-                        ->select('c.id', 'c.name', 'sc.discount_type', 'sc.discount_rate', 'sc.capped_amount', 'sc.sale_id')->get();
+                    $child_sale_arr = DB::table('fumaco_on_sale_categories as sc')->join('fumaco_categories as c', 'sc.category_id', 'c.id')
+                        ->where('sc.sale_id', $sale->id)->select('c.id', 'c.name', 'sc.discount_type', 'sc.discount_rate', 'sc.capped_amount', 'sc.sale_id')->get();
                     break;
                 case 'Per Customer Group':
-                    $child_sale_arr = DB::table('fumaco_on_sale_customer_group as sc')->join('fumaco_customer_group as c', 'sc.customer_group_id', 'c.id')->where('sc.sale_id', $sale->id)
-                        ->select('c.id', 'c.customer_group_name as name', 'sc.discount_type', 'sc.discount_rate', 'sc.capped_amount', 'sc.sale_id')->get();
+                    $child_sale_arr = DB::table('fumaco_on_sale_customer_group as sc')->join('fumaco_customer_group as c', 'sc.customer_group_id', 'c.id')
+                        ->where('sc.sale_id', $sale->id)->select('c.id', 'c.customer_group_name as name', 'sc.discount_type', 'sc.discount_rate', 'sc.capped_amount', 'sc.sale_id')->get();
                     break;
                 case 'Per Shipping Service':
-                    $child_sale_arr = DB::table('fumaco_on_sale_shipping_service')->where('sale_id', $sale->id)->select('id', 'shipping_service as name', 'discount_type', 'discount_rate', 'capped_amount', 'sale_id')->get();
+                    $child_sale_arr = DB::table('fumaco_on_sale_shipping_service')
+                        ->where('sale_id', $sale->id)->select('id', 'shipping_service as name', 'discount_type', 'discount_rate', 'capped_amount', 'sale_id')->get();
                     break;
+                case 'Selected Items':
+                    $child_sale_arr = DB::table('fumaco_on_sale_items')
+                        ->where('sale_id', $sale->id)->select('id', 'item_code as name', 'discount_type', 'discount_rate', 'capped_amount', 'sale_id')->get();
+                    break;
+                    
                 default:
                     $child_sale_arr = [];
                     break;
@@ -1125,18 +1131,24 @@ class ProductController extends Controller
     }
 
     public function addOnsaleForm(){
+        $items = DB::table('fumaco_items')->where('f_status', 1)->select('f_idcode', 'f_item_name')->orderBy('f_idcode', 'asc')->get();
+
         $categories = DB::table('fumaco_categories')->where('publish', 1)->where('external_link', null)->get();
 
         $customer_groups = DB::table('fumaco_customer_group')->get();
 
-        $shipping_services = DB::table('fumaco_shipping_service')->where('shipping_service_name', '!=', 'Free Delivery')->select('shipping_service_name')->distinct()->orderBy('shipping_service_name', 'asc')->pluck('shipping_service_name');
+        $shipping_services = DB::table('fumaco_shipping_service')->where('shipping_service_name', '!=', 'Free Delivery')
+            ->select('shipping_service_name')->distinct()->orderBy('shipping_service_name', 'asc')->pluck('shipping_service_name');
 
         $list_id = env('MAILCHIMP_LIST_ID');
+        if (!isset($list_id)) {
+            return redirect()->back()->with('error', 'Mailchimp not configured.');
+        }
 
         $templates = Newsletter::getTemplatesList();
         $tags = Newsletter::getSegmentsList($list_id);
 
-        return view('backend.marketing.add_onsale', compact('categories', 'customer_groups', 'templates', 'tags', 'shipping_services'));
+        return view('backend.marketing.add_onsale', compact('categories', 'customer_groups', 'templates', 'tags', 'shipping_services', 'items'));
     }
 
     public function editOnsaleForm($id){
@@ -1147,6 +1159,8 @@ class ProductController extends Controller
         }
 
         $categories = DB::table('fumaco_categories')->where('publish', 1)->where('external_link', null)->get();
+
+        $items = DB::table('fumaco_items')->where('f_status', 1)->select('f_idcode', 'f_item_name')->orderBy('f_idcode', 'asc')->get();
 
         $shipping_services = DB::table('fumaco_shipping_service')->where('shipping_service_name', '!=', 'Free Delivery')->select('shipping_service_name')->distinct()->orderBy('shipping_service_name', 'asc')->pluck('shipping_service_name');
 
@@ -1168,9 +1182,18 @@ class ProductController extends Controller
                 ->where('sc.sale_id', $id)->select('sc.shipping_service', 'sc.discount_type', 'sc.discount_rate', 'sc.capped_amount', 'sc.sale_id')->get();
         }
 
+        $discounted_selected_items = [];
+        if ($on_sale->apply_discount_to == 'Selected Items') {
+            $discounted_selected_items = DB::table('fumaco_on_sale_items as sc')
+                ->where('sc.sale_id', $id)->select('sc.item_code', 'sc.discount_type', 'sc.discount_rate', 'sc.capped_amount', 'sc.sale_id')->get();
+        }
+
         $customer_groups = DB::table('fumaco_customer_group')->get();
 
         $list_id = env('MAILCHIMP_LIST_ID');
+        if (!isset($list_id)) {
+            return redirect()->back()->with('error', 'Mailchimp not configured.');
+        }
 
         $templates = Newsletter::getTemplatesList();
         $tags = Newsletter::getSegmentsList($list_id);
@@ -1180,7 +1203,7 @@ class ProductController extends Controller
         $selected_tag = $campaign ? $campaign['recipients']['segment_opts']['saved_segment_id'] : null;
         $selected_template = $campaign ? $campaign['settings']['template_id'] : null;
 
-        return view('backend.marketing.edit_onsale', compact('on_sale', 'categories', 'discounted_categories', 'customer_groups', 'discounted_customer_group', 'templates', 'tags', 'selected_template', 'selected_tag', 'shipping_services', 'discounted_shipping_services'));
+        return view('backend.marketing.edit_onsale', compact('on_sale', 'categories', 'discounted_categories', 'customer_groups', 'discounted_customer_group', 'templates', 'tags', 'selected_template', 'selected_tag', 'shipping_services', 'discounted_shipping_services', 'discounted_selected_items', 'items'));
     }
 
     public function setOnSaleStatus(Request $request){
@@ -1672,6 +1695,7 @@ class ProductController extends Controller
             $insert = [
                 'sale_name' => $request->sale_name,
                 'start_date' => $from,
+                'is_clearance_sale' => $request->is_clearance_sale,
                 'end_date' => $to,
                 'notification_schedule' => $notif_schedule,
                 'discount_type' => $discount_type,
@@ -1723,6 +1747,10 @@ class ProductController extends Controller
 
             // mailchimp
             $list_id = env('MAILCHIMP_LIST_ID');
+            if (!isset($list_id)) {
+                return redirect()->back()->with('error', 'Mailchimp not configured.');
+            }
+
             $campaign = Newsletter::createCampaign(
                 'FUMACO',           // from - name,
                 'it@fumaco.com',    // from - email,
@@ -1751,7 +1779,7 @@ class ProductController extends Controller
 
             $id = DB::table('fumaco_on_sale')->insertGetId($insert);
 
-            if(in_array($request->apply_discount_to, ['Per Shipping Service', 'Per Category', 'Per Customer Group'])){
+            if(in_array($request->apply_discount_to, ['Per Shipping Service', 'Per Category', 'Per Customer Group', 'Selected Items'])){
                 switch ($request->apply_discount_to) {
                     case 'Per Shipping Service':
                         $reference = 'shipping_service';
@@ -1764,6 +1792,10 @@ class ProductController extends Controller
                     case 'Per Customer Group':
                         $reference = 'customer_group_id';
                         $table = 'fumaco_on_sale_customer_group';
+                        break;
+                    case 'Selected Items':
+                        $reference = 'item_code';
+                        $table = 'fumaco_on_sale_items';
                         break;
                     default:
                         $reference = $table = null;
@@ -1821,6 +1853,12 @@ class ProductController extends Controller
                     $reference = 'customer_group_id';
                     $arr_key = 'customer_group';
                     $err = 'customer group';
+                    break;
+                case 'Selected Items':
+                    $table = 'fumaco_on_sale_items';
+                    $reference = 'item_code';
+                    $arr_key = 'item_code';
+                    $err = 'item code';
                     break;
                 default:
                     $err = null;
@@ -1901,6 +1939,7 @@ class ProductController extends Controller
             $update = [
                 'sale_name' => $request->sale_name,
                 'start_date' => $from,
+                'is_clearance_sale' => $request->is_clearance_sale,
                 'end_date' => $to,
                 'notification_schedule' => $notif_schedule,
                 'discount_type' => $discount_type,
@@ -1983,7 +2022,7 @@ class ProductController extends Controller
 
             DB::table('fumaco_on_sale')->where('id', $id)->update($update);
 
-            if(in_array($request->apply_discount_to, ['Per Shipping Service', 'Per Category', 'Per Customer Group'])){
+            if(in_array($request->apply_discount_to, ['Per Shipping Service', 'Per Category', 'Per Customer Group', 'Selected Items'])){
                 foreach($selected_reference as $key => $reference_name){
                     $discount_rate = 0;
                     $capped_amount = 0;
@@ -2001,7 +2040,8 @@ class ProductController extends Controller
                         'discount_type' => $selected_discount_type[$key],
                         'discount_rate' => $discount_rate,
                         'capped_amount' => $capped_amount,
-                        'created_by' => Auth::user()->username
+                        'created_by' => Auth::user()->username,
+                        'last_modified_by' => Auth::user()->username,
                     ]);
                 }
             }
@@ -2034,7 +2074,10 @@ class ProductController extends Controller
             DB::table('fumaco_on_sale')->where('id', $id)->delete();
             DB::table('fumaco_on_sale_categories')->where('sale_id', $id)->delete();
             DB::table('fumaco_on_sale_customer_group')->where('sale_id', $id)->delete();
+            DB::table('fumaco_on_sale_items')->where('sale_id', $id)->delete();
+
             DB::commit();
+            
             return redirect()->back()->with('success', 'On Sale Deleted.');
         } catch (Exception $e) {
             DB::rollback();
