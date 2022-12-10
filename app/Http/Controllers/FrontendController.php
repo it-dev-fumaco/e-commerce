@@ -2473,14 +2473,7 @@ class FrontendController extends Controller
             }
         }
 
-        $selected_cb = $request->selected_cb;
-        $item_code = DB::table('fumaco_items as a')
-            ->join('fumaco_items_attributes as b', 'a.f_idcode', 'b.idcode')
-            ->join('fumaco_attributes_per_category as c', 'c.id', 'b.attribute_name_id')
-            ->where('a.f_parent_code', $request->parent)->where('c.slug', $selected_cb)
-            ->where('b.attribute_value', $attr_collection[$selected_cb])->where('a.f_status', 1)->select('a.slug', 'a.f_idcode')->first();
-
-        return ($item_code) ? ($item_code->slug) ? $item_code->slug : $item_code->f_idcode : $request->id;
+        return null;
     }
 
     public function uploadDepositSlipForm($token, Request $request) {

@@ -108,8 +108,8 @@
 										</ul>
 									</p>
 									<input type="hidden" name="item_code" value="{{ $product_details->f_idcode }}">
-									<p class="card-text">QTY&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;   <input type="number" value="1" id="quantity" name="quantity" min="1" max="{{ ($product_details->f_qty > 0) ? $product_details->f_qty : 1 }}" style="width: 70px;"> <span class="d-inline-block" style="margin-left: 10px;">{{ $product_details->f_stock_uom  }}</span></p>
-									<p class="card-text">
+									<p class="card-text custom-status">QTY&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;   <input type="number" value="1" id="quantity" name="quantity" min="1" max="{{ ($product_details->f_qty > 0) ? $product_details->f_qty : 1 }}" style="width: 70px;"> <span class="d-inline-block" style="margin-left: 10px;">{{ $product_details->f_stock_uom  }}</span></p>
+									<p class="card-text custom-status">
 										@if ($product_details_array['on_stock'])
 											<span style='color:green;'>Available</span>
 										@else
@@ -156,7 +156,7 @@
 									@endforeach
 									<div class="row mt-5" id="product_details">
 										<div class="col-xs-6">
-											<div class="row p-0">
+											<div class="row p-0" id="action-buttons">
 												@if ($product_details_array['on_stock'])
 													<div class="col-12 col-xl-3 p-0">
 														<button type="submit" class="btn btn-lg btn-outline-primary fumacoFont_card_readmore product-btn no-border w-100" name="addtocart" value="1"><i class="fas fa-shopping-cart"></i> Add to Cart</button>
@@ -533,9 +533,8 @@
 <link rel="stylesheet" type="text/css" href="{{ asset('/item/dist/xzoom.css') }}" media="all" />
 <link type="text/css" rel="stylesheet" href="{{ asset('/assets/loading.css') }}" />
 <link rel="stylesheet" type="text/css" href="{{ asset('/page_css/product_page.min.css') }}">
-
-	<link rel="stylesheet" type="text/css" href="{{ asset('/slick/slick.css') }}">
-	<link rel="stylesheet" type="text/css" href="{{ asset('/slick/slick-theme.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ asset('/slick/slick.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ asset('/slick/slick-theme.css') }}">
 @endsection
 
 @section('script')
@@ -549,16 +548,17 @@
 <script src="{{ asset('/slick/slick.js') }}" type="text/javascript" charset="utf-8"></script>
 
 <script>
-   (function() {
-	   $('#submit-review').click(function(e){
-		   e.preventDefault();
+	(function() {
+		$('#submit-review').click(function(e){
+			e.preventDefault();
 			if(!$('input[name="rating"]:checked').val()) {
 				$('#rating-alert').removeClass('d-none');
 			} else {
 				$('#rating-alert').addClass('d-none');
 				$('#review-form').submit();
 			}
-	   });
+		});
+
 		$(document).on('change', '.attr-radio', function(){
 			var selected_attr = {};
 			var selected_cb = $(this).data('attribute');
@@ -573,10 +573,32 @@
 				url:"/getvariantcode",
 				data: {selected_cb: selected_cb, attr: selected_attr, _token: '{{ csrf_token() }}', parent: '{{ $product_details->f_parent_code }}', id: '{{ $product_details->f_idcode }}'},
 				success:function(response){
-					window.location.href = "/product/" + response;
+					if (response) {
+						loadVariant(response);
+					} else { 
+						$('.custom-status').remove();
+						$('#action-buttons').empty();
+						$('#action-buttons').html(
+							'<div class="col-12 col-xl-3 p-0">' +
+								'<button type="button" class="btn btn-lg btn-outline-primary fumacoFont_card_readmore product-btn no-border bg-dark w-100 disabled text-white">Unavailable</button>' +
+								'</div>'
+						);
+					}
 				}
       		});
 		});
+
+		function loadVariant(slug) {
+			window.history.pushState("", "", slug);
+			$.ajax({
+				type:"GET",
+				url:"/product/" + slug,
+				success:function(response){
+					$('body').html(response);
+					FB.XFBML.parse(); 
+				}
+      		});
+		}
   	})();
 </script>
 @endsection
