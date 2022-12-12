@@ -76,15 +76,13 @@
                                                 <input type="text" class="form-control" name="minimum_spend" placeholder="Minimum Spend" required>
                                             </div>
                                         </div>
-                                        <div id="fixed_amount" class="row">
-                                            <br>&nbsp;
+                                        <div id="fixed_amount" class="row mt-3">
                                             <div class="col-12">
                                                 <label>Amount *</label>
                                                 <input type="text" class="form-control" id="discount_amount" name="discount_amount" placeholder="Amount">
                                             </div>
                                         </div>
-                                        <div id="percentage" class="row">
-                                            <div class="col-12"><br/></div>
+                                        <div id="percentage" class="row mt-3">
                                             <div class="col-6">
                                                 <label>Percentage *</label>
                                                 <input type="text" class="form-control" id="discount_percentage" name="discount_percentage" placeholder="Percentage">
@@ -92,6 +90,12 @@
                                             <div class="col-6">
                                                 <label>Capped Amount</label>
                                                 <input type="text" class="form-control" name="capped_amount" id="capped_amount" value="0" placeholder="Capped Amount"/>
+                                            </div>
+                                        </div>
+                                        <div class="row mt-3">
+                                            <div class="col-6">
+                                                <label for="order_no">Order Number</label>
+                                                <input type="text" class="form-control" name="order_no" placeholder="Order Number"/>
                                             </div>
                                         </div>
                                         <br/><br/>

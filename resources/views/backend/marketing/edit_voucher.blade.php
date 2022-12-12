@@ -75,15 +75,13 @@
                                                 <input type="text" class="form-control" name="minimum_spend" value="{{ $coupon->minimum_spend }}" placeholder="Minimum Spend" required>
                                             </div>
                                         </div>
-                                        <div id="fixed_amount" class="row">
-                                            <br>&nbsp;
+                                        <div id="fixed_amount" class="row mt-3">
                                             <div class="col-12">
                                                 <label>Amount *</label>
                                                 <input type="text" class="form-control" id="discount_amount" value="{{ $coupon->discount_type == 'Fixed Amount' ? $coupon->discount_rate : ''  }}" name="discount_amount" placeholder="Amount">
                                             </div>
                                         </div>
-                                        <div id="percentage" class="row">
-                                            <div class="col-12"><br/></div>
+                                        <div id="percentage" class="row mt-3">
                                             <div class="col-6">
                                                 <label>Percentage *</label>
                                                 <input type="text" class="form-control" id="discount_percentage" value="{{ $coupon->discount_type == 'By Percentage' ? $coupon->discount_rate : ''  }}" name="discount_percentage" placeholder="Percentage">
@@ -91,6 +89,12 @@
                                             <div class="col-6">
                                                 <label>Capped Amount</label>
                                                 <input type="text" class="form-control" name="capped_amount" value="{{ $coupon->capped_amount }}" id="capped_amount" placeholder="Capped Amount"/>
+                                            </div>
+                                        </div>
+                                        <div class="row mt-3">
+                                            <div class="col-6">
+                                                <label>Order Number</label>
+                                                <input type="text" class="form-control" name="order_no" placeholder="Order Number" value="{{ $coupon->order_no }}">
                                             </div>
                                         </div>
                                         <br/><br/>
