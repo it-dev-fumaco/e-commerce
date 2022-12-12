@@ -16,6 +16,7 @@ use Illuminate\Support\Str;
 use Adrianorosa\GeoLocation\GeoLocation;
 use Illuminate\Support\Facades\Http;
 use Newsletter;
+use Cache;
 
 use App\Http\Traits\ProductTrait;
 use App\Http\Traits\GeneralTrait;
@@ -1300,7 +1301,6 @@ class FrontendController extends Controller
     }
 
     public function viewProducts($category_id, Request $request) {
-        // return $request->all();
         if(request()->isMethod('post')) {
             $variables = [];
             if ($request->attr) {
@@ -2580,5 +2580,113 @@ class FrontendController extends Controller
         }
    
         return redirect($findurl->url);
+    }
+
+    public function clearanceSalePage(Request $request) {
+        $category_filter = DB::table('fumaco_on_sale as os')
+            ->join('fumaco_on_sale_items as osi', 'os.id', 'osi.sale_id')
+            ->join('fumaco_items as i', 'i.f_idcode', 'osi.item_code')
+            ->join('fumaco_categories as ic', 'ic.id', 'i.f_cat_id')
+            ->where('i.f_status', 1)->where('os.is_clearance_sale', 1)->where('os.status', 1)
+            ->whereDate('os.start_date', '>=', Carbon::now())->whereDate('os.end_date', '>=', Carbon::now())
+            ->orderBy('ic.slug', 'asc')->pluck('ic.name', 'ic.id');
+
+        if (count($category_filter) <= 0) {
+            return redirect('/');
+        }
+
+        // get sorting value 
+        $sortby = $request->sortby;
+        switch ($sortby) {
+            case 'Price':
+                $sortby = 'f_original_price';
+                break;
+            case 'Product Name':
+                $sortby = 'f_name_name';
+                break;
+            default:
+                $sortby = 'f_order_by';
+                break;
+        }
+
+        $orderby = ($request->order) ? $request->order : 'asc';
+
+        $image_for_sharing = null;
+        // get image for social media sharing
+        $default_image_for_sharing = DB::table('fumaco_social_image')->where('is_default', 1)->where('page_type', 'main_page')->select('filename')->first();
+        if ($default_image_for_sharing) {
+            $image_for_sharing = ($default_image_for_sharing->filename) ? asset('/storage/social_images/'. $default_image_for_sharing->filename) : null;
+        }
+
+        $filters = is_array($request->category) ? $request->category : [];
+
+        // get items on clearance sale
+        $products = DB::table('fumaco_on_sale as os')
+            ->join('fumaco_on_sale_items as osi', 'os.id', 'osi.sale_id')
+            ->join('fumaco_items as i', 'i.f_idcode', 'osi.item_code')
+            ->where('i.f_status', 1)->where('os.is_clearance_sale', 1)->where('os.status', 1)
+            ->when(count($filters) > 0, function($c) use ($filters) {
+                $c->whereIn('i.f_cat_id', $filters);
+            })
+            ->whereDate('os.start_date', '>=', Carbon::now())->whereDate('os.end_date', '>=', Carbon::now())
+            ->select('i.id', 'i.f_idcode', 'i.f_default_price', 'i.f_new_item', 'i.f_new_item_start', 'i.f_new_item_end', 'i.f_cat_id', 'osi.discount_type', 'osi.discount_rate', 'i.f_stock_uom', 'i.f_qty', 'i.f_reserved_qty', 'i.slug', 'i.f_name_name', 'i.f_item_name', 'i.image_alt')->orderBy($sortby, $orderby)->paginate(15);
+
+        $item_codes = array_column($products->items(), 'f_idcode');
+
+        $item_images = DB::table('fumaco_items_image_v1')->whereIn('idcode', $item_codes)
+            ->select('imgprimayx', 'idcode')->get();
+        $item_images = collect($item_images)->groupBy('idcode')->toArray();
+
+        $product_reviews = $this->getProductRating($item_codes);
+
+        $products_arr = [];
+        foreach ($products as $product) {
+            $image = null;
+            if (array_key_exists($product->f_idcode, $item_images)) {
+                $image = $item_images[$product->f_idcode][0]->imgprimayx;
+            }
+
+            $item_price = $product->f_default_price;
+            
+            $is_new_item = 0;
+            if($product->f_new_item == 1){
+                if($product->f_new_item_start <= Carbon::now() and $product->f_new_item_end >= Carbon::now()){
+                    $is_new_item = 1;
+                }
+            }
+
+            // get item price, discounted price and discount rate
+            $discount_display = ($product->discount_type == 'By Percentage') ? ($product->discount_rate . '% OFF') : '₱' . number_format($product->discount_rate, 2, '.', ',') . ' OFF';
+            $discount = ($product->discount_type == 'By Percentage') ? ($item_price * ($product->discount_rate/100)) : $product->discount_rate;
+
+            $discounted_price = $item_price - $discount;
+   
+            // get product reviews
+            $total_reviews = array_key_exists($product->f_idcode, $product_reviews) ? $product_reviews[$product->f_idcode]['total_reviews'] : 0;
+            $overall_rating = array_key_exists($product->f_idcode, $product_reviews) ? $product_reviews[$product->f_idcode]['overall_rating'] : 0;
+        
+            $products_arr[] = [
+                'id' => $product->id,
+                'item_code' => $product->f_idcode,
+                'item_name' => $product->f_name_name,
+                'alt' => $product->image_alt ? $product->image_alt : $product->f_item_name,
+                'default_price' => '₱ ' . number_format($item_price, 2, '.', ','),
+                'is_discounted' => ($product->discount_rate > 0) ? 1 : 0,
+                'on_stock' => ($product->f_qty - $product->f_reserved_qty) > 0 ? 1 : 0,
+                'discounted_price' => '₱ ' . number_format($discounted_price, 2, '.', ','),
+                'discount_display' => $discount_display,
+                'image' => $image,
+                'slug' => $product->slug,
+                'is_new_item' => $is_new_item,
+                'overall_rating' => $overall_rating,
+                'total_reviews' => $total_reviews
+            ];
+        }
+
+        if($request->ajax()){
+            return view('frontend.product_list_card', compact('products', 'products_arr'));
+        }
+
+        return view('frontend.clearance_sale', compact('products_arr', 'products', 'image_for_sharing', 'category_filter'));
     }
 }

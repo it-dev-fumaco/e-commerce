@@ -237,6 +237,11 @@
                 <ul class="dropdown-menu dropdown-menu-light navbar-header overflow-auto" style="font-weight: 300 !important;" aria-labelledby="navbarDarkDropdownMenuLink" id="product-category-dropdown">
                 </ul>
               </li>
+              @if (cache('has_clearance_sale'))
+              <li class="nav-item">
+                <a class="nav-link" href="/clearance_sale">CLEARANCE SALE</a>
+              </li>
+              @endif
               <li class="nav-item">
                 <a class="nav-link" href="/about" style="white-space: nowrap !important">ABOUT US</a>
               </li>
@@ -705,7 +710,7 @@
         }
       });
 
-      @if (in_array($activePage, ['homepage', 'product_page', 'search_result', 'product_list', 'cart']))
+      @if (in_array($activePage, ['homepage', 'product_page', 'search_result', 'product_list', 'cart', 'clearance_sale']))
         $(document).on('click', '.add-to-cart', function(e){
           e.preventDefault();
           var btn = $(this);

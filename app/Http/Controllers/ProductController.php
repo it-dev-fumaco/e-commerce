@@ -13,6 +13,7 @@ use Auth;
 use Webp;
 use DB;
 use Mail;
+use Cache;
 
 class ProductController extends Controller
 {
@@ -1209,6 +1210,8 @@ class ProductController extends Controller
     public function setOnSaleStatus(Request $request){
         DB::beginTransaction();
         try {
+            Cache::forget('has_clearance_sale');
+
             $sale_details = [];
             DB::table('fumaco_on_sale')->where('id', $request->sale_id)->update(['status' => $request->status]);
             if($request->status == 1){
@@ -1649,6 +1652,8 @@ class ProductController extends Controller
             $discount_type = null;
             $capped_amount = null;
 
+            Cache::forget('has_clearance_sale');
+
             $sale_duration = explode(' - ', $request->sale_duration);
 
             $from = $request->sale_duration ? date('Y-m-d', strtotime($sale_duration[0])) : null;
@@ -1835,6 +1840,8 @@ class ProductController extends Controller
     public function editOnSale($id, Request $request){
         DB::beginTransaction();
         try {
+            Cache::forget('has_clearance_sale');
+
             switch ($request->apply_discount_to) {
                 case 'Per Shipping Service':
                     $table = 'fumaco_on_sale_shipping_service';
@@ -2058,6 +2065,8 @@ class ProductController extends Controller
     public function removeOnSale($id){
         DB::beginTransaction();
         try {
+            Cache::forget('has_clearance_sale');
+
             $image_to_delete = DB::table('fumaco_on_sale')->Where('id', $id)->first();
 
             if($image_to_delete->banner_image){

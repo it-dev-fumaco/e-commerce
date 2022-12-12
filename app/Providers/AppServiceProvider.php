@@ -6,6 +6,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Config;
 use DB;
 use Cache;
+use Carbon\Carbon;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -34,5 +35,12 @@ class AppServiceProvider extends ServiceProvider
             Config::set('app.url', $config->set_value);
             Config::set('app.asset_url', $config->set_value);
         }
+
+        // check if clearance sale exists
+        Cache::remember('has_clearance_sale', 3600, function () {
+            return DB::table('fumaco_on_sale')->where('is_clearance_sale', 1)->where('status', 1)
+                ->whereDate('start_date', '>=', Carbon::now())->whereDate('end_date', '>=', Carbon::now())
+                ->exists();
+        });
     }
 }
