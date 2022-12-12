@@ -2588,7 +2588,7 @@ class FrontendController extends Controller
             ->join('fumaco_items as i', 'i.f_idcode', 'osi.item_code')
             ->join('fumaco_categories as ic', 'ic.id', 'i.f_cat_id')
             ->where('i.f_status', 1)->where('os.is_clearance_sale', 1)->where('os.status', 1)
-            ->whereDate('os.start_date', '>=', Carbon::now())->whereDate('os.end_date', '>=', Carbon::now())
+            ->whereDate('os.start_date', '<=', Carbon::now()->startOfDay())->whereDate('os.end_date', '>=', Carbon::now()->endOfDay())
             ->orderBy('ic.slug', 'asc')->pluck('ic.name', 'ic.id');
 
         if (count($category_filter) <= 0) {
@@ -2628,7 +2628,7 @@ class FrontendController extends Controller
             ->when(count($filters) > 0, function($c) use ($filters) {
                 $c->whereIn('i.f_cat_id', $filters);
             })
-            ->whereDate('os.start_date', '>=', Carbon::now())->whereDate('os.end_date', '>=', Carbon::now())
+            ->whereDate('os.start_date', '<=', Carbon::now()->startOfDay())->whereDate('os.end_date', '>=', Carbon::now()->endOfDay())
             ->select('i.id', 'i.f_idcode', 'i.f_default_price', 'i.f_new_item', 'i.f_new_item_start', 'i.f_new_item_end', 'i.f_cat_id', 'osi.discount_type', 'osi.discount_rate', 'i.f_stock_uom', 'i.f_qty', 'i.f_reserved_qty', 'i.slug', 'i.f_name_name', 'i.f_item_name', 'i.image_alt')->orderBy($sortby, $orderby)->paginate(15);
 
         $item_codes = array_column($products->items(), 'f_idcode');
