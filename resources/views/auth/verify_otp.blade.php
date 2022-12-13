@@ -36,7 +36,7 @@
             @endif
 			<div class="card">
 				<div class="card-body login-card-body">
-					<p class="login-box-msg">OTP has been sent to your mobile</p>
+					<p class="login-box-msg">OTP has been sent to your email and mobile</p>
 					<form action="/admin/verify_otp" method="POST" autocomplete="off">
 						@csrf
 						<div class="input-group mb-3">

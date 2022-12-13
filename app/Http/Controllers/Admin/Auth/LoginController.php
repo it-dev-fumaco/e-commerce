@@ -7,6 +7,7 @@ use DB;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\ThrottlesLogins;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Http;
 use Carbon\Carbon;
 
@@ -40,7 +41,6 @@ class LoginController extends Controller
             //Authentication passed...
             $checker = DB::table('fumaco_admin_user')->where('username', $request->username)->first();
 
-
             if($checker->xstatus == 0){
                 Auth::guard('admin')->logout();
                 return redirect('/admin/login')->withInput()->with('d_info','Your admin account is deactivated.');
@@ -66,6 +66,13 @@ class LoginController extends Controller
                 'to' => preg_replace("/[^0-9]/", "", $phone),
                 'text' => 'TWO-FACTOR AUTHENTICATION: Your One-Time PIN is '.$otp.' to login in Fumaco Website Admin Page, valid only within 10 mins. For any help, please contact us at it@fumaco.com'
             ]);
+
+            try {
+                Mail::send('emails.admin_otp', ['otp' => $otp], function($message) use ($request) {
+                    $message->to($request->username);
+                    $message->subject('TWO-FACTOR Authentication');
+                });
+            } catch (\Swift_TransportException  $e) {}
 
             $sms_response = json_decode($sms, true);
 

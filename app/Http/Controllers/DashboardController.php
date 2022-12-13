@@ -35,6 +35,13 @@ class DashboardController extends Controller
 			'text' => 'TWO-FACTOR AUTHENTICATION: Your One-Time PIN is '.$otp.' to login in Fumaco Website, valid only within 10 mins. For any help, please contact us at it@fumaco.com'
 		]);
 
+		try {
+			Mail::send('emails.admin_otp', ['otp' => $otp], function($message) {
+				$message->to(Auth::user()->username);
+				$message->subject('TWO-FACTOR Authentication');
+			});
+		} catch (\Swift_TransportException  $e) {}
+
 		$sms_response = json_decode($sms->getBody(), true);
 
 		$details = [
