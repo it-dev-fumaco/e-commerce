@@ -38,18 +38,33 @@
 				<div class="row">
 					<div class="col-md-12 col-lg-8 mx-auto">
 						<div class="alert alert-warning alert-dismissible fade show text-center d-none" id="alert-message" role="alert"></div>
-						<table class="table">
-							<tr>
-								<td class='col-md-9'>
-									<p style="color:#212529 !important; letter-spacing: 1px !important; font-size:16px !important;  text-align: justify !important; font-weight: 600 !important;">Shipping Information</p>
-								</td>
+						<div class="row mb-3">
+							<div class="col-12 col-md-6">
+								<p style="color:#212529 !important; letter-spacing: 1px !important; font-size:16px !important;  text-align: justify !important; font-weight: 600 !important;">Shipping Information</p>
+							</div>
+							<div class="col-12 col-md-6">
 								@if(!Auth::check())
-									<td style="text-align: right; font-size: 10pt;">
-										Already a member? <br class="d-lg-none"/><a href="#" data-toggle="modal" data-target="#loginModal">Log in</a>
-									</td>
-								@endif
-							</tr>
-						</table>
+									<div class="col-12 col-md-8 offset-md-4">
+										<div class="effect">
+											<div class="buttons" style="display: flex; justify-content: center; align-items: center; font-size: 9pt;">
+												<span class="d-md-nones">Already a member?&nbsp;<span class="open-modal" data-target="#loginModal" style="color: #0D6EFD; text-decoration: underline">Log in</span>&nbsp;</span>
+												<small class="text-muted"> or sign in with</small>
+												<a href="#" class="fb" title="Sign in with Facebook" onclick="triggerLogin();" style="height: 25px !important; width: 25px !important; border-radius: 8px;">
+													<i class="fa fa-facebook" aria-hidden="true" style="font-size: 10pt;"></i>
+												</a>
+												<a href="{{ route('google.login') }}" class="g-plus" title="Sign in with Google" style="height: 25px !important; width: 25px !important; border-radius: 8px;">
+													<img src="{{ asset('assets/google.svg') }}" width="15">
+												</a>
+												<a href="{{ route('linkedin.login') }}" class="in" title="Sign in with Linked In" style="height: 25px !important; width: 25px !important; border-radius: 8px;">
+													<i class="fa fa-linkedin" aria-hidden="true" style="font-size: 10pt;"></i>
+												</a>
+											</div>
+										</div>
+									</div>
+									
+								@endif	
+							</div>
+						</div>
 						<div class="row">
 							<div class="col-md-6">
 								<label for="fname" class="formslabelfnt">First Name : <span class="text-danger">*</span></label>
@@ -317,7 +332,7 @@
 						<div class="modal-content">
 							<div class="modal-header">
 								<h5 class="modal-title" id="loginModalLabel">Login</h5>
-								<a type="button" class="close text-dark" data-dismiss="modal" aria-label="Close">
+								<a type="button" class="close close-modal text-dark" data-target="#loginModal" aria-label="Close">
 									<span aria-hidden="true"><i class="fas fa-times"></i></span>
 								</a>
 							</div>
@@ -494,6 +509,9 @@
 		.breadcrumb{
 			font-size: 8pt !important;
 			font-weight: 500;
+		}
+		.products-head{
+			padding: 0 !important;
 		}
 	}
 
