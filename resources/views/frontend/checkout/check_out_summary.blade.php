@@ -1249,13 +1249,13 @@
 
 		sizeTheOverlays();
 
-		$('#coupon-code').val("{{ $applicable_vouchers_arr ? $applicable_vouchers_arr['code'] : '' }}");
+		$('#coupon-code').val("{{ $applicable_voucher ? $applicable_voucher : '' }}");
 		$("#coupon-code").keyup(function () {  
             $(this).val($(this).val().toUpperCase().replace(' ', ''));
         });
 
-		@if ($applicable_vouchers_arr)
-			apply_coupon("{{ $applicable_vouchers_arr['code'] }}");
+		@if ($applicable_voucher)
+			apply_coupon("{{ $applicable_voucher }}");
 		@endif
 
 		function apply_coupon(coupon){

@@ -569,34 +569,26 @@ class CheckoutController extends Controller
 			$available_voucher = DB::table('fumaco_voucher')
 				->when(!Auth::check(), function ($q){
 					return $q->where('require_signin', 0);
-				})->where('minimum_spend', '<=', collect($cart_arr)->sum('subtotal'))
-				->orderByRaw('LENGTH(order_no)', 'ASC')
-            	->orderBy('order_no', 'ASC')
-				->orderBy('created_at', 'ASC')->get();
+				})
+				->where('minimum_spend', '<=', collect($cart_arr)->sum('subtotal'))->where('auto_apply', 1)
+				->orderByRaw('LENGTH(order_no)', 'ASC')->orderBy('order_no', 'ASC')->orderBy('created_at', 'ASC')
+				->get();
 
-			$applicable_vouchers_arr = [];
+			$applicable_voucher = null;
 			foreach ($available_voucher as $voucher) {
-				$applicable = 1;
+				$available = 1;
 				if(!$voucher->unlimited){
 					if($voucher->total_allotment < $voucher->total_consumed){
-						$applicable = 0;
+						$available = 0;
 					}
 				}
 
 				if(Carbon::now() < Carbon::parse($voucher->validity_date_start)->startOfDay() || Carbon::now() > Carbon::parse($voucher->validity_date_end)->endOfDay()){
-					$applicable = 0;
+					$available = 0;
 				}
 
-				if($applicable){
-					$applicable_vouchers_arr = [
-						'voucher' => $voucher->name,
-						'code' => $voucher->code,
-						'description' => $voucher->description,
-						'discount_type' => $voucher->discount_type,
-						'discount_rate' => $voucher->discount_rate,
-						'capped_amount' => $voucher->capped_amount,
-						'creation' => $voucher->created_at
-					];
+				if($available){
+					$applicable_voucher = $voucher->code;
 
 					break; // get only the first applicable coupon
 				}
@@ -604,7 +596,7 @@ class CheckoutController extends Controller
 
 			DB::commit();
 
-			return view('frontend.checkout.check_out_summary', compact('shipping_details', 'billing_details', 'shipping_rates', 'order_no', 'cart_arr', 'shipping_add', 'billing_add', 'shipping_zones', 'payment_methods', 'free_shipping_remarks', 'shipping_service_discount', 'applicable_vouchers_arr'));
+			return view('frontend.checkout.check_out_summary', compact('shipping_details', 'billing_details', 'shipping_rates', 'order_no', 'cart_arr', 'shipping_add', 'billing_add', 'shipping_zones', 'payment_methods', 'free_shipping_remarks', 'shipping_service_discount', 'applicable_voucher'));
 		}catch(Exception $e){
 			DB::rollback();
 			return redirect()->back()->with('error', 'An error occured. Please try again.');

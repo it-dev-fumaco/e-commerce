@@ -25,8 +25,6 @@
                 <div class="container-fluid">
                     <div class="row">
                         <div class="col-md-12">
-                            {{-- <div class="card card-primary"> --}}
-                                {{-- <div class="card-body"> --}}
                             @if(session()->has('success'))
                                 <div class="row">
                                     <div class="col">
@@ -93,13 +91,16 @@
                                                         <th class="text-center">Action</th>
                                                     </tr>
                                                     @forelse ($coupon as $c)
-                                                        @if($c->total_allotment != null)
+                                                        @if(!$c->unlimited)
                                                             @if ($c->total_consumed >= $c->total_allotment)
                                                                 @continue
                                                             @endif
                                                         @endif
                                                         <tr>
-                                                            <td class="text-center">{{ $c->name }}</td>
+                                                            <td class="text-center">
+                                                                {{ $c->name }} <br>
+                                                                <span class="badge badge-primary {{ !$c->auto_apply ? 'd-none' : null }}" style="font-size: 8pt;">Auto-applied in Checkout</span>
+                                                            </td>
                                                             <td class="text-center">
                                                                 @php
                                                                     $badge = 'secondary';
@@ -110,7 +111,7 @@
                                                                 <span class="badge badge-{{ $badge }}" style="font-size: 15px">{{ $c->code }}</span>
                                                             </td>
                                                             <td class="text-center">{{ $c->coupon_type }}</td>
-                                                            <td class="text-center">{{ $c->unlimited == 1 ? '∞' : $c->total_allotment }}</td>
+                                                            <td class="text-center">{{ $c->unlimited ? '∞' : $c->total_allotment }}</td>
                                                             <td class="text-center">{{ $c->total_consumed }}</td>
                                                             <td class="text-center">
                                                                 @if($c->minimum_spend)
@@ -204,7 +205,7 @@
                                                                 <span class="badge badge-secondary" style="font-size: 15px">{{ $exp_c->code }}</span>
                                                             </td>
                                                             <td class="text-center">{{ $exp_c->coupon_type }}</td>
-                                                            <td class="text-center">{{ $exp_c->unlimited == 1 ? '∞' : $exp_c->total_allotment }}</td>
+                                                            <td class="text-center">{{ $exp_c->unlimited ? '∞' : $exp_c->total_allotment }}</td>
                                                             <td class="text-center">{{ $exp_c->total_consumed }}</td>
                                                             <td class="text-center">
                                                                 @if($exp_c->minimum_spend)

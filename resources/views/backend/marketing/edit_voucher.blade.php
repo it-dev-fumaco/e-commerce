@@ -233,10 +233,16 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div id="for_promotional" class="row">
+                                        <div id="for_promotional" class="row mt-3">
                                             <div class="col-6 mx-auto">
-                                                <br/>
-                                                <label><input type="checkbox" name="require_signin" id="require_signin" {{ $coupon->require_signin == 1 ? 'checked' : '' }}> Require Sign in</label>
+                                                <div class="row">
+                                                    <div class="col-6">
+                                                        <label><input type="checkbox" name="require_signin" id="require_signin" {{ $coupon->require_signin ? 'checked' : '' }}> Require Sign in</label>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <label><input type="checkbox" name="auto_apply" {{ $coupon->auto_apply ? 'checked' : '' }}> Auto-apply in Checkout</label>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                         <br/>
