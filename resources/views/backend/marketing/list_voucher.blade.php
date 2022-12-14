@@ -93,13 +93,16 @@
                                                         <th class="text-center">Action</th>
                                                     </tr>
                                                     @forelse ($coupon as $c)
-                                                        @if($c->total_allotment != null)
+                                                        @if(!$c->unlimited)
                                                             @if ($c->total_consumed >= $c->total_allotment)
                                                                 @continue
                                                             @endif
                                                         @endif
                                                         <tr>
-                                                            <td class="text-center">{{ $c->name }}</td>
+                                                            <td class="text-center">
+                                                                {{ $c->name }} <br>
+                                                                <span class="badge badge-primary {{ !$c->auto_apply ? 'd-none' : null }}" style="font-size: 8pt;">Auto-applied in Checkout</span>
+                                                            </td>
                                                             <td class="text-center">
                                                                 @php
                                                                     $badge = 'secondary';
