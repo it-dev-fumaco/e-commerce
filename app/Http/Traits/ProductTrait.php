@@ -48,7 +48,7 @@ trait ProductTrait {
             // get prices based on price list assigned for logged in user
             if (Auth::check()) {
                 $exclusive_pl = DB::table('fumaco_product_prices')->where('price_list_id', Auth::user()->pricelist_id)
-                    ->where('item_code', explode("-", $product->item_code)[0])->where('uom', $product->stock_uom)
+                    ->where('item_code', explode("-", $product['item_code'])[0])->where('uom', $product['stock_uom'])
                     ->select('price', 'on_sale', 'discount_rate', 'discount_type')->first();
                 $item_price = ($exclusive_pl) ? $exclusive_pl->price : $item_price;
                 if ($exclusive_pl) {
