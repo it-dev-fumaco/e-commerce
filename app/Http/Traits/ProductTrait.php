@@ -7,44 +7,56 @@ use DB;
 use Carbon\Carbon;
 
 trait ProductTrait {
-    public function getItemPriceAndDiscount($item_on_sale, $category, $sale, $item_price, $item_code, $discount_type, $discount_rate, $uom, $sale_per_category) {
-        // set discounted price based on sale details
-        $discount_display = ($discount_type == 'percentage') ? ($discount_rate . '% OFF') : '₱' . number_format($discount_rate, 2, '.', ',') . ' OFF';
-        $discount = ($discount_type == 'percentage') ? ($item_price * ($discount_rate/100)) : $discount_rate;
-        if (!$item_on_sale) {
-            if (!$sale) {
-                if(array_key_exists($category, $sale_per_category)) {
-                    $sale = $sale_per_category[$category][0];
+    public function getItemPriceAndDiscount($product, $all_items_sale, $sale_per_category, $is_on_clearance_sale) {
+        $item_price = $product['default_price'];
+        $discount_rate = $product['discount_rate'];
+        // get item default price and discount
+        if (in_array($product['discount_type'], ['percentage', 'By Percentage'])) {
+            $discount_display = ($discount_rate . '% OFF');
+            $discount = ($item_price * ($discount_rate/100));
+        } else {
+            $discount_display = '₱' . number_format($discount_rate, 2, '.', ',') . ' OFF';
+            $discount = $discount_rate;
+        }
+
+        $sale = $all_items_sale;
+        $item_on_sale = $is_on_clearance_sale ? $is_on_clearance_sale : $product['on_sale'];
+        if (!$is_on_clearance_sale) {
+            if (!$item_on_sale) {
+                if (!$sale) {
+                    if(array_key_exists($product['category_id'], $sale_per_category)) {
+                        $sale = $sale_per_category[$product['category_id']][0];
+                    }
                 }
-            }
 
-            if ($sale) {
-                $item_on_sale = 1;
-                if($sale->discount_type == 'By Percentage'){
-                    $discount = ($item_price * ($sale->discount_rate/100));
+                if ($sale) {
+                    $item_on_sale = 1;
+                    if($sale->discount_type == 'By Percentage'){
+                        $discount = ($item_price * ($sale->discount_rate/100));
 
-                    $discount_display = $sale->discount_rate . '% OFF';
-                    $discount_rate = $sale->discount_rate;
-                }else if($sale->discount_type == 'Fixed Amount'){
-                    if($item_price > $sale->discount_rate){
-                        $discount = $sale->discount_rate;
-                        $discount_display = '₱' . number_format($sale->discount_rate, 2, '.', ',') . ' OFF';
+                        $discount_display = $sale->discount_rate . '% OFF';
                         $discount_rate = $sale->discount_rate;
+                    }else if($sale->discount_type == 'Fixed Amount'){
+                        if($item_price > $sale->discount_rate){
+                            $discount = $sale->discount_rate;
+                            $discount_display = '₱' . number_format($sale->discount_rate, 2, '.', ',') . ' OFF';
+                            $discount_rate = $sale->discount_rate;
+                        }
                     }
                 }
             }
-        }
-        // get prices based on price list assigned for logged in user
-        if (Auth::check()) {
-            $exclusive_pl = DB::table('fumaco_product_prices')->where('price_list_id', Auth::user()->pricelist_id)
-                ->where('item_code', explode("-", $item_code)[0])->where('uom', $uom)
-                ->select('price', 'on_sale', 'discount_rate', 'discount_type')->first();
-            $item_price = ($exclusive_pl) ? $exclusive_pl->price : $item_price;
-            if ($exclusive_pl) {
-                $item_on_sale = $exclusive_pl->on_sale;
-                $discount_rate += $exclusive_pl->discount_rate;
+            // get prices based on price list assigned for logged in user
+            if (Auth::check()) {
+                $exclusive_pl = DB::table('fumaco_product_prices')->where('price_list_id', Auth::user()->pricelist_id)
+                    ->where('item_code', explode("-", $product->item_code)[0])->where('uom', $product->stock_uom)
+                    ->select('price', 'on_sale', 'discount_rate', 'discount_type')->first();
+                $item_price = ($exclusive_pl) ? $exclusive_pl->price : $item_price;
+                if ($exclusive_pl) {
+                    $item_on_sale = $exclusive_pl->on_sale;
+                    $discount_rate += $exclusive_pl->discount_rate;
 
-                $discount = ($exclusive_pl->discount_type == 'percentage') ? ($exclusive_pl->price * ($exclusive_pl->discount_rate/100)) : $exclusive_pl->discount_rate;
+                    $discount = ($exclusive_pl->discount_type == 'percentage') ? ($exclusive_pl->price * ($exclusive_pl->discount_rate/100)) : $exclusive_pl->discount_rate;
+                }
             }
         }
 
@@ -112,5 +124,20 @@ trait ProductTrait {
             ->join('fumaco_on_sale_shipping_service as c', 'p.id', 'c.sale_id')->where('c.shipping_service', $shipping_service)
             ->where('status', 1)->where('p.apply_discount_to', 'Per Shipping Service')->whereDate('p.start_date', '<=', Carbon::now())->whereDate('p.end_date', '>=', Carbon::now())
             ->first();
+    }
+
+    public function isIncludedInClearanceSale($collection) {
+        $query = DB::table('fumaco_on_sale as os')
+            ->join('fumaco_on_sale_items as osi', 'os.id', 'osi.sale_id')
+            ->join('fumaco_items as i', 'i.f_idcode', 'osi.item_code')
+            ->when(count($collection) > 0, function($c) use ($collection) {
+                $c->whereIn('i.f_idcode', $collection);
+            })
+            ->where('os.is_clearance_sale', 1)->where('os.status', 1)
+            ->whereDate('os.start_date', '<=', Carbon::now()->startOfDay())->whereDate('os.end_date', '>=', Carbon::now()->endOfDay())
+            ->select('i.f_idcode', 'i.f_default_price', 'i.f_cat_id', 'osi.discount_type', 'osi.discount_rate')
+            ->get();
+
+        return collect($query)->groupBy('f_idcode')->toArray();
     }
 }

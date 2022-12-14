@@ -253,10 +253,13 @@ class CartController extends Controller
 
         $item_codes = array_column($cart_items->toArray(), 'f_idcode');
 
+        $clearance_sale_items = [];
         if (count($item_codes) > 0) {
             $item_images = DB::table('fumaco_items_image_v1')->whereIn('idcode', $item_codes)
                 ->select('imgprimayx', 'idcode')->get();
             $item_images = collect($item_images)->groupBy('idcode')->toArray();
+
+            $clearance_sale_items = $this->isIncludedInClearanceSale($item_codes);
         }
         $sale_per_category = [];
         if (!$sale && !Auth::check()) {
@@ -277,17 +280,32 @@ class CartController extends Controller
                 $image = $item_images[$item->f_idcode][0]->imgprimayx;
             }
 
-            $item_price = $item->f_default_price;
-            $item_on_sale = $item->f_onsale;
-            
             $is_new_item = 0;
             if($item->f_new_item == 1){
                 if($item->f_new_item_start <= Carbon::now() and $item->f_new_item_end >= Carbon::now()){
                     $is_new_item = 1;
                 }
             }
+
+            $item_detail = [
+                'default_price' => $item->f_default_price,
+                'category_id' => $item->f_cat_id,
+                'item_code' => $item->f_idcode,
+                'discount_type' => $item->f_discount_type,
+                'discount_rate' => $item->f_discount_rate,
+                'stock_uom' => $item->f_stock_uom,
+                'on_sale' => $item->f_onsale
+            ];
+
+            $is_on_clearance_sale = false;
+            if (array_key_exists($item->f_idcode, $clearance_sale_items)) {
+                $item_detail['discount_type'] = $clearance_sale_items[$item->f_idcode][0]->discount_type;
+                $item_detail['discount_rate'] = $clearance_sale_items[$item->f_idcode][0]->discount_rate;
+                $is_on_clearance_sale = true;
+            }
+
             // get item price, discounted price and discount rate
-            $item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $item->f_cat_id, $sale, $item_price, $item->f_idcode, $item->f_discount_type, $item->f_discount_rate, $item->f_stock_uom, $sale_per_category);
+            $item_price_data = $this->getItemPriceAndDiscount($item_detail, $sale, $sale_per_category, $is_on_clearance_sale);
 
             $cart_arr[] = [
                 'item_code' => $item->f_idcode,
@@ -312,12 +330,15 @@ class CartController extends Controller
 
         $cross_selling_item_codes = array_column($cross_sell_products->toArray(), 'f_idcode');
 
+        $clearance_sale_items = [];
         if (count($cross_selling_item_codes) > 0) {
             $cross_selling_item_images = DB::table('fumaco_items_image_v1')->whereIn('idcode', $cross_selling_item_codes)
                 ->select('imgprimayx', 'idcode')->get();
             $cross_selling_item_images = collect($cross_selling_item_images)->groupBy('idcode')->toArray();
 
             $product_reviews = $this->getProductRating($cross_selling_item_codes);
+
+            $clearance_sale_items = $this->isIncludedInClearanceSale($cross_selling_item_codes);
         }
         $sale_per_category = [];
         if (!$sale && !Auth::check()) {
@@ -333,8 +354,6 @@ class CartController extends Controller
     
         $cross_sell_arr = [];
         foreach($cross_sell_products as $cs){
-            $item_price = $cs->f_default_price;
-            $item_on_sale = $cs->f_onsale;
             $image = null;
             if (array_key_exists($cs->f_idcode, $cross_selling_item_images)) {
                 $image = $cross_selling_item_images[$cs->f_idcode][0]->imgprimayx;
@@ -346,8 +365,26 @@ class CartController extends Controller
                     $is_new_item = 1;
                 }
             }
+
+            $item_detail = [
+                'default_price' => $cs->f_default_price,
+                'category_id' => $cs->f_cat_id,
+                'item_code' => $cs->f_idcode,
+                'discount_type' => $cs->f_discount_type,
+                'discount_rate' => $cs->f_discount_rate,
+                'stock_uom' => $cs->f_stock_uom,
+                'on_sale' => $cs->f_onsale
+            ];
+
+            $is_on_clearance_sale = false;
+            if (array_key_exists($cs->f_idcode, $clearance_sale_items)) {
+                $item_detail['discount_type'] = $clearance_sale_items[$cs->f_idcode][0]->discount_type;
+                $item_detail['discount_rate'] = $clearance_sale_items[$cs->f_idcode][0]->discount_rate;
+                $is_on_clearance_sale = true;
+            }
+
             // get item price, discounted price and discount rate
-            $item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $cs->f_cat_id, $sale, $item_price, $cs->f_idcode, $cs->f_discount_type, $cs->f_discount_rate, $cs->f_stock_uom, $sale_per_category);
+            $item_price_data = $this->getItemPriceAndDiscount($item_detail, $sale, $sale_per_category, $is_on_clearance_sale);
             // get product reviews
             $total_reviews = array_key_exists($cs->f_idcode, $product_reviews) ? $product_reviews[$cs->f_idcode]['total_reviews'] : 0;
             $overall_rating = array_key_exists($cs->f_idcode, $product_reviews) ? $product_reviews[$cs->f_idcode]['overall_rating'] : 0;

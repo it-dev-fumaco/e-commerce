@@ -357,11 +357,14 @@ class CheckoutController extends Controller
 				->select('discount_rate', 'discount_type')->first();
 
 			$item_codes = array_column($cart_items->toArray(), 'f_idcode');
-
+			
+			$clearance_sale_items = [];
 			if (count($item_codes) > 0) {
 				$item_images = DB::table('fumaco_items_image_v1')->whereIn('idcode', $item_codes)
 					->select('imgprimayx', 'idcode')->get();
 				$item_images = collect($item_images)->groupBy('idcode')->toArray();
+
+				$clearance_sale_items = $this->isIncludedInClearanceSale($item_codes);
 			}
 			$sale_per_category = [];
 			if (!$sale && !Auth::check()) {
@@ -383,17 +386,32 @@ class CheckoutController extends Controller
 					$image = $item_images[$item->f_idcode][0]->imgprimayx;
 				}
 
-				$item_price = $item->f_default_price;
-				$item_on_sale = $item->f_onsale;
-				
 				$is_new_item = 0;
 				if($item->f_new_item == 1){
 					if($item->f_new_item_start <= Carbon::now() and $item->f_new_item_end >= Carbon::now()){
 						$is_new_item = 1;
 					}
 				}
+
+				$item_detail = [
+					'default_price' => $item->f_default_price,
+					'category_id' => $item->f_cat_id,
+					'item_code' => $item->f_idcode,
+					'discount_type' => $item->f_discount_type,
+					'discount_rate' => $item->f_discount_rate,
+					'stock_uom' => $item->f_stock_uom,
+					'on_sale' => $item->f_onsale
+				];
+
+				$is_on_clearance_sale = false;
+				if (array_key_exists($item->f_idcode, $clearance_sale_items)) {
+					$item_detail['discount_type'] = $clearance_sale_items[$item->f_idcode][0]->discount_type;
+					$item_detail['discount_rate'] = $clearance_sale_items[$item->f_idcode][0]->discount_rate;
+					$is_on_clearance_sale = true;
+				}
+
 				// get item price, discounted price and discount rate
-				$item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $item->f_cat_id, $sale, $item_price, $item->f_idcode, $item->f_discount_type, $item->f_discount_rate, $item->f_stock_uom, $sale_per_category);
+				$item_price_data = $this->getItemPriceAndDiscount($item_detail, $sale, $sale_per_category, $is_on_clearance_sale);
 			
 				$price = $item_price_data['discounted_price'];
 				$total_amount = $price * $item->qty;
@@ -646,6 +664,9 @@ class CheckoutController extends Controller
 				->whereDate('start_date', '<=', Carbon::now()->toDateString())
 				->whereDate('end_date', '>=', Carbon::today()->toDateString())
 				->where('status', 1)->where('apply_discount_to', 'All Items')->first();
+
+			$clearance_sale_items = $this->isIncludedInClearanceSale(array_column($cart_items->toArray(), 'f_idcode'));
+
 			$sale_per_category = [];
 			if (!$sale && !Auth::check()) {
 				$item_categories = array_column($cart_items->toArray(), 'f_cat_id');
@@ -660,11 +681,25 @@ class CheckoutController extends Controller
  
 			$cart_arr = [];
 			foreach ($cart_items as $n => $item) {
-				$item_price = $item->f_default_price;
-				$item_on_sale = $item->f_onsale;
+				$item_detail = [
+					'default_price' => $item->f_default_price,
+					'category_id' => $item->f_cat_id,
+					'item_code' => $item->f_idcode,
+					'discount_type' => $item->f_discount_type,
+					'discount_rate' => $item->f_discount_rate,
+					'stock_uom' => $item->f_stock_uom,
+					'on_sale' => $item->f_onsale
+				];
+
+				$is_on_clearance_sale = false;
+				if (array_key_exists($item->f_idcode, $clearance_sale_items)) {
+					$item_detail['discount_type'] = $clearance_sale_items[$item->f_idcode][0]->discount_type;
+					$item_detail['discount_rate'] = $clearance_sale_items[$item->f_idcode][0]->discount_rate;
+					$is_on_clearance_sale = true;
+				}
 
 				// get item price, discounted price and discount rate
-				$item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $item->f_cat_id, $sale, $item_price, $item->f_idcode, $item->f_discount_type, $item->f_discount_rate, $item->f_stock_uom, $sale_per_category);
+				$item_price_data = $this->getItemPriceAndDiscount($item_detail, $sale, $sale_per_category, $is_on_clearance_sale);
 			
 				$price = $item_price_data['discounted_price'];
 				$item_image = DB::table('fumaco_items_image_v1')
@@ -1382,6 +1417,8 @@ class CheckoutController extends Controller
 			->whereDate('end_date', '>=', Carbon::today()->toDateString())
 			->where('status', 1)->where('apply_discount_to', 'All Items')
 			->select('discount_type', 'discount_rate')->first();
+
+		$clearance_sale_items = $this->isIncludedInClearanceSale(array_column($order_items->toArray(), 'f_idcode'));
 		
 		$sale_per_category = [];
 		if (!$sale && !Auth::check()) {
@@ -1396,17 +1433,32 @@ class CheckoutController extends Controller
         }
 			
         foreach ($order_items as $row) {
-			$item_price = $row->f_default_price;
-			$item_on_sale = $row->f_onsale;
-			
 			$is_new_item = 0;
 			if($row->f_new_item == 1){
 				if($row->f_new_item_start <= Carbon::now() and $row->f_new_item_end >= Carbon::now()){
 					$is_new_item = 1;
 				}
 			}
+
+			$item_detail = [
+				'default_price' => $row->f_default_price,
+				'category_id' => $row->f_cat_id,
+				'item_code' => $row->f_idcode,
+				'discount_type' => $row->f_discount_type,
+				'discount_rate' => $row->f_discount_rate,
+				'stock_uom' => $row->f_stock_uom,
+				'on_sale' => $row->f_onsale
+			];
+
+			$is_on_clearance_sale = false;
+			if (array_key_exists($row->f_idcode, $clearance_sale_items)) {
+				$item_detail['discount_type'] = $clearance_sale_items[$row->f_idcode][0]->discount_type;
+				$item_detail['discount_rate'] = $clearance_sale_items[$row->f_idcode][0]->discount_rate;
+				$is_on_clearance_sale = true;
+			}
+
 			// get item price, discounted price and discount rate
-			$item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $row->f_cat_id, $sale, $item_price, $row->f_idcode, $row->f_discount_type, $row->f_discount_rate, $row->f_stock_uom, $sale_per_category);
+			$item_price_data = $this->getItemPriceAndDiscount($item_detail, $sale, $sale_per_category, $is_on_clearance_sale);
 
 			$item_qty = $row->qty;
 			$price = $item_price_data['discounted_price'];
@@ -1694,6 +1746,8 @@ class CheckoutController extends Controller
 				->whereDate('start_date', '<=', Carbon::now()->toDateString())
 				->whereDate('end_date', '>=', Carbon::today()->toDateString())
 				->where('status', 1)->where('apply_discount_to', 'All Items')->first();
+
+			$clearance_sale_items = $this->isIncludedInClearanceSale(array_column($cart_items->toArray(), 'f_idcode'));
 			
 			$sale_per_category = [];
 			if (!$sale && !Auth::check()) {
@@ -1713,8 +1767,25 @@ class CheckoutController extends Controller
 			$item_applied_discount = [];
 			$below_min_spend_category = [];
 			foreach ($cart_items as $item) {
+				$item_detail = [
+					'default_price' => $item->f_default_price,
+					'category_id' => $item->f_cat_id,
+					'item_code' => $item->f_idcode,
+					'discount_type' => $item->f_discount_type,
+					'discount_rate' => $item->f_discount_rate,
+					'stock_uom' => $item->f_stock_uom,
+					'on_sale' => $item->f_onsale
+				];
+
+				$is_on_clearance_sale = false;
+				if (array_key_exists($item->f_idcode, $clearance_sale_items)) {
+					$item_detail['discount_type'] = $clearance_sale_items[$item->f_idcode][0]->discount_type;
+					$item_detail['discount_rate'] = $clearance_sale_items[$item->f_idcode][0]->discount_rate;
+					$is_on_clearance_sale = true;
+				}
+	
 				// get item price, discounted price and discount rate
-				$item_price_data = $this->getItemPriceAndDiscount($item->f_onsale, $item->f_cat_id, $sale, $item->f_default_price, $item->f_idcode, $item->f_discount_type, $item->f_discount_rate, $item->f_stock_uom, $sale_per_category);
+				$item_price_data = $this->getItemPriceAndDiscount($item_detail, $sale, $sale_per_category, $is_on_clearance_sale);
 
 				$price = ( $item_price_data['is_on_sale']) ? $item_price_data['discounted_price'] : $item_price_data['item_price'];
 				$item_total = $price * $item->qty;
