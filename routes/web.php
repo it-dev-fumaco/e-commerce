@@ -37,6 +37,8 @@ Route::get('/products/troffer-luminaires', function() {
     return redirect('/products/troffers-and-louvers');
 });
 
+Route::get('/testing','FrontendController@testing');
+
 Route::namespace('Auth')->group(function(){
     //Login Routes
     Route::get('/login','LoginController@viewLoginPage')->name('login');
@@ -163,7 +165,7 @@ Route::prefix('admin')->group(function () {
     Route::get('/logout', 'Admin\Auth\LoginController@logout');
 
     Route::group(['middleware' => 'auth:admin'], function(){
-        Route::get('/verify', 'DashboardController@verify');
+        Route::get('/verify', 'DashboardController@verify')->name('verify');
         Route::get('/resend_otp', 'DashboardController@resendOTP');
         Route::post('/verify_otp', 'DashboardController@verifyOTP');
 
