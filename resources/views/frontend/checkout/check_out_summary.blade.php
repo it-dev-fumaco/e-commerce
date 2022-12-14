@@ -1249,10 +1249,69 @@
 
 		sizeTheOverlays();
 
-		$('#coupon-code').val('');
+		$('#coupon-code').val("{{ $applicable_vouchers_arr ? $applicable_vouchers_arr['code'] : '' }}");
 		$("#coupon-code").keyup(function () {  
             $(this).val($(this).val().toUpperCase().replace(' ', ''));
         });
+
+		@if ($applicable_vouchers_arr)
+			apply_coupon("{{ $applicable_vouchers_arr['code'] }}");
+		@endif
+		
+		function apply_coupon(coupon){
+			$("#item-preloader").fadeIn();
+			$.ajax({
+				url: '/checkout/apply_voucher/' + coupon,
+				type:"GET",
+				success: function (response) {
+					$('#free-shipping-voucher').remove();
+					if (response.status == 0) {
+						$('#coupon-alert').removeClass('d-none').text(response.message);
+						$('.voucher-item-code').addClass('d-none');
+						$('#voucher-code').addClass('d-none').text('');
+						$('#discount-div').addClass('d-none');
+						$('#discount-amount').text('0.00');
+						$('#voucher-free').empty();
+						$("input:radio[name='shipping_fee']:first").attr('checked', true);
+					} else {
+						var discount = (isNaN(response.discount)) ? 0 : response.discount;
+						$('#voucher-code').removeClass('d-none').text(response.voucher_code);
+						$('#discount-div').removeClass('d-none');
+						$('#discount-amount').text(discount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,"));
+						$('#coupon-code').removeClass('is-invalid');
+						$('#coupon-alert').addClass('d-none');
+						if(response.item_applied_discount.length > 0) {
+							$.each(response.item_applied_discount, function(d, a){
+								$('#voucherApp' + a).removeClass('d-none');
+							});
+						} else {
+							$('.voucher-item-code').addClass('d-none');
+						}
+						var existing_fd = $("input:radio[name='shipping_fee'][data-sname='Free Delivery']").length;
+						if (existing_fd <= 0) {
+							if(response.shipping && response.shipping.length != 0) {
+								var el = '<div class="d-flex justify-content-between align-items-center" id="free-shipping-voucher">' +
+									'<div class="form-check">' +
+									'<input class="form-check-input" type="radio" name="shipping_fee" id="0l" value="'+ response.shipping.shipping_cost+'" data-sname="'+ response.shipping.shipping_service_name+'" data-est="'+ response.shipping.expected_delivery_date+'" data-pickup="false" required data-lead="'+ response.shipping.max_lead_time+'">' +
+									'<label class="form-check-label" for="0l">'+ response.shipping.shipping_service_name+' <br class="d-xl-none"/>' +
+									'<small class="fst-italic">('+ response.shipping.min_lead_time+' - '+ response.shipping.max_lead_time+' Days)</small></label>' +
+									'</div>' +
+									'<small class="text-muted stylecap he1x" style="white-space: nowrap !important">FREE</small>' +
+									'</div>';
+							
+								$('#voucher-free').html(el).removeClass('d-none');
+							}
+						}
+					}
+					updateTotal();
+					
+					$("#item-preloader").fadeOut();
+				},
+				error : function(data) {
+					$('#coupon-alert').removeClass('d-none').text('An error occured. Please try again.');
+				}
+			});
+		}
 
 		$('#apply-coupon-btn').click(function(e){
 			e.preventDefault();
@@ -1261,60 +1320,7 @@
 				$('#coupon-code').addClass('is-invalid');
 			} else {
 				$("#item-preloader").fadeIn();
-				$.ajax({
-					url: '/checkout/apply_voucher/' + $('#coupon-code').val(),
-					type:"GET",
-					success: function (response) {
-						$('#free-shipping-voucher').remove();
-						if (response.status == 0) {
-							$('#coupon-alert').removeClass('d-none').text(response.message);
-							$('.voucher-item-code').addClass('d-none');
-							$('#voucher-code').addClass('d-none').text('');
-							$('#discount-div').addClass('d-none');
-							$('#discount-amount').text('0.00');
-							$('#voucher-free').empty();
-
-							$("input:radio[name='shipping_fee']:first").attr('checked', true);
-						} else {
-							var discount = (isNaN(response.discount)) ? 0 : response.discount;
-							$('#voucher-code').removeClass('d-none').text(response.voucher_code);
-							$('#discount-div').removeClass('d-none');
-							$('#discount-amount').text(discount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,"));
-							$('#coupon-code').removeClass('is-invalid');
-							$('#coupon-alert').addClass('d-none');
-
-							if(response.item_applied_discount.length > 0) {
-								$.each(response.item_applied_discount, function(d, a){
-									$('#voucherApp' + a).removeClass('d-none');
-								});
-							} else {
-								$('.voucher-item-code').addClass('d-none');
-							}
-							var existing_fd = $("input:radio[name='shipping_fee'][data-sname='Free Delivery']").length;
-							if (existing_fd <= 0) {
-								if(response.shipping && response.shipping.length != 0) {
-									var el = '<div class="d-flex justify-content-between align-items-center" id="free-shipping-voucher">' +
-										'<div class="form-check">' +
-										'<input class="form-check-input" type="radio" name="shipping_fee" id="0l" value="'+ response.shipping.shipping_cost+'" data-sname="'+ response.shipping.shipping_service_name+'" data-est="'+ response.shipping.expected_delivery_date+'" data-pickup="false" required data-lead="'+ response.shipping.max_lead_time+'">' +
-										'<label class="form-check-label" for="0l">'+ response.shipping.shipping_service_name+' <br class="d-xl-none"/>' +
-										'<small class="fst-italic">('+ response.shipping.min_lead_time+' - '+ response.shipping.max_lead_time+' Days)</small></label>' +
-										'</div>' +
-										'<small class="text-muted stylecap he1x" style="white-space: nowrap !important">FREE</small>' +
-										'</div>';
-								
-									$('#voucher-free').html(el).removeClass('d-none');
-								}
-							}
-						}
-
-						updateTotal();
-						
-						$("#item-preloader").fadeOut();
-					},
-					error : function(data) {
-						$('#coupon-alert').removeClass('d-none').text('An error occured. Please try again.');
-					}
-				});
+				apply_coupon(coupon);
 			}
 		});
 		updateTotal();
