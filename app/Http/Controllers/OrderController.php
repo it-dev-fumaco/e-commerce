@@ -51,6 +51,7 @@ class OrderController extends Controller
                     'item_qty' => $i->item_qty,
                     'item_price' => $i->item_price,
                     'item_discount' => $i->item_discount,
+                    'discount_type' => $i->item_discount_type,
                     'item_total' => $i->item_total_price,
                     'bundle' => $bundle_items
                 ];
@@ -163,6 +164,7 @@ class OrderController extends Controller
                     'item_qty' => $i->item_qty,
                     'item_price' => $i->item_price,
                     'item_discount' => $i->item_discount,
+                    'discount_type' => $i->item_discount_type,
                     'item_total' => $i->item_total_price,
                 ];
             }
@@ -249,6 +251,7 @@ class OrderController extends Controller
                     'item_qty' => $i->item_qty,
                     'item_price' => $i->item_price,
                     'item_discount' => $i->item_discount,
+                    'discount_type' => $i->item_discount_type,
                     'item_total' => $i->item_total_price,
                 ];
             }
@@ -376,6 +379,7 @@ class OrderController extends Controller
                         'item_name' => $row->item_name,
                         'price' => $row->item_price,
                         'discount' => $row->item_discount,
+                        'discount_type' => $row->item_discount_type,
                         'qty' => $row->item_qty,
                         'amount' => $row->item_total_price,
                         'image' => ($image) ? $image->imgprimayx : null
@@ -456,10 +460,16 @@ class OrderController extends Controller
                         $confirmed_bank_deposit_email = $order_details->order_email;
                         $customer_name = $order_details->order_name . ' ' . $order_details->order_lastname;
 
-                        Mail::send('emails.order_confirmed_bank_deposit', $order, function($message) use($confirmed_bank_deposit_email){
-                            $message->to(trim($confirmed_bank_deposit_email));
-                            $message->subject('Order Confirmed - FUMACO');
-                        });
+                        try {
+                            Mail::send('emails.order_confirmed_bank_deposit', $order, function($message) use($confirmed_bank_deposit_email){
+                                $message->to(trim($confirmed_bank_deposit_email));
+                                $message->subject('Order Confirmed - FUMACO');
+                            });
+                        } catch (\Swift_TransportException  $e) {
+                            DB::rollback();
+                            
+                            return redirect()->back()->with('error', 'An error occured. Please try again.');
+                        }
 
                         if(Mail::failures()){
                             DB::rollback();
@@ -640,11 +650,19 @@ class OrderController extends Controller
                     'item_name' => $row->item_name,
                     'price' => $row->item_price,
                     'discount' => $row->item_discount,
+                    'discount_type' => $row->item_discount_type,
                     'qty' => $row->item_qty,
                     'amount' => $row->item_total_price,
                     'image' => isset($image[$row->item_code]) ? $image[$row->item_code][0]->imgprimayx : null
                 ];
             }
+
+            $voucher_details = DB::table('fumaco_voucher')->where('code', $order_details->voucher_code)->first();
+
+            $shipping_discount = DB::table('fumaco_on_sale as p')
+                ->join('fumaco_on_sale_shipping_service as c', 'p.id', 'c.sale_id')->where('c.shipping_service', $order_details->order_shipping)
+                ->where('status', 1)->where('p.apply_discount_to', 'Per Shipping Service')->whereDate('p.start_date', '<=', $order_details->order_date)->whereDate('p.end_date', '>=', $order_details->order_date)
+                ->first();
 
             $store_address = null;
             if($order_details->order_shipping == 'Store Pickup') {
@@ -659,7 +677,9 @@ class OrderController extends Controller
                 'items' => $items,
                 'store_address' => $store_address,
                 'bank_accounts' => $bank_accounts,
-                'new_token' => $new_token
+                'new_token' => $new_token,
+                'shipping_discount' => $shipping_discount,
+                'voucher_details' => $voucher_details
             ];
 
             $sms_api = DB::table('api_setup')->where('type', 'sms_gateway_api')->first();

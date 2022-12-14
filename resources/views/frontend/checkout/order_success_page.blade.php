@@ -171,7 +171,20 @@
 									</td>
 									<td class="text-center d-none d-sm-table-cell">{{ $item['qty'] }}</td>
 									@if ($sum_discount > 0)
-									<td class="text-center d-none d-sm-table-cell">{{ $item['discount'] ? $item['discount'] . '%' : '-' }}</td>
+									<td class="text-center d-none d-sm-table-cell">
+										@switch($item['discount_type'])
+											@case('Fixed Amount')
+												₱ {{ number_format(str_replace(",","",$item['discount']), 2) }}
+												@break
+											@case('By Percentage')
+											@case('percentage')
+											@case(null)
+												{{ $item['discount'] ? $item['discount'] . '%' : '-' }}
+												@break
+											@default
+											-
+										@endswitch
+									</td>
 									@endif
 									<td class="text-right d-none d-sm-table-cell" style="text-align: right; white-space: nowrap !important">₱ {{ number_format(str_replace(",","",$item['price']), 2) }}</td>
 									<td class="text-right d-none d-sm-table-cell" style="text-align: right; white-space: nowrap !important">₱ {{ number_format(str_replace(",","",$item['amount']), 2) }}</td>

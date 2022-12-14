@@ -28,7 +28,7 @@
 					<div class="col-md-12">
 						<div class="card card-primary">
 							<div class="card-body">
-								@if(session()->has('success'))
+								@if(session()->has('success')) x
 									<div class="row">
 										<div class="col">
 											<div class="alert alert-success alert-dismissible fade show text-center" role="alert">
@@ -314,7 +314,7 @@
 																					<th class="text-center" style="width: 10%;">QTY</th>
 																					<th class="text-center" style="width: 10%;">PRICE</th>
 																					@if ($sum_discount > 0)
-																					<th class="text-center" style="width: 10%;">DISCOUNT(%)</th>
+																					<th class="text-center" style="width: 10%;">DISCOUNT</th>
 																					@endif
 																					<th class="text-center" style="width: 10%;">AMOUNT</th>
 																				</tr>
@@ -376,7 +376,20 @@
 																					<td class="text-center">{{ $item['item_qty'] }}</td>
 																					<td class="text-right">₱ {{ number_format(str_replace(",","",$item['item_price']), 2) }}</td>
 																					@if ($sum_discount > 0)
-																					<td class="text-right">{{ $item['item_discount'] . '%' }}</td>
+																					<td class="text-right">
+																						@switch($item['discount_type'])
+																							@case('Fixed Amount')
+																								₱ {{ number_format(str_replace(",","",$item['item_discount']), 2) }}
+																								@break
+																							@case('By Percentage')
+																							@case('percentage')
+																							@case(null)
+																								{{ $item['item_discount'] ? $item['item_discount'] . '%' : null }}
+																								@break
+																							@default
+																							-																							
+																						@endswitch
+																					</td>
 																					@endif
 																					<td class="text-right">₱ {{ number_format(str_replace(",","",$item['item_total']), 2) }}</td>
 																				</tr>

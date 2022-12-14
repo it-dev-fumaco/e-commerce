@@ -412,7 +412,7 @@ class CheckoutController extends Controller
 
 				// get item price, discounted price and discount rate
 				$item_price_data = $this->getItemPriceAndDiscount($item_detail, $sale, $sale_per_category, $is_on_clearance_sale);
-			
+
 				$price = $item_price_data['discounted_price'];
 				$total_amount = $price * $item->qty;
 				$item_discount = $item_price_data['discount_rate'];
@@ -438,6 +438,7 @@ class CheckoutController extends Controller
 						->where('item_code', $item->f_idcode)->update([
 							'item_name' => $item->f_name_name,
 							'item_discount' => $item_discount,
+							'item_discount_type' => isset($item_price_data['discount_type']) ? $item_price_data['discount_type'] : null, 
 							'item_original_price' => $item->f_default_price,
 							'item_qty' => $item->qty,
 							'item_price' => $price,	
@@ -449,6 +450,7 @@ class CheckoutController extends Controller
 						'item_code' => $item->f_idcode,
 						'item_name' => $item->f_name_name,
 						'item_discount' => $item_discount,
+						'item_discount_type' => isset($item_price_data['discount_type']) ? $item_price_data['discount_type'] : null, 
 						'item_original_price' => $item->f_default_price,
 						'item_qty' => $item->qty,
 						'item_price' => $price,
@@ -717,6 +719,7 @@ class CheckoutController extends Controller
 						->where('item_code', $item->f_idcode)->update([
 							'item_name' => $item->f_name_name,
 							'item_discount' => $item_discount,
+							'item_discount_type' => isset($item_price_data['discount_type']) ? $item_price_data['discount_type'] : null,
 							'item_original_price' => $item->f_default_price,
 							'item_qty' => $item->qty,
 							'item_price' => $price,	
@@ -728,6 +731,7 @@ class CheckoutController extends Controller
 						'item_code' => $item->f_idcode,
 						'item_name' => $item->f_name_name,
 						'item_discount' => $item_discount,
+						'item_discount_type' => isset($item_price_data['discount_type']) ? $item_price_data['discount_type'] : null,
 						'item_original_price' => $item->f_default_price,
 						'item_qty' => $item->qty,
 						'item_price' => $price,
@@ -911,6 +915,7 @@ class CheckoutController extends Controller
 					'item_name' => $row->item_name,
 					'price' => $row->item_price,
 					'discount' => $row->item_discount,
+					'discount_type' => $row->item_discount_type,
 					'qty' => $row->item_qty,
 					'amount' => $row->item_total_price,
 					'image' => ($image) ? $image->imgprimayx : null

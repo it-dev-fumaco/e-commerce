@@ -67,6 +67,7 @@ trait ProductTrait {
             'discounted_price' => $discounted_price,
             'is_on_sale' => $item_on_sale,
             'discount_display' => $discount_display,
+            'discount_type' => $product['discount_type'],
             'discount_rate' => $discount_rate,
         ];
     }
