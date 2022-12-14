@@ -19,24 +19,39 @@ class DashboardController extends Controller
 		return view('auth.verify_otp', compact('user_id'));
 	}
 
-	public function resendOTP(){
+	public function resendOTP(Request $request){
 		$otp = rand(111111, 999999);
 		$api = DB::table('api_setup')->where('type', 'sms_gateway_api')->first();
 		$phone = Auth::user()->mobile_number[0] == '0' ? '63'.substr(Auth::user()->mobile_number, 1) : Auth::user()->mobile_number;
 
-		$sms = Http::asForm()->withHeaders([
-			'Accept' => 'application/json',
-			'Content-Type' => 'application/x-www-form-urlencoded',
-		])->post($api->base_url, [
-			'api_key' => $api->api_key,
-			'api_secret' => $api->api_secret_key,
-			'from' => 'FUMACO',
-			'to' => preg_replace("/[^0-9]/", "", $phone),
-			'text' => 'TWO-FACTOR AUTHENTICATION: Your One-Time PIN is '.$otp.' to login in Fumaco Website, valid only within 10 mins. For any help, please contact us at it@fumaco.com'
-		]);
+		if($request->channel == 'sms'){
+			$sms = Http::asForm()->withHeaders([
+				'Accept' => 'application/json',
+				'Content-Type' => 'application/x-www-form-urlencoded',
+			])->post($api->base_url, [
+				'api_key' => $api->api_key,
+				'api_secret' => $api->api_secret_key,
+				'from' => 'FUMACO',
+				'to' => preg_replace("/[^0-9]/", "", $phone),
+				'text' => 'TWO-FACTOR AUTHENTICATION: Your One-Time PIN is '.$otp.' to login in Fumaco Website, valid only within 10 mins. For any help, please contact us at it@fumaco.com'
+			]);
 
-		$sms_response = json_decode($sms->getBody(), true);
+			$sms_response = json_decode($sms->getBody(), true);
 
+			if(isset($sms_response['error'])){
+				return response()->json(['status' => 0]);
+			}
+		}else{
+			try {
+				Mail::send('emails.admin_otp', ['otp' => $otp], function($message) {
+					$message->to(Auth::user()->username);
+					$message->subject('TWO-FACTOR Authentication');
+				});
+			} catch (\Swift_TransportException  $e) {
+				return response()->json(['status' => 0]);
+			}
+		}
+		
 		$details = [
 			'otp' => $otp,
 			'otp_time_sent' => Carbon::now()
@@ -44,8 +59,7 @@ class DashboardController extends Controller
 
 		DB::table('fumaco_admin_user')->where('id', Auth::user()->id)->update($details);
 
-		$status = isset($sms_response['error']) ? 0 : 1;
-		return response()->json(['status' => $status]);
+		return response()->json(['status' => 1]);
 	}
 
 	public function verifyOTP(Request $request){

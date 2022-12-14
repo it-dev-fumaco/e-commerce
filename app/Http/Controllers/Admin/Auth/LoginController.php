@@ -40,7 +40,6 @@ class LoginController extends Controller
             //Authentication passed...
             $checker = DB::table('fumaco_admin_user')->where('username', $request->username)->first();
 
-
             if($checker->xstatus == 0){
                 Auth::guard('admin')->logout();
                 return redirect('/admin/login')->withInput()->with('d_info','Your admin account is deactivated.');
