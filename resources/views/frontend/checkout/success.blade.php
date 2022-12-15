@@ -118,7 +118,21 @@
 										<div class="d-md-none" style="text-align: left !important;">
 											<span><b>Qty:</b> {{ $item['qty'] }}</span><br>
 											@if ($item['discount'])
-											<span><b>Discount (%):</b> {{ $item['discount'] ? $item['discount'] . '%' : '-' }}</span><br>
+											<span><b>Discount:</b> 
+												@switch($item['discount_type'])
+													@case('Fixed Amount')
+														₱ {{ number_format(str_replace(",","",$item['discount']), 2) }}
+														@break
+													@case('By Percentage')
+													@case('percentage')
+													@case(null)
+														{{ $item['discount'] ? $item['discount'] . '%' : '-' }}
+														@break
+													@default
+													-											
+												@endswitch
+											</span>
+											<br>
 											@endif
 											<span style="white-space: nowrap !important"><b>Price:</b> ₱ {{ number_format(str_replace(",","",$item['price']), 2) }}</span><br>
 											<span style="white-space: nowrap !important"><b>Amount:</b> ₱ {{ number_format(str_replace(",","",$item['amount']), 2) }}</span>
