@@ -45,7 +45,7 @@
 									$a = 0;
 								@endphp
 								<div id="accordion" class="container-fluid p-0">
-									@if (count($category_filter) > 1)
+									@if (count($category_filter) > 0)
 										<div class="card text-left" style="border: none;">
 											<div class="container p-2 filter-id collapse-btn" style="border-bottom: 1px solid #C9C9CB" data-target="#filter-brand">
 												<span class="panel-title" style="font-weight: 600; font-size: 10pt;">Category</span>
