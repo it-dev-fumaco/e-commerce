@@ -1290,7 +1290,7 @@
 						var existing_fd = $("input:radio[name='shipping_fee'][data-sname='Free Delivery']").length;
 						if (existing_fd <= 0) {
 							if(response.shipping && response.shipping.length != 0) {
-								var el = '<div class="d-flex justify-content-between align-items-center" id="free-shipping-voucher">' +
+								var el = '<div class="d-flex justify-content-between align-items-center" id="free-shipping-voucher" style="padding: 0 15px 0 15px;">' +
 									'<div class="form-check">' +
 									'<input class="form-check-input" type="radio" name="shipping_fee" id="0l" value="'+ response.shipping.shipping_cost+'" data-sname="'+ response.shipping.shipping_service_name+'" data-est="'+ response.shipping.expected_delivery_date+'" data-pickup="false" required data-lead="'+ response.shipping.max_lead_time+'">' +
 									'<label class="form-check-label" for="0l">'+ response.shipping.shipping_service_name+' <br class="d-xl-none"/>' +
