@@ -417,9 +417,10 @@
         function clone_table(table, select){
             var clone_select = $(select).html();
             var clone_discount_type = $('#discount_type_select').html();
+            var select_class = select != '#item_code_select' ? select : 'custom-select-2';
 			var row = '<tr>' +
 				'<td class="p-2">' +
-					'<select name="selected_reference[]" class="form-control w-100" style="width: 100%;" required>' + clone_select + '</select>' +
+					'<select name="selected_reference[]" class="form-control w-100 ' + select_class + '" style="width: 100%;" required>' + clone_select + '</select>' +
 				'</td>' +
 				'<td class="p-2">' +
 					'<select name="selected_discount_type[]" class="form-control w-100 category_discount_type" style="width: 100%;" required>' + clone_discount_type + '</select>' +
@@ -434,9 +435,48 @@
 					'<button type="button" class="btn btn-outline-danger btn-sm remove-td-row">Remove</button>' +
 				'</td>' +
 			'</tr>';
-
+            
 			$(table).append(row);
+
+            if (select == '#item_code_select') {
+                $('.custom-select-2').select2({
+                    templateResult: formatState,
+                    placeholder: 'Select an Item',
+    
+                    ajax: {
+                        url: '/admin/product/search_item',
+                        method: 'GET',
+                        dataType: 'json',
+                        data: function (data) {
+                            return {
+                                q: data.term, // search term
+                            };
+                        },
+                        processResults: function (response) {
+                            return {
+                                results: response.items
+                            };
+                        },
+                        cache: true
+                    }
+                });
+            }
         }
+
+        function formatState (opt) {
+            var optimage = opt.image;
+            if(!optimage){
+                return opt.text;
+            } else {
+                var $opt = $(
+                '<div class="d-flex flex-row">' +
+	                '<div class="col-4"><img src="' + optimage + '" width="40px" /></div>' +
+	                '<div class="col-8" style="font-size: 9pt;">' + opt.text + '</div>' +
+                    '</div>'
+                );
+                return $opt;
+            }
+        };
 
         $(document).on('click', '.add-row-btn', function (e){
 			e.preventDefault();
@@ -452,9 +492,9 @@
 
         $(document).on('click', '#is-clearance-sale', function(e) {
             if ($(this).is(":checked")) {
-                $('#apply_discount_to').attr('disabled', true).val('Selected Items').trigger('change');
+                $('#apply_discount_to').attr('readonly', true).val('Selected Items').trigger('change');
             } else {
-                $('#apply_discount_to').attr('disabled', false).val('').trigger('change');
+                $('#apply_discount_to').attr('readonly', false).val('').trigger('change');
             }
         });
 

@@ -233,7 +233,7 @@
                                                                 <th style="width: 20%;" scope="col" class="text-center p-2 align-middle">Amount/Rate</th>
                                                                 <th style="width: 20%;" scope="col" class="text-center p-2 align-middle capped_amount">Capped Amount</th>
                                                                 <th class="text-center p-2 align-middle" style="width: 10%;">
-                                                                    <button type="button" class="add-row-btn btn btn-outline-primary btn-sm" id="add-selected-items-btn" data-table="#selected-items-table" data-select="#item_code_select">Add Row</button>
+                                                                    <button type="button" class="add-row-btn btn btn-outline-primary btn-sm" id="add-selected-items-btn" data-table="#selected-items-table" data-select="#item_code_select" data-reference="item_code">Add Row</button>
                                                                 </th>
                                                             </tr>
                                                         </thead>
@@ -241,7 +241,7 @@
                                                             @foreach($discounted_selected_items as $sale_selected_item) 
                                                             <tr>
                                                                 <td class="p-2">
-                                                                    <select class="form-control" name="selected_reference[item_code][]">
+                                                                    <select class="form-control {{ $on_sale->is_clearance_sale == 1 ? 'custom-select-2' : '' }}" name="selected_reference[item_code][]">
                                                                         <option disabled value="">Select Item</option>
                                                                         @foreach ($items as $item)
                                                                         <option value="{{ $item->f_idcode }}" {{ $sale_selected_item->item_code == $item->f_idcode ? 'selected' : '' }}>{{ $item->f_idcode }}</option>
@@ -451,6 +451,7 @@
 
         discountType();
         applyDiscountTo();
+        loadSelect2();
 
         var start = "{{ $on_sale->start_date ? date('m/d/Y', strtotime($on_sale->start_date)) : null  }}";
         var end = "{{ $on_sale->end_date ? date('m/d/Y', strtotime($on_sale->end_date)) : null }}";
@@ -576,9 +577,10 @@
         function clone_table(table, select, reference){
             var clone_select = $(select).html();
             var clone_discount_type = $('#discount_type_select').html();
+            var select_class = select != '#item_code_select' ? select : 'custom-select-2';
 			var row = '<tr>' +
 				'<td class="p-2">' +
-					'<select name="selected_reference[' + reference + '][]" class="form-control w-100" style="width: 100%;" required>' + clone_select + '</select>' +
+					'<select name="selected_reference[' + reference + '][]" class="form-control w-100 ' + select_class + '" style="width: 100%;" required>' + clone_select + '</select>' +
 				'</td>' +
 				'<td class="p-2">' +
 					'<select name="selected_discount_type[' + reference + '][]" class="form-control w-100 category_discount_type" style="width: 100%;" required>' + clone_discount_type + '</select>' +
@@ -595,7 +597,26 @@
 			'</tr>';
 
 			$(table).append(row);
+
+            if (select == '#item_code_select') {
+                loadSelect2();
+            }
         }
+
+        function formatState (opt) {
+            var optimage = opt.image;
+            if(!optimage){
+                return opt.text;
+            } else {
+                var $opt = $(
+                '<div class="d-flex flex-row">' +
+	                '<div class="col-4"><img src="' + optimage + '" width="40px" /></div>' +
+	                '<div class="col-8" style="font-size: 9pt;">' + opt.text + '</div>' +
+                    '</div>'
+                );
+                return $opt;
+            }
+        };
 
         $(document).on('click', '.add-row-btn', function (e){
 			e.preventDefault();
@@ -612,9 +633,9 @@
 
         $(document).on('click', '#is-clearance-sale', function(e) {
             if ($(this).is(":checked")) {
-                $('#apply_discount_to').attr('disabled', true).val('Selected Items').trigger('change');
+                $('#apply_discount_to').attr('readonly', true).val('Selected Items').trigger('change');
             } else {
-                $('#apply_discount_to').attr('disabled', false).val('').trigger('change');
+                $('#apply_discount_to').attr('readonly', false).val('').trigger('change');
             }
         });
 
@@ -625,6 +646,30 @@
                 $('#is-clearance-sale').prop('checked', false);
             }
         });
+
+        function loadSelect2() {
+            $('.custom-select-2').select2({
+                templateResult: formatState,
+                placeholder: 'Select an Item',
+
+                ajax: {
+                    url: '/admin/product/search_item',
+                    method: 'GET',
+                    dataType: 'json',
+                    data: function (data) {
+                        return {
+                            q: data.term, // search term
+                        };
+                    },
+                    processResults: function (response) {
+                        return {
+                            results: response.items
+                        };
+                    },
+                    cache: true
+                }
+            });
+        }
     });
     </script>
 @endsection

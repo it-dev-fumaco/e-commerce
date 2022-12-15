@@ -197,6 +197,7 @@ Route::prefix('admin')->group(function () {
             Route::get('/product/reviews', 'ProductReviewController@viewList');
             Route::get('/product/toggle/{id}', 'ProductReviewController@toggleStatus');
             Route::get('/product/search', 'ProductController@searchItem');
+            Route::get('/product/search_item', 'ProductController@searchWebItems');
             Route::get('/warehouse/search', 'ProductController@searchWarehouse');
             Route::get('/product/{id}/edit', 'ProductController@viewProduct');
             Route::get('/product/{id}/edit_bundle', 'ProductController@viewProduct');

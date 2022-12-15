@@ -2750,4 +2750,46 @@ class ProductController extends Controller
             return $result;
         }
     }
+
+    public function searchWebItems(Request $request) {
+        if($request->ajax()) {
+            $search_str = explode(' ', $request->q);
+            $items = DB::table('fumaco_items')->where('f_status', 1)
+                ->when($request->q, function ($query) use ($request, $search_str){
+                    return $query->where(function($q) use ($search_str, $request) {
+                        foreach ($search_str as $str) {
+                            $q->where('f_item_name', 'LIKE', "%".$str."%");
+                        }
+
+                        $q->orWhere('f_idcode', 'LIKE', "%".$request->q."%");
+                    });
+                })
+                ->select('f_idcode', 'f_name_name')->orderBy('f_idcode', 'asc')
+                ->limit(8)->get();
+
+            $product_list_images = DB::table('fumaco_items_image_v1')->whereIn('idcode', collect($items)->pluck('f_idcode'))
+                ->select('imgprimayx', 'idcode')->get();
+
+            $product_list_images = collect($product_list_images)->groupBy('idcode')->toArray();
+    
+            $result = [];
+            foreach($items as $item){
+                $image = null;
+                if (array_key_exists($item->f_idcode, $product_list_images)) {
+                    $image = $product_list_images[$item->f_idcode][0]->imgprimayx;
+                }
+
+                $image = ($image) ? '/storage/item_images/'. $item->f_idcode .'/gallery/preview/'. $image : '/storage/no-photo-available.png';
+
+                $result[] = [
+                    'id' => $item->f_idcode,
+                    'text' => $item->f_idcode.' - '.strip_tags($item->f_name_name),
+                    'description' => strip_tags($item->f_name_name),
+                    'image' => asset($image),
+                ];
+            }
+    
+            return response()->json(['items' => $result]);
+        }
+    }
 }
