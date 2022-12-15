@@ -79,6 +79,11 @@
                                         <div class="col-6">
                                             @php
                                                 $types = ['Per Customer Group', 'Per Shipping Service', 'Per Category', 'Selected Items', 'All Items'];
+                                                if ($on_sale->is_clearance_sale == 1) {
+                                                    $apply_discount_to = 'Selected Items';
+                                                } else {
+                                                    $apply_discount_to = $on_sale->apply_discount_to;
+                                                }
                                             @endphp
                                             <label>Apply Discount To <span class="text-danger">*</span></label>
                                             <select class="form-control" name="apply_discount_to" id="apply_discount_to" required>
@@ -442,7 +447,7 @@
 <script>
     $(document).ready(function(){
         $('#discount_type').val("{{ $on_sale->discount_type }}");
-        $('#apply_discount_to').val("{{ $on_sale->apply_discount_to }}");
+        $('#apply_discount_to').val("{{ $apply_discount_to }}");
 
         discountType();
         applyDiscountTo();
@@ -604,6 +609,22 @@
 			e.preventDefault();
 			$(this).closest("tr").remove();
 		});
+
+        $(document).on('click', '#is-clearance-sale', function(e) {
+            if ($(this).is(":checked")) {
+                $('#apply_discount_to').attr('disabled', true).val('Selected Items').trigger('change');
+            } else {
+                $('#apply_discount_to').attr('disabled', false).val('').trigger('change');
+            }
+        });
+
+        $(document).on('change', '#apply_discount_to', function(e) {
+            if ($(this).val() == 'Selected Items') {
+                $('#is-clearance-sale').prop('checked', true);
+            } else {
+                $('#is-clearance-sale').prop('checked', false);
+            }
+        });
     });
     </script>
 @endsection

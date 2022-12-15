@@ -449,6 +449,22 @@
 			e.preventDefault();
 			$(this).closest("tr").remove();
 		});
+
+        $(document).on('click', '#is-clearance-sale', function(e) {
+            if ($(this).is(":checked")) {
+                $('#apply_discount_to').attr('disabled', true).val('Selected Items').trigger('change');
+            } else {
+                $('#apply_discount_to').attr('disabled', false).val('').trigger('change');
+            }
+        });
+
+        $(document).on('change', '#apply_discount_to', function(e) {
+            if ($(this).val() == 'Selected Items') {
+                $('#is-clearance-sale').prop('checked', true);
+            } else {
+                $('#is-clearance-sale').prop('checked', false);
+            }
+        });
     });
     </script>
 @endsection
