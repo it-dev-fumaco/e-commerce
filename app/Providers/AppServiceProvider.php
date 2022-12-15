@@ -38,8 +38,11 @@ class AppServiceProvider extends ServiceProvider
 
         // check if clearance sale exists
         Cache::remember('has_clearance_sale', 3600, function () {
-            return DB::table('fumaco_on_sale')->where('is_clearance_sale', 1)->where('status', 1)
-                ->whereDate('start_date', '<=', Carbon::now()->startOfDay())->whereDate('end_date', '>=', Carbon::now()->endOfDay())
+            return DB::table('fumaco_on_sale as os')
+                ->join('fumaco_on_sale_items as osi', 'os.id', 'osi.sale_id')
+                ->join('fumaco_items as i', 'i.f_idcode', 'osi.item_code')
+                ->where('os.is_clearance_sale', 1)->where('os.status', 1)->where('i.f_status', 1)
+                ->whereDate('os.start_date', '<=', Carbon::now()->startOfDay())->whereDate('os.end_date', '>=', Carbon::now()->endOfDay())
                 ->exists();
         });
     }
