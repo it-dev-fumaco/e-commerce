@@ -293,7 +293,7 @@ class DashboardController extends Controller
 		$guest_items = DB::table('fumaco_cart as cart')
 			->join('fumaco_items as items', 'cart.item_code', 'items.f_idcode')
 			->whereIn('cart.transaction_id', $abandoned_order_numbers)
-			->select('cart.*', 'items.slug', 'items.f_name_name as item_name', 'items.f_onsale', 'items.f_price', 'items.f_original_price')
+			->select('cart.*', 'items.slug', 'items.f_name_name as item_name', 'items.f_onsale', 'items.f_price', 'items.f_default_price')
 			->get();
 
 		$abandoned_items = collect($items)->groupBy('order_number');
@@ -311,8 +311,8 @@ class DashboardController extends Controller
 						'item_name' => $items->item_name,
 						'slug' => $items->slug,
 						'qty' => $items->qty,
-						'item_price' => $items->f_onsale == 1 ? $items->f_price : $items->f_original_price,
-						'total_price' => $items->f_onsale == 1 ? $items->qty * $items->f_price : $items->qty * $items->f_original_price
+						'item_price' => $items->f_onsale == 1 ? $items->f_price : $items->f_default_price,
+						'total_price' => $items->f_onsale == 1 ? $items->qty * $items->f_price : $items->qty * $items->f_default_price
 					];
 				}
 			}else if(isset($abandoned_items[$abandoned->order_tracker_code])){
