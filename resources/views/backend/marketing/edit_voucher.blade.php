@@ -76,7 +76,7 @@
                                             </div>
                                         </div>
                                         <div id="fixed_amount" class="row mt-3">
-                                            <div class="col-12">
+                                            <div class="col-6">
                                                 <label>Amount *</label>
                                                 <input type="text" class="form-control" id="discount_amount" value="{{ $coupon->discount_type == 'Fixed Amount' ? $coupon->discount_rate : ''  }}" name="discount_amount" placeholder="Amount">
                                             </div>
@@ -91,25 +91,24 @@
                                                 <input type="text" class="form-control" name="capped_amount" value="{{ $coupon->capped_amount }}" id="capped_amount" placeholder="Capped Amount"/>
                                             </div>
                                         </div>
-                                        <div class="row mt-3">
-                                            <div class="col-6">
-                                                <label>Order Number</label>
-                                                <input type="text" class="form-control" name="order_no" placeholder="Order Number" value="{{ $coupon->order_no }}">
-                                            </div>
-                                        </div>
                                         <br/><br/>
                                         <h4>Validity and Usage</h4>
                                         <hr/>
                                         <div class="row">
-                                            <div class="col-6">
+                                            <div class="col-4">
                                                 <label><input type="checkbox" name="require_validity" id="require_validity" {{ $coupon->validity_date_start ? 'checked' : '' }}> Set Validity</label>
                                                 <input type="text" class="form-control set_duration" id="daterange" name="validity" disabled/>
                                             </div>
 
-                                            <div class="col-6">
+                                            <div class="col-4">
                                                 <label><input type="checkbox" name="unlimited_allotment" id="unlimited_allotment" {{ $coupon->unlimited == 1 ? 'checked' : '' }}> Unlimited Allotment</label>
                                                 <input type="number" class="form-control" name="allotment" id="allotment" value="{{ $coupon->total_allotment }}" placeholder="Allotment">
                                             </div>
+                                            
+                                            <div class="col-4">
+                                                <label>Priority Number</label>
+                                                <input type="text" class="form-control" name="order_no" placeholder="Priority Number" value="{{ $coupon->order_no != 'P' ? $coupon->order_no : null }}">
+                                            </div> 
                                         </div>
                                         <br/>
                                         <div class="row">
