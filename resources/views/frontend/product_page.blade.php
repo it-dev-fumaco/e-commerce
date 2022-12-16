@@ -381,83 +381,76 @@
 								</div>
 							</section>
 							<div class="row">
-								<div class="col-3 offset-9">
-									<div class="card shadow-sm">
-										test
+								@foreach ($compare_arr as $compare_product)
+								<div class="col-md-3 equal-height-columns p-2 text-center">
+									<div class="container border">
+										@php
+											$compare_img = ($compare_product['image']) ? '/storage/item_images/'. $compare_product['item_code'] .'/gallery/preview/'. $compare_product['image'] : '/storage/no-photo-available.png';
+											$compare_img_webp = ($compare_product['image']) ? '/storage/item_images/'. $compare_product['item_code'] .'/gallery/preview/'. explode(".", $compare_product['image'])[0] .'.webp' : '/storage/no-photo-available.png';
+										@endphp
+										<div class="hover-container product-card" style="position: relative;">
+											<div class="pt-2" style="position: absolute; top: 0; right: 0; z-index: 10;">
+												@if($compare_product['is_discounted'] == 1)
+												<div class="col-12">
+													<span class="p-1 text-center" style="background-color: #FF0000; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
+														&nbsp;<b>{{ $compare_product['discount_display'] }}</b>&nbsp;
+													</span>
+												</div>
+												@endif
+											</div>
+											<div class="overlay-bg"></div>
+											<div class="btn-container">
+												<a href="/product/{{ ($compare_product['slug']) ? $compare_product['slug'] : $compare_product['item_code'] }}" class="view-products-btn btn" role="button"><i class="fas fa-search" style="color: inherit !important;"></i>&nbsp;View Product</a>
+											</div>
+											<picture>
+												<source srcset="{{ asset($compare_img_webp) }}" type="image/webp">
+												<source srcset="{{ asset($compare_img) }}" type="image/jpeg">
+												<img src="{{ asset($compare_img) }}" alt="{{ Str::slug($compare_product['alt'], '-') }}" class="img-responsive hover products-card-img" style="width: 100%; min-height: 300px !important;" loading="lazy"/>
+											</picture>
+										</div>
+										<span class="comparison-description d-block mb-3" style="color: #000">{{ $compare_product['item_name'] }}</span>
+										<center>
+											<div style="clear: both;">
+												@if ($compare_product['is_discounted'] == 1)
+													<span class="comparison-price" style="white-space: nowrap !important">{{ $compare_product['discounted_price'] }}</span>&nbsp;<s style="color: #c5c5c5;">{{ $compare_product['default_price'] }}</s>
+												@else
+													<span style="color: #000">{{ $compare_product['default_price'] }}</span>
+												@endif
+											</div>
+											@if($compare_product['on_stock'] == 1)
+												<button class="btn btn-pill btn-outline-primary btn-sm add-to-cart comparison-add-to-cart mt-3 mb-5" type="button" data-toggle="toast" data-item-code="{{ $compare_product['item_code'] }}"><i class="fas fa-shopping-cart d-inline-block" style="color: inherit !important"></i>&nbsp;Add to Cart</button>
+											@else
+												<a href="/login" class="btn btn-pill btn-outline-primary btn-sm mt-3 {{ Auth::check() ? 'add-to-wishlist' : '' }} comparison-add-to-cart" type="button" data-toggle="toast" data-item-code="{{ $compare_product['item_code'] }}"><i class="fas fa-heart d-inline-block" style="color: inherit !important"></i>&nbsp;Add to Wishlist</a>
+											@endif
+											<br/>
+											@foreach ($attribute_names as $attrib)
+												<div class="col-12 mb-5">
+													<span class="comparison-description d-block" style="color: #000">
+														@php
+															$attr_val = $variant_attr_array[$attrib->attribute_name][$compare_product['item_code']];
+															$str = explode(' ', $variant_attr_array[$attrib->attribute_name][$compare_product['item_code']]);
+															if (strtolower($str[0]) == 'and') {
+																$attr_val = Str::ucfirst(Str::replaceFirst('and ', '', $attr_val));
+															}
+														@endphp
+														@if (Str::contains(strtolower($attrib->attribute_name), 'color temperature'))
+														@if (Str::contains(strtolower($attr_val), 'warm white'))
+														<i class="fas fa-circle shadow" style="color: rgb(253, 244, 220) !important; font-size: 18pt; border-radius: 50%;"></i>
+														@elseif(Str::contains(strtolower($attr_val), 'cool white'))
+														<i class="fas fa-circle shadow" style="color: rgb(244, 253, 255) !important; font-size: 18pt; border-radius: 50%;"></i>
+														@elseif(Str::contains(strtolower($attr_val), 'daylight'))
+														<i class="fas fa-circle shadow" style="color: rgb(255, 255, 251) !important; font-size: 18pt; border-radius: 50%;"></i>
+														@endif
+														&nbsp;&nbsp;
+														@endif
+														{{ $attr_val }}</span>
+													<span style="font-size: 11pt;" class="text-muted">{{ $attrib->attribute_name }}</span>
+												</div>
+											@endforeach
+										</center>
 									</div>
 								</div>
-								{{-- <section class="regular slider"> --}}
-									@foreach ($compare_arr as $compare_product)
-									<div class="col-md-3 equal-height-columns p-2 text-center">
-										<div class="container border">
-											@php
-												$compare_img = ($compare_product['image']) ? '/storage/item_images/'. $compare_product['item_code'] .'/gallery/preview/'. $compare_product['image'] : '/storage/no-photo-available.png';
-												$compare_img_webp = ($compare_product['image']) ? '/storage/item_images/'. $compare_product['item_code'] .'/gallery/preview/'. explode(".", $compare_product['image'])[0] .'.webp' : '/storage/no-photo-available.png';
-											@endphp
-											<div class="hover-container product-card" style="position: relative;">
-												<div class="pt-2" style="position: absolute; top: 0; right: 0; z-index: 10;">
-													@if($compare_product['is_discounted'] == 1)
-													<div class="col-12">
-														<span class="p-1 text-center" style="background-color: #FF0000; font-size: 10pt; border-radius: 20px 0 0 20px; color: #fff; float: right !important; min-width: 80px">
-															&nbsp;<b>{{ $compare_product['discount_display'] }}</b>&nbsp;
-														</span>
-													</div>
-													@endif
-												</div>
-												<div class="overlay-bg"></div>
-												<div class="btn-container">
-													<a href="/product/{{ ($compare_product['slug']) ? $compare_product['slug'] : $compare_product['item_code'] }}" class="view-products-btn btn" role="button"><i class="fas fa-search" style="color: inherit !important;"></i>&nbsp;View Product</a>
-												</div>
-												<picture>
-													<source srcset="{{ asset($compare_img_webp) }}" type="image/webp">
-													<source srcset="{{ asset($compare_img) }}" type="image/jpeg">
-													<img src="{{ asset($compare_img) }}" alt="{{ Str::slug($compare_product['alt'], '-') }}" class="img-responsive hover products-card-img" style="width: 100%; min-height: 300px !important;" loading="lazy"/>
-												</picture>
-											</div>
-											<span class="comparison-description d-block mb-3" style="color: #000">{{ $compare_product['item_name'] }}</span>
-											<center>
-												<div style="clear: both;">
-													@if ($compare_product['is_discounted'] == 1)
-														<span class="comparison-price" style="white-space: nowrap !important">{{ $compare_product['discounted_price'] }}</span>&nbsp;<s style="color: #c5c5c5;">{{ $compare_product['default_price'] }}</s>
-													@else
-														<span style="color: #000">{{ $compare_product['default_price'] }}</span>
-													@endif
-												</div>
-												@if($compare_product['on_stock'] == 1)
-													<button class="btn btn-pill btn-outline-primary btn-sm add-to-cart comparison-add-to-cart mt-3 mb-5" type="button" data-toggle="toast" data-item-code="{{ $compare_product['item_code'] }}"><i class="fas fa-shopping-cart d-inline-block" style="color: inherit !important"></i>&nbsp;Add to Cart</button>
-												@else
-													<a href="/login" class="btn btn-pill btn-outline-primary btn-sm mt-3 {{ Auth::check() ? 'add-to-wishlist' : '' }} comparison-add-to-cart" type="button" data-toggle="toast" data-item-code="{{ $compare_product['item_code'] }}"><i class="fas fa-heart d-inline-block" style="color: inherit !important"></i>&nbsp;Add to Wishlist</a>
-												@endif
-												<br/>
-												@foreach ($attribute_names as $attrib)
-													<div class="col-12 mb-5">
-														<span class="comparison-description d-block" style="color: #000">
-															@php
-																$attr_val = $variant_attr_array[$attrib->attribute_name][$compare_product['item_code']];
-																$str = explode(' ', $variant_attr_array[$attrib->attribute_name][$compare_product['item_code']]);
-																if (strtolower($str[0]) == 'and') {
-																	$attr_val = Str::ucfirst(Str::replaceFirst('and ', '', $attr_val));
-																}
-															@endphp
-															@if (Str::contains(strtolower($attrib->attribute_name), 'color temperature'))
-															@if (Str::contains(strtolower($attr_val), 'warm white'))
-															<i class="fas fa-circle shadow" style="color: rgb(253, 244, 220) !important; font-size: 18pt; border-radius: 50%;"></i>
-															@elseif(Str::contains(strtolower($attr_val), 'cool white'))
-															<i class="fas fa-circle shadow" style="color: rgb(244, 253, 255) !important; font-size: 18pt; border-radius: 50%;"></i>
-															@elseif(Str::contains(strtolower($attr_val), 'daylight'))
-															<i class="fas fa-circle shadow" style="color: rgb(255, 255, 251) !important; font-size: 18pt; border-radius: 50%;"></i>
-															@endif
-															&nbsp;&nbsp;
-															@endif
-															{{ $attr_val }}</span>
-														<span style="font-size: 11pt;" class="text-muted">{{ $attrib->attribute_name }}</span>
-													</div>
-												@endforeach
-											</center>
-										</div>
-									</div>
-									@endforeach
-								{{-- </section> --}}
+								@endforeach
 							</div>
 							@endif							
                    			@if (count($related_products) > 0)
