@@ -252,7 +252,7 @@
                 </ul>
               </li>
               @if (cache('has_clearance_sale'))
-              <li class="nav-item">
+              <li class="nav-item text-center">
                 <a class="nav-link" href="/clearance_sale">CLEARANCE SALE</a>
               </li>
               @endif
