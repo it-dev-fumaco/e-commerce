@@ -474,6 +474,16 @@
   <script src="{{ asset('assets/minified-js/jquery-3.6.0.min.js') }}"></script>
   <script src="{{ asset('assets/minified-js/jquery-ui.min.js') }}"></script>
   @endif
+  @if (in_array($activePage, ['product_page']))
+  <script type="text/javascript" src="{{ asset('/assets/loading.js') }}"></script>
+  <script src="{{ asset('/item/js/foundation.min.js') }}"></script>
+  <script src="{{ asset('/item/js/setup.js') }}"></script>
+  <script type="text/javascript" src="{{ asset('/item/dist/xzoom.min.js') }}"></script>
+  <script type="text/javascript" src="{{ asset('/item/hammer.js/1.0.5/jquery.hammer.min.js') }}"></script>
+  <script type="text/javascript" src="{{ asset('/item/fancybox/source/jquery.fancybox.js') }}"></script>
+  <script type="text/javascript" src="{{ asset('/item/magnific-popup/js/magnific-popup.js') }}"></script>
+  <script src="{{ asset('/slick/slick.js') }}" type="text/javascript" charset="utf-8"></script>
+  @endif
   <script>
     $(document).ready(function() {
       websiteSettings();
