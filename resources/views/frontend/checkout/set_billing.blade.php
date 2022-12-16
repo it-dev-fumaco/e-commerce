@@ -31,32 +31,31 @@
 			<form action="/checkout/set_billing" method="post">
 				@csrf
 				<div class="row">
-					<div class="col-md-12 col-lg-8 mx-auto">
+					<div class="col-md-12 col-xl-8 mx-auto">
 						<div class="row mb-3">
-							<div class="col-12 col-md-6">
-								<p style="color:#212529 !important; letter-spacing: 1px !important; font-size:16px !important;  text-align: justify !important; font-weight: 600 !important;">Billing Information</p>
+							<div class="col-12 col-md-6 head-text">
+								<p style="color:#212529 !important; letter-spacing: 1px !important; font-size:16px !important; font-weight: 600 !important;">Billing Information</p>
 							</div>
-							<div class="col-12 col-md-6">
-								@if(!Auth::check())
-									<div class="col-12 col-md-8 offset-md-4">
-										<div class="effect">
-											<div class="buttons" style="display: flex; justify-content: center; align-items: center; font-size: 9pt;">
-												<span class="d-md-nones">Already a member?&nbsp;<span class="open-modal" data-target="#loginModal" style="color: #0D6EFD; text-decoration: underline">Log in</span>&nbsp;</span>
-												<small class="text-muted"> or sign in with</small>
-												<a href="#" class="fb" title="Sign in with Facebook" onclick="triggerLogin();" style="height: 25px !important; width: 25px !important; border-radius: 8px;">
-													<i class="fa fa-facebook" aria-hidden="true" style="font-size: 10pt;"></i>
-												</a>
-												<a href="{{ route('google.login') }}" class="g-plus" title="Sign in with Google" style="height: 25px !important; width: 25px !important; border-radius: 8px;">
-													<img src="{{ asset('assets/google.svg') }}" width="15">
-												</a>
-												<a href="{{ route('linkedin.login') }}" class="in" title="Sign in with Linked In" style="height: 25px !important; width: 25px !important; border-radius: 8px;">
-													<i class="fa fa-linkedin" aria-hidden="true" style="font-size: 10pt;"></i>
-												</a>
-											</div>
+							@if(!Auth::check())
+								<div class="col-7 offset-5 offset-md-2 col-md-4 col-lg-3 offset-lg-3 col-xl-3 offset-xl-3">
+									<div class="effect">
+										<div class="buttons" style="display: flex; justify-content: center; align-items: center; font-size: 10pt;">
+											<small class="text-muted">
+												<span class="open-modal" data-target="#loginModal" style="color: #0D6EFD; text-decoration: underline; cursor: pointer">Sign in</span> with
+											</small>
+											<a href="#" class="fb" title="Sign in with Facebook" onclick="triggerLogin();" style="height: 25px !important; width: 25px !important; border-radius: 8px;">
+												<i class="fa fa-facebook" aria-hidden="true" style="font-size: 10pt;"></i>
+											</a>
+											<a href="{{ route('google.login').'?checkout=1' }}" class="g-plus" title="Sign in with Google" style="height: 25px !important; width: 25px !important; border-radius: 8px;">
+												<img src="{{ asset('assets/google.svg') }}" width="15">
+											</a>
+											<a href="{{ route('linkedin.login').'?checkout=1' }}" class="in" title="Sign in with Linked In" style="height: 25px !important; width: 25px !important; border-radius: 8px;">
+												<i class="fa fa-linkedin" aria-hidden="true" style="font-size: 10pt;"></i>
+											</a>
 										</div>
 									</div>
-								@endif	
-							</div>
+								</div>
+							@endif	
 						</div>
 						<div class="row">
 							<div class="col-md-6">
@@ -136,13 +135,12 @@
 							</div>
 							<div class="col-md-6">
 								<label for="mobilenumber1_1" class="formslabelfnt">Mobile Number : *</label>
-								{{-- <input type="text" class="form-control formslabelfnt" id="mobilenumber1_1" name="mobilenumber1_1" required> --}}
 								<div class="row">
-									<div class="col-1" style="display: flex; align-items: center">
+									<div class="col-1 col-md-2 col-xl-1" style="display: flex; align-items: center">
 										+63
 									</div>
-									<div class="col-11" style="margin-left: -5px">
-										<input type="text" class="form-control formslabelfnt" id="mobilenumber1_1" name="mobilenumber1_1" required>
+									<div class="col-11 col-md-10 col-xl-11">
+										<input type="text" class="form-control formslabelfnt d-inline" id="mobilenumber1_1" name="mobilenumber1_1" required value=""><br class="d-lg-none d-xl-none"/>
 									</div>
 								</div>
 							</div>
@@ -151,23 +149,14 @@
 				</div>
 				<br/>&nbsp;
 				<div class="row mb-4">
-					<div class="col-md-9 mx-auto">
-						<div class="col-md-4 d-none d-xl-block">
-							<a href="/cart" class="btn btn-lg btn-outline-primary" role="button" style="background-color: #777575 !important; border-color: #777575 !important; float: left; width: 94%;margin-left: 5%;">BACK</a>
+					<div class="col-12 col-xl-8 row mx-auto">
+						<div class="order-last order-md-first col-12 col-md-5 col-xl-4">
+							<a href="/cart" class="btn btn-lg btn-outline-primary w-100" role="button" style="background-color: #777575 !important; border-color: #777575 !important;">BACK</a>
 						</div>
-						<div class="col-md-4 d-none d-xl-block" style="float: right !important">
+						<div class="order-first mb-2 order-md-last col-12 col-md-5 offset-md-2 col-xl-4 offset-xl-4">
 							<button type="submit" class="btn btn-lg btn-outline-primary" style="width: 100% !important">PROCEED</button>
 						</div>
-						<div class="col-md-4 d-md-none d-lg-none d-xl-none">
-							<button type="submit" class="btn btn-lg btn-outline-primary" style="width: 100% !important">PROCEED</button>
-						</div>
-						<br/>
-						<div class="col-md-4 d-md-none d-lg-none d-xl-none">
-							<a href="/cart" class="btn btn-lg btn-outline-primary" role="button" style="background-color: #777575 !important; border-color: #777575 !important; float: left; width: 100%;">BACK</a>
-						</div>
-						<input type="text" name="order_no" class="p" value="{{ 'FUM-'.random_int(10000000, 99999999) }}" hidden readonly/>
 					</div>
-					
 				</div>
 			</form>
 			<!-- Login Modal -->
@@ -175,6 +164,7 @@
 				<div class="modal-dialog" role="document">
 					<form action="/login" method="post">
 						@csrf
+						<input type="checkbox" name="checkout" class="d-none" readonly>
 						<div class="modal-content">
 							<div class="modal-header">
 								<h5 class="modal-title" id="loginModalLabel">Login</h5>
@@ -206,10 +196,10 @@
 										<div class="effect">
 											<div class="buttons">
 											<a href="#" class="fb" title="Sign in with Facebook" onclick="triggerLogin();"><i class="fa fa-facebook" aria-hidden="true"></i></a>
-											<a href="{{ route('google.login') }}" class="g-plus" title="Sign in with Google">
+											<a href="{{ route('google.login').'?checkout=1' }}" class="g-plus" title="Sign in with Google">
 												<img src="{{ asset('assets/google.svg') }}" width="25">
 											</a>
-											<a href="{{ route('linkedin.login') }}" class="in" title="Sign in with Linked In"><i class="fa fa-linkedin" aria-hidden="true"></i></a>
+											<a href="{{ route('linkedin.login').'?checkout=1' }}" class="in" title="Sign in with Linked In"><i class="fa fa-linkedin" aria-hidden="true"></i></a>
 											{{-- <a href="#" class="tw" title="Sign in with Apple"><i class="fab fa-apple" aria-hidden="true"></i></a> --}}
 											</div>
 										</div>
@@ -452,10 +442,20 @@
 		padding-bottom: 25px !important;
 		padding-top: 25px !important;
 	}
+	.head-text{
+		text-align: left;
+	}
 	@media (max-width: 575.98px) {
 		.breadcrumb{
 			font-size: 8pt !important;
 			font-weight: 500;
+		}
+		.products-head{
+			padding-left: 0 !important;
+			padding-right: 0 !important;
+		}
+		.head-text{
+			text-align: center !important;
 		}
 	}
 
@@ -463,6 +463,9 @@
 		.breadcrumb{
 			font-size: 8pt !important;
 			font-weight: 500;
+		}
+		.head-text{
+			text-align: center !important;
 		}
 	}
 </style>
