@@ -365,7 +365,7 @@
     <main style="background-color:#0C0C0C;">
       <div class="col-12 col-xl-10 mx-auto marketing">
         <div class="row p-4">
-          <div class="col-12 col-md-3 col-xl-2">
+          <div class="col-12 col-md-4 col-lg-3 col-xl-2">
             <picture>
               <source srcset="{{ asset('/assets/site-img/logo-sm.webp') }}" type="image/webp">
               <source srcset="{{ asset('/assets/site-img/logo-sm.png') }}" type="image/jpeg">
@@ -379,7 +379,7 @@
             </div>
           </div>
 
-          <div class="col-12 col-md-2 mt-4 mt-md-2" style="text-align: left !important;">
+          <div class="col-12 col-md-4 col-lg-2 mt-4 mt-md-2" style="text-align: left !important;">
             <h6 class="footer1st font-weight-bold" style="color:#ffffff !important; font-weight: 500 !important;">ABOUT FUMACO</h6>
             <table class="table" style="border-style: unset !important;">
               <tbody style="font-size: 12px; color: #ffffff; border-style: unset !important;">
@@ -396,14 +396,14 @@
             </table>
           </div>
 
-          <div class="col-12 col-md-3 mt-4 mt-md-2" style="text-align: left !important;">
+          <div class="col-12 col-md-4 col-lg-3 mt-4 mt-md-2" style="text-align: left !important;">
             <h6 class="footer1st font-weight-bold" style="color:#ffffff !important; font-weight: 500 !important;">PRODUCTS</h6>
             <table class="table" style="border-style: unset !important;">
               <tbody style="font-size: 12px; color: #ffffff; border-style: unset !important;" id="product-category-footer"></tbody>
             </table>
           </div>
 
-          <div class="col-12 col-md-4 col-xl-5 mt-md-2">
+          <div class="col-12 col-lg-4 col-xl-5 mt-lg-2">
             <h6 class="footer1st d-md-none" style="color:#ffffff !important; text-align: left; font-weight: 500 !important">SUBSCRIBE TO NEWSLETTER</h6>
             <h6 class="footer1st d-none d-md-block" style="color:#ffffff !important; text-align: right; font-weight: 500 !important">SUBSCRIBE TO NEWSLETTER</h6>
             <form action="/subscribe" method="POST">
@@ -420,7 +420,7 @@
               </div>
             </form>
 
-            <div class="col-md-12 mt-4" style="text-align: left !important;">
+            <div class="col-lg-12 mt-4" style="text-align: left !important;">
               <h6 class="footer1st" style="color:#ffffff !important; font-weight: 500 !important;">WE ACCEPT</h6>
               <div class="row" style="padding-left:1% !important">
                 @php
