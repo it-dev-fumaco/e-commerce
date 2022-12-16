@@ -39,7 +39,7 @@
 
     @yield('style')
 
-    @if (!in_array($activePage, ['homepage']))
+    @if (!in_array($activePage, ['homepage', 'product_page']))
       <link rel="stylesheet" href="{{ asset('assets/minified-css/jquery-ui.min.css') }}">
     @endif
 
@@ -78,8 +78,22 @@
     	@media (max-width: 369.98px){ /* extra small screens (J2, etc.) */
         .mob-srch{padding-top: 10px;}
       }
-
     </style>
+    @if (in_array($activePage, ['product_page']))
+    <style>
+      .card {
+        position: relative !important;
+        display: flex !important;
+        flex-direction: column !important;
+        min-width: 0 !important;
+        word-wrap: break-word !important;
+        background-color: #fff !important;
+        background-clip: border-box !important;
+        border-radius: .25rem !important;
+        padding: 10px !important;
+      }
+    </style>
+    @endif
 
     @if ($activePage != 'error_page')
     <!-- Google Tag Manager -->
@@ -512,7 +526,7 @@
           $("#cookieConsent").fadeIn(200);
       }, 2000);
 
-      @if (in_array($activePage, ['product_page', 'homepage', 'cart']))
+      @if (in_array($activePage, ['homepage', 'cart']))
       $(".regular").slick({
         dots: true,
         customPaging: function(slider, i) {
