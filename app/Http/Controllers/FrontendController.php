@@ -34,6 +34,13 @@ class FrontendController extends Controller
     }
 
     public function index(Request $request) {
+        $clearance_sale_item_codes = DB::table('fumaco_on_sale as os')
+            ->join('fumaco_on_sale_items as osi', 'os.id', 'osi.sale_id')
+            ->join('fumaco_items as i', 'i.f_idcode', 'osi.item_code')
+            ->where('os.is_clearance_sale', 1)->where('os.status', 1)->where('i.f_status', 1)
+            ->whereDate('os.start_date', '<=', Carbon::now()->startOfDay())->whereDate('os.end_date', '>=', Carbon::now()->endOfDay())
+            ->pluck('f_idcode');
+
         // get sorting value 
         $sortby = $request->sortby;
         switch ($sortby) {
@@ -76,6 +83,9 @@ class FrontendController extends Controller
             if ($request->s == null) {
                 if (in_array($search_by, ['products', 'all', ''])) {
                     $product_list = DB::table('fumaco_items')->where('f_status', 1)->where('f_featured', 1)
+                        ->when(count($clearance_sale_item_codes) > 0, function($c) use ($clearance_sale_item_codes) {
+                            $c->whereNotIn('f_idcode', $clearance_sale_item_codes);
+                        })
                         ->select('f_idcode', 'f_default_price', 'f_onsale', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'f_qty', 'f_reserved_qty', 'slug', 'f_name_name', 'f_item_name', 'f_category', 'id', 'image_alt')->get();
                 }
 
@@ -101,6 +111,9 @@ class FrontendController extends Controller
                                 ->orWhere('f_item_classification', 'LIKE', "%".$search_str."%")
                                 ->orWhere('keywords', 'LIKE', '%'.$search_str.'%');
                         })
+                        ->when(count($clearance_sale_item_codes) > 0, function($c) use ($clearance_sale_item_codes) {
+                            $c->whereNotIn('f_idcode', $clearance_sale_item_codes);
+                        })
                         ->where('f_status', 1)->where('f_status', 1)
                         ->select('f_idcode', 'f_default_price', 'f_onsale', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'f_qty', 'f_reserved_qty', 'slug', 'f_name_name', 'f_item_name', 'f_category', 'id', 'image_alt')
                         ->orderBy($sortby, $orderby)->get();
@@ -115,21 +128,32 @@ class FrontendController extends Controller
                             ->when(count($request_data) > 0, function($c) use ($attribute_name_filter, $attribute_value_filter) {
                                 $c->whereIn('c.slug', $attribute_name_filter)->whereIn('b.attribute_value', $attribute_value_filter);
                             })
+                            ->when(count($clearance_sale_item_codes) > 0, function($c) use ($clearance_sale_item_codes) {
+                                $c->whereNotIn('f_idcode', $clearance_sale_item_codes);
+                            })
                             ->where('a.f_status', 1)->select('c.slug', 'b.attribute_value', 'a.f_idcode', 'a.f_brand')->get();
 
                         if(count($brand_filter) > 0 and count($filtered_items) == 0){ // double check for item codes with "-A"
-                            $filtered_items = DB::table('fumaco_items')->whereIn('f_brand', $brand_filter)->select('f_idcode', 'f_brand')->get();
+                            $filtered_items = DB::table('fumaco_items')->whereIn('f_brand', $brand_filter)
+                                ->when(count($clearance_sale_item_codes) > 0, function($c) use ($clearance_sale_item_codes) {
+                                    $c->whereNotIn('f_idcode', $clearance_sale_item_codes);
+                                })
+                                ->select('f_idcode', 'f_brand')->get();
                         }
 
                         $filtered_item_codes = collect($filtered_items)->pluck('f_idcode');
 
                         $include_bulk_item_codes = [];
                         if($filtered_item_codes){
-                            $include_bulk_item_codes = DB::table('fumaco_items')->where(function($q) use ($filtered_item_codes){
-                                foreach($filtered_item_codes as $items){
-                                    $q->orWhere('f_idcode', 'like', '%'.$items.'%');
-                                }
-                            })->pluck('f_idcode');
+                            $include_bulk_item_codes = DB::table('fumaco_items')
+                                ->when(count($clearance_sale_item_codes) > 0, function($c) use ($clearance_sale_item_codes) {
+                                    $c->whereNotIn('f_idcode', $clearance_sale_item_codes);
+                                })
+                                ->where(function($q) use ($filtered_item_codes){
+                                    foreach($filtered_item_codes as $items){
+                                        $q->orWhere('f_idcode', 'like', '%'.$items.'%');
+                                    }
+                                })->pluck('f_idcode');
 
                             $filtered_item_codes = collect($include_bulk_item_codes);
                         }
@@ -226,8 +250,7 @@ class FrontendController extends Controller
             $paginatedItems->setPath($request->url());
             $results = $paginatedItems;
 
-            $products = [];
-            $blogs = [];
+            $products = $blogs = [];
 
             $recently_added_item_codes = collect($recently_added_items)->toArray();
 
@@ -390,6 +413,9 @@ class FrontendController extends Controller
                 }
 
                 $recently_added_items_query = DB::table('fumaco_items')->whereIn('f_idcode', $recently_added_item_codes)
+                    ->when(count($clearance_sale_item_codes) > 0, function($c) use ($clearance_sale_item_codes) {
+                        $c->whereNotIn('f_idcode', $clearance_sale_item_codes);
+                    })
                     ->select('f_idcode', 'f_default_price', 'f_onsale', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'f_qty', 'f_reserved_qty', 'slug', 'f_name_name')->get();
            
                 $recently_added_items_images = DB::table('fumaco_items_image_v1')->whereIn('idcode', $recently_added_item_codes)
@@ -420,6 +446,9 @@ class FrontendController extends Controller
                 ->when(count($item_code_array) > 0, function($c) use ($item_code_array) {
                     $c->whereIn('a.f_idcode', $item_code_array);
                 })
+                ->when(count($clearance_sale_item_codes) > 0, function($c) use ($clearance_sale_item_codes) {
+                    $c->whereNotIn('a.f_idcode', $clearance_sale_item_codes);
+                })
                 ->where('a.f_status', 1)
                 ->where('c.status', 1)->select('c.attribute_name', 'b.attribute_value')
                 ->groupBy('c.attribute_name', 'b.attribute_value')->get();
@@ -434,6 +463,9 @@ class FrontendController extends Controller
                 })
                 ->when(count($request_data) < 1, function($c) use ($products){
                     $c->whereIn('f_idcode', collect($products)->pluck('item_code'));
+                })
+                ->when(count($clearance_sale_item_codes) > 0, function($c) use ($clearance_sale_item_codes) {
+                    $c->whereNotIn('f_idcode', $clearance_sale_item_codes);
                 })
                 ->where('f_status', 1)->whereNotNull('f_brand')->distinct('f_brand')->pluck('f_brand');
 
@@ -465,6 +497,9 @@ class FrontendController extends Controller
 
         // get best selling items
         $best_selling_query = DB::table('fumaco_items')->where('f_status', 1)->where('f_featured', 1)
+            ->when(count($clearance_sale_item_codes) > 0, function($c) use ($clearance_sale_item_codes) {
+                $c->whereNotIn('f_idcode', $clearance_sale_item_codes);
+            })
             ->select('f_idcode', 'f_default_price', 'f_onsale', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'f_qty', 'f_reserved_qty', 'slug', 'f_name_name', 'f_item_name', 'image_alt')->get();
 
         $best_selling_item_codes = array_column($best_selling_query->toArray(), 'f_idcode');
@@ -481,6 +516,9 @@ class FrontendController extends Controller
         }
 
         $on_sale_query = DB::table('fumaco_items')->where('f_status', 1)->where('f_onsale', 1)
+            ->when(count($clearance_sale_item_codes) > 0, function($c) use ($clearance_sale_item_codes) {
+                $c->whereNotIn('f_idcode', $clearance_sale_item_codes);
+            })
             ->select('f_idcode', 'f_default_price', 'f_onsale', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'f_qty', 'f_reserved_qty', 'slug', 'f_name_name', 'f_item_name', 'image_alt')->get();
 
         $sale_per_category = [];
