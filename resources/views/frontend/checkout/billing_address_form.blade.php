@@ -305,7 +305,7 @@
 							<a href="/cart" class="btn btn-lg btn-outline-primary w-100" role="button" style="background-color: #777575 !important; border-color: #777575 !important;">BACK</a>
 						</div>
 						<div class="order-first mb-2 order-md-last col-12 col-md-5 offset-md-2 col-xl-4 offset-xl-4">
-							<button type="submit" class="btn btn-lg btn-outline-primary" style="width: 100% !important">PROCEED</button>
+							<button type="submit" id="form-submit" class="btn btn-lg btn-outline-primary" style="width: 100% !important">PROCEED</button>
 						</div>
 					</div>
 				</div>
@@ -629,6 +629,11 @@
 					data: brgy
 				});
 			});
+		});
+		
+		$(document).on('click', '#form-submit', function (e){
+			e.preventDefault();
+			$('#checkout-form').submit();
 		});
 
 		$('#ship_City_Municipality1_1').val(null).trigger('change');
