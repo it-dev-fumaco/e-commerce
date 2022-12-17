@@ -426,7 +426,8 @@ class CheckoutController extends Controller
 					'discount' => ($item_discount > 0) ? $item_price_data['is_on_sale'] : 0,
 					'quantity' => $item->qty,
 					'stock_qty' => $item->f_qty,
-					'item_image' => $image
+					'item_image' => $image,
+					'uom' => $item->f_stock_uom
 				];
 
 				$existing_order_item = DB::table('fumaco_order_items')->where('order_number', $order_no)

@@ -35,7 +35,21 @@
 		$shipping_business_name = $shipping_details['business_name'];
 		$shipping_tin = $shipping_details['tin'];
 
-		if($shipping_details['same_as_billing'] == 1){
+		$ship_address = $shipping_address1." ".$shipping_address2.", ".$shipping_brgy.", ".$shipping_city.", ".$shipping_province.", ".$shipping_country." ".$shipping_postal;
+		$bill_address = ucwords(strtolower($billing_details['address_line1']))." ".ucwords(strtolower($billing_details['address_line2'])).", ".ucwords(strtolower($billing_details['brgy'])).", ".ucwords(strtolower($billing_details['city'])).", ".ucwords(strtolower($billing_details['province'])).", ".ucwords(strtolower($billing_details['country']))." ".$billing_details['postal_code'];
+		$same_address = 0;
+		if($ship_address == $bill_address && $shipping_mobile == $billing_details['mobile_no'] && $shipping_details['contact_person'] == $billing_details['contact_person']){
+			$same_address = 1;
+			if($shipping_details['address_type'] == $billing_details['address_type']){
+				if($shipping_business_name != $billing_details['business_name'] || $shipping_tin != $billing_details['tin']){
+					$same_address = 0;
+				}
+			}else{
+				$same_address = 0;
+			}
+		}
+
+		if($shipping_details['same_as_billing'] || $same_address){
 			$checkbox = 'd-block';
 			$col = "12";
 			$ship_text = " & Billing";
@@ -46,7 +60,7 @@
 		}
 	@endphp
 	<main style="background-color:#ffffff;" class="products-head">
-		<div class="container-fluid p-0"">
+		<div class="container-fluid p-0">
 			<div class="row">
 				<div class="col-12 col-lg-4 mb-3">
 					<div class="card he1x" style="background-color: #f4f4f4 !important; padding-bottom: 11px; min-height: 600px;">
@@ -85,7 +99,7 @@
 								</div>
 							</div>
 						</div>
-						@if ($shipping_details['same_as_billing'] == 0)
+						@if (!$shipping_details['same_as_billing'] && !$same_address)
 						<div class="card m-2">
 							<div class="card-header">
 								<div class="d-flex justify-content-between">
@@ -131,31 +145,56 @@
 									<thead style="border-bottom: 1px solid #8c8c8cd0 !important;">
 										<tr style="font-size: 0.8rem !important;">
 											<th class="text-left" colspan="2" style="width: 70%">Product Description</th>
-											<th class="text-center" style="width: 13%">Qty</th>
-											<th class="text-center" style="width: 17%">Amount</th>
+											<th class="text-center d-none d-md-table-cell d-lg-none d-xl-table-cell" style="width: 13%">Qty</th>
+											<th class="text-center d-none d-md-table-cell d-lg-none d-xl-table-cell" style="width: 17%">Amount</th>
 										</tr>
 									</thead>
 									<tbody style="font-size: 0.8rem !important;">
 										@foreach ($cart_arr as $cart)
 										<tr>
-											<td class="col-md-2" style="width: 10%">
-												<center>
-													@php
-														$img = '/storage/item_images/'.$cart['item_code'].'/gallery/preview/'.$cart['item_image'];
-													@endphp
-													<picture>
-														<source srcset="{{ asset(explode('.', $img)[0].'.webp') }}" type="image/webp">
-														<source srcset="{{ asset($img) }}" type="image/jpeg">
-														<img src="{{ asset('/storage/item_images/'.$cart['item_code'].'/gallery/preview/'.$cart['item_image']) }}" class="img-responsive" alt="{{ Str::slug($cart['alt'], '-') }}" width="55" height="55">
-													</picture>
-												</center>
+											<td style="width: 10%">
+												<div class="row p-0">
+													<div class="col-4 col-md-12 col-lg-4 p-lg-0">
+														<center>
+															@php
+																$img = '/storage/item_images/'.$cart['item_code'].'/gallery/preview/'.$cart['item_image'];
+															@endphp
+															<picture>
+																<source srcset="{{ asset(explode('.', $img)[0].'.webp') }}" type="image/webp">
+																<source srcset="{{ asset($img) }}" type="image/jpeg">
+																<img src="{{ asset('/storage/item_images/'.$cart['item_code'].'/gallery/preview/'.$cart['item_image']) }}" class="img-responsive product-image" alt="{{ Str::slug($cart['alt'], '-') }}">
+															</picture>
+														</center>
+													</div>
+													<!-- Mobile -->
+													<div class="col-8 d-md-none d-lg-block d-xl-none p-0">
+														<div class="row">
+															<div class="col-12" style="font-size: 9pt;">
+																<span class="d-block">{!! $cart['item_description'] !!}</span>
+																<span class="text-white d-none voucher-item-code voucherApp{{ $cart['item_code'] }}" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833;">Discount Applied</span>
+															</div>
+															<div class="col-4 offset-1 p-2 text-center">
+																<b>{{ $cart['quantity'] }}</b><br>
+																<small>{{ $cart['uom'] }}</small>
+															</div>
+															<div class="col-6" style="display: flex; justify-content: center; align-items: center;">
+																<b>
+																	<span class="d-block" style="white-space: nowrap !important">₱ {{ number_format($cart['subtotal'], 2, '.', ',') }}</span>
+																	<span class="amount d-none">{{ $cart['subtotal'] }}</span>
+																</b>
+															</div>
+														</div>
+													</div>
+													<!-- Mobile -->
+												</div>
 											</td>
-											<td>
+											<td class="d-none d-md-table-cell d-lg-none d-xl-table-cell">
 												<span class="d-block">{!! $cart['item_description'] !!}</span>
-												<span id="voucherApp{{ $cart['item_code'] }}" class="text-white d-none voucher-item-code" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833;">Discount Applied</span>
+												{{-- <span id="voucherApp{{ $cart['item_code'] }}" class="text-white d-none voucher-item-code" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833;">Discount Applied</span> --}}
+												<span class="text-white d-none voucher-item-code voucherApp{{ $cart['item_code'] }}" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833;">Discount Applied</span>
 											</td>
-											<td style="text-align: center;">{{ $cart['quantity'] }}</td>
-											<td class="col-md-2" style="text-align: right;">
+											<td class="d-none d-md-table-cell d-lg-none d-xl-table-cell" style="text-align: center;">{{ $cart['quantity'] }}</td>
+											<td class="d-none d-md-table-cell d-lg-none d-xl-table-cell" style="text-align: right;">
 												<span class="d-block" id="{{ $cart['item_code'] }}" style="white-space: nowrap !important">₱ {{ number_format($cart['subtotal'], 2, '.', ',') }}</span>
 												<span class="amount d-none">{{ $cart['subtotal'] }}</span>
 											</td>
@@ -367,11 +406,11 @@
 						</div>		
 					</div>
 
-					<div class="row m-4">
-						<div class="col-md-10 mx-auto">
+					<div class="row mt-1 m-xl-4">
+						<div class="col-12 col-xl-10 mx-auto">
 							<div class="card">
 								<div id="payment-form" class="d-none"></div>
-								<button class="btn btn-lg btn-outline-primary" id="checkout-btn" style="border: 0;" {{ (count($shipping_rates) <= 0) ? 'disabled' : '' }}>PAY NOW <br class="d-none d-lg-block d-xl-none"><span id="grand-total1" class="font-weight-bold"></span></button>
+								<button class="btn btn-lg btn-outline-primary" id="checkout-btn" style="border: 0;" {{ (count($shipping_rates) <= 0) ? 'disabled' : '' }}>PAY NOW <span id="grand-total1" class="font-weight-bold"></span></button>
 							</div>
 						</div>
 					</div>
@@ -1175,12 +1214,24 @@
 	.clear-btn:hover{
 		color: #000;
 	}
+
+	.product-image{
+		width: 55px;
+		height: 55px;
+	}
 	@keyframes rotate {
 		0% {
 			transform: rotate(0deg);
 		}
 		100% {
 			transform: rotate(360deg);
+		}
+	}
+
+	@media (max-width: 1199.98px) {/* tablet */
+		.product-image{
+			width: 100%;
+			height: auto;
 		}
 	}
 
@@ -1192,6 +1243,10 @@
 		.addressModal{
 			font-size: 10pt !important;
 		}
+		.product-image{
+			width: 100%;
+			height: auto;
+		}
 	}
 
 	@media only screen and (max-width: 600px) {
@@ -1200,6 +1255,10 @@
 		}
 		.addressModal{
 			font-size: 10pt !important;
+		}
+		.product-image{
+			width: 100%;
+			height: auto;
 		}
 	}
 
@@ -1210,6 +1269,10 @@
 		}
 		.addressModal, .addressModal-icon{
 			font-size: 10pt !important;
+		}
+		.product-image{
+			width: 100%;
+			height: auto;
 		}
 	}
 }
@@ -1282,7 +1345,7 @@
 						$('#coupon-alert').addClass('d-none');
 						if(response.item_applied_discount.length > 0) {
 							$.each(response.item_applied_discount, function(d, a){
-								$('#voucherApp' + a).removeClass('d-none');
+								$('.voucherApp' + a).removeClass('d-none');
 							});
 						} else {
 							$('.voucher-item-code').addClass('d-none');
