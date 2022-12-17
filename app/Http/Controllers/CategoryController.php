@@ -169,4 +169,32 @@ class CategoryController extends Controller
             return redirect()->back()->with('error', 'An error occured. Please try again.');
         }
     }
+
+    public function search(Request $request) {
+        if($request->ajax()) {
+            $search_str = explode(' ', $request->q);
+            $items = DB::table('fumaco_categories')
+                ->when($request->q, function ($query) use ($request, $search_str){
+                    return $query->where(function($q) use ($search_str, $request) {
+                        foreach ($search_str as $str) {
+                            $q->where('name', 'LIKE', "%".$str."%");
+                        }
+
+                        $q->orWhere('slug', 'LIKE', "%".$request->q."%");
+                    });
+                })
+                ->select('id', 'name')->orderBy('name', 'asc')
+                ->limit(8)->get();
+    
+            $result = [];
+            foreach($items as $item){
+                $result[] = [
+                    'id' => $item->id,
+                    'text' => $item->name,
+                ];
+            }
+    
+            return response()->json(['items' => $result]);
+        }
+    }
 }

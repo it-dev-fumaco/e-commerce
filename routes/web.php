@@ -238,6 +238,7 @@ Route::prefix('admin')->group(function () {
             Route::get('/category/reset/{id}', 'CategoryController@resetOrder');
             Route::post('/category/set_row/{id}', 'CategoryController@changeSort');
             Route::post('/category/publish', 'CategoryController@publishCategory');
+            Route::get('/category/search', 'CategoryController@search');
             Route::get('/media/add', 'MediaController@add_media_form');
             Route::get('/media/list', 'MediaController@list_media');
             Route::post('/add_media_records', 'MediaController@add_media_record');
@@ -343,6 +344,7 @@ Route::prefix('admin')->group(function () {
             Route::get('/marketing/pricing_rule/add', 'PricingRuleController@add');
             Route::post('/marketing/pricing_rule/save', 'PricingRuleController@save');
             Route::get('/marketing/pricing_rule/{id}/edit', 'PricingRuleController@edit');
+            Route::post('/marketing/pricing_rule/{id}/update', 'PricingRuleController@update');
             Route::post('/marketing/pricing_rule/{id}/delete', 'PricingRuleController@delete');
             Route::post('/marketing/pricing_rule/{id}/set_status', 'PricingRuleController@updateStatus');
             // SHIPPING SERVICES ROUTES CMS
