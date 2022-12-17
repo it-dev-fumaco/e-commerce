@@ -339,6 +339,12 @@ Route::prefix('admin')->group(function () {
             Route::post('/marketing/social/create', 'SocialImagesController@uploadImage');
             Route::delete('/marketing/social/delete/{id}', 'SocialImagesController@deleteImage');
             Route::get('/marketing/social/default/{id}', 'SocialImagesController@setDefault');
+            Route::get('/marketing/pricing_rule/list', 'PricingRuleController@list');
+            Route::get('/marketing/pricing_rule/add', 'PricingRuleController@add');
+            Route::post('/marketing/pricing_rule/save', 'PricingRuleController@save');
+            Route::get('/marketing/pricing_rule/{id}/edit', 'PricingRuleController@edit');
+            Route::post('/marketing/pricing_rule/{id}/delete', 'PricingRuleController@delete');
+            Route::post('/marketing/pricing_rule/{id}/set_status', 'PricingRuleController@updateStatus');
             // SHIPPING SERVICES ROUTES CMS
             Route::get('/shipping/list', 'ShippingController@viewList');
             Route::get('/shipping/add', 'ShippingController@viewAddForm');

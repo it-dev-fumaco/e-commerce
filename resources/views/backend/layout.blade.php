@@ -427,7 +427,7 @@
             </ul>
           </li>
           @php
-              $marketing_pages = ['Price Rule/Discounts', 'on_sale_list', 'vouchers_list', 'social_images'];
+              $marketing_pages = ['pricing_rule', 'on_sale_list', 'vouchers_list', 'social_images'];
           @endphp
           <li class="nav-header">MARKETING</li>
           <li class="nav-item {{ (in_array($activePage, $marketing_pages) ? 'menu-open' : '') }}">
@@ -437,7 +437,7 @@
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="#" class="nav-link {{ $activePage == 'Price Rule/Discounts' ? 'active' : '' }}">
+                <a href="/admin/marketing/pricing_rule/list" class="nav-link {{ $activePage == 'pricing_rule' ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Price Rule/Discounts</p>
                 </a>
