@@ -217,8 +217,6 @@ class PricingRuleController extends Controller
 
             return response()->json(['status' => 0, 'message' => 'An error occured. Please try again.']);
         }
-
-        return $request->all();
     }
 
     public function delete($id, Request $request) {
