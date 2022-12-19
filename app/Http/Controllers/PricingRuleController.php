@@ -202,9 +202,9 @@ class PricingRuleController extends Controller
                 foreach ($new_conditions as $s => $r) {
                     $price_rule_conditions[] = [
                         'price_rule_id' => $id,
-                        'range_from' => $conditions[$s],
-                        'range_to' => $request->range_to[$s],
-                        'rate' => $request->rate[$s],
+                        'range_from' => $new_conditions[$s],
+                        'range_to' => $request->new_range_to[$s],
+                        'rate' => $request->new_rate[$s],
                         'created_by' => Auth::user()->username,
                         'last_modified_by' => Auth::user()->username,
                     ];
