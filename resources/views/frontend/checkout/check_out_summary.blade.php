@@ -1383,7 +1383,7 @@
 				$('#coupon-code').addClass('is-invalid');
 			} else {
 				$("#item-preloader").fadeIn();
-				apply_coupon(coupon);
+				apply_coupon($('#coupon-code').val());
 			}
 		});
 		updateTotal();
