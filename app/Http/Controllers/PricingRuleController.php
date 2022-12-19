@@ -143,9 +143,13 @@ class PricingRuleController extends Controller
             $new_applied_on = $request->new_applied_on;
             $new_conditions = $request->new_range_from;
 
-            // delete removed rows in applied on
-            DB::table('fumaco_price_rule_applied_on')->where('price_rule_id', $id)
-                ->whereNotIn('price_rule_applied_on_id', array_keys($applied_on))->delete();
+            if ($request->old_apply_on == $request->apply_on) {
+                // delete removed rows in applied on
+                DB::table('fumaco_price_rule_applied_on')->where('price_rule_id', $id)
+                    ->whereNotIn('price_rule_applied_on_id', array_keys($applied_on))->delete();
+            } else {
+                DB::table('fumaco_price_rule_applied_on')->where('price_rule_id', $id)->delete();
+            }
 
             // delete removed rows in conditions
             DB::table('fumaco_price_rule_condition')->where('price_rule_id', $id)

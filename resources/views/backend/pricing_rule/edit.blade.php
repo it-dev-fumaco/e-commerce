@@ -51,6 +51,7 @@
                                                     </div>
                                                 </div>
                                                 <div class="col-6 mt-2">
+                                                    <input type="hidden" name="old_apply_on" value="{{ $price_rule->apply_on }}">
                                                     @php
                                                         $types = ['Item Code', 'Category', 'Transaction'];
                                                     @endphp
