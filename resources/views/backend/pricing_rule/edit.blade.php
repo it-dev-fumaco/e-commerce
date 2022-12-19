@@ -195,6 +195,12 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        <div class="col-12">
+                                            <div class="float-right font-italic">
+                                                <small>Last modified by: {{ $price_rule->last_modified_by . ' - ' . \Carbon\Carbon::parse($price_rule->last_modified_at)->format('Y-m-d h:i A') }}</small><br>
+                                                <small>Created by: {{ $price_rule->created_by . ' - ' . \Carbon\Carbon::parse($price_rule->created_at)->format('Y-m-d h:i A') }}</small>
+                                            </div>
+                                        </div>
                                     </div>
                                 </form>
                             </div>
