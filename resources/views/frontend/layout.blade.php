@@ -58,12 +58,14 @@
       .brand-slide .slick-list {margin: 0 -60px !important;}
       .brand-slide .slick-next{right:-95px!important}
       .brand-slide .slick-prev{left:-95px!important}
+      #notify-me-alert{font-size: 12pt;}
       @media (max-width: 1199.98px) {
         .products-card-img{min-height:200px!important}
         .brand-slide .slick-next, .slick-next{right:-45px!important}
         .brand-slide .slick-prev, .slick-prev{left:-45px!important}
         .brand-slide .slick-slide {margin: 0 10px !important;}
         .brand-slide .slick-list {margin: 0 -10px !important;}
+        #notify-me-alert{font-size: 9pt;}
       }
       @media (max-width: 575.98px){ /* normal mobile */
         .products-card-img{min-height:175px!important}
@@ -74,9 +76,11 @@
         .brand-slide .slick-list {margin: 0 -10px !important;}
         #product-category-dropdown{max-height: 45vh !important;}
         .category-menu{font-size: 9pt !important;}
+        #notify-me-alert{font-size: 9pt;}
       }
     	@media (max-width: 369.98px){ /* extra small screens (J2, etc.) */
         .mob-srch{padding-top: 10px;}
+        #notify-me-alert{font-size: 9pt;}
       }
     </style>
     @if (in_array($activePage, ['product_page']))
@@ -372,7 +376,6 @@
 
       </nav>
       </header>
-
   @yield('content')
   <footer>
     @include('cookieConsent::index')
@@ -466,6 +469,9 @@
       </span>
     </div>
   </footer>
+  <div class="alert alert-success alert-dismissible mx-auto col-11 col-md-5 text-center fade" id="notify-me-alert" role="alert" style="z-index: 1500; position: absolute; top: 20px; left: 50%; display: inline-block; -webkit-transform: translateX(-50%); transform: translateX(-50%);">
+    We will notify you via email once stock is available
+  </div>
   <script src="https://kit.fontawesome.com/ec0415ab92.js"></script> 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> 
   @if($activePage == 'contact')
@@ -583,7 +589,7 @@
         ]
       });
       @endif
-
+      $('.alert').alert();
       // set product category dropdown in navbar and links in dooter
       function productCategories() {
         $('#product-category-dropdown').empty();
@@ -810,6 +816,10 @@
               },
               success: function (response) {
                 btn.html(btn_fill);
+                $('#notify-me-alert').addClass('show');
+                setTimeout(function(){
+                    $('#notify-me-alert').removeClass('show');
+                  }, 2000);
               }
             });
           }else{
