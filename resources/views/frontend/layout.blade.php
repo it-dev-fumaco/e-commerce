@@ -255,11 +255,6 @@
                 <ul class="dropdown-menu dropdown-menu-light navbar-header overflow-auto" style="font-weight: 300 !important;" aria-labelledby="navbarDarkDropdownMenuLink" id="product-category-dropdown">
                 </ul>
               </li>
-              @if (cache('has_clearance_sale'))
-              <li class="nav-item text-center">
-                <a class="nav-link" href="/clearance_sale">CLEARANCE SALE</a>
-              </li>
-              @endif
               <li class="nav-item">
                 <a class="nav-link" href="/about" style="white-space: nowrap !important">ABOUT US</a>
               </li>
@@ -269,6 +264,11 @@
               <li class="nav-item">
                 <a class="nav-link" href="/contact">CONTACT</a>
               </li>
+              @if (cache('has_clearance_sale'))
+              <li class="nav-item text-left text-md-center">
+                <a class="nav-link" href="/clearance_sale">CLEARANCE</a>
+              </li>
+              @endif
             </ul>
             <form class="d-none d-lg-block search-bar" id="desk-search-bar-form" action="/" method="GET" autocomplete="off">
               <div class="input-group mb-0 searchbar search-bar">
