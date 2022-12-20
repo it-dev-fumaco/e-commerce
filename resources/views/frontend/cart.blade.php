@@ -61,7 +61,7 @@
                                         <picture>
                                             <source srcset="{{ asset(explode('.', $c_src)[0].'.webp') }}" type="image/webp">
                                             <source srcset="{{ asset($c_src) }}" type="image/jpeg"> 
-                                            <img src="{{ asset('/storage/item_images/'.$cart['item_code'].'/gallery/preview/'.$cart['item_image']) }}" class="img-responsive img-container" alt="{{ Str::slug($cart['alt'], '-') }}">
+                                            <img src="{{ asset('/storage/item_images/'.$cart['item_code'].'/gallery/preview/'.$cart['item_image']) }}" class="img-responsive img-container" alt="{{ Str::slug($cart['alt'], '-') }}" onerror="this.style.display='none';">
                                         </picture>
                                     </div>
                                     <!-- Mobile -->

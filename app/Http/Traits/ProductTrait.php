@@ -141,4 +141,116 @@ trait ProductTrait {
 
         return collect($query)->groupBy('f_idcode')->toArray();
     }
+
+    public function getPriceRules($cart_arr){
+		$ids = collect($cart_arr)->pluck('category_id')->merge(collect($cart_arr)->pluck('item_code'));
+		$cart_by_item_code = collect($cart_arr)->groupBy('item_code');
+		$cart_by_category = collect($cart_arr)->groupBy('category_id');
+
+		$cat_arr = DB::table('fumaco_categories')->whereIn('id', array_keys($cart_by_category->toArray()))->pluck('name', 'id');
+
+		$price_rule_per_transaction = DB::table('fumaco_price_rule as rule')
+			->join('fumaco_price_rule_condition as condition', 'rule.price_rule_id', 'condition.price_rule_id')
+			->whereDate('rule.valid_from', '<=', Carbon::now()->startOfDay())->whereDate('rule.valid_to', '>=', Carbon::now()->endOfDay())->where('rule.enabled', 1)->where('rule.apply_on', 'Transaction')
+			->select('rule.*', 'condition.range_from', 'condition.range_to', 'condition.rate', DB::raw('NULL as applied_on'));
+
+		$price_rules = DB::table('fumaco_price_rule as rule')
+			->join('fumaco_price_rule_applied_on as apply_to', 'rule.price_rule_id', 'apply_to.price_rule_id')
+			->join('fumaco_price_rule_condition as condition', 'rule.price_rule_id', 'condition.price_rule_id')
+			->whereDate('rule.valid_from', '<=', Carbon::now()->startOfDay())->whereDate('rule.valid_to', '>=', Carbon::now()->endOfDay())->where('rule.enabled', 1)->whereIn('apply_to.applied_on', $ids)
+			->select('rule.*', 'condition.range_from', 'condition.range_to', 'condition.rate', 'apply_to.applied_on')
+			->orderBy('rule.created_at', 'desc')->orderBy('condition.range_to', 'asc')
+			->union($price_rule_per_transaction)->get();
+
+		$price_rules_by_name = collect($price_rules)->groupBy('name');
+
+		$price_rule = [];
+		$applicable_price_rule = [];
+		if($price_rules){
+			foreach ($price_rules as $rule) {
+				$item_val = 0;
+				switch ($rule->apply_on) {
+					case 'Item Code':
+						if (isset($cart_by_item_code[$rule->applied_on])) {
+							$item = $cart_by_item_code[$rule->applied_on][0];
+							$item_val = $rule->conditions_based_on == 'Order Qty' ? $item['quantity'] : $item['subtotal'];
+						}
+						break;
+					case 'Category':
+						if(isset($cart_by_category[$rule->applied_on])){
+							$item_sum = $rule->conditions_based_on == 'Order Qty' ? 'quantity' : 'subtotal';
+							$item_val = collect($cart_by_category[$rule->applied_on])->sum($item_sum);
+						}
+						break;
+					default: // per transaction
+						$item_sum = $rule->conditions_based_on == 'Order Qty' ? 'quantity' : 'subtotal';
+						$item_val = collect($cart_arr)->sum($item_sum);
+						break;
+				}
+
+
+				if($item_val >= $rule->range_from){
+					$price_rule = [
+						'discount_name' => $rule->name,
+						'apply_on' => $rule->apply_on,
+						'applied_on' => $rule->applied_on,
+						'discount_type' => $rule->discount_type,
+						'discount_rate' => $rule->rate,
+						'range_from' => $rule->range_from,
+						'range_to' => $rule->range_to
+					];
+
+					$applicable_price_rule = [];
+
+					$discount_checker = collect($price_rules_by_name[$rule->name])->where('range_from', '>', $item_val)->first();
+					if($discount_checker){
+						$discount_rate = $discount_checker->discount_type == 'Percentage' ? $discount_checker->rate.'%' : '₱ '.number_format($discount_checker->rate, 2);
+						if($rule->apply_on == 'Category'){
+							$applied_on = isset($cat_arr[$discount_checker->applied_on]) ? $cat_arr[$discount_checker->applied_on] : null;
+						}else{
+							$applied_on = $discount_checker->applied_on;
+						}
+
+						$applicable_price_rule = [
+							'apply_on' => $discount_checker->apply_on,
+							'applied_id' => $discount_checker->applied_on,
+							'applied_on' => $applied_on,
+							'discount_type' => $discount_checker->discount_type,
+							'discount_rate' => $discount_rate,
+							'range_from' => $discount_checker->range_from,
+							'range_to' => $discount_checker->range_to,
+							'based_on' => $discount_checker->conditions_based_on
+						];
+					}
+
+					break;
+				}else{
+					if($item_val < $rule->range_from && !$applicable_price_rule){
+						$discount_rate = $rule->discount_type == 'Percentage' ? $rule->rate.'%' : '₱ '.number_format($rule->rate, 2);
+						if($rule->apply_on == 'Category'){
+							$applied_on = isset($cat_arr[$rule->applied_on]) ? $cat_arr[$rule->applied_on] : null;
+						}else{
+							$applied_on = $rule->applied_on;
+						}
+
+						$applicable_price_rule = [
+							'apply_on' => $rule->apply_on,
+							'applied_id' => $rule->applied_on,
+							'applied_on' => $applied_on,
+							'discount_type' => $rule->discount_type,
+							'discount_rate' => $discount_rate,
+							'range_from' => $rule->range_from,
+							'range_to' => $rule->range_to,
+							'based_on' => $rule->conditions_based_on
+						];
+					}
+				}
+			}
+		}
+
+		return [
+			'price_rule' => $price_rule,
+			'applicable_price_rule' => $applicable_price_rule
+		];
+	}
 }

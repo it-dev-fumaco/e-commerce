@@ -427,7 +427,8 @@ class CheckoutController extends Controller
 					'quantity' => $item->qty,
 					'stock_qty' => $item->f_qty,
 					'item_image' => $image,
-					'uom' => $item->f_stock_uom
+					'uom' => $item->f_stock_uom,
+					'category_id' => $item->f_cat_id
 				];
 
 				$existing_order_item = DB::table('fumaco_order_items')->where('order_number', $order_no)
@@ -462,6 +463,14 @@ class CheckoutController extends Controller
 						'item_type' => $item->f_item_type,
 					];
 				}
+			}
+
+			$price_rule = $applicable_price_rule = [];
+
+			$price_rules = $this->getPriceRules($cart_arr);
+			if($price_rules){
+				$price_rule = $price_rules['price_rule'];
+				$applicable_price_rule = $price_rules['applicable_price_rule'];
 			}
 
 			DB::table('fumaco_order_items')->insert($order_cart);
@@ -618,7 +627,7 @@ class CheckoutController extends Controller
 
 			DB::commit();
 
-			return view('frontend.checkout.check_out_summary', compact('shipping_details', 'billing_details', 'shipping_rates', 'order_no', 'cart_arr', 'shipping_add', 'billing_add', 'shipping_zones', 'payment_methods', 'free_shipping_remarks', 'shipping_service_discount', 'applicable_voucher'));
+			return view('frontend.checkout.check_out_summary', compact('shipping_details', 'billing_details', 'shipping_rates', 'order_no', 'cart_arr', 'shipping_add', 'billing_add', 'shipping_zones', 'payment_methods', 'free_shipping_remarks', 'shipping_service_discount', 'applicable_voucher', 'price_rule', 'applicable_price_rule'));
 		}catch(Exception $e){
 			DB::rollback();
 			return redirect()->back()->with('error', 'An error occured. Please try again.');
@@ -765,8 +774,39 @@ class CheckoutController extends Controller
 			$api = DB::table('api_setup')->where('type', 'payment_api')->first();
 
 			$temp = DB::table('fumaco_temp')->where('order_tracker_code', $order_no)->first();
+
+			$items = DB::table('fumaco_order_items as order')
+				->join('fumaco_items as item', 'item.f_idcode', 'order.item_code')
+				->where('order.order_number', $order_no)
+				->select('order.*', 'item.f_cat_id')
+				->get();
+
+			$items_arr = collect($items)->map(function ($q){
+				return [
+					'item_code' => $q->item_code,
+					'quantity' => $q->item_qty,
+					'category_id' => $q->f_cat_id,
+					'subtotal' => $q->item_total_price
+				];
+			});
+
+			$price_rule = $this->getPriceRules($items_arr);
+			$price_rule = $price_rule['price_rule'];
 	
-			$amount = DB::table('fumaco_order_items')->where('order_number', $order_no)->sum('item_total_price');
+			$amount = collect($items)->sum('item_total_price');
+
+			if($price_rule){
+				switch ($price_rule['discount_type']) {
+					case 'Percentage':
+						$discount_amount = $amount * ($price_rule['discount_rate'] / 100);
+						break;
+					default:
+						$discount_amount = $amount > $price_rule['discount_rate'] ? $price_rule['discount_rate'] : 0;
+						break;
+				}
+
+				$amount = $amount - $discount_amount;
+			}
 
 			$discount = 0;
 			if ($temp) {
@@ -898,10 +938,11 @@ class CheckoutController extends Controller
 
 			$now = Carbon::now();
 
-			$order_items = DB::table('fumaco_order_items')
-				->where('order_number', $temp->order_tracker_code)->get();
-
-			$subtotal = collect($order_items)->sum('item_total_price');
+			$order_items = DB::table('fumaco_order_items as order_items')
+				->join('fumaco_items as item', 'order_items.item_code', 'item.f_idcode')
+				->where('order_items.order_number', $temp->order_tracker_code)
+				->select('order_items.*', 'item.f_cat_id')
+				->get();
 
 			$loggedin = ($temp->xusernamex) ? $temp->xusernamex : $temp->xemail_shipping;
 
@@ -919,7 +960,11 @@ class CheckoutController extends Controller
 					'discount_type' => $row->item_discount_type,
 					'qty' => $row->item_qty,
 					'amount' => $row->item_total_price,
-					'image' => ($image) ? $image->imgprimayx : null
+					'image' => ($image) ? $image->imgprimayx : null,
+					// for price rules
+					'quantity' => $row->item_qty,
+					'category_id' => $row->f_cat_id,
+					'subtotal' => $row->item_total_price
 				];
 
 				// update reserved qty for items
@@ -929,6 +974,28 @@ class CheckoutController extends Controller
 						'f_reserved_qty' => $item_details->f_reserved_qty + $row->item_qty,
 					]);
 				}
+			}
+
+			$subtotal = collect($order_items)->sum('item_total_price');
+
+			$price_rules = $this->getPriceRules($items);
+			$price_rule = $price_rules ? $price_rules['price_rule'] : [];
+
+			if($price_rule){
+				switch ($price_rule['discount_type']) {
+					case 'Percentage':
+						$discount_rate = $subtotal * ($price_rule['discount_rate'] / 100);
+						break;
+					case 'Amount':
+						$discount_rate = $subtotal > $price_rule['discount_rate'] ? $price_rule['discount_rate'] : 0;
+						break;
+					default:
+						$discount_rate = 0;
+						break;
+				}
+
+				$subtotal = $subtotal - $discount_rate;
+				$price_rule = collect($price_rule)->merge(['discount_amount' => $discount_rate]);
 			}
 
 			$discount = 0;
@@ -1168,7 +1235,8 @@ class CheckoutController extends Controller
 				'store_address' => $store_address,
 				'new_token' => null,
 				'voucher_details' => $voucher_details,
-				'shipping_discount' => $shipping_discount
+				'shipping_discount' => $shipping_discount,
+				'price_rule' => $price_rule
 			];
 
 			// // send email to customer / client
@@ -1274,7 +1342,7 @@ class CheckoutController extends Controller
 			session()->forget('fumOrderNo');
 			DB::commit();
 
-			return view($view, compact('order_details', 'items', 'loggedin', 'store_address', 'bank_accounts', 'shipping_discount', 'voucher_details'));
+			return view($view, compact('order_details', 'items', 'loggedin', 'store_address', 'bank_accounts', 'shipping_discount', 'voucher_details', 'price_rule'));
 		} catch (Exception $e) {
 			DB::rollback();
 

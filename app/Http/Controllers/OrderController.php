@@ -12,10 +12,12 @@ use Auth;
 use Carbon\Carbon;
 use Illuminate\Pagination\LengthAwarePaginator;
 use App\Http\Traits\GeneralTrait;
+use App\Http\Traits\ProductTrait;
 
 class OrderController extends Controller
 {
     use GeneralTrait;
+    use ProductTrait;
     public function orderList(Request $request){
         $search_id = ($request->search) ? $request->search : '';
         $order_status = ($request->order_status) ? $request->order_status : '';
@@ -24,7 +26,11 @@ class OrderController extends Controller
 
         $orders = DB::table('fumaco_order')->where('order_number', 'LIKE', '%'.$search_id.'%')->where('order_status', 'LIKE', '%'.$order_status.'%')->whereNotIn('order_status', $exluded_status)->orderBy('id', 'desc')->paginate(10);
 
-        $order_items = DB::table('fumaco_order_items')->whereIn('order_number', collect($orders->items())->pluck('order_number'))->get();
+        $order_items = DB::table('fumaco_order_items as order')
+            ->join('fumaco_items as item', 'order.item_code', 'item.f_idcode')
+            ->whereIn('order.order_number', collect($orders->items())->pluck('order_number'))
+            ->select('order.*', 'item.f_cat_id')
+            ->get();
         $item_codes = collect($order_items)->pluck('item_code');
         $order_items = collect($order_items)->groupBy('order_number');
 
@@ -38,7 +44,6 @@ class OrderController extends Controller
 
         foreach($orders as $o){
             $items_arr = [];
-            // $items = DB::table('fumaco_order_items')->where('order_number', $o->order_number)->get();
             $items = isset($order_items[$o->order_number]) ? $order_items[$o->order_number] : [];
             foreach($items as $i){
                 $bundle_items = DB::table('fumaco_product_bundle_item')->where('parent_item_code', $i->item_code)->get();
@@ -53,9 +58,15 @@ class OrderController extends Controller
                     'item_discount' => $i->item_discount,
                     'discount_type' => $i->item_discount_type,
                     'item_total' => $i->item_total_price,
-                    'bundle' => $bundle_items
+                    'bundle' => $bundle_items,
+                    // for price rules
+					'quantity' => $i->item_qty,
+					'category_id' => $i->f_cat_id,
+					'subtotal' => $i->item_total_price
                 ];
             }
+
+            $price_rule = $this->getPriceRules($items_arr);
 
             $shipping_discount = DB::table('fumaco_on_sale as p')
                 ->join('fumaco_on_sale_shipping_service as c', 'p.id', 'c.sale_id')->where('c.shipping_service', $o->order_shipping)
@@ -127,6 +138,7 @@ class OrderController extends Controller
                 'order_status' => $order_status,
                 'deposit_slip_image' => $o->deposit_slip_image,
                 'payment_status' => $o->payment_status,
+                'price_rule' => $price_rule['price_rule']
                 // 'erp_sales_order' => $o->erp_sales_order
             ];
         }

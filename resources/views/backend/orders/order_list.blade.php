@@ -92,16 +92,23 @@
 											<td class="text-center">{{ $order['payment_method'] }}</td>
 											<td class="text-center">₱ {{ number_format(str_replace(",","",$order['grand_total']), 2) }}</td>
 											@php
-												if($order['status'] == 'Order Placed'){
-													$badge = 'warning';
-												}else if($order['status'] == 'Out for Delivery' or $order['status'] == 'Ready for Pickup'){
-													$badge = 'success';
-												}else if($order['status'] == 'Cancelled'){
-													$badge = 'secondary';
-												}else if($order['status'] == 'Order Confirmed'){
-													$badge = 'primary';
-												}else{
-													$badge = "";
+												switch ($order['status']) {
+													case 'Order Placed':
+														$badge = 'warning';
+														break;
+													case 'Out for Delivery':
+													case 'Ready for Pickup':
+														$badge = 'success';
+														break;
+													case 'Cancelled';
+														$badge = 'secondary';
+														break;
+													case 'Order Confirmed':
+														$badge = 'primary';
+														break;
+													default:
+														$badge = null;
+														break;
 												}
 											@endphp
 											<td class="text-center"><span class="badge badge-{{ $badge }}" style="font-size: 11pt; {{ ($order['status'] == 'Delivered') ? "background-color: #fd6300 !important; color: #fff;" : '' }}">{{ $order['status'] }}</span></td>
@@ -400,7 +407,7 @@
 																	<div class="col-md-8 offset-md-4 mb-4">
 																		<dl class="row">
 																			<dt class="col-sm-10 text-right">Subtotal</dt>
-																			<dd class="col-sm-2 text-right">₱ {{ number_format(str_replace(",","",$order['subtotal']), 2) }}</dd>
+																			<dd class="col-sm-2 text-right">₱ {{ number_format(str_replace(",","", collect($order['ordered_items'])->sum('item_total')), 2) }}</dd>
 																			@if ($order['shipping_discount'])
 																				@php
 																					$shipping_discount = $order['shipping_discount'];
@@ -440,8 +447,23 @@
 																						}
 																					}
 																				@endphp
-																				<dt class="col-sm-10 text-right">Discount <span class="text-white" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833;">{{ $order['voucher_code'] }}</span></dt>
+																				<dt class="col-sm-10 text-right"><span class="text-white" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833;">{{ $order['voucher_code'] }}</span></dt>
 																				<dd class="col-sm-2 text-right">- ₱ {{ number_format(str_replace(",","",$voucher_discount_amount), 2) }}</dd>
+																			@endif
+																			@if ($order['price_rule'])
+																				@php
+																					$price_rule = $order['price_rule'];
+																					switch ($price_rule['discount_type']) {
+																						case 'Percentage':
+																							$discount_amount = collect($order['ordered_items'])->sum('item_total') * ($price_rule['discount_rate'] / 100);
+																							break;
+																						default:
+																							$discount_amount = collect($order['ordered_items'])->sum('item_total') > $price_rule['discount_rate'] ? $price_rule['discount_rate'] : 0;
+																							break;
+																					}
+																				@endphp
+																				<dt class="col-sm-10 text-right"><span class="text-white" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833;">{{ $price_rule['discount_name'] }}</span></dt>
+																				<dd class="col-sm-2 text-right">- ₱ {{ number_format(str_replace(",","", $discount_amount), 2) }}</dd>
 																			@endif
 																			<dt class="col-sm-10 text-right">
 																				@if ($order['shipping_name'])
