@@ -18,6 +18,7 @@
 @section('content')
 	@php
 		$page_title = $product_category->name;
+		$banner_image = $product_category->banner_img ? $product_category->banner_img : null;
 	@endphp
 	@include('frontend.header')
 

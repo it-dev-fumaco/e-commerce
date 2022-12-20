@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\Validator;
 use DB;
 use Auth;
 use Carbon\Carbon;
+use Str;
+use Webp;
+use Storage;
 
 class CategoryController extends Controller
 {
@@ -43,6 +46,43 @@ class CategoryController extends Controller
                 'last_modified_by' => Auth::user()->username,
             ];
 
+            $allowed_extensions = array('jpg', 'png', 'jpeg', 'gif');
+            $extension_error = "Sorry, only JPG, JPEG, PNG and GIF files are allowed.";
+
+            if($request->hasFile('banner_img')){
+                $banner_img = $request->file('banner_img');
+
+                $img_name = pathinfo($banner_img->getClientOriginalName(), PATHINFO_FILENAME);
+			    $img_ext = pathinfo($banner_img->getClientOriginalName(), PATHINFO_EXTENSION);
+
+                $img_name = Str::slug($img_name, '-');
+
+                $banner_image_name = $img_name.".".$img_ext;
+
+                $banner_checker = DB::table('fumaco_categories')->where('banner_img', $banner_image_name)->exists();
+                if($banner_checker){
+                    return redirect()->back()->with('error', 'Banner image already exists.');
+                }
+
+                if(!in_array($img_ext, $allowed_extensions)){
+                    return redirect()->back()->with('image_error', $extension_error);
+                }
+
+                $webp = Webp::make($banner_img);
+
+                if(!Storage::disk('public')->exists('/banner_images/')){
+                    Storage::disk('public')->makeDirectory('/banner_images/');
+                }
+
+                $destinationPath = storage_path('/app/public/banner_images/');
+
+                if ($webp->save(storage_path('/app/public/banner_images/'.$img_name.'.webp'))) {
+                    $banner_img->move($destinationPath, $banner_image_name);
+                }
+
+                $cat_edit['banner_img'] = $banner_image_name;
+            }
+
             DB::table('fumaco_categories')->where('id', $id)->update($cat_edit);
 
             DB::commit();
@@ -76,11 +116,49 @@ class CategoryController extends Controller
                 'created_by' => Auth::user()->username,
                 'last_modified_by' => Auth::user()->username,
             ];
+
             if($request->add_cat_slug){
                 $cat_slugs = DB::table('fumaco_categories')->where('slug', $request->add_cat_slug)->exists();
                 if($cat_slugs){
                     return redirect()->back()->with('error', 'Slug must be unique');
                 }
+            }
+
+            $allowed_extensions = array('jpg', 'png', 'jpeg', 'gif');
+            $extension_error = "Sorry, only JPG, JPEG, PNG and GIF files are allowed.";
+
+            if($request->hasFile('banner_img')){
+                $banner_img = $request->file('banner_img');
+
+                $img_name = pathinfo($banner_img->getClientOriginalName(), PATHINFO_FILENAME);
+			    $img_ext = pathinfo($banner_img->getClientOriginalName(), PATHINFO_EXTENSION);
+
+                $img_name = Str::slug($img_name, '-');
+
+                $banner_image_name = $img_name.".".$img_ext;
+
+                $banner_checker = DB::table('fumaco_categories')->where('banner_img', $banner_image_name)->exists();
+                if($banner_checker){
+                    return redirect()->back()->with('error', 'Banner image already exists.');
+                }
+
+                if(!in_array($img_ext, $allowed_extensions)){
+                    return redirect()->back()->with('image_error', $extension_error);
+                }
+
+                $webp = Webp::make($banner_img);
+
+                if(!Storage::disk('public')->exists('/banner_images/')){
+                    Storage::disk('public')->makeDirectory('/banner_images/');
+                }
+
+                $destinationPath = storage_path('/app/public/banner_images/');
+
+                if ($webp->save(storage_path('/app/public/banner_images/'.$img_name.'.webp'))) {
+                    $banner_img->move($destinationPath, $banner_image_name);
+                }
+
+                $add['banner_img'] = $banner_image_name;
             }
 
             DB::table('fumaco_categories')->insert($add);
