@@ -1429,7 +1429,7 @@ class FrontendController extends Controller
             return redirect(request()->fullUrlWithQuery($variables));
         }
 
-        $product_category = DB::table('fumaco_categories')->where('slug', $category_id)->orWhere('id', $category_id)->select('id', 'meta_description', 'meta_keywords', 'slug', 'name')->first();
+        $product_category = DB::table('fumaco_categories')->where('slug', $category_id)->orWhere('id', $category_id)->select('id', 'meta_description', 'meta_keywords', 'slug', 'name', 'banner_img')->first();
 
         if(!$product_category) {
             return view('error');
@@ -2786,6 +2786,10 @@ class FrontendController extends Controller
             ->whereDate('os.start_date', '<=', Carbon::now()->startOfDay())->whereDate('os.end_date', '>=', Carbon::now()->endOfDay())
             ->orderBy('ic.slug', 'asc')->pluck('ic.name', 'ic.id');
 
+        $banner_image = DB::table('fumaco_on_sale')->where('is_clearance_sale', 1)->where('status', 1)->pluck("banner_image")->first();
+
+            // return $banner_image;
+
         if (count($category_filter) <= 0) {
             return redirect('/');
         }
@@ -2887,6 +2891,6 @@ class FrontendController extends Controller
             return view('frontend.product_list_card', compact('products', 'products_arr'));
         }
 
-        return view('frontend.clearance_sale', compact('products_arr', 'products', 'image_for_sharing', 'category_filter'));
+        return view('frontend.clearance_sale', compact('products_arr', 'products', 'image_for_sharing', 'category_filter', 'banner_image'));
     }
 }
