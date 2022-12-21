@@ -94,8 +94,8 @@
                                         </div>
                                         <div class="row mt-3">
                                             <div class="col-6">
-                                                <label for="order_no">Order Number</label>
-                                                <input type="text" class="form-control" name="order_no" placeholder="Order Number"/>
+                                                <label for="order_no">Priority Number</label>
+                                                <input type="text" class="form-control" name="order_no" placeholder="Priority Number"/>
                                             </div>
                                         </div>
                                         <br/><br/>
