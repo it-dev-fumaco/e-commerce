@@ -258,6 +258,8 @@ trait ProductTrait {
 					];
 
 					$applicable_price_rule = [];
+                    
+					break;
                 }
 			}
 		}
