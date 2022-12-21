@@ -18,7 +18,7 @@
 @endif
 <style>
     #page-header{
-        background-image: url("{{ asset('assets/site-img/'.$banner_image) }}");
+        background-image: url("{{ asset('assets/site-img/'.$bg) }}");
         background-color: #cccccc;
         background-position: center;
         background-repeat: no-repeat;
