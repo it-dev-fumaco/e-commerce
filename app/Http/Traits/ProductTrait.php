@@ -189,7 +189,7 @@ trait ProductTrait {
 				}
 
 
-				if($item_val >= $rule->range_from){
+				if($item_val >= $rule->range_from && $item_val <= $rule->range_to){
 					$price_rule = [
 						'discount_name' => $rule->name,
 						'apply_on' => $rule->apply_on,
@@ -245,6 +245,20 @@ trait ProductTrait {
 						];
 					}
 				}
+
+                if($item_val > $rule->range_to){ // if subtotal exceeds all listed ranges
+                    $price_rule = [
+						'discount_name' => $rule->name,
+						'apply_on' => $rule->apply_on,
+						'applied_on' => $rule->applied_on,
+						'discount_type' => $rule->discount_type,
+						'discount_rate' => $rule->rate,
+						'range_from' => $rule->range_from,
+						'range_to' => $rule->range_to
+					];
+
+					$applicable_price_rule = [];
+                }
 			}
 		}
 
