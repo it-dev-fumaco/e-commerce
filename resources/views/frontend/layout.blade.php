@@ -469,7 +469,7 @@
       </span>
     </div>
   </footer>
-  <div class="alert alert-success alert-dismissible mx-auto col-11 col-md-5 text-center fade" id="notify-me-alert" role="alert" style="z-index: 1500; position: absolute; top: 20px; left: 50%; display: inline-block; -webkit-transform: translateX(-50%); transform: translateX(-50%);">
+  <div class="alert alert-success alert-dismissible mx-auto col-11 col-md-5 text-center fade" id="notify-me-alert" role="alert" style="position: absolute; top: 20px; left: 50%; display: inline-block; -webkit-transform: translateX(-50%); transform: translateX(-50%);">
     We will notify you via email once stock is available
   </div>
   <script src="https://kit.fontawesome.com/ec0415ab92.js"></script> 
@@ -817,8 +817,10 @@
               success: function (response) {
                 btn.html(btn_fill);
                 $('#notify-me-alert').addClass('show');
+                $('#notify-me-alert').css('z-index', 1500);
                 setTimeout(function(){
                     $('#notify-me-alert').removeClass('show');
+                    $('#notify-me-alert').css('z-index', 0);
                   }, 2000);
               }
             });
