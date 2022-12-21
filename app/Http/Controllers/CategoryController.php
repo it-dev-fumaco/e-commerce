@@ -70,13 +70,8 @@ class CategoryController extends Controller
 
                 $webp = Webp::make($banner_img);
 
-                if(!Storage::disk('public')->exists('/banner_images/')){
-                    Storage::disk('public')->makeDirectory('/banner_images/');
-                }
-
-                $destinationPath = storage_path('/app/public/banner_images/');
-
-                if ($webp->save(storage_path('/app/public/banner_images/'.$img_name.'.webp'))) {
+                $destinationPath = public_path('/assets/site-img/');
+                if($webp->save(public_path('/assets/site-img/'.$img_name.'.webp'))) {
                     $banner_img->move($destinationPath, $banner_image_name);
                 }
 
@@ -148,13 +143,8 @@ class CategoryController extends Controller
 
                 $webp = Webp::make($banner_img);
 
-                if(!Storage::disk('public')->exists('/banner_images/')){
-                    Storage::disk('public')->makeDirectory('/banner_images/');
-                }
-
-                $destinationPath = storage_path('/app/public/banner_images/');
-
-                if ($webp->save(storage_path('/app/public/banner_images/'.$img_name.'.webp'))) {
+                $destinationPath = public_path('/assets/site-img/');
+                if($webp->save(public_path('/assets/site-img/'.$img_name.'.webp'))) {
                     $banner_img->move($destinationPath, $banner_image_name);
                 }
 

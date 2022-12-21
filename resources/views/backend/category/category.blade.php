@@ -62,7 +62,7 @@
 												<div class="row">
 													@if ($c->banner_img)
 														<div class="col-3 text-center">
-															<img src="{{ asset('storage/banner_images/'.$c->banner_img) }}" width="80">
+															<img src="{{ asset('assets/site-img/'.$c->banner_img) }}" width="80">
 														</div>	
 													@endif
 													<div class="col-{{ $c->banner_img ? 9 : 12 }}">
@@ -104,7 +104,7 @@
 																						<div class="col-8 offset-2 mb-2">
 																							@if ($c->banner_img)
 																								<a href="#" data-toggle="modal" data-target="#preview-banner-{{ $c->id }}">
-																									<img src="{{ asset('storage/banner_images/'.$c->banner_img) }}" width="100%">
+																									<img src="{{ asset('assets/site-img/'.$c->banner_img) }}" width="100%">
 																								</a>
 
 																								<!-- Modal -->
@@ -118,7 +118,7 @@
 																												</button>
 																											</div>
 																											<div class="modal-body">
-																												<img src="{{ asset('storage/banner_images/'.$c->banner_img) }}" width="100%">
+																												<img src="{{ asset('assets/site-img/'.$c->banner_img) }}" width="100%">
 																											</div>
 																										</div>
 																									</div>

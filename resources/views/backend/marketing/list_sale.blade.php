@@ -146,7 +146,7 @@
                                                                 <div class="modal-body">
                                                                     <center>
                                                                         @if ($sale['banner'])
-                                                                            <div class="col-4 mx-auto">
+                                                                            <div class="col-8 mx-auto">
                                                                                 <img class="img-thumbnail" src="{{ asset('/assets/site-img/'.$sale['banner']) }}" alt="" style="width: 100%">
                                                                             </div>
                                                                             <br/>
