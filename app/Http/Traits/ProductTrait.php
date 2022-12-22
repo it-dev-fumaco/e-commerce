@@ -188,6 +188,7 @@ trait ProductTrait {
 						break;
 				}
 
+                $discount_checker = collect($price_rules_by_name[$rule->name])->where('range_from', '>', $item_val)->first();
 
 				if($item_val >= $rule->range_from && $item_val <= $rule->range_to){
 					$price_rule = [
@@ -202,7 +203,7 @@ trait ProductTrait {
 
 					$applicable_price_rule = [];
 
-					$discount_checker = collect($price_rules_by_name[$rule->name])->where('range_from', '>', $item_val)->first();
+					// $discount_checker = collect($price_rules_by_name[$rule->name])->where('range_from', '>', $item_val)->first();
 					if($discount_checker){
 						$discount_rate = $discount_checker->discount_type == 'Percentage' ? $discount_checker->rate.'%' : '₱ '.number_format($discount_checker->rate, 2);
 						if($rule->apply_on == 'Category'){
@@ -225,7 +226,7 @@ trait ProductTrait {
 
 					break;
 				}else{
-					if($item_val < $rule->range_from && !$applicable_price_rule){
+					if($item_val < $rule->range_from && !$applicable_price_rule && !$price_rule){
 						$discount_rate = $rule->discount_type == 'Percentage' ? $rule->rate.'%' : '₱ '.number_format($rule->rate, 2);
 						if($rule->apply_on == 'Category'){
 							$applied_on = isset($cat_arr[$rule->applied_on]) ? $cat_arr[$rule->applied_on] : null;
@@ -246,7 +247,7 @@ trait ProductTrait {
 					}
 				}
 
-                if($item_val > $rule->range_to){ // if subtotal exceeds all listed ranges
+                if($item_val > $rule->range_to && !$discount_checker){ // if subtotal exceeds all listed ranges
                     $price_rule = [
 						'discount_name' => $rule->name,
 						'apply_on' => $rule->apply_on,
