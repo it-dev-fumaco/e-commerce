@@ -95,12 +95,8 @@
                                             </div>
                                         </div>
                                         <div class="row p-0">
-                                            <div class="col-6" style="display: flex; justify-content: center; align-items: center;">
-                                                @if ($cart['insufficient_stock'] || $cart['quantity'] > $cart['stock_qty'])
-                                                    <small class="text-danger d-block m-2 stock-status">Insufficient Stock</small>
-                                                @else
-                                                    <small class="text-success d-block m-2 stock-status" style="white-space: nowrap;">Available:  {{ $cart['stock_qty'] }}</small>
-                                                @endif
+                                            <div class="col-6 p-0" style="display: flex; justify-content: center; align-items: center;">
+                                                <small class="text-danger m-2 stock-status {{ ($cart['insufficient_stock'] || $cart['quantity'] > $cart['stock_qty']) ? null : 'd-none' }}">Only {{  $cart['stock_qty'].' '.$cart['stock_uom'] }} left!</small>
                                             </div>
                                         </div>
                                     </div>
@@ -125,11 +121,7 @@
                                         <a href="#" class="quantity-right-plus btn btn-number" style="background-color: #ccc !important; height: 100% !important; border-radius: 0px !important;"> + </a>
                                     </span>
                                 </div>
-                                @if ($cart['insufficient_stock'] || $cart['quantity'] > $cart['stock_qty'])
-                                <small class="text-danger d-block m-2 stock-status">Insufficient Stock</small>
-                                @else
-                                <small class="text-success d-block m-2 stock-status">Available :  {{  $cart['quantity'].$cart['stock_qty'] }}</small>
-                                @endif
+                                <small class="text-danger m-2 stock-status {{ ($cart['insufficient_stock'] || $cart['quantity'] > $cart['stock_qty']) ? null : 'd-none' }}">Only {{  $cart['stock_qty'].' '.$cart['stock_uom'] }} left!</small>
                             </td>
                             <td class="tbls d-none d-sm-table-cell"><p style="white-space: nowrap !important;">₱ <span class="formatted-amount">{{ number_format($cart['amount'], 2, '.', ',') }}</span></p><span class="amount d-none">{{ $cart['amount'] }}</span>
                             </td>
@@ -235,7 +227,7 @@
       <div class="modal-content">
         <div class="modal-header">
             <h5 class="modal-title" id="exampleModalLabel"><i class="fas fa-exclamation-circle"></i> Notice</h5>
-            <button type="button" class="close clear-btn" data-dismiss="modal" aria-label="Close">
+            <button type="button" class="close close-modal clear-btn" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
             </button>
         </div>
@@ -579,9 +571,9 @@
             }
 
             if (parseInt(current_qty) > parseInt(max)) {
-                row.find('.stock-status').eq(0).removeClass('text-success').addClass('text-danger').text('Insufficient Stock');
-            } else {
-                row.find('.stock-status').eq(0).removeClass('text-danger').addClass('text-success').text('Available : ' + max);
+                row.find('.stock-status').eq(0).removeClass('d-none');
+            }else{
+                row.find('.stock-status').eq(0).addClass('d-none');
             }
         });
 
@@ -672,29 +664,44 @@
                 $('#checkout-btn').prop('disabled', false);
                 updateAmount(row);
                 updateCart('manual', id, current_qty);
+                row.find('.stock-status').eq(1).addClass('d-none');
+                if(parseInt($(this).val()) <= 0){
+                    $('#removeItemModal').modal('show');
+                    $('#item-to-be-removed').text($(this).data('item-description'));
+
+                    $('#remove-item-btn').data('id', $(this).data('id'));
+                    $('#remove-item-btn').data('row', '#row-' + $(this).data('id'));
+                }
             }else if(parseInt($(this).val()) > parseInt(max)){
                 $('#checkout-btn').prop('disabled', true);
-                $('#stockLimitModal').modal('show');
+                row.find('.stock-status').eq(1).removeClass('d-none');
             }
         });
 
         $('.mobile-quantity').change(function(){
-            console.log($(this).val());
             var row = $(this).closest('tr');
             var input_name = row.find('.mobile-quantity').eq(0);
             var id = input_name.data('id');
             var max = input_name.attr('max');
 
             var current_qty = $(this).val();
-            var type = 'mobile'
+            var type = 'mobile';
 
             if(parseInt($(this).val()) <= parseInt(max)){
                 $('#checkout-btn').prop('disabled', false);
                 updateAmount(row, type);
                 updateCart('manual', id, current_qty);
+                row.find('.stock-status').eq(0).addClass('d-none');
+                if(parseInt($(this).val()) <= 0){
+                    $('#removeItemModal').modal('show');
+                    $('#item-to-be-removed').text($(this).data('item-description'));
+
+                    $('#remove-item-btn').data('id', $(this).data('id'));
+                    $('#remove-item-btn').data('row', '#row-' + $(this).data('id'));
+                }
             }else if(parseInt($(this).val()) > parseInt(max)){
                 $('#checkout-btn').prop('disabled', true);
-                $('#stockLimitModal').modal('show');
+                row.find('.stock-status').eq(0).removeClass('d-none');
             }
         });
 
