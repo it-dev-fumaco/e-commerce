@@ -91,7 +91,8 @@
                                                 <div class="row mt-4" id="percentage" style="display: none;">
                                                     <div class="col-6">
                                                         <label>Percentage <span class="text-danger">*</span></label>
-                                                        <input type="text" class="form-control" id="discount_percentage" name="discount_percentage" placeholder="Percentage">
+                                                        <input type="text" class="form-control discount-rate" id="discount_percentage" name="discount_percentage" placeholder="Percentage">
+                                                        <span class="text-danger d-none" style="font-size: 9pt;">Percentage discount cannot be more than or equal to 100%</span>
                                                     </div>
                                                     <div class="col-6">
                                                         <label>Capped Amount</label>
@@ -412,7 +413,25 @@
             }else{
                 $(this).closest('td').next('td').next('td').find('input').prop('readonly', false);
             }
+
+            percentage_discount_checker($(this).closest('td').next('td').find('input'));
 		});
+
+        $(document).on('keyup', '.discount-rate', function (){
+            percentage_discount_checker($(this));
+        });
+
+        function percentage_discount_checker(el){
+            el.removeClass('border').removeClass('border-danger');
+            el.closest('td').find('span').addClass('d-none');
+
+            if(el.closest('td').prev().find('select').val() == 'By Percentage'){
+                if(el.val() >= 100){
+                    el.addClass('border').addClass('border-danger');
+                    el.closest('td').find('span').removeClass('d-none');
+                }
+            }
+        }
         
         function clone_table(table, select){
             var clone_select = $(select).html();
@@ -426,7 +445,8 @@
 					'<select name="selected_discount_type[]" class="form-control w-100 category_discount_type" style="width: 100%;" required>' + clone_discount_type + '</select>' +
 				'</td>' +
                 '<td class="p-2">' +
-					'<input type="number" name="selected_discount_rate[]" class="form-control" placeholder="Amount/Rate" required>' +
+					'<input type="number" name="selected_discount_rate[]" class="form-control discount-rate" placeholder="Amount/Rate" required>' +
+                    '<span class="text-danger d-none" style="font-size: 9pt;">Percentage discount cannot be more than or equal to 100%</span>' +
 				'</td>' +
                 '<td class="p-2">' +
 					'<input type="number" name="selected_capped_amount[]" class="form-control cap_amount" value="0" placeholder="Capped Amount">' +

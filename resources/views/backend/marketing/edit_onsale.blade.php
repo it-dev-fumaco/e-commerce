@@ -100,7 +100,7 @@
                                                         @php
                                                             $discount_type = array('Fixed Amount', 'By Percentage');
                                                         @endphp
-                                                        <select class="form-control" name="discount_type" id="discount_type">
+                                                        <select class="form-control category_discount_type all-item-discount-type" name="discount_type" id="discount_type">
                                                             <option disabled selected value="">Discount Type</option>
                                                             @foreach ($discount_type as $discount)
                                                             <option value="{{ $discount }}">{{ $discount }}</option>
@@ -117,7 +117,8 @@
                                                 <div class="row mt-4" id="percentage" style="display: none;">
                                                     <div class="col-6">
                                                         <label>Percentage <span class="text-danger">*</span></label>
-                                                        <input type="text" class="form-control" id="discount_percentage" name="discount_percentage" value="{{ $on_sale->discount_type == 'By Percentage' ? $on_sale->discount_rate : '' }}" placeholder="Percentage">
+                                                        <input type="text" class="form-control discount-rate" id="discount_percentage" name="discount_percentage" value="{{ $on_sale->discount_type == 'By Percentage' ? $on_sale->discount_rate : '' }}" data-all-item='1' placeholder="Percentage">
+                                                        <span class='text-danger all-item-discount-error d-none' style="font-size: 9pt;">Percentage discount cannot be more than or equal to 100%</span>
                                                     </div>
                                                     <div class="col-6">
                                                         <label>Capped Amount</label>
@@ -190,7 +191,8 @@
                                                                     </select>
                                                                 </td>
                                                                 <td class="p-2">
-                                                                    <input type="text" name="selected_discount_rate[category][]" class="form-control" value="{{ $sale_cat->discount_rate }}" placeholder="Amount/Rate" required>
+                                                                    <input type="text" name="selected_discount_rate[category][]" class="form-control discount-rate" value="{{ $sale_cat->discount_rate }}" placeholder="Amount/Rate" required>
+                                                                    <span class='text-danger d-none' style="font-size: 9pt;">Percentage discount cannot be more than or equal to 100%</span>
                                                                 </td>
                                                                 <td class="p-2">
                                                                     <input type="text" name="selected_capped_amount[category][]" class="form-control cap_amount" value="{{ $sale_cat->capped_amount }}" placeholder="Capped Amount">
@@ -257,7 +259,8 @@
                                                                     </select>
                                                                 </td>
                                                                 <td class="p-2">
-                                                                    <input type="text" name="selected_discount_rate[item_code][]" class="form-control" value="{{ $sale_selected_item->discount_rate }}" placeholder="Amount/Rate" required>
+                                                                    <input type="text" name="selected_discount_rate[item_code][]" class="form-control discount-rate" value="{{ $sale_selected_item->discount_rate }}" placeholder="Amount/Rate" required>
+                                                                    <span class='text-danger d-none' style="font-size: 9pt;">Percentage discount cannot be more than or equal to 100%</span>
                                                                 </td>
                                                                 <td class="p-2">
                                                                     <input type="text" name="selected_capped_amount[item_code][]" class="form-control cap_amount" value="{{ $sale_selected_item->capped_amount }}" placeholder="Capped Amount">
@@ -315,7 +318,8 @@
                                                                     </select>
                                                                 </td>
                                                                 <td class="p-2">
-                                                                    <input type="text" name="selected_discount_rate[customer_group][]" class="form-control" value="{{ $cg->discount_rate }}" placeholder="Amount/Rate" required>
+                                                                    <input type="text" name="selected_discount_rate[customer_group][]" class="form-control discount-rate" value="{{ $cg->discount_rate }}" placeholder="Amount/Rate" required>
+                                                                    <span class='text-danger d-none' style="font-size: 9pt;">Percentage discount cannot be more than or equal to 100%</span>
                                                                 </td>
                                                                 <td class="p-2">
                                                                     <input type="text" name="selected_capped_amount[customer_group][]" class="form-control cap_amount" value="{{ $cg->capped_amount }}" placeholder="Capped Amount">
@@ -374,7 +378,8 @@
                                                                     </select>
                                                                 </td>
                                                                 <td class="p-2">
-                                                                    <input type="text" name="selected_discount_rate[shipping_service][]" class="form-control" value="{{ $cg->discount_rate }}" placeholder="Amount/Rate" required>
+                                                                    <input type="text" name="selected_discount_rate[shipping_service][]" class="form-control discount-rate" value="{{ $cg->discount_rate }}" placeholder="Amount/Rate" required>
+                                                                    <span class='text-danger d-none' style="font-size: 9pt;">Percentage discount cannot be more than or equal to 100%</span>
                                                                 </td>
                                                                 <td class="p-2">
                                                                     <input type="text" name="selected_capped_amount[shipping_service][]" class="form-control cap_amount" value="{{ $cg->capped_amount }}" placeholder="Capped Amount">
@@ -486,12 +491,41 @@
 
         $(document).on('change', '.category_discount_type', function(e){
 			e.preventDefault();
+            $('#all-item-discount-error').addClass('d-none');
             if($(this).val() == 'Fixed Amount'){
                 $(this).closest('td').next('td').next('td').find('input').prop('readonly', true);
             }else{
                 $(this).closest('td').next('td').next('td').find('input').prop('readonly', false);
             }
+
+            percentage_discount_checker($(this).closest('td').next('td').find('input'));
 		});
+
+        $(document).on('keyup', '.discount-rate', function (){
+            if (typeof $(this).data('all-item') !== 'undefined') {
+                if($(this).val() >= 100){
+                    $(this).addClass('border').addClass('border-danger');
+                    $('.all-item-discount-error').removeClass('d-none');
+                }else{
+                    $(this).removeClass('border').removeClass('border-danger');
+                    $('.all-item-discount-error').addClass('d-none');
+                }
+            }else{
+                percentage_discount_checker($(this));
+            }
+        });
+
+        function percentage_discount_checker(el){
+            el.removeClass('border').removeClass('border-danger');
+            el.closest('td').find('span').addClass('d-none');
+
+            if(el.closest('td').prev().find('select').val() == 'By Percentage'){
+                if(el.val() >= 100){
+                    el.addClass('border').addClass('border-danger');
+                    el.closest('td').find('span').removeClass('d-none');
+                }
+            }
+        }
 
         function discountType(){
             if($('#discount_type').val() == 'Fixed Amount'){
@@ -586,7 +620,8 @@
 					'<select name="selected_discount_type[' + reference + '][]" class="form-control w-100 category_discount_type" style="width: 100%;" required>' + clone_discount_type + '</select>' +
 				'</td>' +
                 '<td class="p-2">' +
-					'<input type="number" name="selected_discount_rate[' + reference + '][]" class="form-control" placeholder="Amount/Rate" required>' +
+					'<input type="number" name="selected_discount_rate[' + reference + '][]" class="form-control discount-rate" placeholder="Amount/Rate" required>' +
+                    '<span class="text-danger d-none" style="font-size: 9pt;">Percentage discount cannot be more than or equal to 100%</span>' +
 				'</td>' +
                 '<td class="p-2">' +
 					'<input type="number" name="selected_capped_amount[' + reference + '][]" class="form-control cap_amount" value="0" placeholder="Capped Amount">' +

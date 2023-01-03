@@ -1940,6 +1940,10 @@ class ProductController extends Controller
                 }else if($discount_type == 'By Percentage'){
                     $discount_rate = $request->discount_percentage;
                     $capped_amount = $request->capped_amount;
+
+                    if($discount_rate >= 100){
+                        return redirect()->back()->with('error', 'Percentage discount cannot be more than or equal to 100%');
+                    }
                 }
             }
 
@@ -2041,6 +2045,10 @@ class ProductController extends Controller
                     if($selected_discount_type[$key] == 'By Percentage'){
                         $discount_rate = $selected_discount_rate[$key];
                         $capped_amount = $selected_capped_amount[$key];
+
+                        if($discount_rate >= 100){
+                            return redirect()->back()->with('error', 'Percentage discount(s) cannot be more than or equal to 100%');
+                        }
                     }else if($selected_discount_type[$key] == 'Fixed Amount'){
                         $discount_rate = $selected_discount_rate[$key];
                     }
@@ -2057,7 +2065,7 @@ class ProductController extends Controller
                 }
             }
 
-            DB::commit();
+            // DB::commit();
 
             return redirect('/admin/marketing/on_sale/list')->with('success', 'On Sale Added.');
         } catch (Exception $e) {
