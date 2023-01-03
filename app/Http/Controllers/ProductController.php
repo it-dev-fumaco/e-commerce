@@ -2065,7 +2065,7 @@ class ProductController extends Controller
                 }
             }
 
-            // DB::commit();
+            DB::commit();
 
             return redirect('/admin/marketing/on_sale/list')->with('success', 'On Sale Added.');
         } catch (Exception $e) {
