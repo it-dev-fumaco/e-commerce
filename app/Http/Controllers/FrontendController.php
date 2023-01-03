@@ -487,7 +487,7 @@ class FrontendController extends Controller
             ->orderBy('fumaco_active', 'desc')->get();
 
         $onsale_carousel_data = DB::table('fumaco_on_sale')
-            ->where('status', 1)->where('banner_image', '!=', null)
+            ->where('status', 1)->where('banner_image', '!=', null)->where('is_clearance_sale', 0)
             ->whereDate('start_date', '<=', Carbon::now()->startOfDay())->whereDate('end_date', '>=', Carbon::now()->endOfDay())
             ->pluck('banner_image');
 
@@ -2786,9 +2786,7 @@ class FrontendController extends Controller
             ->whereDate('os.start_date', '<=', Carbon::now()->startOfDay())->whereDate('os.end_date', '>=', Carbon::now()->endOfDay())
             ->orderBy('ic.slug', 'asc')->pluck('ic.name', 'ic.id');
 
-        $banner_image = DB::table('fumaco_on_sale')->where('is_clearance_sale', 1)->where('status', 1)->pluck("banner_image")->first();
-
-            // return $banner_image;
+        $banner_image = DB::table('fumaco_on_sale')->where('is_clearance_sale', 1)->whereDate('start_date', '<=', Carbon::now()->startOfDay())->whereDate('end_date', '>=', Carbon::now()->endOfDay())->where('status', 1)->pluck("banner_image")->first();
 
         if (count($category_filter) <= 0) {
             return redirect('/');
