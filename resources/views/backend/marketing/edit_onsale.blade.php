@@ -240,10 +240,26 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            @foreach($discounted_selected_items as $sale_selected_item) 
+                                                            @foreach($discounted_selected_items as $sale_selected_item)
+                                                            @php
+                                                                $item_price = collect($items)->groupBy('f_idcode');
+                                                                $item_price = isset($item_price[$sale_selected_item->item_code]) ? $item_price[$sale_selected_item->item_code][0]->f_default_price : 0;
+                                                                switch ($sale_selected_item->discount_type) {
+                                                                    case 'By Percentage':
+                                                                        $err = 'Percentage discount cannot be more than or equal to 100%.';
+                                                                        $cap = 100;
+                                                                        $capped_amount_enabled = 0;
+                                                                        break;
+                                                                    default:
+                                                                        $err = 'Discount amount cannot be more than the item price.';
+                                                                        $cap = $item_price;
+                                                                        $capped_amount_enabled = 1;
+                                                                        break;
+                                                                }
+                                                            @endphp
                                                             <tr>
                                                                 <td class="p-2">
-                                                                    <select class="form-control {{ $on_sale->is_clearance_sale == 1 ? 'custom-select-2' : '' }}" name="selected_reference[item_code][]">
+                                                                    <select class="form-control {{ $on_sale->is_clearance_sale == 1 ? 'custom-select-2' : '' }} item-selection" name="selected_reference[item_code][]">
                                                                         <option disabled value="">Select Item</option>
                                                                         @foreach ($items as $item)
                                                                         <option value="{{ $item->f_idcode }}" {{ $sale_selected_item->item_code == $item->f_idcode ? 'selected' : '' }}>{{ $item->f_idcode }}</option>
@@ -259,11 +275,11 @@
                                                                     </select>
                                                                 </td>
                                                                 <td class="p-2">
-                                                                    <input type="text" name="selected_discount_rate[item_code][]" class="form-control discount-rate" value="{{ $sale_selected_item->discount_rate }}" placeholder="Amount/Rate" required>
-                                                                    <span class='text-danger d-none' style="font-size: 9pt;">Percentage discount cannot be more than or equal to 100%</span>
+                                                                    <input type="text" name="selected_discount_rate[item_code][]" class="form-control discount-rate {{ $sale_selected_item->discount_rate >= $cap ? 'border border-danger' : null }}" value="{{ $sale_selected_item->discount_rate }}" placeholder="Amount/Rate" data-price="{{ $item_price }}" required>
+                                                                    <span class='text-danger {{ $sale_selected_item->discount_rate >= $cap ? null : 'd-none' }}' style="font-size: 9pt;">{{ $err }}</span>
                                                                 </td>
                                                                 <td class="p-2">
-                                                                    <input type="text" name="selected_capped_amount[item_code][]" class="form-control cap_amount" value="{{ $sale_selected_item->capped_amount }}" placeholder="Capped Amount">
+                                                                    <input type="text" name="selected_capped_amount[item_code][]" class="form-control cap_amount" value="{{ $sale_selected_item->capped_amount }}" placeholder="Capped Amount" {{ $capped_amount_enabled ? 'disabled' : null }}>
                                                                 </td>
                                                                 <td class="text-center">
                                                                     <button type="button" class="btn btn-outline-danger btn-sm remove-td-row">Remove</button>
@@ -498,7 +514,7 @@
                 $(this).closest('td').next('td').next('td').find('input').prop('readonly', false);
             }
 
-            percentage_discount_checker($(this).closest('td').next('td').find('input'));
+            discount_rate_checker($(this).closest('td').next('td').find('input'));
 		});
 
         $(document).on('keyup', '.discount-rate', function (){
@@ -511,19 +527,35 @@
                     $('.all-item-discount-error').addClass('d-none');
                 }
             }else{
-                percentage_discount_checker($(this));
+                discount_rate_checker($(this));
             }
         });
 
-        function percentage_discount_checker(el){
+        $(document).on('select2:select', '.custom-select-2', function(e){
+            e.preventDefault();
+            $(this).closest('td').next('td').next('td').find('input').data('price', e.params.data.default_price);
+        });
+
+        function discount_rate_checker(el){
             el.removeClass('border').removeClass('border-danger');
             el.closest('td').find('span').addClass('d-none');
 
-            if(el.closest('td').prev().find('select').val() == 'By Percentage'){
-                if(el.val() >= 100){
-                    el.addClass('border').addClass('border-danger');
-                    el.closest('td').find('span').removeClass('d-none');
-                }
+            var cap = 0;
+            var err = '';
+            switch (el.closest('td').prev().find('select').val()) {
+                case 'By Percentage':
+                    cap = 100;
+                    err = 'Percentage discount cannot be more than or equal to 100%.';
+                    break;
+                default:
+                    cap = el.data('price');
+                    err = 'Discount amount cannot be more than the item price.';
+                    break;
+            }
+
+            if(el.val() >= cap){
+                el.addClass('border').addClass('border-danger');
+                el.closest('td').find('span').removeClass('d-none').text(err);
             }
         }
 
@@ -614,7 +646,7 @@
             var select_class = select != '#item_code_select' ? select : 'custom-select-2';
 			var row = '<tr>' +
 				'<td class="p-2">' +
-					'<select name="selected_reference[' + reference + '][]" class="form-control w-100 ' + select_class + '" style="width: 100%;" required>' + clone_select + '</select>' +
+					'<select name="selected_reference[' + reference + '][]" class="form-control w-100 ' + select_class + ' item-selection" style="width: 100%;" required>' + clone_select + '</select>' +
 				'</td>' +
 				'<td class="p-2">' +
 					'<select name="selected_discount_type[' + reference + '][]" class="form-control w-100 category_discount_type" style="width: 100%;" required>' + clone_discount_type + '</select>' +

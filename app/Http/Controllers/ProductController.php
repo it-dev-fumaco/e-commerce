@@ -1161,8 +1161,6 @@ class ProductController extends Controller
 
         $categories = DB::table('fumaco_categories')->where('publish', 1)->where('external_link', null)->get();
 
-        $items = DB::table('fumaco_items')->where('f_status', 1)->select('f_idcode', 'f_item_name')->orderBy('f_idcode', 'asc')->get();
-
         $shipping_services = DB::table('fumaco_shipping_service')->where('shipping_service_name', '!=', 'Free Delivery')->select('shipping_service_name')->distinct()->orderBy('shipping_service_name', 'asc')->pluck('shipping_service_name');
 
         $discounted_categories = [];
@@ -1183,10 +1181,13 @@ class ProductController extends Controller
                 ->where('sc.sale_id', $id)->select('sc.shipping_service', 'sc.discount_type', 'sc.discount_rate', 'sc.capped_amount', 'sc.sale_id')->get();
         }
 
+        $items = [];
         $discounted_selected_items = [];
         if ($on_sale->apply_discount_to == 'Selected Items') {
             $discounted_selected_items = DB::table('fumaco_on_sale_items as sc')
                 ->where('sc.sale_id', $id)->select('sc.item_code', 'sc.discount_type', 'sc.discount_rate', 'sc.capped_amount', 'sc.sale_id')->get();
+                
+            $items = DB::table('fumaco_items')->where('f_status', 1)->whereIn('f_idcode', collect($discounted_selected_items)->pluck('item_code'))->select('f_idcode', 'f_item_name', 'f_default_price')->orderBy('f_idcode', 'asc')->get();
         }
 
         $customer_groups = DB::table('fumaco_customer_group')->get();
@@ -1698,6 +1699,10 @@ class ProductController extends Controller
                 }else if($discount_type == 'By Percentage'){
                     $discount_rate = $request->discount_percentage;
                     $capped_amount = $request->capped_amount;
+
+                    if($discount_rate >= 100){
+                        return redirect()->back()->with('error', 'Percentage discount(s) cannot be more than 100%.');
+                    }
                 }
             }
 
@@ -1789,6 +1794,12 @@ class ProductController extends Controller
             $id = DB::table('fumaco_on_sale')->insertGetId($insert);
 
             if(in_array($request->apply_discount_to, ['Per Shipping Service', 'Per Category', 'Per Customer Group', 'Selected Items'])){
+                $item_prices = [];
+                if($request->apply_discount_to == 'Selected Items'){
+                    $item_prices = DB::table('fumaco_items')->whereIn('f_idcode', $request->selected_reference)->select('f_idcode', 'f_default_price')->get();
+                    $item_prices = collect($item_prices)->groupBy('f_idcode');
+                }
+
                 switch ($request->apply_discount_to) {
                     case 'Per Shipping Service':
                         $reference = 'shipping_service';
@@ -1818,8 +1829,19 @@ class ProductController extends Controller
                     if($request->selected_discount_type[$key] == 'By Percentage'){
                         $discount_rate = $request->selected_discount_rate[$key];
                         $capped_amount = $request->selected_capped_amount[$key];
+
+                        if($discount_rate >= 100){
+                            return redirect()->back()->with('error', 'Percentage discount(s) cannot be more than 100%.');
+                        }
                     }else if($request->selected_discount_type[$key] == 'Fixed Amount'){
                         $discount_rate = $request->selected_discount_rate[$key];
+
+                        $item_price = isset($item_prices[$reference_name]) ? $item_prices[$reference_name][0]->f_default_price: 0;
+                        if($request->apply_discount_to == 'Selected Items'){
+                            if($discount_rate >= $item_price){
+                                return redirect()->back()->with('error', 'Discount amount cannot be more than the item price.');
+                            }
+                        }
                     }
 
                     DB::table($table)->insert([
@@ -2038,19 +2060,35 @@ class ProductController extends Controller
             DB::table('fumaco_on_sale')->where('id', $id)->update($update);
 
             if(in_array($request->apply_discount_to, ['Per Shipping Service', 'Per Category', 'Per Customer Group', 'Selected Items'])){
+                $item_prices = [];
+                if($request->apply_discount_to == 'Selected Items'){
+                    $items = isset($request->selected_reference['item_code']) ? $request->selected_reference['item_code'] : [];
+
+                    $item_prices = DB::table('fumaco_items')->whereIn('f_idcode', $items)->select('f_idcode', 'f_default_price')->get();
+                    $item_prices = collect($item_prices)->groupBy('f_idcode');
+                }
+                
                 foreach($selected_reference as $key => $reference_name){
                     $discount_rate = 0;
                     $capped_amount = 0;
 
                     if($selected_discount_type[$key] == 'By Percentage'){
                         $discount_rate = $selected_discount_rate[$key];
-                        $capped_amount = $selected_capped_amount[$key];
+                        $capped_amount = isset($selected_capped_amount[$key]) ? $selected_capped_amount[$key] : 0;
 
                         if($discount_rate >= 100){
                             return redirect()->back()->with('error', 'Percentage discount(s) cannot be more than or equal to 100%');
                         }
                     }else if($selected_discount_type[$key] == 'Fixed Amount'){
                         $discount_rate = $selected_discount_rate[$key];
+
+                        $item_price = isset($item_prices[$reference_name]) ? $item_prices[$reference_name][0]->f_default_price : 0;
+
+                        if($request->apply_discount_to == 'Selected Items'){
+                            if($discount_rate >= $item_price){
+                                return redirect()->back()->with('error', 'Discount amount cannot be more than the item price.');
+                            }
+                        }
                     }
 
                     DB::table($table)->insert([
@@ -2772,7 +2810,7 @@ class ProductController extends Controller
                         $q->orWhere('f_idcode', 'LIKE', "%".$request->q."%");
                     });
                 })
-                ->select('f_idcode', 'f_name_name')->orderBy('f_idcode', 'asc')
+                ->select('f_idcode', 'f_name_name', 'f_default_price')->orderBy('f_idcode', 'asc')
                 ->limit(8)->get();
 
             $product_list_images = DB::table('fumaco_items_image_v1')->whereIn('idcode', collect($items)->pluck('f_idcode'))
@@ -2794,10 +2832,13 @@ class ProductController extends Controller
                     'text' => $item->f_idcode.' - '.strip_tags($item->f_name_name),
                     'description' => strip_tags($item->f_name_name),
                     'image' => asset($image),
+                    'default_price' => $item->f_default_price
                 ];
             }
     
             return response()->json(['items' => $result]);
         }
+
+        return response()->json(['items' => $result]);
     }
 }

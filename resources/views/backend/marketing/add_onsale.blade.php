@@ -414,22 +414,38 @@
                 $(this).closest('td').next('td').next('td').find('input').prop('readonly', false);
             }
 
-            percentage_discount_checker($(this).closest('td').next('td').find('input'));
+            discount_rate_checker($(this).closest('td').next('td').find('input'));
 		});
 
         $(document).on('keyup', '.discount-rate', function (){
-            percentage_discount_checker($(this));
+            discount_rate_checker($(this));
         });
 
-        function percentage_discount_checker(el){
+        $(document).on('select2:select', '.custom-select-2', function(e){
+            e.preventDefault();
+            $(this).closest('td').next('td').next('td').find('input').data('price', e.params.data.default_price);
+        });
+
+        function discount_rate_checker(el){
             el.removeClass('border').removeClass('border-danger');
             el.closest('td').find('span').addClass('d-none');
 
-            if(el.closest('td').prev().find('select').val() == 'By Percentage'){
-                if(el.val() >= 100){
-                    el.addClass('border').addClass('border-danger');
-                    el.closest('td').find('span').removeClass('d-none');
-                }
+            var cap = 0;
+            var err = '';
+            switch (el.closest('td').prev().find('select').val()) {
+                case 'By Percentage':
+                    cap = 100;
+                    err = 'Percentage discount cannot be more than or equal to 100%.';
+                    break;
+                default:
+                    cap = el.data('price');
+                    err = 'Discount amount cannot be more than the item price.';
+                    break;
+            }
+
+            if(el.val() >= cap){
+                el.addClass('border').addClass('border-danger');
+                el.closest('td').find('span').removeClass('d-none').text(err);
             }
         }
         
@@ -473,8 +489,10 @@
                             };
                         },
                         processResults: function (response) {
+                            // console.log(response.items);
+                            var items = response.items;
                             return {
-                                results: response.items
+                                results: items
                             };
                         },
                         cache: true
