@@ -129,11 +129,32 @@
                                         </div>
                                         @if ($on_sale->banner_image)
                                         <div class="col-1">
-                                            <img class="img-thumbnail" src="{{ asset('/assets/site-img/'.$on_sale->banner_image) }}" alt="" style="width: 100%">
+                                            <a href="#" data-toggle="modal" data-target="#bannerImg{{ $on_sale->id }}">
+                                                <img class="img-thumbnail" src="{{ asset('/assets/site-img/'.$on_sale->banner_image) }}" alt="" style="width: 100%">
+                                            </a>
+                                        </div>
+
+                                        <!-- Modal -->
+                                        <div class="modal fade" id="bannerImg{{ $on_sale->id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                            <div class="modal-xl modal-dialog modal-dialog-centered" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        {{-- <h5 class="modal-title" id="exampleModalLabel">Modal title</h5> --}}
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <div class="container">
+                                                            <img class="img-thumbnail" src="{{ asset('/assets/site-img/'.$on_sale->banner_image) }}" alt="" style="width: 100%">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                         @endif
                                         <div class="col-{{ $on_sale->banner_image ? '5' : '6' }}">
-                                            <label>Banner Image</label>
+                                            <label>Banner Image (1920 x 377)</label>
                                             <div class="custom-file mb-3">
                                                 <input type="file" class="custom-file-input" id="customFile" name="banner_img">
                                                 <label class="custom-file-label" for="customFile">{{ $on_sale->banner_image ? $on_sale->banner_image : 'Choose File' }}</label>

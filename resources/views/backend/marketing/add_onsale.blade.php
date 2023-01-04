@@ -102,7 +102,7 @@
                                             </div>
                                         </div>
                                         <div class="col-6">
-                                            <label>Banner Image</label>
+                                            <label>Banner Image (1920 x 377)</label>
                                             <div class="custom-file mb-3">
                                                 <input type="file" class="custom-file-input" id="customFile" name="banner_img">
                                                 <label class="custom-file-label" for="customFile">Choose File</label>
