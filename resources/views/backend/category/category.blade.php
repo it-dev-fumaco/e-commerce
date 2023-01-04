@@ -62,7 +62,9 @@
 												<div class="row">
 													@if ($c->banner_img)
 														<div class="col-3 text-center">
-															<img src="{{ asset('assets/site-img/'.$c->banner_img) }}" width="80">
+															<a href="#" data-toggle="modal" data-target="#preview-banner-{{ $c->id }}">
+																<img src="{{ asset('assets/site-img/'.$c->banner_img) }}" width="80">
+															</a>
 														</div>	
 													@endif
 													<div class="col-{{ $c->banner_img ? 9 : 12 }}">
@@ -86,6 +88,22 @@
 											<td><img src="{{ asset('assets/site-img/icon/')."/".$c->image }}" width="30" ></td>
 											<td>{{ $c->slug }}</td>
 											<td>
+												<!-- Modal -->
+												<div class="modal fade" id="preview-banner-{{ $c->id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+													<div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+														<div class="modal-content">
+															<div class="modal-header">
+																{{-- <h5 class="modal-title" id="exampleModalLabel">Modal title</h5> --}}
+																<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+																	<span aria-hidden="true">&times;</span>
+																</button>
+															</div>
+															<div class="modal-body">
+																<img src="{{ asset('assets/site-img/'.$c->banner_img) }}" width="100%">
+															</div>
+														</div>
+													</div>
+												</div>
 												<button type="button" class="btn btn-info btn-sm active" data-toggle="modal" data-target="#PPPEdit{{ $c->id }}">Edit</button>
 												<div id="PPPEdit{{ $c->id }}" class="modal fade" role="dialog">
 													<div class="modal-dialog modal-xl">
@@ -106,28 +124,11 @@
 																								<a href="#" data-toggle="modal" data-target="#preview-banner-{{ $c->id }}">
 																									<img src="{{ asset('assets/site-img/'.$c->banner_img) }}" width="100%">
 																								</a>
-
-																								<!-- Modal -->
-																								<div class="modal fade" id="preview-banner-{{ $c->id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-																									<div class="modal-dialog modal-xl modal-dialog-centered" role="document">
-																										<div class="modal-content">
-																											<div class="modal-header">
-																												{{-- <h5 class="modal-title" id="exampleModalLabel">Modal title</h5> --}}
-																												<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-																													<span aria-hidden="true">&times;</span>
-																												</button>
-																											</div>
-																											<div class="modal-body">
-																												<img src="{{ asset('assets/site-img/'.$c->banner_img) }}" width="100%">
-																											</div>
-																										</div>
-																									</div>
-																								</div>
 																							@endif
 																						</div>
 																						<div class="col-6">
 																							<div class="form-group">
-																								<label for="add_cat_name">Banner Image : </label>
+																								<label for="add_cat_name">Banner Image (1920 x 377): </label>
 																								<div class="custom-file">
 																									<input type="file" class="custom-file-input" id="customFile" name="banner_img">
 																									<label class="custom-file-label" for="customFile">Choose File</label>
@@ -241,7 +242,7 @@
 												<input type="text" class="form-control" id="add_cat_name" name="add_cat_name" value="" required>
 											</div>
 											<div class="form-group">
-												<label for="add_cat_name">Banner Image : </label>
+												<label for="add_cat_name">Banner Image (1920 x 377): </label>
 												<div class="custom-file mb-3">
 													<input type="file" class="custom-file-input" id="customFile" name="banner_img">
 													<label class="custom-file-label" for="customFile">Choose File</label>
