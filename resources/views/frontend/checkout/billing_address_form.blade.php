@@ -45,7 +45,7 @@
 								</td>
 								@if(!Auth::check())
 									<td style="text-align: right; font-size: 10pt;">
-										Already a member? <br class="d-lg-none"/><a href="#" data-toggle="modal" data-target="#loginModal">Log in</a>
+										Already a member? <br class="d-lg-none"/><a href="#" class="open-modal" data-target="#loginModal">Log in</a>
 									</td>
 								@endif
 							</tr>
@@ -317,7 +317,7 @@
 						<div class="modal-content">
 							<div class="modal-header">
 								<h5 class="modal-title" id="loginModalLabel">Login</h5>
-								<a type="button" class="close text-dark" data-dismiss="modal" aria-label="Close">
+								<a type="button" class="close text-dark close-modal" data-target="#loginModal" aria-label="Close">
 									<span aria-hidden="true"><i class="fas fa-times"></i></span>
 								</a>
 							</div>
