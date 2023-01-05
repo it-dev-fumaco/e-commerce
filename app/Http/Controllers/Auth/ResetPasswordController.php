@@ -10,8 +10,9 @@ use Hash;
 
 class ResetPasswordController extends Controller
 {
-    public function showResetForm($token) { 
-        return view('auth.passwords.reset', ['token' => $token]);
+    public function showResetForm($token) {
+        $email = DB::table('password_resets')->where('token', $token)->pluck('email')->first();
+        return view('auth.passwords.reset', ['token' => $token, 'email' => $email]);
     }
 
     public function reset(Request $request) {
