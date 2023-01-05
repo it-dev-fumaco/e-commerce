@@ -39,7 +39,7 @@
                     @csrf
                     <input type="hidden" name="token" value="{{ $token }}">
                     <div class="form-group mb-3">
-                        <input id="email" type="email" class="form-control @error('username') is-invalid @enderror" name="username" value="{{ session()->get('forOTP') }}" required autocomplete="email" autofocus placeholder="Email Address" {{ session()->get('forOTP') ? 'readonly' : '' }}>
+                      <input id="email" type="email" class="form-control @error('username') is-invalid @enderror" name="username" value="{{ session()->has('forOTP') ? session()->get('forOTP') : $email }}" required autocomplete="email" autofocus placeholder="Email Address" {{ session()->get('forOTP') ? 'readonly' : '' }} {{ session()->has('forOTP') ? null : 'readonly' }}>
                     </div>
                     <div class="form-group mb-3">
                         <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="new-password" placeholder="New Password">
