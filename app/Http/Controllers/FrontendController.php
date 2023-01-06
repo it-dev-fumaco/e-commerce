@@ -1651,7 +1651,7 @@ class FrontendController extends Controller
         return view('frontend.product_list', compact('product_category', 'products_arr', 'products', 'filters', 'image_for_sharing', 'category_id'));
     }
 
-    public function viewProduct($slug) { // Product Page
+    public function viewProduct($slug, Request $request) { // Product Page
         $product_details = DB::table('fumaco_items')->where('slug', $slug)->orWhere('f_idcode', $slug)
             ->select('f_parent_code', 'f_idcode', 'f_default_price', 'f_onsale', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'f_qty', 'f_reserved_qty', 'slug', 'f_name_name', 'f_item_name', 'id', 'meta_description', 'keywords', 'f_description', 'f_category', 'f_brand', 'f_caption', 'f_featured_image', 'f_full_description', 'url_title', 'image_alt')->first();
         if (!$product_details) {
@@ -1678,9 +1678,17 @@ class FrontendController extends Controller
         // get attributes of all variant items
         $variant_attributes = DB::table('fumaco_items_attributes as a')
             ->join('fumaco_attributes_per_category as c', 'c.id', 'a.attribute_name_id')
-            ->whereIn('idcode', $variant_items)->where('c.status', 1)->orderBy('a.idx', 'asc')
-            ->select('attribute_value', 'attribute_name', 'idcode', 'slug')->get();
+            ->whereIn('idcode', $variant_items)->where('status', 1)->orderBy('a.idx', 'asc')
+            ->select('attribute_value', 'attribute_name', 'idcode', 'slug', 'status')->get();
+        
+        $variant_combs = collect($variant_attributes)->groupBy('idcode');
+
         $variant_attributes = collect($variant_attributes)->groupBy('attribute_name');
+
+        $variant_combinations = [];
+        foreach ($variant_combs as $r => $s) {
+            $variant_combinations[$r] = collect($s)->pluck('attribute_value', 'attribute_name');
+        }
 
         $attrib = DB::table('fumaco_items_attributes as a')
             ->join('fumaco_attributes_per_category as c', 'c.id', 'a.attribute_name_id')
@@ -1688,8 +1696,8 @@ class FrontendController extends Controller
         
         $na_check = DB::table('fumaco_categories')->where('id', $product_details->f_cat_id)->select('hide_none')->first();
      
-        $attributes = $attrib->orderBy('idx', 'asc')->pluck('a.attribute_value', 'c.attribute_name');
-        $filtered_attributes = $attributes;
+        $attributes = $attrib->orderBy('idx', 'asc')->select('a.attribute_value', 'c.attribute_name', 'c.status')->get();
+        $filtered_attributes = collect($attributes)->pluck('attribute_value', 'attribute_name');
         if($na_check->hide_none == 1){
             $filtered_attributes = $attrib->where('a.attribute_value', 'NOT LIKE', '%n/a%')->orderBy('idx', 'asc')->pluck('a.attribute_value', 'c.attribute_name');
         }
@@ -1821,12 +1829,15 @@ class FrontendController extends Controller
             $product_reviews = $this->getProductRating($products_to_compare_item_codes);
             $clearance_sale_items = $this->isIncludedInClearanceSale($products_to_compare_item_codes);
 
-            $products_to_compare = DB::table('fumaco_items')->whereIn('f_idcode', $products_to_compare_item_codes)
-                ->select('f_idcode', 'f_default_price', 'f_onsale', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'f_qty', 'f_reserved_qty', 'slug', 'f_name_name', 'f_item_name', 'image_alt')->get();
+            $products_to_compare = [];
+            if (!$request->ajax()) {
+                $products_to_compare = DB::table('fumaco_items')->whereIn('f_idcode', $products_to_compare_item_codes)
+                    ->select('f_idcode', 'f_default_price', 'f_onsale', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'f_qty', 'f_reserved_qty', 'slug', 'f_name_name', 'f_item_name', 'image_alt')->get()->toArray();
+            }
             
             $sale_per_category = [];
             if (!$sale && !Auth::check()) {
-                $item_categories = array_column($products_to_compare->toArray(), 'f_cat_id');
+                $item_categories = array_column($products_to_compare, 'f_cat_id');
                 $sale_per_category = $this->getSalePerItemCategory($item_categories);
             }
 
@@ -1899,11 +1910,14 @@ class FrontendController extends Controller
         if(!in_array($product_details->f_idcode, $recommended_item_codes)){
             session()->push('recommended_item_codes', $product_details->f_idcode);
         }
-        
-        $recommended_item_codes_query = DB::table('fumaco_items')->whereIn('f_idcode', $recommended_item_codes)
-            ->select('f_idcode', 'f_default_price', 'f_onsale', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'f_qty', 'f_reserved_qty', 'slug', 'f_name_name', 'f_item_name', 'id', 'image_alt')->get();
 
-        $recommended_item_codes = array_column($recommended_item_codes_query->toArray(), 'f_idcode'); 
+        $recommended_item_codes_query = [];
+        if (!$request->ajax()) {
+            $recommended_item_codes_query = DB::table('fumaco_items')->whereIn('f_idcode', $recommended_item_codes)
+                ->select('f_idcode', 'f_default_price', 'f_onsale', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'f_qty', 'f_reserved_qty', 'slug', 'f_name_name', 'f_item_name', 'id', 'image_alt')->get()->toArray();
+        }
+
+        $recommended_item_codes = array_column($recommended_item_codes_query, 'f_idcode'); 
 
         $recommended_item_images = DB::table('fumaco_items_image_v1')->whereIn('idcode', $recommended_item_codes)
             ->select('imgprimayx', 'idcode')->get();
@@ -1913,7 +1927,7 @@ class FrontendController extends Controller
         $clearance_sale_items = $this->isIncludedInClearanceSale($recommended_item_codes);
         $sale_per_category = [];
         if (!$sale && !Auth::check()) {
-            $item_categories = array_column($recommended_item_codes_query->toArray(), 'f_cat_id');
+            $item_categories = array_column($recommended_item_codes_query, 'f_cat_id');
             $sale_per_category = $this->getSalePerItemCategory($item_categories);
         }
 
@@ -1986,13 +2000,16 @@ class FrontendController extends Controller
 
         $product_images = DB::table('fumaco_items_image_v1')->where('idcode', $product_details->f_idcode)->select('imgprimayx', 'idcode', 'imgoriginalx')->get();
 
-        $related_products_query = DB::table('fumaco_items as a')
-            ->join('fumaco_items_relation as b', 'a.f_idcode', 'b.related_item_code')
-            ->where('b.item_code', $product_details->f_idcode)->where('a.f_status', 1)
-            ->select('a.id', 'a.f_idcode', 'a.f_default_price','a.f_stock_uom', 'a.f_onsale', 'a.f_name_name', 'a.f_item_name', 'a.slug', 'a.f_qty', 'a.f_reserved_qty', 'a.f_new_item', 'a.f_new_item_start', 'a.f_new_item_end', 'a.f_discount_rate', 'a.f_category', 'a.f_cat_id', 'a.f_discount_type', 'a.image_alt')
-            ->get();
+        $related_products_query = [];
+        if (!$request->ajax()) {
+            $related_products_query = DB::table('fumaco_items as a')
+                ->join('fumaco_items_relation as b', 'a.f_idcode', 'b.related_item_code')
+                ->where('b.item_code', $product_details->f_idcode)->where('a.f_status', 1)
+                ->select('a.id', 'a.f_idcode', 'a.f_default_price','a.f_stock_uom', 'a.f_onsale', 'a.f_name_name', 'a.f_item_name', 'a.slug', 'a.f_qty', 'a.f_reserved_qty', 'a.f_new_item', 'a.f_new_item_start', 'a.f_new_item_end', 'a.f_discount_rate', 'a.f_category', 'a.f_cat_id', 'a.f_discount_type', 'a.image_alt')
+                ->get()->toArray();
+        }
 
-        $related_item_codes = array_column($related_products_query->toArray(), 'f_idcode');
+        $related_item_codes = array_column($related_products_query, 'f_idcode');
         $clearance_sale_items = [];
         if (count($related_item_codes) > 0) {
             $related_item_images = DB::table('fumaco_items_image_v1')->whereIn('idcode', $related_item_codes)
@@ -2005,7 +2022,7 @@ class FrontendController extends Controller
 
         $sale_per_category = [];
         if (!$sale && !Auth::check()) {
-            $item_categories = array_column($related_products_query->toArray(), 'f_cat_id');
+            $item_categories = array_column($related_products_query, 'f_cat_id');
             $sale_per_category = $this->getSalePerItemCategory($item_categories);
         }
 
@@ -2075,7 +2092,17 @@ class FrontendController extends Controller
             ->where('status', '!=', 'pending')->where('item_code', $product_details->f_idcode)->select('a.*', 'b.f_name', 'b.f_lname')
             ->orderBy('a.created_at', 'desc')->paginate(5);
 
-        return view('frontend.product_page', compact('product_details', 'product_images', 'attributes', 'variant_attr_arr', 'related_products', 'filtered_attributes', 'products_to_compare', 'variant_attributes_to_compare', 'compare_arr', 'attributes_to_compare', 'variant_attr_array', 'attribute_names', 'product_reviews', 'recommended_items', 'product_details_array', 'is_ordered'));
+        $view = 'frontend.product_page';
+        if ($request->ajax()) {
+            $view = 'frontend.product_detail_section';
+        }
+
+        // attribute for variant selection
+        $attributes_arr = collect($attributes)->where('status', 1)->pluck('attribute_value', 'attribute_name');
+
+        $attributes = collect($attributes)->pluck('attribute_value', 'attribute_name');
+
+        return view($view, compact('attributes_arr', 'variant_combinations', 'product_details', 'product_images', 'attributes', 'variant_attr_arr', 'related_products', 'filtered_attributes', 'products_to_compare', 'variant_attributes_to_compare', 'compare_arr', 'attributes_to_compare', 'variant_attr_array', 'attribute_names', 'product_reviews', 'recommended_items', 'product_details_array', 'is_ordered'));
     }
 
     public function viewWishlist() {
