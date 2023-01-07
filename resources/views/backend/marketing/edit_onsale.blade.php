@@ -33,7 +33,7 @@
                                 <div class="alert alert-warning fade show" role="alert">{{ session()->get('error') }}</div>
                             @endif
                             <div class="card-body">
-                                <form action="/admin/marketing/on_sale/{{ $on_sale->id }}/edit" method="post" enctype="multipart/form-data">
+                                <form action="/admin/marketing/on_sale/{{ $on_sale->id }}/edit" method="post" enctype="multipart/form-data" autocomplete="off">
                                     @csrf
                                     @php
                                     switch ($on_sale->apply_discount_to) {
@@ -65,17 +65,62 @@
                                         <div class="col-6">
                                             <label>Sale Name <span class="text-danger">*</span></label>
                                             <input type="text" class="form-control" name="sale_name" placeholder="Sale Name" value="{{ $on_sale->sale_name }}" required>
-                                            <div class="form-check mt-1">
-                                                <input type="checkbox" class="form-check-input" id="is-clearance-sale" name="is_clearance_sale" value="1" {{ $on_sale->is_clearance_sale == 1 ? 'checked' : '' }}>
-                                                <label class="form-check-label" for="is-clearance-sale">Is Clearance Sale</label>
-                                            </div>
                                         </div>
                                         <div class="col-6">
                                             <label>Set Sale Duration <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control set_duration" id="daterange" name="sale_duration"/>
+                                            <input type="text" class="form-control set_duration" id="daterange" name="sale_duration" {{ $on_sale->ignore_sale_duration == 1 ? 'disabled' : '' }}/>
+                                            <div class="form-check mt-1">
+                                                <input type="checkbox" class="form-check-input" id="ignore-sale-duration" name="ignore_sale_duration" value="1" {{ $on_sale->ignore_sale_duration == 1 ? 'checked' : '' }}>
+                                                <label class="form-check-label" for="ignore-sale-duration">Ignore Sale Duration</label>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="row mt-3">
+                                    <div class="row mt-2">
+                                        <div class="col-6">
+                                            @php
+                                                $sale_types = ['Regular Sale', 'Clearance Sale'];
+                                            @endphp
+                                            <label>Sale Type <span class="text-danger">*</span></label>
+                                            <select class="form-control" name="sale_type" id="sale-type" required>
+                                                <option disabled selected value="">Sale Type</option>
+                                                @foreach ($sale_types as $s_type)
+                                                <option value="{{ $s_type }}" {{ $on_sale->is_clearance_sale == 1 && $s_type == 'Clearance Sale' ? 'selected' : '' }}>{{ $s_type }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        @if ($on_sale->banner_image)
+                                        <div class="col-1">
+                                            <a href="#" data-toggle="modal" data-target="#bannerImg{{ $on_sale->id }}">
+                                                <img class="img-thumbnail" src="{{ asset('/assets/site-img/'.$on_sale->banner_image) }}" alt="" style="width: 100%">
+                                            </a>
+                                        </div>
+
+                                        <!-- Modal -->
+                                        <div class="modal fade" id="bannerImg{{ $on_sale->id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                            <div class="modal-xl modal-dialog modal-dialog-centered" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        {{-- <h5 class="modal-title" id="exampleModalLabel">Modal title</h5> --}}
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <div class="container">
+                                                            <img class="img-thumbnail" src="{{ asset('/assets/site-img/'.$on_sale->banner_image) }}" alt="" style="width: 100%">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        @endif
+                                        <div class="col-{{ $on_sale->banner_image ? '5' : '6' }}">
+                                            <label>Banner Image (1920 x 377)</label>
+                                            <div class="custom-file mb-3">
+                                                <input type="file" class="custom-file-input" id="customFile" name="banner_img">
+                                                <label class="custom-file-label" for="customFile">{{ $on_sale->banner_image ? $on_sale->banner_image : 'Choose File' }}</label>
+                                            </div>
+                                        </div>
                                         <div class="col-6">
                                             @php
                                                 $types = ['Per Customer Group', 'Per Shipping Service', 'Per Category', 'Selected Items', 'All Items'];
@@ -125,39 +170,6 @@
                                                         <input type="text" class="form-control" id="capped_amount" name="capped_amount" value="{{ $on_sale->capped_amount }}" placeholder="Capped Amount"/>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        </div>
-                                        @if ($on_sale->banner_image)
-                                        <div class="col-1">
-                                            <a href="#" data-toggle="modal" data-target="#bannerImg{{ $on_sale->id }}">
-                                                <img class="img-thumbnail" src="{{ asset('/assets/site-img/'.$on_sale->banner_image) }}" alt="" style="width: 100%">
-                                            </a>
-                                        </div>
-
-                                        <!-- Modal -->
-                                        <div class="modal fade" id="bannerImg{{ $on_sale->id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                            <div class="modal-xl modal-dialog modal-dialog-centered" role="document">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        {{-- <h5 class="modal-title" id="exampleModalLabel">Modal title</h5> --}}
-                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                            <span aria-hidden="true">&times;</span>
-                                                        </button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <div class="container">
-                                                            <img class="img-thumbnail" src="{{ asset('/assets/site-img/'.$on_sale->banner_image) }}" alt="" style="width: 100%">
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        @endif
-                                        <div class="col-{{ $on_sale->banner_image ? '5' : '6' }}">
-                                            <label>Banner Image (1920 x 377)</label>
-                                            <div class="custom-file mb-3">
-                                                <input type="file" class="custom-file-input" id="customFile" name="banner_img">
-                                                <label class="custom-file-label" for="customFile">{{ $on_sale->banner_image ? $on_sale->banner_image : 'Choose File' }}</label>
                                             </div>
                                         </div>
                                     </div>
@@ -247,15 +259,16 @@
                                                         <option value="{{ $discount }}">{{ $discount }}</option>
                                                     @endforeach
                                                 </select>
-                                                <div class="col-8 mx-auto">
+                                                <div class="col-9 mx-auto">
                                                     <table class="table table-bordered" id="selected-items-table">
                                                         <thead>
                                                             <tr>
-                                                                <th style="width: 30%;" scope="col" class="text-center p-2 align-middle">Item Code</th>
-                                                                <th style="width: 20%;" scope="col" class="text-center p-2 align-middle">Discount Type</th>
-                                                                <th style="width: 20%;" scope="col" class="text-center p-2 align-middle">Amount/Rate</th>
-                                                                <th style="width: 20%;" scope="col" class="text-center p-2 align-middle capped_amount">Capped Amount</th>
-                                                                <th class="text-center p-2 align-middle" style="width: 10%;">
+                                                                <th style="width: 20%;" scope="col" class="text-center p-2 align-middle">Item Code</th>
+                                                                <th style="width: 24%;" scope="col" class="text-center p-2 align-middle">Item Description</th>
+                                                                <th style="width: 18%;" scope="col" class="text-center p-2 align-middle">Discount Type</th>
+                                                                <th style="width: 15%;" scope="col" class="text-center p-2 align-middle">Amount/Rate</th>
+                                                                <th style="width: 15%;" scope="col" class="text-center p-2 align-middle capped_amount">Capped Amount</th>
+                                                                <th style="width: 8%;" scope="col" class="text-center p-2 align-middle">
                                                                     <button type="button" class="add-row-btn btn btn-outline-primary btn-sm" id="add-selected-items-btn" data-table="#selected-items-table" data-select="#item_code_select" data-reference="item_code">Add Row</button>
                                                                 </th>
                                                             </tr>
@@ -264,8 +277,8 @@
                                                             @foreach($discounted_selected_items as $sale_selected_item)
                                                             @php
                                                                 $item_price = collect($items)->groupBy('f_idcode');
-                                                                $item_price = isset($item_price[$sale_selected_item->item_code]) ? $item_price[$sale_selected_item->item_code][0]->f_default_price : 0;
-                                                                switch ($sale_selected_item->discount_type) {
+                                                                $item_price = isset($item_price[$sale_selected_item['item_code']]) ? $item_price[$sale_selected_item['item_code']][0]->f_default_price : 0;
+                                                                switch ($sale_selected_item['discount_type']) {
                                                                     case 'By Percentage':
                                                                         $err = 'Percentage discount cannot be more than or equal to 100%.';
                                                                         $cap = 100;
@@ -283,24 +296,30 @@
                                                                     <select class="form-control {{ $on_sale->is_clearance_sale == 1 ? 'custom-select-2' : '' }} item-selection" name="selected_reference[item_code][]">
                                                                         <option disabled value="">Select Item</option>
                                                                         @foreach ($items as $item)
-                                                                        <option value="{{ $item->f_idcode }}" {{ $sale_selected_item->item_code == $item->f_idcode ? 'selected' : '' }}>{{ $item->f_idcode }}</option>
+                                                                        <option value="{{ $item->f_idcode }}" {{ $sale_selected_item['item_code'] == $item->f_idcode ? 'selected' : '' }}>{{ $item->f_idcode }}</option>
                                                                         @endforeach
                                                                     </select>
+                                                                </td>
+                                                                <td class="p-2">
+                                                                    <div class="d-flex flex-row">
+                                                                        <div class="col-3 itemimg"><img src="{{ $sale_selected_item['image'] }}" class="img-responsive rounded d-inline-block" width="45" height="45"></div>
+                                                                        <div class="col-9 itemdesc" style="font-size: 10pt;">{{ $sale_selected_item['description'] }}</div>
+                                                                    </div>
                                                                 </td>
                                                                 <td class="p-2">
                                                                     <select class="form-control category_discount_type" name="selected_discount_type[item_code][]" id="selected_discount_type">
                                                                         <option disabled selected value="">Select Discount Type</option>
                                                                         @foreach ($discount_type as $discount)
-                                                                            <option value="{{ $discount }}" {{ $discount == $sale_selected_item->discount_type ? 'selected' : '' }}>{{ $discount }}</option>
+                                                                            <option value="{{ $discount }}" {{ $discount == $sale_selected_item['discount_type'] ? 'selected' : '' }}>{{ $discount }}</option>
                                                                         @endforeach
                                                                     </select>
                                                                 </td>
                                                                 <td class="p-2">
-                                                                    <input type="text" name="selected_discount_rate[item_code][]" class="form-control discount-rate {{ $sale_selected_item->discount_rate >= $cap ? 'border border-danger' : null }}" value="{{ $sale_selected_item->discount_rate }}" placeholder="Amount/Rate" data-price="{{ $item_price }}" required>
-                                                                    <span class='text-danger {{ $sale_selected_item->discount_rate >= $cap ? null : 'd-none' }}' style="font-size: 9pt;">{{ $err }}</span>
+                                                                    <input type="text" name="selected_discount_rate[item_code][]" class="form-control discount-rate {{ $sale_selected_item['discount_rate'] >= $cap ? 'border border-danger' : null }}" value="{{ $sale_selected_item['discount_rate'] }}" placeholder="Amount/Rate" data-price="{{ $item_price }}" required>
+                                                                    <span class='text-danger {{ $sale_selected_item['discount_rate'] >= $cap ? null : 'd-none' }}' style="font-size: 9pt;">{{ $err }}</span>
                                                                 </td>
                                                                 <td class="p-2">
-                                                                    <input type="text" name="selected_capped_amount[item_code][]" class="form-control cap_amount" value="{{ $sale_selected_item->capped_amount }}" placeholder="Capped Amount" {{ $capped_amount_enabled ? 'disabled' : null }}>
+                                                                    <input type="text" name="selected_capped_amount[item_code][]" class="form-control cap_amount" value="{{ $sale_selected_item['capped_amount'] }}" placeholder="Capped Amount" {{ $capped_amount_enabled ? 'disabled' : null }}>
                                                                 </td>
                                                                 <td class="text-center">
                                                                     <button type="button" class="btn btn-outline-danger btn-sm remove-td-row">Remove</button>
@@ -432,8 +451,8 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <br>
                                     <hr>
-
                                     <div class="row mt-3">
                                         <div class="col-12">
                                             <h4>Email Notification</h4>
@@ -600,6 +619,10 @@
         }
 
         function applyDiscountTo(){
+            $('#customer-group-table tbody').empty();
+            $('#shipping-table tbody').empty();
+            $('#categories-table tbody').empty();
+            $('#selected-items-table tbody').empty();
             if($('#apply_discount_to').val() == 'All Items'){
                 $('#for_all_items').slideDown();
                 $('#customer-groups').slideUp();
@@ -665,10 +688,22 @@
             var clone_select = $(select).html();
             var clone_discount_type = $('#discount_type_select').html();
             var select_class = select != '#item_code_select' ? select : 'custom-select-2';
+
+            var img_col = '';
+            if (select == '#item_code_select') {
+                img_col = '<td class="p-2">' +
+                    '<div class="d-flex flex-row">' +
+                        '<div class="col-3 itemimg"></div>' +
+                        '<div class="col-9 itemdesc" style="font-size: 10pt;"></div>' +
+                    '</div>'
+				'</td>';
+            } 
+
 			var row = '<tr>' +
 				'<td class="p-2">' +
-					'<select name="selected_reference[' + reference + '][]" class="form-control w-100 ' + select_class + ' item-selection" style="width: 100%;" required>' + clone_select + '</select>' +
+					'<select name="selected_reference[' + reference + '][]" class="form-control w-100 ' + select_class + ' item-selection" required>' + clone_select + '</select>' +
 				'</td>' +
+                img_col +
 				'<td class="p-2">' +
 					'<select name="selected_discount_type[' + reference + '][]" class="form-control w-100 category_discount_type" style="width: 100%;" required>' + clone_discount_type + '</select>' +
 				'</td>' +
@@ -719,22 +754,6 @@
 			$(this).closest("tr").remove();
 		});
 
-        $(document).on('click', '#is-clearance-sale', function(e) {
-            if ($(this).is(":checked")) {
-                $('#apply_discount_to').attr('readonly', true).val('Selected Items').trigger('change');
-            } else {
-                $('#apply_discount_to').attr('readonly', false).val('').trigger('change');
-            }
-        });
-
-        $(document).on('change', '#apply_discount_to', function(e) {
-            if ($(this).val() == 'Selected Items') {
-                $('#is-clearance-sale').prop('checked', true);
-            } else {
-                $('#is-clearance-sale').prop('checked', false);
-            }
-        });
-
         function loadSelect2() {
             $('.custom-select-2').select2({
                 templateResult: formatState,
@@ -758,6 +777,30 @@
                 }
             });
         }
+
+        $(document).on('change', '#sale-type', function(e) {
+            if ($(this).val() == 'Clearance Sale') {
+                $('#apply_discount_to').attr('disabled', true).val('Selected Items').trigger('change');
+            } else {
+                $('#apply_discount_to').attr('disabled', false).val('').trigger('change');
+            }
+        });
+
+        $(document).on('click', '#ignore-sale-duration', function(e) {
+            if ($(this).is(":checked")) {
+                $('#daterange').attr('disabled', true);
+            } else {
+                $('#daterange').removeAttr('disabled');
+            }
+        });
+
+        $(document).on('select2:select', '.custom-select-2', function(e){
+            var data = e.params.data;
+            var row = $(this).closest('tr');
+
+            row.find('.itemdesc').eq(0).text(data.description);
+            row.find('.itemimg').eq(0).html('<img src="'+ data.image +'" class="img-responsive rounded d-inline-block" width="45" height="45">');
+        });
     });
     </script>
 @endsection

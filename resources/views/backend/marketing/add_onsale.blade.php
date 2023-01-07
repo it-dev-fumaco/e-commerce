@@ -33,7 +33,7 @@
                             <div class="alert alert-warning fade show" role="alert">{{ session()->get('error') }}</div>
                             @endif
                             <div class="card-body">
-                                <form action="/admin/marketing/on_sale/add" method="post" enctype="multipart/form-data">
+                                <form action="/admin/marketing/on_sale/add" method="post" enctype="multipart/form-data" autocomplete="off">
                                     @csrf
                                     <div class="row">
                                         <div class="col-9"><h4>On Sale Details</h4></div>
@@ -45,17 +45,36 @@
                                         <div class="col-6">
                                             <label>Sale Name <span class="text-danger">*</span></label>
                                             <input type="text" class="form-control" name="sale_name" placeholder="Sale Name" required>
-                                            <div class="form-check mt-1">
-                                                <input type="checkbox" class="form-check-input" id="is-clearance-sale" name="is_clearance_sale" value="1">
-                                                <label class="form-check-label" for="is-clearance-sale">Is Clearance Sale</label>
-                                            </div>
                                         </div>
                                         <div class="col-6">
                                             <label>Set Sale Duration <span class="text-danger">*</span></label>
                                             <input type="text" class="form-control set_duration" id="daterange" name="sale_duration" required/>
+                                            <div class="form-check mt-1">
+                                                <input type="checkbox" class="form-check-input" id="ignore-sale-duration" name="ignore_sale_duration" value="1">
+                                                <label class="form-check-label" for="ignore-sale-duration">Ignore Sale Duration</label>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="row mt-3">
+                                    <div class="row mt-2">
+                                        <div class="col-6">
+                                            @php
+                                                $sale_types = ['Regular Sale', 'Clearance Sale'];
+                                            @endphp
+                                            <label>Sale Type <span class="text-danger">*</span></label>
+                                            <select class="form-control" name="sale_type" id="sale-type" required>
+                                                <option disabled selected value="">Sale Type</option>
+                                                @foreach ($sale_types as $s_type)
+                                                <option value="{{ $s_type }}">{{ $s_type }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="col-6">
+                                            <label>Banner Image (1920 x 377)</label>
+                                            <div class="custom-file mb-3">
+                                                <input type="file" class="custom-file-input" id="customFile" name="banner_img">
+                                                <label class="custom-file-label" for="customFile">Choose File</label>
+                                            </div>
+                                        </div>
                                         <div class="col-6">
                                             @php
                                                 $types = ['Per Customer Group', 'Per Shipping Service', 'Per Category', 'Selected Items', 'All Items'];
@@ -99,13 +118,6 @@
                                                     <input type="text" class="form-control" name="capped_amount" id="capped_amount" placeholder="Capped Amount"/>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-6">
-                                            <label>Banner Image (1920 x 377)</label>
-                                            <div class="custom-file mb-3">
-                                                <input type="file" class="custom-file-input" id="customFile" name="banner_img">
-                                                <label class="custom-file-label" for="customFile">Choose File</label>
                                             </div>
                                         </div>
                                     </div>
@@ -214,15 +226,16 @@
                                                     <option value="{{ $discount }}">{{ $discount }}</option>
                                                     @endforeach
                                                 </select>
-                                                <div class="col-8 mx-auto">
+                                                <div class="col-9 mx-auto">
                                                     <table class="table table-bordered" id="selected-items-table">
                                                         <thead>
                                                             <tr>
                                                                 <th style="width: 20%;" scope="col" class="text-center p-2 align-middle">Item Code</th>
-                                                                <th style="width: 20%;" scope="col" class="text-center p-2 align-middle">Discount Type</th>
-                                                                <th style="width: 25%;" scope="col" class="text-center p-2 align-middle">Amount/Rate</th>
-                                                                <th style="width: 25%;" scope="col" class="text-center p-2 align-middle capped_amount">Capped Amount</th>
-                                                                <th style="width: 10%;" scope="col" class="text-center p-2 align-middle">
+                                                                <th style="width: 24%;" scope="col" class="text-center p-2 align-middle">Item Description</th>
+                                                                <th style="width: 18%;" scope="col" class="text-center p-2 align-middle">Discount Type</th>
+                                                                <th style="width: 15%;" scope="col" class="text-center p-2 align-middle">Amount/Rate</th>
+                                                                <th style="width: 15%;" scope="col" class="text-center p-2 align-middle capped_amount">Capped Amount</th>
+                                                                <th style="width: 8%;" scope="col" class="text-center p-2 align-middle">
                                                                     <button type="button" class="add-row-btn btn btn-outline-primary btn-sm" id="add-selected-items-btn" data-table="#selected-items-table" data-select="#item_code_select">Add Row</button>
                                                                 </th>
                                                             </tr>
@@ -233,6 +246,7 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <br>
                                     <hr>
                                     <div class="row mt-3">
                                         <div class="col-12">
@@ -453,10 +467,21 @@
             var clone_select = $(select).html();
             var clone_discount_type = $('#discount_type_select').html();
             var select_class = select != '#item_code_select' ? select : 'custom-select-2';
+
+            var img_col = '';
+            if (select == '#item_code_select') {
+                img_col = '<td class="p-2">' +
+                    '<div class="d-flex flex-row">' +
+                        '<div class="col-3 itemimg"></div>' +
+                        '<div class="col-9 itemdesc" style="font-size: 10pt;"></div>' +
+                    '</div>'
+				'</td>';
+            } 
 			var row = '<tr>' +
 				'<td class="p-2">' +
 					'<select name="selected_reference[]" class="form-control w-100 ' + select_class + '" style="width: 100%;" required>' + clone_select + '</select>' +
 				'</td>' +
+                img_col +
 				'<td class="p-2">' +
 					'<select name="selected_discount_type[]" class="form-control w-100 category_discount_type" style="width: 100%;" required>' + clone_discount_type + '</select>' +
 				'</td>' +
@@ -489,7 +514,6 @@
                             };
                         },
                         processResults: function (response) {
-                            // console.log(response.items);
                             var items = response.items;
                             return {
                                 results: items
@@ -528,21 +552,29 @@
 			$(this).closest("tr").remove();
 		});
 
-        $(document).on('click', '#is-clearance-sale', function(e) {
-            if ($(this).is(":checked")) {
-                $('#apply_discount_to').attr('readonly', true).val('Selected Items').trigger('change');
+        $(document).on('change', '#sale-type', function(e) {
+            if ($(this).val() == 'Clearance Sale') {
+                $('#apply_discount_to').attr('disabled', true).val('Selected Items').trigger('change');
             } else {
-                $('#apply_discount_to').attr('readonly', false).val('').trigger('change');
+                $('#apply_discount_to').attr('disabled', false).val('').trigger('change');
             }
         });
 
-        $(document).on('change', '#apply_discount_to', function(e) {
-            if ($(this).val() == 'Selected Items') {
-                $('#is-clearance-sale').prop('checked', true);
+        $(document).on('click', '#ignore-sale-duration', function(e) {
+            if ($(this).is(":checked")) {
+                $('#daterange').attr('disabled', true);
             } else {
-                $('#is-clearance-sale').prop('checked', false);
+                $('#daterange').removeAttr('disabled');
             }
         });
+
+        $(document).on('select2:select', '.custom-select-2', function(e){
+            var data = e.params.data;
+            var row = $(this).closest('tr');
+
+            row.find('.itemdesc').eq(0).text(data.description);
+            row.find('.itemimg').eq(0).html('<img src="'+ data.image +'" class="img-responsive rounded d-inline-block" width="45" height="45">');
+        });
     });
-    </script>
+</script>
 @endsection

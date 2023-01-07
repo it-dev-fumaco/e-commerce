@@ -1184,10 +1184,37 @@ class ProductController extends Controller
         $items = [];
         $discounted_selected_items = [];
         if ($on_sale->apply_discount_to == 'Selected Items') {
-            $discounted_selected_items = DB::table('fumaco_on_sale_items as sc')
-                ->where('sc.sale_id', $id)->select('sc.item_code', 'sc.discount_type', 'sc.discount_rate', 'sc.capped_amount', 'sc.sale_id')->get();
+            $discounted_selected_items_query = DB::table('fumaco_on_sale_items as sc')
+                ->join('fumaco_items as i', 'sc.item_code', 'i.f_idcode')
+                ->where('sc.sale_id', $id)
+                ->select('sc.item_code', 'sc.discount_type', 'sc.discount_rate', 'sc.capped_amount', 'sc.sale_id', 'i.f_name_name')->get();
+
+            $product_list_images = DB::table('fumaco_items_image_v1')->whereIn('idcode', collect($discounted_selected_items_query)->pluck('item_code'))
+                ->select('imgprimayx', 'idcode')->get();
+
+            $product_list_images = collect($product_list_images)->groupBy('idcode')->toArray();
+    
+            foreach($discounted_selected_items_query as $dsiq){
+                $image = null;
+                if (array_key_exists($dsiq->item_code, $product_list_images)) {
+                    $image = $product_list_images[$dsiq->item_code][0]->imgprimayx;
+                }
+
+                $image = ($image) ? '/storage/item_images/'. $dsiq->item_code .'/gallery/preview/'. $image : '/storage/no-photo-available.png';
+
+                $discounted_selected_items[] = [
+                    'item_code' => $dsiq->item_code,
+                    'discount_type' => $dsiq->discount_type,
+                    'discount_rate' => $dsiq->discount_rate,
+                    'image' => asset($image),
+                    'capped_amount' => $dsiq->capped_amount,
+                    'sale_id' => $dsiq->sale_id,
+                    'description' => strip_tags($dsiq->f_name_name)
+                ];
+            }
                 
-            $items = DB::table('fumaco_items')->where('f_status', 1)->whereIn('f_idcode', collect($discounted_selected_items)->pluck('item_code'))->select('f_idcode', 'f_item_name', 'f_default_price')->orderBy('f_idcode', 'asc')->get();
+            $items = DB::table('fumaco_items')->where('f_status', 1)->whereIn('f_idcode', collect($discounted_selected_items_query)->pluck('item_code'))
+                ->select('f_idcode', 'f_item_name', 'f_default_price')->orderBy('f_idcode', 'asc')->get();
         }
 
         $customer_groups = DB::table('fumaco_customer_group')->get();
@@ -1653,40 +1680,43 @@ class ProductController extends Controller
 				return redirect()->back()->with('error', "Cannot select the same category twice.");
             }
 
-            $discount_rate = null;
-            $discount_type = null;
-            $capped_amount = null;
+            $discount_rate = $discount_type = $capped_amount = null;
 
             Cache::forget('has_clearance_sale');
 
-            $sale_duration = explode(' - ', $request->sale_duration);
+            $notif_schedule = $request->notif_schedule ? Carbon::parse($request->notif_schedule)->format('Y-m-d') : null;
 
-            $from = $request->sale_duration ? date('Y-m-d', strtotime($sale_duration[0])) : null;
-            $to = $request->sale_duration ? date('Y-m-d', strtotime($sale_duration[1])) : null;
-            $notif_schedule = $request->notif_schedule ? date('Y-m-d', strtotime($request->notif_schedule)) : null;
+            $from = $to = null;
+            if (!$request->ignore_sale_duration) {
+                $sale_duration = explode(' - ', $request->sale_duration);
 
-            // check if date overlaps with other "On Sale"
-            $date_check = DB::table('fumaco_on_sale')->where('start_date', '!=', '')->where('end_date', '!=', '')->get();
-            $customer_group_date = DB::table('fumaco_customer_group as customer_group')->join('fumaco_on_sale_customer_group as on_sale', 'customer_group.id', 'on_sale.customer_group_id')->get();
-            $customer_grp_check = collect($customer_group_date)->groupBy('sale_id');
+                $from = $request->sale_duration ? Carbon::parse($sale_duration[0])->format('Y-m-d') : null;
+                $to = $request->sale_duration ? Carbon::parse($sale_duration[1])->format('Y-m-d') : null;
 
-            foreach($date_check as $date){
-                if($from >= $date->start_date and $from <= $date->end_date){
-                    if($request->apply_discount_to != 'Per Customer Group'){
-                        return redirect()->back()->with('error', 'On Sale dates cannot overlap');
-                    }else{ // for customer group sale date
-                        if(isset($customer_grp_check[$date->id]) and in_array($customer_grp_check[$date->id][0]->customer_group_id, $request->selected_customer_group)){
+                 // check if date overlaps with other "On Sale"
+                $date_check = DB::table('fumaco_on_sale')->where('start_date', '!=', '')->where('end_date', '!=', '')->get();
+
+                $customer_group_date = DB::table('fumaco_customer_group as customer_group')->join('fumaco_on_sale_customer_group as on_sale', 'customer_group.id', 'on_sale.customer_group_id')->get();
+                $customer_grp_check = collect($customer_group_date)->groupBy('sale_id');
+    
+                foreach($date_check as $date){
+                    if($from >= $date->start_date and $from <= $date->end_date){
+                        if($request->apply_discount_to != 'Per Customer Group'){
                             return redirect()->back()->with('error', 'On Sale dates cannot overlap');
+                        }else{ // for customer group sale date
+                            if(isset($customer_grp_check[$date->id]) and in_array($customer_grp_check[$date->id][0]->customer_group_id, $request->selected_customer_group)){
+                                return redirect()->back()->with('error', 'On Sale dates cannot overlap');
+                            }
                         }
                     }
-                }
-
-                if($to >= $date->start_date and $to <= $date->end_date){
-                    if($request->apply_discount_to != 'Per Customer Group'){
-                        return redirect()->back()->with('error', 'On Sale dates cannot overlap');
-                    }else{ // for customer group sale date
-                        if(isset($customer_grp_check[$date->id]) and in_array($customer_grp_check[$date->id][0]->customer_group_id, $request->selected_customer_group)){
+    
+                    if($to >= $date->start_date and $to <= $date->end_date){
+                        if($request->apply_discount_to != 'Per Customer Group'){
                             return redirect()->back()->with('error', 'On Sale dates cannot overlap');
+                        }else{ // for customer group sale date
+                            if(isset($customer_grp_check[$date->id]) and in_array($customer_grp_check[$date->id][0]->customer_group_id, $request->selected_customer_group)){
+                                return redirect()->back()->with('error', 'On Sale dates cannot overlap');
+                            }
                         }
                     }
                 }
@@ -1706,17 +1736,20 @@ class ProductController extends Controller
                 }
             }
 
+            $apply_discount_to = $request->sale_type == 'Clearance Sale' ? 'Selected Items' : $request->apply_discount_to;
+
             $insert = [
                 'sale_name' => $request->sale_name,
                 'start_date' => $from,
-                'is_clearance_sale' => $request->is_clearance_sale,
                 'end_date' => $to,
+                'is_clearance_sale' => $request->sale_type == 'Clearance Sale' ? 1 : 0,
                 'notification_schedule' => $notif_schedule,
                 'discount_type' => $discount_type,
                 'discount_rate' => $discount_rate,
                 'capped_amount' => $capped_amount,
                 'discount_for' => $request->discount_for,
-                'apply_discount_to' => $request->apply_discount_to,
+                'ignore_sale_duration' => $request->ignore_sale_duration,
+                'apply_discount_to' => $apply_discount_to,
                 'created_by' => Auth::user()->username
             ];
 
@@ -1793,14 +1826,14 @@ class ProductController extends Controller
 
             $id = DB::table('fumaco_on_sale')->insertGetId($insert);
 
-            if(in_array($request->apply_discount_to, ['Per Shipping Service', 'Per Category', 'Per Customer Group', 'Selected Items'])){
+            if(in_array($apply_discount_to, ['Per Shipping Service', 'Per Category', 'Per Customer Group', 'Selected Items'])){
                 $item_prices = [];
-                if($request->apply_discount_to == 'Selected Items'){
+                if($apply_discount_to == 'Selected Items'){
                     $item_prices = DB::table('fumaco_items')->whereIn('f_idcode', $request->selected_reference)->select('f_idcode', 'f_default_price')->get();
                     $item_prices = collect($item_prices)->groupBy('f_idcode');
                 }
 
-                switch ($request->apply_discount_to) {
+                switch ($apply_discount_to) {
                     case 'Per Shipping Service':
                         $reference = 'shipping_service';
                         $table = 'fumaco_on_sale_shipping_service';
@@ -1822,9 +1855,77 @@ class ProductController extends Controller
                         break;
                 }
 
+                $duplicate_ref = array_count_values($request->selected_reference);
+                $duplicate_item  = array_filter($request->selected_reference, function ($value) use ($duplicate_ref) {
+                    return $duplicate_ref[$value] > 1;
+                });
+
+                if ($duplicate_item && count($duplicate_item) > 0) {
+                    $duplicate_name = $duplicate_item[0];
+                    if ($reference == 'customer_group_id') {
+                        $duplicate_name = DB::table('fumaco_customer_group')->where('id', $duplicate_name)->first()->customer_group_name;
+                    }
+
+                    if ($reference == 'category_id') {
+                        $duplicate_name = DB::table('fumaco_categories')->where('id', $duplicate_name)->first()->name;
+                    }
+
+                    if ($reference == 'shipping_service') {
+                        $duplicate_name = DB::table('fumaco_shipping_service')->where('shipping_service_id', $duplicate_name)->first()->shipping_service_name;
+                    }
+
+                    return redirect()->back()->with('error', $duplicate_name . ' has been entered multiple times.');
+                }
+
+                if ($reference == 'customer_group_id') {
+                    $existing_ref = DB::table('fumaco_on_sale_customer_group as a')
+                        ->join('fumaco_on_sale as b', 'a.sale_id', 'b.id')
+                        ->join('fumaco_customer_group as c', 'a.customer_group_id', 'c.id')
+                        ->where('b.status', 1)->whereIn('a.customer_group_id', $request->selected_reference)
+                        ->first();
+
+                    if ($existing_ref) {
+                        return redirect()->back()->with('error', $existing_ref->customer_group_name . ' already exists in ' . $existing_ref->sale_name);
+                    }
+                }
+
+                if ($reference == 'category_id') {
+                    $existing_ref = DB::table('fumaco_on_sale_categories as a')
+                        ->join('fumaco_on_sale as b', 'a.sale_id', 'b.id')
+                        ->join('fumaco_categories as c', 'a.category_id', 'c.id')
+                        ->where('b.status', 1)->whereIn('a.category_id', $request->selected_reference)
+                        ->first();
+
+                    if ($existing_ref) {
+                        return redirect()->back()->with('error', $existing_ref->name . ' already exists in ' . $existing_ref->sale_name);
+                    }
+                }
+
+                if ($reference == 'shipping_service') {
+                    $existing_ref = DB::table('fumaco_on_sale_shipping_service as a')
+                        ->join('fumaco_on_sale as b', 'a.sale_id', 'b.id')
+                        ->where('b.status', 1)->whereIn('a.shipping_service', $request->selected_reference)
+                        ->first();
+
+                    if ($existing_ref) {
+                        return redirect()->back()->with('error', $existing_ref->shipping_service_name . ' already exists in ' . $existing_ref->sale_name);
+                    }
+                }
+
+                if ($reference == 'item_code') {
+                    $existing_ref = DB::table('fumaco_on_sale_items as a')
+                        ->join('fumaco_on_sale as b', 'a.sale_id', 'b.id')
+                        ->join('fumaco_items as c', 'a.item_code', 'c.f_idcode')
+                        ->where('b.status', 1)->whereIn('a.item_code', $request->selected_reference)
+                        ->first();
+
+                    if ($existing_ref) {
+                        return redirect()->back()->with('error', $existing_ref->item_code . ' already exists in ' . $existing_ref->sale_name);
+                    }
+                }
+
                 foreach($request->selected_reference as $key => $reference_name){
-                    $discount_rate = 0;
-                    $capped_amount = 0;
+                    $discount_rate = $capped_amount = 0;
 
                     if($request->selected_discount_type[$key] == 'By Percentage'){
                         $discount_rate = $request->selected_discount_rate[$key];
@@ -1837,7 +1938,7 @@ class ProductController extends Controller
                         $discount_rate = $request->selected_discount_rate[$key];
 
                         $item_price = isset($item_prices[$reference_name]) ? $item_prices[$reference_name][0]->f_default_price: 0;
-                        if($request->apply_discount_to == 'Selected Items'){
+                        if($apply_discount_to == 'Selected Items'){
                             if($discount_rate >= $item_price){
                                 return redirect()->back()->with('error', 'Discount amount cannot be more than the item price.');
                             }
@@ -1856,9 +1957,11 @@ class ProductController extends Controller
             }
 
             DB::commit();
+
             return redirect('/admin/marketing/on_sale/list')->with('success', 'On Sale Added.');
         } catch (Exception $e) {
             DB::rollback();
+            
             return redirect()->back()->with('error', 'An error occured. Please try again.');
         }
     }
@@ -1901,10 +2004,76 @@ class ProductController extends Controller
                     break;
             }
 
-            $selected_reference = [];
-            $selected_discount_rate = [];
-            $selected_discount_type = [];
-            $selected_capped_amount = [];
+            $duplicate_ref = array_count_values($request->selected_reference[$arr_key]);
+            $duplicate_item  = array_filter($request->selected_reference[$arr_key], function ($value) use ($duplicate_ref) {
+                return $duplicate_ref[$value] > 1;
+            });
+
+            if ($duplicate_item && count($duplicate_item) > 0) {
+                $duplicate_name = $duplicate_item[0];
+                if ($reference == 'customer_group_id') {
+                    $duplicate_name = DB::table('fumaco_customer_group')->where('id', $duplicate_name)->first()->customer_group_name;
+                }
+
+                if ($reference == 'category_id') {
+                    $duplicate_name = DB::table('fumaco_categories')->where('id', $duplicate_name)->first()->name;
+                }
+
+                if ($reference == 'shipping_service') {
+                    $duplicate_name = DB::table('fumaco_shipping_service')->where('shipping_service_id', $duplicate_name)->first()->shipping_service_name;
+                }
+
+                return redirect()->back()->with('error', $duplicate_name . ' has been entered multiple times.');
+            }
+
+            if ($reference == 'customer_group_id') {
+                $existing_ref = DB::table('fumaco_on_sale_customer_group as a')
+                    ->join('fumaco_on_sale as b', 'a.sale_id', 'b.id')
+                    ->join('fumaco_customer_group as c', 'a.customer_group_id', 'c.id')
+                    ->where('b.status', 1)->whereIn('a.customer_group_id', $request->selected_reference[$arr_key])
+                    ->first();
+
+                if ($existing_ref) {
+                    return redirect()->back()->with('error', $existing_ref->customer_group_name . ' already exists in ' . $existing_ref->sale_name);
+                }
+            }
+
+            if ($reference == 'category_id') {
+                $existing_ref = DB::table('fumaco_on_sale_categories as a')
+                    ->join('fumaco_on_sale as b', 'a.sale_id', 'b.id')
+                    ->join('fumaco_categories as c', 'a.category_id', 'c.id')
+                    ->where('b.status', 1)->whereIn('a.category_id', $request->selected_reference[$arr_key])
+                    ->first();
+
+                if ($existing_ref) {
+                    return redirect()->back()->with('error', $existing_ref->name . ' already exists in ' . $existing_ref->sale_name);
+                }
+            }
+
+            if ($reference == 'shipping_service') {
+                $existing_ref = DB::table('fumaco_on_sale_shipping_service as a')
+                    ->join('fumaco_on_sale as b', 'a.sale_id', 'b.id')
+                    ->where('b.status', 1)->whereIn('a.shipping_service', $request->selected_reference[$arr_key])
+                    ->first();
+
+                if ($existing_ref) {
+                    return redirect()->back()->with('error', $existing_ref->shipping_service_name . ' already exists in ' . $existing_ref->sale_name);
+                }
+            }
+
+            if ($reference == 'item_code') {
+                $existing_ref = DB::table('fumaco_on_sale_items as a')
+                    ->join('fumaco_on_sale as b', 'a.sale_id', 'b.id')
+                    ->join('fumaco_items as c', 'a.item_code', 'c.f_idcode')
+                    ->where('b.status', 1)->whereIn('a.item_code', $request->selected_reference[$arr_key])
+                    ->first();
+
+                if ($existing_ref) {
+                    return redirect()->back()->with('error', $existing_ref->item_code . ' already exists in ' . $existing_ref->sale_name);
+                }
+            }
+
+            $selected_reference = $selected_discount_rate = $selected_discount_type = $selected_capped_amount = [];
             if($request->apply_discount_to != 'All Items'){
                 if(isset($request->selected_reference[$arr_key]) and count($request->selected_reference[$arr_key]) !== count(array_unique($request->selected_reference[$arr_key]))){
                     return redirect()->back()->with('error', "Cannot select the same ".$err." more than once.");
@@ -1916,40 +2085,42 @@ class ProductController extends Controller
                 $selected_capped_amount = isset($request->selected_capped_amount[$arr_key]) ? $request->selected_capped_amount[$arr_key] : [];
             }
 
-            $discount_rate = null;
-            $discount_type = null;
-            $capped_amount = null;
+            $discount_rate = $discount_type = $capped_amount = null;
 
-            $sale_duration = explode(' - ', $request->sale_duration);
-
-            $from = $request->sale_duration ? date('Y-m-d', strtotime($sale_duration[0])) : null;
-            $to = $request->sale_duration ? date('Y-m-d', strtotime($sale_duration[1])) : null;
             $notif_schedule = $request->notif_schedule ? date('Y-m-d', strtotime($request->notif_schedule)) : null;
 
-            // check if date overlaps with other "On Sale"
-            $date_check = DB::table('fumaco_on_sale')->where('id', '!=', $id)->where('start_date', '!=', '')->where('end_date', '!=', '')->get();
-            $customer_group_date = DB::table('fumaco_customer_group as customer_group')->join('fumaco_on_sale_customer_group as on_sale', 'customer_group.id', 'on_sale.customer_group_id')->get();
-            $customer_grp_check = collect($customer_group_date)->groupBy('sale_id');
+            $from = $to = null;
+            if (!$request->ignore_sale_duration) {
+                $sale_duration = explode(' - ', $request->sale_duration);
 
-            foreach($date_check as $date){
-                if($from >= $date->start_date and $from <= $date->end_date){
-                    if($request->apply_discount_to != 'Per Customer Group'){
-                        return redirect()->back()->with('error', 'On Sale dates cannot overlap');
-                    }else{ // for customer group sale date
-                        $customer_group_arr = isset($request->selected_reference['customer_group']) ? $request->selected_reference['customer_group'] : [];
-                        if(isset($customer_grp_check[$date->id]) and in_array($customer_grp_check[$date->id][0]->customer_group_id, $customer_group_arr)){
+                $from = $request->sale_duration ? date('Y-m-d', strtotime($sale_duration[0])) : null;
+                $to = $request->sale_duration ? date('Y-m-d', strtotime($sale_duration[1])) : null;
+                    
+                // check if date overlaps with other "On Sale"
+                $date_check = DB::table('fumaco_on_sale')->where('id', '!=', $id)->where('start_date', '!=', '')->where('end_date', '!=', '')->get();
+                $customer_group_date = DB::table('fumaco_customer_group as customer_group')->join('fumaco_on_sale_customer_group as on_sale', 'customer_group.id', 'on_sale.customer_group_id')->get();
+                $customer_grp_check = collect($customer_group_date)->groupBy('sale_id');
+
+                foreach($date_check as $date){
+                    if($from >= $date->start_date and $from <= $date->end_date){
+                        if($request->apply_discount_to != 'Per Customer Group'){
                             return redirect()->back()->with('error', 'On Sale dates cannot overlap');
+                        }else{ // for customer group sale date
+                            $customer_group_arr = isset($request->selected_reference['customer_group']) ? $request->selected_reference['customer_group'] : [];
+                            if(isset($customer_grp_check[$date->id]) and in_array($customer_grp_check[$date->id][0]->customer_group_id, $customer_group_arr)){
+                                return redirect()->back()->with('error', 'On Sale dates cannot overlap');
+                            }
                         }
                     }
-                }
 
-                if($to >= $date->start_date and $to <= $date->end_date){
-                    if($request->apply_discount_to != 'Per Customer Group'){
-                        return redirect()->back()->with('error', 'On Sale dates cannot overlap');
-                    }else{ // for customer group sale date
-                        $customer_group_arr = isset($request->selected_reference['customer_group']) ? $request->selected_reference['customer_group'] : [];
-                        if(isset($customer_grp_check[$date->id]) and in_array($customer_grp_check[$date->id][0]->customer_group_id, $customer_group_arr)){
+                    if($to >= $date->start_date and $to <= $date->end_date){
+                        if($request->apply_discount_to != 'Per Customer Group'){
                             return redirect()->back()->with('error', 'On Sale dates cannot overlap');
+                        }else{ // for customer group sale date
+                            $customer_group_arr = isset($request->selected_reference['customer_group']) ? $request->selected_reference['customer_group'] : [];
+                            if(isset($customer_grp_check[$date->id]) and in_array($customer_grp_check[$date->id][0]->customer_group_id, $customer_group_arr)){
+                                return redirect()->back()->with('error', 'On Sale dates cannot overlap');
+                            }
                         }
                     }
                 }
@@ -1973,17 +2144,20 @@ class ProductController extends Controller
                 DB::table($request->child_table)->where('sale_id', $id)->delete();
             }
 
+            $apply_discount_to = $request->sale_type == 'Clearance Sale' ? 'Selected Items' : $request->apply_discount_to;
+
             $update = [
                 'sale_name' => $request->sale_name,
                 'start_date' => $from,
-                'is_clearance_sale' => $request->is_clearance_sale,
                 'end_date' => $to,
+                'is_clearance_sale' => $request->sale_type == 'Clearance Sale' ? 1 : 0,
                 'notification_schedule' => $notif_schedule,
                 'discount_type' => $discount_type,
                 'discount_rate' => $discount_rate,
                 'discount_for' => $request->discount_for,
                 'capped_amount' => $capped_amount,
-                'apply_discount_to' => $request->apply_discount_to,
+                'ignore_sale_duration' => $request->ignore_sale_duration,
+                'apply_discount_to' => $apply_discount_to,
                 'last_modified_at' => Carbon::now()->toDateTimeString(),
                 'last_modified_by' => Auth::user()->username
             ];
@@ -2059,9 +2233,9 @@ class ProductController extends Controller
 
             DB::table('fumaco_on_sale')->where('id', $id)->update($update);
 
-            if(in_array($request->apply_discount_to, ['Per Shipping Service', 'Per Category', 'Per Customer Group', 'Selected Items'])){
+            if(in_array($apply_discount_to, ['Per Shipping Service', 'Per Category', 'Per Customer Group', 'Selected Items'])){
                 $item_prices = [];
-                if($request->apply_discount_to == 'Selected Items'){
+                if($apply_discount_to == 'Selected Items'){
                     $items = isset($request->selected_reference['item_code']) ? $request->selected_reference['item_code'] : [];
 
                     $item_prices = DB::table('fumaco_items')->whereIn('f_idcode', $items)->select('f_idcode', 'f_default_price')->get();
@@ -2084,7 +2258,7 @@ class ProductController extends Controller
 
                         $item_price = isset($item_prices[$reference_name]) ? $item_prices[$reference_name][0]->f_default_price : 0;
 
-                        if($request->apply_discount_to == 'Selected Items'){
+                        if($apply_discount_to == 'Selected Items'){
                             if($discount_rate >= $item_price){
                                 return redirect()->back()->with('error', 'Discount amount cannot be more than the item price.');
                             }
@@ -2105,9 +2279,10 @@ class ProductController extends Controller
 
             DB::commit();
 
-            return redirect('/admin/marketing/on_sale/list')->with('success', 'On Sale Added.');
+            return redirect('/admin/marketing/on_sale/list')->with('success', 'On Sale Updated.');
         } catch (Exception $e) {
             DB::rollback();
+
             return redirect()->back()->with('error', 'An error occured. Please try again.');
         }
     }
