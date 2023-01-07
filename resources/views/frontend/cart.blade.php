@@ -43,9 +43,9 @@
                         <tr>
                             <th class="he1x">Product</th>
                             <th class="he1x d-none d-sm-table-cell"></th>
-                            <th class="he1x d-none d-sm-table-cell">Price</th>
-                            <th class="he1x d-none d-sm-table-cell">Quantity</th>
-                            <th class="he1x d-none d-sm-table-cell">Total</th>
+                            <th class="he1x d-none d-sm-table-cell text-center">Price</th>
+                            <th class="he1x d-none d-sm-table-cell" style="width: 20% !important">Quantity</th>
+                            <th class="he1x d-none d-sm-table-cell text-center">Total</th>
                             <th class="he1x d-none d-sm-table-cell" style="width: 5px !important"></th>
                         </tr>
                     </thead>
@@ -91,7 +91,16 @@
                                                 </div>
                                             </div>
                                             <div class="col-6" style="display: flex; justify-content: center; align-items: center; white-space: nowrap">
-                                                <span class="formatted-price"><b>₱ {{ number_format($cart['price'], 2, '.', ',') }}</b></span>
+                                                <div class="text-center">
+                                                    {{-- <span class="formatted-price" style="font-size: 11pt;"><b>₱ {{ number_format($cart['price'], 2, '.', ',') }}</b></span> --}}
+                                                    <p style="white-space: nowrap !important; font-weight: 600;">₱ <span class="formatted-amount" style="font-size: 11pt;">{{ number_format($cart['amount'], 2, '.', ',') }}</span>
+                                                        <br>
+                                                        <del><span class="orig-amount d-none">₱ 0.00</span></del>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div class="col-12">
+                                                <small class="price-rule-display text-success"></small>
                                             </div>
                                         </div>
                                         <div class="row p-0">
@@ -108,7 +117,16 @@
                                     <a href="/product/{{ $cart['slug'] }}" style="text-decoration: none !important; color: #000;">{{ $cart['item_description'] }}</a>
                                 </div>
                             </td>
-                            <td class="tbls d-none d-sm-table-cell"><p style="white-space: nowrap !important;">₱ <span class="formatted-price">{{ number_format($cart['price'], 2, '.', ',') }}</span></p><span class="price d-none">{{ $cart['price'] }}</span></td>
+                            <td class="tbls d-none d-sm-table-cell text-center">
+                                <p style="white-space: nowrap !important;">
+                                    ₱ <span class="formatted-price" style="font-size: 11pt;">{{ number_format($cart['price'], 2, '.', ',') }}</span>
+                                    @if ($cart['is_discounted'])
+                                        <br>
+                                        <del>₱ {{ number_format($cart['default_price'], 2, '.', ',') }}</del>
+                                    @endif
+                                </p>
+                                <span class="price d-none">{{ $cart['price'] }}</span>
+                            </td>
                             <td class="tbls d-none d-sm-table-cell text-center">
                                 <div class="input-group">
                                     <span class="input-group-btn">
@@ -122,8 +140,14 @@
                                     </span>
                                 </div>
                                 <small class="text-danger m-2 stock-status {{ ($cart['insufficient_stock'] || $cart['quantity'] > $cart['stock_qty']) ? null : 'd-none' }}">Only {{  $cart['stock_qty'].' '.$cart['stock_uom'] }} left!</small>
+                                <small class="price-rule-display text-success"></small>
                             </td>
-                            <td class="tbls d-none d-sm-table-cell"><p style="white-space: nowrap !important;">₱ <span class="formatted-amount">{{ number_format($cart['amount'], 2, '.', ',') }}</span></p><span class="amount d-none">{{ $cart['amount'] }}</span>
+                            <td class="tbls d-none d-sm-table-cell text-center">
+                                <p style="white-space: nowrap !important;">₱ <span class="formatted-amount" style="font-size: 11pt;">{{ number_format($cart['amount'], 2, '.', ',') }}</span>
+                                    <br>
+                                    <del><span class="orig-amount d-none">₱ 0.00</span></del>
+                                </p>
+                                <span class="amount d-none">{{ $cart['amount'] }}</span>
                             </td>
                             <td class="tbls tbl-qtr d-none d-sm-table-cell">
                                 <a class="btn btn-sm btn-outline-primary remove-from-cart-btn no-border" href="#" role="button" 
@@ -141,13 +165,19 @@
                         @endforelse
                     </tbody>
                 </table>
-                <table class="table">
-                    <tr>
-                        <td class="col-6 col-md-8">&nbsp;</td>
-                        <td class="col-3 col-md-2">Total</td>
-                        <td><small class="text-muted stylecap he1x" id="cart-subtotal" style="white-space: nowrap">₱ {{ number_format(collect($cart_arr)->sum('amount'), 2, '.', ',') }}</small></td>
-                    </tr> 
-                </table>
+                <div class="row" style="border-top: 1px solid #DEE2E6; border-bottom: 1px solid #DEE2E6;">
+                    <div class="col-8 p-2 text-right">
+                        Total
+                    </div>
+                    <div class="col-4 p-2 text-center text-md-left">
+                        <small class="text-muted stylecap he1x" id="cart-subtotal" style="white-space: nowrap">₱ {{ number_format(collect($cart_arr)->sum('amount'), 2, '.', ',') }}</small>
+                        <br class="d-md-none">
+                        <del id="orig-total" class="text-muted" style="font-size: 9pt;"></del>
+                    </div>
+                    <div class="col-12 col-md-4 offset-md-8 text-center">
+                        <span id="price-rule-display-total" class='text-success' style="font-size: 10pt;"></span>
+                    </div>
+                </div>
                 <br/>
                 @php
                     $action = '';
@@ -412,6 +442,10 @@
     .img-container{
         width: 55px;
     }
+
+    .text-right{
+        text-align: right;
+    }
     /* Animation */
     @keyframes fadeInUp {
         from {
@@ -543,7 +577,7 @@
             }
         };
     $(document).ready(function() {
-     
+        var applicable_price_rule = @json($applicable_price_rule);
 
         updateTotal();
         $(document).on('click', '.quantity-left-minus', function(e){
@@ -552,7 +586,6 @@
             var input_name = row.find('input[name="quantity[]"]').eq(0);
             var id = input_name.data('id');
             var max = input_name.attr('max');
-
             var res_input_name = row.find('input[name="res_quantity[]"]').eq(0);
 
             var current_qty = input_name.val();
@@ -646,7 +679,7 @@
         }
 
         $('#checkout-btn').click(function(e){
-            e.preventDefault();
+            // e.preventDefault();
             $('#custom-overlay').fadeIn();
             window.location.href = "{{ $action }}";
         });
@@ -705,11 +738,13 @@
             }
         });
 
-
         function updateTotal() {
-            var subtotal = 0;
+            var subtotal = transaction_qty = 0;
             $('#cart-items tbody tr').each(function(){
                 var amount = $(this).find('.amount').eq(0).text();
+                var qty = $(this).find('input[name="quantity[]"]').eq(0).val();
+
+                transaction_qty = parseInt(transaction_qty) + parseInt(qty);
                 subtotal += parseFloat(amount);
             });
 
@@ -719,21 +754,137 @@
             total = (isNaN(total)) ? 0 : total;
             subtotal = (isNaN(subtotal)) ? 0 : subtotal;
 
+            if('Transaction' in applicable_price_rule){
+                var price_rule = applicable_price_rule['Transaction'];
+                var active_price_rule = apr = 0;
+                var discounted_amount = 0;
+
+                $.each(price_rule, function (q, i){
+                    var a = i.based_on == 'Total Amount' ? subtotal : transaction_qty;
+                    var isLastElement = q == price_rule.length -1;
+                    if(a >= i.range_from && a <= i.range_to || a > i.range_to && isLastElement){
+                        if(!active_price_rule){
+                            $('#orig-total').eq(0).text('₱ ' + subtotal.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,"));
+                            switch (i.discount_type) {
+                                case 'Percentage':
+                                    discounted_amount = subtotal * (i.rate / 100);
+                                    discounted_amount = subtotal - discounted_amount;
+                                    active_price_rule = 1;
+                                    break;
+                                default:
+                                    discounted_amount = subtotal > i.rate ? subtotal - i.rate : subtotal;
+                                    active_price_rule = subtotal > i.rate ? 1 : 0;
+                                    break;
+                            }
+                            
+                            subtotal = discounted_amount;
+                        }
+
+                    }
+
+                    if(a < i.range_from){
+                        $('#price-rule-display-total').removeClass('d-none');
+                        if (!apr) {
+                            if(i.based_on == 'Total Amount'){
+                                var msg = 'Reach at least <b>₱ ' + i.range_from.toFixed(2) + '</b> on this item and get a ' + i.discount_rate + ' discount';
+                            }else{
+                                var msg = 'Add at least <b>' + (parseInt(i.range_from) - transaction_qty) + '</b> more item(s) and get a ' + i.discount_rate + ' discount.';
+                            }
+                            $('#price-rule-display-total').html(msg);
+                        }
+                        
+                        apr = 1;
+                    }else{
+                        $('#price-rule-display-total').addClass('d-none');
+                    }
+                });
+
+                if (!active_price_rule) {
+                    $('#orig-total').addClass('d-none');
+                }else{
+                    $('#orig-total').removeClass('d-none');
+                }
+            }
+
             $('#cart-subtotal').text('₱ ' + subtotal.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,"));
             $('#grand-total').text('₱ ' + total.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,"));
+        }
+
+        if (!('Transaction' in applicable_price_rule)) {
+            $('#cart-items tbody tr').each(function(){
+                updateAmount($(this));
+            });
         }
 
         function updateAmount(row, type) {
             var price = row.find('.price').eq(0).text();
             if(type == 'mobile'){
                 var qty = row.find('input[name="res_quantity[]"]').eq(0).val();
+                var input_name = row.find('input[name="res_quantity[]"]').eq(0);
             }else{
                 var qty = row.find('input[name="quantity[]"]').eq(0).val();
+                var input_name = row.find('input[name="quantity[]"]').eq(0);
             }
             var amount = (price * qty).toFixed(2);
 
-            row.find('.amount').eq(0).text(amount);
-            row.find('.formatted-amount').eq(0).text(parseFloat(amount).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,"));
+            // price rule checker
+            var item_code = input_name.data('id');
+
+            if(item_code in applicable_price_rule && !('Transaction' in applicable_price_rule)){
+                var price_rule = applicable_price_rule[item_code];
+                var active_price_rule = apr = 0;
+                var discounted_amount = 0;
+
+                $.each(price_rule, function (q, i){
+                    var a = i.based_on == 'Total Amount' ? (price * qty) : qty; 
+                    var isLastElement = q == price_rule.length -1;
+                    if(a >= i.range_from && a <= i.range_to || a > i.range_to && isLastElement){
+                        if(!active_price_rule){
+                            row.find('.orig-amount').text('₱ ' + (price * qty).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,"));
+                            switch (i.discount_type) {
+                                case 'Percentage':
+                                    discounted_amount = (price * qty) * (i.rate / 100);
+                                    discounted_amount = (price * qty) - discounted_amount;
+                                    active_price_rule = 1;
+                                    break;
+                                default:
+                                    discounted_amount = (price * qty) > i.rate ? (price * qty) - i.rate : (price * qty);
+                                    active_price_rule = (price * qty) > i.rate ? 1 : 0;
+                                    break;
+                            }
+                            
+                            
+                            amount = discounted_amount.toFixed(2);
+                        }
+                    }
+
+                    if(a < i.range_from){
+                        row.find('.price-rule-display').removeClass('d-none');
+                        if (!apr) {
+                            if(i.based_on == 'Total Amount'){
+                                var msg = 'Reach at least <b>₱ ' + i.range_from.toFixed(2) + '</b> on this item and get a ' + i.discount_rate + ' discount';
+                            }else{
+                                var msg = 'Add at least <b>' + (parseInt(i.range_from) - qty) + '</b> more and get a ' + i.discount_rate + ' discount.';
+                            }
+                            row.find('.price-rule-display').html(msg);
+                        }
+                        
+                        apr = 1;
+                    }else{
+                        row.find('.price-rule-display').addClass('d-none');
+                    }
+                });
+
+                if (!active_price_rule) {
+                    row.find('.orig-amount').addClass('d-none');
+                }else{
+                    row.find('.orig-amount').removeClass('d-none');
+                }
+            }
+            // price rule checker
+
+            row.find('.amount').text(amount);
+            row.find('.formatted-amount').text(parseFloat(amount).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,"));
             updateTotal();
         }
 

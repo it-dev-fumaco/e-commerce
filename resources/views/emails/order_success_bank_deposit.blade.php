@@ -135,7 +135,7 @@
 							</tr>
 						@endif
 					@endif
-					@if ($order_details->voucher_code || $price_rule)
+					@if ($order_details->voucher_code)
 						@if ($order_details->voucher_code)
 							@php
 								$voucher_discount_amount = 0;
@@ -158,13 +158,26 @@
 								<td class="pb-1 pt-1" style="padding: 6px;">- ₱ {{ number_format(str_replace(",","",$voucher_discount_amount), 2) }}</td>
 							</tr>
 						@endif
-						@if ($price_rule)
+					@endif
+					@isset($price_rule['Transaction'])
+						@php
+							$rule = $price_rule['Transaction'];
+							switch ($rule['discount_type']) {
+								case 'Percentage':
+									$discount_amount = collect($items)->sum('amount') * ($rule['discount_rate'] / 100);
+									break;
+								default:
+									$discount_amount = collect($items)->sum('amount') > $rule['discount_rate'] ? $rule['discount_rate'] : 0;
+									break;
+							}
+						@endphp
+						@if ($discount_amount)
 							<tr style="font-size: 0.8rem; text-align: right;">
-								<td class="pb-1 pt-1" style="padding: 6px;" colspan="{{ $colspan }}"><span class="text-white" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833;">{{ $price_rule['discount_name'] }}</span></td>
-								<td class="pb-1 pt-1" style="padding: 6px;">- ₱ {{ number_format(str_replace(",","", $price_rule['discount_amount']), 2) }}</td>
+								<td class="pb-1 pt-1" style="padding: 6px;" colspan="{{ $colspan }}"><span class="text-white" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833;">{{ $rule['discount_name'] }}</span></td>
+								<td class="pb-1 pt-1" style="padding: 6px;">- ₱ {{ number_format(str_replace(",","",$discount_amount), 2) }}</td>
 							</tr>
 						@endif
-					@endif
+					@endisset
 					<tr style="font-size: 0.8rem; text-align: right;">
 						<td class="pb-1 pt-1" style="padding: 6px;" colspan="{{ $colspan }}">{{ $order_details->order_shipping }}</td>
 						<td class="pb-1 pt-1" style="padding: 6px; white-space: nowrap !important">

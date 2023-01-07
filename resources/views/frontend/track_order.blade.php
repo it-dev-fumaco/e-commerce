@@ -63,6 +63,18 @@
 											@if ($order_details->order_payment_method == 'Bank Deposit')
 												@php
 													$order_tracker_payment = collect($track_order_details)->groupBy('track_payment_status');
+													$shipping_discount_amount = $voucher_discount_amount = 0;
+													if($shipping_discount){
+														switch ($shipping_discount->discount_type) {
+															case 'By Percentage':
+															$shipping_discount_amount = ($shipping_discount->discount_rate / 100) * collect($items)->sum('amount');
+															$shipping_discount_amount = $shipping_discount_amount > $shipping_discount->capped_amount ? $shipping_discount->capped_amount : $shipping_discount_amount;
+															break;
+															default:
+															$shipping_discount_amount = $shipping_discount->discount_rate;
+															break;
+														}
+													}
 												@endphp
 												@foreach ($payment_statuses as $s => $status)
 													@php
@@ -171,14 +183,38 @@
 													<td class="table-text p-1" style="text-align: right; white-space: nowrap !important">₱ {{ number_format($order_details->order_subtotal, 2) }}</td>
 												</tr>
 												@if ($order_details->voucher_code)
+												@php
+													if($voucher_details){
+														switch ($voucher_details->discount_type) {
+															case 'By Percentage':
+																$voucher_discount_amount = ($voucher_details->discount_rate / 100) * $order_details->order_subtotal;
+																break;
+															default:
+																$voucher_discount_amount = $voucher_details->discount_rate;
+																break;
+														}
+													}
+												@endphp
 												<tr style="border-bottom: rgba(0,0,0,0) !important; font-size: 10pt;">
 													<td colspan="4" class="table-text p-1" style="text-align: right;">Discount :
 														<span class="text-white" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833;">{{ $order_details->voucher_code }}</span>
 														</td>
-													<td class="table-text p-1" style="text-align: right; white-space: nowrap !important">- ₱ {{ number_format($order_details->discount_amount, 2) }}</td>
+													<td class="table-text p-1" style="text-align: right; white-space: nowrap !important">- ₱ {{ number_format($voucher_discount_amount, 2) }}</td>
 												</tr>
 												@endif 
-												
+												@if ($price_rule)
+													@php
+														$pr_discount_amount = $order_details->discount_amount > ($shipping_discount_amount + $voucher_discount_amount) ? $order_details->discount_amount - ($shipping_discount_amount + $voucher_discount_amount) : 0;
+													@endphp
+													@if ($pr_discount_amount > 0)
+														<tr style="border-bottom: rgba(0,0,0,0) !important; font-size: 10pt;">
+															<td colspan="4" class="table-text p-1" style="text-align: right;">Discount :
+																<span class="text-white" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833;">{{ $price_rule['discount_name'] }}</span>
+																</td>
+															<td class="table-text p-1" style="text-align: right; white-space: nowrap !important">- ₱ {{ number_format($pr_discount_amount, 2) }}</td>
+														</tr>
+													@endif
+												@endif
 												<tr style="border-bottom: rgba(0,0,0,0) !important; font-size: 10pt;">
 													<td colspan="4" class="table-text p-1" style="text-align: right;">{{ $order_details->order_shipping }} : </td>
 													<td class="table-text p-1" style="text-align: right; white-space: nowrap !important">

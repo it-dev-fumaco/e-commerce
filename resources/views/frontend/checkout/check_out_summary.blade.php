@@ -205,90 +205,34 @@
 							<div class="he1x">
 								@php
 									$cart_subtotal = collect($cart_arr)->sum('subtotal');
-									$discount_rate = 0;
-									if ($price_rule) {
-										switch ($price_rule['discount_type']) {
+									if(isset($price_rule['Transaction'])){
+										$rule = $price_rule['Transaction'];
+										switch ($rule['discount_type']) {
 											case 'Percentage':
-												$discount_rate = $cart_subtotal * ($price_rule['discount_rate'] / 100);
-												break;
-											case 'Amount':
-												$discount_rate = $cart_subtotal > $price_rule['discount_rate'] ? $price_rule['discount_rate'] : 0;
+												$discount_rate = $cart_subtotal * ($rule['discount_rate'] / 100);
+												$cart_subtotal = $cart_subtotal - $discount_rate;
 												break;
 											default:
-												$discount_rate = 0;
+												$cart_subtotal = $cart_subtotal > $rule['discount_rate'] ? $cart_subtotal - $rule['discount_rate'] : $cart_subtotal;
 												break;
 										}
-
-										$cart_subtotal = $cart_subtotal - $discount_rate;
 									}
 								@endphp
 								<div class="d-flex justify-content-between align-items-center" style="padding: 7px 0 7px 5px; border-bottom: 1px solid #8c8c8cd0;">
-									Total Amount <small class="text-muted stylecap he1x">₱ {{ number_format(collect($cart_arr)->sum('subtotal'), 2, '.', ',') }}</small>
+									Total Amount <small class="text-muted stylecap he1x">₱ {{ number_format($cart_subtotal, 2, '.', ',') }}</small>
 								</div>
 								<div class="d-flex justify-content-between align-items-center d-none" style="padding: 7px 0 7px 5px; border-bottom: 1px solid #8c8c8cd0;" id="shipping-discount-div">
 									<p class="m-0" id="shipping-name" style='font-weight: 700 !important'>Shipping Service Discount</p>
 									<small class="text-danger stylecap he1x">- ₱ <span id="shipping-discount-amount">0.00</span></small>
 								</div>
-								<div class="d-none" style="padding: 7px 0 7px 5px; border-bottom: 1px solid #8c8c8cd0;" id="discount-tbl">
-									<div class="d-flex justify-content-between align-items-center pb-1">
-										Discount(s)
-									</div>
-									<div id="discount-div" class="d-flex justify-content-between align-items-center d-none p-2" style="border-top: 1px solid #D5D5D5">
-										<span id="voucher-code" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833; color: #fff">Voucher Applied</span> <small class="text-danger stylecap he1x">- ₱ <span id="discount-amount">0.00</span></small>
-									</div>
-									@if ($price_rule)
-										<div class="d-flex justify-content-between align-items-center p-2" style="border-top: 1px solid #D5D5D5">
-											<span style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833; color: #fff">{{ $price_rule['discount_name'] }}</span> <small class="text-danger stylecap he1x">- ₱ {{ number_format($discount_rate, 2) }}</small>
-										</div>
-									@endif
+								<div class="d-flex justify-content-between align-items-center d-none" style="padding: 7px 0 7px 5px; border-bottom: 1px solid #8c8c8cd0;" id="discount-div">
+									<p class="m-0">Discount <span id="voucher-code" class="text-white d-none" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833;">Voucher Applied</span></p>
+									<small class="text-danger stylecap he1x">- ₱ <span id="discount-amount">0.00</span></small>
 								</div>
 								<div class="d-flex justify-content-between align-items-center" style="padding: 7px 0 7px 5px; border-bottom: 1px solid #8c8c8cd0;">
-									Subtotal <small class="text-muted stylecap he1x" id="cart-subtotal">₱ {{ number_format(collect($cart_arr)->sum('subtotal'), 2, '.', ',') }}</small>
+									Subtotal <small class="text-muted stylecap he1x" id="cart-subtotal">₱ {{ number_format($cart_subtotal, 2, '.', ',') }}</small>
 								</div>
 							</div>
-							@if ($applicable_price_rule)
-								@php
-									$cart_by_item_code = collect($cart_arr)->groupBy('item_code');
-									$cart_by_category = collect($cart_arr)->groupBy('category_id');
-									$item = isset($cart_by_item_code[$applicable_price_rule['applied_id']]) ? $cart_by_item_code[$applicable_price_rule['applied_id']][0] : [];
-									$category = isset($cart_by_category[$applicable_price_rule['applied_id']]) ? $cart_by_category[$applicable_price_rule['applied_id']] : [];
-								@endphp
-								@switch($applicable_price_rule['apply_on'])
-									@case('Item Code')
-										@if ($applicable_price_rule['based_on'] == 'Order Qty')
-											<div class="alert alert-warning fade show mt-2" role="alert" style="border: 1px solid;">
-												<i class="fas fa-shopping-cart d-inline-block m-1" style="font-size: 15pt;"></i> Add at least {{ $applicable_price_rule['range_from'] - $item['quantity'] }} more of <b>{!! $item['item_description'] !!}</b> and get a {{ $applicable_price_rule['discount_rate'] }} discount!
-											</div>
-										@else
-											<div class="alert alert-warning fade show mt-2" role="alert" style="border: 1px solid;">
-												<i class="fas fa-shopping-cart d-inline-block m-1" style="font-size: 15pt;"></i> Get a {{ $applicable_price_rule['discount_rate'] }} discount when you reach ₱ {{ number_format($applicable_price_rule['range_from'], 2) }} on <b>{!! $item['item_description'] !!}</b>.
-											</div>	
-										@endif
-										@break
-									@case('Category')
-										@if ($applicable_price_rule['based_on'] == 'Order Qty')
-											<div class="alert alert-warning fade show mt-2" role="alert" style="border: 1px solid;">
-												<i class="fas fa-shopping-cart d-inline-block m-1" style="font-size: 15pt;"></i> Add at least {{ $applicable_price_rule['range_from'] - collect($category)->sum('quantity') }} more item(s) from <b>{{ $applicable_price_rule['applied_on'] }}</b> and get a {{ $applicable_price_rule['discount_rate'] }} discount!
-											</div>
-										@else
-											<div class="alert alert-warning fade show mt-2" role="alert" style="border: 1px solid;">
-												<i class="fas fa-shopping-cart d-inline-block m-1" style="font-size: 15pt;"></i> Get a {{ $applicable_price_rule['discount_rate'] }} discount when you reach ₱ {{ number_format($applicable_price_rule['range_from'], 2) }} on <b>{{ $applicable_price_rule['applied_on'] }}</b>.
-											</div>	
-										@endif
-										@break
-									@default
-										@if ($applicable_price_rule['based_on'] == 'Order Qty')
-											<div class="alert alert-warning fade show mt-2" role="alert" style="border: 1px solid;">
-												<i class="fas fa-shopping-cart d-inline-block m-1" style="font-size: 15pt;"></i> Add at least {{ $applicable_price_rule['range_from'] - collect($cart_arr)->sum('quantity') }} more item(s) on your cart and get a {{ $applicable_price_rule['discount_rate'] }} discount!
-											</div>
-										@else
-											<div class="alert alert-warning fade show mt-2" role="alert" style="border: 1px solid;">
-												<i class="fas fa-shopping-cart d-inline-block m-1" style="font-size: 15pt;"></i> Get a {{ $applicable_price_rule['discount_rate'] }} discount when your cart reaches at least ₱ {{ number_format($applicable_price_rule['range_from'], 2) }}
-											</div>
-										@endif
-										@break
-								@endswitch
-							@endif
 							@if ($free_shipping_remarks)
 							<div class="alert alert-success fade show mt-2" role="alert" style="border: 1px solid;">
 								<i class="fas fa-truck d-inline-block m-1" style="font-size: 15pt;"></i> {{ $free_shipping_remarks }}
@@ -1614,6 +1558,7 @@
 						shipping_discount = shipping_discount_rate;
 						break;
 					case 'By Percentage':
+					case 'percentage':
 						shipping_discount = subtotal * shipping_discount_rate;
 						shipping_discount = shipping_discount < shipping_capped_amount ? shipping_discount : shipping_capped_amount;
 						break;

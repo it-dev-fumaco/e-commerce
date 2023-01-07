@@ -154,15 +154,23 @@
 							<td class="pb-1 pt-1" style="padding: 6px;">- ₱ {{ number_format(str_replace(",","",$voucher_discount_amount), 2) }}</td>
 						</tr>
 					@endif
-					@if ($order['price_rule'])
+					@isset($order['price_rule']['Transaction'])
 						@php
-							$price_rule = $order['price_rule'];
+							$rule = $order['price_rule']['Transaction'];
+							switch ($rule['discount_type']) {
+								case 'Percentage':
+									$discount_amount = collect($order['items'])->sum('amount') * ($rule['discount_rate'] / 100);
+									break;
+								default:
+									$discount_amount = $rule['discount_rate'];
+									break;
+							}
 						@endphp
 						<tr style="font-size: 0.8rem; text-align: right;">
-							<td class="pb-1 pt-1" style="padding: 6px;" colspan="{{ $colspan }}"><span class="text-white" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833;">{{ $price_rule['discount_name'] }}</span></td>
-							<td class="pb-1 pt-1" style="padding: 6px;">- ₱ {{ number_format(str_replace(",","", $price_rule['discount_amount']), 2) }}</td>
+							<td class="pb-1 pt-1" style="padding: 6px;" colspan="{{ $colspan }}">Discount <span class="text-white" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833;">{{ $rule['discount_name'] }}</span></td>
+							<td class="pb-1 pt-1" style="padding: 6px;">- ₱ {{ number_format(str_replace(",","",$discount_amount), 2) }}</td>
 						</tr>
-					@endif
+					@endisset
 					<tr style="font-size: 0.8rem; text-align: right;">
 						<td class="pb-1 pt-1" style="padding: 6px;" colspan="{{ $colspan }}">{{ $order['order_details']->order_shipping }}</td>
 						<td class="pb-1 pt-1" style="padding: 6px; white-space: nowrap !important">

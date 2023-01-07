@@ -33,6 +33,21 @@ class FrontendController extends Controller
         return view('frontend.register');
     }
 
+    public function testing(){
+        $sms_api = DB::table('api_setup')->where('type', 'sms_gateway_api')->first();
+        if ($sms_api) {
+            $sms = Http::asForm()->withHeaders([
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/x-www-form-urlencoded',
+            ])->post('https://api.movider.co/v1/balance', [
+                'api_key' => $sms_api->api_key,
+                'api_secret' => $sms_api->api_secret_key
+            ]);
+
+            return $sms;
+        }
+    }
+
     public function index(Request $request) {
         $clearance_sale_item_codes = DB::table('fumaco_on_sale as os')
             ->join('fumaco_on_sale_items as osi', 'os.id', 'osi.sale_id')
@@ -2625,7 +2640,11 @@ class FrontendController extends Controller
 
         $track_order_details = DB::table('track_order')->where('track_code', $order_number)->where('track_active', 1)->get();
 
-        $ordered_items = DB::table('fumaco_order_items')->where('order_number', $order_number)->get();
+        $ordered_items = DB::table('fumaco_order_items as o')
+            ->join('fumaco_items as i', 'i.f_idcode', 'o.item_code')
+            ->where('o.order_number', $order_number)
+            ->select('o.*', 'i.f_cat_id')
+            ->get();
         $items = $payment_statuses = $status = $order_status = [];
         $payment_status_sequence = $status_sequence = null;
         if($order_details){
@@ -2635,13 +2654,31 @@ class FrontendController extends Controller
                 ->select('s.status', 's.status_description', 'p.order_sequence')
                 ->orderBy('order_sequence', 'asc')
                 ->get();
-            
+
+            $arr = collect($ordered_items)->map(function ($q){
+                return [
+                    'quantity' => $q->item_qty,
+					'category_id' => $q->f_cat_id,
+					'subtotal' => $q->item_total_price
+                ];
+            });
+
+            $price_rule = $this->getPriceRules($arr, $order_details->order_date);
+            $price_rule = isset($price_rule['price_rule']['Transaction']) ? $price_rule['price_rule']['Transaction'] : [];
+
             $status = collect($order_status)->groupBy('status');
             $status_sequence = isset($status[$order_details->order_status]) ? $status[$order_details->order_status][0]->order_sequence : 0;
 
             $payment_statuses = DB::table('fumaco_payment_status')->get();
             $payment_status = collect($payment_statuses)->sortByDesc('status_sequence')->groupBy('status');
             $payment_status_sequence = isset($payment_status[$order_details->payment_status]) ? $payment_status[$order_details->payment_status][0]->status_sequence : 1;
+
+            $voucher_details = DB::table('fumaco_voucher')->where('code', $order_details->voucher_code)->first();
+
+            $shipping_discount = DB::table('fumaco_on_sale as p')
+                ->join('fumaco_on_sale_shipping_service as c', 'p.id', 'c.sale_id')->where('c.shipping_service', $order_details->order_shipping)
+                ->where('status', 1)->where('p.apply_discount_to', 'Per Shipping Service')->whereDate('p.start_date', '<=', $order_details->order_date)->whereDate('p.end_date', '>=', $order_details->order_date)
+                ->first();
 
             foreach ($ordered_items as $item) {
                 $item_image = DB::table('fumaco_items_image_v1')
@@ -2659,7 +2696,7 @@ class FrontendController extends Controller
             }
         }
 
-        return view('frontend.track_order', compact('order_details', 'items', 'track_order_details', 'order_status', 'status_sequence', 'payment_statuses', 'payment_status_sequence'));
+        return view('frontend.track_order', compact('order_details', 'items', 'track_order_details', 'order_status', 'status_sequence', 'payment_statuses', 'payment_status_sequence', 'shipping_discount', 'price_rule', 'voucher_details'));
     }
 
     // get item code based on variants selected in product page

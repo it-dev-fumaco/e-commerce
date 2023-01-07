@@ -45,6 +45,7 @@ class OrderController extends Controller
         foreach($orders as $o){
             $items_arr = [];
             $items = isset($order_items[$o->order_number]) ? $order_items[$o->order_number] : [];
+
             foreach($items as $i){
                 $bundle_items = DB::table('fumaco_product_bundle_item')->where('parent_item_code', $i->item_code)->get();
                 $items_arr[] = [
@@ -66,7 +67,8 @@ class OrderController extends Controller
                 ];
             }
 
-            $price_rule = $this->getPriceRules($items_arr);
+            $price_rule = $this->getPriceRules($items_arr, $o->order_date);
+            $price_rule = isset($price_rule['price_rule']['Transaction']) ? $price_rule['price_rule']['Transaction'] : [];
 
             $shipping_discount = DB::table('fumaco_on_sale as p')
                 ->join('fumaco_on_sale_shipping_service as c', 'p.id', 'c.sale_id')->where('c.shipping_service', $o->order_shipping)
@@ -138,10 +140,12 @@ class OrderController extends Controller
                 'order_status' => $order_status,
                 'deposit_slip_image' => $o->deposit_slip_image,
                 'payment_status' => $o->payment_status,
-                'price_rule' => $price_rule['price_rule']
+                'price_rule' => $price_rule
                 // 'erp_sales_order' => $o->erp_sales_order
             ];
         }
+
+        // return $orders_arr;
 
         return view('backend.orders.order_list', compact('orders_arr', 'orders'));
     }
@@ -330,7 +334,11 @@ class OrderController extends Controller
                 $order_status_check = DB::table('order_status')->where('status', $status)->first();
 
                 $order_details = DB::table('fumaco_order')->where('order_number', $request->order_number)->first();
-                $ordered_items = DB::table('fumaco_order_items')->where('order_number', $request->order_number)->get();
+                $ordered_items = DB::table('fumaco_order_items as order_items')
+                    ->join('fumaco_items as items', 'items.f_idcode', 'order_items.item_code')
+                    ->where('order_number', $request->order_number)
+                    ->select('order_items.*', 'items.f_cat_id')
+                    ->get();
                 
                 if($order_status_check){
                     if($order_status_check->update_stocks == 1){ // check if stocks needs to update
@@ -394,9 +402,17 @@ class OrderController extends Controller
                         'discount_type' => $row->item_discount_type,
                         'qty' => $row->item_qty,
                         'amount' => $row->item_total_price,
-                        'image' => ($image) ? $image->imgprimayx : null
+                        'image' => ($image) ? $image->imgprimayx : null,
+
+                        // for price rule
+                        'quantity' => $row->item_qty,
+                        'category_id' => $row->f_cat_id,
+                        'subtotal' => $row->item_total_price
                     ];
                 }
+
+                $price_rule = $this->getPriceRules($items, $order_details->order_date);
+                $price_rule = isset($price_rule['price_rule']['Transaction']) ? $price_rule['price_rule']['Transaction'] : [];
 
                 $total_amount = $order_details->amount_paid;
                 
@@ -417,7 +433,8 @@ class OrderController extends Controller
                     'order_details' => $order_details,
                     'items' => $items,
                     'shipping_discount' =>  $shipping_discount,
-                    'voucher_details' => $voucher_details
+                    'voucher_details' => $voucher_details,
+                    'price_rule' => $price_rule
                 ];
 
                 if ($status == 'Order Confirmed'){
@@ -619,6 +636,7 @@ class OrderController extends Controller
 
                 DB::table('fumaco_order')->where('order_number', $request->order_number)->update($orders_arr);
                 DB::table('track_order')->insert($track_order);
+
 
                 DB::commit();
             }

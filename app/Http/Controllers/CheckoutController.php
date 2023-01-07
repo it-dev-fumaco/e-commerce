@@ -378,6 +378,17 @@ class CheckoutController extends Controller
 				$sale = $customer_group_sale ? $customer_group_sale : $sale;
 			}
 
+			$cart_arr = collect($cart_items)->map(function ($q){
+				return [
+					'item_code' => $q->f_idcode,
+					'category_id' => $q->f_cat_id,
+					'quantity' => $q->qty,
+				];
+			});
+
+			$price_rule = $this->getPriceRules($cart_arr);
+        	$price_rule = isset($price_rule['price_rule']) ? $price_rule['price_rule'] : [];
+
 			$cart_arr = [];
 			$order_cart = [];
 			foreach ($cart_items as $n => $item) {
@@ -416,6 +427,25 @@ class CheckoutController extends Controller
 				$price = $item_price_data['discounted_price'];
 				$total_amount = $price * $item->qty;
 				$item_discount = $item_price_data['discount_rate'];
+
+				$discount_type = isset($item_price_data['discount_type']) ? $item_price_data['discount_type'] : null;
+				
+				if(isset($price_rule[$item->f_idcode]) && !isset($price_rule['Transaction'])){
+					$rule = $price_rule[$item->f_idcode];
+					$item_discount = $rule['discount_rate'];
+					switch ($rule['discount_type']) {
+						case 'Percentage':
+							$discount_type = 'percentage';
+							$discount_rate = $total_amount * ($rule['discount_rate'] / 100);
+							$total_amount = $total_amount - $discount_rate;
+							break;
+						default:
+							$discount_type = 'Fixed Amount';
+							$total_amount = $total_amount - $rule['discount_rate'];
+							break;
+					}
+				}
+
 				$cart_arr[] = [
 					'item_code' => $item->f_idcode,
 					'item_description' => $item->f_name_name,
@@ -440,7 +470,7 @@ class CheckoutController extends Controller
 						->where('item_code', $item->f_idcode)->update([
 							'item_name' => $item->f_name_name,
 							'item_discount' => $item_discount,
-							'item_discount_type' => isset($item_price_data['discount_type']) ? $item_price_data['discount_type'] : null, 
+							'item_discount_type' => $discount_type, 
 							'item_original_price' => $item->f_default_price,
 							'item_qty' => $item->qty,
 							'item_price' => $price,	
@@ -452,7 +482,7 @@ class CheckoutController extends Controller
 						'item_code' => $item->f_idcode,
 						'item_name' => $item->f_name_name,
 						'item_discount' => $item_discount,
-						'item_discount_type' => isset($item_price_data['discount_type']) ? $item_price_data['discount_type'] : null, 
+						'item_discount_type' => $discount_type, 
 						'item_original_price' => $item->f_default_price,
 						'item_qty' => $item->qty,
 						'item_price' => $price,
@@ -463,14 +493,6 @@ class CheckoutController extends Controller
 						'item_type' => $item->f_item_type,
 					];
 				}
-			}
-
-			$price_rule = $applicable_price_rule = [];
-
-			$price_rules = $this->getPriceRules($cart_arr);
-			if($price_rules){
-				$price_rule = $price_rules['price_rule'];
-				$applicable_price_rule = $price_rules['applicable_price_rule'];
 			}
 
 			DB::table('fumaco_order_items')->insert($order_cart);
@@ -624,10 +646,9 @@ class CheckoutController extends Controller
 				}
 			}
 
-
 			DB::commit();
 
-			return view('frontend.checkout.check_out_summary', compact('shipping_details', 'billing_details', 'shipping_rates', 'order_no', 'cart_arr', 'shipping_add', 'billing_add', 'shipping_zones', 'payment_methods', 'free_shipping_remarks', 'shipping_service_discount', 'applicable_voucher', 'price_rule', 'applicable_price_rule'));
+			return view('frontend.checkout.check_out_summary', compact('shipping_details', 'billing_details', 'shipping_rates', 'order_no', 'cart_arr', 'shipping_add', 'billing_add', 'shipping_zones', 'payment_methods', 'free_shipping_remarks', 'shipping_service_discount', 'applicable_voucher', 'price_rule'));
 		}catch(Exception $e){
 			DB::rollback();
 			return redirect()->back()->with('error', 'An error occured. Please try again.');
@@ -690,6 +711,17 @@ class CheckoutController extends Controller
 
 				$sale = $customer_group_sale ? $customer_group_sale : $sale;
 			}
+
+			$cart_arr = collect($cart_items)->map(function ($q){
+				return [
+					'item_code' => $q->f_idcode,
+					'category_id' => $q->f_cat_id,
+					'quantity' => $q->qty,
+				];
+			});
+
+			$price_rule = $this->getPriceRules($cart_arr);
+        	$price_rule = isset($price_rule['price_rule']) ? $price_rule['price_rule'] : [];
  
 			$cart_arr = [];
 			foreach ($cart_items as $n => $item) {
@@ -720,6 +752,24 @@ class CheckoutController extends Controller
 				$total_amount = $price * $item->qty;
 				$item_discount = $item_price_data['discount_rate'];
 
+				$discount_type = isset($item_price_data['discount_type']) ? $item_price_data['discount_type'] : null;
+				
+				if(isset($price_rule[$item->f_idcode]) && !isset($price_rule['Transaction'])){
+					$rule = $price_rule[$item->f_idcode];
+					$item_discount = $rule['discount_rate'];
+					switch ($rule['discount_type']) {
+						case 'Percentage':
+							$discount_type = 'percentage';
+							$discount_rate = $total_amount * ($rule['discount_rate'] / 100);
+							$total_amount = $total_amount - $discount_rate;
+							break;
+						default:
+							$discount_type = 'Fixed Amount';
+							$total_amount = $total_amount - $rule['discount_rate'];
+							break;
+					}
+				}
+
 				$existing_order_item = DB::table('fumaco_order_items')->where('order_number', $order_no)
 						->where('item_code', $item->f_idcode)->exists();
 			
@@ -729,7 +779,7 @@ class CheckoutController extends Controller
 						->where('item_code', $item->f_idcode)->update([
 							'item_name' => $item->f_name_name,
 							'item_discount' => $item_discount,
-							'item_discount_type' => isset($item_price_data['discount_type']) ? $item_price_data['discount_type'] : null,
+							'item_discount_type' => $discount_type,
 							'item_original_price' => $item->f_default_price,
 							'item_qty' => $item->qty,
 							'item_price' => $price,	
@@ -741,7 +791,7 @@ class CheckoutController extends Controller
 						'item_code' => $item->f_idcode,
 						'item_name' => $item->f_name_name,
 						'item_discount' => $item_discount,
-						'item_discount_type' => isset($item_price_data['discount_type']) ? $item_price_data['discount_type'] : null,
+						'item_discount_type' => $discount_type,
 						'item_original_price' => $item->f_default_price,
 						'item_qty' => $item->qty,
 						'item_price' => $price,
@@ -795,13 +845,14 @@ class CheckoutController extends Controller
 	
 			$amount = collect($items)->sum('item_total_price');
 
-			if($price_rule){
-				switch ($price_rule['discount_type']) {
+			if(isset($price_rule['Transaction'])){
+				$rule = $price_rule['Transaction'];
+				switch ($rule['discount_type']) {
 					case 'Percentage':
-						$discount_amount = $amount * ($price_rule['discount_rate'] / 100);
+						$discount_amount = $amount * ($rule['discount_rate'] / 100);
 						break;
 					default:
-						$discount_amount = $amount > $price_rule['discount_rate'] ? $price_rule['discount_rate'] : 0;
+						$discount_amount = $amount > $rule['discount_rate'] ? $rule['discount_rate'] : 0;
 						break;
 				}
 
@@ -978,24 +1029,22 @@ class CheckoutController extends Controller
 
 			$subtotal = collect($order_items)->sum('item_total_price');
 
-			$price_rules = $this->getPriceRules($items);
-			$price_rule = $price_rules ? $price_rules['price_rule'] : [];
+			$price_rule = $this->getPriceRules($items);
+			$price_rule = isset($price_rule['price_rule']) ? $price_rule['price_rule'] : [];
 
-			if($price_rule){
-				switch ($price_rule['discount_type']) {
+			$pr_discount_rate = 0;
+			if(isset($price_rule['Transaction'])){
+				$rule = $price_rule['Transaction'];
+				switch ($rule['discount_type']) {
 					case 'Percentage':
-						$discount_rate = $subtotal * ($price_rule['discount_rate'] / 100);
-						break;
-					case 'Amount':
-						$discount_rate = $subtotal > $price_rule['discount_rate'] ? $price_rule['discount_rate'] : 0;
+						$pr_discount_rate = $subtotal * ($rule['discount_rate'] / 100);
 						break;
 					default:
-						$discount_rate = 0;
+						$pr_discount_rate = $subtotal > $rule['discount_rate'] ? $rule['discount_rate'] : 0;
 						break;
 				}
 
-				$subtotal = $subtotal - $discount_rate;
-				$price_rule = collect($price_rule)->merge(['discount_amount' => $discount_rate]);
+				$price_rule = collect($price_rule)->merge(['discount_amount' => $pr_discount_rate]);
 			}
 
 			$discount = 0;
@@ -1192,7 +1241,7 @@ class CheckoutController extends Controller
 					'pickup_date' => $temp->xpickup_date,
 					'pickup_time' => $temp->xpickup_time,
 					'voucher_code' => ($is_voucher_valid) ? $temp->voucher_code : null,
-					'discount_amount' => $discount + $shipping_discount_amount,
+					'discount_amount' => $discount + $shipping_discount_amount + $pr_discount_rate,
 					'deposit_slip_token' => $payment_method == 'Bank Deposit' ? hash('sha256', Carbon::now()->toDateTimeString()) : null,
 					'deposit_slip_token_date_created' => $payment_method == 'Bank Deposit' ? Carbon::now()->toDateTimeString() : null,
 				]);

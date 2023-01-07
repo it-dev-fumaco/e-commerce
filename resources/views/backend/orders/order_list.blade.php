@@ -28,7 +28,7 @@
 					<div class="col-md-12">
 						<div class="card card-primary">
 							<div class="card-body">
-								@if(session()->has('success')) x
+								@if(session()->has('success'))
 									<div class="row">
 										<div class="col">
 											<div class="alert alert-success alert-dismissible fade show text-center" role="alert">
@@ -92,6 +92,8 @@
 											<td class="text-center">{{ $order['payment_method'] }}</td>
 											<td class="text-center">₱ {{ number_format(str_replace(",","",$order['grand_total']), 2) }}</td>
 											@php
+												$voucher_discount_amount = 0;
+												$shipping_discount_amount = 0;
 												switch ($order['status']) {
 													case 'Order Placed':
 														$badge = 'warning';
@@ -412,15 +414,12 @@
 																				@php
 																					$shipping_discount = $order['shipping_discount'];
 																					switch ($shipping_discount->discount_type) {
-																						case 'Fixed Amount':
-																							$shipping_discount_amount = $shipping_discount->discount_rate;
-																							break;
 																						case 'By Percentage':
 																							$shipping_discount_amount = ($shipping_discount->discount_rate / 100) * $order['subtotal'];
 																							$shipping_discount_amount = $shipping_discount_amount > $shipping_discount->capped_amount ? $shipping_discount->capped_amount : $shipping_discount_amount;
 																							break;
 																						default:
-																							$shipping_discount_amount = 0;
+																							$shipping_discount_amount = $shipping_discount->discount_rate;
 																							break;
 																					}
 																				@endphp
@@ -435,14 +434,11 @@
 																					$voucher_discount_amount = 0;
 																					if($voucher_details){
 																						switch ($voucher_details->discount_type) {
-																							case 'Fixed Amount':
-																								$voucher_discount_amount = $voucher_details->discount_rate;
-																								break;
 																							case 'By Percentage':
 																								$voucher_discount_amount = ($voucher_details->discount_rate / 100) * $order['subtotal'];
 																								break;
 																							default:
-																								$voucher_discount_amount = 0;
+																								$voucher_discount_amount = $voucher_details->discount_rate;
 																								break;
 																						}
 																					}
@@ -452,18 +448,13 @@
 																			@endif
 																			@if ($order['price_rule'])
 																				@php
-																					$price_rule = $order['price_rule'];
-																					switch ($price_rule['discount_type']) {
-																						case 'Percentage':
-																							$discount_amount = collect($order['ordered_items'])->sum('item_total') * ($price_rule['discount_rate'] / 100);
-																							break;
-																						default:
-																							$discount_amount = collect($order['ordered_items'])->sum('item_total') > $price_rule['discount_rate'] ? $price_rule['discount_rate'] : 0;
-																							break;
-																					}
+																					$rule = $order['price_rule'];
+																					$pr_discount_amount = $order['discount_amount'] > ($voucher_discount_amount + $shipping_discount_amount) ? $order['discount_amount'] - ($voucher_discount_amount + $shipping_discount_amount) : 0;
 																				@endphp
-																				<dt class="col-sm-10 text-right"><span class="text-white" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833;">{{ $price_rule['discount_name'] }}</span></dt>
-																				<dd class="col-sm-2 text-right">- ₱ {{ number_format(str_replace(",","", $discount_amount), 2) }}</dd>
+																				@if ($pr_discount_amount > 0)
+																					<dt class="col-sm-10 text-right"><span class="text-white" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833;">{{ $rule['discount_name'] }}</span></dt>
+																					<dd class="col-sm-2 text-right">- ₱ {{ number_format(str_replace(",","", $pr_discount_amount), 2) }}</dd>
+																				@endif
 																			@endif
 																			<dt class="col-sm-10 text-right">
 																				@if ($order['shipping_name'])
