@@ -538,6 +538,10 @@
         });
 
         $('#apply_discount_to').change(function(){
+            $('#customer-group-table tbody').empty();
+            $('#shipping-table tbody').empty();
+            $('#categories-table tbody').empty();
+            $('#selected-items-table tbody').empty();
             applyDiscountTo();
         });
 
@@ -619,10 +623,6 @@
         }
 
         function applyDiscountTo(){
-            $('#customer-group-table tbody').empty();
-            $('#shipping-table tbody').empty();
-            $('#categories-table tbody').empty();
-            $('#selected-items-table tbody').empty();
             if($('#apply_discount_to').val() == 'All Items'){
                 $('#for_all_items').slideDown();
                 $('#customer-groups').slideUp();
