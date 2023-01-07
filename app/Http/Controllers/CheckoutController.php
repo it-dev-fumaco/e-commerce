@@ -639,6 +639,10 @@ class CheckoutController extends Controller
 					$available = 0;
 				}
 
+				if($voucher->discount_type == 'Fixed Amount' && $voucher->discount_rate > collect($cart_arr)->sum('subtotal')){
+					$available = 0;
+				}
+
 				if($available){
 					$applicable_voucher = $voucher->code;
 
