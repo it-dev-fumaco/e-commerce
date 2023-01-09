@@ -43,12 +43,42 @@ class PricingRuleController extends Controller
             $applied_on = $request->applied_on;
             $conditions = $request->range_from;
 
+            $applied_on = is_array($applied_on) ? $applied_on : [];
+
             if (!$applied_on && in_array($request->apply_on, ['Item Code', 'Category'])) {
                 return response()->json(['status' => 0, 'message' => 'Please enter at least one (1) item code / category.']);
             }
 
             if (!$conditions) {
                 return response()->json(['status' => 0, 'message' => 'Please enter at least one (1) price rule condition.']);
+            }
+
+            // validate
+            $duplicate_ref = array_count_values($applied_on);
+            $duplicate_item  = array_filter($applied_on, function ($value) use ($duplicate_ref) {
+                return $duplicate_ref[$value] > 1;
+            });
+
+            if ($duplicate_item && count($duplicate_item) > 0) {
+                $duplicate_name = $duplicate_item[0];
+                if ($request->apply_on == 'Category') {
+                    $duplicate_name = DB::table('fumaco_categories')->where('id', $duplicate_name)->first()->name;
+                }
+               
+                return response()->json(['status' => 0, 'message' => $duplicate_name . ' has been entered multiple times.']);
+            }
+
+            $existing = DB::table('fumaco_price_rule as a')->join('fumaco_price_rule_applied_on as b', 'b.price_rule_id', 'a.price_rule_id')
+                ->where('a.enabled', 1)->whereIn('b.applied_on', $applied_on)->first();
+            
+            if ($existing) {
+                if ($request->apply_on == 'Category') {
+                    $category_name = DB::table('fumaco_categories')->where('id', $existing->applied_on)->first()->name;
+
+                    return response()->json(['status' => 0, 'message' => $category_name . ' already exists in ' . $existing->name]);
+                }
+
+                return response()->json(['status' => 0, 'message' => $existing->applied_on . ' already exists in ' . $existing->name]);
             }
 
             $price_rule_applied_on = $price_rule_conditions = [];
@@ -140,8 +170,8 @@ class PricingRuleController extends Controller
             $applied_on = is_array($applied_on) ? $applied_on : [];
             $conditions = is_array($conditions) ? $conditions : [];
 
-            $new_applied_on = $request->new_applied_on;
-            $new_conditions = $request->new_range_from;
+            $new_applied_on = is_array($new_applied_on) ? $new_applied_on : [];
+            $new_conditions = is_array($new_conditions) ? $new_conditions : [];
 
             if ($request->old_apply_on == $request->apply_on) {
                 // delete removed rows in applied on
@@ -163,6 +193,35 @@ class PricingRuleController extends Controller
 
             if (!$conditions && !$new_conditions) {
                 return response()->json(['status' => 0, 'message' => 'Please enter at least one (1) price rule condition.']);
+            }
+
+            // validate
+            $applies_on = array_merge($applied_on, $new_applied_on);
+            $duplicate_ref = array_count_values($applies_on);
+            $duplicate_item  = array_filter($applies_on, function ($value) use ($duplicate_ref) {
+                return $duplicate_ref[$value] > 1;
+            });
+
+            if ($duplicate_item && count($duplicate_item) > 0) {
+                $duplicate_name = $duplicate_item[0];
+                if ($request->apply_on == 'Category') {
+                    $duplicate_name = DB::table('fumaco_categories')->where('id', $duplicate_name)->first()->name;
+                }
+               
+                return response()->json(['status' => 0, 'message' => $duplicate_name . ' has been entered multiple times.']);
+            }
+
+            $existing = DB::table('fumaco_price_rule as a')->join('fumaco_price_rule_applied_on as b', 'b.price_rule_id', 'a.price_rule_id')
+                ->where('a.enabled', 1)->whereIn('b.applied_on', $applies_on)->where('a.price_rule_id', '!=', $id)->first();
+            
+            if ($existing) {
+                if ($request->apply_on == 'Category') {
+                    $category_name = DB::table('fumaco_categories')->where('id', $existing->applied_on)->first()->name;
+
+                    return response()->json(['status' => 0, 'message' => $category_name . ' already exists in ' . $existing->name]);
+                }
+
+                return response()->json(['status' => 0, 'message' => $existing->applied_on . ' already exists in ' . $existing->name]);
             }
 
             foreach ($applied_on as $price_rule_applied_on_id => $d) {
