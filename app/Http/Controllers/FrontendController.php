@@ -60,7 +60,7 @@ class FrontendController extends Controller
         $sortby = $request->sortby;
         switch ($sortby) {
             case 'Price':
-                $sortby = 'f_original_price';
+                $sortby = 'f_default_price';
                 break;
             case 'Product Name':
                 $sortby = 'f_name_name';
@@ -738,8 +738,8 @@ class FrontendController extends Controller
                 ->orWhere('f_category', 'LIKE', "%".$search_str."%")
                 ->where('f_status', 1)->where('f_status', 1)
                 ->where('item.f_status', 1)
-                ->select('item.f_idcode', 'item.f_name_name', 'item.f_discount_type', 'item.f_discount_rate', 'item.f_default_price', 'item.f_onsale', 'item.f_cat_id', 'item.slug as item_slug', 'item.f_stock_uom', 'f_cat_id')->orderBy('f_order_by', 'asc')
-                ->limit($request->type == 'desktop' ? 8 : 4)->get();
+                ->select('item.f_idcode', 'item.f_name_name', 'item.f_default_price', 'item.f_cat_id', 'item.slug as item_slug', 'item.f_stock_uom', 'f_cat_id')
+                ->orderBy('f_order_by', 'asc')->limit($request->type == 'desktop' ? 8 : 4)->get();
 
             // get sitewide sale
             $sale = DB::table('fumaco_on_sale')
@@ -756,7 +756,7 @@ class FrontendController extends Controller
 
             $ik_items = array_column($item_keywords->toArray(), 'f_idcode'); 
 
-            $clearance_sale_items = [];
+            $clearance_sale_items = $on_sale_items = [];
             if (count($ik_items) > 0) {
                 $ik_images = DB::table('fumaco_items_image_v1')->whereIn('idcode', $ik_items)
                     ->select('imgprimayx', 'idcode')->get();
@@ -765,6 +765,8 @@ class FrontendController extends Controller
                 $product_reviews = $this->getProductRating($ik_items);
 
                 $clearance_sale_items = $this->isIncludedInClearanceSale($ik_items);
+
+                $on_sale_items = $this->onSaleItems($ik_items);
             }   
 
             $sale_per_category = [];
@@ -785,14 +787,22 @@ class FrontendController extends Controller
                     $image = $ik_images[$item->f_idcode][0]->imgprimayx;
                 }
 
+                $on_sale = false;
+                $discount_type = $discount_rate = null;
+                if (array_key_exists($item->f_idcode, $on_sale_items)) {
+                    $on_sale = $on_sale_items[$item->f_idcode]['on_sale'];
+                    $discount_type = $on_sale_items[$item->f_idcode]['discount_type'];
+                    $discount_rate = $on_sale_items[$item->f_idcode]['discount_rate'];
+                }
+
                 $item_detail = [
                     'default_price' => $item->f_default_price,
                     'category_id' => $item->f_cat_id,
                     'item_code' => $item->f_idcode,
-                    'discount_type' => $item->f_discount_type,
-                    'discount_rate' => $item->f_discount_rate,
+                    'discount_type' => $discount_type,
+                    'discount_rate' => $discount_rate,
                     'stock_uom' => $item->f_stock_uom,
-                    'on_sale' => $item->f_onsale
+                    'on_sale' => $on_sale
                 ];
 
                 $is_on_clearance_sale = false;
@@ -1577,7 +1587,7 @@ class FrontendController extends Controller
         $sortby = $request->sortby;
         switch ($sortby) {
             case 'Price':
-                $sortby = 'f_original_price';
+                $sortby = 'f_default_price';
                 break;
             case 'Product Name':
                 $sortby = 'f_name_name';
@@ -2939,7 +2949,7 @@ class FrontendController extends Controller
         $sortby = $request->sortby;
         switch ($sortby) {
             case 'Price':
-                $sortby = 'f_original_price';
+                $sortby = 'f_default_price';
                 break;
             case 'Product Name':
                 $sortby = 'f_name_name';
