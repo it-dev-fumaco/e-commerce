@@ -142,58 +142,35 @@
 													$is_active = [1];
 												@endphp
 											
-												@if (isset($attributes[$attr]))
-												<input type="radio" class="btn-check attr-radio" {{ ($attributes[$attr] == $attr_value) ? 'checked' : '' }} name="{{ $opt_name }}" id="{{ $opt_name . $x }}" autocomplete="off" value="{{ $attr_value }}" data-attribute="{{ Str::slug($attr, '-') }}" {{ (count($is_active) > 0) ? '' : 'disabled' }}>
-												<label class="btn btn-outline-{{ (count($is_active) > 0) ? 'info' : 'secondary' }} btn-sm mb-2 mt-2" for="{{ $opt_name . $x }}">
+											@if (isset($attributes[$attr]))
+											@php
+												if (array_key_exists($attr, $tmp)) {
+													$tmp[$attr] = $attr_value;
+												}
+												$variant_available = false;
+											@endphp
+												@if(count($is_active) > 0)
+												@foreach ($variant_combinations as $combi)
 												@php
-													if (array_key_exists($attr, $tmp)) {
-														$tmp[$attr] = $attr_value;
+													if (!$variant_available)
+													$v_diff = array_diff_assoc(array_values($tmp), array_values($combi->toArray()));
+													if (count($v_diff) <= 0) {
+														$variant_available = true;
 													}
-													$variant_available = false;
 												@endphp
-													@if(count($is_active) > 0)
-													{{-- {{ $attr_value }}
-													<br><br><br>
-													tempbr 	 {{ implode('+++', $tmp) }}
-													<br> --}}
-													
-													@foreach ($variant_combinations as $combi)
-													@php
-														if (!$variant_available)
-														$v_diff = array_diff_assoc(array_values($tmp), array_values($combi->toArray()));
-														if (count($v_diff) <= 0) {
-															$variant_available = true;
-														}
-													@endphp
-														{{-- <br>
-													{{ implode('+++', $combi->toArray()) }}
-													<br>
-													diff {{ count($v_diff) }}{{ implode(',', $v_diff) }} --}}
-													{{-- @if (count($v_diff) > 0)
-													<del>{{ $attr_value }}</del>
-													@else
-													{{ $attr_value }}
-													@endif --}}
-													{{-- <br>
-													{{ implode(',', $combi->toArray()) }}
-													<br>
-													{{ implode(',', $tmp) }}
-													<br>
-													{{ implode(',', $v_diff) }} --}}
-													@endforeach
-													@if ($variant_available)
-													{{ $attr_value }}
-													@else
-													<del>{{ $attr_value }}</del>
-													@endif
-													{{-- <br> --}}
-													{{-- {{ implode(',', $tmp) }}<br> --}}
-													{{-- {{ implode(',', $variant_combinations) }} --}}
-													@else
-													<del>{{ $attr_value }}</del>
-													@endif
-												</label>
+												@endforeach
+												@if ($variant_available)
+												<input type="radio" class="btn-check attr-radio" {{ ($attributes[$attr] == $attr_value) ? 'checked' : '' }} name="{{ $opt_name }}" id="{{ $opt_name . $x }}" autocomplete="off" value="{{ $attr_value }}" data-attribute="{{ Str::slug($attr, '-') }}" {{ (count($is_active) > 0) ? '' : 'disabled' }}>
+												<label class="btn btn-outline-{{ (count($is_active) > 0) ? 'info' : 'secondary' }} btn-sm mb-2 mt-2" for="{{ $opt_name . $x }}">{{ $attr_value }}</label>
 												@else
+												<input type="radio" class="btn-check attr-radio" {{ ($attributes[$attr] == $attr_value) ? 'checked' : '' }} name="{{ $opt_name }}" id="{{ $opt_name . $x }}" autocomplete="off" value="{{ $attr_value }}" data-attribute="{{ Str::slug($attr, '-') }}" {{ (count($is_active) > 0) ? '' : 'disabled' }}>
+												<label class="btn btn-outline-{{ (count($is_active) > 0) ? 'info' : 'secondary' }} btn-sm mb-2 mt-2" for="{{ $opt_name . $x }}"><del>{{ $attr_value }}</del></label>
+												@endif
+												@else
+												<input type="radio" class="btn-check attr-radio" {{ ($attributes[$attr] == $attr_value) ? 'checked' : '' }} name="{{ $opt_name }}" id="{{ $opt_name . $x }}" autocomplete="off" value="{{ $attr_value }}" data-attribute="{{ Str::slug($attr, '-') }}" {{ (count($is_active) > 0) ? '' : 'disabled' }}>
+												<label class="btn btn-outline-{{ (count($is_active) > 0) ? 'info' : 'secondary' }} btn-sm mb-2 mt-2" for="{{ $opt_name . $x }}"><del>{{ $attr_value }}</del></label>
+												@endif
+											@else
 												Error in Variants.
 												@endif
 												@endforeach

@@ -2057,7 +2057,7 @@ class ProductController extends Controller
                     ->join('fumaco_on_sale as b', 'a.sale_id', 'b.id')
                     ->join('fumaco_customer_group as c', 'a.customer_group_id', 'c.id')
                     ->where('b.status', 1)->whereIn('a.customer_group_id', $request->selected_reference[$arr_key])
-                    ->first();
+                    ->where('a.sale_id', '!=', $id)->first();
 
                 if ($existing_ref) {
                     return redirect()->back()->with('error', $existing_ref->customer_group_name . ' already exists in ' . $existing_ref->sale_name);
@@ -2069,7 +2069,7 @@ class ProductController extends Controller
                     ->join('fumaco_on_sale as b', 'a.sale_id', 'b.id')
                     ->join('fumaco_categories as c', 'a.category_id', 'c.id')
                     ->where('b.status', 1)->whereIn('a.category_id', $request->selected_reference[$arr_key])
-                    ->first();
+                    ->where('a.sale_id', '!=', $id)->first();
 
                 if ($existing_ref) {
                     return redirect()->back()->with('error', $existing_ref->name . ' already exists in ' . $existing_ref->sale_name);
@@ -2080,7 +2080,7 @@ class ProductController extends Controller
                 $existing_ref = DB::table('fumaco_on_sale_shipping_service as a')
                     ->join('fumaco_on_sale as b', 'a.sale_id', 'b.id')
                     ->where('b.status', 1)->whereIn('a.shipping_service', $request->selected_reference[$arr_key])
-                    ->first();
+                    ->where('a.sale_id', '!=', $id)->first();
 
                 if ($existing_ref) {
                     return redirect()->back()->with('error', $existing_ref->shipping_service_name . ' already exists in ' . $existing_ref->sale_name);
@@ -2092,7 +2092,7 @@ class ProductController extends Controller
                     ->join('fumaco_on_sale as b', 'a.sale_id', 'b.id')
                     ->join('fumaco_items as c', 'a.item_code', 'c.f_idcode')
                     ->where('b.status', 1)->whereIn('a.item_code', $request->selected_reference[$arr_key])
-                    ->first();
+                    ->where('a.sale_id', '!=', $id)->first();
 
                 if ($existing_ref) {
                     return redirect()->back()->with('error', $existing_ref->item_code . ' already exists in ' . $existing_ref->sale_name);
