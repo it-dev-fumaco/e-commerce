@@ -14,6 +14,8 @@ use App\Http\Traits\ProductTrait;
 
 class DashboardController extends Controller
 {
+	use ProductTrait;
+
 	public function verify(){
 		$user_id = Auth::user()->id;
 		return view('auth.verify_otp', compact('user_id'));
@@ -293,8 +295,10 @@ class DashboardController extends Controller
 		$guest_items = DB::table('fumaco_cart as cart')
 			->join('fumaco_items as items', 'cart.item_code', 'items.f_idcode')
 			->whereIn('cart.transaction_id', $abandoned_order_numbers)
-			->select('cart.*', 'items.slug', 'items.f_name_name as item_name', 'items.f_onsale', 'items.f_price', 'items.f_default_price')
+			->select('cart.*', 'items.slug', 'items.f_name_name as item_name', 'items.f_default_price')
 			->get();
+
+		$on_sale_items = $this->onSaleItems(collect($guest_items)->pluck('item_code'));
 
 		$abandoned_items = collect($items)->groupBy('order_number');
 		$guest_abandoned_items = collect($guest_items)->groupBy('transaction_id');
@@ -306,13 +310,19 @@ class DashboardController extends Controller
 
 			if(isset($guest_abandoned_items[$abandoned->order_tracker_code])){
 				foreach($guest_abandoned_items[$abandoned->order_tracker_code] as $items){
+					$f_onsale = false;
+					$f_item_price = $items->f_default_price;
+					if (array_key_exists($items->item_code, $on_sale_items)) {
+						$f_onsale = $on_sale_items[$items->item_code]['on_sale'];
+						$f_item_price = $on_sale_items[$items->item_code]['discounted_price'];
+					}
 					$items_arr[] = [
 						'item_code' => $items->item_code,
 						'item_name' => $items->item_name,
 						'slug' => $items->slug,
 						'qty' => $items->qty,
-						'item_price' => $items->f_onsale == 1 ? $items->f_price : $items->f_default_price,
-						'total_price' => $items->f_onsale == 1 ? $items->qty * $items->f_price : $items->qty * $items->f_default_price
+						'item_price' => $f_item_price,
+						'total_price' => $items->qty * $f_item_price
 					];
 				}
 			}else if(isset($abandoned_items[$abandoned->order_tracker_code])){

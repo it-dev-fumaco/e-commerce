@@ -234,4 +234,58 @@ trait ProductTrait {
 			'applicable_price_rule' => $applicable_price_rule
 		];
 	}
+
+    public function onSaleItems($collection) {
+        $query = DB::table('fumaco_on_sale as a')->join('fumaco_on_sale_items as b', 'a.id', 'b.sale_id')
+            ->join('fumaco_items as c', 'c.f_idcode', 'b.item_code')
+            ->when(count($collection) > 0, function($c) use ($collection) {
+                $c->whereIn('b.item_code', $collection);
+            })
+            ->where('a.status', 1)
+            ->where('a.is_clearance_sale', 0)->where('a.apply_discount_to', 'Selected Items')
+            ->select('b.item_code', 'b.discount_type', 'b.discount_rate', 'a.ignore_sale_duration', 'a.start_date', 'a.end_date', 'c.f_default_price')
+            ->get();
+
+        $result = [];
+        foreach ($query as $value) {
+            $default_price = $value->f_default_price;
+
+            $on_sale = true;
+            $discount_type = $discount_rate = null;
+            if (!$value->ignore_sale_duration) {
+                if($value->start_date <= Carbon::now() and $value->end_date >= Carbon::now()){
+                    $on_sale = true;
+                } else {
+                    $on_sale = false;
+                }
+            }
+            
+            if ($on_sale) {
+                $discount_type = $value->discount_type;
+                $discount_rate = $value->discount_rate;
+            }
+
+            if (in_array($discount_type, ['percentage', 'By Percentage'])) {
+                $discount_display = ($discount_rate . '% OFF');
+                $discount = ($default_price * ($discount_rate/100));
+            } else {
+                $discount_display = '₱' . number_format($discount_rate, 2, '.', ',') . ' OFF';
+                $discount = $discount_rate;
+            }
+
+            $discounted_price = $default_price - $discount;
+
+            $result[$value->item_code] = [
+                'item_code' => $value->item_code,
+                'discount_type' => $discount_type,
+                'discount_rate' => $discount_rate,
+                'on_sale' => $on_sale,
+                'default_price' => $default_price,
+                'discounted_price' => $discounted_price,
+                'discount_display' => $discount_display,
+            ];
+        }
+
+        return $result;
+    }
 }

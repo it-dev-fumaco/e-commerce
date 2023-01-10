@@ -101,7 +101,7 @@ class FrontendController extends Controller
                         ->when(count($clearance_sale_item_codes) > 0, function($c) use ($clearance_sale_item_codes) {
                             $c->whereNotIn('f_idcode', $clearance_sale_item_codes);
                         })
-                        ->select('f_idcode', 'f_default_price', 'f_onsale', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'f_qty', 'f_reserved_qty', 'slug', 'f_name_name', 'f_item_name', 'f_category', 'id', 'image_alt')->get();
+                        ->select('f_idcode', 'f_default_price', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_stock_uom', 'f_qty', 'f_reserved_qty', 'slug', 'f_name_name', 'f_item_name', 'f_category', 'id', 'image_alt')->get();
                 }
 
                 if (in_array($search_by, ['blogs', 'all', ''])) {
@@ -130,7 +130,7 @@ class FrontendController extends Controller
                             $c->whereNotIn('f_idcode', $clearance_sale_item_codes);
                         })
                         ->where('f_status', 1)->where('f_status', 1)
-                        ->select('f_idcode', 'f_default_price', 'f_onsale', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'f_qty', 'f_reserved_qty', 'slug', 'f_name_name', 'f_item_name', 'f_category', 'id', 'image_alt')
+                        ->select('f_idcode', 'f_default_price', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_stock_uom', 'f_qty', 'f_reserved_qty', 'slug', 'f_name_name', 'f_item_name', 'f_category', 'id', 'image_alt')
                         ->orderBy($sortby, $orderby)->get();
 
                     if(count($request_data) > 0 or count($brand_filter) > 0){
@@ -192,6 +192,8 @@ class FrontendController extends Controller
                 } 
             }
 
+            $on_sale_items = $this->onSaleItems(collect($product_list)->pluck('f_idcode'));
+
             $results = [];
             foreach($product_list as $row){
                 $is_new_item = 0;
@@ -201,6 +203,15 @@ class FrontendController extends Controller
                     }
                 }
 
+                $on_sale = false;
+                $discount_type = $discount_rate = null;
+                if (array_key_exists($row->f_idcode, $on_sale_items)) {
+                    $on_sale = $on_sale_items[$row->f_idcode]['on_sale'];
+                    $discount_type = $on_sale_items[$row->f_idcode]['discount_type'];
+                    $discount_rate = $on_sale_items[$row->f_idcode]['discount_rate'];
+                }
+        
+
                 $results[] = [
                     'id' => $row->id,
                     'item_code' => $row->f_idcode,
@@ -209,9 +220,9 @@ class FrontendController extends Controller
                     'category' => $row->f_category,
                     'category_id' => $row->f_cat_id,
                     'default_price' => $row->f_default_price,
-                    'is_discounted' => $row->f_onsale,
-                    'discount_rate' => $row->f_discount_rate,
-                    'discount_type' => $row->f_discount_type,
+                    'is_discounted' => $on_sale,
+                    'discount_rate' => $discount_rate,
+                    'discount_type' => $discount_type,
                     'image' => null,
                     'comment_count' => null,
                     'publish_date' => null,
@@ -431,7 +442,7 @@ class FrontendController extends Controller
                     ->when(count($clearance_sale_item_codes) > 0, function($c) use ($clearance_sale_item_codes) {
                         $c->whereNotIn('f_idcode', $clearance_sale_item_codes);
                     })
-                    ->select('f_idcode', 'f_default_price', 'f_onsale', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'f_qty', 'f_reserved_qty', 'slug', 'f_name_name')->get();
+                    ->select('f_idcode', 'f_default_price', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_stock_uom', 'f_qty', 'f_reserved_qty', 'slug', 'f_name_name')->get();
            
                 $recently_added_items_images = DB::table('fumaco_items_image_v1')->whereIn('idcode', $recently_added_item_codes)
                     ->select('imgprimayx', 'idcode')->get();
@@ -515,11 +526,11 @@ class FrontendController extends Controller
             ->when(count($clearance_sale_item_codes) > 0, function($c) use ($clearance_sale_item_codes) {
                 $c->whereNotIn('f_idcode', $clearance_sale_item_codes);
             })
-            ->select('f_idcode', 'f_default_price', 'f_onsale', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'f_qty', 'f_reserved_qty', 'slug', 'f_name_name', 'f_item_name', 'image_alt')->get();
+            ->select('f_idcode', 'f_default_price', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_stock_uom', 'f_qty', 'f_reserved_qty', 'slug', 'f_name_name', 'f_item_name', 'image_alt')->get();
 
         $best_selling_item_codes = array_column($best_selling_query->toArray(), 'f_idcode');
 
-        $clearance_sale_items = [];
+        $clearance_sale_items = $on_sale_items = [];
         if (count($best_selling_item_codes) > 0) {
             $best_selling_item_images = DB::table('fumaco_items_image_v1')->whereIn('idcode', $best_selling_item_codes)
                 ->select('imgprimayx', 'idcode')->get();
@@ -528,13 +539,17 @@ class FrontendController extends Controller
             $product_reviews = $this->getProductRating($best_selling_item_codes);
 
             $clearance_sale_items = $this->isIncludedInClearanceSale($best_selling_item_codes);
+
+            $on_sale_items = $this->onSaleItems($best_selling_item_codes);
         }
 
-        $on_sale_query = DB::table('fumaco_items')->where('f_status', 1)->where('f_onsale', 1)
+        $onsale_item_codes = $this->onSaleItems([]);
+        $on_sale_query = DB::table('fumaco_items')->where('f_status', 1)
             ->when(count($clearance_sale_item_codes) > 0, function($c) use ($clearance_sale_item_codes) {
                 $c->whereNotIn('f_idcode', $clearance_sale_item_codes);
             })
-            ->select('f_idcode', 'f_default_price', 'f_onsale', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'f_qty', 'f_reserved_qty', 'slug', 'f_name_name', 'f_item_name', 'image_alt')->get();
+            ->whereIn('f_idcode', $onsale_item_codes)
+            ->select('f_idcode', 'f_default_price', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_stock_uom', 'f_qty', 'f_reserved_qty', 'slug', 'f_name_name', 'f_item_name', 'image_alt')->get();
 
         $sale_per_category = [];
         if (!$sale && !Auth::check()) {
@@ -564,14 +579,22 @@ class FrontendController extends Controller
                 }
             }
 
+            $on_sale = false;
+            $discount_type = $discount_rate = null;
+            if (array_key_exists($row->f_idcode, $on_sale_items)) {
+                $on_sale = $on_sale_items[$row->f_idcode]['on_sale'];
+                $discount_type = $on_sale_items[$row->f_idcode]['discount_type'];
+                $discount_rate = $on_sale_items[$row->f_idcode]['discount_rate'];
+            }
+
             $item_detail = [
                 'default_price' => $row->f_default_price,
                 'category_id' => $row->f_cat_id,
                 'item_code' => $row->f_idcode,
-                'discount_type' => $row->f_discount_type,
-                'discount_rate' => $row->f_discount_rate,
+                'discount_type' => $discount_type,
+                'discount_rate' => $discount_rate,
                 'stock_uom' => $row->f_stock_uom,
-                'on_sale' => $row->f_onsale
+                'on_sale' => $on_sale
             ];
 
             $is_on_clearance_sale = false;
@@ -604,9 +627,9 @@ class FrontendController extends Controller
             ];
         }
 
-        $onsale_item_codes = array_column($on_sale_query->toArray(), 'f_idcode'); 
+        
 
-        $clearance_sale_items = [];
+        $clearance_sale_items = $on_sale_items = [];
         if (count($onsale_item_codes) > 0) {
             $onsale_item_images = DB::table('fumaco_items_image_v1')->whereIn('idcode', $onsale_item_codes)
                 ->select('imgprimayx', 'idcode')->get();
@@ -615,6 +638,8 @@ class FrontendController extends Controller
             $product_reviews = $this->getProductRating($onsale_item_codes);
 
             $clearance_sale_items = $this->isIncludedInClearanceSale($onsale_item_codes);
+
+            $on_sale_items = $this->onSaleItems($onsale_item_codes);
         }       
 
         $on_sale_arr = [];
@@ -631,14 +656,22 @@ class FrontendController extends Controller
                 }
             }
 
+            $on_sale = false;
+            $discount_type = $discount_rate = null;
+            if (array_key_exists($row->f_idcode, $on_sale_items)) {
+                $on_sale = $on_sale_items[$row->f_idcode]['on_sale'];
+                $discount_type = $on_sale_items[$row->f_idcode]['discount_type'];
+                $discount_rate = $on_sale_items[$row->f_idcode]['discount_rate'];
+            }
+
             $item_detail = [
                 'default_price' => $row->f_default_price,
                 'category_id' => $row->f_cat_id,
                 'item_code' => $row->f_idcode,
-                'discount_type' => $row->f_discount_type,
-                'discount_rate' => $row->f_discount_rate,
+                'discount_type' => $discount_type,
+                'discount_rate' => $discount_rate,
                 'stock_uom' => $row->f_stock_uom,
-                'on_sale' => $row->f_onsale
+                'on_sale' => $on_sale
             ];
 
             $is_on_clearance_sale = false;
@@ -1574,7 +1607,7 @@ class FrontendController extends Controller
                 $c->whereIn('f_idcode', $filtered_items);
             })
             ->where('f_status', 1)->orderBy($sortby, $orderby)
-            ->select('id', 'f_idcode', 'f_default_price', 'f_onsale', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'f_qty', 'f_reserved_qty', 'slug', 'f_name_name', 'f_item_name', 'image_alt')->paginate(15);
+            ->select('id', 'f_idcode', 'f_default_price', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_stock_uom', 'f_qty', 'f_reserved_qty', 'slug', 'f_name_name', 'f_item_name', 'image_alt')->paginate(15);
 
         // get sitewide sale
         $sale = DB::table('fumaco_on_sale')
@@ -1604,6 +1637,8 @@ class FrontendController extends Controller
             $sale = $customer_group_sale ? $customer_group_sale : $sale;
         }
 
+        $on_sale_items = $this->onSaleItems($item_codes);
+
         $products_arr = [];
         foreach ($products as $product) {
             $image = null;
@@ -1618,14 +1653,22 @@ class FrontendController extends Controller
                 }
             }
 
+            $on_sale = false;
+            $discount_type = $discount_rate = null;
+            if (array_key_exists($product->f_idcode, $on_sale_items)) {
+                $on_sale = $on_sale_items[$product->f_idcode]['on_sale'];
+                $discount_type = $on_sale_items[$product->f_idcode]['discount_type'];
+                $discount_rate = $on_sale_items[$product->f_idcode]['discount_rate'];
+            }
+
             $item_detail = [
                 'default_price' => $product->f_default_price,
                 'category_id' => $product->f_cat_id,
                 'item_code' => $product->f_idcode,
-                'discount_type' => $product->f_discount_type,
-                'discount_rate' => $product->f_discount_rate,
+                'discount_type' => $discount_type,
+                'discount_rate' => $discount_rate,
                 'stock_uom' => $product->f_stock_uom,
-                'on_sale' => $product->f_onsale
+                'on_sale' => $on_sale
             ];
 
             $is_on_clearance_sale = false;
@@ -1668,7 +1711,8 @@ class FrontendController extends Controller
 
     public function viewProduct($slug, Request $request) { // Product Page
         $product_details = DB::table('fumaco_items')->where('slug', $slug)->orWhere('f_idcode', $slug)
-            ->select('f_parent_code', 'f_idcode', 'f_default_price', 'f_onsale', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'f_qty', 'f_reserved_qty', 'slug', 'f_name_name', 'f_item_name', 'id', 'meta_description', 'keywords', 'f_description', 'f_category', 'f_brand', 'f_caption', 'f_featured_image', 'f_full_description', 'url_title', 'image_alt')->first();
+            ->select('f_parent_code', 'f_idcode', 'f_default_price', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_stock_uom', 'f_qty', 'f_reserved_qty', 'slug', 'f_name_name', 'f_item_name', 'id', 'meta_description', 'keywords', 'f_description', 'f_category', 'f_brand', 'f_caption', 'f_featured_image', 'f_full_description', 'url_title', 'image_alt')
+            ->first();
         if (!$product_details) {
             return redirect('/');
         }
@@ -1766,14 +1810,23 @@ class FrontendController extends Controller
             $sale = $customer_group_sale ? $customer_group_sale : $sale;
         }
 
+        $on_sale = false;
+        $on_sale_items = $this->onSaleItems([$product_details->f_idcode]);
+        $discount_type = $discount_rate = null;
+        if (array_key_exists($product_details->f_idcode, $on_sale_items)) {
+            $on_sale = $on_sale_items[$product_details->f_idcode]['on_sale'];
+            $discount_type = $on_sale_items[$product_details->f_idcode]['discount_type'];
+            $discount_rate = $on_sale_items[$product_details->f_idcode]['discount_rate'];
+        }
+
         $item_detail = [
             'default_price' => $product_details->f_default_price,
             'category_id' => $product_details->f_cat_id,
             'item_code' => $product_details->f_idcode,
-            'discount_type' => $product_details->f_discount_type,
-            'discount_rate' => $product_details->f_discount_rate,
+            'discount_type' => $discount_type,
+            'discount_rate' => $discount_rate,
             'stock_uom' => $product_details->f_stock_uom,
-            'on_sale' => $product_details->f_onsale
+            'on_sale' => $on_sale
         ];
 
         $clearance_sale_items = $this->isIncludedInClearanceSale([$product_details->f_idcode]);
@@ -1809,12 +1862,8 @@ class FrontendController extends Controller
             'bundle_items' => $bundle_items
         ];
 
-        $compare_arr = [];
-        $variant_attr_array = [];
-        $products_to_compare = null;
-        $variant_attributes_to_compare = null;
-        $attributes_to_compare = null;
-        $attribute_names = null;
+        $compare_arr = $variant_attr_array = [];
+        $products_to_compare = $variant_attributes_to_compare = $attributes_to_compare = $attribute_names = null;
         $product_comparison_id = DB::table('product_comparison_attribute')->where('item_code', $product_details->f_idcode)->where('status', 1)->pluck('product_comparison_id')->first();
         if($product_comparison_id){
             $compare_query = DB::table('product_comparison_attribute as compare_attrib')->join('fumaco_attributes_per_category as cat_attrib', 'compare_attrib.attribute_name_id', 'cat_attrib.id')->where('compare_attrib.product_comparison_id', $product_comparison_id);
@@ -1847,7 +1896,7 @@ class FrontendController extends Controller
             $products_to_compare = [];
             if (!$request->ajax()) {
                 $products_to_compare = DB::table('fumaco_items')->whereIn('f_idcode', $products_to_compare_item_codes)
-                    ->select('f_idcode', 'f_default_price', 'f_onsale', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'f_qty', 'f_reserved_qty', 'slug', 'f_name_name', 'f_item_name', 'image_alt')->get()->toArray();
+                    ->select('f_idcode', 'f_default_price', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_stock_uom', 'f_qty', 'f_reserved_qty', 'slug', 'f_name_name', 'f_item_name', 'image_alt')->get()->toArray();
             }
             
             $sale_per_category = [];
@@ -1862,6 +1911,8 @@ class FrontendController extends Controller
                 $sale = $customer_group_sale ? $customer_group_sale : $sale;
             }
 
+            $on_sale_items = $this->onSaleItems(collect($products_to_compare)->pluck('f_idcode'));
+
             foreach($products_to_compare as $item_details){
                 $image = null;
                 if (array_key_exists($item_details->f_idcode, $products_to_compare_item_images)) {
@@ -1875,14 +1926,22 @@ class FrontendController extends Controller
                     }
                 }
 
+                $on_sale = false;
+                $discount_type = $discount_rate = null;
+                if (array_key_exists($item_details->f_idcode, $on_sale_items)) {
+                    $on_sale = $on_sale_items[$item_details->f_idcode]['on_sale'];
+                    $discount_type = $on_sale_items[$item_details->f_idcode]['discount_type'];
+                    $discount_rate = $on_sale_items[$item_details->f_idcode]['discount_rate'];
+                }
+
                 $item_detail = [
                     'default_price' => $item_details->f_default_price,
                     'category_id' => $item_details->f_cat_id,
                     'item_code' => $item_details->f_idcode,
-                    'discount_type' => $item_details->f_discount_type,
-                    'discount_rate' => $item_details->f_discount_rate,
+                    'discount_type' => $discount_type,
+                    'discount_rate' => $discount_rate,
                     'stock_uom' => $item_details->f_stock_uom,
-                    'on_sale' => $item_details->f_onsale
+                    'on_sale' => $on_sale
                 ];
 
                 $is_on_clearance_sale = false;
@@ -1929,7 +1988,7 @@ class FrontendController extends Controller
         $recommended_item_codes_query = [];
         if (!$request->ajax()) {
             $recommended_item_codes_query = DB::table('fumaco_items')->whereIn('f_idcode', $recommended_item_codes)
-                ->select('f_idcode', 'f_default_price', 'f_onsale', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'f_qty', 'f_reserved_qty', 'slug', 'f_name_name', 'f_item_name', 'id', 'image_alt')->get()->toArray();
+                ->select('f_idcode', 'f_default_price', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_stock_uom', 'f_qty', 'f_reserved_qty', 'slug', 'f_name_name', 'f_item_name', 'id', 'image_alt')->get()->toArray();
         }
 
         $recommended_item_codes = array_column($recommended_item_codes_query, 'f_idcode'); 
@@ -1951,6 +2010,8 @@ class FrontendController extends Controller
 
             $sale = $customer_group_sale ? $customer_group_sale : $sale;
         }
+
+        $on_sale_items = $this->onSaleItems(collect($recommended_item_codes_query)->pluck('f_idcode'));
         
         $recommended_items = [];
         foreach($recommended_item_codes_query as $row){
@@ -1972,14 +2033,22 @@ class FrontendController extends Controller
             
             $item_code = $row->f_idcode;
 
+            $on_sale = false;
+            $discount_type = $discount_rate = null;
+            if (array_key_exists($item_code, $on_sale_items)) {
+                $on_sale = $on_sale_items[$item_code]['on_sale'];
+                $discount_type = $on_sale_items[$item_code]['discount_type'];
+                $discount_rate = $on_sale_items[$item_code]['discount_rate'];
+            }
+
             $item_detail = [
                 'default_price' => $row->f_default_price,
                 'category_id' => $row->f_cat_id,
                 'item_code' => $row->f_idcode,
-                'discount_type' => $row->f_discount_type,
-                'discount_rate' => $row->f_discount_rate,
+                'discount_type' => $discount_type,
+                'discount_rate' => $discount_rate,
                 'stock_uom' => $row->f_stock_uom,
-                'on_sale' => $row->f_onsale
+                'on_sale' => $on_sale
             ];
 
             $is_on_clearance_sale = false;
@@ -2020,7 +2089,7 @@ class FrontendController extends Controller
             $related_products_query = DB::table('fumaco_items as a')
                 ->join('fumaco_items_relation as b', 'a.f_idcode', 'b.related_item_code')
                 ->where('b.item_code', $product_details->f_idcode)->where('a.f_status', 1)
-                ->select('a.id', 'a.f_idcode', 'a.f_default_price','a.f_stock_uom', 'a.f_onsale', 'a.f_name_name', 'a.f_item_name', 'a.slug', 'a.f_qty', 'a.f_reserved_qty', 'a.f_new_item', 'a.f_new_item_start', 'a.f_new_item_end', 'a.f_discount_rate', 'a.f_category', 'a.f_cat_id', 'a.f_discount_type', 'a.image_alt')
+                ->select('a.id', 'a.f_idcode', 'a.f_default_price','a.f_stock_uom', 'a.f_name_name', 'a.f_item_name', 'a.slug', 'a.f_qty', 'a.f_reserved_qty', 'a.f_new_item', 'a.f_new_item_start', 'a.f_new_item_end', 'a.f_category', 'a.f_cat_id', 'a.image_alt')
                 ->get()->toArray();
         }
 
@@ -2047,6 +2116,8 @@ class FrontendController extends Controller
             $sale = $customer_group_sale ? $customer_group_sale : $sale;
         }
 
+        $on_sale_items = $this->onSaleItems(collect($related_products_query)->pluck('f_idcode'));
+
         $related_products = [];
         foreach($related_products_query as $row) {
             $image = null;
@@ -2061,14 +2132,22 @@ class FrontendController extends Controller
                 }
             }
 
+            $on_sale = false;
+            $discount_type = $discount_rate = null;
+            if (array_key_exists($row->f_idcode, $on_sale_items)) {
+                $on_sale = $on_sale_items[$row->f_idcode]['on_sale'];
+                $discount_type = $on_sale_items[$row->f_idcode]['discount_type'];
+                $discount_rate = $on_sale_items[$row->f_idcode]['discount_rate'];
+            }
+
             $item_detail = [
                 'default_price' => $row->f_default_price,
                 'category_id' => $row->f_cat_id,
                 'item_code' => $row->f_idcode,
-                'discount_type' => $row->f_discount_type,
-                'discount_rate' => $row->f_discount_rate,
+                'discount_type' => $discount_type,
+                'discount_rate' => $discount_rate,
                 'stock_uom' => $row->f_stock_uom,
-                'on_sale' => $row->f_onsale
+                'on_sale' => $on_sale
             ];
 
             $is_on_clearance_sale = false;

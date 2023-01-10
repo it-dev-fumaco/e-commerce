@@ -14,9 +14,12 @@ use Webp;
 use DB;
 use Mail;
 use Cache;
+use App\Http\Traits\ProductTrait;
 
 class ProductController extends Controller
 {
+    use ProductTrait;
+
     // function to get items from ERP via API
     public function searchItem(Request $request) {
         if($request->ajax()) {
@@ -915,10 +918,6 @@ class ProductController extends Controller
             ->when($request->is_featured, function($c) use ($request) {
                 $c->where('f_featured', $request->is_featured);
             })
-            // ->when($request->on_sale, function($c) use ($request) {
-            //     $on_sale_items = DB::table('fumaco_product_prices')->where('on_sale', 1)->pluck('item_code');
-            //     $c->whereIn('f_idcode', $on_sale_items);
-            // })
             ->when($q_string, function ($query) use ($search_str, $q_string) {
                 return $query->where(function($q) use ($search_str, $q_string) {
                     foreach ($search_str as $str) {
@@ -936,8 +935,22 @@ class ProductController extends Controller
 
         $customer_groups = DB::table('fumaco_customer_group')->get();
 
+        $on_sale_items = $this->onSaleItems(collect($product_list->items())->pluck('f_idcode'));
+
         $list = [];
         foreach ($product_list as $product) {
+            // check if item is on sale
+            $on_sale = false;
+            $discount_type = $discount_rate = $discount_display = null;
+            $discounted_price = 0;
+            if (array_key_exists($product->f_idcode, $on_sale_items)) {
+                $on_sale = $on_sale_items[$product->f_idcode]['on_sale'];
+                $discount_type = $on_sale_items[$product->f_idcode]['discount_type'];
+                $discount_rate = $on_sale_items[$product->f_idcode]['discount_rate'];
+                $discounted_price = $on_sale_items[$product->f_idcode]['discounted_price'];
+                $discount_display = $on_sale_items[$product->f_idcode]['discount_display'];
+            }
+
             $item_image = DB::table('fumaco_items_image_v1')->where('idcode', $product->f_idcode)->first();
 
             $image = $item_image ? $item_image->imgprimayx : null;
@@ -967,14 +980,16 @@ class ProductController extends Controller
                 'reserved_qty' => $product->f_reserved_qty,
                 'product_category' => $product->f_category,
                 'brand' => $product->f_brand,
-                'on_sale' => $product->f_onsale,
+                'on_sale' => $on_sale,
                 'erp_stock' => $product->stock_source,
                 'status' => $product->f_status,
                 'featured' => $product->f_featured,
                 'is_new_item' => $is_new_item,
                 'pricelist' => $pricelist,
-                'discount_type' => $product->f_discount_type,
-                'discount_rate' => $product->f_discount_rate,
+                'discount_type' => $discount_type,
+                'discount_rate' => $discount_rate,
+                'discounted_price' => $discounted_price,
+                'discount_display' => $discount_display,
                 'last_sync_date' => $product->last_sync_date
             ];
         }
@@ -1246,34 +1261,41 @@ class ProductController extends Controller
                 $sale_check = DB::table('fumaco_on_sale')->where('id', $request->sale_id)->first();
 
                 $subscribers = DB::table('fumaco_subscribe')->where('status', 1)->select('email')->pluck('email');
-                $categories = DB::table('fumaco_categories as cat')->join('fumaco_on_sale_categories as sale', 'cat.id', 'sale.category_id')->where('sale.sale_id', $request->sale_id)->select('sale.*', 'cat.name')->get();
+
+                $categories = DB::table('fumaco_categories as cat')->join('fumaco_on_sale_categories as sale', 'cat.id', 'sale.category_id')
+                    ->where('sale.sale_id', $request->sale_id)->select('sale.*', 'cat.name')->get();
 
                 $items_on_sale = DB::table('fumaco_items')->whereIn('f_cat_id', collect($categories)->pluck('category_id'))->pluck('f_idcode');
 
                 foreach($subscribers as $subscriber){
-                    $items = [];
-                    $cart_items = [];
-                    $wish_items = [];
-                    $category_arr = [];
+                    $items = $cart_items = $wish_items = $category_arr = [];
                     $customer = DB::table('fumaco_users')->where('username', $subscriber)->select('id', 'f_name', 'f_lname')->first();
 
-                    $discount_rate = null;
-                    $discount_type = null;
-                    $type = null;
-                    
+                    $discount_rate = $discount_type = $type = null;
                     if($customer){
                         if($categories){
-                            $cart_check = DB::table('fumaco_cart as cart')->join('fumaco_items as items', 'items.f_idcode', 'cart.item_code')->where('items.f_onsale', 0)->whereIn('cart.category_id', collect($categories)->pluck('category_id'))->where('cart.user_email', $subscriber)->exists();
-                            $wish_check = DB::table('datawishlist as wish')->join('fumaco_items as items', 'items.f_idcode', 'wish.item_code')->where('items.f_onsale', 0)->whereIn('wish.category_id', collect($categories)->pluck('category_id'))->where('userid', $customer->id)->exists();
+                            $cart_check = DB::table('fumaco_cart as cart')->join('fumaco_items as items', 'items.f_idcode', 'cart.item_code')
+                                ->where('items.f_onsale', 0)->whereIn('cart.category_id', collect($categories)->pluck('category_id'))
+                                ->where('cart.user_email', $subscriber)->exists();
+
+                            $wish_check = DB::table('datawishlist as wish')->join('fumaco_items as items', 'items.f_idcode', 'wish.item_code')
+                                ->where('items.f_onsale', 0)->whereIn('wish.category_id', collect($categories)->pluck('category_id'))
+                                ->where('userid', $customer->id)->exists();
                         }else{
-                            $cart_check = DB::table('fumaco_cart as cart')->join('fumaco_items as items', 'items.f_idcode', 'cart.item_code')->where('f_onsale', 0)->where('cart.user_email', $subscriber)->exists();
-                            $wish_check = DB::table('datawishlist as wish')->join('fumaco_items as items', 'items.f_idcode', 'wish.item_code')->where('items.f_onsale', 0)->where('wish.userid', $customer->id)->exists();
+                            $cart_check = DB::table('fumaco_cart as cart')->join('fumaco_items as items', 'items.f_idcode', 'cart.item_code')
+                                ->where('f_onsale', 0)->where('cart.user_email', $subscriber)->exists();
+
+                            $wish_check = DB::table('datawishlist as wish')->join('fumaco_items as items', 'items.f_idcode', 'wish.item_code')
+                                ->where('items.f_onsale', 0)->where('wish.userid', $customer->id)->exists();
                         }
     
                         if($cart_check){
                             $type = 'cart';
                             if($sale_check->apply_discount_to == 'Per Category'){
-                                $cart_items = DB::table('fumaco_cart as cart')->join('fumaco_items as items', 'cart.item_code', 'items.f_idcode')->where('cart.user_email', $subscriber)->where('items.f_onsale', 0)->whereIn('items.f_cat_id', collect($categories)->pluck('category_id'))->select('cart.*', 'items.f_default_price', 'items.f_name_name')->get();
+                                $cart_items = DB::table('fumaco_cart as cart')->join('fumaco_items as items', 'cart.item_code', 'items.f_idcode')
+                                    ->where('cart.user_email', $subscriber)->where('items.f_onsale', 0)
+                                    ->whereIn('items.f_cat_id', collect($categories)->pluck('category_id'))
+                                    ->select('cart.*', 'items.f_default_price', 'items.f_name_name')->get();
         
                                 foreach($cart_items as $item){
                                     $price = $item->f_default_price;
@@ -1305,7 +1327,8 @@ class ProductController extends Controller
                                     ];
                                 }
                             }else{
-                                $cart_items = DB::table('fumaco_cart as cart')->join('fumaco_items as items', 'cart.item_code', 'items.f_idcode')->where('cart.user_email', $subscriber)->where('items.f_onsale', 0)->select('cart.*', 'items.f_default_price')->get();
+                                $cart_items = DB::table('fumaco_cart as cart')->join('fumaco_items as items', 'cart.item_code', 'items.f_idcode')
+                                    ->where('cart.user_email', $subscriber)->where('items.f_onsale', 0)->select('cart.*', 'items.f_default_price')->get();
         
                                 foreach($cart_items as $item){
                                     $price = $item->f_default_price;
@@ -1338,7 +1361,8 @@ class ProductController extends Controller
                         }else if($wish_check){
                             $type = 'wishlist';
                             if($sale_check->apply_discount_to == 'Per Category'){
-                                $wish_items = DB::table('datawishlist as wish')->join('fumaco_items as items', 'wish.item_code', 'items.f_idcode')->where('wish.userid', $customer->id)->where('items.f_onsale', 0)->select('wish.*', 'items.f_name_name', 'items.f_default_price')->get();
+                                $wish_items = DB::table('datawishlist as wish')->join('fumaco_items as items', 'wish.item_code', 'items.f_idcode')
+                                    ->where('wish.userid', $customer->id)->where('items.f_onsale', 0)->select('wish.*', 'items.f_name_name', 'items.f_default_price')->get();
     
                                 foreach($wish_items as $item){
                                     $price = $item->f_default_price;
@@ -1368,7 +1392,8 @@ class ProductController extends Controller
                                     ];
                                 }
                             }else{
-                                $wish_items = DB::table('datawishlist as wish')->join('fumaco_items as items', 'wish.item_code', 'items.f_idcode')->where('wish.userid', $customer->id)->where('items.f_onsale', 0)->select('wish.*', 'items.f_name_name', 'items.f_default_price')->get();
+                                $wish_items = DB::table('datawishlist as wish')->join('fumaco_items as items', 'wish.item_code', 'items.f_idcode')
+                                    ->where('wish.userid', $customer->id)->where('items.f_onsale', 0)->select('wish.*', 'items.f_name_name', 'items.f_default_price')->get();
     
                                 foreach($wish_items as $item){
                                     $price = $item->f_default_price;
@@ -1420,7 +1445,6 @@ class ProductController extends Controller
                             }
                         }else if($type == 'general'){
                             if($sale_check->apply_discount_to == 'Per Category'){
-                                
                                 foreach($categories as $category){
                                     $category_arr[] = [
                                         'category_name' => $category->name,
@@ -1446,9 +1470,11 @@ class ProductController extends Controller
             }
 
             DB::commit();
+
             return response()->json(['status' => 1]);
         } catch (Exception $e) {
             DB::rollback();
+            
             return redirect()->back()->with('error', 'An error occured. Please try again.');
         }
     }
@@ -2651,119 +2677,6 @@ class ProductController extends Controller
             DB::commit();
 
             return redirect()->back()->with('success', 'Product has been removed from related products.');
-        } catch (Exception $e) {
-            DB::rollback();
-
-            return redirect()->back()->with('error', 'An error occured. Please try again.');
-        }
-    }
-
-    public function setProductOnSale($item_code, Request $request) {
-        DB::beginTransaction();
-        try {
-            $item = DB::table('fumaco_items')->where('f_idcode', $item_code)->first();
-            if (!$item) {
-                return redirect()->back()->with('error', 'Product not found.');
-            }
-
-            $discount_rate = $request->discount_rate;
-            if (!$discount_rate && $discount_rate <= 0) {
-                return redirect()->back()->with('error', 'Discount rate cannot be less than or equal to zero.');
-            }
-            
-            $customer_group = DB::table('fumaco_customer_group')->where('id', $request->customer_group)->first()->customer_group_name;
-            if ($customer_group == 'Individual') {
-                DB::table('fumaco_items')->where('f_idcode', $item_code)->update([
-                    'f_discount_type' => $request->discount_type,
-                    'f_onsale' => 1,
-                    'f_discount_rate' => $discount_rate,
-                    'last_modified_by' => Auth::user()->username,
-                ]);
-            } else {
-                DB::table('fumaco_product_prices')->where('id', $request->price_list_id)->update([
-                    'discount_type' => $request->discount_type,
-                    'on_sale' => 1,
-                    'discount_rate' => $discount_rate,
-                    'last_modified_by' => Auth::user()->username,
-                ]);
-            }
-            
-            // $success_msg = 'Product has been set "On Sale".';
-
-            // $subscribers = DB::table('fumaco_subscribe')->where('status', 1)->select('email')->pluck('email');
-
-            // foreach($subscribers as $subscriber){
-            //     $customer = DB::table('fumaco_users')->where('username', $subscriber)->select('id', 'f_name', 'f_lname')->first();
-            //     $image = DB::table('fumaco_items_image_v1')->where('idcode', $item_code)->pluck('imgprimayx')->first();
-
-            //     $cart_check = DB::table('fumaco_cart')->where('user_email', $subscriber)->where('item_code', $item_code)->first();
-            //     $wish_check = DB::table('datawishlist')->where('userid', $customer->id)->where('item_code', $item_code)->first();
-
-            //     $name = $customer->f_name.' '.$customer->f_lname;
-
-            //     $sale_details = [
-            //         'item_code' => $item_code,
-            //         'image' => $image,
-            //         'percentage' => $request->discount_percentage,
-            //         'customer_name' => $name,
-            //         'item_details' => $item->f_name_name,
-            //         'original_price' => $item->f_original_price,
-            //         'discounted_price' => $discounted_price,
-            //         'email' => $subscriber,
-            //         'type' => $cart_check ? 'cart' : 'wishlist',
-            //         'multiple_items' => 0
-            //     ];
-
-            //     if($cart_check or $wish_check){
-            //         Mail::send('emails.items_on_cart_sale', $sale_details, function($message) use($subscriber){
-            //             $message->to(trim($subscriber));
-            //             $message->subject("Hurry or you might miss out - FUMACO");
-            //         });
-            //     }else{ // Subscriber does not have items listed on cart and wishlist
-            //         Mail::send('emails.sale_per_item', $sale_details, function($message) use($subscriber){
-            //             $message->to(trim($subscriber));
-            //             $message->subject("Hurry or you might miss out - FUMACO");
-            //         });
-            //     }
-            // }
-
-            DB::commit();
-
-            return redirect()->back()->with('success', 'Product has been set "On Sale".');
-        } catch (Exception $e) {
-            DB::rollback();
-
-            return redirect()->back()->with('error', 'An error occured. Please try again.');
-        }
-    }
-
-    public function disableProductOnSale($item_code, Request $request) {
-        DB::beginTransaction();
-        try {
-            $selected_pricelists = $request->price_list ? $request->price_list : [];
-            DB::table('fumaco_items')->where('f_idcode', $item_code)->update([
-                'f_onsale' => 0,
-                'f_discount_rate' => 0,
-                'f_discount_type' => null,
-                'last_modified_by' => Auth::user()->username
-            ]);
-
-            if (($key = array_search("Website Price List", $selected_pricelists)) !== false) {
-                unset($selected_pricelists[$key]);
-            }
-    
-            foreach ($selected_pricelists as $price_list_id) {
-                DB::table('fumaco_product_prices')->where('id', $price_list_id)->update([
-                    'on_sale' => 0,
-                    'discount_rate' => 0,
-                    'discount_type' => null,
-                    'last_modified_by' => Auth::user()->username
-                ]);
-            }
-
-            DB::commit();
-
-            return redirect()->back()->with('success', 'Product code <b>' . $item_code . '</b> has been updated.');
         } catch (Exception $e) {
             DB::rollback();
 

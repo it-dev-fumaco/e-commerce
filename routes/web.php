@@ -220,8 +220,6 @@ Route::prefix('admin')->group(function () {
             Route::delete('/product/{item_code}/delete', 'ProductController@deleteItem');
             Route::get('/product/{id}/featured', 'ProductController@featureItem');
             Route::get('/is_new_item/{id}', 'ProductController@isNewItem');
-            Route::post('/product/{item_code}/enable_on_sale', 'ProductController@setProductOnSale');
-            Route::post('/product/{item_code}/disable_on_sale', 'ProductController@disableProductOnSale');
             Route::get('/product/{item_code}/{item_type}', 'ProductController@getItemDetails');
             Route::get('/products/compare/list', 'ProductController@viewProductsToCompare');
             Route::get('/products/compare/add', 'ProductController@addProductsToCompare');
