@@ -196,13 +196,13 @@
             e.preventDefault();
             var row = '<tr>' +
 				'<td class="p-2">' +
-					'<input type="number" name="range_from[]" class="form-control" placeholder="Range From" required>' +
+					'<input type="number" name="range_from[]" class="form-control" placeholder="Range From" min="0" required>' +
 				'</td>' +
                 '<td class="p-2">' +
-					'<input type="number" name="range_to[]" class="form-control" placeholder="Range To" required>' +
+					'<input type="number" name="range_to[]" class="form-control" placeholder="Range To" min="0" required>' +
 				'</td>' +
                 '<td class="p-2">' +
-					'<input type="number" name="rate[]" class="form-control" placeholder="Rate" required>' +
+					'<input type="number" name="rate[]" class="form-control" placeholder="Rate" min="0" required>' +
 				'</td>' +
 				'<td class="text-center">' +
 					'<button type="button" class="btn btn-outline-danger btn-sm remove-td-row">Remove</button>' +

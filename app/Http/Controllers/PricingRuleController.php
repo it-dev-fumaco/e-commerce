@@ -96,7 +96,49 @@ class PricingRuleController extends Controller
             DB::table('fumaco_price_rule_applied_on')->insert($price_rule_applied_on);
            
             if ($conditions) {
+                // validate overlapping conditions
+                $conditions_array = [];
+                foreach ($conditions as $key => $value) {
+                    $conditions_array[] = [
+                        'from' => (int)$value,
+                        'to' => (int)$request->range_to[$key],
+                    ];
+                }
+
+                $conditions_overlap = $this->isOverlapped($conditions_array);
+                if ($conditions_overlap) {
+                    return response()->json(['status' => 0, 'message' => 'Price Rule Conditions cannot overlap.']);
+                }
+                
                 foreach ($conditions as $s => $r) {
+                    if (!is_numeric($conditions[$s])) {
+                        return response()->json(['status' => 0, 'message' => '<b>Range From</b> must be a whole number.']);
+                    }
+
+                    if (!is_numeric($request->range_to[$s])) {
+                        return response()->json(['status' => 0, 'message' => '<b>Range To</b> must be a whole number.']);
+                    }
+
+                    if (!is_numeric($request->rate[$s])) {
+                        return response()->json(['status' => 0, 'message' => '<b>Discount Rate</b> must be a whole number.']);
+                    }
+
+                    if ($conditions[$s] <= 0) {
+                        return response()->json(['status' => 0, 'message' => '<b>Range From</b> cannot be less than or equal to zero.']);
+                    }
+    
+                    if ($request->range_to[$s] <= 0) {
+                        return response()->json(['status' => 0, 'message' => '<b>Range To</b> cannot be less than or equal to zero.']);
+                    }
+    
+                    if ($request->rate[$s] <= 0) {
+                        return response()->json(['status' => 0, 'message' => '<b>Discount Rate</b> cannot be less than or equal to zero.']);
+                    }
+
+                    if ($conditions[$s] >= $request->range_to[$s]) {
+                        return response()->json(['status' => 0, 'message' => '<b>Range From</b> cannot be greater than or equal to <b>Range To</b>.']);
+                    }
+
                     $price_rule_conditions[] = [
                         'price_rule_id' => $price_rule_id,
                         'range_from' => $conditions[$s],
@@ -173,6 +215,27 @@ class PricingRuleController extends Controller
             $new_applied_on = is_array($new_applied_on) ? $new_applied_on : [];
             $new_conditions = is_array($new_conditions) ? $new_conditions : [];
 
+            // validate overlapping conditions
+            $conditions_array = [];
+            foreach ($conditions as $key => $value) {
+                $conditions_array[] = [
+                    'from' => (int)$value,
+                    'to' => (int)$request->range_to[$key],
+                ];
+            }
+
+            foreach ($new_conditions as $key => $value) {
+                $conditions_array[] = [
+                    'from' => (int)$value,
+                    'to' => (int)$request->new_range_to[$key],
+                ];
+            }
+
+            $conditions_overlap = $this->isOverlapped($conditions_array);
+            if ($conditions_overlap) {
+                return response()->json(['status' => 0, 'message' => 'Price Rule Conditions cannot overlap.']);
+            }
+
             if ($request->old_apply_on == $request->apply_on) {
                 // delete removed rows in applied on
                 DB::table('fumaco_price_rule_applied_on')->where('price_rule_id', $id)
@@ -233,6 +296,34 @@ class PricingRuleController extends Controller
             }
 
             foreach ($conditions as $price_rule_condition_id => $s) {
+                if (!is_numeric($request->range_from[$price_rule_condition_id])) {
+                    return response()->json(['status' => 0, 'message' => '<b>Range From</b> must be a whole number.']);
+                }
+
+                if (!is_numeric($request->range_to[$price_rule_condition_id])) {
+                    return response()->json(['status' => 0, 'message' => '<b>Range To</b> must be a whole number.']);
+                }
+
+                if (!is_numeric($request->rate[$price_rule_condition_id])) {
+                    return response()->json(['status' => 0, 'message' => '<b>Discount Rate</b> must be a whole number.']);
+                }
+
+                if ($request->range_from[$price_rule_condition_id] <= 0) {
+                    return response()->json(['status' => 0, 'message' => '<b>Range From</b> cannot be less than or equal to zero.']);
+                }
+
+                if ($request->range_to[$price_rule_condition_id] <= 0) {
+                    return response()->json(['status' => 0, 'message' => '<b>Range To</b> cannot be less than or equal to zero.']);
+                }
+
+                if ($request->rate[$price_rule_condition_id] <= 0) {
+                    return response()->json(['status' => 0, 'message' => '<b>Discount Rate</b> cannot be less than or equal to zero.']);
+                }
+
+                if ($request->range_from[$price_rule_condition_id] >= $request->range_to[$price_rule_condition_id]) {
+                    return response()->json(['status' => 0, 'message' => '<b>Range From</b> cannot be greater than or equal to <b>Range To</b>.']);
+                }
+
                 DB::table('fumaco_price_rule_condition')->where('price_rule_condition_id', $price_rule_condition_id)
                     ->update([
                         'range_from' => $request->range_from[$price_rule_condition_id],
@@ -259,6 +350,34 @@ class PricingRuleController extends Controller
            
             if ($new_conditions) {
                 foreach ($new_conditions as $s => $r) {
+                    if (!is_numeric($new_conditions[$s])) {
+                        return response()->json(['status' => 0, 'message' => '<b>Range From</b> must be a whole number.']);
+                    }
+    
+                    if (!is_numeric($request->new_range_to[$s])) {
+                        return response()->json(['status' => 0, 'message' => '<b>Range To</b> must be a whole number.']);
+                    }
+    
+                    if (!is_numeric($request->new_rate[$s])) {
+                        return response()->json(['status' => 0, 'message' => '<b>Discount Rate</b> must be a whole number.']);
+                    }
+
+                    if ($new_conditions[$s] <= 0) {
+                        return response()->json(['status' => 0, 'message' => '<b>Range From</b> cannot be less than or equal to zero.']);
+                    }
+    
+                    if ($request->new_range_to[$s] <= 0) {
+                        return response()->json(['status' => 0, 'message' => '<b>Range To</b> cannot be less than or equal to zero.']);
+                    }
+    
+                    if ($request->new_rate[$s] <= 0) {
+                        return response()->json(['status' => 0, 'message' => '<b>Discount Rate</b> cannot be less than or equal to zero.']);
+                    }
+
+                    if ($new_conditions[$s] >= $request->new_range_to[$s]) {
+                        return response()->json(['status' => 0, 'message' => '<b>Range From</b> cannot be greater than or equal to <b>Range To</b>.']);
+                    }
+
                     $price_rule_conditions[] = [
                         'price_rule_id' => $id,
                         'range_from' => $new_conditions[$s],
@@ -280,6 +399,24 @@ class PricingRuleController extends Controller
 
             return response()->json(['status' => 0, 'message' => 'An error occured. Please try again.']);
         }
+    }
+
+    public static function isOverlapped($conditions) {
+        // order conditions
+        usort($conditions, function ($a, $b) {
+            return ($a['from']) <=> ($b['from']);
+        });
+
+        // check for overlap
+        foreach ($conditions as $key => $condition) {
+            if ($key != 0) {
+                if (($condition['from']) <= ($conditions[$key - 1]['to'])) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     public function delete($id, Request $request) {
