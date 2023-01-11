@@ -96,7 +96,7 @@ class OrderController extends Controller
 
             $price_rule = $this->getPriceRules($items_arr, $o->order_date);
             $price_rule = isset($price_rule['price_rule']['Transaction']) ? $price_rule['price_rule']['Transaction'] : [];
-            $gt_discount = 0;
+            $gt_discount = $o->discount_amount;
             if($price_rule){
                 switch($price_rule['discount_type']){
                     case 'Percentage':
@@ -107,7 +107,7 @@ class OrderController extends Controller
                         break;
                 }
 
-                $gt_discount = $o->discount_amount > $pr_discount_amount ? $o->discount_amount - $pr_discount_amount : 0;
+                $gt_discount = $o->discount_amount > $pr_discount_amount ? $o->discount_amount - $pr_discount_amount : $o->discount_amount;
             }
 
             $shipping_discount = DB::table('fumaco_on_sale as p')
@@ -160,7 +160,7 @@ class OrderController extends Controller
                 'ship_postal' => $o->order_ship_postal,
                 'shipping_name' => $o->order_shipping,
                 'shipping_amount' => $o->order_shipping_amount,
-                'grand_total' => ($o->order_shipping_amount + $o->order_subtotal) - $gt_discount,
+                'grand_total' => $o->grand_total ? $o->grand_total : ($o->order_shipping_amount + $o->order_subtotal) - $gt_discount,
                 'status' => $o->order_status,
                 'estimated_delivery_date' => $o->estimated_delivery_date,
                 'payment_id' => $o->payment_id,
@@ -339,7 +339,7 @@ class OrderController extends Controller
                         $min_leadtime = collect($leadtime_arr)->pluck('min_leadtime')->max();
                         $max_leadtime = collect($leadtime_arr)->pluck('max_leadtime')->max();
 
-                        $gt_discount = 0;
+                        $gt_discount = $order_details->discount_amount;
 
                         if($price_rule){
                             switch ($price_rule['discount_type']) {
@@ -351,10 +351,13 @@ class OrderController extends Controller
                                     break;
                             }
 
-                            $gt_discount = $order_details->discount_amount > $pr_discount ? $order_details->discount_amount - $pr_discount : 0;
+                            $gt_discount = $order_details->discount_amount > $pr_discount ? $order_details->discount_amount - $pr_discount : $order_details->discount_amount;
                         }
 
-                        $total_amount = ($order_details->order_subtotal + $order_details->order_shipping_amount) - $gt_discount;
+                        $total_amount = $order_details->grand_total;
+                        if(!$order_details->grand_total){
+                            $total_amount = ($order_details->order_subtotal + $order_details->order_shipping_amount) - $gt_discount;
+                        }
 
                         $orders_arr['deposit_slip_token_used'] = 1;
 

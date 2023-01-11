@@ -1213,6 +1213,8 @@ class CheckoutController extends Controller
 				}
 
 				$shipping_discount_amount = $subtotal > $shipping_discount_amount ? $shipping_discount_amount : 0;
+				
+				$grand_total = collect($order_items)->sum('item_total_price') - ($discount + $shipping_discount_amount + $pr_discount_rate);
 
 				DB::table('fumaco_order')->insert([
 					'order_number' => $temp->xlogs,
@@ -1256,6 +1258,7 @@ class CheckoutController extends Controller
 					'issuing_bank' => $request->IssuingBank,
 					'payment_transaction_time' => $request->RespTime,
 					'amount_paid' => ($request->Amount) ? $request->Amount : 0,
+					'grand_total' => $grand_total,
 					'order_type' => $temp->xusertype,
 					'user_email' => $loggedin,
 					'shipping_business_name' => $temp->xship_business_name,
