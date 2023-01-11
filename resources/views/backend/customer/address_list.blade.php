@@ -13,6 +13,7 @@
                         <p class="m-0">{{ $address->xcontactname1 .' ' . $address->xcontactlastname1 }}</p>
                         <p class="m-0">{{ $address->xcontactemail1 }}</p>
                         <p class="m-0">{{ $address->xcontactnumber1 }}</p>
+                        <p class="m-0">{{ $address->xmobile_number }}</p>
                     </dd>
                   </dl>
             </div>
