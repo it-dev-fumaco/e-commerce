@@ -444,6 +444,7 @@
 																						switch ($voucher_details->discount_type) {
 																							case 'By Percentage':
 																								$voucher_discount_amount = ($voucher_details->discount_rate / 100) * $order['subtotal'];
+																								$voucher_discount_amount = $voucher_discount_amount < $voucher_details->capped_amount ? $voucher_discount_amount : $voucher_details->capped_amount;
 																								break;
 																							default:
 																								$voucher_discount_amount = $voucher_details->discount_rate;
