@@ -83,8 +83,11 @@
                                             <label>Sale Type <span class="text-danger">*</span></label>
                                             <select class="form-control" name="sale_type" id="sale-type" required>
                                                 <option disabled selected value="">Sale Type</option>
+                                                @php
+                                                    $selected_sale_type = $on_sale->is_clearance_sale == 1 ? 'Clearance Sale' : 'Regular Sale';
+                                                @endphp
                                                 @foreach ($sale_types as $s_type)
-                                                <option value="{{ $s_type }}" {{ $on_sale->is_clearance_sale == 1 && $s_type == 'Clearance Sale' ? 'selected' : '' }}>{{ $s_type }}</option>
+                                                <option value="{{ $s_type }}" {{ $s_type == $selected_sale_type ? 'selected' : '' }}>{{ $s_type }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
