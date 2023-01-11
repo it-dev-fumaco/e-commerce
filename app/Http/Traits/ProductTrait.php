@@ -143,7 +143,7 @@ trait ProductTrait {
     }
 
     public function getPriceRules($cart_arr, $date = null){
-		$ids = collect($cart_arr)->pluck('category_id')->merge(collect($cart_arr)->pluck('item_code'));
+		$ids = collect($cart_arr)->pluck('category_id')->merge(collect($cart_arr)->pluck('item_code'))->filter()->values()->all();
 		$cart_by_item_code = collect($cart_arr)->groupBy('item_code');
 		$cart_by_category = collect($cart_arr)->groupBy('category_id');
 
@@ -164,6 +164,8 @@ trait ProductTrait {
 			->orderBy('rule.created_at', 'desc')->orderBy('condition.range_to', 'asc')
 			->union($price_rule_per_transaction)->get();
 
+        $price_rules = collect($price_rules)->sortBy('rate')->values()->all();
+
 		$price_rules_by_name = collect($price_rules)->groupBy('name');
 
 		$price_rule = [];
@@ -179,12 +181,6 @@ trait ProductTrait {
 						}
                         $applied_on = $rule->applied_on;
 						break;
-					// case 'Category':
-					// 	if(isset($cart_by_category[$rule->applied_on])){
-					// 		$item_sum = $rule->conditions_based_on == 'Order Qty' ? 'quantity' : 'subtotal';
-					// 		$item_val = collect($cart_by_category[$rule->applied_on])->sum($item_sum);
-					// 	}
-					// 	break;
 					default: // per transaction
 						$item_sum = $rule->conditions_based_on == 'Order Qty' ? 'quantity' : 'subtotal';
 						$item_val = collect($cart_arr)->sum($item_sum);
@@ -208,11 +204,6 @@ trait ProductTrait {
 				}
 
                 $discount_rate = $rule->discount_type == 'Percentage' ? $rule->rate.'%' : '₱ '.number_format($rule->rate, 2);
-                // if($rule->apply_on == 'Category'){
-                //     $applied_on = isset($cat_arr[$rule->applied_on]) ? $cat_arr[$rule->applied_on] : null;
-                // }else{
-                //     $applied_on = $rule->applied_on;
-                // }
                 $applied_on = $rule->apply_on == 'Item Code' ? $rule->applied_on : 'Transaction';
 
                 $applicable_price_rule[$applied_on][] = [

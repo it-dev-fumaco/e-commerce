@@ -339,7 +339,6 @@ class CartController extends Controller
             ];
         }
 
-        // $price_rules = $this->getPriceRules($cart_arr);
         $applicable_price_rule = $this->getPriceRules($cart_arr);
         $price_rule = isset($applicable_price_rule['price_rule']) ? $applicable_price_rule['price_rule'] : [];
         $applicable_price_rule = isset($applicable_price_rule['applicable_price_rule']) ? $applicable_price_rule['applicable_price_rule'] : [];
