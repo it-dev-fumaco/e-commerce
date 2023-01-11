@@ -2248,7 +2248,7 @@ class FrontendController extends Controller
 
         $orders = DB::table('fumaco_order')->where('user_email', Auth::user()->username)
             ->whereIn('order_status', $archived_statuses)
-            ->select('id', 'order_number', 'order_date', 'order_status', 'estimated_delivery_date', 'date_delivered', 'pickup_date', 'order_subtotal', 'order_shipping', 'order_shipping_amount', 'discount_amount', 'voucher_code')
+            ->select('id', 'order_number', 'order_date', 'order_status', 'estimated_delivery_date', 'date_delivered', 'pickup_date', 'order_subtotal', 'order_shipping', 'order_shipping_amount', 'discount_amount', 'voucher_code', 'grand_total')
             ->orderBy('id', 'desc')->paginate(10);
 
         $order_numbers = array_column($orders->items(), 'order_number');
@@ -2294,7 +2294,7 @@ class FrontendController extends Controller
                 'subtotal' => $order->order_subtotal,
                 'shipping_name' => $order->order_shipping,
                 'shipping_fee' => $order->order_shipping_amount,
-                'grand_total' => ($order->order_shipping_amount + ($order->order_subtotal - $order->discount_amount)),
+                'grand_total' => $order->grand_total ? $order->grand_total : (($order->order_shipping_amount + $order->order_subtotal) - $order->discount_amount),
                 'voucher_code' => $order->voucher_code,
                 'discount_amount' => $order->discount_amount,
             ];
@@ -2302,7 +2302,7 @@ class FrontendController extends Controller
 
         $new_orders = DB::table('fumaco_order')->where('user_email', Auth::user()->username)
             ->whereNotIn('order_status', $archived_statuses)
-            ->select('id', 'pickup_date', 'order_number', 'order_date', 'order_status', 'payment_status', 'estimated_delivery_date', 'date_delivered', 'order_subtotal', 'order_payment_method', 'order_shipping', 'order_shipping_amount', 'discount_amount', 'voucher_code')
+            ->select('id', 'pickup_date', 'order_number', 'order_date', 'order_status', 'payment_status', 'estimated_delivery_date', 'date_delivered', 'order_subtotal', 'order_payment_method', 'order_shipping', 'order_shipping_amount', 'discount_amount', 'voucher_code', 'grand_total')
             ->orderBy('id', 'desc')->paginate(10);
 
         $order_numbers = array_column($new_orders->items(), 'order_number');
@@ -2375,7 +2375,7 @@ class FrontendController extends Controller
                 'subtotal' => $new_order->order_subtotal,
                 'shipping_name' => $new_order->order_shipping,
                 'shipping_fee' => $new_order->order_shipping_amount,
-                'grand_total' => ($new_order->order_shipping_amount + ($new_order->order_subtotal - $new_order->discount_amount)),
+                'grand_total' => $new_order->grand_total ? $new_order->grand_total : ($new_order->order_shipping_amount + ($new_order->order_subtotal - $new_order->discount_amount)),
                 'pickup_date' => $new_order->pickup_date,
                 'order_tracker' => $track_order_details,
                 'ship_status' => $order_status,
