@@ -128,14 +128,14 @@
           @php
             if($voucher_details){
               switch ($voucher_details->discount_type) {
-                case 'Fixed Amount':
-                  $voucher_discount_amount = $voucher_details->discount_rate;
-                  break;
                 case 'By Percentage':
                   $voucher_discount_amount = ($voucher_details->discount_rate / 100) * $order_details->order_subtotal;
+                  if($voucher_details->capped_amount){
+                    $voucher_discount_amount = $voucher_discount_amount < $voucher_details->capped_amount ? $voucher_discount_amount : $voucher_details->capped_amount;
+                  }
                   break;
                 default:
-                  $voucher_discount_amount = 0;
+                  $voucher_discount_amount = $voucher_details->discount_rate;
                   break;
               }
             }
