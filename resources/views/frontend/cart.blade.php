@@ -95,7 +95,7 @@
                                                     {{-- <span class="formatted-price" style="font-size: 11pt;"><b>₱ {{ number_format($cart['price'], 2, '.', ',') }}</b></span> --}}
                                                     <p style="white-space: nowrap !important; font-weight: 600;">₱ <span class="formatted-amount" style="font-size: 11pt;">{{ number_format($cart['amount'], 2, '.', ',') }}</span>
                                                         <br>
-                                                        <del><span class="orig-amount d-none">₱ 0.00</span></del>
+                                                        <del class="text-muted" style="font-size: 8pt;"><span class="orig-amount d-none">₱ 0.00</span></del>
                                                     </p>
                                                 </div>
                                             </div>
@@ -122,7 +122,7 @@
                                     ₱ <span class="formatted-price" style="font-size: 11pt;">{{ number_format($cart['price'], 2, '.', ',') }}</span>
                                     @if ($cart['is_discounted'])
                                         <br>
-                                        <del>₱ {{ number_format($cart['default_price'], 2, '.', ',') }}</del>
+                                        <del style="font-size: 8pt;" class="text-muted">₱ {{ number_format($cart['default_price'], 2, '.', ',') }}</del>
                                     @endif
                                 </p>
                                 <span class="price d-none">{{ $cart['price'] }}</span>
@@ -145,7 +145,7 @@
                             <td class="tbls d-none d-sm-table-cell text-center">
                                 <p style="white-space: nowrap !important;">₱ <span class="formatted-amount" style="font-size: 11pt;">{{ number_format($cart['amount'], 2, '.', ',') }}</span>
                                     <br>
-                                    <del><span class="orig-amount d-none">₱ 0.00</span></del>
+                                    <del class="text-muted" style="font-size: 8pt;"><span class="orig-amount d-none">₱ 0.00</span></del>
                                 </p>
                                 <span class="amount d-none">{{ $cart['amount'] }}</span>
                             </td>
@@ -682,6 +682,7 @@
             // e.preventDefault();
             $('#custom-overlay').fadeIn();
             window.location.href = "{{ $action }}";
+            // alert('{{ $action }}');
         });
 
         $('input[name="quantity[]"]').change(function(){

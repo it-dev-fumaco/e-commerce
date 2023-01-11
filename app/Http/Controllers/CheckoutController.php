@@ -332,11 +332,11 @@ class CheckoutController extends Controller
 			if(Auth::check()) {
 				$cart_items = DB::table('fumaco_items as a')->join('fumaco_cart as b', 'a.f_idcode', 'b.item_code')
 					->where('user_type', 'member')->where('user_email', Auth::user()->username)
-					->select('f_idcode', 'f_default_price', 'f_onsale', 'b.qty', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'slug', 'f_name_name', 'f_item_name', 'f_qty', 'f_reserved_qty', 'f_item_type')->get();
-			} else {
+					->select('f_idcode', 'f_default_price', 'b.qty', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_stock_uom', 'slug', 'f_name_name', 'f_item_name', 'f_qty', 'f_reserved_qty', 'f_item_type')->get();
+			}else{
 				$cart_items = DB::table('fumaco_items as a')->join('fumaco_cart as b', 'a.f_idcode', 'b.item_code')
 					->where('user_type', 'guest')->where('transaction_id', $order_no)
-					->select('f_idcode', 'f_default_price', 'f_onsale', 'b.qty', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'slug', 'f_name_name', 'f_item_name', 'f_qty', 'f_reserved_qty', 'f_item_type')->get();
+					->select('f_idcode', 'f_default_price', 'b.qty', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_stock_uom', 'slug', 'f_name_name', 'f_item_name', 'f_qty', 'f_reserved_qty', 'f_item_type')->get();
 			}
 
 			if(count($cart_items) <= 0) {
@@ -358,13 +358,15 @@ class CheckoutController extends Controller
 
 			$item_codes = array_column($cart_items->toArray(), 'f_idcode');
 			
-			$clearance_sale_items = [];
+			$clearance_sale_items = $on_sale_items = [];
 			if (count($item_codes) > 0) {
 				$item_images = DB::table('fumaco_items_image_v1')->whereIn('idcode', $item_codes)
 					->select('imgprimayx', 'idcode')->get();
 				$item_images = collect($item_images)->groupBy('idcode')->toArray();
 
 				$clearance_sale_items = $this->isIncludedInClearanceSale($item_codes);
+
+				$on_sale_items = $this->onSaleItems($item_codes);
 			}
 			$sale_per_category = [];
 			if (!$sale && !Auth::check()) {
@@ -404,14 +406,22 @@ class CheckoutController extends Controller
 					}
 				}
 
+				$on_sale = false;
+				$discount_type = $discount_rate = null;
+				if (array_key_exists($item->f_idcode, $on_sale_items)) {
+					$on_sale = $on_sale_items[$item->f_idcode]['on_sale'];
+					$discount_type = $on_sale_items[$item->f_idcode]['discount_type'];
+					$discount_rate = $on_sale_items[$item->f_idcode]['discount_rate'];
+				}
+
 				$item_detail = [
 					'default_price' => $item->f_default_price,
 					'category_id' => $item->f_cat_id,
 					'item_code' => $item->f_idcode,
-					'discount_type' => $item->f_discount_type,
-					'discount_rate' => $item->f_discount_rate,
+					'discount_type' => $discount_type,
+					'discount_rate' => $discount_rate,
 					'stock_uom' => $item->f_stock_uom,
-					'on_sale' => $item->f_onsale
+					'on_sale' => $on_sale
 				];
 
 				$is_on_clearance_sale = false;
@@ -426,7 +436,7 @@ class CheckoutController extends Controller
 
 				$price = $item_price_data['discounted_price'];
 				$total_amount = $price * $item->qty;
-				$item_discount = $item_price_data['discount_rate'];
+				$item_discount = $item_price_data['discount_rate'] ? $item_price_data['discount_rate'] : 0;
 
 				$discount_type = isset($item_price_data['discount_type']) ? $item_price_data['discount_type'] : null;
 				
@@ -494,7 +504,7 @@ class CheckoutController extends Controller
 					];
 				}
 			}
-
+			
 			DB::table('fumaco_order_items')->insert($order_cart);
 
 			$shipping_rates = $this->getShippingRates();
@@ -688,11 +698,11 @@ class CheckoutController extends Controller
 
 			if(Auth::check()) {
 				$cart_items = DB::table('fumaco_items as a')->join('fumaco_cart as b', 'a.f_idcode', 'b.item_code')
-					->select('f_idcode', 'f_default_price', 'f_onsale', 'b.qty', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'slug', 'f_name_name', 'f_qty', 'f_reserved_qty', 'f_item_type')
+					->select('f_idcode', 'f_default_price', 'b.qty', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_stock_uom', 'slug', 'f_name_name', 'f_qty', 'f_reserved_qty', 'f_item_type')
 					->where('user_type', 'member')->where('user_email', Auth::user()->username)->get();
 			} else {
 				$cart_items = DB::table('fumaco_items as a')->join('fumaco_cart as b', 'a.f_idcode', 'b.item_code')
-					->select('f_idcode', 'f_default_price', 'f_onsale', 'b.qty', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'slug', 'f_name_name', 'f_qty', 'f_reserved_qty', 'f_item_type')
+					->select('f_idcode', 'f_default_price', 'b.qty', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_stock_uom', 'slug', 'f_name_name', 'f_qty', 'f_reserved_qty', 'f_item_type')
 					->where('user_type', 'guest')->where('transaction_id', $order_no)->get();
 			}
 
@@ -703,6 +713,7 @@ class CheckoutController extends Controller
 				->where('status', 1)->where('apply_discount_to', 'All Items')->first();
 
 			$clearance_sale_items = $this->isIncludedInClearanceSale(array_column($cart_items->toArray(), 'f_idcode'));
+			$on_sale_items = $this->onSaleItems(array_column($cart_items->toArray(), 'f_idcode'));
 
 			$sale_per_category = [];
 			if (!$sale && !Auth::check()) {
@@ -729,14 +740,23 @@ class CheckoutController extends Controller
  
 			$cart_arr = [];
 			foreach ($cart_items as $n => $item) {
+				$on_sale = false;
+				$discount_type = null;
+				$discount_rate = 0;
+				if (array_key_exists($item->f_idcode, $on_sale_items)) {
+					$on_sale = $on_sale_items[$item->f_idcode]['on_sale'];
+					$discount_type = $on_sale_items[$item->f_idcode]['discount_type'];
+					$discount_rate = $on_sale_items[$item->f_idcode]['discount_rate'];
+				}
+
 				$item_detail = [
 					'default_price' => $item->f_default_price,
 					'category_id' => $item->f_cat_id,
 					'item_code' => $item->f_idcode,
-					'discount_type' => $item->f_discount_type,
-					'discount_rate' => $item->f_discount_rate,
+					'discount_type' => $discount_type,
+					'discount_rate' => $discount_rate,
 					'stock_uom' => $item->f_stock_uom,
-					'on_sale' => $item->f_onsale
+					'on_sale' => $on_sale
 				];
 
 				$is_on_clearance_sale = false;
@@ -811,7 +831,6 @@ class CheckoutController extends Controller
 			DB::table('fumaco_order_items')->insert($cart_arr);
 
 			DB::commit();
-
 			session()->forget('fumVoucher');
 
 			return response()->json(['status' => 1, 'id' => $order_no, 'code' => $existing_order_temp->xtempcode]);
@@ -1049,6 +1068,8 @@ class CheckoutController extends Controller
 				}
 
 				$price_rule = collect($price_rule)->merge(['discount_amount' => $pr_discount_rate]);
+
+				$subtotal = $subtotal - $pr_discount_rate;
 			}
 
 			$discount = 0;
@@ -1527,11 +1548,11 @@ class CheckoutController extends Controller
 		if(Auth::check()) {
 			$order_items = DB::table('fumaco_items as a')->join('fumaco_cart as b', 'a.f_idcode', 'b.item_code')
 				->where('user_type', 'member')->where('user_email', Auth::user()->username)
-				->select('f_idcode', 'f_default_price', 'f_onsale', 'b.qty', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'f_package_height', 'f_package_weight', 'f_package_length', 'f_package_width')->get();
+				->select('f_idcode', 'f_default_price', 'b.qty', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_stock_uom', 'f_package_height', 'f_package_weight', 'f_package_length', 'f_package_width')->get();
 		} else {
 			$order_items = DB::table('fumaco_items as a')->join('fumaco_cart as b', 'a.f_idcode', 'b.item_code')
 				->where('user_type', 'guest')->where('transaction_id', $order_no)
-				->select('f_idcode', 'f_default_price', 'f_onsale', 'b.qty', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'f_package_height', 'f_package_weight', 'f_package_length', 'f_package_width')->get();
+				->select('f_idcode', 'f_default_price', 'b.qty', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_stock_uom', 'f_package_height', 'f_package_weight', 'f_package_length', 'f_package_width')->get();
 		}
 
 		$total_amount = 0;
@@ -1546,6 +1567,7 @@ class CheckoutController extends Controller
 			->select('discount_type', 'discount_rate')->first();
 
 		$clearance_sale_items = $this->isIncludedInClearanceSale(array_column($order_items->toArray(), 'f_idcode'));
+		$on_sale_items = $this->onSaleItems(array_column($order_items->toArray(), 'f_idcode'));
 		
 		$sale_per_category = [];
 		if (!$sale && !Auth::check()) {
@@ -1567,14 +1589,22 @@ class CheckoutController extends Controller
 				}
 			}
 
+			$on_sale = false;
+            $discount_type = $discount_rate = null;
+            if (array_key_exists($row->f_idcode, $on_sale_items)) {
+                $on_sale = $on_sale_items[$row->f_idcode]['on_sale'];
+                $discount_type = $on_sale_items[$row->f_idcode]['discount_type'];
+                $discount_rate = $on_sale_items[$row->f_idcode]['discount_rate'];
+            }
+
 			$item_detail = [
 				'default_price' => $row->f_default_price,
 				'category_id' => $row->f_cat_id,
 				'item_code' => $row->f_idcode,
-				'discount_type' => $row->f_discount_type,
-				'discount_rate' => $row->f_discount_rate,
+				'discount_type' => $discount_type,
+				'discount_rate' => $discount_rate,
 				'stock_uom' => $row->f_stock_uom,
-				'on_sale' => $row->f_onsale
+				'on_sale' => $on_sale
 			];
 
 			$is_on_clearance_sale = false;
@@ -1853,13 +1883,16 @@ class CheckoutController extends Controller
 			$order_no = session()->get('fumOrderNo');
 			if(Auth::check()) {
 				$cart_items = DB::table('fumaco_items as a')->join('fumaco_cart as b', 'a.f_idcode', 'b.item_code')
-					->select('f_idcode', 'f_default_price', 'f_onsale', 'b.qty', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'f_package_height', 'f_package_weight', 'f_package_length', 'f_package_width')
+					->select('f_idcode', 'f_default_price', 'b.qty', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_stock_uom', 'f_package_height', 'f_package_weight', 'f_package_length', 'f_package_width')
 					->where('user_type', 'member')->where('user_email', Auth::user()->username)->get();
 			} else {
 				$cart_items = DB::table('fumaco_items as a')->join('fumaco_cart as b', 'a.f_idcode', 'b.item_code')
-					->select('f_idcode', 'f_default_price', 'f_onsale', 'b.qty', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'f_package_height', 'f_package_weight', 'f_package_length', 'f_package_width')
+					->select('f_idcode', 'f_default_price', 'b.qty', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_stock_uom', 'f_package_height', 'f_package_weight', 'f_package_length', 'f_package_width')
 					->where('user_type', 'guest')->where('transaction_id', $order_no)->get();
 			}
+
+			$order_items = DB::table('fumaco_order_items')->where('order_number', $order_no)->get();
+			$order_items = collect($order_items)->groupBy('item_code');
 
 			$voucher_category = [];
 			$vouched_item_category_price = 0;
@@ -1868,54 +1901,13 @@ class CheckoutController extends Controller
 					->where('voucher_type', 'Per Category')->distinct()->pluck('exclusive_to')->toArray();
 			}
 
-			// get sitewide sale
-			$sale = DB::table('fumaco_on_sale')
-				->whereDate('start_date', '<=', Carbon::now()->toDateString())
-				->whereDate('end_date', '>=', Carbon::today()->toDateString())
-				->where('status', 1)->where('apply_discount_to', 'All Items')->first();
-
-			$clearance_sale_items = $this->isIncludedInClearanceSale(array_column($cart_items->toArray(), 'f_idcode'));
-			
-			$sale_per_category = [];
-			if (!$sale && !Auth::check()) {
-				$item_categories = array_column($cart_items->toArray(), 'f_cat_id');
-				$sale_per_category = $this->getSalePerItemCategory($item_categories);
-			}
-
-			if (Auth::check()) {
-				$customer_group_sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
-
-				$sale = $customer_group_sale ? $customer_group_sale : $sale;
-			}
-
 			$subtotal = 0;
 			$discount = 0;
 			$item_total_amount = 0;
 			$item_applied_discount = [];
 			$below_min_spend_category = [];
 			foreach ($cart_items as $item) {
-				$item_detail = [
-					'default_price' => $item->f_default_price,
-					'category_id' => $item->f_cat_id,
-					'item_code' => $item->f_idcode,
-					'discount_type' => $item->f_discount_type,
-					'discount_rate' => $item->f_discount_rate,
-					'stock_uom' => $item->f_stock_uom,
-					'on_sale' => $item->f_onsale
-				];
-
-				$is_on_clearance_sale = false;
-				if (array_key_exists($item->f_idcode, $clearance_sale_items)) {
-					$item_detail['discount_type'] = $clearance_sale_items[$item->f_idcode][0]->discount_type;
-					$item_detail['discount_rate'] = $clearance_sale_items[$item->f_idcode][0]->discount_rate;
-					$is_on_clearance_sale = true;
-				}
-	
-				// get item price, discounted price and discount rate
-				$item_price_data = $this->getItemPriceAndDiscount($item_detail, $sale, $sale_per_category, $is_on_clearance_sale);
-
-				$price = ( $item_price_data['is_on_sale']) ? $item_price_data['discounted_price'] : $item_price_data['item_price'];
-				$item_total = $price * $item->qty;
+				$item_total = isset($order_items[$item->f_idcode]) ? $order_items[$item->f_idcode][0]->item_total_price : $item->f_default_price * $item->qty;
 				if (in_array($item->f_idcode, $voucher_items)) {
 					$discount_per_item = 0;
 					if($voucher_details->minimum_spend >= 0) {
@@ -1953,6 +1945,19 @@ class CheckoutController extends Controller
 				$subtotal += $item_total;
 			}
 
+			$items_arr = collect($cart_items)->map(function ($q) use ($order_items){
+				return [
+					'item_code' => $q->f_idcode,
+					'quantity' => $q->qty,
+					'subtotal' => isset($order_items[$q->f_idcode]) ? $order_items[$q->f_idcode][0]->item_total_price : $q->f_default_price * $q->qty
+				];
+			});
+
+			$applicable_price_rule = $this->getPriceRules($items_arr);
+			$price_rule = isset($applicable_price_rule['price_rule']) ? $applicable_price_rule['price_rule'] : [];
+
+			$cart_item_codes = collect($cart_items)->pluck('f_idcode');
+
 			if($voucher_details->coupon_type == 'Per Category') {
 				$discount_per_category = 0;
 				if($voucher_details->minimum_spend > 0) {
@@ -1989,6 +1994,20 @@ class CheckoutController extends Controller
 						->whereIn('id', $voucher_category)->pluck('name', 'id')->toArray();
 					return response()->json(['status' => 0, 'message' => 'Required total amount ₱ ' . number_format(str_replace(",","",$voucher_details->minimum_spend), 2) . ' for ' . $item_categories[$below_min_spend_category[0]]]);
 				}
+			}
+
+			if(isset($price_rule['Transaction'])){
+				$pr = $price_rule['Transaction'];
+				switch($pr['discount_type']){
+					case 'Percentage':
+						$pr_discount = $subtotal * ($pr['discount_rate'] / 100);
+						break;
+					default:
+						$pr_discount = $pr['discount_rate'] < $subtotal ? $pr['discount_rate'] : 0;
+						break;
+				}
+
+				$subtotal = $subtotal - $pr_discount;
 			}
 
 			if(in_array($voucher_details->coupon_type, ['Promotional', 'Per Customer Group'])) {

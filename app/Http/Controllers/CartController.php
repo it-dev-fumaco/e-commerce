@@ -215,11 +215,11 @@ class CartController extends Controller
         if(Auth::check()) {
             $cart_items = DB::table('fumaco_items as a')->join('fumaco_cart as b', 'a.f_idcode', 'b.item_code')
                 ->where('user_type', 'member')->where('user_email', Auth::user()->username)
-                ->select('f_idcode', 'f_default_price', 'f_onsale', 'b.qty', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'slug', 'f_name_name', 'f_item_name', 'f_qty', 'f_reserved_qty')->get();
+                ->select('f_idcode', 'f_default_price', 'b.qty', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_stock_uom', 'slug', 'f_name_name', 'f_item_name', 'f_qty', 'f_reserved_qty')->get();
         } else {
             $cart_items = DB::table('fumaco_items as a')->join('fumaco_cart as b', 'a.f_idcode', 'b.item_code')
                 ->where('user_type', 'guest')->where('transaction_id', $order_no)
-                ->select('f_idcode', 'f_default_price', 'f_onsale', 'b.qty', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'slug', 'f_name_name', 'f_item_name', 'f_qty', 'f_reserved_qty')->get();
+                ->select('f_idcode', 'f_default_price', 'b.qty', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_stock_uom', 'slug', 'f_name_name', 'f_item_name', 'f_qty', 'f_reserved_qty')->get();
         }
 
         if (count($cart_items) > 0) {
@@ -253,16 +253,18 @@ class CartController extends Controller
 
         $item_codes = array_column($cart_items->toArray(), 'f_idcode');
 
-        $clearance_sale_items = [];
+        $clearance_sale_items = $on_sale_items = [];
         if (count($item_codes) > 0) {
             $item_images = DB::table('fumaco_items_image_v1')->whereIn('idcode', $item_codes)
                 ->select('imgprimayx', 'idcode')->get();
             $item_images = collect($item_images)->groupBy('idcode')->toArray();
 
             $clearance_sale_items = $this->isIncludedInClearanceSale($item_codes);
+
+            $on_sale_items = $this->onSaleItems($item_codes);
         }
         $sale_per_category = [];
-        if (!$sale && !Auth::check()) {
+        if (!$on_sale_items && !Auth::check()) {
             $item_categories = array_column($cart_items->toArray(), 'f_cat_id');
             $sale_per_category = $this->getSalePerItemCategory($item_categories);
         }
@@ -287,14 +289,22 @@ class CartController extends Controller
                 }
             }
 
+            $on_sale = false;
+            $discount_type = $discount_rate = null;
+            if (array_key_exists($item->f_idcode, $on_sale_items)) {
+                $on_sale = $on_sale_items[$item->f_idcode]['on_sale'];
+                $discount_type = $on_sale_items[$item->f_idcode]['discount_type'];
+                $discount_rate = $on_sale_items[$item->f_idcode]['discount_rate'];
+            }
+
             $item_detail = [
                 'default_price' => $item->f_default_price,
                 'category_id' => $item->f_cat_id,
                 'item_code' => $item->f_idcode,
-                'discount_type' => $item->f_discount_type,
-                'discount_rate' => $item->f_discount_rate,
+                'discount_type' => $discount_type,
+                'discount_rate' => $discount_rate,
                 'stock_uom' => $item->f_stock_uom,
-                'on_sale' => $item->f_onsale
+                'on_sale' => $on_sale
             ];
 
             $is_on_clearance_sale = false;
@@ -331,17 +341,18 @@ class CartController extends Controller
 
         // $price_rules = $this->getPriceRules($cart_arr);
         $applicable_price_rule = $this->getPriceRules($cart_arr);
+        $price_rule = isset($applicable_price_rule['price_rule']) ? $applicable_price_rule['price_rule'] : [];
         $applicable_price_rule = isset($applicable_price_rule['applicable_price_rule']) ? $applicable_price_rule['applicable_price_rule'] : [];
 
         $cart_item_codes = collect($cart_items)->pluck('f_idcode');
 
         $cross_sell_products = DB::table('fumaco_items_cross_sell as cs')->join('fumaco_items as i', 'cs.item_code_cross_sell', 'i.f_idcode')
             ->whereIn('cs.item_code', $cart_item_codes)->whereNotIn('cs.item_code_cross_sell', $cart_item_codes)
-            ->select('f_idcode', 'f_default_price', 'f_onsale', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'slug', 'f_name_name', 'f_item_name', 'f_qty', 'f_reserved_qty')->get();
+            ->select('f_idcode', 'f_default_price', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_stock_uom', 'slug', 'f_name_name', 'f_item_name', 'f_qty', 'f_reserved_qty')->get();
 
         $cross_selling_item_codes = array_column($cross_sell_products->toArray(), 'f_idcode');
 
-        $clearance_sale_items = [];
+        $clearance_sale_items = $on_sale_items = [];
         if (count($cross_selling_item_codes) > 0) {
             $cross_selling_item_images = DB::table('fumaco_items_image_v1')->whereIn('idcode', $cross_selling_item_codes)
                 ->select('imgprimayx', 'idcode')->get();
@@ -350,9 +361,10 @@ class CartController extends Controller
             $product_reviews = $this->getProductRating($cross_selling_item_codes);
 
             $clearance_sale_items = $this->isIncludedInClearanceSale($cross_selling_item_codes);
+            $on_sale_items = $this->onSaleItems($cross_selling_item_codes);
         }
         $sale_per_category = [];
-        if (!$sale && !Auth::check()) {
+        if (!$on_sale_items && !Auth::check()) {
             $item_categories = array_column($cross_sell_products->toArray(), 'f_cat_id');
             $sale_per_category = $this->getSalePerItemCategory($item_categories);
         }
@@ -360,7 +372,7 @@ class CartController extends Controller
         if (Auth::check()) {
             $customer_group_sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
 
-            $sale = $customer_group_sale ? $customer_group_sale : $sale;
+            $sale = $customer_group_sale ? $customer_group_sale : $on_sale_items;
         }
     
         $cross_sell_arr = [];
@@ -377,14 +389,22 @@ class CartController extends Controller
                 }
             }
 
+            $on_sale = false;
+            $discount_type = $discount_rate = null;
+            if (array_key_exists($cs->f_idcode, $on_sale_items)) {
+                $on_sale = $on_sale_items[$cs->f_idcode]['on_sale'];
+                $discount_type = $on_sale_items[$cs->f_idcode]['discount_type'];
+                $discount_rate = $on_sale_items[$cs->f_idcode]['discount_rate'];
+            }
+
             $item_detail = [
                 'default_price' => $cs->f_default_price,
                 'category_id' => $cs->f_cat_id,
                 'item_code' => $cs->f_idcode,
-                'discount_type' => $cs->f_discount_type,
-                'discount_rate' => $cs->f_discount_rate,
+                'discount_type' => $discount_type,
+                'discount_rate' => $discount_rate,
                 'stock_uom' => $cs->f_stock_uom,
-                'on_sale' => $cs->f_onsale
+                'on_sale' => $on_sale
             ];
 
             $is_on_clearance_sale = false;
@@ -426,7 +446,7 @@ class CartController extends Controller
 		}
 
         if ($request->ajax()) {
-            return view('frontend.cart_preview', compact('cart_arr', 'bill_address', 'ship_address'));
+            return view('frontend.cart_preview', compact('cart_arr', 'bill_address', 'ship_address', 'price_rule', 'applicable_price_rule'));
         }
 
         return view('frontend.cart', compact('cart_arr', 'bill_address', 'ship_address', 'cross_sell_arr', 'applicable_price_rule'));

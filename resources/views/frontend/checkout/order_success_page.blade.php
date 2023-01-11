@@ -126,6 +126,7 @@
 							@php
 								$sum_discount = collect($items)->sum('discount');
 								$colspan = ($sum_discount > 0) ? 5 : 4;
+								$gt_discount = 0;
 							@endphp
 							<thead>
 								<tr style="font-size: 0.9rem;">
@@ -282,6 +283,8 @@
 												$discount_amount = collect($items)->sum('amount') > $rule['discount_rate'] ? $rule['discount_rate'] : 0;
 												break;
 										}
+
+										$gt_discount = $order_details->discount_amount > $discount_amount ? $order_details->discount_amount - $discount_amount : 0;
 									@endphp
 									@if ($discount_amount)
 										<tr style="font-size: 0.8rem; text-align: right; border-top: 0;">
@@ -309,7 +312,7 @@
 								<tr style="font-size: 0.9rem; text-align: right; border-top: 2px solid;">
 									<td class="pb-1 pt-1 d-none d-sm-table-cell" colspan="{{ $colspan }}"><b>Grand Total</b></td>
 									<td class="pb-1 pt-1 d-md-none" style="white-space: nowrap !important;"><b>Grand Total</b></td>
-									<td class="pb-1 pt-1" style="white-space: nowrap !important;"><b>₱ {{ number_format(str_replace(",","",($order_details->order_shipping_amount + ($order_details->order_subtotal - $order_details->discount_amount))), 2) }}</b></td>
+									<td class="pb-1 pt-1" style="white-space: nowrap !important;"><b>₱ {{ number_format(str_replace(",","",($order_details->order_shipping_amount + ($order_details->order_subtotal - $gt_discount))), 2) }}</b></td>
 								</tr>
 							</tfoot>
 						</table>

@@ -627,20 +627,18 @@ class FrontendController extends Controller
             ];
         }
 
-        
-
         $clearance_sale_items = $on_sale_items = [];
-        if (count($onsale_item_codes) > 0) {
+        if (count(array_keys($onsale_item_codes)) > 0) {
             $onsale_item_images = DB::table('fumaco_items_image_v1')->whereIn('idcode', $onsale_item_codes)
                 ->select('imgprimayx', 'idcode')->get();
             $onsale_item_images = collect($onsale_item_images)->groupBy('idcode')->toArray();
 
             $product_reviews = $this->getProductRating($onsale_item_codes);
 
-            $clearance_sale_items = $this->isIncludedInClearanceSale($onsale_item_codes);
+            $clearance_sale_items = $this->isIncludedInClearanceSale(array_keys($onsale_item_codes));
 
-            $on_sale_items = $this->onSaleItems($onsale_item_codes);
-        }       
+            $on_sale_items = $this->onSaleItems(array_keys($onsale_item_codes));
+        }
 
         $on_sale_arr = [];
         foreach($on_sale_query as $row){
