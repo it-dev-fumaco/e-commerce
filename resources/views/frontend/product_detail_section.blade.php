@@ -363,3 +363,19 @@
         </div>
     </div>
 </div>
+<link type="text/css" rel="stylesheet" media="all" href="{{ asset('/item/fancybox/source/jquery.fancybox.css') }}" />
+<link type="text/css" rel="stylesheet" media="all" href="{{ asset('/item/magnific-popup/css/magnific-popup.css') }}" />
+<link rel="stylesheet" type="text/css" href="{{ asset('/item/dist/xzoom.css') }}" media="all" />
+<link type="text/css" rel="stylesheet" href="{{ asset('/assets/loading.css') }}" />
+<link rel="stylesheet" type="text/css" href="{{ asset('/page_css/product_page.min.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ asset('/slick/slick.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ asset('/slick/slick-theme.css') }}">
+
+<script type="text/javascript" src="{{ asset('/assets/loading.js') }}"></script>
+<script src="{{ asset('/item/js/foundation.min.js') }}"></script>
+<script src="{{ asset('/item/js/setup.js') }}"></script>
+<script type="text/javascript" src="{{ asset('/item/dist/xzoom.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('/item/hammer.js/1.0.5/jquery.hammer.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('/item/fancybox/source/jquery.fancybox.js') }}"></script>
+<script type="text/javascript" src="{{ asset('/item/magnific-popup/js/magnific-popup.js') }}"></script>
+<script src="{{ asset('/slick/slick.js') }}" type="text/javascript" charset="utf-8"></script>
