@@ -164,7 +164,7 @@ trait ProductTrait {
 			->orderBy('rule.created_at', 'desc')->orderBy('condition.range_to', 'asc')
 			->union($price_rule_per_transaction)->get();
 
-        $price_rules = collect($price_rules)->sortBy('rate')->values()->all();
+        $price_rules = collect($price_rules)->sortBy('range_from')->values()->all();
 
 		$price_rules_by_name = collect($price_rules)->groupBy('name');
 
