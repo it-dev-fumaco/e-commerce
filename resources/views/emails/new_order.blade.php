@@ -155,9 +155,9 @@
 							</tr>
 						@endif
 					@endif
-					@isset($price_rule['Transaction'])
+					@isset($price_rule['Any'])
 						@php
-							$rule = $price_rule['Transaction'];
+							$rule = $price_rule['Any'];
 							switch ($rule['discount_type']) {
 								case 'Percentage':
 									$discount_amount = collect($items)->sum('amount') * ($rule['discount_rate'] / 100);

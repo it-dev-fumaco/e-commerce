@@ -153,7 +153,7 @@ trait ProductTrait {
 
 		$price_rule_per_transaction = DB::table('fumaco_price_rule as rule')
 			->join('fumaco_price_rule_condition as condition', 'rule.price_rule_id', 'condition.price_rule_id')
-			->whereDate('rule.valid_from', '<=', $transaction_date->startOfDay())->whereDate('rule.valid_to', '>=', $transaction_date->endOfDay())->where('rule.enabled', 1)->where('rule.apply_on', 'Transaction')
+			->whereDate('rule.valid_from', '<=', $transaction_date->startOfDay())->whereDate('rule.valid_to', '>=', $transaction_date->endOfDay())->where('rule.enabled', 1)->where('rule.apply_on', 'Any')
 			->select('rule.*', 'condition.range_from', 'condition.range_to', 'condition.rate', DB::raw('NULL as applied_on'));
 
 		$price_rules = DB::table('fumaco_price_rule as rule')
@@ -161,7 +161,7 @@ trait ProductTrait {
 			->join('fumaco_price_rule_condition as condition', 'rule.price_rule_id', 'condition.price_rule_id')
 			->whereDate('rule.valid_from', '<=', $transaction_date->startOfDay())->whereDate('rule.valid_to', '>=', $transaction_date->endOfDay())->where('rule.enabled', 1)->whereIn('apply_to.applied_on', $ids)
 			->select('rule.*', 'condition.range_from', 'condition.range_to', 'condition.rate', 'apply_to.applied_on')
-			->orderBy('rule.created_at', 'desc')->orderBy('condition.range_to', 'asc')
+			->orderBy('rule.created_at', 'desc')
 			->union($price_rule_per_transaction)->get();
 
         $price_rules = collect($price_rules)->sortBy('range_from')->values()->all();
@@ -185,13 +185,16 @@ trait ProductTrait {
 						$item_sum = $rule->conditions_based_on == 'Order Qty' ? 'quantity' : 'subtotal';
 						$item_val = collect($cart_arr)->sum($item_sum);
 
-                        $applied_on = 'Transaction';
+                        $applied_on = 'Any';
 						break;
 				}
 
-                $discount_checker = collect($price_rules_by_name[$rule->name])->where('range_from', '>', $item_val)->first();
+                $max_check = 1;
+                if(is_numeric($rule->range_to)){
+                    $max_check = $item_val <= $rule->range_to ? 1 : 0;
+                }
 
-				if($item_val >= $rule->range_from && $item_val <= $rule->range_to || $item_val > $rule->range_to){
+				if($item_val >= $rule->range_from && $max_check){
 					$price_rule[$applied_on] = [
 						'discount_name' => $rule->name,
 						'apply_on' => $rule->apply_on,
@@ -203,8 +206,8 @@ trait ProductTrait {
 					];
 				}
 
+                $discount_checker = collect($price_rules_by_name[$rule->name])->where('range_from', '>', $item_val)->first();
                 $discount_rate = $rule->discount_type == 'Percentage' ? $rule->rate.'%' : '₱ '.number_format($rule->rate, 2);
-                $applied_on = $rule->apply_on == 'Item Code' ? $rule->applied_on : 'Transaction';
 
                 $applicable_price_rule[$applied_on][] = [
                     'apply_on' => $rule->apply_on,

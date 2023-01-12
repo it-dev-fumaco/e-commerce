@@ -20,7 +20,7 @@
             <img src="{{ asset($img) }}" alt="{{ Str::slug(explode(".", $cart['alt'])[0], '-') }}" class="img-responsive" width="55" height="55">
         </picture>
         <span class="item-name">{{ $cart['item_description'] }}</span>
-        @if ($price_rule && !isset($price_rule['Transaction']))
+        @if ($price_rule && !isset($price_rule['Any']))
             @php
                 $pr = [];
                 $discount_amount = 0;
@@ -59,7 +59,7 @@
                 $apr = collect($applicable_price_rule[$cart['item_code']])->where('range_from', '>', $cart['quantity'])->first();
             }
         @endphp
-        @if ($apr && !isset($applicable_price_rule['Transaction']))
+        @if ($apr && !isset($applicable_price_rule['Any']))
             {!! $discount_amount ? '<br/>' : '<br/><br/>' !!}
             @switch($apr['based_on'])
                 @case('Order Qty')
@@ -81,9 +81,9 @@
     @endforelse
 </ul>
 <div style="text-align: right; margin: 10px; font-size: 10pt;">
-    @isset($price_rule['Transaction'])
+    @isset($price_rule['Any'])
         @php
-            $pr = $price_rule['Transaction'];
+            $pr = $price_rule['Any'];
             switch ($pr['discount_type']) {
                 case 'Percentage':
                     $discount_amount = $subtotal * ($pr['discount_rate'] / 100);
@@ -101,10 +101,10 @@
     <br>
         <del class="text-muted" style="font-size: 8pt;">₱ {{ number_format(collect($cart_arr)->sum('amount'), 2, '.', ',') }}</del>
     @endif
-    @isset($applicable_price_rule['Transaction'])
+    @isset($applicable_price_rule['Any'])
         <br>
         @php
-            $apr = $applicable_price_rule['Transaction'];
+            $apr = $applicable_price_rule['Any'];
         @endphp
         @foreach ($apr as $item)
             @php

@@ -755,15 +755,20 @@
             total = (isNaN(total)) ? 0 : total;
             subtotal = (isNaN(subtotal)) ? 0 : subtotal;
 
-            if('Transaction' in applicable_price_rule){
-                var price_rule = applicable_price_rule['Transaction'];
+            if('Any' in applicable_price_rule){
+                var price_rule = applicable_price_rule['Any'];
                 var active_price_rule = apr = 0;
-                var discounted_amount = 0;
+                var discounted_amount = subtotal;
 
                 $.each(price_rule, function (q, i){
                     var a = i.based_on == 'Total Amount' ? subtotal : transaction_qty;
-                    var isLastElement = q == price_rule.length -1;
-                    if(a >= i.range_from && a <= i.range_to || a > i.range_to && isLastElement){
+                    // var isLastElement = q == price_rule.length -1;
+                    var max_check = 1;
+                    if($.isNumeric(i.range_to)){
+                        max_check = a <= parseFloat(i.range_to) ? 1 : 0;
+                    }
+
+                    if(a >= i.range_from && max_check){
                         if(!active_price_rule){
                             $('#orig-total').eq(0).text('₱ ' + subtotal.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,"));
                             switch (i.discount_type) {
@@ -773,8 +778,10 @@
                                     active_price_rule = 1;
                                     break;
                                 default:
-                                    discounted_amount = subtotal > i.rate ? subtotal - i.rate : subtotal;
-                                    active_price_rule = subtotal > i.rate ? 1 : 0;
+                                    if(subtotal > i.rate){
+                                        discounted_amount = subtotal - i.rate;
+                                        active_price_rule = 1;
+                                    }
                                     break;
                             }
                             
@@ -831,15 +838,20 @@
             // price rule checker
             var item_code = input_name.data('id');
 
-            if(item_code in applicable_price_rule && !('Transaction' in applicable_price_rule)){
+            if(item_code in applicable_price_rule && !('Any' in applicable_price_rule)){
                 var price_rule = applicable_price_rule[item_code];
                 var active_price_rule = apr = 0;
-                var discounted_amount = 0;
+                var discounted_amount = price * qty;
 
                 $.each(price_rule, function (q, i){
                     var a = i.based_on == 'Total Amount' ? (price * qty) : qty; 
-                    var isLastElement = q == price_rule.length -1;
-                    if(a >= i.range_from && a <= i.range_to || a > i.range_to && isLastElement){
+                    // var isLastElement = q == price_rule.length -1;
+                    var max_check = 1;
+                    if($.isNumeric(i.range_to)){
+                        max_check = a <= parseFloat(i.range_to) ? 1 : 0;
+                    }
+
+                    if(a >= i.range_from && max_check){
                         if(!active_price_rule){
                             row.find('.orig-amount').text('₱ ' + (price * qty).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,"));
                             switch (i.discount_type) {
@@ -849,11 +861,12 @@
                                     active_price_rule = 1;
                                     break;
                                 default:
-                                    discounted_amount = (price * qty) > i.rate ? (price * qty) - i.rate : (price * qty);
-                                    active_price_rule = (price * qty) > i.rate ? 1 : 0;
+                                    if((price * qty) > i.rate){
+                                        discounted_amount = (price * qty) - i.rate;
+                                        active_price_rule = 1;
+                                    }
                                     break;
                             }
-                            
                             
                             amount = discounted_amount.toFixed(2);
                         }

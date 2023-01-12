@@ -95,7 +95,7 @@ class OrderController extends Controller
             }
 
             $price_rule = $this->getPriceRules($items_arr, $o->order_date);
-            $price_rule = isset($price_rule['price_rule']['Transaction']) ? $price_rule['price_rule']['Transaction'] : [];
+            $price_rule = isset($price_rule['price_rule']['Any']) ? $price_rule['price_rule']['Any'] : [];
             $gt_discount = $o->discount_amount;
             if($price_rule){
                 switch($price_rule['discount_type']){
@@ -279,7 +279,7 @@ class OrderController extends Controller
                 }
 
                 $price_rule = $this->getPriceRules($items, $order_details->order_date);
-                $price_rule = isset($price_rule['price_rule']['Transaction']) ? $price_rule['price_rule']['Transaction'] : [];
+                $price_rule = isset($price_rule['price_rule']['Any']) ? $price_rule['price_rule']['Any'] : [];
 
                 $total_amount = $order_details->amount_paid;
                 

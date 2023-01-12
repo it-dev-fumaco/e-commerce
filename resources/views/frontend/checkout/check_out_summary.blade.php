@@ -205,8 +205,8 @@
 							<div class="he1x">
 								@php
 									$cart_subtotal = collect($cart_arr)->sum('subtotal');
-									if(isset($price_rule['Transaction'])){
-										$rule = $price_rule['Transaction'];
+									if(isset($price_rule['Any'])){
+										$rule = $price_rule['Any'];
 										switch ($rule['discount_type']) {
 											case 'Percentage':
 												$discount_rate = $cart_subtotal * ($rule['discount_rate'] / 100);

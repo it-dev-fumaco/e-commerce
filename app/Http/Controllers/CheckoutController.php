@@ -440,7 +440,7 @@ class CheckoutController extends Controller
 
 				$discount_type = isset($item_price_data['discount_type']) ? $item_price_data['discount_type'] : null;
 				
-				if(isset($price_rule[$item->f_idcode]) && !isset($price_rule['Transaction'])){
+				if(isset($price_rule[$item->f_idcode]) && !isset($price_rule['Any'])){
 					$rule = $price_rule[$item->f_idcode];
 					$item_discount = $rule['discount_rate'];
 					switch ($rule['discount_type']) {

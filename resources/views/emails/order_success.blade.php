@@ -155,9 +155,9 @@
 							<td class="pb-1 pt-1" style="padding: 6px;">- ₱ {{ number_format(str_replace(",","",$voucher_discount_amount), 2) }}</td>
 						</tr>
 					@endif
-					@isset($order['price_rule']['Transaction'])
+					@isset($order['price_rule']['Any'])
 						@php
-							$rule = $order['price_rule']['Transaction'];
+							$rule = $order['price_rule']['Any'];
 							switch ($rule['discount_type']) {
 								case 'Percentage':
 									$discount_amount = collect($order['items'])->sum('amount') * ($rule['discount_rate'] / 100);
