@@ -52,9 +52,9 @@
                                                 </div>
                                                 <div class="col-6 mt-2">
                                                     @php
-                                                        $types = ['Item Code', 'Category', 'Transaction'];
+                                                        $types = ['Item Code', 'Category', 'Any'];
                                                     @endphp
-                                                    <label for="apply-on">Apply On <span class="text-danger">*</span></label>
+                                                    <label for="apply-on">Applicable To <span class="text-danger">*</span></label>
                                                     <select class="form-control" name="apply_on" id="apply-on" required>
                                                         <option disabled selected value=""></option>
                                                         @foreach ($types as $type)
@@ -82,7 +82,7 @@
                                                     @php
                                                         $conditions_based_on = ['Order Qty', 'Total Amount'];
                                                     @endphp
-                                                    <label for="conditions-based-on">Conditions Based On <span class="text-danger">*</span></label>
+                                                    <label for="conditions-based-on">Apply Discount Based On <span class="text-danger">*</span></label>
                                                     <select class="form-control" name="conditions_based_on" id="conditions-based-on" required>
                                                         <option disabled selected value=""></option>
                                                         @foreach ($conditions_based_on as $cbo)
