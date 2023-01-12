@@ -35,6 +35,9 @@
                                         <div class="col-3 text-right">
                                             <button class="btn btn-primary" type="submit">Submit</button>
                                         </div>
+                                        <div class="col-12">
+                                            <p class="mt-3 mb-0"><strong>Note:</strong> If item has existing discount, discount will be based on regular price.</p>
+                                        </div>
                                     </div>
                                     <hr class="mt-2">
                                     <div class="row">
@@ -129,6 +132,7 @@
                                         <div class="col-12">
                                             <div class="row">
                                                 <div class="col-8 mx-auto">
+                                                    <small class="font-italic text-right d-block mb-1">Asterisk (*) means any quantity or amount</small>
                                                     <table class="table table-bordered" id="conditions-table">
                                                         <thead>
                                                             <th style="width: 30%;" scope="col" class="text-center p-2 align-middle">Range From</th>
@@ -196,13 +200,13 @@
             e.preventDefault();
             var row = '<tr>' +
 				'<td class="p-2">' +
-					'<input type="number" name="range_from[]" class="form-control" placeholder="Range From" min="0" required>' +
+					'<input type="text" name="range_from[]" class="form-control" placeholder="Range From" required>' +
 				'</td>' +
                 '<td class="p-2">' +
-					'<input type="number" name="range_to[]" class="form-control" placeholder="Range To" min="0" required>' +
+					'<input type="text" name="range_to[]" class="form-control" placeholder="Range To" required>' +
 				'</td>' +
                 '<td class="p-2">' +
-					'<input type="number" name="rate[]" class="form-control" placeholder="Rate" min="0" required>' +
+					'<input type="text" name="rate[]" class="form-control" placeholder="Rate" required>' +
 				'</td>' +
 				'<td class="text-center">' +
 					'<button type="button" class="btn btn-outline-danger btn-sm remove-td-row">Remove</button>' +

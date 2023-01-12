@@ -98,10 +98,49 @@ class PricingRuleController extends Controller
             if ($conditions) {
                 // validate overlapping conditions
                 $conditions_array = [];
+                $asterisk_count = 0;
                 foreach ($conditions as $key => $value) {
+                    if (!is_numeric($conditions[$key])) {
+                        return response()->json(['status' => 0, 'message' => '<b>Range From</b> must be a whole number.']);
+                    }
+
+                    if (!is_numeric($request->range_to[$key]) && $request->range_to[$key] != '*') {
+                        return response()->json(['status' => 0, 'message' => '<b>Range To</b> must be a whole number.']);
+                    }
+
+                    if (!is_numeric($request->rate[$key])) {
+                        return response()->json(['status' => 0, 'message' => '<b>Discount Rate</b> must be a whole number.']);
+                    }
+
+                    if ($conditions[$key] <= 0) {
+                        return response()->json(['status' => 0, 'message' => '<b>Range From</b> cannot be less than or equal to zero.']);
+                    }
+    
+                    if ($request->range_to[$key] <= 0 && $request->range_to[$key] != '*') {
+                        return response()->json(['status' => 0, 'message' => '<b>Range To</b> cannot be less than or equal to zero.']);
+                    }
+    
+                    if ($request->rate[$key] <= 0) {
+                        return response()->json(['status' => 0, 'message' => '<b>Discount Rate</b> cannot be less than or equal to zero.']);
+                    }
+
+                    if ($request->range_to[$key] != '*') {
+                        if ($conditions[$key] >= $request->range_to[$key]) {
+                            return response()->json(['status' => 0, 'message' => '<b>Range From</b> cannot be greater than or equal to <b>Range To</b>.']);
+                        }
+                    }
+
+                    if ($request->range_to[$key] == '*') {
+                        $asterisk_count++;
+                    }
+
+                    if ($asterisk_count > 1) {
+                        return response()->json(['status' => 0, 'message' => 'Asterisk (*) should be entered only once.']);
+                    }
+
                     $conditions_array[] = [
                         'from' => (int)$value,
-                        'to' => (int)$request->range_to[$key],
+                        'to' => $request->range_to[$key],
                     ];
                 }
 
@@ -111,34 +150,6 @@ class PricingRuleController extends Controller
                 }
                 
                 foreach ($conditions as $s => $r) {
-                    if (!is_numeric($conditions[$s])) {
-                        return response()->json(['status' => 0, 'message' => '<b>Range From</b> must be a whole number.']);
-                    }
-
-                    if (!is_numeric($request->range_to[$s])) {
-                        return response()->json(['status' => 0, 'message' => '<b>Range To</b> must be a whole number.']);
-                    }
-
-                    if (!is_numeric($request->rate[$s])) {
-                        return response()->json(['status' => 0, 'message' => '<b>Discount Rate</b> must be a whole number.']);
-                    }
-
-                    if ($conditions[$s] <= 0) {
-                        return response()->json(['status' => 0, 'message' => '<b>Range From</b> cannot be less than or equal to zero.']);
-                    }
-    
-                    if ($request->range_to[$s] <= 0) {
-                        return response()->json(['status' => 0, 'message' => '<b>Range To</b> cannot be less than or equal to zero.']);
-                    }
-    
-                    if ($request->rate[$s] <= 0) {
-                        return response()->json(['status' => 0, 'message' => '<b>Discount Rate</b> cannot be less than or equal to zero.']);
-                    }
-
-                    if ($conditions[$s] >= $request->range_to[$s]) {
-                        return response()->json(['status' => 0, 'message' => '<b>Range From</b> cannot be greater than or equal to <b>Range To</b>.']);
-                    }
-
                     $price_rule_conditions[] = [
                         'price_rule_id' => $price_rule_id,
                         'range_from' => $conditions[$s],
@@ -217,20 +228,97 @@ class PricingRuleController extends Controller
 
             // validate overlapping conditions
             $conditions_array = [];
+            $asterisk_count = 0;
             foreach ($conditions as $key => $value) {
+                if (!is_numeric($conditions[$key])) {
+                    return response()->json(['status' => 0, 'message' => '<b>Range From</b> must be a whole number.']);
+                }
+
+                if (!is_numeric($request->range_to[$key]) && $request->range_to[$key] != '*') {
+                    return response()->json(['status' => 0, 'message' => '<b>Range To</b> must be a whole number.']);
+                }
+
+                if (!is_numeric($request->rate[$key])) {
+                    return response()->json(['status' => 0, 'message' => '<b>Discount Rate</b> must be a whole number.']);
+                }
+
+                if ($conditions[$key] <= 0) {
+                    return response()->json(['status' => 0, 'message' => '<b>Range From</b> cannot be less than or equal to zero.']);
+                }
+
+                if ($request->range_to[$key] <= 0 && $request->range_to[$key] != '*') {
+                    return response()->json(['status' => 0, 'message' => '<b>Range To</b> cannot be less than or equal to zero.']);
+                }
+
+                if ($request->rate[$key] <= 0) {
+                    return response()->json(['status' => 0, 'message' => '<b>Discount Rate</b> cannot be less than or equal to zero.']);
+                }
+
+                if ($request->range_to[$key] != '*') {
+                    if ($conditions[$key] >= $request->range_to[$key]) {
+                        return response()->json(['status' => 0, 'message' => '<b>Range From</b> cannot be greater than or equal to <b>Range To</b>.']);
+                    }
+                }
+
+                if ($request->range_to[$key] == '*') {
+                    $asterisk_count++;
+                }
+
+                if ($asterisk_count > 1) {
+                    return response()->json(['status' => 0, 'message' => 'Asterisk (*) should be entered only once.']);
+                }
+
                 $conditions_array[] = [
                     'from' => (int)$value,
-                    'to' => (int)$request->range_to[$key],
+                    'to' => $request->range_to[$key],
                 ];
             }
 
             foreach ($new_conditions as $key => $value) {
+                if (!is_numeric($new_conditions[$key])) {
+                    return response()->json(['status' => 0, 'message' => '<b>Range From</b> must be a whole number.']);
+                }
+
+                if (!is_numeric($request->new_range_to[$key]) && $request->new_range_to[$key] != '*') {
+                    return response()->json(['status' => 0, 'message' => '<b>Range To</b> must be a whole number.']);
+                }
+
+                if (!is_numeric($request->new_rate[$key])) {
+                    return response()->json(['status' => 0, 'message' => '<b>Discount Rate</b> must be a whole number.']);
+                }
+
+                if ($new_conditions[$key] <= 0) {
+                    return response()->json(['status' => 0, 'message' => '<b>Range From</b> cannot be less than or equal to zero.']);
+                }
+
+                if ($request->new_range_to[$key] <= 0 && $request->new_range_to[$key] != '*') {
+                    return response()->json(['status' => 0, 'message' => '<b>Range To</b> cannot be less than or equal to zero.']);
+                }
+
+                if ($request->new_rate[$key] <= 0) {
+                    return response()->json(['status' => 0, 'message' => '<b>Discount Rate</b> cannot be less than or equal to zero.']);
+                }
+
+                if ($request->new_range_to[$key] != '*') {
+                    if ($new_conditions[$key] >= $request->new_range_to[$key]) {
+                        return response()->json(['status' => 0, 'message' => '<b>Range From</b> cannot be greater than or equal to <b>Range To</b>.']);
+                    }
+                }
+
+                if ($request->new_range_to[$key] == '*') {
+                    $asterisk_count++;
+                }
+
+                if ($asterisk_count > 1) {
+                    return response()->json(['status' => 0, 'message' => 'Asterisk (*) should be entered only once.']);
+                }
+
                 $conditions_array[] = [
                     'from' => (int)$value,
-                    'to' => (int)$request->new_range_to[$key],
+                    'to' => $request->new_range_to[$key],
                 ];
             }
-
+// if item has existing discount, discount will be based on regular price
             $conditions_overlap = $this->isOverlapped($conditions_array);
             if ($conditions_overlap) {
                 return response()->json(['status' => 0, 'message' => 'Price Rule Conditions cannot overlap.']);
@@ -296,34 +384,6 @@ class PricingRuleController extends Controller
             }
 
             foreach ($conditions as $price_rule_condition_id => $s) {
-                if (!is_numeric($request->range_from[$price_rule_condition_id])) {
-                    return response()->json(['status' => 0, 'message' => '<b>Range From</b> must be a whole number.']);
-                }
-
-                if (!is_numeric($request->range_to[$price_rule_condition_id])) {
-                    return response()->json(['status' => 0, 'message' => '<b>Range To</b> must be a whole number.']);
-                }
-
-                if (!is_numeric($request->rate[$price_rule_condition_id])) {
-                    return response()->json(['status' => 0, 'message' => '<b>Discount Rate</b> must be a whole number.']);
-                }
-
-                if ($request->range_from[$price_rule_condition_id] <= 0) {
-                    return response()->json(['status' => 0, 'message' => '<b>Range From</b> cannot be less than or equal to zero.']);
-                }
-
-                if ($request->range_to[$price_rule_condition_id] <= 0) {
-                    return response()->json(['status' => 0, 'message' => '<b>Range To</b> cannot be less than or equal to zero.']);
-                }
-
-                if ($request->rate[$price_rule_condition_id] <= 0) {
-                    return response()->json(['status' => 0, 'message' => '<b>Discount Rate</b> cannot be less than or equal to zero.']);
-                }
-
-                if ($request->range_from[$price_rule_condition_id] >= $request->range_to[$price_rule_condition_id]) {
-                    return response()->json(['status' => 0, 'message' => '<b>Range From</b> cannot be greater than or equal to <b>Range To</b>.']);
-                }
-
                 DB::table('fumaco_price_rule_condition')->where('price_rule_condition_id', $price_rule_condition_id)
                     ->update([
                         'range_from' => $request->range_from[$price_rule_condition_id],
@@ -350,34 +410,6 @@ class PricingRuleController extends Controller
            
             if ($new_conditions) {
                 foreach ($new_conditions as $s => $r) {
-                    if (!is_numeric($new_conditions[$s])) {
-                        return response()->json(['status' => 0, 'message' => '<b>Range From</b> must be a whole number.']);
-                    }
-    
-                    if (!is_numeric($request->new_range_to[$s])) {
-                        return response()->json(['status' => 0, 'message' => '<b>Range To</b> must be a whole number.']);
-                    }
-    
-                    if (!is_numeric($request->new_rate[$s])) {
-                        return response()->json(['status' => 0, 'message' => '<b>Discount Rate</b> must be a whole number.']);
-                    }
-
-                    if ($new_conditions[$s] <= 0) {
-                        return response()->json(['status' => 0, 'message' => '<b>Range From</b> cannot be less than or equal to zero.']);
-                    }
-    
-                    if ($request->new_range_to[$s] <= 0) {
-                        return response()->json(['status' => 0, 'message' => '<b>Range To</b> cannot be less than or equal to zero.']);
-                    }
-    
-                    if ($request->new_rate[$s] <= 0) {
-                        return response()->json(['status' => 0, 'message' => '<b>Discount Rate</b> cannot be less than or equal to zero.']);
-                    }
-
-                    if ($new_conditions[$s] >= $request->new_range_to[$s]) {
-                        return response()->json(['status' => 0, 'message' => '<b>Range From</b> cannot be greater than or equal to <b>Range To</b>.']);
-                    }
-
                     $price_rule_conditions[] = [
                         'price_rule_id' => $id,
                         'range_from' => $new_conditions[$s],
