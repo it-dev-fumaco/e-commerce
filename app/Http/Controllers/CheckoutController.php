@@ -2068,6 +2068,10 @@ class CheckoutController extends Controller
 				$discount = 0;
 			}
 
+			if ($discount > $subtotal) {
+				return response()->json(['status' => 0, 'message' => 'Coupon not applicable.']);
+			}
+
 			$discounted_subtotal = $subtotal - $discount;
 
 			if($voucher_details) {
