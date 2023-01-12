@@ -33,21 +33,6 @@ class FrontendController extends Controller
         return view('frontend.register');
     }
 
-    public function testing(){
-        $sms_api = DB::table('api_setup')->where('type', 'sms_gateway_api')->first();
-        if ($sms_api) {
-            $sms = Http::asForm()->withHeaders([
-                'Accept' => 'application/json',
-                'Content-Type' => 'application/x-www-form-urlencoded',
-            ])->post('https://api.movider.co/v1/balance', [
-                'api_key' => $sms_api->api_key,
-                'api_secret' => $sms_api->api_secret_key
-            ]);
-
-            return $sms;
-        }
-    }
-
     public function index(Request $request) {
         $clearance_sale_item_codes = DB::table('fumaco_on_sale as os')
             ->join('fumaco_on_sale_items as osi', 'os.id', 'osi.sale_id')

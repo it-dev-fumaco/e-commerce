@@ -37,8 +37,6 @@ Route::get('/products/troffer-luminaires', function() {
     return redirect('/products/troffers-and-louvers');
 });
 
-Route::get('/testing','FrontendController@testing');
-
 Route::namespace('Auth')->group(function(){
     //Login Routes
     Route::get('/login','LoginController@viewLoginPage')->name('login');
