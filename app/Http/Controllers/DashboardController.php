@@ -443,18 +443,58 @@ class DashboardController extends Controller
 		}
 
 		if($username){
+			$sale = DB::table('fumaco_on_sale')
+				->whereDate('start_date', '<=', Carbon::now()->toDateString())
+				->whereDate('end_date', '>=', Carbon::today()->toDateString())
+				->where('status', 1)->where('apply_discount_to', 'All Items')
+				->select('discount_type', 'discount_rate')->first();
+
 			$item_details = DB::table('fumaco_items')->whereIn('f_idcode', $item_codes)->get();
 			$item_detail = collect($item_details)->groupBy('f_idcode');
 
 			$item_images = DB::table('fumaco_items_image_v1')->whereIn('idcode', $item_codes)->get();
 			$image = collect($item_images)->groupBy('idcode');
 
+			$clearance_sale_items = $this->isIncludedInClearanceSale(array_keys(collect($item_details)->toArray()));
+
+			$on_sale_items = $this->onSaleItems(array_keys(collect($item_details)->toArray()));
+
+			$sale_per_category = [];
+			if (!$on_sale_items && !Auth::check()) {
+				$item_categories = array_column($item_details->toArray(), 'f_cat_id');
+				$sale_per_category = $this->getSalePerItemCategory($item_categories);
+			}
+
 			$cart_arr = [];
 			foreach($abandon_details as $cart){
 				$price = 0;
-				if(isset($item_detail[$cart->item_code])){
-					$price = $item_detail[$cart->item_code][0]->f_discount_trigger == 1 ? $item_detail[$cart->item_code][0]->f_price : $item_detail[$cart->item_code][0]->f_default_price;
+				$on_sale = false;
+				$discount_type = $discount_rate = null;
+				if (array_key_exists($cart->item_code, $on_sale_items)) {
+					$on_sale = $on_sale_items[$cart->item_code]['on_sale'];
+					$discount_type = $on_sale_items[$cart->item_code]['discount_type'];
+					$discount_rate = $on_sale_items[$cart->item_code]['discount_rate'];
 				}
+
+				$item_detail = [
+					'default_price' => isset($item_detail[$cart->item_code]) ? $item_detail[$cart->item_code][0]->f_default_price : 0,
+					'category_id' => isset($item_detail[$cart->item_code]) ? $item_detail[$cart->item_code][0]->f_cat_id : null,
+					'item_code' => $cart->item_code,
+					'discount_type' => $discount_type,
+					'discount_rate' => $discount_rate,
+					'stock_uom' => isset($item_detail[$cart->item_code]) ? $item_detail[$cart->item_code][0]->f_stock_uom : null,
+					'on_sale' => $on_sale
+				];
+
+				$is_on_clearance_sale = false;
+				if (array_key_exists($cart->item_code, $clearance_sale_items)) {
+					$item_detail['discount_type'] = $clearance_sale_items[$cart->item_code][0]->discount_type;
+					$item_detail['discount_rate'] = $clearance_sale_items[$cart->item_code][0]->discount_rate;
+					$is_on_clearance_sale = true;
+				}
+				$item_price_data = $this->getItemPriceAndDiscount($item_detail, $sale, $sale_per_category, $is_on_clearance_sale);
+
+				$price = $item_price_data['discounted_price'];
 
 				$cart_arr[] = [
 					'item_code' => $cart->item_code,
