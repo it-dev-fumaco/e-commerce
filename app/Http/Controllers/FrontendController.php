@@ -2736,7 +2736,7 @@ class FrontendController extends Controller
             });
 
             $price_rule = $this->getPriceRules($arr, $order_details->order_date);
-            $price_rule = isset($price_rule['price_rule']['Transaction']) ? $price_rule['price_rule']['Transaction'] : [];
+            $price_rule = isset($price_rule['price_rule']['Any']) ? $price_rule['price_rule']['Any'] : [];
 
             $status = collect($order_status)->groupBy('status');
             $status_sequence = isset($status[$order_details->order_status]) ? $status[$order_details->order_status][0]->order_sequence : 0;

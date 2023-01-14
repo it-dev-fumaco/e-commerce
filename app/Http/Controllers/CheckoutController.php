@@ -778,7 +778,7 @@ class CheckoutController extends Controller
 
 				$discount_type = isset($item_price_data['discount_type']) ? $item_price_data['discount_type'] : null;
 				
-				if(isset($price_rule[$item->f_idcode]) && !isset($price_rule['Transaction'])){
+				if(isset($price_rule[$item->f_idcode]) && !isset($price_rule['Any'])){
 					$rule = $price_rule[$item->f_idcode];
 					$item_discount = $rule['discount_rate'];
 					switch ($rule['discount_type']) {
@@ -868,8 +868,8 @@ class CheckoutController extends Controller
 	
 			$amount = collect($items)->sum('item_total_price');
 
-			if(isset($price_rule['Transaction'])){
-				$rule = $price_rule['Transaction'];
+			if(isset($price_rule['Any'])){
+				$rule = $price_rule['Any'];
 				switch ($rule['discount_type']) {
 					case 'Percentage':
 						$discount_amount = $amount * ($rule['discount_rate'] / 100);
@@ -1056,8 +1056,8 @@ class CheckoutController extends Controller
 			$price_rule = isset($price_rule['price_rule']) ? $price_rule['price_rule'] : [];
 
 			$pr_discount_rate = 0;
-			if(isset($price_rule['Transaction'])){
-				$rule = $price_rule['Transaction'];
+			if(isset($price_rule['Any'])){
+				$rule = $price_rule['Any'];
 				switch ($rule['discount_type']) {
 					case 'Percentage':
 						$pr_discount_rate = $subtotal * ($rule['discount_rate'] / 100);
@@ -1999,8 +1999,8 @@ class CheckoutController extends Controller
 				}
 			}
 
-			if(isset($price_rule['Transaction'])){
-				$pr = $price_rule['Transaction'];
+			if(isset($price_rule['Any'])){
+				$pr = $price_rule['Any'];
 				switch($pr['discount_type']){
 					case 'Percentage':
 						$pr_discount = $subtotal * ($pr['discount_rate'] / 100);
