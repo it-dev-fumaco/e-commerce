@@ -895,6 +895,7 @@ class FrontendController extends Controller
 
             $product_reviews = $this->getProductRating($featured_item_codes);
             $clearance_sale_items = $this->isIncludedInClearanceSale($featured_item_codes);
+            $on_sale_items = $this->onSaleItems($featured_item_codes);
 
             $item_images = DB::table('fumaco_items_image_v1')->whereIn('idcode', $featured_item_codes)
                 ->select('imgprimayx', 'idcode')->get();
@@ -928,14 +929,22 @@ class FrontendController extends Controller
                     }
                 }
 
+                $on_sale = false;
+                $discount_type = $discount_rate = null;
+                if (array_key_exists($row->f_idcode, $on_sale_items)) {
+                    $on_sale = $on_sale_items[$row->f_idcode]['on_sale'];
+                    $discount_type = $on_sale_items[$row->f_idcode]['discount_type'];
+                    $discount_rate = $on_sale_items[$row->f_idcode]['discount_rate'];
+                }
+
                 $item_detail = [
                     'default_price' => $row->f_default_price,
                     'category_id' => $row->f_cat_id,
                     'item_code' => $row->f_idcode,
-                    'discount_type' => $row->f_discount_type,
-                    'discount_rate' => $row->f_discount_rate,
+                    'discount_type' => $discount_type,
+                    'discount_rate' => $discount_rate,
                     'stock_uom' => $row->f_stock_uom,
-                    'on_sale' => $row->f_onsale
+                    'on_sale' => $on_sale
                 ];
 
                 $is_on_clearance_sale = false;
@@ -2962,7 +2971,7 @@ class FrontendController extends Controller
                 $c->whereIn('i.f_cat_id', $filters);
             })
             ->whereDate('os.start_date', '<=', Carbon::now()->startOfDay())->whereDate('os.end_date', '>=', Carbon::now()->endOfDay())
-            ->select('i.id', 'i.f_idcode', 'i.f_default_price', 'i.f_new_item', 'i.f_new_item_start', 'i.f_new_item_end', 'i.f_cat_id', 'osi.discount_type', 'osi.discount_rate', 'i.f_stock_uom', 'i.f_qty', 'i.f_reserved_qty', 'i.slug', 'i.f_name_name', 'i.f_item_name', 'i.image_alt', 'i.f_onsale')
+            ->select('i.id', 'i.f_idcode', 'i.f_default_price', 'i.f_new_item', 'i.f_new_item_start', 'i.f_new_item_end', 'i.f_cat_id', 'osi.discount_type', 'osi.discount_rate', 'i.f_stock_uom', 'i.f_qty', 'i.f_reserved_qty', 'i.slug', 'i.f_name_name', 'i.f_item_name', 'i.image_alt')
             ->orderBy($sortby, $orderby)->paginate(15);
 
         $item_codes = array_column($products->items(), 'f_idcode');
@@ -2994,7 +3003,7 @@ class FrontendController extends Controller
                 'discount_type' => $product->discount_type,
                 'discount_rate' => $product->discount_rate,
                 'stock_uom' => $product->f_stock_uom,
-                'on_sale' => $product->f_onsale
+                'on_sale' => true
             ];
 
             // get item price, discounted price and discount rate

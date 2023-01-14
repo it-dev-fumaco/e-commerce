@@ -1275,25 +1275,25 @@ class ProductController extends Controller
                     if($customer){
                         if($categories){
                             $cart_check = DB::table('fumaco_cart as cart')->join('fumaco_items as items', 'items.f_idcode', 'cart.item_code')
-                                ->where('items.f_onsale', 0)->whereIn('cart.category_id', collect($categories)->pluck('category_id'))
+                                ->whereIn('cart.category_id', collect($categories)->pluck('category_id'))
                                 ->where('cart.user_email', $subscriber)->exists();
 
                             $wish_check = DB::table('datawishlist as wish')->join('fumaco_items as items', 'items.f_idcode', 'wish.item_code')
-                                ->where('items.f_onsale', 0)->whereIn('wish.category_id', collect($categories)->pluck('category_id'))
+                                ->whereIn('wish.category_id', collect($categories)->pluck('category_id'))
                                 ->where('userid', $customer->id)->exists();
                         }else{
                             $cart_check = DB::table('fumaco_cart as cart')->join('fumaco_items as items', 'items.f_idcode', 'cart.item_code')
-                                ->where('f_onsale', 0)->where('cart.user_email', $subscriber)->exists();
+                                ->where('cart.user_email', $subscriber)->exists();
 
                             $wish_check = DB::table('datawishlist as wish')->join('fumaco_items as items', 'items.f_idcode', 'wish.item_code')
-                                ->where('items.f_onsale', 0)->where('wish.userid', $customer->id)->exists();
+                                ->where('wish.userid', $customer->id)->exists();
                         }
     
                         if($cart_check){
                             $type = 'cart';
                             if($sale_check->apply_discount_to == 'Per Category'){
                                 $cart_items = DB::table('fumaco_cart as cart')->join('fumaco_items as items', 'cart.item_code', 'items.f_idcode')
-                                    ->where('cart.user_email', $subscriber)->where('items.f_onsale', 0)
+                                    ->where('cart.user_email', $subscriber)
                                     ->whereIn('items.f_cat_id', collect($categories)->pluck('category_id'))
                                     ->select('cart.*', 'items.f_default_price', 'items.f_name_name')->get();
         
@@ -1328,7 +1328,7 @@ class ProductController extends Controller
                                 }
                             }else{
                                 $cart_items = DB::table('fumaco_cart as cart')->join('fumaco_items as items', 'cart.item_code', 'items.f_idcode')
-                                    ->where('cart.user_email', $subscriber)->where('items.f_onsale', 0)->select('cart.*', 'items.f_default_price')->get();
+                                    ->where('cart.user_email', $subscriber)->select('cart.*', 'items.f_default_price')->get();
         
                                 foreach($cart_items as $item){
                                     $price = $item->f_default_price;
@@ -1362,7 +1362,7 @@ class ProductController extends Controller
                             $type = 'wishlist';
                             if($sale_check->apply_discount_to == 'Per Category'){
                                 $wish_items = DB::table('datawishlist as wish')->join('fumaco_items as items', 'wish.item_code', 'items.f_idcode')
-                                    ->where('wish.userid', $customer->id)->where('items.f_onsale', 0)->select('wish.*', 'items.f_name_name', 'items.f_default_price')->get();
+                                    ->where('wish.userid', $customer->id)->select('wish.*', 'items.f_name_name', 'items.f_default_price')->get();
     
                                 foreach($wish_items as $item){
                                     $price = $item->f_default_price;
@@ -1393,7 +1393,7 @@ class ProductController extends Controller
                                 }
                             }else{
                                 $wish_items = DB::table('datawishlist as wish')->join('fumaco_items as items', 'wish.item_code', 'items.f_idcode')
-                                    ->where('wish.userid', $customer->id)->where('items.f_onsale', 0)->select('wish.*', 'items.f_name_name', 'items.f_default_price')->get();
+                                    ->where('wish.userid', $customer->id)->select('wish.*', 'items.f_name_name', 'items.f_default_price')->get();
     
                                 foreach($wish_items as $item){
                                     $price = $item->f_default_price;
