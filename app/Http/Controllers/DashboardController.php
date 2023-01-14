@@ -453,7 +453,7 @@ class DashboardController extends Controller
 			foreach($abandon_details as $cart){
 				$price = 0;
 				if(isset($item_detail[$cart->item_code])){
-					$price = $item_detail[$cart->item_code][0]->f_discount_trigger == 1 ? $item_detail[$cart->item_code][0]->f_price : $item_detail[$cart->item_code][0]->f_original_price;
+					$price = $item_detail[$cart->item_code][0]->f_discount_trigger == 1 ? $item_detail[$cart->item_code][0]->f_price : $item_detail[$cart->item_code][0]->f_default_price;
 				}
 
 				$cart_arr[] = [
