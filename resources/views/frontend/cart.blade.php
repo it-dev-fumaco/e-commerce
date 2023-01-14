@@ -818,7 +818,7 @@
             $('#grand-total').text('₱ ' + total.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,"));
         }
 
-        if (!('Transaction' in applicable_price_rule)) {
+        if (!('Any' in applicable_price_rule)) {
             $('#cart-items tbody tr').each(function(){
                 updateAmount($(this));
             });
