@@ -59,44 +59,90 @@
 										<tr>
 											<td>{{ $c->id }}</td>
 											<td>
-												@php
-													$is_new = 0;
-													if($c->new > 0){
-														if($c->new_tag_start && $c->new_tag_end){
-															$start = Carbon\Carbon::parse($c->new_tag_start)->startOfDay();
-															$end = Carbon\Carbon::parse($c->new_tag_end)->endOfDay();
+												<div class="row">
+													@if ($c->banner_img)
+														<div class="col-3 text-center">
+															<a href="#" data-toggle="modal" data-target="#preview-banner-{{ $c->id }}">
+																<img src="{{ asset('assets/site-img/'.$c->banner_img) }}" width="80">
+															</a>
+														</div>	
+													@endif
+													<div class="col-{{ $c->banner_img ? 9 : 12 }}">
+														@php
+															$is_new = 0;
+															if($c->new > 0){
+																if($c->new_tag_start && $c->new_tag_end){
+																	$start = Carbon\Carbon::parse($c->new_tag_start)->startOfDay();
+																	$end = Carbon\Carbon::parse($c->new_tag_end)->endOfDay();
 
-															if(Carbon\Carbon::now() > $start && Carbon\Carbon::now() < $end){
-																$is_new = 1;
+																	if(Carbon\Carbon::now() > $start && Carbon\Carbon::now() < $end){
+																		$is_new = 1;
+																	}
+																}
 															}
-														}
-													}
-												@endphp
-												{{ $c->name }} <span class="badge badge-primary {{ $is_new == 0 ? 'd-none' : null }}">New</span>
+														@endphp
+														{{ $c->name }} <span class="badge badge-primary {{ $is_new == 0 ? 'd-none' : null }}">New</span>
+													</div>
+												</div>
 											</td>
 											<td><img src="{{ asset('assets/site-img/icon/')."/".$c->image }}" width="30" ></td>
 											<td>{{ $c->slug }}</td>
 											<td>
+												<!-- Modal -->
+												<div class="modal fade" id="preview-banner-{{ $c->id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+													<div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+														<div class="modal-content">
+															<div class="modal-header">
+																{{-- <h5 class="modal-title" id="exampleModalLabel">Modal title</h5> --}}
+																<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+																	<span aria-hidden="true">&times;</span>
+																</button>
+															</div>
+															<div class="modal-body">
+																<img src="{{ asset('assets/site-img/'.$c->banner_img) }}" width="100%">
+															</div>
+														</div>
+													</div>
+												</div>
 												<button type="button" class="btn btn-info btn-sm active" data-toggle="modal" data-target="#PPPEdit{{ $c->id }}">Edit</button>
 												<div id="PPPEdit{{ $c->id }}" class="modal fade" role="dialog">
 													<div class="modal-dialog modal-xl">
 														<div class="modal-content">
 															<div class="modal-header">
-																<h4 class="modal-title">Edit Category : {{ $c->id }}</h4>
+																<h4 class="modal-title">Edit Category : {{ $c->name }}</h4>
 																<button type="button" class="close" data-dismiss="modal">&times;</button>
 															</div>
 															<div class="modal-body">
 																<div class="row">
 																	<div class="col-md-12">{{-- Edit Category Start --}}
-																			<form role="form" action="/admin/category/edit/{{ $c->id }}" method="post">
+																			<form role="form" action="/admin/category/edit/{{ $c->id }}" method="post" enctype="multipart/form-data">
 																				@csrf
 																				<div class="card-body">
 																					<div class="row">
+																						<div class="col-8 offset-2 mb-2">
+																							@if ($c->banner_img)
+																								<a href="#" data-toggle="modal" data-target="#preview-banner-{{ $c->id }}">
+																									<img src="{{ asset('assets/site-img/'.$c->banner_img) }}" width="100%">
+																								</a>
+																							@endif
+																						</div>
+																						<div class="col-6">
+																							<div class="form-group">
+																								<label for="add_cat_name">Banner Image (1920 x 377): </label>
+																								<div class="custom-file">
+																									<input type="file" class="custom-file-input" id="customFile" name="banner_img">
+																									<label class="custom-file-label" for="customFile">Choose File</label>
+																								</div>
+																							</div>
+																						</div>
+																						{{-- <div class="col-6">&nbsp;</div> --}}
 																						<div class="col-md-6">
 																							<div class="form-group">
 																								<label for="edit_cat_name">Category Name :</label>
 																								<input type="text" class="form-control" id="edit_cat_name" name="edit_cat_name" value="{{ $c->name }}" required>
 																							</div>
+																						</div>
+																						<div class="col-6">
 																							<div class="form-group">
 																								<label for="x2">Image : </label>
 																								<br>
@@ -186,7 +232,7 @@
 							<div class="card-header">
 								<h3 class="card-title">Add Category</h3>
 							</div>
-							<form role="form" action="/admin/category/add" method="post">
+							<form role="form" action="/admin/category/add" method="post" enctype="multipart/form-data">
 								@csrf
 								<div class="card-body">
 									<div class="row">
@@ -194,6 +240,13 @@
 											<div class="form-group">
 												<label for="add_cat_name">Category Name : </label>
 												<input type="text" class="form-control" id="add_cat_name" name="add_cat_name" value="" required>
+											</div>
+											<div class="form-group">
+												<label for="add_cat_name">Banner Image (1920 x 377): </label>
+												<div class="custom-file mb-3">
+													<input type="file" class="custom-file-input" id="customFile" name="banner_img">
+													<label class="custom-file-label" for="customFile">Choose File</label>
+												</div>
 											</div>
 											<div class="form-group">
 												<label for="x2">Image : </label>
@@ -249,6 +302,9 @@
 	</div>
 </div> 
 <style>
+	.modal{
+		background-color: rgba(0,0,0,0.4);
+	}
 	.switch {
 		position: relative;
 		display: inline-block;
@@ -313,65 +369,71 @@
 @section('script')
 <script>
   	$(document).ready(function() {
+		// Add the following code if you want the name of the file appear on select
+        $(".custom-file-input").change(function() {
+            var fileName = $(this).val().split("\\").pop();
+            $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+        });
+
 		$('input[name="is_external_link"]').prop('checked', false);
 	  	$('input[name="is_external_link"]').click(function(){
-		  if ($(this).prop('checked')) {
-			  $('#external-link-div').removeClass('d-none');
-			  $('#external-link').attr('required', true);
-		  } else {
-			$('#external-link-div').addClass('d-none');
-			$('#external-link').removeAttr('required');
-		  }
-	  });
+			if ($(this).prop('checked')) {
+				$('#external-link-div').removeClass('d-none');
+				$('#external-link').attr('required', true);
+			} else {
+				$('#external-link-div').addClass('d-none');
+				$('#external-link').removeAttr('required');
+			}
+	  	});
 
-	  $(document).on('click', '.edit_is_external_link', function(){
-		  var tid = $(this).data('tid');
-		  if ($(this).prop('checked')) {
-			  $('#' + tid).closest('.form-group').removeClass('d-none');
-			  $('#' + tid).attr('required', true);
-		  } else {
-			$('#' + tid).closest('.form-group').addClass('d-none');
-			$('#' + tid).removeAttr('required');
-		  }
-	  });
+		$(document).on('click', '.edit_is_external_link', function(){
+			var tid = $(this).data('tid');
+			if ($(this).prop('checked')) {
+				$('#' + tid).closest('.form-group').removeClass('d-none');
+				$('#' + tid).attr('required', true);
+			} else {
+				$('#' + tid).closest('.form-group').addClass('d-none');
+				$('#' + tid).removeAttr('required');
+			}
+		});
 
-    $(".toggle").change(function(){
-      var data = {
-        'publish': $(this).prop('checked') == true ? 1 : 0,
-        'cat_id': $(this).val(),
-        '_token': "{{ csrf_token() }}",
-      }
-      $.ajax({
-          type:'POST',
-          url:'/admin/category/publish',
-          data: data,
-          success: function (response) {
-            console.log(status);
-          },
-          error: function () {
-              alert('An error occured.');
-          }
-      });
-    });
+		$(".toggle").change(function(){
+			var data = {
+				'publish': $(this).prop('checked') == true ? 1 : 0,
+				'cat_id': $(this).val(),
+				'_token': "{{ csrf_token() }}",
+			}
+			$.ajax({
+				type:'POST',
+				url:'/admin/category/publish',
+				data: data,
+				success: function (response) {
+					console.log(status);
+				},
+				error: function () {
+					alert('An error occured.');
+				}
+			});
+		});
 
-	$('.new-duration').daterangepicker({
-    	opens: 'left',
-		startDate: moment(),
-		endDate: moment().add(7, 'days'),
-		minDate: moment(),
-		locale: {
-			format: 'MMM DD, YYYY'
-		}
-  	});
+		$('.new-duration').daterangepicker({
+			opens: 'left',
+			startDate: moment(),
+			endDate: moment().add(7, 'days'),
+			minDate: moment(),
+			locale: {
+				format: 'MMM DD, YYYY'
+			}
+		});
 
-	$(document).on('click', ".set_as_new", function(){
-		var target = $(this).data('target');
-		if($(this).is(':checked')){
-			$('#d-' + target).slideDown();
-		}else{
-			$('#d-' + target).slideUp();
-		}
-    });
-  });
+		$(document).on('click', ".set_as_new", function(){
+			var target = $(this).data('target');
+			if($(this).is(':checked')){
+				$('#d-' + target).slideDown();
+			}else{
+				$('#d-' + target).slideUp();
+			}
+		});
+	});
 </script>
 @endsection

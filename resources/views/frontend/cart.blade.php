@@ -43,9 +43,9 @@
                         <tr>
                             <th class="he1x">Product</th>
                             <th class="he1x d-none d-sm-table-cell"></th>
-                            <th class="he1x d-none d-sm-table-cell">Price</th>
-                            <th class="he1x d-none d-sm-table-cell">Quantity</th>
-                            <th class="he1x d-none d-sm-table-cell">Total</th>
+                            <th class="he1x d-none d-sm-table-cell text-center">Price</th>
+                            <th class="he1x d-none d-sm-table-cell" style="width: 20% !important">Quantity</th>
+                            <th class="he1x d-none d-sm-table-cell text-center">Total</th>
                             <th class="he1x d-none d-sm-table-cell" style="width: 5px !important"></th>
                         </tr>
                     </thead>
@@ -61,7 +61,7 @@
                                         <picture>
                                             <source srcset="{{ asset(explode('.', $c_src)[0].'.webp') }}" type="image/webp">
                                             <source srcset="{{ asset($c_src) }}" type="image/jpeg"> 
-                                            <img src="{{ asset('/storage/item_images/'.$cart['item_code'].'/gallery/preview/'.$cart['item_image']) }}" class="img-responsive img-container" alt="{{ Str::slug($cart['alt'], '-') }}">
+                                            <img src="{{ asset('/storage/item_images/'.$cart['item_code'].'/gallery/preview/'.$cart['item_image']) }}" class="img-responsive img-container" alt="{{ Str::slug($cart['alt'], '-') }}" onerror="this.style.display='none';">
                                         </picture>
                                     </div>
                                     <!-- Mobile -->
@@ -91,16 +91,21 @@
                                                 </div>
                                             </div>
                                             <div class="col-6" style="display: flex; justify-content: center; align-items: center; white-space: nowrap">
-                                                <span class="formatted-price"><b>₱ {{ number_format($cart['price'], 2, '.', ',') }}</b></span>
+                                                <div class="text-center">
+                                                    {{-- <span class="formatted-price" style="font-size: 11pt;"><b>₱ {{ number_format($cart['price'], 2, '.', ',') }}</b></span> --}}
+                                                    <p style="white-space: nowrap !important; font-weight: 600;">₱ <span class="formatted-amount" style="font-size: 11pt;">{{ number_format($cart['amount'], 2, '.', ',') }}</span>
+                                                        <br>
+                                                        <del class="text-muted" style="font-size: 8pt;"><span class="orig-amount d-none">₱ 0.00</span></del>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div class="col-12">
+                                                <small class="price-rule-display text-success"></small>
                                             </div>
                                         </div>
                                         <div class="row p-0">
-                                            <div class="col-6" style="display: flex; justify-content: center; align-items: center;">
-                                                @if ($cart['insufficient_stock'] || $cart['quantity'] > $cart['stock_qty'])
-                                                    <small class="text-danger d-block m-2 stock-status">Insufficient Stock</small>
-                                                @else
-                                                    <small class="text-success d-block m-2 stock-status" style="white-space: nowrap;">Available:  {{ $cart['stock_qty'] }}</small>
-                                                @endif
+                                            <div class="col-6 p-0" style="display: flex; justify-content: center; align-items: center;">
+                                                <small class="text-danger m-2 stock-status {{ ($cart['insufficient_stock'] || $cart['quantity'] > $cart['stock_qty']) ? null : 'd-none' }}">Only {{  $cart['stock_qty'].' '.$cart['stock_uom'] }} left!</small>
                                             </div>
                                         </div>
                                     </div>
@@ -112,7 +117,16 @@
                                     <a href="/product/{{ $cart['slug'] }}" style="text-decoration: none !important; color: #000;">{{ $cart['item_description'] }}</a>
                                 </div>
                             </td>
-                            <td class="tbls d-none d-sm-table-cell"><p style="white-space: nowrap !important;">₱ <span class="formatted-price">{{ number_format($cart['price'], 2, '.', ',') }}</span></p><span class="price d-none">{{ $cart['price'] }}</span></td>
+                            <td class="tbls d-none d-sm-table-cell text-center">
+                                <p style="white-space: nowrap !important;">
+                                    ₱ <span class="formatted-price" style="font-size: 11pt;">{{ number_format($cart['price'], 2, '.', ',') }}</span>
+                                    @if ($cart['is_discounted'])
+                                        <br>
+                                        <del style="font-size: 8pt;" class="text-muted">₱ {{ number_format($cart['default_price'], 2, '.', ',') }}</del>
+                                    @endif
+                                </p>
+                                <span class="price d-none">{{ $cart['price'] }}</span>
+                            </td>
                             <td class="tbls d-none d-sm-table-cell text-center">
                                 <div class="input-group">
                                     <span class="input-group-btn">
@@ -125,13 +139,15 @@
                                         <a href="#" class="quantity-right-plus btn btn-number" style="background-color: #ccc !important; height: 100% !important; border-radius: 0px !important;"> + </a>
                                     </span>
                                 </div>
-                                @if ($cart['insufficient_stock'] || $cart['quantity'] > $cart['stock_qty'])
-                                <small class="text-danger d-block m-2 stock-status">Insufficient Stock</small>
-                                @else
-                                <small class="text-success d-block m-2 stock-status">Available :  {{  $cart['quantity'].$cart['stock_qty'] }}</small>
-                                @endif
+                                <small class="text-danger m-2 stock-status {{ ($cart['insufficient_stock'] || $cart['quantity'] > $cart['stock_qty']) ? null : 'd-none' }}">Only {{  $cart['stock_qty'].' '.$cart['stock_uom'] }} left!</small>
+                                <small class="price-rule-display text-success"></small>
                             </td>
-                            <td class="tbls d-none d-sm-table-cell"><p style="white-space: nowrap !important;">₱ <span class="formatted-amount">{{ number_format($cart['amount'], 2, '.', ',') }}</span></p><span class="amount d-none">{{ $cart['amount'] }}</span>
+                            <td class="tbls d-none d-sm-table-cell text-center">
+                                <p style="white-space: nowrap !important;">₱ <span class="formatted-amount" style="font-size: 11pt;">{{ number_format($cart['amount'], 2, '.', ',') }}</span>
+                                    <br>
+                                    <del class="text-muted" style="font-size: 8pt;"><span class="orig-amount d-none">₱ 0.00</span></del>
+                                </p>
+                                <span class="amount d-none">{{ $cart['amount'] }}</span>
                             </td>
                             <td class="tbls tbl-qtr d-none d-sm-table-cell">
                                 <a class="btn btn-sm btn-outline-primary remove-from-cart-btn no-border" href="#" role="button" 
@@ -149,13 +165,19 @@
                         @endforelse
                     </tbody>
                 </table>
-                <table class="table">
-                    <tr>
-                        <td class="col-6 col-md-8">&nbsp;</td>
-                        <td class="col-3 col-md-2">Total</td>
-                        <td><small class="text-muted stylecap he1x" id="cart-subtotal" style="white-space: nowrap">₱ {{ number_format(collect($cart_arr)->sum('amount'), 2, '.', ',') }}</small></td>
-                    </tr> 
-                </table>
+                <div class="row" style="border-top: 1px solid #DEE2E6; border-bottom: 1px solid #DEE2E6;">
+                    <div class="col-8 p-2 text-right">
+                        Total
+                    </div>
+                    <div class="col-4 p-2 text-center text-md-left">
+                        <small class="text-muted stylecap he1x" id="cart-subtotal" style="white-space: nowrap">₱ {{ number_format(collect($cart_arr)->sum('amount'), 2, '.', ',') }}</small>
+                        <br class="d-md-none">
+                        <del id="orig-total" class="text-muted" style="font-size: 9pt;"></del>
+                    </div>
+                    <div class="col-12 col-md-4 offset-md-8 text-center">
+                        <span id="price-rule-display-total" class='text-success' style="font-size: 10pt;"></span>
+                    </div>
+                </div>
                 <br/>
                 @php
                     $action = '';
@@ -235,7 +257,7 @@
       <div class="modal-content">
         <div class="modal-header">
             <h5 class="modal-title" id="exampleModalLabel"><i class="fas fa-exclamation-circle"></i> Notice</h5>
-            <button type="button" class="close clear-btn" data-dismiss="modal" aria-label="Close">
+            <button type="button" class="close close-modal clear-btn" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
             </button>
         </div>
@@ -420,6 +442,10 @@
     .img-container{
         width: 55px;
     }
+
+    .text-right{
+        text-align: right;
+    }
     /* Animation */
     @keyframes fadeInUp {
         from {
@@ -551,7 +577,7 @@
             }
         };
     $(document).ready(function() {
-     
+        var applicable_price_rule = @json($applicable_price_rule);
 
         updateTotal();
         $(document).on('click', '.quantity-left-minus', function(e){
@@ -560,7 +586,6 @@
             var input_name = row.find('input[name="quantity[]"]').eq(0);
             var id = input_name.data('id');
             var max = input_name.attr('max');
-
             var res_input_name = row.find('input[name="res_quantity[]"]').eq(0);
 
             var current_qty = input_name.val();
@@ -579,9 +604,9 @@
             }
 
             if (parseInt(current_qty) > parseInt(max)) {
-                row.find('.stock-status').eq(0).removeClass('text-success').addClass('text-danger').text('Insufficient Stock');
-            } else {
-                row.find('.stock-status').eq(0).removeClass('text-danger').addClass('text-success').text('Available : ' + max);
+                row.find('.stock-status').eq(0).removeClass('d-none');
+            }else{
+                row.find('.stock-status').eq(0).addClass('d-none');
             }
         });
 
@@ -654,9 +679,10 @@
         }
 
         $('#checkout-btn').click(function(e){
-            e.preventDefault();
+            // e.preventDefault();
             $('#custom-overlay').fadeIn();
             window.location.href = "{{ $action }}";
+            // alert('{{ $action }}');
         });
 
         $('input[name="quantity[]"]').change(function(){
@@ -672,37 +698,54 @@
                 $('#checkout-btn').prop('disabled', false);
                 updateAmount(row);
                 updateCart('manual', id, current_qty);
+                row.find('.stock-status').eq(1).addClass('d-none');
+                if(parseInt($(this).val()) <= 0){
+                    $('#removeItemModal').modal('show');
+                    $('#item-to-be-removed').text($(this).data('item-description'));
+
+                    $('#remove-item-btn').data('id', $(this).data('id'));
+                    $('#remove-item-btn').data('row', '#row-' + $(this).data('id'));
+                }
             }else if(parseInt($(this).val()) > parseInt(max)){
                 $('#checkout-btn').prop('disabled', true);
-                $('#stockLimitModal').modal('show');
+                row.find('.stock-status').eq(1).removeClass('d-none');
             }
         });
 
         $('.mobile-quantity').change(function(){
-            console.log($(this).val());
             var row = $(this).closest('tr');
             var input_name = row.find('.mobile-quantity').eq(0);
             var id = input_name.data('id');
             var max = input_name.attr('max');
 
             var current_qty = $(this).val();
-            var type = 'mobile'
+            var type = 'mobile';
 
             if(parseInt($(this).val()) <= parseInt(max)){
                 $('#checkout-btn').prop('disabled', false);
                 updateAmount(row, type);
                 updateCart('manual', id, current_qty);
+                row.find('.stock-status').eq(0).addClass('d-none');
+                if(parseInt($(this).val()) <= 0){
+                    $('#removeItemModal').modal('show');
+                    $('#item-to-be-removed').text($(this).data('item-description'));
+
+                    $('#remove-item-btn').data('id', $(this).data('id'));
+                    $('#remove-item-btn').data('row', '#row-' + $(this).data('id'));
+                }
             }else if(parseInt($(this).val()) > parseInt(max)){
                 $('#checkout-btn').prop('disabled', true);
-                $('#stockLimitModal').modal('show');
+                row.find('.stock-status').eq(0).removeClass('d-none');
             }
         });
 
-
         function updateTotal() {
-            var subtotal = 0;
+            var subtotal = transaction_qty = 0;
             $('#cart-items tbody tr').each(function(){
                 var amount = $(this).find('.amount').eq(0).text();
+                var qty = $(this).find('input[name="quantity[]"]').eq(0).val();
+
+                transaction_qty = parseInt(transaction_qty) + parseInt(qty);
                 subtotal += parseFloat(amount);
             });
 
@@ -712,21 +755,150 @@
             total = (isNaN(total)) ? 0 : total;
             subtotal = (isNaN(subtotal)) ? 0 : subtotal;
 
+            if('Any' in applicable_price_rule){
+                var price_rule = applicable_price_rule['Any'];
+                var active_price_rule = apr = 0;
+                var discounted_amount = subtotal;
+
+                $.each(price_rule, function (q, i){
+                    var a = i.based_on == 'Total Amount' ? subtotal : transaction_qty;
+                    // var isLastElement = q == price_rule.length -1;
+                    var max_check = 1;
+                    if($.isNumeric(i.range_to)){
+                        max_check = a <= parseFloat(i.range_to) ? 1 : 0;
+                    }
+
+                    if(a >= i.range_from && max_check){
+                        if(!active_price_rule){
+                            $('#orig-total').eq(0).text('₱ ' + subtotal.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,"));
+                            switch (i.discount_type) {
+                                case 'Percentage':
+                                    discounted_amount = subtotal * (i.rate / 100);
+                                    discounted_amount = subtotal - discounted_amount;
+                                    active_price_rule = 1;
+                                    break;
+                                default:
+                                    if(subtotal > i.rate){
+                                        discounted_amount = subtotal - i.rate;
+                                        active_price_rule = 1;
+                                    }
+                                    break;
+                            }
+                            
+                            subtotal = discounted_amount;
+                        }
+
+                    }
+
+                    if(a < i.range_from){
+                        $('#price-rule-display-total').removeClass('d-none');
+                        if (!apr) {
+                            if(i.based_on == 'Total Amount'){
+                                var msg = 'Reach at least <b>₱ ' + i.range_from.toFixed(2) + '</b> on this item and get a ' + i.discount_rate + ' discount';
+                            }else{
+                                var msg = 'Add at least <b>' + (parseInt(i.range_from) - transaction_qty) + '</b> more item(s) and get a ' + i.discount_rate + ' discount.';
+                            }
+                            $('#price-rule-display-total').html(msg);
+                        }
+                        
+                        apr = 1;
+                    }else{
+                        $('#price-rule-display-total').addClass('d-none');
+                    }
+                });
+
+                if (!active_price_rule) {
+                    $('#orig-total').addClass('d-none');
+                }else{
+                    $('#orig-total').removeClass('d-none');
+                }
+            }
+
             $('#cart-subtotal').text('₱ ' + subtotal.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,"));
             $('#grand-total').text('₱ ' + total.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,"));
+        }
+
+        if (!('Any' in applicable_price_rule)) {
+            $('#cart-items tbody tr').each(function(){
+                updateAmount($(this));
+            });
         }
 
         function updateAmount(row, type) {
             var price = row.find('.price').eq(0).text();
             if(type == 'mobile'){
                 var qty = row.find('input[name="res_quantity[]"]').eq(0).val();
+                var input_name = row.find('input[name="res_quantity[]"]').eq(0);
             }else{
                 var qty = row.find('input[name="quantity[]"]').eq(0).val();
+                var input_name = row.find('input[name="quantity[]"]').eq(0);
             }
             var amount = (price * qty).toFixed(2);
 
-            row.find('.amount').eq(0).text(amount);
-            row.find('.formatted-amount').eq(0).text(parseFloat(amount).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,"));
+            // price rule checker
+            var item_code = input_name.data('id');
+
+            if(item_code in applicable_price_rule && !('Any' in applicable_price_rule)){
+                var price_rule = applicable_price_rule[item_code];
+                var active_price_rule = apr = 0;
+                var discounted_amount = price * qty;
+
+                $.each(price_rule, function (q, i){
+                    var a = i.based_on == 'Total Amount' ? (price * qty) : qty; 
+                    // var isLastElement = q == price_rule.length -1;
+                    var max_check = 1;
+                    if($.isNumeric(i.range_to)){
+                        max_check = a <= parseFloat(i.range_to) ? 1 : 0;
+                    }
+
+                    if(a >= i.range_from && max_check){
+                        if(!active_price_rule){
+                            row.find('.orig-amount').text('₱ ' + (price * qty).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,"));
+                            switch (i.discount_type) {
+                                case 'Percentage':
+                                    discounted_amount = (price * qty) * (i.rate / 100);
+                                    discounted_amount = (price * qty) - discounted_amount;
+                                    active_price_rule = 1;
+                                    break;
+                                default:
+                                    if((price * qty) > i.rate){
+                                        discounted_amount = (price * qty) - i.rate;
+                                        active_price_rule = 1;
+                                    }
+                                    break;
+                            }
+                            
+                            amount = discounted_amount.toFixed(2);
+                        }
+                    }
+
+                    if(a < i.range_from){
+                        row.find('.price-rule-display').removeClass('d-none');
+                        if (!apr) {
+                            if(i.based_on == 'Total Amount'){
+                                var msg = 'Reach at least <b>₱ ' + i.range_from.toFixed(2) + '</b> on this item and get a ' + i.discount_rate + ' discount';
+                            }else{
+                                var msg = 'Add at least <b>' + (parseInt(i.range_from) - qty) + '</b> more and get a ' + i.discount_rate + ' discount.';
+                            }
+                            row.find('.price-rule-display').html(msg);
+                        }
+                        
+                        apr = 1;
+                    }else{
+                        row.find('.price-rule-display').addClass('d-none');
+                    }
+                });
+
+                if (!active_price_rule) {
+                    row.find('.orig-amount').addClass('d-none');
+                }else{
+                    row.find('.orig-amount').removeClass('d-none');
+                }
+            }
+            // price rule checker
+
+            row.find('.amount').text(amount);
+            row.find('.formatted-amount').text(parseFloat(amount).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,"));
             updateTotal();
         }
 

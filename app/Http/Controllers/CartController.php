@@ -215,11 +215,11 @@ class CartController extends Controller
         if(Auth::check()) {
             $cart_items = DB::table('fumaco_items as a')->join('fumaco_cart as b', 'a.f_idcode', 'b.item_code')
                 ->where('user_type', 'member')->where('user_email', Auth::user()->username)
-                ->select('f_idcode', 'f_default_price', 'f_onsale', 'b.qty', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'slug', 'f_name_name', 'f_item_name', 'f_qty', 'f_reserved_qty')->get();
+                ->select('f_idcode', 'f_default_price', 'b.qty', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_stock_uom', 'slug', 'f_name_name', 'f_item_name', 'f_qty', 'f_reserved_qty')->get();
         } else {
             $cart_items = DB::table('fumaco_items as a')->join('fumaco_cart as b', 'a.f_idcode', 'b.item_code')
                 ->where('user_type', 'guest')->where('transaction_id', $order_no)
-                ->select('f_idcode', 'f_default_price', 'f_onsale', 'b.qty', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'slug', 'f_name_name', 'f_item_name', 'f_qty', 'f_reserved_qty')->get();
+                ->select('f_idcode', 'f_default_price', 'b.qty', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_stock_uom', 'slug', 'f_name_name', 'f_item_name', 'f_qty', 'f_reserved_qty')->get();
         }
 
         if (count($cart_items) > 0) {
@@ -253,13 +253,18 @@ class CartController extends Controller
 
         $item_codes = array_column($cart_items->toArray(), 'f_idcode');
 
+        $clearance_sale_items = $on_sale_items = [];
         if (count($item_codes) > 0) {
             $item_images = DB::table('fumaco_items_image_v1')->whereIn('idcode', $item_codes)
                 ->select('imgprimayx', 'idcode')->get();
             $item_images = collect($item_images)->groupBy('idcode')->toArray();
+
+            $clearance_sale_items = $this->isIncludedInClearanceSale($item_codes);
+
+            $on_sale_items = $this->onSaleItems($item_codes);
         }
         $sale_per_category = [];
-        if (!$sale && !Auth::check()) {
+        if (!$on_sale_items && !Auth::check()) {
             $item_categories = array_column($cart_items->toArray(), 'f_cat_id');
             $sale_per_category = $this->getSalePerItemCategory($item_categories);
         }
@@ -277,17 +282,40 @@ class CartController extends Controller
                 $image = $item_images[$item->f_idcode][0]->imgprimayx;
             }
 
-            $item_price = $item->f_default_price;
-            $item_on_sale = $item->f_onsale;
-            
             $is_new_item = 0;
             if($item->f_new_item == 1){
                 if($item->f_new_item_start <= Carbon::now() and $item->f_new_item_end >= Carbon::now()){
                     $is_new_item = 1;
                 }
             }
+
+            $on_sale = false;
+            $discount_type = $discount_rate = null;
+            if (array_key_exists($item->f_idcode, $on_sale_items)) {
+                $on_sale = $on_sale_items[$item->f_idcode]['on_sale'];
+                $discount_type = $on_sale_items[$item->f_idcode]['discount_type'];
+                $discount_rate = $on_sale_items[$item->f_idcode]['discount_rate'];
+            }
+
+            $item_detail = [
+                'default_price' => $item->f_default_price,
+                'category_id' => $item->f_cat_id,
+                'item_code' => $item->f_idcode,
+                'discount_type' => $discount_type,
+                'discount_rate' => $discount_rate,
+                'stock_uom' => $item->f_stock_uom,
+                'on_sale' => $on_sale
+            ];
+
+            $is_on_clearance_sale = false;
+            if (array_key_exists($item->f_idcode, $clearance_sale_items)) {
+                $item_detail['discount_type'] = $clearance_sale_items[$item->f_idcode][0]->discount_type;
+                $item_detail['discount_rate'] = $clearance_sale_items[$item->f_idcode][0]->discount_rate;
+                $is_on_clearance_sale = true;
+            }
+
             // get item price, discounted price and discount rate
-            $item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $item->f_cat_id, $sale, $item_price, $item->f_idcode, $item->f_discount_type, $item->f_discount_rate, $item->f_stock_uom, $sale_per_category);
+            $item_price_data = $this->getItemPriceAndDiscount($item_detail, $sale, $sale_per_category, $is_on_clearance_sale);
 
             $cart_arr[] = [
                 'item_code' => $item->f_idcode,
@@ -295,32 +323,47 @@ class CartController extends Controller
                 'item_description' => $item->f_name_name,
                 'alt' => $item->f_item_name,
                 'price' => $item_price_data['discounted_price'],
+                'default_price' => $item->f_default_price,
                 'amount' => ($item_price_data['discounted_price'] * $item->qty),
                 'quantity' => $item->qty,
                 'stock_qty' => $item->f_qty - $item->f_reserved_qty,
                 'stock_uom' => $item->f_stock_uom,
                 'item_image' => $image,
-                'insufficient_stock' => ($item->qty > $item->f_qty) ? 1 : 0
+                'insufficient_stock' => ($item->qty > $item->f_qty) ? 1 : 0,
+                'is_discounted' => ($item_price_data['discount_rate'] > 0) ? $item_price_data['is_on_sale'] : 0,
+                'discounted_price' => '₱ ' . number_format($item_price_data['discounted_price'], 2, '.', ','),
+                'discount_display' => $item_price_data['discount_display'],
+                
+                // for price rule
+                'subtotal' => ($item_price_data['discounted_price'] * $item->qty)
             ];
         }
+
+        $applicable_price_rule = $this->getPriceRules($cart_arr);
+        $price_rule = isset($applicable_price_rule['price_rule']) ? $applicable_price_rule['price_rule'] : [];
+        $applicable_price_rule = isset($applicable_price_rule['applicable_price_rule']) ? $applicable_price_rule['applicable_price_rule'] : [];
 
         $cart_item_codes = collect($cart_items)->pluck('f_idcode');
 
         $cross_sell_products = DB::table('fumaco_items_cross_sell as cs')->join('fumaco_items as i', 'cs.item_code_cross_sell', 'i.f_idcode')
             ->whereIn('cs.item_code', $cart_item_codes)->whereNotIn('cs.item_code_cross_sell', $cart_item_codes)
-            ->select('f_idcode', 'f_default_price', 'f_onsale', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_discount_type', 'f_discount_rate', 'f_stock_uom', 'slug', 'f_name_name', 'f_item_name', 'f_qty', 'f_reserved_qty')->get();
+            ->select('f_idcode', 'f_default_price', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_stock_uom', 'slug', 'f_name_name', 'f_item_name', 'f_qty', 'f_reserved_qty')->get();
 
         $cross_selling_item_codes = array_column($cross_sell_products->toArray(), 'f_idcode');
 
+        $clearance_sale_items = $on_sale_items = [];
         if (count($cross_selling_item_codes) > 0) {
             $cross_selling_item_images = DB::table('fumaco_items_image_v1')->whereIn('idcode', $cross_selling_item_codes)
                 ->select('imgprimayx', 'idcode')->get();
             $cross_selling_item_images = collect($cross_selling_item_images)->groupBy('idcode')->toArray();
 
             $product_reviews = $this->getProductRating($cross_selling_item_codes);
+
+            $clearance_sale_items = $this->isIncludedInClearanceSale($cross_selling_item_codes);
+            $on_sale_items = $this->onSaleItems($cross_selling_item_codes);
         }
         $sale_per_category = [];
-        if (!$sale && !Auth::check()) {
+        if (!$on_sale_items && !Auth::check()) {
             $item_categories = array_column($cross_sell_products->toArray(), 'f_cat_id');
             $sale_per_category = $this->getSalePerItemCategory($item_categories);
         }
@@ -328,13 +371,11 @@ class CartController extends Controller
         if (Auth::check()) {
             $customer_group_sale = $this->getSalePerCustomerGroup(Auth::user()->customer_group);
 
-            $sale = $customer_group_sale ? $customer_group_sale : $sale;
+            $sale = $customer_group_sale ? $customer_group_sale : $on_sale_items;
         }
     
         $cross_sell_arr = [];
         foreach($cross_sell_products as $cs){
-            $item_price = $cs->f_default_price;
-            $item_on_sale = $cs->f_onsale;
             $image = null;
             if (array_key_exists($cs->f_idcode, $cross_selling_item_images)) {
                 $image = $cross_selling_item_images[$cs->f_idcode][0]->imgprimayx;
@@ -346,8 +387,34 @@ class CartController extends Controller
                     $is_new_item = 1;
                 }
             }
+
+            $on_sale = false;
+            $discount_type = $discount_rate = null;
+            if (array_key_exists($cs->f_idcode, $on_sale_items)) {
+                $on_sale = $on_sale_items[$cs->f_idcode]['on_sale'];
+                $discount_type = $on_sale_items[$cs->f_idcode]['discount_type'];
+                $discount_rate = $on_sale_items[$cs->f_idcode]['discount_rate'];
+            }
+
+            $item_detail = [
+                'default_price' => $cs->f_default_price,
+                'category_id' => $cs->f_cat_id,
+                'item_code' => $cs->f_idcode,
+                'discount_type' => $discount_type,
+                'discount_rate' => $discount_rate,
+                'stock_uom' => $cs->f_stock_uom,
+                'on_sale' => $on_sale
+            ];
+
+            $is_on_clearance_sale = false;
+            if (array_key_exists($cs->f_idcode, $clearance_sale_items)) {
+                $item_detail['discount_type'] = $clearance_sale_items[$cs->f_idcode][0]->discount_type;
+                $item_detail['discount_rate'] = $clearance_sale_items[$cs->f_idcode][0]->discount_rate;
+                $is_on_clearance_sale = true;
+            }
+
             // get item price, discounted price and discount rate
-            $item_price_data = $this->getItemPriceAndDiscount($item_on_sale, $cs->f_cat_id, $sale, $item_price, $cs->f_idcode, $cs->f_discount_type, $cs->f_discount_rate, $cs->f_stock_uom, $sale_per_category);
+            $item_price_data = $this->getItemPriceAndDiscount($item_detail, $sale, $sale_per_category, $is_on_clearance_sale);
             // get product reviews
             $total_reviews = array_key_exists($cs->f_idcode, $product_reviews) ? $product_reviews[$cs->f_idcode]['total_reviews'] : 0;
             $overall_rating = array_key_exists($cs->f_idcode, $product_reviews) ? $product_reviews[$cs->f_idcode]['overall_rating'] : 0;
@@ -378,10 +445,10 @@ class CartController extends Controller
 		}
 
         if ($request->ajax()) {
-            return view('frontend.cart_preview', compact('cart_arr', 'bill_address', 'ship_address'));
+            return view('frontend.cart_preview', compact('cart_arr', 'bill_address', 'ship_address', 'price_rule', 'applicable_price_rule'));
         }
 
-        return view('frontend.cart', compact('cart_arr', 'bill_address', 'ship_address', 'cross_sell_arr'));
+        return view('frontend.cart', compact('cart_arr', 'bill_address', 'ship_address', 'cross_sell_arr', 'applicable_price_rule'));
     }
 
     public function updateCart(Request $request) {
@@ -516,182 +583,88 @@ class CartController extends Controller
     }
 
     public function setShippingBillingDetails(Request $request) {
-        $order_no = session()->get('fumOrderNo');
-        $existing_order_temp = DB::table('fumaco_temp')->where('order_tracker_code', $order_no)->first();
-        if(!$existing_order_temp){
-            if ($order_no) {
-                $existing_temp = DB::table('fumaco_temp')->where('xlogs', $order_no)->first();
-                if(!$existing_temp) {
-                    $loc = GeoLocation::lookup($request->ip());
-                    DB::table('fumaco_temp')->insert([
-                        'xtempcode' => uniqid(),
-                        'xlogs' => $order_no,
-                        'order_tracker_code' => $order_no,
-                        'order_ip' => $request->ip(),
-                        'ip_city' => $loc->getCity(),
-                        'ip_region' => $loc->getRegion(),
-                        'ip_country' => $loc->getCountry(), 
-                        'xusertype' => Auth::check() ? 'Member' : 'Guest',
-                        'xusernamex' => Auth::check() ? Auth::user()->username : null,
-                        'xuser_id' => Auth::check() ? Auth::user()->id : null,
-                    ]);
-                }
-            }
-        }
-
-        if(Auth::check()) {
-            $user_id = Auth::user()->id;
-            $user = DB::table('fumaco_users')->where('id', $user_id)->first();
-
-            $shipping_address = DB::table('fumaco_user_add')->where('xdefault', 1)
-                ->where('user_idx', $user_id)->where('address_class', 'Delivery')->first();
-
-            $mobile = null;
-            if($shipping_address->xmobile_number){
-                $mobile = preg_replace("/[^0-9]/", "", $shipping_address->xmobile_number);
-                if($mobile[0] == 0){
-                    $mobile = '63'.substr($mobile, 1);
-                }else if(substr($mobile, 0, 2) != '63' || $mobile[0] == '9'){
-                    $mobile = '63'.$mobile;
-                }
-                // $mobile = $mobile[0] == 0 ? '63'.substr($mobile, 1) : '63'.$mobile;
-            }
-
-            $contact = null;
-            if($shipping_address->xcontactnumber1){
-                $contact = preg_replace("/[^0-9]/", "", $shipping_address->xcontactnumber1);
-                // $contact = $contact[0] == 0 ? '63'.substr($contact, 1) : '63'.$contact;
-                if($contact[0] == 0){
-                    $contact = '63'.substr($contact, 1);
-                }else if(substr($contact, 0, 2) != '63' || $contact[0] == '9'){
-                    $contact = '63'.$contact;
+        DB::beginTransaction();
+        try {
+            $order_no = session()->get('fumOrderNo');
+            $existing_order_temp = DB::table('fumaco_temp')->where('order_tracker_code', $order_no)->first();
+            if(!$existing_order_temp){
+                if ($order_no) {
+                    $existing_temp = DB::table('fumaco_temp')->where('xlogs', $order_no)->first();
+                    if(!$existing_temp) {
+                        $loc = GeoLocation::lookup($request->ip());
+                        DB::table('fumaco_temp')->insert([
+                            'xtempcode' => uniqid(),
+                            'xlogs' => $order_no,
+                            'order_tracker_code' => $order_no,
+                            'order_ip' => $request->ip(),
+                            'ip_city' => $loc->getCity(),
+                            'ip_region' => $loc->getRegion(),
+                            'ip_country' => $loc->getCountry(), 
+                            'xusertype' => Auth::check() ? 'Member' : 'Guest',
+                            'xusernamex' => Auth::check() ? Auth::user()->username : null,
+                            'xuser_id' => Auth::check() ? Auth::user()->id : null,
+                        ]);
+                    }
                 }
             }
 
-            $bill_mobile = $mobile;
-            $bill_contact = $contact;
-            
-            $shipping_details = [
-                'fname' => $shipping_address->xcontactname1,
-                'lname' => $shipping_address->xcontactlastname1,
-                'address_line1' => $shipping_address->xadd1,
-                'address_line2' => $shipping_address->xadd2,
-                'province' => $shipping_address->xprov,
-                'city' => $shipping_address->xcity,
-                'brgy' => $shipping_address->xbrgy,
-                'postal_code' => $shipping_address->xpostal,
-                'country' => $shipping_address->xcountry,
-                'address_type' => $shipping_address->add_type,
-                'business_name' => $shipping_address->xbusiness_name,
-                'tin' => $shipping_address->xtin_no,
-                'email_address' => $shipping_address->xcontactemail1,
-                'mobile_no' => $mobile,
-                'contact_no' => $contact,
-                'same_as_billing' => 0
-            ];
+            if(Auth::check()) {
+                $user_id = Auth::user()->id;
+                $user = DB::table('fumaco_users')->where('id', $user_id)->first();
 
-            $billing_address = DB::table('fumaco_user_add')->where('xdefault', 1)
-                ->where('user_idx', $user_id)->where('address_class', 'Billing')->first();
-            if ($billing_address) {
-                $bill_mobile = null;
-                if($billing_address->xmobile_number){
-                    $bill_mobile = preg_replace("/[^0-9]/", "", $billing_address->xmobile_number);
-                    // $bill_mobile = $bill_mobile[0] == 0 ? '63'.substr($bill_mobile, 1) : '63'.$bill_mobile;
-                    if($bill_mobile[0] == 0){
-                        $bill_mobile = '63'.substr($bill_mobile, 1);
-                    }else if(substr($bill_mobile, 0, 2) != '63' || $bill_mobile[0] == '9'){
-                        $bill_mobile = '63'.$bill_mobile;
+                $shipping_address = DB::table('fumaco_user_add')->where('xdefault', 1)
+                    ->where('user_idx', $user_id)->where('address_class', 'Delivery')->first();
+
+                $mobile = null;
+                if($shipping_address->xmobile_number){
+                    $mobile = preg_replace("/[^0-9]/", "", $shipping_address->xmobile_number);
+                    if($mobile[0] == 0){
+                        $mobile = '63'.substr($mobile, 1);
+                    }else if(substr($mobile, 0, 2) != '63' || $mobile[0] == '9'){
+                        $mobile = '63'.$mobile;
+                    }
+                    // $mobile = $mobile[0] == 0 ? '63'.substr($mobile, 1) : '63'.$mobile;
+                }
+
+                $contact = null;
+                if($shipping_address->xcontactnumber1){
+                    $contact = preg_replace("/[^0-9]/", "", $shipping_address->xcontactnumber1);
+                    // $contact = $contact[0] == 0 ? '63'.substr($contact, 1) : '63'.$contact;
+                    if($contact[0] == 0){
+                        $contact = '63'.substr($contact, 1);
+                    }else if(substr($contact, 0, 2) != '63' || $contact[0] == '9'){
+                        $contact = '63'.$contact;
                     }
                 }
 
-                $bill_contact = null;
-                if($billing_address->xcontactnumber1){
-                    $bill_contact = preg_replace("/[^0-9]/", "", $billing_address->xcontactnumber1);
-                    // $bill_contact = $bill_contact[0] == 0 ? '63'.substr($bill_contact, 1) : '63'.$bill_contact;
-                    if($bill_contact[0] == 0){
-                        $bill_contact = '63'.substr($bill_contact, 1);
-                    }else if(substr($bill_contact, 0, 2) != '63' || $bill_contact[0] == '9'){
-                        $bill_contact = '63'.$bill_contact;
-                    }
-                }
-
-                $billing_details = [
-                    'fname' => $billing_address->xcontactname1,
-                    'lname' => $billing_address->xcontactlastname1,
-                    'address_line1' => $billing_address->xadd1,
-                    'address_line2' => $billing_address->xadd2,
-                    'province' => $billing_address->xprov,
-                    'city' => $billing_address->xcity,
-                    'brgy' => $billing_address->xbrgy,
-                    'postal_code' => $billing_address->xpostal,
-                    'country' => $billing_address->xcountry,
-                    'address_type' => $billing_address->add_type,
-                    'business_name' => $billing_address->xbusiness_name,
-                    'tin' => $billing_address->xtin_no,
-                    'email_address' => $billing_address->xcontactemail1,
-                    'mobile_no' => $bill_mobile,
-                    'contact_no' => $bill_contact,
-                ];
-            }
-        }
-        
-        if($request->isMethod('POST')) {
-            if ($request->ajax()) {
-                if (!Auth::check()) {
-                    $existing_account = DB::table('fumaco_users')->where('username', $request->ship_email)->exists();
-                    if ($existing_account) {
-                        return response()->json(['status' => 'error', 'message' => 'Email already exists, please <a href="'. route('login') .'">login</a>.']);
-                    }
-                }
-
-                $ship_mobile = null;
-                if($request->ship_mobilenumber1_1){
-                    $ship_mobile = preg_replace("/[^0-9]/", "", $request->ship_mobilenumber1_1);
-                    // $ship_mobile = $ship_mobile[0] == 0 ? '63'.substr($ship_mobile, 1) : '63'.$ship_mobile;
-                    if($ship_mobile[0] == 0){
-                        $ship_mobile = '63'.substr($ship_mobile, 1);
-                    }else if(substr($ship_mobile, 0, 2) != '63' || $ship_mobile[0] == '9'){
-                        $ship_mobile = '63'.$ship_mobile;
-                    }
-                }
-
-                $ship_contact = null;
-                if($request->contactnumber1_1){
-                    $ship_contact = preg_replace("/[^0-9]/", "", $request->contactnumber1_1);
-                    // $ship_contact = $ship_contact[0] == 0 ? '63'.substr($ship_contact, 1) : '63'.$ship_contact;
-                    if($ship_contact[0] == 0){
-                        $ship_contact = '63'.substr($ship_contact, 1);
-                    }else if(substr($ship_contact, 0, 2) != '63' || $ship_contact[0] == '9'){
-                        $ship_contact = '63'.$ship_contact;
-                    }
-                }
-
-                $bill_mobile = $ship_mobile;
-               
-                $shipping_details = [
-                    'fname' => $request->fname,
-                    'lname' => $request->lname,
-                    'address_line1' => $request->ship_Address1_1,
-                    'address_line2' => $request->ship_Address2_1,
-                    'province' => $request->ship_province1_1,
-                    'city' => $request->ship_City_Municipality1_1,
-                    'brgy' => $request->ship_Barangay1_1,
-                    'postal_code' => $request->ship_postal1_1,
-                    'country' => $request->ship_country_region1_1,
-                    'address_type' => $request->ship_Address_type1_1,
-                    'business_name' => $request->ship_business_name,
-                    'tin' => $request->ship_tin,
-                    'email_address' => $request->ship_email,
-                    'mobile_no' => $ship_mobile,
-                    'contact_no' => $ship_contact,
-                    'same_as_billing' => ($request->same_as_billing) ? 1 : 0
-                ];
+                $bill_mobile = $mobile;
+                $bill_contact = $contact;
                 
-                $billing_details = [];
-                if(!$request->same_as_billing) {
+                $shipping_details = [
+                    'fname' => $shipping_address->xcontactname1,
+                    'lname' => $shipping_address->xcontactlastname1,
+                    'address_line1' => $shipping_address->xadd1,
+                    'address_line2' => $shipping_address->xadd2,
+                    'province' => $shipping_address->xprov,
+                    'city' => $shipping_address->xcity,
+                    'brgy' => $shipping_address->xbrgy,
+                    'postal_code' => $shipping_address->xpostal,
+                    'country' => $shipping_address->xcountry,
+                    'address_type' => $shipping_address->add_type,
+                    'business_name' => $shipping_address->xbusiness_name,
+                    'tin' => $shipping_address->xtin_no,
+                    'email_address' => $shipping_address->xcontactemail1,
+                    'mobile_no' => $mobile,
+                    'contact_no' => $contact,
+                    'same_as_billing' => 0
+                ];
+
+                $billing_address = DB::table('fumaco_user_add')->where('xdefault', 1)
+                    ->where('user_idx', $user_id)->where('address_class', 'Billing')->first();
+                if ($billing_address) {
                     $bill_mobile = null;
-                    if($request->mobilenumber1_1){
-                        $bill_mobile = preg_replace("/[^0-9]/", "", $request->mobilenumber1_1);
+                    if($billing_address->xmobile_number){
+                        $bill_mobile = preg_replace("/[^0-9]/", "", $billing_address->xmobile_number);
                         // $bill_mobile = $bill_mobile[0] == 0 ? '63'.substr($bill_mobile, 1) : '63'.$bill_mobile;
                         if($bill_mobile[0] == 0){
                             $bill_mobile = '63'.substr($bill_mobile, 1);
@@ -699,73 +672,176 @@ class CartController extends Controller
                             $bill_mobile = '63'.$bill_mobile;
                         }
                     }
-                    
+
+                    $bill_contact = null;
+                    if($billing_address->xcontactnumber1){
+                        $bill_contact = preg_replace("/[^0-9]/", "", $billing_address->xcontactnumber1);
+                        // $bill_contact = $bill_contact[0] == 0 ? '63'.substr($bill_contact, 1) : '63'.$bill_contact;
+                        if($bill_contact[0] == 0){
+                            $bill_contact = '63'.substr($bill_contact, 1);
+                        }else if(substr($bill_contact, 0, 2) != '63' || $bill_contact[0] == '9'){
+                            $bill_contact = '63'.$bill_contact;
+                        }
+                    }
+
                     $billing_details = [
-                        'fname' => $request->bill_fname,
-                        'lname' => $request->bill_lname,
-                        'address_line1' => $request->Address1_1,
-                        'address_line2' => $request->Address2_1,
-                        'province' => $request->province1_1,
-                        'city' => $request->City_Municipality1_1,
-                        'brgy' => $request->Barangay1_1,
-                        'postal_code' => $request->postal1_1,
-                        'country' => $request->country_region1_1,
-                        'address_type' => $request->Address_type1_1,
-                        'business_name' => $request->bill_business_name,
-                        'tin' => $request->bill_tin,
-                        'email_address' => $request->email,
+                        'fname' => $billing_address->xcontactname1,
+                        'lname' => $billing_address->xcontactlastname1,
+                        'address_line1' => $billing_address->xadd1,
+                        'address_line2' => $billing_address->xadd2,
+                        'province' => $billing_address->xprov,
+                        'city' => $billing_address->xcity,
+                        'brgy' => $billing_address->xbrgy,
+                        'postal_code' => $billing_address->xpostal,
+                        'country' => $billing_address->xcountry,
+                        'address_type' => $billing_address->add_type,
+                        'business_name' => $billing_address->xbusiness_name,
+                        'tin' => $billing_address->xtin_no,
+                        'email_address' => $billing_address->xcontactemail1,
                         'mobile_no' => $bill_mobile,
+                        'contact_no' => $bill_contact,
                     ];
                 }
             }
+            
+            if($request->isMethod('POST')) {
+                if ($request->ajax()) {
+                    if (!Auth::check()) {
+                        $existing_account = DB::table('fumaco_users')->where('username', $request->ship_email)->exists();
+                        if ($existing_account) {
+                            return response()->json(['status' => 'error', 'message' => 'Email already exists, please <a href="'. route('login') .'">login</a>.']);
+                        }
+                    }
+
+                    $ship_mobile = null;
+                    if($request->ship_mobilenumber1_1){
+                        $ship_mobile = preg_replace("/[^0-9]/", "", $request->ship_mobilenumber1_1);
+                        // $ship_mobile = $ship_mobile[0] == 0 ? '63'.substr($ship_mobile, 1) : '63'.$ship_mobile;
+                        if($ship_mobile[0] == 0){
+                            $ship_mobile = '63'.substr($ship_mobile, 1);
+                        }else if(substr($ship_mobile, 0, 2) != '63' || $ship_mobile[0] == '9'){
+                            $ship_mobile = '63'.$ship_mobile;
+                        }
+                    }
+
+                    $ship_contact = null;
+                    if($request->contactnumber1_1){
+                        $ship_contact = preg_replace("/[^0-9]/", "", $request->contactnumber1_1);
+                        // $ship_contact = $ship_contact[0] == 0 ? '63'.substr($ship_contact, 1) : '63'.$ship_contact;
+                        if($ship_contact[0] == 0){
+                            $ship_contact = '63'.substr($ship_contact, 1);
+                        }else if(substr($ship_contact, 0, 2) != '63' || $ship_contact[0] == '9'){
+                            $ship_contact = '63'.$ship_contact;
+                        }
+                    }
+
+                    $bill_mobile = $ship_mobile;
+                
+                    $shipping_details = [
+                        'fname' => $request->fname,
+                        'lname' => $request->lname,
+                        'address_line1' => $request->ship_Address1_1,
+                        'address_line2' => $request->ship_Address2_1,
+                        'province' => $request->ship_province1_1,
+                        'city' => $request->ship_City_Municipality1_1,
+                        'brgy' => $request->ship_Barangay1_1,
+                        'postal_code' => $request->ship_postal1_1,
+                        'country' => $request->ship_country_region1_1,
+                        'address_type' => $request->ship_Address_type1_1,
+                        'business_name' => $request->ship_business_name,
+                        'tin' => $request->ship_tin,
+                        'email_address' => $request->ship_email,
+                        'mobile_no' => $ship_mobile,
+                        'contact_no' => $ship_contact,
+                        'same_as_billing' => ($request->same_as_billing) ? 1 : 0
+                    ];
+                    
+                    $billing_details = [];
+                    if(!$request->same_as_billing) {
+                        $bill_mobile = null;
+                        if($request->mobilenumber1_1){
+                            $bill_mobile = preg_replace("/[^0-9]/", "", $request->mobilenumber1_1);
+                            // $bill_mobile = $bill_mobile[0] == 0 ? '63'.substr($bill_mobile, 1) : '63'.$bill_mobile;
+                            if($bill_mobile[0] == 0){
+                                $bill_mobile = '63'.substr($bill_mobile, 1);
+                            }else if(substr($bill_mobile, 0, 2) != '63' || $bill_mobile[0] == '9'){
+                                $bill_mobile = '63'.$bill_mobile;
+                            }
+                        }
+                        
+                        $billing_details = [
+                            'fname' => $request->bill_fname,
+                            'lname' => $request->bill_lname,
+                            'address_line1' => $request->Address1_1,
+                            'address_line2' => $request->Address2_1,
+                            'province' => $request->province1_1,
+                            'city' => $request->City_Municipality1_1,
+                            'brgy' => $request->Barangay1_1,
+                            'postal_code' => $request->postal1_1,
+                            'country' => $request->country_region1_1,
+                            'address_type' => $request->Address_type1_1,
+                            'business_name' => $request->bill_business_name,
+                            'tin' => $request->bill_tin,
+                            'email_address' => $request->email,
+                            'mobile_no' => $bill_mobile,
+                        ];
+                    }
+                }
+            }
+
+            if ($order_no) {
+                $temp_data = [
+                    'xfname' => (Auth::check()) ? Auth::user()->f_name : $shipping_details['fname'],
+                    'xlname' => (Auth::check()) ? Auth::user()->f_lname : $shipping_details['lname'],
+                    'xcontact_person' => ($billing_details) ? $billing_details['fname']. " " . $billing_details['lname'] : $shipping_details['fname']. " " . $shipping_details['lname'],
+                    'xshipcontact_person' => $shipping_details['fname']. " " . $shipping_details['lname'],
+                    'xadd1' => ($billing_details) ? $billing_details['address_line1'] : $shipping_details['address_line1'],
+                    'xadd2' => ($billing_details) ? $billing_details['address_line2'] : $shipping_details['address_line2'],
+                    'xprov' => ($billing_details) ? $billing_details['province'] : $shipping_details['province'],
+                    'xcity' => ($billing_details) ? $billing_details['city'] : $shipping_details['city'],
+                    'xbrgy' => ($billing_details) ? $billing_details['brgy'] : $shipping_details['brgy'],
+                    'xpostal' => ($billing_details) ? $billing_details['postal_code'] : $shipping_details['postal_code'],
+                    'xcountry' => ($billing_details) ? $billing_details['country'] : $shipping_details['country'],
+                    'xaddresstype' => ($billing_details) ? $billing_details['address_type'] : $shipping_details['address_type'],
+                    'xbusiness_name' => ($billing_details) ? $billing_details['business_name'] : $shipping_details['business_name'],
+                    'xtin_no' => ($billing_details) ? $billing_details['tin'] : $shipping_details['tin'],
+                    'xemail' => ($billing_details) ? $billing_details['email_address'] : $shipping_details['email_address'],
+                    'xemail_shipping' => $shipping_details['email_address'],
+                    'xmobile' => ($billing_details) ? $billing_details['mobile_no'] : null,
+                    'xcontact' => $shipping_details['mobile_no'],
+                    'xshippadd1' => $shipping_details['address_line1'],
+                    'xshippadd2' => $shipping_details['address_line2'],
+                    'xshiprov' => $shipping_details['province'],
+                    'xshipcity' => $shipping_details['city'],
+                    'xshipbrgy' => $shipping_details['brgy'],
+                    'xshippostalcode' => $shipping_details['postal_code'],
+                    'xshipcountry' => $shipping_details['country'],
+                    'xshiptype' => $shipping_details['address_type'],
+                    'xship_business_name' => $shipping_details['business_name'],
+                    'xship_tin' => $shipping_details['tin'],
+                    'order_status' => 'Order Pending',
+                    'order_shipping_type' => null, 
+                    'xusertype' => (Auth::check()) ? 'Member' : 'Guest',
+                    'xusernamex' => (Auth::check()) ? Auth::user()->username : null,
+                    'xstatus' => 2,
+                    'xuser_id' => (Auth::check()) ? Auth::user()->id : null,
+                    'shipping_same_as_billing' => ($request->same_as_billing) ? 1 : 0,
+                ];
+
+                DB::table('fumaco_temp')->where('order_tracker_code', $order_no)->update($temp_data);
+            }
+
+            DB::commit();
+
+            if($request->isMethod('POST')) {
+                return response()->json(['status' => 'success', 'message' => '/checkout/summary']);
+            }
+
+            return redirect('/checkout/summary');
+        } catch (Exception $e) {
+            DB::rollback();
+
+            return redirect()->back()->with('error', 'An error occured. Please try again.'); 
         }
-
-        if ($order_no) {
-            $temp_data = [
-                'xfname' => (Auth::check()) ? Auth::user()->f_name : $shipping_details['fname'],
-                'xlname' => (Auth::check()) ? Auth::user()->f_lname : $shipping_details['lname'],
-                'xcontact_person' => ($billing_details) ? $billing_details['fname']. " " . $billing_details['lname'] : $shipping_details['fname']. " " . $shipping_details['lname'],
-                'xshipcontact_person' => $shipping_details['fname']. " " . $shipping_details['lname'],
-                'xadd1' => ($billing_details) ? $billing_details['address_line1'] : $shipping_details['address_line1'],
-                'xadd2' => ($billing_details) ? $billing_details['address_line2'] : $shipping_details['address_line2'],
-                'xprov' => ($billing_details) ? $billing_details['province'] : $shipping_details['province'],
-                'xcity' => ($billing_details) ? $billing_details['city'] : $shipping_details['city'],
-                'xbrgy' => ($billing_details) ? $billing_details['brgy'] : $shipping_details['brgy'],
-                'xpostal' => ($billing_details) ? $billing_details['postal_code'] : $shipping_details['postal_code'],
-                'xcountry' => ($billing_details) ? $billing_details['country'] : $shipping_details['country'],
-                'xaddresstype' => ($billing_details) ? $billing_details['address_type'] : $shipping_details['address_type'],
-                'xbusiness_name' => ($billing_details) ? $billing_details['business_name'] : $shipping_details['business_name'],
-                'xtin_no' => ($billing_details) ? $billing_details['tin'] : $shipping_details['tin'],
-                'xemail' => ($billing_details) ? $billing_details['email_address'] : $shipping_details['email_address'],
-                'xemail_shipping' => $shipping_details['email_address'],
-                'xmobile' => ($billing_details) ? $billing_details['mobile_no'] : null,
-                'xcontact' => $shipping_details['mobile_no'],
-                'xshippadd1' => $shipping_details['address_line1'],
-                'xshippadd2' => $shipping_details['address_line2'],
-                'xshiprov' => $shipping_details['province'],
-                'xshipcity' => $shipping_details['city'],
-                'xshipbrgy' => $shipping_details['brgy'],
-                'xshippostalcode' => $shipping_details['postal_code'],
-                'xshipcountry' => $shipping_details['country'],
-                'xshiptype' => $shipping_details['address_type'],
-                'xship_business_name' => $shipping_details['business_name'],
-                'xship_tin' => $shipping_details['tin'],
-                'order_status' => 'Order Pending',
-                'order_shipping_type' => null, 
-                'xusertype' => (Auth::check()) ? 'Member' : 'Guest',
-                'xusernamex' => (Auth::check()) ? Auth::user()->username : null,
-                'xstatus' => 2,
-                'xuser_id' => (Auth::check()) ? Auth::user()->id : null,
-                'shipping_same_as_billing' => ($request->same_as_billing) ? 1 : 0,
-            ];
-
-            DB::table('fumaco_temp')->where('order_tracker_code', $order_no)->update($temp_data);
-        }
-
-        if($request->isMethod('POST')) {
-            return response()->json(['status' => 'success', 'message' => '/checkout/summary']);
-        }
-
-        return redirect('/checkout/summary');
     }
 }

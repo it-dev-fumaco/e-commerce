@@ -1,24 +1,15 @@
 @extends('frontend.layout', [
-    'namePage' => $product_category->name,
-    'activePage' => 'product_list',
-	'category_id' => $category_id
+    'namePage' => 'Clearance Sale',
+    'activePage' => 'clearance_sale',
 ])
 @section('meta')
-<meta name="description" content="{{ $product_category->meta_description }}">
-	<meta name="keywords" content="{{ $product_category->meta_keywords }}" />
-
-	<meta property="og:url" content="https://www.fumaco.com/products/{{ ($product_category->slug) ? $product_category->slug : $product_category->id }}" />
-	<meta property="og:type" content="article" />
-	<meta property="og:title" content="{{ $product_category->name }}" />
-	<meta property="og:description" content="{{ $product_category->meta_description }}" />
 	@if ($image_for_sharing)
 	<meta property="og:image" content="{{ $image_for_sharing }}" />
 	@endif
 @endsection
 @section('content')
 	@php
-		$page_title = $product_category->name;
-		$banner_image = $product_category->banner_img ? $product_category->banner_img : null;
+		$page_title = 'Clearance Sale';
 	@endphp
 	@include('frontend.header')
 
@@ -29,7 +20,7 @@
 					<a href="/" style="color: #000000 !important; text-decoration: none;">Home</a>
 				</li>
 				<li class="breadcrumb-item active">
-					<a href="#" style="color: #000000 !important; text-decoration: underline;">{{ $product_category->name }}</a>
+					<a href="#" style="color: #000000 !important; text-decoration: underline;">Clearance Sale</a>
 				</li>
 			</ol>
 		</nav>
@@ -48,90 +39,33 @@
 						</div>
 
 						<div class="col-12 p-0">
-							<form action="/products/{{ ($product_category->slug) ? $product_category->slug : $product_category->id }}" method="POST" id="filter-form">
+							<form action="/clearance_sale" method="POST" id="filter-form" autocomplete="off">
 								@csrf
 								@php
 									$a = 0;
 								@endphp
 								<div id="accordion" class="container-fluid p-0">
-									@if (count($filters['Brand']) > 1)
+									@if (count($category_filter) > 0)
 										<div class="card text-left" style="border: none;">
 											<div class="container p-2 filter-id collapse-btn" style="border-bottom: 1px solid #C9C9CB" data-target="#filter-brand">
-												<span class="panel-title" style="font-weight: 600; font-size: 10pt;">Brand</span>
+												<span class="panel-title" style="font-weight: 600; font-size: 10pt;">Category</span>
 												<i id="filter-brand-arrow" class="fas fa-caret-up" style="position: absolute; right: 0;"></i>
 											</div>
 			
 											<div id="filter-brand" class="collapse show">
 												<div class="card-body">
-													@foreach ($filters['Brand'] as $brand)
-														@php
-															$filter_values = explode('+', request()->brand);
-															$status = (in_array($brand, $filter_values)) ? 'checked' : '';
-														@endphp
+													@foreach ($category_filter as $category_slug => $category_name)
 														<div class="form-check">
-															<input class="form-check-input filter-checkbox" type="checkbox" name="attr[brand][]" value="{{ $brand }}" {{ $status }}>
-															<label class="form-check-label" style="font-size: 10pt; font-weight: 500">
-																{{ $brand }}
-															</label>
+															<input class="form-check-input filter-checkbox" type="checkbox" name="category[]" value="{{ $category_slug }}">
+															<label class="form-check-label" style="font-size: 10pt; font-weight: 500">{{ $category_name }}</label>
 														</div>
 													@endforeach
 												</div>
 											</div>
 										</div>
 									@endif
-									@foreach ($filters as $id => $filter)
-										@php
-											$filter_attr = Str::slug($id, '-');
-											$collapse = null;
-											$arrow = 'down';
-											$a++;
-		
-											if(count($filters['Brand']) > 1){
-												if($loop->first){
-													$collapse = 'show';
-													$arrow = 'up';
-												}
-											}else{
-												if($a < 3){
-													$collapse = 'show';
-													$arrow = 'up';
-												}
-											}
-
-											if(request()->$filter_attr){
-												$collapse = 'show';
-												$arrow = 'up';
-											}
-										@endphp
-										@if ($id != 'Brand')
-											<div class="card text-left" style="border: none;">
-												<div class="container p-2 filter-id collapse-btn" style="border-bottom: 1px solid #C9C9CB" data-target="#filter-{{ $filter_attr }}">
-													<span class="panel-title" style="font-weight: 600; font-size: 10pt;">{{ $id }}</span>
-													<i id="filter-{{ $filter_attr }}-arrow" class="fas fa-caret-{{ $arrow }}" style="position: absolute; right: 0;"></i>
-												</div>
-											
-												<div id="filter-{{ $filter_attr }}" class="collapse {{ $collapse }}">
-													<div class="card-body">
-														@foreach ($filter as $value)
-															@php
-																$filter_values = explode('+', request()->$filter_attr);
-																$status = (in_array($value, $filter_values)) ? 'checked' : '';
-															@endphp
-															<div class="form-check">
-																<input class="form-check-input filter-checkbox" type="checkbox" name="{{ 'attr[' .$filter_attr.'][]' }}" value="{{ $value }}" {{ $status }}>
-																<label class="form-check-label" style="font-size: 10pt; font-weight: 500">
-																	{{ $value }}
-																</label>
-															</div>
-														@endforeach
-													</div>
-												</div>
-											</div>
-										@endif
-									@endforeach
 								</div>
 								<input type="hidden" name="sortby" value="{{ request()->sortby }}">
-								<input type="hidden" name="sel_attr" value="{{ request()->sel_attr }}">
 							</form>
 						</div>
 					</div>
@@ -190,74 +124,30 @@
 														</span>
 													</div>
 													<div class="col-12">
-														<form action="/products/{{ ($product_category->slug) ? $product_category->slug : $product_category->id }}" method="POST" id="filter-form2">
+														<form action="/clearance_sale" method="POST" id="filter-form2" autocomplete="off">
 															@csrf
 															<div id="accordion2" class="container-fluid p-0">
-																@if (count($filters['Brand']) > 1)
+																@if (count($category_filter) > 1)
 																	<div class="card text-left" style="border: none;">
 																		<div class="container p-2 filter-id collapse-btn" style="border-bottom: 1px solid #C9C9CB" data-target="#filter-brand2">
-																			<span style="font-weight: 600; font-size: 10pt;">Brand</span>
+																			<span style="font-weight: 600; font-size: 10pt;">Category</span>
 																			<i id="filter-brand2-arrow" class="fas fa-caret-up" style="position: absolute; right: 0;"></i>
 																		</div>
 										
 																		<div id="filter-brand2" class="collapse show">
 																			<div class="card-body">
-																				@foreach ($filters['Brand'] as $brand)
-																					@php
-																						$filter_values = explode('+', request()->brand);
-																						$status = (in_array($brand, $filter_values)) ? 'checked' : '';
-																					@endphp
+																				@foreach ($category_filter as $category_slug => $category_name)
 																					<div class="form-check">
-																						<input class="form-check-input filter-checkbox" type="checkbox" name="attr[brand][]" value="{{ $brand }}" {{ $status }}>
-																						<label class="form-check-label" style="font-size: 10pt; font-weight: 500">
-																							{{ $brand }}
-																						</label>
+																						<input class="form-check-input filter-checkbox" type="checkbox" name="category[]" value="{{ $category_slug }}">
+																						<label class="form-check-label" style="font-size: 10pt; font-weight: 500">{{ $category_name }}</label>
 																					</div>
 																				@endforeach
 																			</div>
 																		</div>
 																	</div>
 																@endif
-																@foreach ($filters as $id => $filter)
-																	@php
-																		$filter_attr = Str::slug($id, '-');
-																		$collapse = null;
-																		$arrow = 'down';
-									
-																		if(count($filters['Brand']) <= 1 && $loop->first || request()->$filter_attr){
-																			$collapse = 'show';
-																			$arrow = 'up';
-																		}
-																	@endphp
-																	@if ($id != 'Brand')
-																		<div class="card text-left" style="border: none;">
-																			<div class="container p-2 filter-id collapse-btn" style="border-bottom: 1px solid #C9C9CB" data-target="#filter-{{ $filter_attr }}2">
-																				<span style="font-weight: 600; font-size: 10pt;">{{ $id }}</span>
-																				<i id="filter-{{ $filter_attr }}2-arrow" class="fas fa-caret-{{ $arrow }}" style="position: absolute; right: 0;"></i>
-																			</div>
-																		
-																			<div id="filter-{{ $filter_attr }}2" class="collapse {{ $collapse }}">
-																				<div class="card-body">
-																					@foreach ($filter as $value)
-																						@php
-																							$filter_values = explode('+', request()->$filter_attr);
-																							$status = (in_array($value, $filter_values)) ? 'checked' : '';
-																						@endphp
-																						<div class="form-check">
-																							<input class="form-check-input filter-checkbox" type="checkbox" name="attr[{{ $filter_attr }}][]" value="{{ $value }}" {{ $status }}>
-																							<label class="form-check-label" style="font-size: 10pt; font-weight: 500">
-																								{{ $value }}
-																							</label>
-																						</div>
-																					@endforeach
-																				</div>
-																			</div>
-																		</div>
-																	@endif
-																@endforeach
 															</div>
 															<input type="hidden" name="sortby" value="{{ request()->sortby }}">
-															<input type="hidden" name="sel_attr" value="{{ request()->sel_attr }}">
 														</form>
 													</div>
 												</div>
@@ -313,11 +203,6 @@
 			var filter_form = '#filter-form';
 		}
 
-		$(document).on('change', '.product-cb-filter', function(){
-			$(filter_form).find('input[name="sel_attr"]').eq(0).val($(this).data('attrname'));
-			$(filter_form).submit();
-		});
-
 		$(document).on('click', '.filter-checkbox', function (){
 			loadProducts(1);
 		});
@@ -328,11 +213,11 @@
 			loadProducts(page);
 		});
 
-		// loadProducts();
+		
         function loadProducts(page) {
 			$.ajax({
 				type: "GET",
-				url: "/products/{{ $category_id }}?page=" + page,
+				url: "/clearance_sale?page=" + page,
                 data: $(filter_form).serialize(),
 				success: function (response) {
                     $('#products-list').empty();

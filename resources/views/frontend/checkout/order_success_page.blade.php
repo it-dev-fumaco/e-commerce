@@ -126,6 +126,7 @@
 							@php
 								$sum_discount = collect($items)->sum('discount');
 								$colspan = ($sum_discount > 0) ? 5 : 4;
+								$gt_discount = $order_details->discount_amount;
 							@endphp
 							<thead>
 								<tr style="font-size: 0.9rem;">
@@ -162,7 +163,21 @@
 										<div class="d-md-none" style="text-align: left !important;">
 											<span><b>Qty:</b> {{ $item['qty'] }}</span><br>
 											@if ($item['discount'])
-											<span><b>Discount (%):</b> {{ $item['discount'] ? $item['discount'] . '%' : '-' }}</span><br>
+											<span><b>Discount:</b>
+												@switch($item['discount_type'])
+													@case('Fixed Amount')
+														₱ {{ number_format(str_replace(",","",$item['discount']), 2) }}
+														@break
+													@case('By Percentage')
+													@case('percentage')
+													@case(null)
+														{{ $item['discount'] ? $item['discount'] . '%' : '-' }}
+														@break
+													@default
+													-
+												@endswitch
+											</span>
+												<br>
 											@endif
 											<span style="white-space: nowrap !important"><b>Price:</b> ₱ {{ number_format(str_replace(",","",$item['price']), 2) }}</span><br>
 											<span style="white-space: nowrap !important"><b>Amount:</b> ₱ {{ number_format(str_replace(",","",$item['amount']), 2) }}</span>
@@ -171,7 +186,20 @@
 									</td>
 									<td class="text-center d-none d-sm-table-cell">{{ $item['qty'] }}</td>
 									@if ($sum_discount > 0)
-									<td class="text-center d-none d-sm-table-cell">{{ $item['discount'] ? $item['discount'] . '%' : '-' }}</td>
+									<td class="text-center d-none d-sm-table-cell">
+										@switch($item['discount_type'])
+											@case('Fixed Amount')
+												₱ {{ number_format(str_replace(",","",$item['discount']), 2) }}
+												@break
+											@case('By Percentage')
+											@case('percentage')
+											@case(null)
+												{{ $item['discount'] ? $item['discount'] . '%' : '-' }}
+												@break
+											@default
+											-
+										@endswitch
+									</td>
 									@endif
 									<td class="text-right d-none d-sm-table-cell" style="text-align: right; white-space: nowrap !important">₱ {{ number_format(str_replace(",","",$item['price']), 2) }}</td>
 									<td class="text-right d-none d-sm-table-cell" style="text-align: right; white-space: nowrap !important">₱ {{ number_format(str_replace(",","",$item['amount']), 2) }}</td>
@@ -191,7 +219,7 @@
 								<tr style="font-size: 0.8rem; text-align: right;">
 									<td class="pb-1 pt-1 d-none d-sm-table-cell" colspan="{{ $colspan }}">Subtotal</td>
 									<td class="pb-1 pt-1 d-md-none" style="white-space: nowrap !important;">Subtotal</td>
-									<td class="pb-1 pt-1" style="white-space: nowrap !important;">₱ {{ number_format(str_replace(",","",$order_details->order_subtotal), 2) }}</td>
+									<td class="pb-1 pt-1" style="white-space: nowrap !important;">₱ {{ number_format(str_replace(",","", collect($items)->sum('amount')), 2) }}</td>
 								</tr>
 								@if ($shipping_discount)
 								@php
@@ -219,29 +247,63 @@
 									@endif
 								@endif
 								@if ($order_details->voucher_code)
-								@php
-									switch ($voucher_details->discount_type) {
-										case 'Fixed Amount':
-											$voucher_discount_amount = $voucher_details->discount_rate;
-											break;
-										case 'By Percentage':
-											$voucher_discount_amount = ($voucher_details->discount_rate / 100) * $order_details->order_subtotal;
-											break;
-										default:
-											$voucher_discount_amount = 0;
-											break;
-									}
-								@endphp
-								<tr style="font-size: 0.8rem; text-align: right; border-top: 0;">
-									<td class="pb-1 pt-1 d-none d-sm-table-cell" colspan="{{ $colspan }}">Discount
-										<span class="text-white" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833;">{{ $order_details->voucher_code }}</span>
-									</td>
-									<td class="pb-1 pt-1 d-md-none">Discount 
-										<span class="text-white" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833;">{{ $order_details->voucher_code }}</span>
-									</td>
-									<td class="pb-1 pt-1" style="white-space: nowrap !important;">- ₱ {{ number_format($voucher_discount_amount, 2) }}</td>
-								</tr>
+									@if ($order_details->voucher_code)
+										@php
+											switch ($voucher_details->discount_type) {
+												case 'By Percentage':
+													$voucher_discount_amount = ($voucher_details->discount_rate / 100) * $order_details->order_subtotal;
+													if($voucher_details->capped_amount){
+														$voucher_discount_amount = $voucher_discount_amount < $voucher_details->capped_amount ? $voucher_discount_amount : $voucher_details->capped_amount;
+													}
+													break;
+												default:
+													$voucher_discount_amount = $order_details->order_subtotal > $voucher_details->discount_rate ? $voucher_details->discount_rate : 0;
+													break;
+											}
+										@endphp
+										<tr style="font-size: 0.8rem; text-align: right; border-top: 0;">
+											<td class="pb-1 pt-1 d-none d-sm-table-cell" colspan="{{ $colspan }}">
+												<span class="text-white" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833;">{{ $order_details->voucher_code }}</span>
+											</td>
+											<td class="pb-1 pt-1 d-md-none">
+												<span class="text-white" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833;">{{ $order_details->voucher_code }}</span>
+											</td>
+											<td class="pb-1 pt-1" style="white-space: nowrap !important;">- ₱ {{ number_format($voucher_discount_amount, 2) }}</td>
+										</tr>
+									@endif
 								@endif
+								@isset($price_rule['Any'])
+									@php
+										$rule = $price_rule['Any'];
+										switch ($rule['discount_type']) {
+											case 'Percentage':
+												$discount_amount = collect($items)->sum('amount') * ($rule['discount_rate'] / 100);
+												break;
+											default:
+												$discount_amount = collect($items)->sum('amount') > $rule['discount_rate'] ? $rule['discount_rate'] : 0;
+												break;
+										}
+
+										$gt_discount = $order_details->discount_amount > $discount_amount ? $order_details->discount_amount - $discount_amount : $order_details->discount_amount;
+									@endphp
+									@if ($discount_amount)
+										<tr style="font-size: 0.8rem; text-align: right; border-top: 0;">
+											<td class="pb-1 pt-1 d-none d-sm-table-cell" colspan="{{ $colspan }}">
+												<span class="text-white" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833;">{{ $rule['discount_name'] }}</span>
+											</td>
+											<td class="pb-1 pt-1 d-md-none">
+												<span class="text-white" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833;">{{ $rule['discount_name'] }}</span>
+											</td>
+											<td class="pb-1 pt-1" style="white-space: nowrap !important;">- ₱ {{ number_format($discount_amount, 2) }}</td>
+										</tr>
+									@endif
+								@endisset
+								@php
+									$grand_total = $order_details->grand_total;
+									if (!$order_details->grand_total) {
+										$grand_total = $order_details->order_shipping_amount + ($order_details->order_subtotal - $gt_discount);
+									}
+								@endphp	
 								<tr style="font-size: 0.8rem; text-align: right; border-top: 0;">
 									<td class="pb-1 pt-1 d-none d-sm-table-cell" colspan="{{ $colspan }}">{{ $order_details->order_shipping }}</td>
 									<td class="pb-1 pt-1 d-md-none" style="white-space: nowrap !important;">{{ $order_details->order_shipping }}</td>
@@ -256,7 +318,7 @@
 								<tr style="font-size: 0.9rem; text-align: right; border-top: 2px solid;">
 									<td class="pb-1 pt-1 d-none d-sm-table-cell" colspan="{{ $colspan }}"><b>Grand Total</b></td>
 									<td class="pb-1 pt-1 d-md-none" style="white-space: nowrap !important;"><b>Grand Total</b></td>
-									<td class="pb-1 pt-1" style="white-space: nowrap !important;"><b>₱ {{ number_format(str_replace(",","",($order_details->order_shipping_amount + ($order_details->order_subtotal - $order_details->discount_amount))), 2) }}</b></td>
+									<td class="pb-1 pt-1" style="white-space: nowrap !important;"><b>₱ {{ number_format(str_replace(",","", $grand_total), 2) }}</b></td>
 								</tr>
 							</tfoot>
 						</table>

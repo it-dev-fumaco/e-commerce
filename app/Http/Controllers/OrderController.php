@@ -12,19 +12,52 @@ use Auth;
 use Carbon\Carbon;
 use Illuminate\Pagination\LengthAwarePaginator;
 use App\Http\Traits\GeneralTrait;
+use App\Http\Traits\ProductTrait;
 
 class OrderController extends Controller
 {
     use GeneralTrait;
-    public function orderList(Request $request){
+    use ProductTrait;
+    public function orderList(Request $request, $list){
         $search_id = ($request->search) ? $request->search : '';
         $order_status = ($request->order_status) ? $request->order_status : '';
+        $excluded_status = $included_status = [];
 
-        $exluded_status = ['Cancelled', 'Delivered', 'Order Completed', 'Order Delivered'];
+        switch ($list) {
+            case 'active':
+                $excluded_status = ['Cancelled', 'Delivered', 'Order Completed', 'Order Delivered'];
+                break;
+            case 'cancelled':
+                $included_status = ['Cancelled'];
+                break;
+            case 'completed':
+                $included_status = ['Order Completed', 'Order Delivered'];
+                break;
+            default:
+                Abort(404);
+                break;
+        }
 
-        $orders = DB::table('fumaco_order')->where('order_number', 'LIKE', '%'.$search_id.'%')->where('order_status', 'LIKE', '%'.$order_status.'%')->whereNotIn('order_status', $exluded_status)->orderBy('id', 'desc')->paginate(10);
+        $orders = DB::table('fumaco_order')
+        ->when($search_id, function ($q) use ($search_id){
+            $q->where('order_number', 'like', '%'.$search_id.'%');
+        })
+        ->when($order_status, function ($q) use ($order_status){
+            $q->where('order_status', $order_status);
+        })
+        ->when($list == 'active', function ($q) use ($excluded_status){
+            $q->whereNotIn('order_status', $excluded_status);
+        })
+        ->when(in_array($list, ['cancelled', 'completed']), function ($q) use ($included_status){
+            $q->whereIn('order_status', $included_status);
+        })
+        ->orderBy('id', 'desc')->paginate(10);
 
-        $order_items = DB::table('fumaco_order_items')->whereIn('order_number', collect($orders->items())->pluck('order_number'))->get();
+        $order_items = DB::table('fumaco_order_items as order')
+            ->join('fumaco_items as item', 'order.item_code', 'item.f_idcode')
+            ->whereIn('order.order_number', collect($orders->items())->pluck('order_number'))
+            ->select('order.*', 'item.f_cat_id')
+            ->get();
         $item_codes = collect($order_items)->pluck('item_code');
         $order_items = collect($order_items)->groupBy('order_number');
 
@@ -38,8 +71,8 @@ class OrderController extends Controller
 
         foreach($orders as $o){
             $items_arr = [];
-            // $items = DB::table('fumaco_order_items')->where('order_number', $o->order_number)->get();
             $items = isset($order_items[$o->order_number]) ? $order_items[$o->order_number] : [];
+
             foreach($items as $i){
                 $bundle_items = DB::table('fumaco_product_bundle_item')->where('parent_item_code', $i->item_code)->get();
                 $items_arr[] = [
@@ -51,9 +84,30 @@ class OrderController extends Controller
                     'item_qty' => $i->item_qty,
                     'item_price' => $i->item_price,
                     'item_discount' => $i->item_discount,
+                    'discount_type' => $i->item_discount_type,
                     'item_total' => $i->item_total_price,
-                    'bundle' => $bundle_items
+                    'bundle' => $bundle_items,
+                    // for price rules
+					'quantity' => $i->item_qty,
+					'category_id' => $i->f_cat_id,
+					'subtotal' => $i->item_total_price
                 ];
+            }
+
+            $price_rule = $this->getPriceRules($items_arr, $o->order_date);
+            $price_rule = isset($price_rule['price_rule']['Any']) ? $price_rule['price_rule']['Any'] : [];
+            $gt_discount = $o->discount_amount;
+            if($price_rule){
+                switch($price_rule['discount_type']){
+                    case 'Percentage':
+                        $pr_discount_amount = collect($items_arr)->sum('subtotal') * ($price_rule['discount_rate'] / 100);
+                        break;
+                    default:
+                        $pr_discount_amount = $price_rule['discount_rate'] < $o->order_subtotal ? $price_rule['discount_rate'] : 0;
+                        break;
+                }
+
+                $gt_discount = $o->discount_amount > $pr_discount_amount ? $o->discount_amount - $pr_discount_amount : $o->discount_amount;
             }
 
             $shipping_discount = DB::table('fumaco_on_sale as p')
@@ -106,7 +160,7 @@ class OrderController extends Controller
                 'ship_postal' => $o->order_ship_postal,
                 'shipping_name' => $o->order_shipping,
                 'shipping_amount' => $o->order_shipping_amount,
-                'grand_total' => ($o->order_shipping_amount + ($o->order_subtotal - $o->discount_amount)),
+                'grand_total' => $o->grand_total ? $o->grand_total : ($o->order_shipping_amount + $o->order_subtotal) - $gt_discount,
                 'status' => $o->order_status,
                 'estimated_delivery_date' => $o->estimated_delivery_date,
                 'payment_id' => $o->payment_id,
@@ -126,180 +180,12 @@ class OrderController extends Controller
                 'order_status' => $order_status,
                 'deposit_slip_image' => $o->deposit_slip_image,
                 'payment_status' => $o->payment_status,
+                'price_rule' => $price_rule
                 // 'erp_sales_order' => $o->erp_sales_order
             ];
         }
 
-        return view('backend.orders.order_list', compact('orders_arr', 'orders'));
-    }
-
-    public function cancelledOrders(Request $request){
-        $search_id = ($request->search) ? $request->search : '';
-        $orders = DB::table('fumaco_order')->where('order_number', 'LIKE', '%'.$search_id.'%')->where('order_status', 'Cancelled')->orderBy('id', 'desc')->paginate(10);
-
-        $order_items = DB::table('fumaco_order_items')->whereIn('order_number', collect($orders->items())->pluck('order_number'))->get();
-        $item_codes = collect($order_items)->pluck('item_code');
-        $order_items = collect($order_items)->groupBy('order_number');
-
-        $orders_arr = [];
-
-        $item_images = DB::table('fumaco_items_image_v1')->whereIn('idcode', $item_codes)->get();
-        $item_image = collect($item_images)->groupBy('idcode');
-
-        $voucher_details = DB::table('fumaco_voucher')->whereIn('code', collect($orders->items())->pluck('voucher_code')->unique())->get();
-        $voucher_details = collect($voucher_details)->groupBy('code');
-
-        $orders_arr = [];
-
-        foreach($orders as $o){
-            $items_arr = [];
-            $items = isset($order_items[$o->order_number]) ? $order_items[$o->order_number] : [];
-            foreach($items as $i){
-                $items_arr[] = [
-                    'image' => isset($item_image[$i->item_code]) ? $item_image[$i->item_code][0]->imgprimayx : null,
-                    'orig' => isset($item_image[$i->item_code]) ? $item_image[$i->item_code][0]->imgoriginalx : null,
-                    'item_code' => $i->item_code,
-                    'item_name' => $i->item_name,
-                    'item_qty' => $i->item_qty,
-                    'item_price' => $i->item_price,
-                    'item_discount' => $i->item_discount,
-                    'item_total' => $i->item_total_price,
-                ];
-            }
-
-            $shipping_discount = DB::table('fumaco_on_sale as p')
-                ->join('fumaco_on_sale_shipping_service as c', 'p.id', 'c.sale_id')->where('c.shipping_service', $o->order_shipping)
-                ->where('status', 1)->where('p.apply_discount_to', 'Per Shipping Service')->whereDate('p.start_date', '<=', $o->order_date)->whereDate('p.end_date', '>=', $o->order_date)
-                ->first();
-
-            $orders_arr[] = [
-                'order_no' => $o->order_number,
-                'first_name' => $o->order_name,
-                'last_name' => $o->order_lastname,
-                'bill_contact_person' => $o->order_contactperson,
-                'ship_contact_person' => $o->order_ship_contactperson,
-                'email' => $o->order_email,
-                'date' => Carbon::parse($o->order_update)->format('M d, Y - h:m A'),
-                'ordered_items' => $items_arr,
-                'order_tracker_code' => $o->tracker_code,
-                'payment_method' => $o->order_payment_method,
-                'cust_id' => $o->order_account,
-                'bill_address1' => $o->order_bill_address1,
-                'bill_address2' => $o->order_bill_address2,
-                'bill_province' => $o->order_bill_prov,
-                'bill_city' => $o->order_bill_city,
-                'bill_brgy' => $o->order_bill_brgy,
-                'bill_country' => $o->order_bill_country,
-                'bill_postal' => $o->order_bill_postal,
-                'ship_address1' => $o->order_ship_address1,
-                'ship_address2' => $o->order_ship_address2,
-                'ship_province' => $o->order_ship_prov,
-                'ship_city' => $o->order_ship_city,
-                'ship_brgy' => $o->order_ship_brgy,
-                'ship_country' => $o->order_ship_country,
-                'ship_postal' => $o->order_ship_postal,
-                'shipping_name' => $o->order_shipping,
-                'shipping_amount' => $o->order_shipping_amount,
-                'grand_total' => ($o->order_shipping_amount + $o->order_subtotal),
-                'status' => $o->order_status,
-                'estimated_delivery_date' => $o->estimated_delivery_date,
-                'voucher_code' => $o->voucher_code,
-                'voucher_details' => isset($voucher_details[$o->voucher_code]) ? $voucher_details[$o->voucher_code][0] : [],
-                'shipping_discount' => $shipping_discount ? $shipping_discount : [],
-                'discount_amount' => $o->discount_amount,
-                'payment_id' => $o->payment_id,
-                'payment_method' => $o->order_payment_method,
-                'subtotal' => $o->order_subtotal,
-                'date_cancelled' => Carbon::parse($o->date_cancelled)->format('M d, Y - h:m A')
-            ];
-        }
-
-        return view('backend.orders.cancelled_orders', compact('orders_arr', 'orders'));
-    }
-
-    public function deliveredOrders(Request $request){
-        $search_id = ($request->search) ? $request->search : '';
-        $orders = DB::table('fumaco_order')->where('order_number', 'LIKE', '%'.$search_id.'%')
-            ->whereNotIn('order_status', ['Order Placed', 'Order Confirmed', 'Out for Delivery', 'Ready for Pickup', 'Cancelled'])
-            ->orderBy('id', 'desc')->paginate(10);
-
-        $order_items = DB::table('fumaco_order_items')->whereIn('order_number', collect($orders->items())->pluck('order_number'))->get();
-        $item_codes = collect($order_items)->pluck('item_code');
-        $order_items = collect($order_items)->groupBy('order_number');
-
-        $orders_arr = [];
-
-        $item_images = DB::table('fumaco_items_image_v1')->whereIn('idcode', $item_codes)->get();
-        $item_image = collect($item_images)->groupBy('idcode');
-
-        $voucher_details = DB::table('fumaco_voucher')->whereIn('code', collect($orders->items())->pluck('voucher_code')->unique())->get();
-        $voucher_details = collect($voucher_details)->groupBy('code');
-
-        $orders_arr = [];
-
-        foreach($orders as $o){
-            $items_arr = [];
-            $items = isset($order_items[$o->order_number]) ? $order_items[$o->order_number] : [];
-            foreach($items as $i){
-                $items_arr[] = [
-                    'image' => isset($item_image[$i->item_code]) ? $item_image[$i->item_code][0]->imgprimayx : null,
-                    'orig' => isset($item_image[$i->item_code]) ? $item_image[$i->item_code][0]->imgoriginalx : null,
-                    'item_code' => $i->item_code,
-                    'item_name' => $i->item_name,
-                    'item_qty' => $i->item_qty,
-                    'item_price' => $i->item_price,
-                    'item_discount' => $i->item_discount,
-                    'item_total' => $i->item_total_price,
-                ];
-            }
-
-            $shipping_discount = DB::table('fumaco_on_sale as p')
-                ->join('fumaco_on_sale_shipping_service as c', 'p.id', 'c.sale_id')->where('c.shipping_service', $o->order_shipping)
-                ->where('status', 1)->where('p.apply_discount_to', 'Per Shipping Service')->whereDate('p.start_date', '<=', $o->order_date)->whereDate('p.end_date', '>=', $o->order_date)
-                ->first();
-
-            $orders_arr[] = [
-                'order_no' => $o->order_number,
-                'first_name' => $o->order_name,
-                'last_name' => $o->order_lastname,
-                'bill_contact_person' => $o->order_contactperson,
-                'ship_contact_person' => $o->order_ship_contactperson,
-                'email' => $o->order_email,
-                'date' => Carbon::parse($o->order_update)->format('M d, Y - h:m A'),
-                'ordered_items' => $items_arr,
-                'order_tracker_code' => $o->tracker_code,
-                'payment_method' => $o->order_payment_method,
-                'cust_id' => $o->order_account,
-                'bill_address1' => $o->order_bill_address1,
-                'bill_address2' => $o->order_bill_address2,
-                'bill_province' => $o->order_bill_prov,
-                'bill_city' => $o->order_bill_city,
-                'bill_brgy' => $o->order_bill_brgy,
-                'bill_country' => $o->order_bill_country,
-                'bill_postal' => $o->order_bill_postal,
-                'ship_address1' => $o->order_ship_address1,
-                'ship_address2' => $o->order_ship_address2,
-                'ship_province' => $o->order_ship_prov,
-                'ship_city' => $o->order_ship_city,
-                'ship_brgy' => $o->order_ship_brgy,
-                'ship_country' => $o->order_ship_country,
-                'ship_postal' => $o->order_ship_postal,
-                'shipping_name' => $o->order_shipping,
-                'shipping_amount' => $o->order_shipping_amount,
-                'grand_total' => ($o->order_shipping_amount + $o->order_subtotal),
-                'status' => $o->order_status,
-                'estimated_delivery_date' => $o->estimated_delivery_date,
-                'voucher_code' => $o->voucher_code,
-                'voucher_details' => isset($voucher_details[$o->voucher_code]) ? $voucher_details[$o->voucher_code][0] : [],
-                'shipping_discount' => $shipping_discount ? $shipping_discount : [],
-                'discount_amount' => $o->discount_amount,
-                'date_delivered' => $o->date_delivered,
-                'payment_id' => $o->payment_id,
-                'payment_method' => $o->order_payment_method,
-                'subtotal' => $o->order_subtotal
-            ];
-        }
-        return view('backend.orders.delivered_orders', compact('orders_arr', 'orders'));
+        return view('backend.orders.order_list', compact('orders_arr', 'orders', 'list'));
     }
 
     public function statusUpdate(Request $request){
@@ -315,7 +201,11 @@ class OrderController extends Controller
                 $order_status_check = DB::table('order_status')->where('status', $status)->first();
 
                 $order_details = DB::table('fumaco_order')->where('order_number', $request->order_number)->first();
-                $ordered_items = DB::table('fumaco_order_items')->where('order_number', $request->order_number)->get();
+                $ordered_items = DB::table('fumaco_order_items as order_items')
+                    ->join('fumaco_items as items', 'items.f_idcode', 'order_items.item_code')
+                    ->where('order_number', $request->order_number)
+                    ->select('order_items.*', 'items.f_cat_id')
+                    ->get();
                 
                 if($order_status_check){
                     if($order_status_check->update_stocks == 1){ // check if stocks needs to update
@@ -376,11 +266,20 @@ class OrderController extends Controller
                         'item_name' => $row->item_name,
                         'price' => $row->item_price,
                         'discount' => $row->item_discount,
+                        'discount_type' => $row->item_discount_type,
                         'qty' => $row->item_qty,
                         'amount' => $row->item_total_price,
-                        'image' => ($image) ? $image->imgprimayx : null
+                        'image' => ($image) ? $image->imgprimayx : null,
+
+                        // for price rule
+                        'quantity' => $row->item_qty,
+                        'category_id' => $row->f_cat_id,
+                        'subtotal' => $row->item_total_price
                     ];
                 }
+
+                $price_rule = $this->getPriceRules($items, $order_details->order_date);
+                $price_rule = isset($price_rule['price_rule']['Any']) ? $price_rule['price_rule']['Any'] : [];
 
                 $total_amount = $order_details->amount_paid;
                 
@@ -401,7 +300,8 @@ class OrderController extends Controller
                     'order_details' => $order_details,
                     'items' => $items,
                     'shipping_discount' =>  $shipping_discount,
-                    'voucher_details' => $voucher_details
+                    'voucher_details' => $voucher_details,
+                    'price_rule' => $price_rule
                 ];
 
                 if ($status == 'Order Confirmed'){
@@ -439,7 +339,26 @@ class OrderController extends Controller
                         $min_leadtime = collect($leadtime_arr)->pluck('min_leadtime')->max();
                         $max_leadtime = collect($leadtime_arr)->pluck('max_leadtime')->max();
 
-                        $total_amount = ($order_details->order_subtotal + $order_details->order_shipping_amount) - $order_details->discount_amount;
+                        $gt_discount = $order_details->discount_amount;
+
+                        if($price_rule){
+                            switch ($price_rule['discount_type']) {
+                                case 'Percentage':
+                                    $pr_discount = collect($ordered_items)->sum('item_total_price') * ($price_rule['discount_rate'] / 100);
+                                    break;
+                                default:
+                                    $pr_discount = $price_rule['discount_rate'] < collect($ordered_items)->sum('item_total_price') ? $price_rule['discount_rate'] : 0;
+                                    break;
+                            }
+
+                            $gt_discount = $order_details->discount_amount > $pr_discount ? $order_details->discount_amount - $pr_discount : $order_details->discount_amount;
+                        }
+
+                        $total_amount = $order_details->grand_total;
+                        if(!$order_details->grand_total){
+                            $total_amount = ($order_details->order_subtotal + $order_details->order_shipping_amount) - $gt_discount;
+                        }
+
                         $orders_arr['deposit_slip_token_used'] = 1;
 
                         $message = 'Hi '.$order_details->order_name . ' ' . $order_details->order_lastname.' your order '.$request->order_number.' with an amount of P '.number_format($total_amount, 2).' has been received, please allow '.$min_leadtime.' to '.$max_leadtime.' business days to process your order. Click ' . $sms_short_url . ' to track your order.';
@@ -456,10 +375,16 @@ class OrderController extends Controller
                         $confirmed_bank_deposit_email = $order_details->order_email;
                         $customer_name = $order_details->order_name . ' ' . $order_details->order_lastname;
 
-                        Mail::send('emails.order_confirmed_bank_deposit', $order, function($message) use($confirmed_bank_deposit_email){
-                            $message->to(trim($confirmed_bank_deposit_email));
-                            $message->subject('Order Confirmed - FUMACO');
-                        });
+                        try {
+                            Mail::send('emails.order_confirmed_bank_deposit', $order, function($message) use($confirmed_bank_deposit_email){
+                                $message->to(trim($confirmed_bank_deposit_email));
+                                $message->subject('Order Confirmed - FUMACO');
+                            });
+                        } catch (\Swift_TransportException  $e) {
+                            DB::rollback();
+                            
+                            return redirect()->back()->with('error', 'An error occured. Please try again.');
+                        }
 
                         if(Mail::failures()){
                             DB::rollback();
@@ -598,6 +523,7 @@ class OrderController extends Controller
                 DB::table('fumaco_order')->where('order_number', $request->order_number)->update($orders_arr);
                 DB::table('track_order')->insert($track_order);
 
+
                 DB::commit();
             }
 
@@ -640,11 +566,19 @@ class OrderController extends Controller
                     'item_name' => $row->item_name,
                     'price' => $row->item_price,
                     'discount' => $row->item_discount,
+                    'discount_type' => $row->item_discount_type,
                     'qty' => $row->item_qty,
                     'amount' => $row->item_total_price,
                     'image' => isset($image[$row->item_code]) ? $image[$row->item_code][0]->imgprimayx : null
                 ];
             }
+
+            $voucher_details = DB::table('fumaco_voucher')->where('code', $order_details->voucher_code)->first();
+
+            $shipping_discount = DB::table('fumaco_on_sale as p')
+                ->join('fumaco_on_sale_shipping_service as c', 'p.id', 'c.sale_id')->where('c.shipping_service', $order_details->order_shipping)
+                ->where('status', 1)->where('p.apply_discount_to', 'Per Shipping Service')->whereDate('p.start_date', '<=', $order_details->order_date)->whereDate('p.end_date', '>=', $order_details->order_date)
+                ->first();
 
             $store_address = null;
             if($order_details->order_shipping == 'Store Pickup') {
@@ -659,7 +593,9 @@ class OrderController extends Controller
                 'items' => $items,
                 'store_address' => $store_address,
                 'bank_accounts' => $bank_accounts,
-                'new_token' => $new_token
+                'new_token' => $new_token,
+                'shipping_discount' => $shipping_discount,
+                'voucher_details' => $voucher_details
             ];
 
             $sms_api = DB::table('api_setup')->where('type', 'sms_gateway_api')->first();

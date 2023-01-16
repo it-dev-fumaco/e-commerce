@@ -11,6 +11,7 @@ use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Laravel\Socialite\Facades\Socialite;
 use App\Models\User;
 use Carbon\Carbon;
+use Session;
 
 class LoginController extends Controller
 {
@@ -66,7 +67,7 @@ class LoginController extends Controller
             $user_check = $this->checkEmail('Website Account');
             $soc_used = collect($user_check)->implode(', ');
 
-            if ($request->has('summary')){
+            if (isset($request->checkout)){
                 return redirect('/checkout/summary');
             }
             
@@ -122,7 +123,10 @@ class LoginController extends Controller
         return redirect('/');
     }
 
-    public function loginUsingGoogle() {
+    public function loginUsingGoogle(Request $request) {
+        if(isset($request->checkout)){
+            Session::put('checkout_login', 1);
+        }
         return Socialite::driver('google')->redirect();
     }
 
@@ -131,6 +135,12 @@ class LoginController extends Controller
             $user = Socialite::driver('google')->user();
 
             $finduser = User::where('google_id', $user->id)->orWhere('username', $user->email)->first();
+
+            $checkout_login_check = Session::get('checkout_login');
+            Session::forget('checkout_login');
+
+            $verified = 0;
+
             if($finduser){
                 Auth::loginUsingId($finduser->id);
 
@@ -144,7 +154,7 @@ class LoginController extends Controller
                 $user_check = $this->checkEmail('Google');
                 $soc_used = collect($user_check)->implode(', ');
 
-                return redirect('/')->with('accounts', $soc_used);
+                $verified = 1;
             }else{
                 $newUser = new User;
                 $newUser->username = trim($user->email);
@@ -164,7 +174,15 @@ class LoginController extends Controller
                 $user_check = $this->checkEmail('Google');
                 $soc_used = collect($user_check)->implode(', ');
 
-                return redirect('/')->with('accounts', $soc_used);
+                $verified = 1;
+            }
+
+            if($verified){
+                if($checkout_login_check){
+                    return redirect('/checkout/summary');
+                }else{
+                    return redirect('/')->with('accounts', $soc_used);
+                }
             }
         } catch (\Throwable $th) {
             return redirect('/login')->with('error', 'Your email address or password is incorrect, please try again');
@@ -172,6 +190,9 @@ class LoginController extends Controller
     }
 
     public function loginUsingLinkedin() {
+        if(isset($request->checkout)){
+            Session::put('checkout_login', 1);
+        }
         return Socialite::driver('linkedin')->redirect();
     }
 
@@ -179,6 +200,12 @@ class LoginController extends Controller
         try {
             $user = Socialite::driver('linkedin')->user();
             $finduser = User::where('linkedin_id', $user->id)->orWhere('username', $user->email)->first();
+
+            $checkout_login_check = Session::get('checkout_login');
+            Session::forget('checkout_login');
+
+            $verified = 0;
+
             if($finduser){
                 Auth::loginUsingId($finduser->id);
 
@@ -192,7 +219,7 @@ class LoginController extends Controller
                 $user_check = $this->checkEmail('LinkedIn');
                 $soc_used = collect($user_check)->implode(', ');
 
-                return redirect('/')->with('accounts', $soc_used);
+                $verified = 1;
             }else{
                 $newUser = new User;
                 $newUser->username = trim($user->email);
@@ -212,7 +239,15 @@ class LoginController extends Controller
                 $user_check = $this->checkEmail('LinkedIn');
                 $soc_used = collect($user_check)->implode(', ');
 
-                return redirect('/')->with('accounts', $soc_used);
+                $verified = 1;
+            }
+
+            if($verified){
+                if($checkout_login_check){
+                    return redirect('/checkout/summary');
+                }else{
+                    return redirect('/')->with('accounts', $soc_used);
+                }
             }
         } catch (\Throwable $th) {
             return redirect('/login')->with('error', 'Your email address or password is incorrect, please try again');

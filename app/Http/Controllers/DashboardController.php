@@ -14,29 +14,46 @@ use App\Http\Traits\ProductTrait;
 
 class DashboardController extends Controller
 {
+	use ProductTrait;
+
 	public function verify(){
 		$user_id = Auth::user()->id;
 		return view('auth.verify_otp', compact('user_id'));
 	}
 
-	public function resendOTP(){
+	public function resendOTP(Request $request){
 		$otp = rand(111111, 999999);
 		$api = DB::table('api_setup')->where('type', 'sms_gateway_api')->first();
 		$phone = Auth::user()->mobile_number[0] == '0' ? '63'.substr(Auth::user()->mobile_number, 1) : Auth::user()->mobile_number;
 
-		$sms = Http::asForm()->withHeaders([
-			'Accept' => 'application/json',
-			'Content-Type' => 'application/x-www-form-urlencoded',
-		])->post($api->base_url, [
-			'api_key' => $api->api_key,
-			'api_secret' => $api->api_secret_key,
-			'from' => 'FUMACO',
-			'to' => preg_replace("/[^0-9]/", "", $phone),
-			'text' => 'TWO-FACTOR AUTHENTICATION: Your One-Time PIN is '.$otp.' to login in Fumaco Website, valid only within 10 mins. For any help, please contact us at it@fumaco.com'
-		]);
+		if($request->channel == 'sms'){
+			$sms = Http::asForm()->withHeaders([
+				'Accept' => 'application/json',
+				'Content-Type' => 'application/x-www-form-urlencoded',
+			])->post($api->base_url, [
+				'api_key' => $api->api_key,
+				'api_secret' => $api->api_secret_key,
+				'from' => 'FUMACO',
+				'to' => preg_replace("/[^0-9]/", "", $phone),
+				'text' => 'TWO-FACTOR AUTHENTICATION: Your One-Time PIN is '.$otp.' to login in Fumaco Website, valid only within 10 mins. For any help, please contact us at it@fumaco.com'
+			]);
 
-		$sms_response = json_decode($sms->getBody(), true);
+			$sms_response = json_decode($sms->getBody(), true);
 
+			if(isset($sms_response['error'])){
+				return response()->json(['status' => 0]);
+			}
+		}else{
+			try {
+				Mail::send('emails.admin_otp', ['otp' => $otp], function($message) {
+					$message->to(Auth::user()->username);
+					$message->subject('TWO-FACTOR Authentication');
+				});
+			} catch (\Swift_TransportException  $e) {
+				return response()->json(['status' => 0]);
+			}
+		}
+		
 		$details = [
 			'otp' => $otp,
 			'otp_time_sent' => Carbon::now()
@@ -44,8 +61,7 @@ class DashboardController extends Controller
 
 		DB::table('fumaco_admin_user')->where('id', Auth::user()->id)->update($details);
 
-		$status = isset($sms_response['error']) ? 0 : 1;
-		return response()->json(['status' => $status]);
+		return response()->json(['status' => 1]);
 	}
 
 	public function verifyOTP(Request $request){
@@ -279,8 +295,10 @@ class DashboardController extends Controller
 		$guest_items = DB::table('fumaco_cart as cart')
 			->join('fumaco_items as items', 'cart.item_code', 'items.f_idcode')
 			->whereIn('cart.transaction_id', $abandoned_order_numbers)
-			->select('cart.*', 'items.slug', 'items.f_name_name as item_name', 'items.f_onsale', 'items.f_price', 'items.f_original_price')
+			->select('cart.*', 'items.slug', 'items.f_name_name as item_name', 'items.f_default_price')
 			->get();
+
+		$on_sale_items = $this->onSaleItems(collect($guest_items)->pluck('item_code'));
 
 		$abandoned_items = collect($items)->groupBy('order_number');
 		$guest_abandoned_items = collect($guest_items)->groupBy('transaction_id');
@@ -292,13 +310,19 @@ class DashboardController extends Controller
 
 			if(isset($guest_abandoned_items[$abandoned->order_tracker_code])){
 				foreach($guest_abandoned_items[$abandoned->order_tracker_code] as $items){
+					$f_onsale = false;
+					$f_item_price = $items->f_default_price;
+					if (array_key_exists($items->item_code, $on_sale_items)) {
+						$f_onsale = $on_sale_items[$items->item_code]['on_sale'];
+						$f_item_price = $on_sale_items[$items->item_code]['discounted_price'];
+					}
 					$items_arr[] = [
 						'item_code' => $items->item_code,
 						'item_name' => $items->item_name,
 						'slug' => $items->slug,
 						'qty' => $items->qty,
-						'item_price' => $items->f_onsale == 1 ? $items->f_price : $items->f_original_price,
-						'total_price' => $items->f_onsale == 1 ? $items->qty * $items->f_price : $items->qty * $items->f_original_price
+						'item_price' => $f_item_price,
+						'total_price' => $items->qty * $f_item_price
 					];
 				}
 			}else if(isset($abandoned_items[$abandoned->order_tracker_code])){
@@ -419,18 +443,58 @@ class DashboardController extends Controller
 		}
 
 		if($username){
+			$sale = DB::table('fumaco_on_sale')
+				->whereDate('start_date', '<=', Carbon::now()->toDateString())
+				->whereDate('end_date', '>=', Carbon::today()->toDateString())
+				->where('status', 1)->where('apply_discount_to', 'All Items')
+				->select('discount_type', 'discount_rate')->first();
+
 			$item_details = DB::table('fumaco_items')->whereIn('f_idcode', $item_codes)->get();
 			$item_detail = collect($item_details)->groupBy('f_idcode');
 
 			$item_images = DB::table('fumaco_items_image_v1')->whereIn('idcode', $item_codes)->get();
 			$image = collect($item_images)->groupBy('idcode');
 
+			$clearance_sale_items = $this->isIncludedInClearanceSale(array_keys(collect($item_details)->toArray()));
+
+			$on_sale_items = $this->onSaleItems(array_keys(collect($item_details)->toArray()));
+
+			$sale_per_category = [];
+			if (!$on_sale_items && !Auth::check()) {
+				$item_categories = array_column($item_details->toArray(), 'f_cat_id');
+				$sale_per_category = $this->getSalePerItemCategory($item_categories);
+			}
+
 			$cart_arr = [];
 			foreach($abandon_details as $cart){
 				$price = 0;
-				if(isset($item_detail[$cart->item_code])){
-					$price = $item_detail[$cart->item_code][0]->f_discount_trigger == 1 ? $item_detail[$cart->item_code][0]->f_price : $item_detail[$cart->item_code][0]->f_original_price;
+				$on_sale = false;
+				$discount_type = $discount_rate = null;
+				if (array_key_exists($cart->item_code, $on_sale_items)) {
+					$on_sale = $on_sale_items[$cart->item_code]['on_sale'];
+					$discount_type = $on_sale_items[$cart->item_code]['discount_type'];
+					$discount_rate = $on_sale_items[$cart->item_code]['discount_rate'];
 				}
+
+				$item_detail = [
+					'default_price' => isset($item_detail[$cart->item_code]) ? $item_detail[$cart->item_code][0]->f_default_price : 0,
+					'category_id' => isset($item_detail[$cart->item_code]) ? $item_detail[$cart->item_code][0]->f_cat_id : null,
+					'item_code' => $cart->item_code,
+					'discount_type' => $discount_type,
+					'discount_rate' => $discount_rate,
+					'stock_uom' => isset($item_detail[$cart->item_code]) ? $item_detail[$cart->item_code][0]->f_stock_uom : null,
+					'on_sale' => $on_sale
+				];
+
+				$is_on_clearance_sale = false;
+				if (array_key_exists($cart->item_code, $clearance_sale_items)) {
+					$item_detail['discount_type'] = $clearance_sale_items[$cart->item_code][0]->discount_type;
+					$item_detail['discount_rate'] = $clearance_sale_items[$cart->item_code][0]->discount_rate;
+					$is_on_clearance_sale = true;
+				}
+				$item_price_data = $this->getItemPriceAndDiscount($item_detail, $sale, $sale_per_category, $is_on_clearance_sale);
+
+				$price = $item_price_data['discounted_price'];
 
 				$cart_arr[] = [
 					'item_code' => $cart->item_code,

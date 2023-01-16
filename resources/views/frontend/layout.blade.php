@@ -39,7 +39,7 @@
 
     @yield('style')
 
-    @if (!in_array($activePage, ['homepage']))
+    @if (!in_array($activePage, ['homepage', 'product_page']))
       <link rel="stylesheet" href="{{ asset('assets/minified-css/jquery-ui.min.css') }}">
     @endif
 
@@ -58,12 +58,14 @@
       .brand-slide .slick-list {margin: 0 -60px !important;}
       .brand-slide .slick-next{right:-95px!important}
       .brand-slide .slick-prev{left:-95px!important}
+      #notify-me-alert{font-size: 12pt;}
       @media (max-width: 1199.98px) {
         .products-card-img{min-height:200px!important}
         .brand-slide .slick-next, .slick-next{right:-45px!important}
         .brand-slide .slick-prev, .slick-prev{left:-45px!important}
         .brand-slide .slick-slide {margin: 0 10px !important;}
         .brand-slide .slick-list {margin: 0 -10px !important;}
+        #notify-me-alert{font-size: 9pt;}
       }
       @media (max-width: 575.98px){ /* normal mobile */
         .products-card-img{min-height:175px!important}
@@ -74,12 +76,28 @@
         .brand-slide .slick-list {margin: 0 -10px !important;}
         #product-category-dropdown{max-height: 45vh !important;}
         .category-menu{font-size: 9pt !important;}
+        #notify-me-alert{font-size: 9pt;}
       }
     	@media (max-width: 369.98px){ /* extra small screens (J2, etc.) */
         .mob-srch{padding-top: 10px;}
+        #notify-me-alert{font-size: 9pt;}
       }
-
     </style>
+    @if (in_array($activePage, ['product_page']))
+    <style>
+      .card {
+        position: relative !important;
+        display: flex !important;
+        flex-direction: column !important;
+        min-width: 0 !important;
+        word-wrap: break-word !important;
+        background-color: #fff !important;
+        background-clip: border-box !important;
+        border-radius: .25rem !important;
+        padding: 10px !important;
+      }
+    </style>
+    @endif
 
     @if ($activePage != 'error_page')
     <!-- Google Tag Manager -->
@@ -246,6 +264,11 @@
               <li class="nav-item">
                 <a class="nav-link" href="/contact">CONTACT</a>
               </li>
+              @if (cache('has_clearance_sale'))
+              <li class="nav-item text-left text-md-center">
+                <a class="nav-link" href="/clearance_sale">CLEARANCE</a>
+              </li>
+              @endif
             </ul>
             <form class="d-none d-lg-block search-bar" id="desk-search-bar-form" action="/" method="GET" autocomplete="off">
               <div class="input-group mb-0 searchbar search-bar">
@@ -353,14 +376,13 @@
 
       </nav>
       </header>
-
   @yield('content')
   <footer>
     @include('cookieConsent::index')
     <main style="background-color:#0C0C0C;">
       <div class="col-12 col-xl-10 mx-auto marketing">
         <div class="row p-4">
-          <div class="col-12 col-md-3 col-xl-2">
+          <div class="col-12 col-md-4 col-lg-3 col-xl-2">
             <picture>
               <source srcset="{{ asset('/assets/site-img/logo-sm.webp') }}" type="image/webp">
               <source srcset="{{ asset('/assets/site-img/logo-sm.png') }}" type="image/jpeg">
@@ -374,7 +396,7 @@
             </div>
           </div>
 
-          <div class="col-12 col-md-2 mt-4 mt-md-2" style="text-align: left !important;">
+          <div class="col-12 col-md-4 col-lg-2 mt-4 mt-md-2" style="text-align: left !important;">
             <h6 class="footer1st font-weight-bold" style="color:#ffffff !important; font-weight: 500 !important;">ABOUT FUMACO</h6>
             <table class="table" style="border-style: unset !important;">
               <tbody style="font-size: 12px; color: #ffffff; border-style: unset !important;">
@@ -391,14 +413,14 @@
             </table>
           </div>
 
-          <div class="col-12 col-md-3 mt-4 mt-md-2" style="text-align: left !important;">
+          <div class="col-12 col-md-4 col-lg-3 mt-4 mt-md-2" style="text-align: left !important;">
             <h6 class="footer1st font-weight-bold" style="color:#ffffff !important; font-weight: 500 !important;">PRODUCTS</h6>
             <table class="table" style="border-style: unset !important;">
               <tbody style="font-size: 12px; color: #ffffff; border-style: unset !important;" id="product-category-footer"></tbody>
             </table>
           </div>
 
-          <div class="col-12 col-md-4 col-xl-5 mt-md-2">
+          <div class="col-12 col-lg-4 col-xl-5 mt-lg-2">
             <h6 class="footer1st d-md-none" style="color:#ffffff !important; text-align: left; font-weight: 500 !important">SUBSCRIBE TO NEWSLETTER</h6>
             <h6 class="footer1st d-none d-md-block" style="color:#ffffff !important; text-align: right; font-weight: 500 !important">SUBSCRIBE TO NEWSLETTER</h6>
             <form action="/subscribe" method="POST">
@@ -415,7 +437,7 @@
               </div>
             </form>
 
-            <div class="col-md-12 mt-4" style="text-align: left !important;">
+            <div class="col-lg-12 mt-4" style="text-align: left !important;">
               <h6 class="footer1st" style="color:#ffffff !important; font-weight: 500 !important;">WE ACCEPT</h6>
               <div class="row" style="padding-left:1% !important">
                 @php
@@ -447,6 +469,9 @@
       </span>
     </div>
   </footer>
+  <div class="alert alert-success alert-dismissible mx-auto col-11 col-md-5 text-center fade" id="notify-me-alert" role="alert" style="position: absolute; top: 20px; left: 50%; display: inline-block; -webkit-transform: translateX(-50%); transform: translateX(-50%);">
+    We will notify you via email once stock is available
+  </div>
   <script src="https://kit.fontawesome.com/ec0415ab92.js"></script> 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> 
   @if($activePage == 'contact')
@@ -463,12 +488,21 @@
     });
   </script> 
   @endif
-  {{-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script> --}}
   <script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.4/Chart.bundle.min.js' defer></script>
   <script src="{{ asset('/assets/dist/js/bootstrap.bundle.min.js') }}"></script>
   @if (!in_array($activePage, ['homepage', 'product_page']))
   <script src="{{ asset('assets/minified-js/jquery-3.6.0.min.js') }}"></script>
   <script src="{{ asset('assets/minified-js/jquery-ui.min.js') }}"></script>
+  @endif
+  @if (in_array($activePage, ['product_page']))
+  <script type="text/javascript" src="{{ asset('/assets/loading.js') }}"></script>
+  <script src="{{ asset('/item/js/foundation.min.js') }}"></script>
+  <script src="{{ asset('/item/js/setup.js') }}"></script>
+  <script type="text/javascript" src="{{ asset('/item/dist/xzoom.min.js') }}"></script>
+  <script type="text/javascript" src="{{ asset('/item/hammer.js/1.0.5/jquery.hammer.min.js') }}"></script>
+  <script type="text/javascript" src="{{ asset('/item/fancybox/source/jquery.fancybox.js') }}"></script>
+  <script type="text/javascript" src="{{ asset('/item/magnific-popup/js/magnific-popup.js') }}"></script>
+  <script src="{{ asset('/slick/slick.js') }}" type="text/javascript" charset="utf-8"></script>
   @endif
   <script>
     $(document).ready(function() {
@@ -498,7 +532,7 @@
           $("#cookieConsent").fadeIn(200);
       }, 2000);
 
-      @if (in_array($activePage, ['product_page', 'homepage', 'cart']))
+      @if (in_array($activePage, ['homepage', 'cart']))
       $(".regular").slick({
         dots: true,
         customPaging: function(slider, i) {
@@ -555,7 +589,7 @@
         ]
       });
       @endif
-
+      $('.alert').alert();
       // set product category dropdown in navbar and links in dooter
       function productCategories() {
         $('#product-category-dropdown').empty();
@@ -706,7 +740,7 @@
         }
       });
 
-      @if (in_array($activePage, ['homepage', 'product_page', 'search_result', 'product_list', 'cart']))
+      @if (in_array($activePage, ['homepage', 'product_page', 'search_result', 'product_list', 'cart', 'clearance_sale']))
         $(document).on('click', '.add-to-cart', function(e){
           e.preventDefault();
           var btn = $(this);
@@ -782,6 +816,12 @@
               },
               success: function (response) {
                 btn.html(btn_fill);
+                $('#notify-me-alert').addClass('show');
+                $('#notify-me-alert').css('z-index', 1500);
+                setTimeout(function(){
+                    $('#notify-me-alert').removeClass('show');
+                    $('#notify-me-alert').css('z-index', 0);
+                  }, 2000);
               }
             });
           }else{

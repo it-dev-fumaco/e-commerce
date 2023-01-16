@@ -75,15 +75,13 @@
                                                 <input type="text" class="form-control" name="minimum_spend" value="{{ $coupon->minimum_spend }}" placeholder="Minimum Spend" required>
                                             </div>
                                         </div>
-                                        <div id="fixed_amount" class="row">
-                                            <br>&nbsp;
-                                            <div class="col-12">
+                                        <div id="fixed_amount" class="row mt-3">
+                                            <div class="col-6">
                                                 <label>Amount *</label>
                                                 <input type="text" class="form-control" id="discount_amount" value="{{ $coupon->discount_type == 'Fixed Amount' ? $coupon->discount_rate : ''  }}" name="discount_amount" placeholder="Amount">
                                             </div>
                                         </div>
-                                        <div id="percentage" class="row">
-                                            <div class="col-12"><br/></div>
+                                        <div id="percentage" class="row mt-3">
                                             <div class="col-6">
                                                 <label>Percentage *</label>
                                                 <input type="text" class="form-control" id="discount_percentage" value="{{ $coupon->discount_type == 'By Percentage' ? $coupon->discount_rate : ''  }}" name="discount_percentage" placeholder="Percentage">
@@ -97,15 +95,20 @@
                                         <h4>Validity and Usage</h4>
                                         <hr/>
                                         <div class="row">
-                                            <div class="col-6">
+                                            <div class="col-4">
                                                 <label><input type="checkbox" name="require_validity" id="require_validity" {{ $coupon->validity_date_start ? 'checked' : '' }}> Set Validity</label>
                                                 <input type="text" class="form-control set_duration" id="daterange" name="validity" disabled/>
                                             </div>
 
-                                            <div class="col-6">
+                                            <div class="col-4">
                                                 <label><input type="checkbox" name="unlimited_allotment" id="unlimited_allotment" {{ $coupon->unlimited == 1 ? 'checked' : '' }}> Unlimited Allotment</label>
                                                 <input type="number" class="form-control" name="allotment" id="allotment" value="{{ $coupon->total_allotment }}" placeholder="Allotment">
                                             </div>
+                                            
+                                            <div class="col-4">
+                                                <label>Priority Number</label>
+                                                <input type="text" class="form-control" name="order_no" placeholder="Priority Number" value="{{ $coupon->order_no != 'P' ? $coupon->order_no : null }}">
+                                            </div> 
                                         </div>
                                         <br/>
                                         <div class="row">
@@ -229,10 +232,14 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div id="for_promotional" class="row">
-                                            <div class="col-6 mx-auto">
-                                                <br/>
-                                                <label><input type="checkbox" name="require_signin" id="require_signin" {{ $coupon->require_signin == 1 ? 'checked' : '' }}> Require Sign in</label>
+                                        <div id="for_promotional" class="row mt-3">
+                                            <div class="col-6 row mx-auto">
+                                                <div class="col-6">
+                                                    <label><input type="checkbox" name="require_signin" id="require_signin" {{ $coupon->require_signin ? 'checked' : '' }}> Require Sign in</label>
+                                                </div>
+                                                <div class="col-6">
+                                                    <label><input type="checkbox" name="auto_apply" {{ $coupon->auto_apply ? 'checked' : '' }}> Auto-apply in Checkout</label>
+                                                </div>
                                             </div>
                                         </div>
                                         <br/>

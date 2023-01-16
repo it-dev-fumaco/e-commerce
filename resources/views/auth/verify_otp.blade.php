@@ -10,11 +10,17 @@
 		<link rel="stylesheet" href="{{ asset('/assets/admin/plugins/icheck-bootstrap/icheck-bootstrap.min.css') }}">
 		<link rel="stylesheet" href="{{ asset('/assets/admin/dist/css/adminlte.min.css') }}">
 		<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
         <style>
             #resend{
                 border: none !important;
                 background-color: rgba(0,0,0,0) !important;
+            }
+            a, button, input:focus, *:focus{
+                outline: none !important;
+                -webkit-box-shadow: none !important;
+                box-shadow: none !important;
             }
         </style>
 	</head>
@@ -43,72 +49,124 @@
 							<input type="text" name="otp" class="form-control" placeholder="OTP" value="" required>
 							<div class="input-group-append">
 								<div class="input-group-text">
-									<span class="fa fa-mobile-phone" style="font-size: 25px"></span>
+									<span class="fa fa-mobile-phone" style="font-size: 24px"></span>
 								</div>
 							</div>
 						</div>
                         <input type="text" name="user_id" value="{{ $user_id }}" hidden readonly>
                         <button type="submit" class="btn btn-primary w-100">Verify</button>
 					</form>
-                    <p class="pt-3">Didn't get the code? <button id="resend" style="color: #1E1E83; cursor: pointer">Resend</button>&nbsp;<span id="countdown" class="d-none"></span></p>
-                    <p id="resend-error" style="color: red; display: none">An error occured, please try again.</p>
+                    <br>
+                    <span class="pt-3">Didn't get the code? <a href="#" class="resend text-primary" style="cursor: pointer;text-transform: none; text-decoration: none;" data-channel="sms">Resend</a>&nbsp;<span id="countdown" class="d-none"></span></span><br>
+                    <span><a href="#" data-toggle="modal" data-target="#sendAuthToEmailModal" style="text-transform: none; text-decoration: none;" data-channel="email">Resend via Email</a></span>
+                    <p id="resend-error" class="text-danger d-none">An error occured, please try again.</p>
 				</div>
 			</div>
 		</div>
+        <!-- Modal -->
+        <div class="modal fade" id="sendAuthToEmailModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Resend Verification Code</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        @php
+                            $email_arr = explode('@', Auth::user()->username);
+                            $email = substr(Auth::user()->username, 0, 2).str_repeat("*", strlen($email_arr[0]) - 2).'@'.$email_arr[1];
+                        @endphp
+                        <span>Email verification code to {{ $email }}?</span>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary resend" data-channel="email">
+                            <span class="email-text">Confirm</span>
+                            <div class="spinner-border spinner-border-sm d-none spinner" role="status">
+                                <span class="sr-only">Loading...</span>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
         <script src="https://code.jquery.com/jquery-3.5.0.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.4/Chart.bundle.min.js'></script>
+
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
         <script>
             $(document).ready(function(){
-                $('#resend').click(function(){
-                    $(this).css('color', '#666666');
-                    $('#resend').prop('disabled', true);
-                    $('#countdown').removeClass('d-none');
-                    $('#resend-error').css('display', 'none');
+                $('.resend').click(function(){
+                    var channel = $(this).data('channel');
+                    var btn = $(this);
+                    if(channel == 'sms'){
+                        $(this).removeClass('text-primary').addClass('text-secondary');
+                        $(this).prop('disabled', true);
+                        $('#countdown').removeClass('d-none');
+                        $('#resend-error').addClass('d-none');
+                    }else{
+                        $('.email-text').addClass('d-none');
+                        $('.spinner').removeClass('d-none');
+                    }
 
                     $.ajax({
                         type:"GET",
-                        url:"/admin/resend_otp",
+                        url:"/admin/resend_otp?channel=" + channel,
                         success:function(response){
                             if(response.status == 1){
-                                console.log('OTP Sent');
+                                if (channel == 'sms') {
+                                    // var timer2 = "00:03";
+                                    var timer2 = "10:01";
+                                    var interval = setInterval(function() {
+                                        var timer = timer2.split(':');
+                                        //by parsing integer, I avoid all extra string processing
+                                        var minutes = parseInt(timer[0], 10);
+                                        var seconds = parseInt(timer[1], 10);
+                                        --seconds;
+                                        minutes = (seconds < 0) ? --minutes : minutes;
+                                        seconds = (seconds < 0) ? 59 : seconds;
+                                        seconds = (seconds < 10) ? '0' + seconds : seconds;
+                                        $('#countdown').html("("+minutes + ':' + seconds+")");
+                                        if (minutes < 0) clearInterval(interval);
+                                        //check if both minutes and seconds are 0
+                                        if ((seconds <= 0) && (minutes <= 0)){
+                                            clearInterval(interval);
+                                            btn.removeClass('text-secondary').addClass('text-primary');
+                                            btn.prop('disabled', false);
+                                            $('#countdown').addClass('d-none');
+                                        }
+                                        timer2 = minutes + ':' + seconds;
+                                    }, 1000);
+                                }
                             }else{
-                                $('#resend').css('color', '#1E1E83');
-                                $('#resend').prop('disabled', false);
-                                $('#countdown').addClass('d-none');
-                                $('#resend-error').css('display', 'block');
+                                $('#resend-error').addClass('d-none');
+                                if (channel == 'sms') {
+                                    btn.removeClass('text-secondary').addClass('text-primary');
+                                    btn.prop('disabled', false);
+                                    $('#countdown').addClass('d-none');
+                                }
                             }
+                            $('.email-text').removeClass('d-none');
+                            $('.spinner').addClass('d-none');
+                            $('#sendAuthToEmailModal').modal('hide');
                         },
                         error : function(data) {
-                            $('#resend').css('color', '#1E1E83');
-                            $('#resend').prop('disabled', false);
-                            $('#countdown').addClass('d-none');
-                            $('#resend-error').css('display', 'block');
+                            $('#resend-error').removeClass('d-none');
+                            if(channel == 'sms'){
+                                btn.removeClass('text-secondary').addClass('text-primary');
+                                btn.prop('disabled', false);
+                                $('#countdown').addClass('d-none');
+                            }else{
+                                $('.email-text').removeClass('d-none');
+                                $('.spinner').addClass('d-none');
+                                $('#sendAuthToEmailModal').modal('hide');
+                            }
                         }
                     });
-
-                    // var timer2 = "10:01";
-                    var timer2 = "10:05";
-                    var interval = setInterval(function() {
-                        var timer = timer2.split(':');
-                        //by parsing integer, I avoid all extra string processing
-                        var minutes = parseInt(timer[0], 10);
-                        var seconds = parseInt(timer[1], 10);
-                        --seconds;
-                        minutes = (seconds < 0) ? --minutes : minutes;
-                        seconds = (seconds < 0) ? 59 : seconds;
-                        seconds = (seconds < 10) ? '0' + seconds : seconds;
-                        $('#countdown').html("("+minutes + ':' + seconds+")");
-                        if (minutes < 0) clearInterval(interval);
-                        //check if both minutes and seconds are 0
-                        if ((seconds <= 0) && (minutes <= 0)){
-                            clearInterval(interval);
-                            $('#resend').css('color', '#1E1E83');
-                            $('#resend').prop('disabled', false);
-                            $('#countdown').addClass('d-none');
-                        }
-                        timer2 = minutes + ':' + seconds;
-                    }, 1000);
                 });
             });
         </script>
