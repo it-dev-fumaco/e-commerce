@@ -103,7 +103,6 @@
 										<th class="text-center align-middle" rowspan="2">Category</th>
 										<th class="text-center align-middle" rowspan="2">Brand</th>
 										<th class="text-center align-middle" rowspan="2">Featured</th>
-										<th class="text-center align-middle" rowspan="2">On Sale</th>
 										<th class="text-center align-middle" rowspan="2">Status</th>
 										<th class="text-center align-middle" rowspan="2">Action</th>
 									</tr>
@@ -129,7 +128,11 @@
 											</picture>
 										</td>
 										<td>
-											<span class="d-block font-weight-bold">{{ $item['item_code'] }} <span class="badge badge-success {{ $item['is_new_item'] == 1 ? '' : 'd-none' }}">New Item</span></span> {{ $item['product_name'] }}
+											<span class="d-block font-weight-bold">{{ $item['item_code'] }} <span class="badge badge-success {{ $item['is_new_item'] == 1 ? '' : 'd-none' }}">New Item</span>
+												@if ($item['on_sale'] == 1)
+													<span class="badge badge-danger">On Sale</span>
+												@endif 
+											</span> {{ $item['product_name'] }}
 										</td>
 										<td class="text-center">{{ $item['product_code'] }}</td>
 										<td class="text-center">{{ number_format($item['qty']) }}<br>
@@ -146,11 +149,6 @@
 										<td class="text-center">{{ $item['brand'] }}</td>
 										<td class="text-center" style="font-size: 1.2rem;">
 											<a href="/admin/product/{{ $item['id'] }}/featured">{!! ($item['featured']) ? '<i class="fas fa-star"></i>' : '<i class="far fa-star"></i>' !!}</a>
-										</td>
-										<td class="text-center">
-											 @if ($item['on_sale'] == 1)
-												 <span class="badge badge-danger">On Sale</span>
-											@endif 
 										</td>
 										<td class="text-center">
 											@if ($item['status'] == 1)
