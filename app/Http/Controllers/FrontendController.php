@@ -533,7 +533,7 @@ class FrontendController extends Controller
             ->when(count($clearance_sale_item_codes) > 0, function($c) use ($clearance_sale_item_codes) {
                 $c->whereNotIn('f_idcode', $clearance_sale_item_codes);
             })
-            ->whereIn('f_idcode', $onsale_item_codes)
+            ->whereIn('f_idcode', array_keys($onsale_item_codes))
             ->select('f_idcode', 'f_default_price', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_stock_uom', 'f_qty', 'f_reserved_qty', 'slug', 'f_name_name', 'f_item_name', 'image_alt')->get();
 
         $sale_per_category = [];
