@@ -66,7 +66,7 @@
                     <small class="item-detail text-success">Add at least <b>{{ $apr['range_from'] - $cart['quantity'] }}</b> more and get a {{ $apr['discount_rate'] }} discount</small>
                     @break
                 @default
-                    <small class="item-detail text-success">Reach at least {{ number_format($apr['range_from']) }} on this item and get a {{ $apr['discount_rate'] }} discount</small>
+                    <small class="item-detail text-success">Reach at least ₱ {{ number_format($apr['range_from'], 2) }} on this item and get a {{ $apr['discount_rate'] }} discount</small>
                     @break
             @endswitch
         @endif
@@ -117,7 +117,7 @@
                         <small class="item-detail text-success">Add at least <b>{{ $item['range_from'] - $transaction_qty }}</b> more and get a {{ $item['discount_rate'] }} discount</small>
                         @break
                     @default
-                        <small class="item-detail text-success">Get a {{ $item['discount_rate'] }} discount when you reach {{ $item['range_from'] }}</small>
+                        <small class="item-detail text-success">Get a {{ $item['discount_rate'] }} discount when you reach ₱ {{ number_format($item['range_from'], 2) }}</small>
                         @break
                 @endswitch
 

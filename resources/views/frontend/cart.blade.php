@@ -794,7 +794,7 @@
                         $('#price-rule-display-total').removeClass('d-none');
                         if (!apr) {
                             if(i.based_on == 'Total Amount'){
-                                var msg = 'Reach at least <b>₱ ' + i.range_from.toFixed(2) + '</b> on this item and get a ' + i.discount_rate + ' discount';
+                                var msg = 'Reach at least <b>' + i.formatted_range_from + '</b> on this item and get a ' + i.discount_rate + ' discount';
                             }else{
                                 var msg = 'Add at least <b>' + (parseInt(i.range_from) - transaction_qty) + '</b> more item(s) and get a ' + i.discount_rate + ' discount.';
                             }
@@ -876,7 +876,7 @@
                         row.find('.price-rule-display').removeClass('d-none');
                         if (!apr) {
                             if(i.based_on == 'Total Amount'){
-                                var msg = 'Reach at least <b>₱ ' + i.range_from.toFixed(2) + '</b> on this item and get a ' + i.discount_rate + ' discount';
+                                var msg = 'Reach at least <b>' + i.formatted_range_from + '</b> on this item and get a ' + i.discount_rate + ' discount';
                             }else{
                                 var msg = 'Add at least <b>' + (parseInt(i.range_from) - qty) + '</b> more and get a ' + i.discount_rate + ' discount.';
                             }

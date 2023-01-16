@@ -202,7 +202,8 @@ trait ProductTrait {
 						'discount_type' => $rule->discount_type,
 						'discount_rate' => $rule->rate,
 						'range_from' => $rule->range_from,
-						'range_to' => $rule->range_to
+						'range_to' => $rule->range_to,
+                        'formatted_range_from' => $rule->conditions_based_on == 'Total Amount' ? '₱ ' . number_format($rule->range_from, 2) : number_format($rule->range_from, 2)
 					];
 				}
 
@@ -218,7 +219,8 @@ trait ProductTrait {
                     'rate' => $rule->rate,
                     'range_from' => $rule->range_from,
                     'range_to' => $rule->range_to,
-                    'based_on' => $rule->conditions_based_on
+                    'based_on' => $rule->conditions_based_on,
+                    'formatted_range_from' => $rule->conditions_based_on == 'Total Amount' ? '₱ ' . number_format($rule->range_from, 2) : number_format($rule->range_from, 2)
                 ];
 			}
 		}
