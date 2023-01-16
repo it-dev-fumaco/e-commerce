@@ -614,7 +614,7 @@ class FrontendController extends Controller
 
         $clearance_sale_items = $on_sale_items = [];
         if (count(array_keys($onsale_item_codes)) > 0) {
-            $onsale_item_images = DB::table('fumaco_items_image_v1')->whereIn('idcode', $onsale_item_codes)
+            $onsale_item_images = DB::table('fumaco_items_image_v1')->whereIn('idcode', array_keys($onsale_item_codes))
                 ->select('imgprimayx', 'idcode')->get();
             $onsale_item_images = collect($onsale_item_images)->groupBy('idcode')->toArray();
 
