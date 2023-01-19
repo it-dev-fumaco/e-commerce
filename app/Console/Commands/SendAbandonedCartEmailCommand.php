@@ -143,7 +143,7 @@ class SendAbandonedCartEmailCommand extends Command
                     try {
                         Mail::send('emails.admin_abandoned_email', $arr, function($message) use($admin){
                             $message->to(trim($admin->username));
-                            $message->subject('Abandoned Cart - FUMACO - For Testing');
+                            $message->subject('Abandoned Cart - FUMACO');
                         });
                     } catch (\Swift_TransportException  $e) {}
                 }
