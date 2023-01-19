@@ -6,9 +6,11 @@ use DB;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
+use App\Http\Traits\ProductTrait;
 
 class SendAbandonedCartEmailCommand extends Command
 {
+    use ProductTrait;
     /**
      * The name and signature of the console command.
      *
