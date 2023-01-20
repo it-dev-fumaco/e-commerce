@@ -15,7 +15,7 @@
 
 <table class="table" bgcolor="#ffffff" style="margin: 0 auto 0 auto;">
     <tr>
-        <td class="h2" style="padding: 5% 0 0 5%;">Abandoned Cart Notification</td>
+        <td class="h2" style="padding: 5% 0 0 5%;">Customer Abandoned a Cart</td>
      </tr>
      <tr>
         <td class="bodycopy" style="padding: 3% 5%; width: 100% !important">
