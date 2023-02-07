@@ -707,21 +707,23 @@ class FrontendController extends Controller
         if($request->ajax() and $request->search_term){
             $search_str = $request->search_term;
             $item_keywords = DB::table('fumaco_items as item')
-                ->where('f_brand', 'LIKE', "%".$search_str."%")
-                ->orWhere('f_parent_code', 'LIKE', "%".$search_str."%")
-                ->orWhere('f_name_name', 'LIKE', "%".$search_str."%")
-                ->orWhere(function($q) use ($search_str) {
-                    $search_strs = explode(" ", $search_str);
-                    foreach ($search_strs as $str) {
-                        $q->where('f_description', 'LIKE', "%".$str."%");
-                    }
+                ->where(function ($q) use ($search_str){
+                    return $q->where('f_brand', 'LIKE', "%".$search_str."%")
+                        ->orWhere('f_parent_code', 'LIKE', "%".$search_str."%")
+                        ->orWhere('f_name_name', 'LIKE', "%".$search_str."%")
+                        ->orWhere(function($q) use ($search_str) {
+                            $search_strs = explode(" ", $search_str);
+                            foreach ($search_strs as $str) {
+                                $q->where('f_description', 'LIKE', "%".$str."%");
+                            }
 
-                    $q->orWhere('f_idcode', 'LIKE', "%".$search_str."%")
-                        ->orWhere('f_item_classification', 'LIKE', "%".$search_str."%")
-                        ->orWhere('keywords', 'LIKE', '%'.$search_str.'%');
+                            $q->orWhere('f_idcode', 'LIKE', "%".$search_str."%")
+                                ->orWhere('f_item_classification', 'LIKE', "%".$search_str."%")
+                                ->orWhere('keywords', 'LIKE', '%'.$search_str.'%');
+                        })
+                        ->orWhere('f_category', 'LIKE', "%".$search_str."%");
                 })
-                ->orWhere('f_category', 'LIKE', "%".$search_str."%")
-                ->where('f_status', 1)->where('f_status', 1)
+                ->where('f_status', 1)
                 ->where('item.f_status', 1)
                 ->select('item.f_idcode', 'item.f_name_name', 'item.f_default_price', 'item.f_cat_id', 'item.slug as item_slug', 'item.f_stock_uom', 'f_cat_id')
                 ->orderBy('f_order_by', 'asc')->limit($request->type == 'desktop' ? 8 : 4)->get();
