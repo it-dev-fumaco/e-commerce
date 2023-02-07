@@ -4,6 +4,9 @@
 ])
 
 @section('content')
+@php
+	$request_brand = isset(request()->attr['brand']) ? request()->attr['brand'] : [];
+@endphp
 <main style="background-color:#0062A5;">
 	<div id="myCarousel" class="carousel slide" data-bs-ride="carousel">
 		<div class="carousel-inner">
@@ -131,7 +134,6 @@
 																<div class="card-body">
 																	@foreach ($filters['Brand'] as $brand)
 																		@php
-																			$request_brand = isset(request()->attr['brand']) ? request()->attr['brand'] : [];
 																			$status = (in_array($brand, $request_brand)) ? 'checked' : '';
 																		@endphp
 																		<div class="form-check">
@@ -222,7 +224,6 @@
 										<div class="card-body">
 											@foreach ($filters['Brand'] as $brand)
 												@php
-													$request_brand = isset(request()->attr['brand']) ? request()->attr['brand'] : [];
 													$status = (in_array($brand, $request_brand)) ? 'checked' : '';
 												@endphp
 												<div class="form-check">
