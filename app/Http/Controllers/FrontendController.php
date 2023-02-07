@@ -96,25 +96,27 @@ class FrontendController extends Controller
             } else {
                 if (in_array($search_by, ['products', 'all', ''])) {
                     $product_list = DB::table('fumaco_items')
-                        ->where('f_brand', 'LIKE', "%".$search_str."%")
-                        ->orWhere('f_parent_code', 'LIKE', "%".$search_str."%")
-                        ->orWhere('f_category', 'LIKE', "%".$search_str."%")
-                        ->orWhere('f_name_name', 'LIKE', "%".$search_str."%")
-                        ->orWhere('f_item_name', 'LIKE', "%".$search_str."%")
-                        ->orWhere(function($q) use ($search_str) {
-                            $search_strs = explode(" ", $search_str);
-                            foreach ($search_strs as $str) {
-                                $q->where('f_description', 'LIKE', "%".$str."%");
-                            }
-    
-                            $q->orWhere('f_idcode', 'LIKE', "%".$search_str."%")
-                                ->orWhere('f_item_classification', 'LIKE', "%".$search_str."%")
-                                ->orWhere('keywords', 'LIKE', '%'.$search_str.'%');
+                        ->where(function ($q) use ($search_str){
+                            return $q->where('f_brand', 'LIKE', "%".$search_str."%")
+                                ->orWhere('f_parent_code', 'LIKE', "%".$search_str."%")
+                                ->orWhere('f_category', 'LIKE', "%".$search_str."%")
+                                ->orWhere('f_name_name', 'LIKE', "%".$search_str."%")
+                                ->orWhere('f_item_name', 'LIKE', "%".$search_str."%")
+                                ->orWhere(function($q) use ($search_str) {
+                                    $search_strs = explode(" ", $search_str);
+                                    foreach ($search_strs as $str) {
+                                        $q->where('f_description', 'LIKE', "%".$str."%");
+                                    }
+            
+                                    $q->orWhere('f_idcode', 'LIKE', "%".$search_str."%")
+                                        ->orWhere('f_item_classification', 'LIKE', "%".$search_str."%")
+                                        ->orWhere('keywords', 'LIKE', '%'.$search_str.'%');
+                                });
                         })
                         ->when(count($clearance_sale_item_codes) > 0, function($c) use ($clearance_sale_item_codes) {
                             $c->whereNotIn('f_idcode', $clearance_sale_item_codes);
                         })
-                        ->where('f_status', 1)->where('f_status', 1)
+                        ->where('f_status', 1)
                         ->select('f_idcode', 'f_default_price', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_stock_uom', 'f_qty', 'f_reserved_qty', 'slug', 'f_name_name', 'f_item_name', 'f_category', 'id', 'image_alt')
                         ->orderBy($sortby, $orderby)->get();
 
