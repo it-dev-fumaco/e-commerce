@@ -411,7 +411,7 @@
               <p>Manage Price List</p>
             </a>
           </li>
-          <li class="nav-header">MEDIA FILES</li>
+          {{-- <li class="nav-header">MEDIA FILES</li>
           <li class="nav-item {{ (in_array($activePage, $media_pages) ? 'menu-open' : '') }}">
             <a href="#" class="nav-link {{ (in_array($activePage, $media_pages) ? 'active' : '') }}">
               <i class="nav-icon fas fa-photo-video"></i>
@@ -431,7 +431,7 @@
                 </a>
               </li>
             </ul>
-          </li>
+          </li> --}}
           @php
               $marketing_pages = ['pricing_rule', 'on_sale_list', 'vouchers_list', 'social_images'];
           @endphp
