@@ -41,7 +41,7 @@
                                 <div class="row">
                                     <div class="col-8">&nbsp;</div>
                                     <div class="col-4 text-right">
-                                        <a href="/admin/payment/status/add/form" class="btn btn-primary">Add</a>
+                                        <a href="/admin/payment/status/add/form" class="btn btn-primary"><i class="fa fa-plus"></i> Add</a>
                                     </div>
                                 </div>
                                 <br/>
@@ -60,16 +60,10 @@
                                             <td>{{ $status->status_description }}</td>
                                             <td>{{ $status->updates_status ? 'Yes' : 'No' }}</td>
                                             <td class="text-center">
-                                                <div class="dropdown">
-                                                    <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Action
-                                                    </button>
-                                                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
-                                                      <a class="dropdown-item" href="/admin/payment/status/{{ $status->id }}/edit/form">View Details</a>
-                                                      <a class="dropdown-item" href="#" data-toggle="modal" data-target="#dm{{ $status->id }}"><small>Delete</small></a>
-                                                    </div>
-                                                </div>
+                                                <a href="/admin/payment/status/{{ $status->id }}/edit/form" class="btn btn-sm btn-primary"><i class="fa fa-eye"></i></a>
+                                                <a href="#" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#dm{{ $status->id }}"><i class="fa fa-trash"></i></a>
                                             </td>
-                                        </tr>                                          
+                                        </tr>
                                           <!-- Modal -->
                                         <div class="modal fade" id="dm{{ $status->id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                             <div class="modal-dialog" role="document">

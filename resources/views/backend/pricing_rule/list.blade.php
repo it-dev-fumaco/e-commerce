@@ -53,7 +53,7 @@
                                                 </div>
                                                 <div class="col-6">&nbsp;</div>
                                                 <div class="col-1">
-                                                    <a href="/admin/marketing/pricing_rule/add" class="btn btn-primary mx-auto" style='width: 100%'>Add</a>
+                                                    <a href="/admin/marketing/pricing_rule/add" class="btn btn-primary mx-auto" style='width: 100%'><i class="fa fa-plus"></i>&nbsp;Add</a>
                                                 </div>
                                             </div>
                                         </form>
@@ -87,13 +87,8 @@
                                                     </center>
                                                 </td>
                                                 <td class="text-center p-1 align-middle">
-                                                    <div class="dropdown m-0">
-                                                        <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Action</button>
-                                                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
-                                                            <a class="dropdown-item" href="/admin/marketing/pricing_rule/{{ $r->price_rule_id }}/edit">View Details</a>
-                                                            <a class="dropdown-item" data-toggle="modal" data-target="#delete{{ $r->price_rule_id }}"><small>Delete</small></a>
-                                                        </div>
-                                                    </div>
+                                                    <a href="/admin/marketing/pricing_rule/{{ $r->price_rule_id }}/edit" class="btn btn-sm btn-primary"><i class="fa fa-eye"></i></a>
+                                                    <a href="#" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#delete{{ $r->price_rule_id }}"><i class="fa fa-trash"></i></a>
                                                 </td>
                                             </tr>
                                             <div class="modal fade" id="delete{{ $r->price_rule_id }}" role="dialog" aria-labelledby="delete{{ $r->price_rule_id }}Label" aria-hidden="true">

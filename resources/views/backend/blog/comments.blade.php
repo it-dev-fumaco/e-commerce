@@ -73,7 +73,7 @@
                                                     <td>
                                                         {{ $c['blog_comments'] }}
                                                     </td>
-                                                    <td>{{ $c['blog_date'] }}</td>
+                                                    <td>{{ \Carbon\Carbon::parse($c['blog_date'])->format('M d, Y') }}</td>
                                                     <td>
                                                         <center>
                                                             <label class="switch">
@@ -84,7 +84,7 @@
                                                     </td>
                                                     <td>
                                                         <center>
-                                                            <a href="#" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#deleteComment-{{ $c['id'] }}">Delete</a>
+                                                            <a href="#" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#deleteComment-{{ $c['id'] }}"><i class="fa fa-trash"></i></a>
                                                         </center>
 
                                                         <div class="modal fade" id="deleteComment-{{ $c['id'] }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -121,7 +121,7 @@
                                                             <td>
                                                                 {{ $r['blog_comments'] }}
                                                             </td>
-                                                            <td>{{ $r['blog_date'] }}</td>
+                                                            <td>{{ \Carbon\Carbon::parse($r['blog_date'])->format('M d, Y') }}</td>
                                                             <td>
                                                                 <center>
                                                                     <label class="switch">
@@ -132,7 +132,7 @@
                                                             </td>
                                                             <td>
                                                                 <center>
-                                                                    <a href="#" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#deleteComment-{{ $r['id'] }}">Delete</a>
+                                                                    <a href="#" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#deleteComment-{{ $r['id'] }}"><i class="fa fa-trash"></i></a>
                                                                 </center>
         
                                                                 <div class="modal fade" id="deleteComment-{{ $r['id'] }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">

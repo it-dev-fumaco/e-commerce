@@ -62,7 +62,7 @@
 									</div>
 									<div class="col-md-8">
 										<div class="float-right">
-                                            <button class="btn btn-primary" type="button" data-toggle="modal" data-target="#add-bank-account">Add Bank Account</button>
+                                            <button class="btn btn-primary" type="button" data-toggle="modal" data-target="#add-bank-account"><i class="fa fa-plus"></i> Add Bank Account</button>
 										</div>
 									</div>
 								</div>
@@ -101,8 +101,8 @@
 										<td class="text-center align-middle">{{ \Carbon\Carbon::parse($row->last_modified_at)->format('M d, Y - h:i A') }}</td>
 										<td class="text-center align-middle">
 											<div class="btn-group" role="group" aria-label="Basic example">
-                                                <button type="button" class="btn btn-outline-success btn-sm" data-toggle="modal" data-target="#edit{{ $row->bank_account_id }}">Edit</button>
-												<button type="button" class="btn btn-outline-danger btn-sm" data-toggle="modal" data-target="#delete{{ $row->bank_account_id }}">Delete</button>
+                                                <button type="button" class="btn btn-outline-success btn-sm" data-toggle="modal" data-target="#edit{{ $row->bank_account_id }}"><i class="fa fa-edit"></i></button>
+												<button type="button" class="btn btn-outline-danger btn-sm" data-toggle="modal" data-target="#delete{{ $row->bank_account_id }}"><i class="fa fa-trash"></i></button>
 											</div>
 										</td>
 									</tr>

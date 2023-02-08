@@ -62,7 +62,7 @@
                                                 <button type="submit" class="btn btn-primary">Search</button>
                                             </div>
                                             <div class="col-sm-3">
-                                                <a href="/admin/holiday/add_form" class="btn btn-primary float-right">Register New Holiday</a>
+                                                <a href="/admin/holiday/add_form" class="btn btn-primary float-right"><i class="fa fa-plus"></i>&nbsp;Register New Holiday</a>
                                             </div>
                                         </div>
                                     </form>
@@ -92,10 +92,10 @@
                                                     <td>{{ $holiday['date'] }}</td>
                                                     <td>{{ $holiday['year'] }}</td>
                                                     <td>
-                                                        <div class="row">
-                                                            <button class="btn btn-primary mx-auto" type="button" data-toggle="modal" data-target="#holidayModal-{{ $holiday['id'] }}">Edit</button>
-                                                            <a href="/admin/holiday/delete/{{ $holiday['id'] }}" class="btn btn-danger mx-auto">Delete</a>
-                                                        </div>
+                                                        <center>
+                                                            <a href="#" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#holidayModal-{{ $holiday['id'] }}"><i class="fa fa-edit"></i></a>
+                                                            <a href="/admin/holiday/delete/{{ $holiday['id'] }}" class="btn btn-sm btn-danger"><i class="fa fa-trash"></i></a>
+                                                        </center>
 
                                                         <div class="modal fade" id="holidayModal-{{ $holiday['id'] }}" tabindex="-1" aria-labelledby="holidayModalLabel" aria-hidden="true">
                                                             <div class="modal-dialog">

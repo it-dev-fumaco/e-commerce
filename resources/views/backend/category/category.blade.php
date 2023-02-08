@@ -104,7 +104,6 @@
 														</div>
 													</div>
 												</div>
-												<button type="button" class="btn btn-info btn-sm active" data-toggle="modal" data-target="#PPPEdit{{ $c->id }}">Edit</button>
 												<div id="PPPEdit{{ $c->id }}" class="modal fade" role="dialog">
 													<div class="modal-dialog modal-xl">
 														<div class="modal-content">
@@ -209,8 +208,11 @@
 														</div>
 													</div>
 												</div>
-												<a href="{{ (!$c->external_link) ? '/admin/category/settings/' . $c->id : '' }}" class="btn btn-success btn-sm active  {{ ($c->external_link) ? 'disabled' : '' }}" role="button" aria-pressed="true">Sort Items</a>
-												<a href="/admin/category/delete/{{ $c->id }}" class="float-right btn btn-danger btn-sm active" role="button" aria-pressed="true">Delete</a>
+												<center>													
+													<a href="#" class="btn btn-info btn-sm active" data-toggle="modal" data-target="#PPPEdit{{ $c->id }}"><i class="fa fa-edit"></i></a>
+													<a href="{{ (!$c->external_link) ? '/admin/category/settings/' . $c->id : '' }}" class="btn btn-success btn-sm active {{ ($c->external_link) ? 'disabled' : '' }}" role="button" aria-pressed="true" style="padding: 4px 11px 4px 11px"><i class="fa fa-sort"></i></a>
+													<a href="/admin/category/delete/{{ $c->id }}" class="btn btn-danger btn-sm active" role="button" aria-pressed="true"><i class="fa fa-trash"></i></a>
+												</center>
 											</td>
 											<td class="col-sm-1">
 												<center>

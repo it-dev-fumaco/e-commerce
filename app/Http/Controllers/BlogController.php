@@ -153,10 +153,13 @@ class BlogController extends Controller
     public function publishBlog(Request $request){
         DB::beginTransaction();
         try {
-            DB::table('fumaco_blog')->where('id', $request->blog_id)->update(['blog_enable' => $request->publish]);
+            DB::table('fumaco_blog')->where('id', $request->blog_id)->update(['blog_enable' => $request->toggle]);
 
-            if($request->publish == 1){
+            if($request->toggle == 1){
                 $blog = DB::table('fumaco_blog')->where('id', $request->blog_id)->first();
+                if(!$blog){
+                    return response()->json(['status' => 0]);
+                }
 
                 $subscribers = DB::table('fumaco_subscribe')->where('status', 1)->get();
                 $blog_title = $blog->blogtitle;
@@ -177,19 +180,19 @@ class BlogController extends Controller
             return response()->json(['status' => 1]);
         } catch (Exception $e) {
             DB::rollback();
-            return redirect()->back()->with('error', 'An error occured. Please try again.');
+            return response()->json(['status' => 0]);
         }
     }
 
     public function featuredBlog(Request $request){
         DB::beginTransaction();
         try {
-            DB::table('fumaco_blog')->where('id', $request->blog_id)->update(['blog_featured' => $request->feature]);
+            DB::table('fumaco_blog')->where('id', $request->blog_id)->update(['blog_featured' => $request->toggle]);
             DB::commit();
             return response()->json(['status' => 1]);
         } catch (Exception $e) {
             DB::rollback();
-            return redirect()->back()->with('error', 'An error occured. Please try again.');
+            return response()->json(['status' => 0]);
         }
     }
 
@@ -448,16 +451,18 @@ class BlogController extends Controller
         }
     }
 
-    public function setBlogActive($id){
+    public function setBlogActive(Request $request, $id){
         DB::beginTransaction();
         try {
-            DB::table('fumaco_blog')->where('id', $id)->update(['blog_active' => 1, 'blog_enable' => 1, 'blog_featured' => 1]);
-            DB::table('fumaco_blog')->where('id', '!=', $id)->update(['blog_active' => 0]);
+            DB::table('fumaco_blog')->update(['blog_active' => 0]);
+            if($request->toggle){
+                DB::table('fumaco_blog')->where('id', $id)->update(['blog_active' => 1, 'blog_enable' => 1, 'blog_featured' => 1]);
+            }
             DB::commit();
-            return redirect()->back()->with('success', 'Blog Updated.');
+            return response()->json(['success' => 1, 'message' => 'Blog Updated.']);
         } catch (Exception $e) {
             DB::rollback();
-            return redirect()->back()->with('error', 'An error occured. Please try again.');
+            return response()->json(['success' => 0, 'message' => 'An error occured. Please try again']);
         }
     }
 

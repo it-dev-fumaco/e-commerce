@@ -41,7 +41,7 @@
                                     <div class="row">
                                         <div class="col-md-9"></div>
                                         <div class="col-md-3 text-right">
-                                            <a href="/admin/pages/contact/add_form" class="btn btn-primary">Add an Address</a>
+                                            <a href="/admin/pages/contact/add_form" class="btn btn-primary"><i class="fa fa-plus"></i>&nbsp;Add an Address</a>
                                         </div>
                                     </div>
                                     <br/>
@@ -56,15 +56,8 @@
                                                 <td>{{ $add->office_title }}</td>
                                                 <td>{{ $add->office_address }}</td>
                                                 <td>
-                                                    <div class="dropdown">
-                                                        <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Action
-                                                        </button>
-                                                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
-                                                            <a class="dropdown-item" href="/admin/pages/contact/edit/{{ $add->id }}">View Details</a>
-                                                            <a class="dropdown-item" data-toggle="modal" data-target="#a{{ $add->id }}-Modal">
-                                                                Delete
-                                                            </a>
-                                                    </div>
+                                                    <a href="/admin/pages/contact/edit/{{ $add->id }}" class="btn btn-sm btn-primary"><i class="fa fa-edit"></i></a>
+                                                    <a href="#" data-toggle="modal" data-target="#a{{ $add->id }}-Modal" class="btn btn-sm btn-danger"><i class="fa fa-trash"></i></a>
                                                       <!-- Modal -->
                                                     <div class="modal fade" id="a{{ $add->id }}-Modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                                         <div class="modal-dialog">

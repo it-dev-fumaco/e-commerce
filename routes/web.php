@@ -178,6 +178,7 @@ Route::prefix('admin')->group(function () {
             Route::get('/delete_header/{carousel_id}', 'HomeCRUDController@remove_header');
             Route::get('/api_setup/erp', 'SettingsController@erpApiSetup');
             Route::get('/api_setup/payment', 'SettingsController@paymentApiSetup');
+            Route::get('/api_setup/transportify', 'SettingsController@transportifyApiSetup');
             Route::get('/api_setup/google', 'SettingsController@googleApiSetup');
             Route::get('/api_setup/sms', 'SettingsController@smsApiSetup');
             Route::post('/api_setup/save', 'SettingsController@saveApiCredentials');
@@ -268,8 +269,8 @@ Route::prefix('admin')->group(function () {
             Route::get('/items_on_cart_by_location', 'OrderController@viewItemOnCartByLocation');
             Route::get('/items_on_cart_by_item', 'OrderController@viewItemOnCartByItem');
             Route::get('/abandoned_items_on_cart', 'OrderController@viewAbandonedItemOnCart');
-            Route::get('/order/payment_status', 'OrderController@checkPaymentStatus');
-            Route::post('/order/payment_status', 'OrderController@checkPaymentStatus');
+            Route::get('/payment/check_payment_status', 'OrderController@checkPaymentStatus');
+            Route::post('/payment/check_payment_status', 'OrderController@checkPaymentStatus');
             Route::get('/customer/list', 'CustomerController@viewCustomers');
             Route::get('/customer/profile/{id}', 'CustomerController@viewCustomerProfile');
             Route::get('/customer/address/{address_type}/{user_id}', 'CustomerController@getCustomerAddress');
@@ -281,10 +282,10 @@ Route::prefix('admin')->group(function () {
             Route::post('/blog/add', 'BlogController@addBlog');
             Route::post('/blog/publish', 'BlogController@publishBlog');
             Route::post('/blog/feature', 'BlogController@featuredBlog');
+            Route::post('/blog/set_active/{id}', 'BlogController@setBlogActive');
             Route::get('/blog/edit/form/{id}', 'BlogController@editBlogForm');
             Route::post('/blog/edit/{id}', 'BlogController@editBlog');
             Route::post('/blog/images/edit/{id}', 'BlogController@editBlogImages');
-            Route::get('/blog/delete/{id}', 'BlogController@deleteBlog');
             Route::get('/blog/delete/{id}', 'BlogController@deleteBlog');
             Route::get('/blog/images/img-delete/{id}/{image}', 'BlogController@deleteBlogImage');
             Route::get('/blog/comments', 'BlogController@viewComments');

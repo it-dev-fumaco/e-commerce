@@ -161,8 +161,14 @@
   <!-- Main Sidebar Container -->
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
-    <a href="/admin" class="brand-link text-center">
-      <span class="brand-text font-weight-light">FUMACO Admin v2.0</span>
+    <a href="/admin" class="brand-link text-center pb-0">
+      <span class="brand-text font-weight-light mb-2">
+         <picture>
+            <source srcset="{{ asset('/assets/site-img/logo-sm.webp') }}" type="image/webp">
+            <source srcset="{{ asset('/assets/site-img/logo-sm.png') }}" type="image/jpeg">
+            <img src="{{ asset('/assets/site-img/logo-sm.png') }}" alt="Fumaco" width="155" height="54">
+          </picture>
+      </span>
     </a>
 
     <!-- Sidebar -->
@@ -334,7 +340,7 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a href="/admin/order/payment_status" class="nav-link {{ $activePage == 'payment_status' ? 'active' : '' }}">
+                <a href="/admin/payment/check_payment_status" class="nav-link {{ $activePage == 'payment_status' ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Check Payment Status</p>
                 </a>
@@ -405,7 +411,7 @@
               <p>Manage Price List</p>
             </a>
           </li>
-          <li class="nav-header">MEDIA FILES</li>
+          {{-- <li class="nav-header">MEDIA FILES</li>
           <li class="nav-item {{ (in_array($activePage, $media_pages) ? 'menu-open' : '') }}">
             <a href="#" class="nav-link {{ (in_array($activePage, $media_pages) ? 'active' : '') }}">
               <i class="nav-icon fas fa-photo-video"></i>
@@ -425,7 +431,7 @@
                 </a>
               </li>
             </ul>
-          </li>
+          </li> --}}
           @php
               $marketing_pages = ['pricing_rule', 'on_sale_list', 'vouchers_list', 'social_images'];
           @endphp
@@ -479,7 +485,7 @@
           @if (Auth::user()->user_type == 'System Admin')
           <li class="nav-header">SYSTEM SETTINGS</li>
           @php
-            $settings_pages = ['erp_api_setup', 'payment_api_setup', 'google_api_setup', 'sms_api_setup'];
+            $settings_pages = ['erp_api_setup', 'payment_api_setup', 'google_api_setup', 'sms_api_setup', 'transportify_api_setup'];
           @endphp
           <li class="nav-item {{ (in_array($activePage, $settings_pages) ? 'menu-open' : '') }}">
             <a href="#" class="nav-link {{ (in_array($activePage, $settings_pages) ? 'active' : '') }}">
@@ -515,6 +521,12 @@
                 <a href="/admin/api_setup/sms" class="nav-link {{ $activePage == 'sms_api_setup' ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>SMS Gateway API</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="/admin/api_setup/transportify" class="nav-link {{ $activePage == 'transportify_api_setup' ? 'active' : '' }}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Transportify API</p>
                 </a>
               </li>
             </ul>

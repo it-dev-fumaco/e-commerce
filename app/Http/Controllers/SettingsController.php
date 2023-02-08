@@ -43,6 +43,12 @@ class SettingsController extends Controller
         return view('backend.system_logs', compact('logs'));
     }
 
+    public function transportifyApiSetup() {
+        $api_details = DB::table('api_setup')->where('type', 'transportify_api')->first();
+
+		return view('backend.settings.transportify_api_setup', compact('api_details'));
+    }
+
     public function saveApiCredentials(Request $request) {
         DB::beginTransaction();
         try {
@@ -103,6 +109,7 @@ class SettingsController extends Controller
                         'merchant_type' => $request->merchant_type,
                         'service_id' => $request->service_id,
                         'password' => $request->password,
+                        'is_enabled' => $request->is_enabled ? $request->is_enabled : 0,
                         'last_modified_by' => Auth::user()->username,
                     ]);
                 } else {
@@ -114,6 +121,7 @@ class SettingsController extends Controller
                         'merchant_type' => $request->merchant_type,
                         'service_id' => $request->service_id,
                         'password' => $request->password,
+                        'is_enabled' => $request->is_enabled ? $request->is_enabled : 0,
                         'created_by' => Auth::user()->username,
                         'last_modified_by' => Auth::user()->username,
                     ]);

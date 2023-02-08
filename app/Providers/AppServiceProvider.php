@@ -43,7 +43,7 @@ class AppServiceProvider extends ServiceProvider
                 ->join('fumaco_items as i', 'i.f_idcode', 'osi.item_code')
                 ->where('os.is_clearance_sale', 1)->where('os.status', 1)->where('i.f_status', 1)
                 ->first();
-            
+                
             if($query){
                 if($query->ignore_sale_duration || $query->start_date <= Carbon::now()->startOfDay() && $query->end_date >= Carbon::now()->endOfDay()){
                     return true;

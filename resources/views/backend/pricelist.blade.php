@@ -59,8 +59,8 @@
                                         </div>
                                         <div class="col-md-4">
                                             <div class="float-right">
-                                                <button class="btn btn-warning" type="button" id="sync-prices-btn">Sync Prices</button>
-                                                <button class="btn btn-primary" type="button" data-toggle="modal" data-target="#add-price-list">Add Price List</button>
+                                                <button class="btn btn-warning" type="button" id="sync-prices-btn"><i class="fa fa-sync"></i>&nbsp; Sync Prices</button>
+                                                <button class="btn btn-primary" type="button" data-toggle="modal" data-target="#add-price-list"><i class="fa fa-plus"></i>&nbsp; Add Price List</button>
                                             </div>
                                         </div>
                                     </div>
@@ -83,8 +83,8 @@
                                             <td class="text-center">{{ $row->last_modified_by }}</td>
                                             <td class="text-center">{{ \Carbon\Carbon::parse($row->last_modified_at)->format('M d, Y - h:i A') }}</td>
                                             <td class="text-center">
-                                                <a href="/admin/item_prices/{{ $row->id }}" class="btn btn-info btn-sm">View Items</a>
-                                                <button class="btn btn-danger btn-sm" type="button" data-toggle="modal" data-target="#delete{{ $row->id }}">Delete</button>
+                                                <a href="/admin/item_prices/{{ $row->id }}" class="btn btn-info btn-sm"><i class="fa fa-eye"></i></a>
+                                                <button class="btn btn-danger btn-sm" type="button" data-toggle="modal" data-target="#delete{{ $row->id }}"><i class="fa fa-trash"></i></button>
                                                 <div class="modal fade" id="delete{{ $row->id }}" tabindex="-1" role="dialog" aria-labelledby="disablemodal" aria-hidden="true">
                                                     <form action="/admin/price_list/delete/{{ $row->id }}" method="POST">
                                                         @csrf
