@@ -178,6 +178,7 @@ Route::prefix('admin')->group(function () {
             Route::get('/delete_header/{carousel_id}', 'HomeCRUDController@remove_header');
             Route::get('/api_setup/erp', 'SettingsController@erpApiSetup');
             Route::get('/api_setup/payment', 'SettingsController@paymentApiSetup');
+            Route::get('/api_setup/transportify', 'SettingsController@transportifyApiSetup');
             Route::get('/api_setup/google', 'SettingsController@googleApiSetup');
             Route::get('/api_setup/sms', 'SettingsController@smsApiSetup');
             Route::post('/api_setup/save', 'SettingsController@saveApiCredentials');

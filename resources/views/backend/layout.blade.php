@@ -479,7 +479,7 @@
           @if (Auth::user()->user_type == 'System Admin')
           <li class="nav-header">SYSTEM SETTINGS</li>
           @php
-            $settings_pages = ['erp_api_setup', 'payment_api_setup', 'google_api_setup', 'sms_api_setup'];
+            $settings_pages = ['erp_api_setup', 'payment_api_setup', 'google_api_setup', 'sms_api_setup', 'transportify_api_setup'];
           @endphp
           <li class="nav-item {{ (in_array($activePage, $settings_pages) ? 'menu-open' : '') }}">
             <a href="#" class="nav-link {{ (in_array($activePage, $settings_pages) ? 'active' : '') }}">
@@ -515,6 +515,12 @@
                 <a href="/admin/api_setup/sms" class="nav-link {{ $activePage == 'sms_api_setup' ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>SMS Gateway API</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="/admin/api_setup/transportify" class="nav-link {{ $activePage == 'transportify_api_setup' ? 'active' : '' }}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Transportify API</p>
                 </a>
               </li>
             </ul>
