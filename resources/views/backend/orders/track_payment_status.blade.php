@@ -49,7 +49,7 @@
 					<!-- general form elements -->
 					<div class="card card-primary">
 						<!-- form start -->
-						<form action="/admin/order/payment_status" method="POST" autocomplete="off">
+						<form action="/admin/payment/check_payment_status" method="POST" autocomplete="off">
 							@csrf
 							<div class="card-body">
 								<div class="form-group">

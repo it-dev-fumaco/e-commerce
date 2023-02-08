@@ -334,7 +334,7 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a href="/admin/order/payment_status" class="nav-link {{ $activePage == 'payment_status' ? 'active' : '' }}">
+                <a href="/admin/payment/check_payment_status" class="nav-link {{ $activePage == 'payment_status' ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Check Payment Status</p>
                 </a>
