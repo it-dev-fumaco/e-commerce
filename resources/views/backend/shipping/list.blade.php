@@ -55,7 +55,7 @@
 									</div>
 									<div class="col-md-8">
 										<div class="float-right">
-											<a href="/admin/shipping/add" class="btn btn-primary">Create New Shipping</a>
+											<a href="/admin/shipping/add" class="btn btn-primary"><i class="fa fa-plus"></i>&nbsp; Create New Shipping</a>
 										</div>
 									</div>
 								</div>
@@ -87,8 +87,8 @@
 										<td class="text-center align-middle">{{ $row->shipping_calculation }}</td>
 										<td class="text-center align-middle">
 											<div class="btn-group" role="group" aria-label="Basic example">
-												<a href="/admin/shipping/{{ $row->shipping_service_id }}/edit" class="btn btn-outline-success btn-sm">Edit</a>
-												<button type="button" class="btn btn-outline-danger btn-sm" data-toggle="modal" data-target="#delete-{{ $i }}">Delete</button>
+												<a href="/admin/shipping/{{ $row->shipping_service_id }}/edit" class="btn btn-outline-success btn-sm"><i class="fa fa-edit"></i></a>
+												<button type="button" class="btn btn-outline-danger btn-sm" data-toggle="modal" data-target="#delete-{{ $i }}"><i class="fa fa-trash"></i></button>
 											</div>
 										</td>
 									</tr>
