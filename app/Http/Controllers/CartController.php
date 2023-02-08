@@ -520,6 +520,11 @@ class CartController extends Controller
                     DB::table('fumaco_cart')->where('transaction_id', $order_no)
                         ->where('item_code', $product_details->f_idcode)->delete();
                 }
+
+                $count_cart_items = DB::table('fumaco_cart')->where('transaction_id', $order_no)->count();
+                if ($count_cart_items <= 0) {
+                    DB::table('fumaco_temp')->where('order_tracker_code', $order_no)->delete();
+                }
             }
 
             return response()->json(['status' => 1, 'message' => 'Cart updated!']);

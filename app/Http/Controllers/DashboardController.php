@@ -280,11 +280,22 @@ class DashboardController extends Controller
 		$paginatedItems->setPath($request->url());
 		$cart_collection = $paginatedItems;
 
-		$abandoned_cart = DB::table('fumaco_temp')->orderBy('xdateupdate', 'desc')->paginate(10, ['*'], 'abandoned_page');
+		$abandoned_cart_query1 = DB::table('fumaco_temp as ft')
+			->join('fumaco_order_items as foi', 'ft.order_tracker_code', 'foi.order_number')
+			->whereDate('ft.xdateupdate', '<', Carbon::now()->subHours(8))
+			->select('ft.order_tracker_code', 'ft.xdateupdate')->groupBy('ft.order_tracker_code', 'ft.xdateupdate');
+
+		$abandoned_cart = DB::table('fumaco_temp as ft')
+			->join('fumaco_cart as fc', 'ft.order_tracker_code', 'fc.transaction_id')
+			->whereDate('ft.xdateupdate', '<', Carbon::now()->subHours(8))
+			->select('ft.order_tracker_code', 'ft.xdateupdate')->groupBy('ft.order_tracker_code', 'ft.xdateupdate')
+			->unionAll($abandoned_cart_query1)->orderBy('xdateupdate', 'desc')->paginate(10, ['*'], 'abandoned_page');
 
 		$abandoned_order_numbers = collect($abandoned_cart->items())->map(function($result){
 			return $result->order_tracker_code;
 		});
+
+		$abandoned_carts = DB::table('fumaco_temp')->whereIn('order_tracker_code', $abandoned_order_numbers)->orderBy('xdateupdate', 'desc')->get();
 
 		$items = DB::table('fumaco_order_items as order')
 			->join('fumaco_items as items', 'order.item_code', 'items.f_idcode')
@@ -304,7 +315,7 @@ class DashboardController extends Controller
 		$guest_abandoned_items = collect($guest_items)->groupBy('transaction_id');
 
 		$abandoned_arr = [];
-		foreach($abandoned_cart as $abandoned){
+		foreach($abandoned_carts as $abandoned){
 			$items_arr = [];
 			$active = 1;
 

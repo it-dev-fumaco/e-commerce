@@ -494,7 +494,7 @@
 												<div class="modal-content">
 													<div class="modal-header">
 														<div class="col-md-6 text-left">
-															<h4 class="modal-title">ORDER NO. {{ $cart['transaction_id'] }}</h4>
+															<h4 class="modal-title">ORDER NO. {{ $abandoned['order_number'] }}</h4>
 														</div>
 														<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 															<span aria-hidden="true">&times;</span>
