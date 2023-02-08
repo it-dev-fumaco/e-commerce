@@ -44,12 +44,15 @@ class AppServiceProvider extends ServiceProvider
                 ->where('os.is_clearance_sale', 1)->where('os.status', 1)->where('i.f_status', 1)
                 ->first();
             
-            if($query->ignore_sale_duration || $query->start_date <= Carbon::now()->startOfDay() && $query->end_date >= Carbon::now()->endOfDay()){
-                return true;
+            if($query){
+                if($query->ignore_sale_duration || $query->start_date <= Carbon::now()->startOfDay() && $query->end_date >= Carbon::now()->endOfDay()){
+                    return true;
+                }else{
+                    return false;
+                }
             }else{
                 return false;
             }
-
         });
     }
 }
