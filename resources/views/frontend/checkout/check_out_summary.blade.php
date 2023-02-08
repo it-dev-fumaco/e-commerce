@@ -318,7 +318,7 @@
 									<div class="form-check">
 										<input class="form-check-input" type="radio" name="shipping_fee" id="{{ 'sr' . $l }}" value="{{ $shipping_cost }}" data-sname="{{ $srate['shipping_service_name'] }}" data-est="{{ $srate['expected_delivery_date'] }}" data-pickup="{{ $srate['pickup'] }}" required {{ $defaul_selected }} data-lead="{{ $srate['max_lead_time'] }}" data-discount-type="{{ $shipping_discount_type }}" data-discount-rate={{ $shipping_discount_rate }} data-capped-amount='{{ $shipping_capped_amount }}' data-discount-name="{{ $shipping_discount_name }}">
 										<label class="form-check-label" for="{{ 'sr' . $l }}">{{ $srate['shipping_service_name'] }} <br class="d-xl-none"/>
-											@if (count($srate['stores']) <= 0)<small class="fst-italic">({{ $srate['min_lead_time'] . " - ". $srate['max_lead_time'] . " Days" }})</small>@endif</label>
+											@if (count($srate['stores']) <= 0 && !$srate['external_carrier'])<small class="fst-italic">({{ $srate['min_lead_time'] . " - ". $srate['max_lead_time'] . " Days" }})</small>@endif</label>
 									</div>
 									@if ($srate['shipping_cost'] > 0)
 										@if ($new_shipping_cost > 0)

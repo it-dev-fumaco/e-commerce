@@ -1441,6 +1441,7 @@ class CheckoutController extends Controller
             ];
 
             $output= json_decode($response, true);
+
             $arr= [];
 			if ($output['status'] != "ZERO_RESULTS") {
 				for ($i = 0; $i < count($output['results'][0]['address_components']); $i++) {
@@ -1449,6 +1450,9 @@ class CheckoutController extends Controller
 						array_push($arr, strtolower($output['results'][0]['address_components'][$i][$components[$address_type]]));
 					}
 				}
+
+				$arr['lat'] = $output['results'][0]['geometry']['location']['lat'];
+				$arr['lng'] = $output['results'][0]['geometry']['location']['lng'];
 			}
             
             return $arr;
@@ -1558,9 +1562,7 @@ class CheckoutController extends Controller
 				->select('f_idcode', 'f_default_price', 'b.qty', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_stock_uom', 'f_package_height', 'f_package_weight', 'f_package_length', 'f_package_width')->get();
 		}
 
-		$total_amount = 0;
-		$total_weight_of_items = 0;
-		$total_cubic_cm = 0;
+		$total_amount = $total_weight_of_items = $total_cubic_cm = 0;
 
 		// get sitewide sale
 		$sale = DB::table('fumaco_on_sale')
@@ -1637,7 +1639,7 @@ class CheckoutController extends Controller
         }
 
 		$intersect_array_counts = [];
-        $shipping_address_arr = $this->getAddressDetails($address);
+       	$shipping_address_arr = $this->getAddressDetails($address);
 
         // get shipping zone based on selected address
         $shipping_zones = ShippingZoneRate::whereIn('province_name', $shipping_address_arr)
@@ -1646,8 +1648,8 @@ class CheckoutController extends Controller
 
         $shipping_services_arr = [];
         foreach($shipping_zones as $row){
-            $address = ($row->city_code > -1) ? $row->city_name . ' ' . $row->province_name : $row->province_name;
-            $address_details = $this->getAddressDetails($address);
+            $sz_address = ($row->city_code > -1) ? $row->city_name . ' ' . $row->province_name : $row->province_name;
+            $address_details = $this->getAddressDetails($sz_address);
 
             $address_arr_intersect = array_intersect($shipping_address_arr, $address_details);
 
@@ -1718,7 +1720,7 @@ class CheckoutController extends Controller
 			}
         }
 
-       $shipping_services = ShippingService::join('fumaco_shipping_condition as a', 'fumaco_shipping_service.shipping_service_id', 'a.shipping_service_id')
+      	$shipping_services = ShippingService::join('fumaco_shipping_condition as a', 'fumaco_shipping_service.shipping_service_id', 'a.shipping_service_id')
             ->whereIn('a.shipping_service_id', $shipping_services_arr)
 			->select('shipping_calculation', 'shipping_amount', 'conditional_operator', 'value', 'min_charge_amount', 'max_charge_amount', 'a.shipping_service_id', 'min_leadtime', 'max_leadtime', 'shipping_service_name')->get();
 
@@ -1821,11 +1823,77 @@ class CheckoutController extends Controller
 			}
 		}
 
+		$transportify_api = DB::table('api_setup')->where('type', 'transportify_api')->where('is_enabled', 1)->first();
+		if ($transportify_api) {
+			$package_total_cubic_m = $total_cubic_cm / 1000000;
+			$locations = [
+                [
+                    'address' => '35 Pleasant View, Drive, Caloocan, 1400 Metro Manila',
+                    'latitude' => 14.726183,
+                    'longitude' => 121.00502
+                ],
+                [
+                    'address' => $address,
+                    "latitude" => (float)$shipping_address_arr['lat'],
+                    "longitude" => (float)$shipping_address_arr['lng'],
+                ]
+            ];
+
+			$api_vehicle_types = Http::withHeaders([
+                'Content-Type' => 'application/json',
+                'Authorization' => $transportify_api->api_key,
+                'Accept-Language' => 'en'
+            ])->get($transportify_api->base_url . '/vehicle_types');
+
+			// $vehicle_type_id = $this->assign_vehicle_type($package_total_cubic_m, $total_weight_of_items, $api_vehicle_types['data']);
+
+			$data = [
+                'time_type' => 'now',
+                // 'vehicle_type_id' => $vehicle_type_id,
+                'packs' => $packs,
+                'locations' => $locations
+            ];
+
+            $response = Http::withHeaders([
+                'Content-Type' => 'application/json',
+                'Authorization' => $transportify_api->api_key,
+                'Accept-Language' => 'en'
+            ])->post($transportify_api->base_url . '/deliveries/get_quote', $data);
+
+			$shipping_cost = (isset($response['data'])) ? $response['data'][0]['total_fees'] : $response['message'];
+
+			if (!is_string($shipping_cost)) {
+				$shipping_offer_rates[] = [
+					'shipping_service_name' => 'Transportify',
+					'expected_delivery_date' => null,
+					'min_lead_time' => 0,
+					'max_lead_time' => 0,
+					'shipping_cost' => $shipping_cost,
+					'external_carrier' => true,
+					'allow_delivery_after' => 0,
+					'pickup' => false,
+					'stores' => [],
+					'remarks' => null
+				];
+			}
+		}
+
 		return [
 			'shipping_offer_rates' => $shipping_offer_rates,
 			'free_delivery_zones' => $free_delivery_zone_remarks
 		];
 	}
+
+	// public function assign_vehicle_type($package_cubic_meter, $package_weight, $vehicle_types){
+	// 	$vehicle_types = collect($vehicle_types)->sortBy('cargo_cubic_meter')->toArray();
+
+    //     $vehicle_types_arr = [];
+    //     foreach ($vehicle_types as $vehicle_type) {
+    //         if($vehicle_type['cargo_cubic_meter'] >= $package_cubic_meter){
+    //             return $vehicle_type['id'];
+    //         }
+    //     }
+    // }
 
 	public function orderFailed() {
 		return view('frontend.checkout.failed');
