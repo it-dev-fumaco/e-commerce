@@ -2945,8 +2945,7 @@ class FrontendController extends Controller
         }
 
         $ignore_sale_duration = collect($category_query)->pluck('ignore_sale_duration')->first();
-
-        $banner_image = DB::table('fumaco_on_sale')->where('is_clearance_sale', 1)->whereDate('start_date', '<=', Carbon::now()->startOfDay())->whereDate('end_date', '>=', Carbon::now()->endOfDay())->where('status', 1)->pluck("banner_image")->first();
+        $banner_image = collect($category_query)->pluck('banner_image')->first();
 
         if (count($category_filter) <= 0) {
             return redirect('/');
