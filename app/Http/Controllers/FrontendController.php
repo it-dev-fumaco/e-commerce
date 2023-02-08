@@ -2931,11 +2931,9 @@ class FrontendController extends Controller
             ->join('fumaco_items as i', 'i.f_idcode', 'osi.item_code')
             ->join('fumaco_categories as ic', 'ic.id', 'i.f_cat_id')
             ->where('i.f_status', 1)->where('os.is_clearance_sale', 1)->where('os.status', 1)
-            // ->whereDate('os.start_date', '<=', Carbon::now()->startOfDay())->whereDate('os.end_date', '>=', Carbon::now()->endOfDay())
             ->orderBy('ic.slug', 'asc')
-            ->select('os.start_date', 'os.end_date', 'os.ignore_sale_duration', 'ic.name', 'ic.id')
+            ->select('os.start_date', 'os.end_date', 'os.ignore_sale_duration', 'ic.name', 'ic.id', 'banner_image')
             ->get();
-            // ->pluck('ic.name', 'ic.id');
         
         $category_filter = [];
         foreach($category_query as $q){
