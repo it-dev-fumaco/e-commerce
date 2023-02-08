@@ -58,7 +58,7 @@
 							<input type="hidden" name="api_type" value="transportify_api">
 							<div class="card-body">
                                 <div class="form-check pb-2">
-                                    <input type="checkbox" class="form-check-input" id="enable-checkbox" name="is_enabled" value="1" {{ $api_details->is_enabled ? 'checked' : '' }}>
+                                    <input type="checkbox" class="form-check-input" id="enable-checkbox" name="is_enabled" value="1" {{ ($api_details) ? ($api_details->is_enabled ? 'checked' : '') : '' }}>
                                     <label class="form-check-label" for="enable-checkbox">Enabled</label>
                                  </div>
 								<div class="form-group">
