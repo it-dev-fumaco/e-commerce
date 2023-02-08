@@ -105,7 +105,7 @@
 									<option value="2020">2020</option>
 									@foreach ($sales_year as $year)
 										@php
-											$selected = (\Carbon\Carbon::now()->format('Y') == $year->{'YEAR(order_date)'}) ? 'selected' : '';
+											$selected = $loop->last ? 'selected' : '';
 										@endphp
 										<option value="{{ $year->{'YEAR(order_date)'} }}" {{ $selected }}>{{ $year->{'YEAR(order_date)'} }}</option>
 									@endforeach
