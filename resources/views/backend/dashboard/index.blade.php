@@ -99,25 +99,18 @@
 					<div class="card-tools">
 						<ul class="nav nav-pills ml-auto">
 							<li class="nav-item">
+								<form autocomplete="off">
 								<select name="year" class="form-control" id="year-filter" required> 
 									<option value="" disabled>Year</option>
 									<option value="2020">2020</option>
 									@foreach ($sales_year as $year)
 										@php
-											$selected = null;
-											if(!request()->get('year')){
-												if(\Carbon\Carbon::now()->format('Y') == $year->{'YEAR(order_date)'}){
-													$selected = 'selected';
-												}
-											}else{
-												if($year->{'YEAR(order_date)'} == request()->get('year')){
-													$selected = 'selected';
-												}
-											}
+											$selected = (\Carbon\Carbon::now()->format('Y') == $year->{'YEAR(order_date)'}) ? 'selected' : '';
 										@endphp
-										<option {{ $selected }} value="{{ $year->{'YEAR(order_date)'} }}">{{ $year->{'YEAR(order_date)'} }}</option>
+										<option value="{{ $year->{'YEAR(order_date)'} }}" {{ $selected }}>{{ $year->{'YEAR(order_date)'} }}</option>
 									@endforeach
 								</select>
+							</form>
 							</li>
 						</ul>
 					</div>
