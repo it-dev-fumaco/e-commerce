@@ -62,7 +62,7 @@
                                                 <td class="text-center">{{ \Carbon\Carbon::parse($user->created_at)->format('M d, Y - h:i A') }}</td>
                                                 <td class="text-center">{{ $user->login_used }}</td>
                                                 <td class="text-center">
-                                                    <a href="/admin/customer/profile/{{ $user->id }}" class="btn btn-sm btn-primary">View Profile</a>
+                                                    <a href="/admin/customer/profile/{{ $user->id }}" class="btn btn-sm btn-primary"><i class="fas fa-eye"></i></a>
                                                 </td>
                                             </tr>
                                         @empty

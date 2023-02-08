@@ -72,7 +72,7 @@
                                                             </div>
                                                             <div class="col-6"></div>
                                                             <div class="col-1">
-                                                                <a href="/admin/marketing/voucher/add_voucher" class="btn btn-primary mx-auto" style='width: 100%'>Add</a>
+                                                                <a href="/admin/marketing/voucher/add_voucher" class="btn btn-primary mx-auto" style='width: 100%'><i class="fa fa-plus"></i>&nbsp;Add</a>
                                                             </div>
                                                         </div>
                                                     </form>
@@ -136,14 +136,8 @@
                                                             <td class="text-center">{{ $c->validity_date_start ? date('M d, Y', strtotime($c->validity_date_start)).' - '.date('M d, Y', strtotime($c->validity_date_end)) : '' }}</td>
                                                             <td class="text-center">{{ $c->remarks }}</td>
                                                             <td class="text-center">
-                                                                <div class="dropdown">
-                                                                    <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Action
-                                                                    </button>
-                                                                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
-                                                                        <a class="dropdown-item" href="/admin/marketing/voucher/{{ $c->id }}/edit_form">View Details</a>
-                                                                        <a class="dropdown-item" data-toggle="modal" data-target="#delete{{ $c->id }}"><small>Delete</small></a>
-                                                                    </div>
-                                                                </div>
+                                                                <a href="/admin/marketing/voucher/{{ $c->id }}/edit_form" class="btn btn-sm btn-primary"><i class="fa fa-eye"></i></a>
+                                                                <a href="#" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#delete{{ $c->id }}"><i class="fa fa-trash"></i></a>
                                                             </td>
                                                         </tr>
                                                         <div class="modal fade" id="delete{{ $c->id }}" role="dialog" aria-labelledby="delete{{ $c->id }}Label" aria-hidden="true">

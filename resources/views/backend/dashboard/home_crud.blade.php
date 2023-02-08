@@ -27,9 +27,18 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-12">
-                    <div class="card card-primary">
+                    <div class="card">
                         <div class="card-header">
-                            <h3 class="card-title">List Carousel</h3>
+                            <div class="row">
+                                <div class="col-8">
+                                    <h3 class="card-title">List Carousel</h3>
+                                </div>
+                                <div class="col-4 text-right">
+                                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+                                        <i class="fa fa-plus"></i>&nbsp; Add header carousel
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                         <div class="card-body">
                             <div class="container-fluid text-right mb-2">
@@ -43,10 +52,6 @@
                                         {{ session()->get('error') }}
                                     </div>
                                 @endif
-                                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
-                                    Add header carousel
-                                </button>
-
                                 <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                     <div class="modal-dialog modal-xl" role="document">
                                         <div class="modal-content">
@@ -152,9 +157,9 @@
                                     <th>Title</th>
                                     <th>Btn Caption</th>
                                     <th>Url</th>
-                                    <th>Active</th>
-                                    <th>Status</th>
-                                    <th>Action</th>
+                                    <th class="text-center">Active</th>
+                                    <th class="text-center">Status</th>
+                                    <th class="text-center">Action</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -204,21 +209,18 @@
                                             <td>{{ strip_tags($carousel['title']) }}</td>
                                             <td>{{ $carousel['btn_name'] }}</td>
                                             <td>{{ $carousel['url'] }}</td>
-                                            <td>
-                                                <span class="badge badge-{{ $carousel['is_active'] }}">{{ $carousel['is_active'] ? 'Active' : ''}}</span>
+                                            <td class="text-center">
+                                                <center>
+													<label class="switch">
+														<input type="checkbox" class="toggle" id="toggle_{{ $carousel['id'] }}" name="publish" {{ $carousel['is_active'] ? 'checked' : null }} value="{{ $carousel['id'] }}"/>
+														<span class="slider round"></span>
+													</label>
+												</center>
                                             </td>
                                             <td><span class="badge badge-{{ $carousel['status'] }}">{{ $carousel['status'] != 'danger' ? 'OK' : 'DISABLED'}}</span></td>
-                                            <td>
-                                                <div class="dropdown">
-                                                    <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Action
-                                                    </button>
-                                                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
-                                                        <a class="dropdown-item" href="#" data-toggle="modal" data-target="#header-{{ $carousel['id'] }}-Modal">Edit Carousel Item</a>
-                                                        <a class="dropdown-item" href="/admin/set_active/{{ $carousel['id'] }}">Set Active</a>
-                                                        <a class="dropdown-item" href="/admin/remove_active/{{ $carousel['id'] }}">Remove Active</a>
-                                                        <a class="dropdown-item" href="/admin/delete_header/{{ $carousel['id'] }}">Delete</a>
-                                                    </div>
-                                                </div>
+                                            <td class="text-center">
+                                                <a href="#" data-toggle="modal" data-target="#header-{{ $carousel['id'] }}-Modal" class="btn btn-sm btn-primary"><i class="fa fa-edit"></i></a>
+                                                <a href="#" data-toggle="modal" data-target="#delete-header-{{ $carousel['id'] }}-Modal" class="btn btn-sm btn-danger"><i class="fa fa-trash"></i></a>
 
                                                 <div class="modal fade" id="header-{{ $carousel['id'] }}-Modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                                     <div class="modal-dialog modal-xl" role="document">
@@ -345,6 +347,26 @@
                                                         </div>
                                                     </div>
                                                 </div>
+
+                                                <div class="modal fade" id="delete-header-{{ $carousel['id'] }}-Modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                    <div class="modal-dialog" role="document">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                            <h5 class="modal-title" id="exampleModalLabel">Confirm Delete</h5>
+                                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                <span aria-hidden="true">&times;</span>
+                                                            </button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                Delete header?
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                                <a href="/admin/delete_header/{{ $carousel['id'] }}" type="button" class="btn btn-danger">Confirm</a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </td>
                                         </tr>
                                     @endforeach
@@ -394,7 +416,7 @@
                             </div>
                             <!-- /.card-body -->
                             <div class="card-footer text-center">
-                                <button type="submit" class="btn btn-primary btn-lg">SUBMIT</button>
+                                <button type="submit" class="btn btn-primary btn-lg"><i class="fa fa-check"></i>&nbsp;SUBMIT</button>
                             </div>
                         </form>
                     </div>
@@ -468,6 +490,66 @@
         cursor: pointer;
         border: none !important;
     }
+
+    .switch {
+		position: relative;
+		display: inline-block;
+		width: 30px;
+		height: 16px;
+	}
+
+	.switch input { 
+		opacity: 0;
+		width: 0;
+		height: 0;
+	}
+
+    .slider {
+		position: absolute;
+		cursor: pointer;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background-color: #ccc;
+		-webkit-transition: .4s;
+		transition: .4s;
+	}
+
+	.slider:before {
+		position: absolute;
+		content: "";
+		height: 10px;
+		width: 10px;
+		left: 3px;
+		bottom: 3px;
+		background-color: white;
+		-webkit-transition: .4s;
+		transition: .4s;
+	}
+
+	input:checked + .slider {
+		background-color: #2196F3;
+	}
+
+	input:focus + .slider {
+		box-shadow: 0 0 1px #2196F3;
+	}
+
+	input:checked + .slider:before {
+		-webkit-transform: translateX(16px);
+		-ms-transform: translateX(16px);
+		transform: translateX(16px);
+	}
+
+	/* Rounded sliders */
+	.slider.round {
+		border-radius: 34px;
+	}
+
+	.slider.round:before {
+		border-radius: 50%;
+	}
 </style>
 @endsection
 @section('script')
@@ -499,6 +581,35 @@
         $('.nav-' + id + '-link').removeClass('active');
         $(target).addClass('active');
         $(this).addClass('active');
+    });
+
+    $(".toggle").change(function(){
+        if($(this).prop('checked')){
+            $('.toggle').prop('checked', false);
+            $(this).prop('checked', true);
+            var publish = 1;
+        }else{
+            var publish = 0;
+        }
+
+        var data = {
+            'publish': publish,
+            'cat_id': $(this).val()
+        }
+        console.log(data);
+        $.ajax({
+            type:'get',
+            url:'/admin/set_active/' + $(this).val(),
+            data: data,
+            success: function (response) {
+                if(response.success == 0){
+                    alert(response.message);
+                }
+            },
+            error: function () {
+                alert('An error occured.');
+            }
+        });
     });
 </script>
 @endsection

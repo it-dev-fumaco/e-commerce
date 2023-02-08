@@ -55,7 +55,7 @@
 									</div>
 									<div class="col-md-8">
 										<div class="float-right">
-											<a href="/admin/store/add" class="btn btn-primary">Create New Store</a>
+											<a href="/admin/store/add" class="btn btn-primary"><i class="fa fa-plus"></i>&nbsp; Create New Store</a>
 										</div>
 									</div>
 								</div>
@@ -79,8 +79,8 @@
 										<td class="text-center">{{ date('h:i A', strtotime($row->available_from)) }} - {{ date('h:i A', strtotime($row->available_to)) }}</td>
 										<td class="text-center align-middle">
 											<div class="btn-group" role="group" aria-label="Basic example">
-												<a href="/admin/store/{{ $row->store_id }}/edit" class="btn btn-outline-success btn-sm">Edit</a>
-												<button type="button" class="btn btn-outline-danger btn-sm" data-toggle="modal" data-target="#delete-{{ $i }}">Delete</button>
+												<a href="/admin/store/{{ $row->store_id }}/edit" class="btn btn-outline-success btn-sm"><i class="fa fa-edit"></i></a>
+												<button type="button" class="btn btn-outline-danger btn-sm" data-toggle="modal" data-target="#delete-{{ $i }}"><i class="fa fa-trash"></i></button>
 											</div>
 										</td>
 									</tr>

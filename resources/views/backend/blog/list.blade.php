@@ -48,7 +48,7 @@
                                             </div>
 
                                             <div class="col-sm-6">
-                                                <a href="/admin/blog/new" class="btn btn-primary float-right">Add New Blog</a>
+                                                <a href="/admin/blog/new" class="btn btn-primary float-right"><i class="fa fa-plus"></i>&nbsp;Add New Blog</a>
                                             </div>
                                         </div>
                                     </form>
@@ -63,32 +63,30 @@
                                                 <th style="font-size: 10pt;" class="text-center">Status</th>
                                                 <th style="font-size: 10pt;" class="text-center">Is featured</th>
                                                 <th style="font-size: 10pt;">Publish</th>
-                                                <th style="font-size: 10pt;">Action</th>
+                                                <th class="text-center" style="font-size: 10pt;">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             @forelse($blogs as $b)
-                                            @php
-                                                $toggle = '';
-                                                if($b->blog_active == 1 or $b->blog_status == 0){
-                                                    $toggle = "disabled";
-                                                }
-                                            @endphp
                                                 <tr>
                                                     <td>{{ $b->blogtitle }}</td>
                                                     <td>{{ $b->blogtype }}</td>
                                                     <td>{{ $b->blog_by }}</td>
-                                                    <td>{{ $b->created_at }}</td>
+                                                    <td>{{ \Carbon\Carbon::parse($b->created_at)->format('M d, Y') }}</td>
                                                     <td>{{ $b->created_by }}</td>
                                                     <td class="text-center">
-                                                        <span class="badge badge-primary {{ $b->blog_active == 1 ? '' : 'd-none' }}">ACTIVE</span>
-                                                        <br/>
+                                                        <center>
+                                                            <label class="switch">
+                                                                <input type="checkbox" class="toggle set-active-toggle" data-function="set_active" name="publish" {{ ($b->blog_active == 1) ? 'checked' : '' }} value="{{ $b->id }}"/>
+                                                                <span class="slider round"></span>
+                                                            </label>
+                                                        </center>
                                                         <span class="badge badge-{{ $b->blog_status == 1 ? 'primary' : 'warning' }}">{{ $b->blog_status == 1 ? '' : 'NOT ' }}COMPLETE</span>
                                                     </td>
                                                     <td>
                                                         <center>
                                                             <label class="switch">
-                                                                <input type="checkbox" class="feature-toggle" id="toggle_{{ $b->id }}" name="featured" {{ ($b->blog_featured == 1) ? 'checked' : '' }} value="{{ $b->id }}" {{ $toggle }}/>
+                                                                <input type="checkbox" class="toggle" data-function="feature" name="featured" {{ ($b->blog_featured == 1) ? 'checked' : '' }} value="{{ $b->id }}"/>
                                                                 <span class="slider round"></span>
                                                             </label>
                                                         </center>
@@ -96,23 +94,15 @@
                                                     <td>
                                                         <center>
                                                             <label class="switch">
-                                                                <input type="checkbox" class="toggle" id="toggle_{{ $b->id }}" name="publish" {{ ($b->blog_enable == 1) ? 'checked' : '' }} value="{{ $b->id }}" {{ $toggle }}/>
+                                                                <input type="checkbox" class="toggle" data-function="publish" name="publish" {{ ($b->blog_enable == 1) ? 'checked' : '' }} value="{{ $b->id }}"/>
                                                                 <span class="slider round"></span>
                                                             </label>
                                                         </center>
                                                     </td>
                                                     <td>
                                                         <center>
-                                                            <div class="dropdown">
-                                                                <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Action
-                                                                </button>
-                                                                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
-                                                                    <a href="/admin/blog/edit/form/{{ $b->id }}" class="dropdown-item">View Details</a>
-                                                                    <a href="/admin/blog/set_active/{{ $b->id }}" class="dropdown-item"><small>Set Active</small></a>
-                                                                    <a href="/blog/{{ $b->slug ? $b->slug : $b->id }}" target="_blank" class="dropdown-item"><small>Preview</small></a>
-                                                                    <a href="#" class="dropdown-item" data-toggle="modal" data-target="#deleteBlog-{{ $b->id }}"><small>Delete</small></a>
-                                                                </div>
-                                                            </div>
+                                                            <a href="/admin/blog/edit/form/{{ $b->id }}" class="btn btn-sm btn-primary"><i class="fa fa-edit"></i></a>
+                                                            <a href="#" data-toggle="modal" data-target="#deleteBlog-{{ $b->id }}" class="btn btn-sm btn-danger"><i class="fa fa-trash"></i></a>
                                                         </center>
 
                                                         <div class="modal fade" id="deleteBlog-{{ $b->id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -220,33 +210,26 @@
     <script>
         $(document).ready(function() {
             $(".toggle").change(function(){
-                var data = {
-                    'publish': $(this).prop('checked') == true ? 1 : 0,
-                    'blog_id': $(this).val(),
-                    '_token': "{{ csrf_token() }}",
-                }
-                $.ajax({
-                    type:'POST',
-                    url:'/admin/blog/publish',
-                    data: data,
-                    success: function (response) {
-                        console.log(status);
-                    },
-                    error: function () {
-                        alert('An error occured.');
+                var toggle = 0;
+                var feature = $(this).data('function');
+                if($(this).data('function') == 'set_active'){
+                    feature = $(this).data('function') + '/' + $(this).val();
+                    if($(this).prop('checked')){
+                        toggle = 1;
+                        $('.set-active-toggle').prop('checked', false);
+                        $(this).prop('checked', true);
                     }
-                });
-            });
-
-            $(".feature-toggle").change(function(){
+                }else{
+                    toggle = $(this).prop('checked') == true ? 1 : 0;
+                }
                 var data = {
-                    'feature': $(this).prop('checked') == true ? 1 : 0,
+                    'toggle': toggle,
                     'blog_id': $(this).val(),
                     '_token': "{{ csrf_token() }}",
                 }
                 $.ajax({
                     type:'POST',
-                    url:'/admin/blog/feature',
+                    url:'/admin/blog/' + feature,
                     data: data,
                     success: function (response) {
                         console.log(status);

@@ -50,7 +50,7 @@
                                                 <tr>
                                                     <td>{{ $page->page_name }}</td>
                                                     <td>{{ $page->page_title }}</td>
-                                                    <td><a href="/admin/pages/edit/{{ $page->page_id }}" class="btn btn-primary">Edit</a></td>
+                                                    <td><a href="/admin/pages/edit/{{ $page->page_id }}" class="btn btn-primary"><i class="fa fa-edit"></i></a></td>
                                                 </tr> 
                                             @endforeach
                                         </tbody>

@@ -265,29 +265,23 @@ class HomeCRUDController extends Controller
 		}
 	}
 
-    public function set_header_active($carousel_id){
+    public function set_header_active(Request $request, $carousel_id){
 		DB::beginTransaction();
 		try{
 			$checker = DB::table('fumaco_header')->where('id', $carousel_id)->first();
-			if($checker->fumaco_active == 1){
-				return redirect()->back()->with('error', 'Header is already active');
-			}
-
 			if($checker->fumaco_status == 0){
-				return redirect()->back()->with('error', 'Header is disabled');
+				return response()->json(['success' => 0, 'message' => 'Header is disabled']);
 			}
 
-			$checker2 = DB::table('fumaco_header')->where('id', '!=', $carousel_id)->where('fumaco_active', 1)->exists();
-			if($checker2){
-				return redirect()->back()->with('error', 'Another item is currently active. Please remove active status of existing one.');
+			DB::table('fumaco_header')->update(['fumaco_active' => 0, 'last_modified_by' => Auth::user()->username]);
+			if($request->publish){
+				DB::table('fumaco_header')->where('id', $carousel_id)->update(['fumaco_active' => 1, 'last_modified_by' => Auth::user()->username]);
 			}
-
-			DB::table('fumaco_header')->where('id', $carousel_id)->update(['fumaco_active' => 1, 'last_modified_by' => Auth::user()->username]);
             DB::commit();
-			return redirect()->back()->with('success', 'Record Updated Successfully');
+			return response()->json(['success' => 1, 'message' => 'Record Updated Successfully']);
 		}catch(Exception $e){
 			DB::rollback();
-			return redirect()->back()->with('error', 'An error occured. Please try again');
+			return response()->json(['success' => 0, 'message' => 'An error occured. Please try again']);
 		}
     }
 

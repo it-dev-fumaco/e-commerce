@@ -282,10 +282,10 @@ Route::prefix('admin')->group(function () {
             Route::post('/blog/add', 'BlogController@addBlog');
             Route::post('/blog/publish', 'BlogController@publishBlog');
             Route::post('/blog/feature', 'BlogController@featuredBlog');
+            Route::post('/blog/set_active/{id}', 'BlogController@setBlogActive');
             Route::get('/blog/edit/form/{id}', 'BlogController@editBlogForm');
             Route::post('/blog/edit/{id}', 'BlogController@editBlog');
             Route::post('/blog/images/edit/{id}', 'BlogController@editBlogImages');
-            Route::get('/blog/delete/{id}', 'BlogController@deleteBlog');
             Route::get('/blog/delete/{id}', 'BlogController@deleteBlog');
             Route::get('/blog/images/img-delete/{id}/{image}', 'BlogController@deleteBlogImage');
             Route::get('/blog/comments', 'BlogController@viewComments');

@@ -55,7 +55,7 @@
 									</div>
 									<div class="col-md-2">
                                         <div class="float-right">
-                                            <button class="btn btn-primary" data-toggle="modal" data-target="#addSocialImage" type="button">Add Social Image</button>
+                                            <button class="btn btn-primary" data-toggle="modal" data-target="#addSocialImage" type="button"><i class="fa fa-plus"></i>&nbsp; Add Social Image</button>
 										</div>
 									</div>
 								</div>
@@ -101,7 +101,7 @@
                                         <td class="text-center align-middle">{{ $row->last_modified_by }}</td>
                                         <td class="text-center align-middle">{{ $row->last_modified_at }}</td>
 										<td class="text-center align-middle">
-                                            <button class="btn btn-sm btn-danger" data-toggle="modal" data-target="#delete{{ $row->id }}" type="button">Delete</button>
+                                            <button class="btn btn-sm btn-danger" data-toggle="modal" data-target="#delete{{ $row->id }}" type="button"><i class="fa fa-trash"></i></button>
 
                                             <div class="modal fade" id="delete{{ $row->id }}" tabindex="-1" role="dialog" aria-labelledby="deletemodal" aria-hidden="true">
                                                 <form action="/admin/marketing/social/delete/{{ $row->id }}" method="POST">
