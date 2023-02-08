@@ -38,8 +38,7 @@ class FrontendController extends Controller
             ->join('fumaco_on_sale_items as osi', 'os.id', 'osi.sale_id')
             ->join('fumaco_items as i', 'i.f_idcode', 'osi.item_code')
             ->where('os.is_clearance_sale', 1)->where('os.status', 1)->where('i.f_status', 1)
-            ->whereDate('os.start_date', '<=', Carbon::now()->startOfDay())->whereDate('os.end_date', '>=', Carbon::now()->endOfDay())
-            ->pluck('f_idcode');
+            ->pluck('i.f_idcode');
 
         // get sorting value 
         $sortby = $request->sortby;
@@ -2927,15 +2926,24 @@ class FrontendController extends Controller
     }
 
     public function clearanceSalePage(Request $request) {
-        $category_filter = DB::table('fumaco_on_sale as os')
+        $category_query = DB::table('fumaco_on_sale as os')
             ->join('fumaco_on_sale_items as osi', 'os.id', 'osi.sale_id')
             ->join('fumaco_items as i', 'i.f_idcode', 'osi.item_code')
             ->join('fumaco_categories as ic', 'ic.id', 'i.f_cat_id')
             ->where('i.f_status', 1)->where('os.is_clearance_sale', 1)->where('os.status', 1)
-            ->whereDate('os.start_date', '<=', Carbon::now()->startOfDay())->whereDate('os.end_date', '>=', Carbon::now()->endOfDay())
-            ->orderBy('ic.slug', 'asc')->pluck('ic.name', 'ic.id');
+            ->orderBy('ic.slug', 'asc')
+            ->select('os.start_date', 'os.end_date', 'os.ignore_sale_duration', 'ic.name', 'ic.id', 'banner_image')
+            ->get();
+        
+        $category_filter = [];
+        foreach($category_query as $q){
+            if($q->ignore_sale_duration || $q->start_date <= Carbon::now()->startOfDay() && $q->end_date >= Carbon::now()->endOfDay()){
+                $category_filter[$q->id] = $q->name;
+            }
+        }
 
-        $banner_image = DB::table('fumaco_on_sale')->where('is_clearance_sale', 1)->whereDate('start_date', '<=', Carbon::now()->startOfDay())->whereDate('end_date', '>=', Carbon::now()->endOfDay())->where('status', 1)->pluck("banner_image")->first();
+        $ignore_sale_duration = collect($category_query)->pluck('ignore_sale_duration')->first();
+        $banner_image = collect($category_query)->pluck('banner_image')->first();
 
         if (count($category_filter) <= 0) {
             return redirect('/');
@@ -2974,7 +2982,12 @@ class FrontendController extends Controller
             ->when(count($filters) > 0, function($c) use ($filters) {
                 $c->whereIn('i.f_cat_id', $filters);
             })
-            ->whereDate('os.start_date', '<=', Carbon::now()->startOfDay())->whereDate('os.end_date', '>=', Carbon::now()->endOfDay())
+            ->when(!$ignore_sale_duration, function ($q){
+                $q->whereDate('os.start_date', '<=', Carbon::now()->startOfDay())->whereDate('os.end_date', '>=', Carbon::now()->endOfDay());
+            })
+            ->when($ignore_sale_duration, function ($q){
+                $q->where('os.ignore_sale_duration', 1);
+            })
             ->select('i.id', 'i.f_idcode', 'i.f_default_price', 'i.f_new_item', 'i.f_new_item_start', 'i.f_new_item_end', 'i.f_cat_id', 'osi.discount_type', 'osi.discount_rate', 'i.f_stock_uom', 'i.f_qty', 'i.f_reserved_qty', 'i.slug', 'i.f_name_name', 'i.f_item_name', 'i.image_alt')
             ->orderBy($sortby, $orderby)->paginate(15);
 
