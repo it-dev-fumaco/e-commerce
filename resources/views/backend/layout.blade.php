@@ -161,8 +161,14 @@
   <!-- Main Sidebar Container -->
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
-    <a href="/admin" class="brand-link text-center">
-      <span class="brand-text font-weight-light">FUMACO Admin v2.0</span>
+    <a href="/admin" class="brand-link text-center pb-0">
+      <span class="brand-text font-weight-light mb-2">
+         <picture>
+            <source srcset="{{ asset('/assets/site-img/logo-sm.webp') }}" type="image/webp">
+            <source srcset="{{ asset('/assets/site-img/logo-sm.png') }}" type="image/jpeg">
+            <img src="{{ asset('/assets/site-img/logo-sm.png') }}" alt="Fumaco" width="155" height="54">
+          </picture>
+      </span>
     </a>
 
     <!-- Sidebar -->
