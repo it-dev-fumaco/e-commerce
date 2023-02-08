@@ -135,9 +135,14 @@ trait ProductTrait {
                 $c->whereIn('i.f_idcode', $collection);
             })
             ->where('os.is_clearance_sale', 1)->where('os.status', 1)
-            ->whereDate('os.start_date', '<=', Carbon::now()->startOfDay())->whereDate('os.end_date', '>=', Carbon::now()->endOfDay())
-            ->select('i.f_idcode', 'i.f_default_price', 'i.f_cat_id', 'osi.discount_type', 'osi.discount_rate')
+            ->select('i.f_idcode', 'i.f_default_price', 'i.f_cat_id', 'osi.discount_type', 'osi.discount_rate', 'os.ignore_sale_duration', 'os.start_date', 'os.end_date')
             ->get();
+
+        $query = collect($query)->map(function ($q){
+            if($q->ignore_sale_duration || $q->start_date <= Carbon::now()->startOfDay() && $q->end_date >= Carbon::now()->endOfDay()){
+                return $q;
+            }
+        })->filter()->values()->all();
 
         return collect($query)->groupBy('f_idcode')->toArray();
     }
