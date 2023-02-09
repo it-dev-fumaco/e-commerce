@@ -703,10 +703,10 @@
 			}
 		});
 	}
-
-	$('#year-filter').change(function(){
+	loadchart();
+	function loadchart() {
 		var data = {
-			'year': $(this).val()
+			'year': $('#year-filter').val()
 		}
 		$.ajax({
 			type: 'GET',
@@ -730,6 +730,10 @@
 				getChartData(xValues, yValues);
 			}
 		});
+	}
+
+	$('#year-filter').change(function(){
+		loadchart();
 	});
 </script>
 @endsection
