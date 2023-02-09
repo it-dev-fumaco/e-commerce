@@ -314,7 +314,7 @@
             </ul>
           </li>
 
-          <li class="nav-header">ORDERS / SHIPPING</li>
+          <li class="nav-header">ORDERS</li>
           <li class="nav-item {{ (in_array($activePage, $order_pages) ? 'menu-open' : '') }}">
             <a href="#" class="nav-link {{ (in_array($activePage, $order_pages) ? 'active' : '') }}">
               <i class="nav-icon fas fa-dolly-flatbed"></i>
@@ -353,6 +353,7 @@
               </li>
             </ul>
           </li>
+          <li class="nav-header">SHIPPING</li>
           <li class="nav-item {{ (in_array($activePage, ['shipping_list', 'store_list', 'holiday_list']) ? 'menu-open' : '') }}">
             <a href="#" class="nav-link {{ (in_array($activePage, ['shipping_list', 'store_list', 'holiday_list'])) ? 'active' : '' }}">
               <i class="nav-icon fas fa-truck"></i>

@@ -259,11 +259,6 @@
 											$badge = 'ban';
 											break;
 									}
-									// if($cart['status'] == 'Active'){
-									// 	$status_color = '#007BFF';
-									// }else if($cart['status'] == 'Converted'){
-									// 	$status_color = '#28A745';
-									// }
 								@endphp
 								<tr style="background-color: {{ $status_color }};">
 									<td style="font-size: 11pt; border-bottom: 1px solid #CED0D2 !important" class="text-center">
@@ -486,21 +481,32 @@
 					<div class="card-body">
 						<table class="table table-hover table-bordered table-striped">
 							<thead>
-								<th class="text-center">Name</th>
-								<th class="text-center">Email</th>
+								<th class="text-center" style="white-space: nowrap !important">Transaction Date</th>
+								<th class="text-center">Customer</th>
+								{{-- <th class="text-center">Email</th> --}}
 								<th class="text-center">Products</th>
 								<th class="text-center">Total Qty</th>
 								<th class="text-center">Amount</th>
 								<th class="text-center">Abandoned Transaction</th>
-								<th class="text-center">IP Address</th>
+								{{-- <th class="text-center">IP Address</th> --}}
 								<th class="text-center">Location</th>
-								<th class="text-center">Transaction Date</th>
 								<th class="text-center">Action</th>
 							</thead>
 							@forelse ($abandoned_arr as $abandoned)
 								<tr>
-									<td class="text-center">{{ $abandoned['name'] ? $abandoned['name'] : 'Guest' }}</td>
-									<td class="text-center">{{ $abandoned['email'] ? $abandoned['email'] : '-' }}</td>
+									<td class="text-center" style="white-space: nowrap !important">
+										{{-- {{ $abandoned['transaction_date'] ? \Carbon\Carbon::parse($abandoned['transaction_date'])->format('M. d, Y - h:i a') : '-' }} --}}
+										@if($abandoned['transaction_date'])
+											<span style="font-size: 13pt;">{{ Carbon\Carbon::parse($abandoned['transaction_date'])->format('M. d, Y') }}</span><br>
+											<span class="text-muted">{{ Carbon\Carbon::parse($abandoned['transaction_date'])->format('h:i a') }}</span>
+										@endif
+									</td>
+									<td>
+										{{-- {{ $abandoned['name'] ? $abandoned['name'] : 'Guest' }} --}}
+										<span style="font-size: 13pt;">{{ $abandoned['name'] ? $abandoned['name'] : 'Guest' }}</span><br>
+										<span class="text-muted">{{ $abandoned['email'] ? $abandoned['email'] : '-' }}</span>
+									</td>
+									{{-- <td class="text-center">{{ $abandoned['email'] ? $abandoned['email'] : '-' }}</td> --}}
 									<td>
 										@forelse ($abandoned['items'] as $item)
 										<a href="/product/{{ $item['slug'] ? $item['slug'] : $item['item_code'] }}" class="badge badge-primary" target="_blank">{{ $item['item_code'] }}</a>
@@ -591,14 +597,16 @@
 											</div>
 										</div>
 									</td>
-									<td class="text-center">{{ $abandoned['ip_address'] }}</td>
-									<td class="text-center">{{ $abandoned['location'] ? $abandoned['location'] : '-' }}</td>
-									<td class="text-center" style="white-space: nowrap !important">{{ $abandoned['transaction_date'] ? \Carbon\Carbon::parse($abandoned['transaction_date'])->format('M. d, Y - h:i a') : '-' }}</td>
+									{{-- <td class="text-center">{{ $abandoned['ip_address'] }}</td> --}}
+									<td>
+										<span style="font-size: 13pt;">{{ $abandoned['ip_address'] }}</span><br>
+										<span class="text-muted">{{ $abandoned['location'] ? $abandoned['location'] : '-' }}</span>
+									</td>
 									<td class="text-center">
 										<div class="btn-group" role="group" aria-label="Basic example">
-											<a href="#" class="btn btn-outline-secondary btn-sm" data-toggle="modal" data-target="#abandoned-{{ $abandoned['order_number'] }}-Modal">View</a>
+											<a href="#" class="btn btn-outline-secondary btn-sm" data-toggle="modal" data-target="#abandoned-{{ $abandoned['order_number'] }}-Modal"><i class="fa fa-eye"></i></a>
 											@if ($abandoned['active'] == 1 && $abandoned['email'] && $abandoned['name'])
-											<button type="button" class="btn btn-outline-primary btn-sm" data-toggle="modal" data-target="#email-{{ $abandoned['order_number'] }}">Email</button>
+											<button type="button" class="btn btn-outline-primary btn-sm" data-toggle="modal" data-target="#email-{{ $abandoned['order_number'] }}"><i class="fa fa-envelope"></i></button>
 											@endif
 										</div>
 										@if ($abandoned['active'] == 1 && $abandoned['email'] && $abandoned['name'])
