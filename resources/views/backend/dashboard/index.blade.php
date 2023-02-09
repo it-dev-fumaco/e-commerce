@@ -107,7 +107,7 @@
 										@php
 											$selected = $loop->last ? 'selected' : '';
 										@endphp
-										<option value="{{ $year->{'YEAR(order_date)'} }}" {{ $selected }}>{{ $year->{'YEAR(order_date)'} }}</option>
+										<option value="{{ $year }}" {{ $selected }}>{{ $year }}</option>
 									@endforeach
 								</select>
 							</form>

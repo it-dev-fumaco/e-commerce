@@ -132,7 +132,8 @@ class DashboardController extends Controller
 				'js_month_name' => $month_name->format('M')
 			];
 		}
-		$sales_year = DB::table('fumaco_order')->selectRaw('YEAR(order_date)')->orderBy('order_date', 'asc')->distinct()->get();
+		
+		$sales_year = DB::table('fumaco_order')->orderBy('order_date', 'asc')->selectRaw('YEAR(order_date) as year_order_date')->distinct()->pluck('year_order_date');
 
 		if($request->ajax()){
 			$sales_data = collect($sales_arr)->pluck('sales')->implode(',');
