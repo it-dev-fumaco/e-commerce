@@ -39,8 +39,8 @@
 						<div class="card-body">
 							<h4 class="d-inline-block">Shipping Service Details</h4>
 								<div class="float-right">
-									<a href="/admin/shipping/add" class="btn btn-secondary mr-2">Create New Shipping</a>
-									<button type="submit" class="btn btn-primary">Update</button>
+									<a href="/admin/shipping/add" class="btn btn-secondary mr-2"><i class="fa fa-plus"></i>&nbsp;Create New Shipping</a>
+									<button type="submit" class="btn btn-primary"><i class="fas fa-save"></i>&nbsp;Update</button>
 								</div>
 							<hr>
 							<div class="row">
@@ -113,7 +113,7 @@
 							<div class="row store-locations {{ ($details->shipping_service_name != 'Store Pickup') ? 'd-none' : ''  }}">
 								<div class="col-md-8 offset-md-2">
 									<div class="float-right mt-2">
-										 <button class="btn btn-outline-primary btn-sm mb-2" type="button" id="add-store-btn">Add Store</button>
+										 <button class="btn btn-outline-primary btn-sm mb-2" type="button" id="add-store-btn"><i class="fa fa-plus"></i>&nbsp;Add Store</button>
 									</div>
 									<table class="table table-bordered" id="stores-table">
 										 <thead>
@@ -139,7 +139,7 @@
 													<input type="text" name="allowed_hours[]" class="form-control" placeholder="0.00" value="{{ $row->allowance_in_hours }}" required>
 												 </td>
 												 <td class="text-center">
-													  <button class="btn btn-outline-danger btn-sm remove-td-row">Remove</button>
+													  <button class="btn btn-outline-danger btn-sm remove-td-row"><i class="fa fa-trash"></i></button>
 												 </td>
 											</tr>
 											@endforeach
@@ -164,7 +164,7 @@
 							<div class="row shipping-conditions {{ ($details->shipping_calculation == 'Flat Rate' || !$details->shipping_calculation) ? 'd-none' : ''  }}">
 								<div class="col-md-10 offset-md-1">
 									<div class="float-right">
-										 <button class="btn btn-outline-primary btn-sm mb-2" type="button" id="add-shipping-condition-btn">Add Shipping Condition</button>
+										 <button class="btn btn-outline-primary btn-sm mb-2" type="button" id="add-shipping-condition-btn"><i class="fa fa-plus"></i>&nbsp;Add Shipping Condition</button>
 									</div>
 									<table class="table table-bordered" id="shipping-condition-table">
 										 <thead>
@@ -198,7 +198,7 @@
 													  <input type="text" name="shipping_amount[]" class="form-control" value="{{ $conditions->shipping_amount }}" placeholder="0.00" required>
 												 </td>
 												 <td class="text-center">
-													  <button type="button" class="btn btn-outline-danger btn-sm remove-td-row">Remove</button>
+													  <button type="button" class="btn btn-outline-danger btn-sm remove-td-row"><i class="fa fa-trash"></i></button>
 												 </td>
 											</tr>
 											@endforeach
@@ -212,7 +212,7 @@
 								<div class="col-md-10 offset-md-1">
 									<label>Allow shipping rule to these region/city only.</label>
 									<div class="float-right">
-										 <button class="btn btn-outline-primary btn-sm mb-2" id="add-shipping-zone-btn">Add Shipping Zone</button>
+										 <button class="btn btn-outline-primary btn-sm mb-2" id="add-shipping-zone-btn"><i class="fa fa-plus"></i>&nbsp;Add Shipping Zone</button>
 									</div>
 									<table class="table table-bordered" id="shipping-zone-table">
 										 <thead>
@@ -239,7 +239,7 @@
 													  </select>
 												 </td>
 												 <td class="text-center">
-													  <button class="btn btn-outline-danger btn-sm remove-td-row">Remove</button>
+													  <button class="btn btn-outline-danger btn-sm remove-td-row"><i class="fa fa-trash"></i></button>
 												 </td>
 											</tr>
 											@endforeach
@@ -253,7 +253,7 @@
 								<div class="col-md-6 offset-md-3">
 									<label id="label-cat">{{ $details->shipping_service_name == 'Store Pickup' ? 'Override leadtime for the following product categories' : 'Not applicable for the following product categories' }}</label>
 									<div class="float-right">
-										 <button class="btn btn-outline-primary btn-sm mb-2" id="add-product-category-btn">Add Product Category</button>
+										 <button class="btn btn-outline-primary btn-sm mb-2" id="add-product-category-btn"><i class="fa fa-plus"></i>&nbsp;Add Product Category</button>
 									</div>
 									<table class="table table-bordered" id="product-category-table">
 										 <thead>
@@ -282,7 +282,7 @@
 													<input type="text" name="c_max_leadtime[]" class="form-control" value="{{ $row->max_leadtime }}" placeholder="0.00" required>
 												</td>
 												<td class="text-center">
-													<button class="btn btn-outline-danger btn-sm remove-td-row">Remove</button>
+													<button class="btn btn-outline-danger btn-sm remove-td-row"><i class="fa fa-trash"></i></button>
 												</td>
 											</tr>
 											 @endforeach
@@ -443,7 +443,7 @@
 					'<input type="text" name="allowed_hours[]" class="form-control" placeholder="0.00" required>' +
 				'</td>' +
 				'<td class="text-center">' +
-					'<button class="btn btn-outline-danger btn-sm remove-td-row">Remove</button>' +
+					'<button class="btn btn-outline-danger btn-sm remove-td-row"><i class="fa fa-trash"></i></button>' +
 				'</td>' +
 			'</tr>';
 
@@ -461,7 +461,7 @@
 					'<select name="city[]" class="form-control city-select w-100" style="width: 100%;" required><option value=""></option></select>' +
 				'</td>' +
 				'<td class="text-center">' +
-					'<button class="btn btn-outline-danger btn-sm remove-td-row">Remove</button>' +
+					'<button class="btn btn-outline-danger btn-sm remove-td-row"><i class="fa fa-trash"></i></button>' +
 				'</td>' +
 			'</tr>';
 
@@ -508,7 +508,7 @@
 					'<input type="text" name="shipping_amount[]" class="form-control" placeholder="0.00" required>' +
 				'</td>' +
 				'<td class="text-center">' +
-					'<button type="button" class="btn btn-outline-danger btn-sm remove-td-row">Remove</button>' +
+					'<button type="button" class="btn btn-outline-danger btn-sm remove-td-row"><i class="fa fa-trash"></i></button>' +
 				'</td>' +
 			'</tr>';
 
@@ -650,7 +650,7 @@
 					'<input type="text" name="c_max_leadtime[]" class="form-control" placeholder="0 Day(s)" required>' +
 				'</td>' +
 				'<td class="text-center">' +
-					'<button class="btn btn-outline-danger btn-sm remove-td-row">Remove</button>' +
+					'<button class="btn btn-outline-danger btn-sm remove-td-row"><i class="fa fa-trash"></i></button>' +
 				'</td>' +
 			'</tr>';
 

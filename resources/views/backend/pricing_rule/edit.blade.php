@@ -33,7 +33,7 @@
                                     <div class="row">
                                         <div class="col-9 p-0"><h4 class="ml-1 mb-0 p-1">Price Rule Details</h4></div>
                                         <div class="col-3 text-right">
-                                            <button class="btn btn-primary" type="submit">Submit</button>
+                                            <button class="btn btn-primary" type="submit"><i class="fas fa-save"></i>&nbsp;Submit</button>
                                         </div>
                                         <div class="col-12">
                                             <p class="mt-3 mb-0"><strong>Note:</strong> If item has existing discount, discount will be based on regular price.</p>
@@ -104,7 +104,7 @@
                                                         <thead>
                                                             <th style="width: 80%;" scope="col" class="text-center p-2 align-middle">Item Code</th>
                                                             <th style="width: 20%;" scope="col" class="text-center p-2 align-middle">
-                                                                <button type="button" class="add-row-btn btn btn-outline-primary btn-sm" data-table="#item-code-table" data-ref="item_code">Add Row</button>
+                                                                <button type="button" class="add-row-btn btn btn-outline-primary btn-sm" data-table="#item-code-table" data-ref="item_code" style="white-space: nowrap"><i class="fa fa-plus"></i>&nbsp;Add Row</button>
                                                             </th>
                                                         </thead>
                                                         <tbody>
@@ -119,7 +119,7 @@
                                                                     </select>
                                                                 </td>
                                                                 <td class="text-center">
-                                                                    <button type="button" class="btn btn-outline-danger btn-sm remove-td-row">Remove</button>
+                                                                    <button type="button" class="btn btn-outline-danger btn-sm remove-td-row"><i class="fa fa-trash"></i></button>
                                                                 </td>
                                                             </tr>
                                                             @endforeach
@@ -135,7 +135,7 @@
                                                         <thead>
                                                             <th style="width: 80%;" scope="col" class="text-center p-2 align-middle">Category</th>
                                                             <th style="width: 20%;" scope="col" class="text-center p-2 align-middle">
-                                                                <button type="button" class="add-row-btn btn btn-outline-primary btn-sm" data-table="#category-table" data-ref="category">Add Row</button>
+                                                                <button type="button" class="add-row-btn btn btn-outline-primary btn-sm" data-table="#category-table" data-ref="category" style="white-space: nowrap"><i class="fa fa-plus"></i>&nbsp;Add Row</button>
                                                             </th>
                                                         </thead>
                                                         <tbody>
@@ -150,7 +150,7 @@
                                                                     </select>
                                                                 </td>
                                                                 <td class="text-center">
-                                                                    <button type="button" class="btn btn-outline-danger btn-sm remove-td-row">Remove</button>
+                                                                    <button type="button" class="btn btn-outline-danger btn-sm remove-td-row"><i class="fa fa-trash"></i></button>
                                                                 </td>
                                                             </tr>
                                                             @endforeach
@@ -174,7 +174,7 @@
                                                             <th style="width: 30%;" scope="col" class="text-center p-2 align-middle">Range To</th>
                                                             <th style="width: 30%;" scope="col" class="text-center p-2 align-middle" id="conditions-text">{{ $price_rule->discount_type == 'Percentage' ? 'Discount Percentage' : 'Discount Amount' }}</th>
                                                             <th style="width: 10%;" scope="col" class="text-center p-2 align-middle">
-                                                                <button type="button" class="btn btn-outline-primary btn-sm" id="add-conditions-row-btn">Add Row</button>
+                                                                <button type="button" class="btn btn-outline-primary btn-sm" id="add-conditions-row-btn" style="white-space: nowrap"><i class="fa fa-plus"></i>&nbsp;Add Row</button>
                                                             </th>
                                                         </thead>
                                                         <tbody>
@@ -190,7 +190,7 @@
                                                                     <input type="text" name="rate[{{ $s->price_rule_condition_id }}]" class="form-control" placeholder="Rate" value="{{ $s->rate }}" required>
                                                                 </td>
                                                                 <td class="text-center">
-                                                                    <button type="button" class="btn btn-outline-danger btn-sm remove-td-row">Remove</button>
+                                                                    <button type="button" class="btn btn-outline-danger btn-sm remove-td-row"><i class="fa fa-trash"></i></button>
                                                                 </td>
                                                             </tr>
                                                             @endforeach
@@ -272,7 +272,7 @@
 					'<input type="text" name="new_rate[]" class="form-control" placeholder="Rate" required>' +
 				'</td>' +
 				'<td class="text-center">' +
-					'<button type="button" class="btn btn-outline-danger btn-sm remove-td-row">Remove</button>' +
+					'<button type="button" class="btn btn-outline-danger btn-sm remove-td-row"><i class="fa fa-trash"></i></button>' +
 				'</td>' +
 			'</tr>';
             
@@ -285,7 +285,7 @@
 					'<select name="new_applied_on[]" class="form-control w-100 custom-select-2" required></select>' +
 				'</td>' +
 				'<td class="text-center">' +
-					'<button type="button" class="btn btn-outline-danger btn-sm remove-td-row">Remove</button>' +
+					'<button type="button" class="btn btn-outline-danger btn-sm remove-td-row"><i class="fa fa-trash"></i></button>' +
 				'</td>' +
 			'</tr>';
             

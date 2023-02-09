@@ -533,12 +533,12 @@
                   <p>Email Setup</p>
                 </a>
               </li>
-              <li class="nav-item">
+              {{-- <li class="nav-item">
                 <a href=" " class="nav-link {{ $activePage == 'erp_api_setup' ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Email Templates</p>
                 </a>
-              </li>
+              </li> --}}
             </ul>
           </li>
 

@@ -38,7 +38,7 @@
                                     <div class="row">
                                         <div class="col-9"><h4>On Sale Details</h4></div>
                                         <div class="col-3 text-right">
-                                            <button class="btn btn-primary">Submit</button>
+                                            <button class="btn btn-primary"><i class="fas fa-save"></i>&nbsp;Submit</button>
                                         </div>
                                     </div>
                                     <div class="row">
@@ -145,7 +145,7 @@
                                                                 <th style="width: 25%;" scope="col" class="text-center p-2 align-middle">Amount/Rate</th>
                                                                 <th style="width: 25%;" scope="col" class="text-center p-2 align-middle capped_amount">Capped Amount</th>
                                                                 <th style="width: 10%;" scope="col" class="text-center p-2 align-middle">
-                                                                    <button type="button" class="add-row-btn btn btn-outline-primary btn-sm" id="add-categories-btn" data-table="#categories-table" data-select="#category_select">Add Row</button>
+                                                                    <button type="button" class="add-row-btn btn btn-outline-primary btn-sm" id="add-categories-btn" data-table="#categories-table" data-select="#category_select" style="white-space: nowrap"><i class="fa fa-plus"></i>&nbsp;Add Row</button>
                                                                 </th>
                                                             </tr>
                                                         </thead>
@@ -173,7 +173,7 @@
                                                                 <th style="width: 25%;" scope="col" class="text-center p-2 align-middle">Amount/Rate</th>
                                                                 <th style="width: 25%;" scope="col" class="text-center p-2 align-middle capped_amount">Capped Amount</th>
                                                                 <th style="width: 10%;" scope="col" class="text-center p-2 align-middle">
-                                                                    <button type="button" class="add-row-btn btn btn-outline-primary btn-sm" id="add-customer-group-btn" data-table="#customer-group-table" data-select="#customer-group-select">Add Row</button>
+                                                                    <button type="button" class="add-row-btn btn btn-outline-primary btn-sm" id="add-customer-group-btn" data-table="#customer-group-table" data-select="#customer-group-select" style="white-space: nowrap"><i class="fa fa-plus"></i>&nbsp;Add Row</button>
                                                                 </th>
                                                             </tr>
                                                         </thead>
@@ -201,7 +201,7 @@
                                                                 <th style="width: 25%;" scope="col" class="text-center p-2 align-middle">Amount/Rate</th>
                                                                 <th style="width: 25%;" scope="col" class="text-center p-2 align-middle capped_amount">Capped Amount</th>
                                                                 <th style="width: 10%;" scope="col" class="text-center p-2 align-middle">
-                                                                    <button type="button" class="btn btn-outline-primary btn-sm add-row-btn" id="add-shipping-btn" data-table="#shipping-table" data-select="#shipping_select">Add Row</button>
+                                                                    <button type="button" class="btn btn-outline-primary btn-sm add-row-btn" id="add-shipping-btn" data-table="#shipping-table" data-select="#shipping_select" style="white-space: nowrap"><i class="fa fa-plus"></i>&nbsp;Add Row</button>
                                                                 </th>
                                                             </tr>
                                                         </thead>
@@ -236,7 +236,7 @@
                                                                 <th style="width: 15%;" scope="col" class="text-center p-2 align-middle">Amount/Rate</th>
                                                                 <th style="width: 15%;" scope="col" class="text-center p-2 align-middle capped_amount">Capped Amount</th>
                                                                 <th style="width: 8%;" scope="col" class="text-center p-2 align-middle">
-                                                                    <button type="button" class="add-row-btn btn btn-outline-primary btn-sm" id="add-selected-items-btn" data-table="#selected-items-table" data-select="#item_code_select">Add Row</button>
+                                                                    <button type="button" class="add-row-btn btn btn-outline-primary btn-sm" id="add-selected-items-btn" data-table="#selected-items-table" data-select="#item_code_select" style="white-space: nowrap"><i class="fa fa-plus"></i>&nbsp;Add Row</button>
                                                                 </th>
                                                             </tr>
                                                         </thead>
@@ -493,7 +493,7 @@
 					'<input type="number" name="selected_capped_amount[]" class="form-control cap_amount" value="0" placeholder="Capped Amount">' +
 				'</td>' +
 				'<td class="text-center">' +
-					'<button type="button" class="btn btn-outline-danger btn-sm remove-td-row">Remove</button>' +
+					'<button type="button" class="btn btn-outline-danger btn-sm remove-td-row"><i class="fa fa-trash"></i></button>' +
 				'</td>' +
 			'</tr>';
             

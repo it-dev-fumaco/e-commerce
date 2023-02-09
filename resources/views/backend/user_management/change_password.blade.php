@@ -69,7 +69,7 @@
                                         </div>
                                         <br/>
                                         <div class="row">
-                                            <button type="submit" class="btn btn-primary">Save</button>
+                                            <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i>&nbsp;Save</button>
                                         </div>
                                     </form>
                                 </div>

@@ -96,7 +96,7 @@
 							</div>
 							<!-- /.card-body -->
 							<div class="card-footer text-center">
-								<button type="submit" class="btn btn-primary btn-lg">SUBMIT</button>
+								<button type="submit" class="btn btn-primary btn-lg"><i class="fas fa-save"></i>&nbsp;SUBMIT</button>
 							</div>
 						</div>
 						<!-- /.card -->
