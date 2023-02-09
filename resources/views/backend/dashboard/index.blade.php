@@ -233,11 +233,11 @@
 						</h3>
 					</div>
 					<div class="card-body">
-						<table class="table table-hover table-bordered table-striped">
+						<table class="table table-hover">
 							<thead>
-								<th style="width: 20%" class="text-center">Cart Owner</th>
-								<th style="width: 10%" class="text-center">Cart Status</th>
 								<th style="width: 15%" class="text-center">Last Online</th>
+								<th style="width: 20%" class="text-center">Cart Owner</th>
+								<th style="width: 10%" class="text-center">Status</th>
 								<th style="width: 20%" class="text-center">Products</th>
 								<th style="width: 10%" class="text-center">Total Qty</th>
 								<th style="width: 10%" class="text-center">Amount</th>
@@ -245,29 +245,51 @@
 							</thead>
 							@foreach ($cart_collection as $cart)
 								@php
-									$status_color = '#DC3545';
-									if($cart['status'] == 'Active'){
-										$status_color = '#007BFF';
-									}else if($cart['status'] == 'Converted'){
-										$status_color = '#28A745';
+									switch ($cart['status']) {
+										case 'Active':
+											$status_color = '#fff';
+											$badge = 'info';
+											break;
+										case 'Converted':
+											$status_color = 'rgba(40, 167, 69, 0.2)';
+											$badge = 'check';
+											break;
+										default:
+											$status_color = 'rgba(255, 0, 0, 0.15)';
+											$badge = 'ban';
+											break;
 									}
+									// if($cart['status'] == 'Active'){
+									// 	$status_color = '#007BFF';
+									// }else if($cart['status'] == 'Converted'){
+									// 	$status_color = '#28A745';
+									// }
 								@endphp
-								<tr>
-									<td class="text-center">{{ $cart['user_type'] == 'member' ? $cart['owner'] : 'Guest' }}</td>
-									<td class="text-center">
-										<span class="badge w-100" style="font-size: 11pt; background-color: {{ $status_color }}; color: #fff">{{ $cart['status'] }}</span>
+								<tr style="background-color: {{ $status_color }};">
+									<td style="font-size: 11pt; border-bottom: 1px solid #CED0D2 !important" class="text-center">
+										@if($cart['last_online'])
+											<span style="font-size: 13pt;">{{ Carbon\Carbon::parse($cart['last_online'])->format('M d, Y') }}</span><br>
+											<span class="text-muted">{{ Carbon\Carbon::parse($cart['last_online'])->format('h:i a') }}</span>
+										@endif
 									</td>
-									<td style="font-size: 11pt" class="text-center">{{ $cart['last_online'] ? \Carbon\Carbon::parse($cart['last_online'])->format('M d, Y - h:i a') : null }}</td>
-									<td>
+									<td class="text-center" style="border-bottom: 1px solid #CED0D2 !important">{{ $cart['user_type'] == 'member' ? $cart['owner'] : 'Guest' }}</td>
+									<td style="border-bottom: 1px solid #CED0D2 !important">
+										<i class="fa fa-{{ $badge }}"></i>&nbsp;<span style="font-size: 13pt;">{{ $cart['status'] }}</span>
+										@if($cart['status'] == 'Converted')
+											<br>
+											<span class="text-muted">{{ $cart['transaction_id'] }}</span>
+										@endif
+									</td>
+									<td style="border-bottom: 1px solid #CED0D2 !important">
 										@foreach ($cart['items'] as $item)
 											<a href="/product/{{ $item['slug'] ? $item['slug'] : $item['item_code'] }}" class="badge badge-primary" target="_blank">{{ $item['item_code'] }}</a>
 										@endforeach
 									</td>
-									<td class="text-center">
+									<td class="text-center" style="border-bottom: 1px solid #CED0D2 !important">
 										{{ $cart['total_qty'] }}
 									</td>
-									<td class="text-center">{{ isset($cart['grand_total']) ? '₱ '.number_format($cart['grand_total'], 2) : null }}</td>
-									<td class="text-center">
+									<td class="text-center" style="border-bottom: 1px solid #CED0D2 !important">{{ isset($cart['grand_total']) ? '₱ '.number_format($cart['grand_total'], 2) : null }}</td>
+									<td class="text-center" style="border-bottom: 1px solid #CED0D2 !important">
 										@if($cart['status'] == 'Converted')
 											<a href="#" data-toggle="modal" data-target="#view{{ $cart['transaction_id'] }}Modal">
 												View Order
