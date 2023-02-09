@@ -133,7 +133,9 @@ class DashboardController extends Controller
 			];
 		}
 		
-		$sales_year = DB::table('fumaco_order')->orderBy('order_date', 'asc')->distinct()->pluck(DB::raw('YEAR(order_date)'));
+		$sales_year = DB::table('fumaco_order')->distinct()->pluck(DB::raw('YEAR(order_date)'));
+		$sales_year = collect($sales_year)->sort();	
+		$sales_year = $sales_year->values()->all();
 
 		if($request->ajax()){
 			$sales_data = collect($sales_arr)->pluck('sales')->implode(',');
