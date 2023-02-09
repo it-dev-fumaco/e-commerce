@@ -41,33 +41,33 @@
                                         <div class="row">
                                             <div class="col-md-9"><h4>Contact Us</h4></div>
                                             <div class="col-md-3 text-right">
-                                                <a href="/admin/pages/contact/add_form" class="btn btn-secondary">Add an Address</a>
-                                                <button class="btn btn-primary">Submit</button>
+                                                <a href="/admin/pages/contact/add_form" class="btn btn-secondary"><i class="fas fa-plus"></i> Add an Address</a>
+                                                <button class="btn btn-primary"><i class="fas fa-save"></i> Save</button>
                                             </div>
                                         </div>
                                         @csrf
                                         <div class="row">
                                             <div class="form-group col-md-12">
-                                                <label>Office Title *</label>
+                                                <label>Office Title <span class="text-danger">*</span></label>
                                                 <input type="text" name="title" class="form-control" value="{{ $address->office_title }}" required>
                                             </div>
                                         </div>
                                         <div class="row">
                                             <div class="form-group col-md-12">
-                                                <label>Office Address *</label>
+                                                <label>Office Address <span class="text-danger">*</span></label>
                                                 <input type="text" name="address" class="form-control" value="{{ $address->office_address }}" required/>
                                             </div>
                                         </div>
                                         <div class="row">
                                             <div class="col-8 mx-auto">
                                                 <button class="btn btn-primary float-right m-2" id="add-contact-numbers-btn"><i class="fa fa-plus"></i> Add Contact Info</button>
-                                                <table class="table table-striped" id="contact-numbers-table">
+                                                <table class="table table-striped table-bordered" id="contact-numbers-table">
                                                     <thead>
-                                                        <tr>
+                                                        <thead>
                                                             <th class='text-center' style="width: 30%;">Type</th>
-                                                            <th class='text-center' style="width: 50%">Contact Info</th>
-                                                            <th class='text-center' style="width: 20%">-</th>
-                                                        </tr>
+                                                            <th class='text-center' style="width: 60%">Contact Info</th>
+                                                            <th class='text-center' style="width: 10%">-</th>
+                                                        </thead>
                                                     </thead>
                                                     <tbody>
                                                         @php
@@ -94,7 +94,7 @@
                                                                     $a = $i + 1;
                                                                     $selected_platforms = $info->messaging_apps ? explode(',', $info->messaging_apps) : [];
                                                                 @endphp
-                                                                <td class="text-center">
+                                                                <td class="text-center align-middle">
                                                                     <select name="type[row-{{ $a }}]" class="form-control type-select" data-row="row-{{ $a }}" required>
                                                                         <option value="" disabled>Select Contact Type</option>
                                                                         @foreach ($types as $type)
@@ -102,7 +102,7 @@
                                                                         @endforeach
                                                                     </select>
                                                                 </td>
-                                                                <td class="text-center">
+                                                                <td class="text-center align-middle">
                                                                     <input type="text" name="contact[row-{{ $a }}]" class="form-control" value="{{ $info->contact }}" required>
                                                                     <div id="row-{{ $a }}-msg-container" class="text-left p-2" style="display: {{ $info->type != 'Mobile' ? 'none' : null}}">
                                                                         <div>
@@ -113,8 +113,8 @@
                                                                         </div>
                                                                     </div>
                                                                 </td>
-                                                                <td>
-                                                                    <button class="btn btn-outline-danger w-100 remove-row" data-row="row-{{ $a }}">Remove</button>
+                                                                <td class="text-center align-middle">
+                                                                    <button class="btn btn-danger btn-sm remove-row" data-row="row-{{ $a }}"><i class="fas fa-trash"></i></button>
                                                                 </td>
                                                             </tr> 
                                                         @endforeach
@@ -159,7 +159,7 @@
                         '</div>' + 
                     '</td>' +
                     '<td>' +
-                        '<button type="button" class="btn btn-outline-danger w-100 remove-row" data-row="row-' + row_count + '">Remove</button>' +
+                        '<button type="button" class="btn btn-danger remove-row btn-sm" data-row="row-' + row_count + '"><i class="fas fa-trash"></i></button>' +
                     '</td>' +
                 '</tr>';
 

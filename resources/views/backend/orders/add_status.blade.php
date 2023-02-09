@@ -43,7 +43,7 @@
                                     <div class="row">
                                         <div class="col-9"><h4>Add Order Status</h4></div>
                                         <div class="col-3 text-right">
-                                            <button class="btn btn-primary">Submit</button>
+                                            <button class="btn btn-primary"><i class="fas fa-save"></i>&nbsp;Submit</button>
                                         </div>
                                     </div>
                                     <div class="row">

@@ -35,20 +35,20 @@
                                                 </div>
                                             </div>
                                             <div class="col-md-4">
-                                                <button type="submit" class="btn btn-secondary">Search</button>
+                                                <button type="submit" class="btn btn-info"><i class="fa fa-search"></i> Search</button>
                                             </div>
                                         </div>
                                     </form>
                                     <table class="table table-hover table-bordered" style="font-size: 11pt;">
                                         <thead>
                                             <tr>
-                                                <th class="text-center">ID</th>
-                                                <th class="text-center">Customer Name</th>
-                                                <th class="text-center">Email Address</th>
-                                                <th class="text-center">Customer Group</th>
-                                                <th class="text-center">Last Login Date</th>
-                                                <th class="text-center">Last Login Used</th>
-                                                <th class="text-center">Action</th>
+                                                <th class="text-center align-middle">ID</th>
+                                                <th class="text-center align-middle">Customer Name</th>
+                                                <th class="text-center align-middle">Email Address</th>
+                                                <th class="text-center align-middle">Customer Group</th>
+                                                <th class="text-center align-middle">Last Login Date</th>
+                                                <th class="text-center align-middle">Last Login Used</th>
+                                                <th class="text-center align-middle">Action</th>
                                             </tr>
                                         </thead>
                                         
@@ -67,7 +67,7 @@
                                             </tr>
                                         @empty
                                             <tr>
-                                                <td colspan=5 class="text-center">No Customers</td>
+                                                <td colspan=5 class="text-center text-muted text-uppercase">No Customers</td>
                                             </tr>
                                         @endforelse
                                     </table>

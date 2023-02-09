@@ -49,7 +49,7 @@
                                                     <input type="text" class="form-control" id="search-box" name="q" placeholder="Search Price Rule Name" value="{{ request()->get('q') }}">
                                                 </div>
                                                 <div class="col-1">
-                                                    <button type="submit" class="btn btn-secondary mx-auto" style='width: 100%'>Search</button>
+                                                    <button type="submit" class="btn btn-info mx-auto" style='width: 100%'><i class="fas fa-search"></i> Search</button>
                                                 </div>
                                                 <div class="col-6">&nbsp;</div>
                                                 <div class="col-1">
@@ -87,7 +87,7 @@
                                                     </center>
                                                 </td>
                                                 <td class="text-center p-1 align-middle">
-                                                    <a href="/admin/marketing/pricing_rule/{{ $r->price_rule_id }}/edit" class="btn btn-sm btn-primary"><i class="fa fa-eye"></i></a>
+                                                    <a href="/admin/marketing/pricing_rule/{{ $r->price_rule_id }}/edit" class="btn btn-sm btn-primary"><i class="fa fa-edit"></i></a>
                                                     <a href="#" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#delete{{ $r->price_rule_id }}"><i class="fa fa-trash"></i></a>
                                                 </td>
                                             </tr>
@@ -97,15 +97,15 @@
                                                         @csrf
                                                         <div class="modal-content">
                                                             <div class="modal-header">
-                                                                <h5 class="modal-title">Delete Price Rule</h5>
+                                                                <h5 class="modal-title"><i class="fas fa-trash"></i> Delete Price Rule</h5>
                                                             </div>
                                                             <div class="modal-body">
                                                                 <input type="hidden" name="price_rule_name" value="{{ $r->name }}">
                                                                 Delete <b>{{ $r->name }}</b>?
                                                             </div>
                                                             <div class="modal-footer">
-                                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                                                <button type="submit" class="btn btn-danger">Delete</button>
+                                                                <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fas fa-times"></i> Close</button>
+                                                                <button type="submit" class="btn btn-danger"><i class="fas fa-trash"></i> Delete</button>
                                                             </div>
                                                         </div>
                                                     </form>

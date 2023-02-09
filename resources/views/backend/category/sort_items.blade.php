@@ -53,7 +53,7 @@
                                                     <input type="text" class="form-control" id="search-box" name="q" placeholder="Search" value="" required>
                                                     </div>
                                                     <div class="col-md-4">
-                                                        <button type="submit" class="btn btn-primary">Search</button>
+                                                        <button type="submit" class="btn btn-info"><i class="fas fa-search"></i> Search</button>
                                                     </div>
                                                 </div>
                                             </div>
@@ -62,10 +62,10 @@
                                     <table class="table table-bordered table-hover">
                                         <thead>
                                             <tr>
-                                                <th class="text-center">Order No.</th>
-                                                <th class="text-center">Item Code</th>
-                                                <th class="text-center">Item Name</th>
-                                                <th class="text-center">Row</th>
+                                                <th class="text-center align-middle">Order No.</th>
+                                                <th class="text-center align-middle">Item Code</th>
+                                                <th class="text-center align-middle">Item Name</th>
+                                                <th class="text-center align-middle">Row</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -73,13 +73,13 @@
                                             <tr>
                                                 <form action="/admin/category/set_row/{{ $item->f_cat_id }}" method="post">
                                                     @csrf
-                                                    <td class="text-center" style="width: 10%;" >{{ $item->f_order_by }}</td>
-                                                    <td class="text-center" style="width: 20%;" >{{ $item->f_idcode }}</td>
-                                                    <td class="text-center" style="width: 40%;" >{{ $item->f_name_name }}</td>
-                                                    <td class="text-center" style="width: 30%;" >
-                                                        <div class="form-group row">
-                                                            <div class="col-md-6">
-                                                                <select class="form-control formslabelfnt" id="row_select" aria-label="Default select example" name="item_row" required>
+                                                    <td class="text-center align-middle" style="width: 8%;" >{{ $item->f_order_by }}</td>
+                                                    <td class="text-center align-middle" style="width: 10%;" >{{ $item->f_idcode }}</td>
+                                                    <td class="text-justify align-middle" style="width: 62%;" >{{ $item->f_name_name }}</td>
+                                                    <td class="text-center align-middle" style="width: 20%;" >
+                                                        <div class="form-group row m-0 p-0">
+                                                            <div class="col-md-8">
+                                                                <select class="form-control form-control-sm formslabelfnt" id="row_select" aria-label="Default select example" name="item_row" required>
                                                                     <option selected disabled value="">Select Order No.</option>
                                                                     @for ($i = 0; $i < $count; $i++)
                                                                         @php
@@ -89,14 +89,10 @@
                                                                     @endfor
                                                                 </select>
                                                             </div>
-                                                            <div class="col-md-3">
+                                                            <div class="col-md-4">
                                                                 <input type="text" name="item_code" id="item_code" value="{{ $item->f_idcode }}" required hidden/>
-                                                                <button type="submit" id="send" class="btn btn-primary" style="width: 100%">Update</button>
-                                                            </div>
-                                                            <div class="col-md-3">
-                                                                {{-- <input type="text" name="item_code" id="item_code" value="{{ $item->f_idcode }}" required hidden/>
-                                                                <button type="submit" id="send" class="btn btn-danger">Remove Order No.</button> --}}
-                                                                <a href="/admin/category/reset/{{ $item->f_idcode }}" class="btn btn-danger" style="width: 100%" role="button">Reset</a>
+                                                                <button type="submit" id="send" class="btn btn-primary btn-sm"><i class="fas fa-check"></i></button>
+                                                                <a href="/admin/category/reset/{{ $item->f_idcode }}" class="btn btn-danger btn-sm" role="button"><i class="fas fa-undo"></i></a>
                                                             </div>
                                                         </div>
                                                     </td>

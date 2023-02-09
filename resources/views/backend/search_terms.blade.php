@@ -31,12 +31,12 @@
                                         <div class="float-right">
                                             <form action="/admin/search/list" class="text-center" method="GET">
                                                 <div class="form-group row">
-                                                    <div class="col-sm-9">
+                                                    <div class="col-sm-8">
                                                         <input type="text" class="form-control" id="search-box" name="q" placeholder="Search" value="{{request()->get('q')}}">
                                                     </div>
                                                         
-                                                    <div class="col-sm-2">
-                                                        <button type="submit" class="btn btn-primary">Search</button>
+                                                    <div class="col-sm-3">
+                                                        <button type="submit" class="btn btn-primary" style="white-space: nowrap"><i class="fa fa-search"></i>&nbsp;Search</button>
                                                     </div>
                                                 </div>
                                             </form>

@@ -122,7 +122,7 @@
                                     </div>
                                 </div>
                                 <div class="card-footer">
-                                    <center><button type="submit" class="btn btn-lg btn-primary">Save Changes</button></center>
+                                    <center><button type="submit" class="btn btn-lg btn-primary"><i class="fas fa-save"></i> Save Changes</button></center>
                                 </div>
                                 </form>
                             </div>
@@ -142,9 +142,9 @@
                                                     <label class="custom-file-label" for="customFile">{{ $blog->blogprimaryimage ? $blog->blogprimaryimage : 'Choose File' }}</label>
                                                 </div>
                                                 @if($blog->blogprimaryimage)
-                                                    <p>Saved image: <b>{{ $blog->blogprimaryimage }}</b><button type="button" class="btn btn-sm btn-danger ml-3" data-toggle="modal" data-target="#deletePrimaryImageModal">Delete</button></p>
+                                                    <p>Saved image: <b>{{ $blog->blogprimaryimage }}</b><button type="button" class="btn btn-sm btn-danger ml-3" data-toggle="modal" data-target="#deletePrimaryImageModal"><i class="fas fa-trash"></i></button></p>
                                                 @else
-                                                    <p>No saved image</p>
+                                                    <p class="text-muted">No saved image</p>
                                                 @endif
                                                 <div class="modal fade" id="deletePrimaryImageModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                                     <div class="modal-dialog" role="document">
@@ -159,8 +159,8 @@
                                                                 Delete Primary Image?
                                                             </div>
                                                             <div class="modal-footer">
-                                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                                                <a href="/admin/blog/images/img-delete/{{ $id }}/blogprimaryimage" type="button" class="btn btn-danger">Delete</a>
+                                                                <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fas fa-times"></i> Close</button>
+                                                                <a href="/admin/blog/images/img-delete/{{ $id }}/blogprimaryimage" type="button" class="btn btn-danger"><i class="fas fa-trash"></i> Delete</a>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -173,9 +173,9 @@
                                                     <label class="custom-file-label" for="customFile">{{ $blog->{'blogprimayimage-tab'} ? $blog->{'blogprimayimage-tab'} : 'Choose File' }}</label>
                                                 </div>
                                                 @if($blog->{'blogprimayimage-tab'})
-                                                    <p>Saved image: <b>{{ $blog->{'blogprimayimage-tab'} }}</b><button type="button" class="btn btn-sm btn-danger ml-3" data-toggle="modal" data-target="#deleteTabletImageModal">Delete</button></p>
+                                                    <p>Saved image: <b>{{ $blog->{'blogprimayimage-tab'} }}</b><button type="button" class="btn btn-sm btn-danger ml-3" data-toggle="modal" data-target="#deleteTabletImageModal"><i class="fas fa-trash"></i></button></p>
                                                 @else
-                                                    <p>No saved image</p>
+                                                    <p class="text-muted">No saved image</p>
                                                 @endif
                                                 <div class="modal fade" id="deleteTabletImageModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                                     <div class="modal-dialog" role="document">
@@ -190,8 +190,8 @@
                                                                 Delete Tablet Image?
                                                             </div>
                                                             <div class="modal-footer">
-                                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                                                <a href="/admin/blog/images/img-delete/{{ $id }}/blogprimayimage-tab" type="button" class="btn btn-danger">Delete</a>
+                                                                <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fas fa-times"></i> Close</button>
+                                                                <a href="/admin/blog/images/img-delete/{{ $id }}/blogprimayimage-tab" type="button" class="btn btn-danger"><i class="fas fa-trash"></i> Delete</a>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -204,9 +204,9 @@
                                                     <label class="custom-file-label" for="customFile">{{ $blog->{'blogprimayimage-mob'} ? $blog->{'blogprimayimage-mob'} : 'Choose File' }}</label>
                                                 </div>
                                                 @if($blog->{'blogprimayimage-mob'})
-                                                    <p>Saved image: <b>{{ $blog->{'blogprimayimage-mob'} }}</b><button type="button" class="btn btn-sm btn-danger ml-3" data-toggle="modal" data-target="#deleteMobileImageModal">Delete</button></p>
+                                                    <p>Saved image: <b>{{ $blog->{'blogprimayimage-mob'} }}</b><button type="button" class="btn btn-sm btn-danger ml-3" data-toggle="modal" data-target="#deleteMobileImageModal"><i class="fas fa-trash"></i></button></p>
                                                 @else
-                                                    <p>No saved image</p>
+                                                    <p class="text-muted">No saved image</p>
                                                 @endif
                                                 <div class="modal fade" id="deleteMobileImageModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                                     <div class="modal-dialog" role="document">
@@ -221,8 +221,8 @@
                                                                 Delete Mobile Image?
                                                             </div>
                                                             <div class="modal-footer">
-                                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                                                <a href="/admin/blog/images/img-delete/{{ $id }}/blogprimayimage-mob" type="button" class="btn btn-danger">Delete</a>
+                                                                <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fas fa-times"></i> Close</button>
+                                                                <a href="/admin/blog/images/img-delete/{{ $id }}/blogprimayimage-mob" type="button" class="btn btn-danger"><i class="fas fa-trash"></i> Delete</a>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -236,9 +236,9 @@
                                                     <label class="custom-file-label" for="customFile">{{ $blog->{'blogprimayimage-home'} ? $blog->{'blogprimayimage-home'} : 'Choose File' }}</label>
                                                 </div>
                                                 @if($blog->{'blogprimayimage-home'})
-                                                    <p>Saved image: <b>{{ $blog->{'blogprimayimage-home'} }}</b><button type="button" class="btn btn-sm btn-danger ml-3" data-toggle="modal" data-target="#deleteHomeImageModal">Delete</button></p>
+                                                    <p>Saved image: <b>{{ $blog->{'blogprimayimage-home'} }}</b><button type="button" class="btn btn-sm btn-danger ml-3" data-toggle="modal" data-target="#deleteHomeImageModal"><i class="fas fa-trash"></i></button></p>
                                                 @else
-                                                    <p>No saved image</p>
+                                                    <p class="text-muted">No saved image</p>
                                                 @endif
                                                 <div class="modal fade" id="deleteHomeImageModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                                     <div class="modal-dialog" role="document">
@@ -253,8 +253,8 @@
                                                                 Delete Homepage Image?
                                                             </div>
                                                             <div class="modal-footer">
-                                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                                                <a href="/admin/blog/images/img-delete/{{ $id }}/blogprimayimage-home" type="button" class="btn btn-danger">Delete</a>
+                                                                <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fas fa-times"></i> Close</button>
+                                                                <a href="/admin/blog/images/img-delete/{{ $id }}/blogprimayimage-home" type="button" class="btn btn-danger"><i class="fas fa-trash"></i> Delete</a>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -267,9 +267,9 @@
                                                     <label class="custom-file-label" for="customFile">{{ $blog->{'blogprimayimage-journal'} ? $blog->{'blogprimayimage-journal'} : 'Choose File' }}</label>
                                                 </div>
                                                 @if($blog->{'blogprimayimage-journal'})
-                                                    <p>Saved image: <b>{{ $blog->{'blogprimayimage-journal'} }}</b><button type="button" class="btn btn-sm btn-danger ml-3" data-toggle="modal" data-target="#deleteJournalsImageModal">Delete</button></p>
+                                                    <p>Saved image: <b>{{ $blog->{'blogprimayimage-journal'} }}</b><button type="button" class="btn btn-sm btn-danger ml-3" data-toggle="modal" data-target="#deleteJournalsImageModal"><i class="fas fa-trash"></i></button></p>
                                                 @else
-                                                    <p>No saved image</p>
+                                                    <p class="text-muted">No saved image</p>
                                                 @endif
                                                 <div class="modal fade" id="deleteJournalsImageModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                                     <div class="modal-dialog" role="document">
@@ -284,8 +284,8 @@
                                                                 Delete Journals Page Image?
                                                             </div>
                                                             <div class="modal-footer">
-                                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                                                <a href="/admin/blog/images/img-delete/{{ $id }}/blogprimayimage-journal" type="button" class="btn btn-danger">Delete</a>
+                                                                <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fas fa-times"></i> Close</button>
+                                                                <a href="/admin/blog/images/img-delete/{{ $id }}/blogprimayimage-journal" type="button" class="btn btn-danger"><i class="fas fa-trash"></i> Delete</a>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -294,7 +294,7 @@
                                         </div>
                                     </div>
                                     <div class="card-footer">
-                                        <center><button type="submit" class="btn btn-lg btn-primary">Save Changes</button></center>
+                                        <center><button type="submit" class="btn btn-lg btn-primary"><i class="fas fa-save"></i> Save Changes</button></center>
                                     </div>
                                 </form>
                             </div>

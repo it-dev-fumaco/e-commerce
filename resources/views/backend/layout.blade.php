@@ -254,7 +254,7 @@
           @php
             $product_pages = ['add_product_form', 'product_list', 'view_product_form', 'product_attribute_settings', 'product_category', 'product_comparison', 'product_category_settings', 'product_reviews'];
             $media_pages = ['list_media', 'add_media'];
-            $order_pages = ['active', 'cancelled', 'completed', 'payment_status', 'order_status', 'order_status_sequence', 'payment_status_list'];
+            $order_pages = ['Order List', 'cancelled', 'completed', 'payment_status', 'order_status', 'order_status_sequence', 'payment_status_list'];
             $category_pages = ['product_category'];
             $customer_pages = ['customers_list'];
             $reports_pages = ['items_on_cart'];
@@ -314,7 +314,7 @@
             </ul>
           </li>
 
-          <li class="nav-header">ORDERS / SHIPPING</li>
+          <li class="nav-header">ORDERS</li>
           <li class="nav-item {{ (in_array($activePage, $order_pages) ? 'menu-open' : '') }}">
             <a href="#" class="nav-link {{ (in_array($activePage, $order_pages) ? 'active' : '') }}">
               <i class="nav-icon fas fa-dolly-flatbed"></i>
@@ -322,21 +322,9 @@
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="/admin/order/active" class="nav-link {{ $activePage == 'active' ? 'active' : '' }}">
+                <a href="/admin/order/list/Order Placed" class="nav-link {{ $activePage == 'Order List' ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>New Orders</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="/admin/order/cancelled" class="nav-link {{ $activePage == 'cancelled' ? 'active' : '' }}">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Cancelled Orders</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="/admin/order/completed" class="nav-link {{ $activePage == 'completed' ? 'active' : '' }}">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Delivered Orders</p>
+                  <p>Order List</p>
                 </a>
               </li>
               <li class="nav-item">
@@ -365,6 +353,7 @@
               </li>
             </ul>
           </li>
+          <li class="nav-header">SHIPPING</li>
           <li class="nav-item {{ (in_array($activePage, ['shipping_list', 'store_list', 'holiday_list']) ? 'menu-open' : '') }}">
             <a href="#" class="nav-link {{ (in_array($activePage, ['shipping_list', 'store_list', 'holiday_list'])) ? 'active' : '' }}">
               <i class="nav-icon fas fa-truck"></i>
@@ -544,12 +533,12 @@
                   <p>Email Setup</p>
                 </a>
               </li>
-              <li class="nav-item">
+              {{-- <li class="nav-item">
                 <a href=" " class="nav-link {{ $activePage == 'erp_api_setup' ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Email Templates</p>
                 </a>
-              </li>
+              </li> --}}
             </ul>
           </li>
 

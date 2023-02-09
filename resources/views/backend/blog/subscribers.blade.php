@@ -34,27 +34,27 @@
                                             </div>
                                                 
                                             <div class="col-sm-3">
-                                                <button type="submit" class="btn btn-primary">Search</button>
+                                                <button type="submit" class="btn btn-info"><i class="fa fa-search"></i> Search</button>
                                             </div>
                                         </div>
                                     </form>
-                                    <table class="table table-bordered table-hover">
+                                    <table class="table table-bordered table-hover table-striped">
                                         <thead>
                                             <tr>
-                                                <th>Email</th>
-                                                <th>Membership Status</th>
-                                                <th>Date Subscribed</th>
-                                                <th>Status</th>
+                                                <th class="text-center align-middle">Email</th>
+                                                <th class="text-center align-middle">Membership Status</th>
+                                                <th class="text-center align-middle">Date Subscribed</th>
+                                                <th class="text-center align-middle">Status</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             @forelse($subs_arr as $subs)
     
                                                 <tr>
-                                                    <td>{{ $subs['email'] }}</td>
-                                                    <td>{{ $subs['membership_status'] }}</td>
-                                                    <td>{{ $subs['subscribe_date'] }}</td>
-                                                    <td>
+                                                    <td class="text-center align-middle">{{ $subs['email'] }}</td>
+                                                    <td class="text-center align-middle">{{ $subs['membership_status'] }}</td>
+                                                    <td class="text-center align-middle">{{ \Carbon\Carbon::parse($subs['subscribe_date'])->format('M. d, Y h:i A') }}</td>
+                                                    <td class="text-center align-middle">
                                                         <center>
                                                             <label class="switch">
                                                                 <input type="checkbox" class="toggle" id="toggle_{{ $subs['id'] }}" name="publish" {{ ($subs['status'] == 1) ? 'checked' : '' }} value="{{ $subs['id'] }}"/>
@@ -65,7 +65,7 @@
                                                 </tr>
                                             @empty
                                                 <tr>
-                                                    <td colspan=2 class="text-center">No Subscribers</td>
+                                                    <td colspan="2" class="text-center text-muted text-uppercase">No Subscribers</td>
                                                 </tr>
                                             @endforelse
                                         </tbody>

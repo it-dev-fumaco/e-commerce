@@ -10,7 +10,7 @@
 	  <div class="container-fluid">
 		 <div class="row mb-2">
 			<div class="col-sm-6">
-			  <h1 class="m-0">Dashboard</h1>
+			  <h1 class="m-0">Admin Dashboard</h1>
 			</div><!-- /.col -->
 			<div class="col-sm-6">
 			  <ol class="breadcrumb float-sm-right">
@@ -105,7 +105,7 @@
 									<option value="2020">2020</option>
 									@foreach ($sales_year as $year)
 										@php
-											$selected = (\Carbon\Carbon::now()->format('Y') == $year->{'YEAR(order_date)'}) ? 'selected' : '';
+											$selected = $loop->last ? 'selected' : '';
 										@endphp
 										<option value="{{ $year->{'YEAR(order_date)'} }}" {{ $selected }}>{{ $year->{'YEAR(order_date)'} }}</option>
 									@endforeach
@@ -233,11 +233,11 @@
 						</h3>
 					</div>
 					<div class="card-body">
-						<table class="table table-hover table-bordered table-striped">
+						<table class="table table-hover">
 							<thead>
-								<th style="width: 20%" class="text-center">Cart Owner</th>
-								<th style="width: 10%" class="text-center">Cart Status</th>
 								<th style="width: 15%" class="text-center">Last Online</th>
+								<th style="width: 20%" class="text-center">Cart Owner</th>
+								<th style="width: 10%" class="text-center">Status</th>
 								<th style="width: 20%" class="text-center">Products</th>
 								<th style="width: 10%" class="text-center">Total Qty</th>
 								<th style="width: 10%" class="text-center">Amount</th>
@@ -245,29 +245,46 @@
 							</thead>
 							@foreach ($cart_collection as $cart)
 								@php
-									$status_color = '#DC3545';
-									if($cart['status'] == 'Active'){
-										$status_color = '#007BFF';
-									}else if($cart['status'] == 'Converted'){
-										$status_color = '#28A745';
+									switch ($cart['status']) {
+										case 'Active':
+											$status_color = '#fff';
+											$badge = 'info';
+											break;
+										case 'Converted':
+											$status_color = 'rgba(40, 167, 69, 0.2)';
+											$badge = 'check';
+											break;
+										default:
+											$status_color = 'rgba(255, 0, 0, 0.15)';
+											$badge = 'ban';
+											break;
 									}
 								@endphp
-								<tr>
-									<td class="text-center">{{ $cart['user_type'] == 'member' ? $cart['owner'] : 'Guest' }}</td>
-									<td class="text-center">
-										<span class="badge w-100" style="font-size: 11pt; background-color: {{ $status_color }}; color: #fff">{{ $cart['status'] }}</span>
+								<tr style="background-color: {{ $status_color }};">
+									<td style="font-size: 11pt; border-bottom: 1px solid #CED0D2 !important" class="text-center">
+										@if($cart['last_online'])
+											<span style="font-size: 13pt;">{{ Carbon\Carbon::parse($cart['last_online'])->format('M d, Y') }}</span><br>
+											<span class="text-muted">{{ Carbon\Carbon::parse($cart['last_online'])->format('h:i a') }}</span>
+										@endif
 									</td>
-									<td style="font-size: 11pt" class="text-center">{{ $cart['last_online'] ? \Carbon\Carbon::parse($cart['last_online'])->format('M d, Y - h:i a') : null }}</td>
-									<td>
+									<td class="text-center" style="border-bottom: 1px solid #CED0D2 !important">{{ $cart['user_type'] == 'member' ? $cart['owner'] : 'Guest' }}</td>
+									<td style="border-bottom: 1px solid #CED0D2 !important">
+										<i class="fa fa-{{ $badge }}"></i>&nbsp;<span style="font-size: 13pt;">{{ $cart['status'] }}</span>
+										@if($cart['status'] == 'Converted')
+											<br>
+											<span class="text-muted">{{ $cart['transaction_id'] }}</span>
+										@endif
+									</td>
+									<td style="border-bottom: 1px solid #CED0D2 !important">
 										@foreach ($cart['items'] as $item)
 											<a href="/product/{{ $item['slug'] ? $item['slug'] : $item['item_code'] }}" class="badge badge-primary" target="_blank">{{ $item['item_code'] }}</a>
 										@endforeach
 									</td>
-									<td class="text-center">
+									<td class="text-center" style="border-bottom: 1px solid #CED0D2 !important">
 										{{ $cart['total_qty'] }}
 									</td>
-									<td class="text-center">{{ isset($cart['grand_total']) ? '₱ '.number_format($cart['grand_total'], 2) : null }}</td>
-									<td class="text-center">
+									<td class="text-center" style="border-bottom: 1px solid #CED0D2 !important">{{ isset($cart['grand_total']) ? '₱ '.number_format($cart['grand_total'], 2) : null }}</td>
+									<td class="text-center" style="border-bottom: 1px solid #CED0D2 !important">
 										@if($cart['status'] == 'Converted')
 											<a href="#" data-toggle="modal" data-target="#view{{ $cart['transaction_id'] }}Modal">
 												View Order
@@ -464,21 +481,32 @@
 					<div class="card-body">
 						<table class="table table-hover table-bordered table-striped">
 							<thead>
-								<th class="text-center">Name</th>
-								<th class="text-center">Email</th>
+								<th class="text-center" style="white-space: nowrap !important">Transaction Date</th>
+								<th class="text-center">Customer</th>
+								{{-- <th class="text-center">Email</th> --}}
 								<th class="text-center">Products</th>
 								<th class="text-center">Total Qty</th>
 								<th class="text-center">Amount</th>
 								<th class="text-center">Abandoned Transaction</th>
-								<th class="text-center">IP Address</th>
+								{{-- <th class="text-center">IP Address</th> --}}
 								<th class="text-center">Location</th>
-								<th class="text-center">Transaction Date</th>
 								<th class="text-center">Action</th>
 							</thead>
 							@forelse ($abandoned_arr as $abandoned)
 								<tr>
-									<td class="text-center">{{ $abandoned['name'] ? $abandoned['name'] : 'Guest' }}</td>
-									<td class="text-center">{{ $abandoned['email'] ? $abandoned['email'] : '-' }}</td>
+									<td class="text-center" style="white-space: nowrap !important">
+										{{-- {{ $abandoned['transaction_date'] ? \Carbon\Carbon::parse($abandoned['transaction_date'])->format('M. d, Y - h:i a') : '-' }} --}}
+										@if($abandoned['transaction_date'])
+											<span style="font-size: 13pt;">{{ Carbon\Carbon::parse($abandoned['transaction_date'])->format('M. d, Y') }}</span><br>
+											<span class="text-muted">{{ Carbon\Carbon::parse($abandoned['transaction_date'])->format('h:i a') }}</span>
+										@endif
+									</td>
+									<td>
+										{{-- {{ $abandoned['name'] ? $abandoned['name'] : 'Guest' }} --}}
+										<span style="font-size: 13pt;">{{ $abandoned['name'] ? $abandoned['name'] : 'Guest' }}</span><br>
+										<span class="text-muted">{{ $abandoned['email'] ? $abandoned['email'] : '-' }}</span>
+									</td>
+									{{-- <td class="text-center">{{ $abandoned['email'] ? $abandoned['email'] : '-' }}</td> --}}
 									<td>
 										@forelse ($abandoned['items'] as $item)
 										<a href="/product/{{ $item['slug'] ? $item['slug'] : $item['item_code'] }}" class="badge badge-primary" target="_blank">{{ $item['item_code'] }}</a>
@@ -569,14 +597,16 @@
 											</div>
 										</div>
 									</td>
-									<td class="text-center">{{ $abandoned['ip_address'] }}</td>
-									<td class="text-center">{{ $abandoned['location'] ? $abandoned['location'] : '-' }}</td>
-									<td class="text-center" style="white-space: nowrap !important">{{ $abandoned['transaction_date'] ? \Carbon\Carbon::parse($abandoned['transaction_date'])->format('M. d, Y - h:i a') : '-' }}</td>
+									{{-- <td class="text-center">{{ $abandoned['ip_address'] }}</td> --}}
+									<td>
+										<span style="font-size: 13pt;">{{ $abandoned['ip_address'] }}</span><br>
+										<span class="text-muted">{{ $abandoned['location'] ? $abandoned['location'] : '-' }}</span>
+									</td>
 									<td class="text-center">
 										<div class="btn-group" role="group" aria-label="Basic example">
-											<a href="#" class="btn btn-outline-secondary btn-sm" data-toggle="modal" data-target="#abandoned-{{ $abandoned['order_number'] }}-Modal">View</a>
+											<a href="#" class="btn btn-outline-secondary btn-sm" data-toggle="modal" data-target="#abandoned-{{ $abandoned['order_number'] }}-Modal"><i class="fa fa-eye"></i></a>
 											@if ($abandoned['active'] == 1 && $abandoned['email'] && $abandoned['name'])
-											<button type="button" class="btn btn-outline-primary btn-sm" data-toggle="modal" data-target="#email-{{ $abandoned['order_number'] }}">Email</button>
+											<button type="button" class="btn btn-outline-primary btn-sm" data-toggle="modal" data-target="#email-{{ $abandoned['order_number'] }}"><i class="fa fa-envelope"></i></button>
 											@endif
 										</div>
 										@if ($abandoned['active'] == 1 && $abandoned['email'] && $abandoned['name'])

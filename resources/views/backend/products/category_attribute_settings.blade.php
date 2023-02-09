@@ -50,7 +50,7 @@
 											<input type="text" class="form-control" id="search-box" name="q" placeholder="Search" value="{{request()->get('q')}}">
 											</div>
 											<div class="col-md-4">
-												<button type="submit" class="btn btn-primary">Search</button>
+												<button type="submit" class="btn btn-info"><i class="fa fa-search"></i> Search</button>
 											</div>
 										</div>
 									</div>
@@ -68,12 +68,12 @@
 									<tr>
 										<td class="text-center">{{ $item->name }}</td>
 										<td class="text-center">
-											<a href="{{ request()->fullUrlWithQuery(['cat_id' =>  $item->id, 'parent' => $item->name]) }} " class="btn btn-secondary btn-sm">Edit</a>
+											<a href="{{ request()->fullUrlWithQuery(['cat_id' =>  $item->id, 'parent' => $item->name]) }} " class="btn btn-primary btn-sm"><i class="fa fa-edit"></i></a>
 										</td>
 									</tr>
 									@empty
 									<tr>
-										<td colspan="2" class="text-center">No records found.</td>
+										<td colspan="2" class="text-center text-muted text-uppercase">No records found.</td>
 									</tr>
 									@endforelse
 								</tbody>
@@ -133,7 +133,7 @@
 									</tbody>
 								</table>
 								<div class="m-3 text-center">
-									<button type="submit" class="btn btn-primary btn-lg">UPDATE</button>
+									<button type="submit" class="btn btn-primary btn-lg"><i class="fa fa-save"></i> Save</button>
 								</div>
 							</div>
 						</form>

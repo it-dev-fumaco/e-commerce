@@ -48,10 +48,12 @@
                                     <div class="row">
                                         <div class="col-4">
                                             <form action="" class="text-center" method="GET">
-                                                <div class="input-group mb-3">
-                                                    <input type="text" class="form-control" name="search" placeholder="Search" aria-describedby="basic-addon2" value="{{request()->get('q')}}">
-                                                    <div class="input-group-append">
-                                                        <button type="submit" class="btn btn-secondary" type="button">Search</button>
+                                                <div class="form-group row">
+                                                    <div class="col-sm-8">
+                                                        <input type="text" class="form-control" name="search" placeholder="Search" aria-describedby="basic-addon2" value="{{request()->get('q')}}">
+                                                    </div>
+                                                    <div class="col-sm-4 text-left">
+                                                        <button type="submit" class="btn btn-info"><i class="fa fa-search"></i> Search</button>
                                                     </div>
                                                 </div>
                                             </form>
@@ -87,7 +89,7 @@
                                                     </center>
                                                 </td>
                                                 <td class="text-center">
-                                                    <a href="/admin/products/compare/{{ $compare['comparison_id'] }}/edit" class="btn btn-sm btn-primary"><i class="fa fa-eye"></i></a>
+                                                    <a href="/admin/products/compare/{{ $compare['comparison_id'] }}/edit" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
                                                     <a href="#" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#dm{{ $compare['comparison_id'] }}"><i class="fa fa-trash"></i></a>
                                                 </td>
                                             </tr>
@@ -96,7 +98,7 @@
                                                 <div class="modal-dialog" role="document">
                                                     <div class="modal-content">
                                                         <div class="modal-header">
-                                                            <h5 class="modal-title" id="exampleModalLabel">Delete Comparison {{ $compare['comparison_id'] }}?</h5>
+                                                            <h5 class="modal-title" id="exampleModalLabel"><i class="fa fa-trash"></i> Delete Comparison {{ $compare['comparison_id'] }}?</h5>
                                                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                                                 <span aria-hidden="true">&times;</span>
                                                             </button>
@@ -105,8 +107,8 @@
                                                             Delete Comparison {{ $compare['comparison_id'] }}?
                                                         </div>
                                                         <div class="modal-footer">
-                                                            <a href="/admin/products/compare/{{ $compare['comparison_id'] }}/delete" class="btn btn-danger">Delete</a>
-                                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                            <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>
+                                                            <a href="/admin/products/compare/{{ $compare['comparison_id'] }}/delete" class="btn btn-danger"><i class="fa fa-trash"></i> Delete</a>
                                                         </div>
                                                     </div>
                                                 </div>

@@ -240,7 +240,7 @@ Route::prefix('admin')->group(function () {
             Route::get('/media/list', 'MediaController@list_media');
             Route::post('/add_media_records', 'MediaController@add_media_record');
             Route::post('/delete_media', 'MediaController@delete_media_record');
-            Route::get('/order/{list}', 'OrderController@orderList')->name('orders');
+            Route::get('/order/list/{status}', 'OrderController@orderList')->name('orders');
             Route::get('/order/confirm_buffer/', 'OrderController@confirmBuffer')->name('confirm_buffer');
             Route::get('/order/cancelled/', 'OrderController@cancelledOrders');
             Route::get('/order/delivered/', 'OrderController@deliveredOrders');

@@ -40,32 +40,32 @@
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="col-md-9">
-                                            <h4>Sponsors</h4>
+                                            <h4><i class="fas fa-users"></i> Sponsors</h4>
                                         </div>
                                         <div class="col-md-3 text-right">
-                                            <a href="#add_sponsor" class="btn btn-primary">Add a Sponsor</a>
+                                            <a href="#add_sponsor" class="btn btn-primary"><i class="fas fa-plus"></i> Add a Sponsor</a>
                                         </div>
                                     </div>
                                     <br/>
-                                    <table class="table table-hover">
-                                        <tr>
-                                            <th>Name</th>
-                                            <th>Image</th>
-                                            <th>URL</th>
-                                            <th>Sorting</th>
-                                            <th>Action</th>
-                                        </tr>
+                                    <table class="table table-hover table-bordered">
+                                        <thead>
+                                            <th class="text-center">Name</th>
+                                            <th class="text-center">Image</th>
+                                            <th class="text-center">URL</th>
+                                            <th class="text-center">Sorting</th>
+                                            <th class="text-center">Action</th>
+                                        </thead>
                                         @forelse ($sponsors as $sponsor)
                                             <tr>
-                                                <td style="width: 10%">{{ $sponsor->name_img }}</td>
-                                                <td style="width: 7%"><img src="{{ asset('/storage/sponsors/'.$sponsor->image) }}" alt="{{ $sponsor->name_img }}" width='100%'></td>
-                                                <td style="width: 40%"><a href="{{ $sponsor->url }}" target="_blank">{{ $sponsor->url }}</a></td>
-                                                <td style="width: 30%">
+                                                <td class="text-center align-middle" style="width: 10%">{{ $sponsor->name_img }}</td>
+                                                <td class="text-center align-middle" style="width: 7%"><img src="{{ asset('/storage/sponsors/'.$sponsor->image) }}" alt="{{ $sponsor->name_img }}" width='100%'></td>
+                                                <td class="align-middle" style="width: 50%"><a href="{{ $sponsor->url }}" target="_blank">{{ $sponsor->url }}</a></td>
+                                                <td class="text-center align-middle" style="width: 20%">
                                                     <form action="/admin/edit/page/about_us/sponsor/sort/{{ $sponsor->id }}" method="post">
                                                         <div class="row">
                                                             @csrf
-                                                            <div class="col-md-6">
-                                                                <select class="form-control formslabelfnt" id="row_select" aria-label="Default select example" name="item_row" required>
+                                                            <div class="col-md-6 offset-1">
+                                                                <select class="form-control form-control-sm formslabelfnt" id="row_select" aria-label="Default select example" name="item_row" required>
                                                                     <option selected disabled value="">Order No.</option>
                                                                     @for ($i = 0; $i < $sponsors_count; $i++)
                                                                         @php
@@ -75,16 +75,15 @@
                                                                     @endfor
                                                                 </select>
                                                             </div>
-                                                            <div class="col-md-3">
-                                                                <button type="submit" class="btn btn-sm btn-primary" style="width: 100%">Apply</button>
-                                                            </div>
-                                                            <div class="col-md-3">
-                                                                <a href="#" class="btn btn-sm btn-secondary" style="width: 100%" role="button" data-toggle="modal" data-target="#resetModal{{ $sponsor->id }}">Reset</a>
+                                                         
+                                                            <div class="col-md-4 p-0">
+                                                                <button type="submit" class="btn btn-sm btn-primary"><i class="fas fa-check"></i></button>
+                                                                <a href="#" class="btn btn-sm btn-secondary" role="button" data-toggle="modal" data-target="#resetModal{{ $sponsor->id }}"><i class="fas fa-undo"></i></a>
                                                                 <div class="modal fade" id="resetModal{{ $sponsor->id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                                                     <div class="modal-dialog" role="document">
                                                                         <div class="modal-content">
                                                                             <div class="modal-header">
-                                                                                <h5 class="modal-title" id="exampleModalLabel">Reset Sorting</h5>
+                                                                                <h5 class="modal-title" id="exampleModalLabel"><i class="fas fa-undo"></i> Reset Sorting</h5>
                                                                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                                                                 <span aria-hidden="true">&times;</span>
                                                                             </button>
@@ -93,8 +92,8 @@
                                                                                 Reset sorting for {{ $sponsor->name_img }}?
                                                                             </div>
                                                                             <div class="modal-footer">
-                                                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                                                                <a href="/admin/edit/page/about_us/sponsor/reset/{{ $sponsor->id }}" class="btn btn-danger" role="button">Reset</a>
+                                                                                <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fas fa-times"></i> Close</button>
+                                                                                <a href="/admin/edit/page/about_us/sponsor/reset/{{ $sponsor->id }}" class="btn btn-danger" role="button"><i class="fas fa-undo"></i> Reset</a>
                                                                             </div>
                                                                         </div>
                                                                     </div>
@@ -103,14 +102,14 @@
                                                         </div>
                                                     </form>
                                                 </td>
-                                                <td style="width: 5%">
-                                                    <center><a href="#" class="btn btn-sm btn-danger" role="button" data-toggle="modal" data-target="#deleteModal{{ $sponsor->id }}"><i class="fas fa-trash-alt"></i></a></center>
+                                                <td class="text-center align-middle" style="width: 5%">
+                                                    <a href="#" class="btn btn-sm btn-danger" role="button" data-toggle="modal" data-target="#deleteModal{{ $sponsor->id }}"><i class="fas fa-trash-alt"></i></a>
 
                                                     <div class="modal fade" id="deleteModal{{ $sponsor->id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                                         <div class="modal-dialog" role="document">
                                                             <div class="modal-content">
                                                                 <div class="modal-header">
-                                                                    <h5 class="modal-title" id="exampleModalLabel">Delete Sponsor</h5>
+                                                                    <h5 class="modal-title" id="exampleModalLabel"><i class="fas fa-trash"></i> Delete Sponsor</h5>
                                                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                                                     <span aria-hidden="true">&times;</span>
                                                                 </button>
@@ -119,8 +118,8 @@
                                                                     Delete {{ $sponsor->name_img }}?
                                                                 </div>
                                                                 <div class="modal-footer">
-                                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                                                    <a href="/admin/edit/page/about_us/sponsor/delete/{{ $sponsor->id }}" class="btn btn-danger" role="button">Delete</a>
+                                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fas fa-times"></i> Close</button>
+                                                                    <a href="/admin/edit/page/about_us/sponsor/delete/{{ $sponsor->id }}" class="btn btn-danger" role="button"><i class="fas fa-trash"></i> Delete</a>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -152,27 +151,27 @@
                                     <div class="card-body">
                                         <div class="row">
                                             <div class="col-md-9">
-                                                <h4>Add a sponsor</h4>
+                                                <h4><i class="fas fa-user"></i> Add a Sponsor</h4>
                                             </div>
                                             <div class="col-md-3 text-right">
-                                                <button type="submit" class="btn btn-primary">Submit</button>
+                                                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save</button>
                                             </div>
                                         </div>
                                         <div class="row">
                                             <div class="form-group col-md-12">
-                                                <label>Sponsor Name *</label>
+                                                <label>Sponsor Name <span class="text-danger">*</span></label>
                                                 <input type="text" name="sponsor_name" class="form-control" required>
                                             </div>
                                         </div>
                                         <div class="row">
                                             <div class="form-group col-md-12">
-                                                <label>Sponsor URL *</label>
+                                                <label>Sponsor URL <span class="text-danger">*</span></label>
                                                 <input type="text" name="sponsor_url" class="form-control" required>
                                             </div>
                                         </div>
                                         <div class="row">
                                             <div class="col-md-12">
-                                                <label>Sponsor Image *</label>
+                                                <label>Sponsor Image <span class="text-danger">*</span></label>
                                                 <div class="custom-file mb-3">
                                                     <input type="file" class="custom-file-input" id="customFile" name="sponsor_img" required>
                                                     <label class="custom-file-label" for="customFile">Choose File</label>

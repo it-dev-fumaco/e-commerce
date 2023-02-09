@@ -41,33 +41,27 @@
                                 <div class="row">
                                     <div class="col-8">&nbsp;</div>
                                     <div class="col-4 text-right">
-                                        <a href="/admin/order/status/add_form" class="btn btn-primary">Add</a>
+                                        <a href="/admin/order/status/add_form" class="btn btn-primary"><i class="fas fa-plus"></i> Add</a>
                                     </div>
                                 </div>
                                 <br/>
-                                <table class="table table-bordered">
-                                    <tr>
-                                        <td>Status ID</td>
-                                        <td>Status</td>
-                                        <td>Status Description</td>
-                                        <td>Updates Stock</td>
-                                        <td>Action</td>
-                                    </tr>
+                                <table class="table table-bordered table-striped table-hover">
+                                    <thead>
+                                        <th class="text-center align-middle">Status ID</th>
+                                        <th class="text-center align-middle">Status</th>
+                                        <th class="text-center align-middle">Status Description</th>
+                                        <th class="text-center align-middle">Updates Stock</th>
+                                        <th class="text-center align-middle">Action</th>
+                                    </thead>
                                     @forelse ($status_list as $status)
                                         <tr>
-                                            <td>{{ $status->order_status_id }}</td>
-                                            <td>{{ $status->status }}</td>
-                                            <td>{{ $status->status_description }}</td>
-                                            <td>{{ $status->update_stocks ? 'Yes' : 'No' }}</td>
+                                            <td class="text-center align-middle">{{ $status->order_status_id }}</td>
+                                            <td class="text-center align-middle">{{ $status->status }}</td>
+                                            <td class="text-center align-middle">{{ $status->status_description }}</td>
+                                            <td class="text-center align-middle">{{ $status->update_stocks ? 'Yes' : 'No' }}</td>
                                             <td class="text-center">
-                                                <div class="dropdown">
-                                                    <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Action
-                                                    </button>
-                                                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
-                                                      <a class="dropdown-item" href="/admin/order/status/{{ $status->order_status_id }}/edit_form">View Details</a>
-                                                      <a class="dropdown-item" href="#" data-toggle="modal" data-target="#dm{{ $status->order_status_id }}"><small>Delete</small></a>
-                                                    </div>
-                                                </div>
+                                                <a class="btn btn-primary btn-sm" href="/admin/order/status/{{ $status->order_status_id }}/edit_form"><i class="fas fa-eye"></i></a>
+                                                <a class="btn btn-danger btn-sm" href="#" data-toggle="modal" data-target="#dm{{ $status->order_status_id }}"><i class="fas fa-trash"></i></a>
                                             </td>
                                         </tr>                                          
                                           <!-- Modal -->

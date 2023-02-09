@@ -63,7 +63,7 @@
                                                     <thead>
                                                         <tr>
                                                             <th scope="col" class="text-center">Item Code</th>
-                                                            <th class="text-center" style="width: 10%;"><button class="btn btn-outline-primary btn-sm" id="add-items-btn">Add</button></th>
+                                                            <th class="text-center" style="width: 10%;"><button class="btn btn-info btn-sm" id="add-items-btn"><i class="fa fa-plus"></i></button></th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -79,7 +79,7 @@
                                                                         </select>
                                                                     </td>
                                                                     <td class="text-center">
-                                                                        <button type="button" class="btn btn-outline-danger btn-sm remove-td-row">Remove</button>
+                                                                        <button type="button" class="btn btn-danger btn-sm remove-td-row"><i class="fa fa-trash"></i></button>
                                                                     </td>
                                                                 </tr>
                                                             @endforeach
@@ -95,7 +95,7 @@
                                                                         </select>
                                                                     </td>
                                                                     <td class="text-center">
-                                                                        <button type="button" class="btn btn-outline-danger btn-sm remove-td-row">Remove</button>
+                                                                        <button type="button" class="btn btn-danger btn-sm remove-td-row"><i class="fa fa-trash"></i></button>
                                                                     </td>
                                                                 </tr>
                                                             @endfor
@@ -109,7 +109,7 @@
                                     <div class="col-6">
                                         <div class="card card-primary">
                                             <div class="card-body">
-                                                <button type="submit" class="btn btn-primary float-right">Save</button>
+                                                <button type="submit" class="btn btn-primary float-right"><i class="fa fa-save"></i> Save</button>
                                                 <br/>&nbsp;
                                                 <div class="d-none">
                                                     <input type="text" name="product_comparison_id" value="{{ collect($product_comparison)->pluck('product_comparison_id')->first() }}">
@@ -126,7 +126,7 @@
                                                     <thead>
                                                         <tr>
                                                             <th scope="col" class="text-center">Item Attributes</th>
-                                                            <th class="text-center"><button class="btn btn-outline-primary btn-sm" id="add-attributes-btn">Add</button></th>
+                                                            <th class="text-center"><button class="btn btn-info btn-sm" id="add-attributes-btn"><i class="fa fa-plus"></i></button></th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -137,7 +137,7 @@
                                                                     <input type="text" name="attribute_names[]" value="{{ $selected_attrib->id }}" hidden>
                                                                 </td>
                                                                 <td class="text-center">
-                                                                    <button type="button" class="btn btn-outline-danger btn-sm remove-td-row">Remove</button>
+                                                                    <button type="button" class="btn btn-danger btn-sm remove-td-row"><i class="fa fa-trash"></i></button>
                                                                 </td>
                                                             </tr>
                                                         @endforeach
@@ -176,7 +176,7 @@
                         '<select name="selected_items[]" class="form-control w-100" style="width: 100%;" required>' + items_clone_select + '</select>' +
                     '</td>' +
                     '<td class="text-center">' +
-                        '<button type="button" class="btn btn-outline-danger btn-sm remove-td-row">Remove</button>' +
+                        '<button type="button" class="btn btn-danger btn-sm remove-td-row"><i class="fa fa-trash"></i></button>' +
                     '</td>' +
                 '</tr>';
 
@@ -192,7 +192,7 @@
                         '<select name="attribute_names[]" class="form-control w-100" style="width: 100%;" required>' + clone_select + '</select>' +
                     '</td>' +
                     '<td class="text-center">' +
-                        '<button type="button" class="btn btn-outline-danger btn-sm remove-td-row">Remove</button>' +
+                        '<button type="button" class="btn btn-danger btn-sm remove-td-row"><i class="fa fa-trash"></i></button>' +
                     '</td>' +
                 '</tr>';
 
