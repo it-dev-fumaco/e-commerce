@@ -35,7 +35,9 @@
 											<ul class="nav nav-tabs" id="tabs" role="tablist" style="cursor: pointer">
 												@foreach ($status_arr as $status)
 													<li class="nav-item">
-														<a class="nav-link pt-3 pb-3 nav-ctrl {{ $loop->first ? 'active' : null }}" data-status="{{ $status }}" style="font-size: 13pt;"><b>{{ $status }}</b></a>
+														<a class="nav-link pt-3 pb-3 nav-ctrl {{ $loop->first ? 'active' : null }}" data-status="{{ $status }}">
+															{{ $status == 'Order Placed' ? 'New Orders' : $status }}
+														</a>
 													</li>
 												@endforeach
 											</ul>
@@ -55,21 +57,29 @@
 		</div>
 	</div>
 	<style>
-	.modal{
-		background: rgba(0, 0, 0, .7);
-	}
-	.stat-label {
-		height: 100%;
-		padding: 0 10px;
-		white-space: normal;
-		word-break: break-word;
-		display: flex;
-		align-items: center;
-	}
-	.badge-completed{
-		background-color: #fd6300 !important;
-		color: #fff;
-	}
+		.modal{
+			background: rgba(0, 0, 0, .7);
+		}
+		.stat-label {
+			height: 100%;
+			padding: 0 10px;
+			white-space: normal;
+			word-break: break-word;
+			display: flex;
+			align-items: center;
+		}
+		.badge-completed{
+			background-color: #fd6300 !important;
+			color: #fff;
+		}
+		.nav-link{
+			font-size: 12pt;
+			color: #000;
+		}
+		#tabs .active{
+			color: #007BFF !important;
+			border-top: 3px solid #007BFF;
+		}
 	</style>
 @endsection
 

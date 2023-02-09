@@ -8,7 +8,6 @@
             <td class="p-1">Shipping Method</td>
             <td class="p-1">Payment Method</td>
             <td class="p-1">Grand Total</td>
-            <td class="p-1">Status</td>
             <td class="p-1">Action</td>
         </tr>
     </thead>
@@ -48,7 +47,6 @@
                         break;
                 }
             @endphp
-            <td class="text-center"><span class="badge badge-{{ $badge }}" style="font-size: 11pt; {{ ($order['status'] == 'Delivered') ? "background-color: #fd6300 !important; color: #fff;" : '' }}">{{ $order['status'] }}</span></td>
             <td>
                 <div class="text-center">
                     <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#order-{{ $order['order_no']}}"><i class="fa fa-eye"></i></button>
