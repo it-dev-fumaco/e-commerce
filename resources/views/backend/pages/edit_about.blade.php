@@ -10,12 +10,12 @@
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1>Edit About Us</h1>
+                            <h1>Edit About Us Page</h1>
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
                                 <li class="breadcrumb-item"><a href="/admin/dashboard">Home</a></li>
-                                <li class="breadcrumb-item active">Edit About Us</li>
+                                <li class="breadcrumb-item active">Edit About Us Page</li>
                             </ol>
                         </div>
                     </div>
@@ -40,143 +40,143 @@
                                     <div class="card-body">
                                         <div class="row">
                                             <div class="col-md-9">
-                                                <h4>Content</h4>
+                                                <h4><i class="fas fa-edit"></i> Content</h4>
                                             </div>
                                             <div class="col-md-3 text-right">
-                                                <a href="/admin/pages/about/sponsor/list#add_sponsor" class="btn btn-secondary">Add a Sponsor</a>
-                                                <button type="submit" class="btn btn-primary">Submit</button>
+                                                <a href="/admin/pages/about/sponsor/list#add_sponsor" class="btn btn-secondary"><i class="fas fa-plus"></i> Add a Sponsor</a>
+                                                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save</button>
                                             </div>
                                         </div>
                                         @csrf
                                         <div class="row">
                                             <div class="form-group col-md-12">
-                                                <label>Title *</label>
+                                                <label>Title <span class="text-danger">*</span></label>
                                                 <input type="text" name="title" class="form-control" value="{{ $about->title }}" required>
                                             </div>
                                         </div>
                                         <div class="row">
                                             <div class="form-group col-md-12">
-                                                <label>Title 1 - 1 *</label>
+                                                <label>Title 1 - 1 <span class="text-danger">*</span></label>
                                                 <textarea class="form-control page-content" rows="5" name="title_1_1">{{ $about->{'1_title_1'} }}</textarea>
                                             </div>
                                         </div>
                                         <div class="row">
                                             <div class="form-group col-md-12">
-                                                <label>Caption 1 - 1 *</label>
+                                                <label>Caption 1 - 1 <span class="text-danger">*</span></label>
                                                 <textarea class="form-control page-content" rows="5" name="caption_1_1">{{ $about->{'1_caption_1'} }}</textarea>
                                             </div>
                                         </div>
                                         <div class="row">
                                             <div class="form-group col-md-12">
-                                                <label>Caption 2 - 1 *</label>
+                                                <label>Caption 2 - 1 <span class="text-danger">*</span></label>
                                                 <textarea class="form-control page-content" rows="5" name="caption_2_1">{{ $about->{'1_caption_2'} }}</textarea>
                                             </div>
                                         </div>
                                         <div class="row">
                                             <div class="form-group col-md-12">
-                                                <label>Caption 3 - 1 *</label>
+                                                <label>Caption 3 - 1 <span class="text-danger">*</span></label>
                                                 <textarea class="form-control page-content" rows="5" name="caption_3_1">{{ $about->{'1_caption_3'} }}</textarea>
                                             </div>
                                         </div>
                                         <div class="row">
                                             <div class="form-group col-md-12">
-                                                <label>Caption 4 Head - 1 *</label>
+                                                <label>Caption 4 Head - 1 <span class="text-danger">*</span></label>
                                                 <input type="text" name="caption4_head1" class="form-control" value="{{ $about->{'1_year_1'} }}" required>
                                             </div>
                                         </div>
                                         <div class="row">
                                             <div class="form-group col-md-12">
-                                                <label>Caption 4 Caption - 1 *</label>
+                                                <label>Caption 4 Caption - 1 <span class="text-danger">*</span></label>
                                                 <textarea class="form-control page-content" rows="5" name="caption4_caption1">{{ $about->{'1_year_1_details'} }}</textarea>
                                             </div>
                                         </div>
                                         <div class="row">
                                             <div class="form-group col-md-12">
-                                                <label>Caption 5 Head - 1 *</label>
+                                                <label>Caption 5 Head - 1 <span class="text-danger">*</span></label>
                                                 <input type="text" name="caption5_head1" class="form-control" value="{{ $about->{'1_year_2'} }}" required>
                                             </div>
                                         </div>
                                         <div class="row">
                                             <div class="form-group col-md-12">
-                                                <label>Caption 5 Caption - 1 *</label>
+                                                <label>Caption 5 Caption - 1 <span class="text-danger">*</span></label>
                                                 <textarea class="form-control page-content" rows="5" name="caption5_caption1">{{ $about->{'1_year_2_details'} }}</textarea>
                                             </div>
                                         </div>
                                         <div class="row">
                                             <div class="form-group col-md-12">
-                                                <label>Title 1 - 2 *</label>
+                                                <label>Title 1 - 2 <span class="text-danger">*</span></label>
                                                 <textarea class="form-control page-content" rows="5" name="title_1_2">{{ $about->{'2_title_1'} }}</textarea>
                                             </div>
                                         </div>
                                         <div class="row">
                                             <div class="form-group col-md-12">
-                                                <label>Caption 1 - 2 *</label>
+                                                <label>Caption 1 - 2 <span class="text-danger">*</span></label>
                                                 <textarea class="form-control page-content" rows="5" name="caption_1_2">{{ $about->{'2_caption_1'} }}</textarea>
                                             </div>
                                         </div>
                                         <div class="row">
                                             <div class="form-group col-md-12">
-                                                <label>Caption 2 - 2 *</label>
+                                                <label>Caption 2 - 2 <span class="text-danger">*</span></label>
                                                 <textarea class="form-control page-content" rows="5" name="caption_2_2">{{ $about->{'2_caption_2'} }}</textarea>
                                             </div>
                                         </div>
                                         <div class="row">
                                             <div class="form-group col-md-12">
-                                                <label>Caption 4 Head - 2 *</label>
+                                                <label>Caption 4 Head - 2 <span class="text-danger">*</span></label>
                                                 <input type="text" name="caption4_head2" class="form-control" value="{{ $about->{'2_year_1'} }}" required>
                                             </div>
                                         </div>
                                         <div class="row">
                                             <div class="form-group col-md-12">
-                                                <label>Caption 4 Caption - 2 *</label>
+                                                <label>Caption 4 Caption - 2 <span class="text-danger">*</span></label>
                                                 <textarea class="form-control page-content" rows="5" name="caption4_caption2">{{ $about->{'2_year_1_details'} }}</textarea>
                                             </div>
                                         </div>
                                         <div class="row">
                                             <div class="form-group col-md-12">
-                                                <label>Title 1 - 3 *</label>
+                                                <label>Title 1 - 3 <span class="text-danger">*</span></label>
                                                 <textarea class="form-control page-content" rows="5" name="title_1_3">{{ $about->{'3_title_1'} }}</textarea>
                                             </div>
                                         </div>
                                         <div class="row">
                                             <div class="form-group col-md-12">
-                                                <label>Caption 1 - 3 *</label>
+                                                <label>Caption 1 - 3 <span class="text-danger">*</span></label>
                                                 <textarea class="form-control page-content" rows="5" name="caption_1_3">{{ $about->{'3_caption_1'} }}</textarea>
                                             </div>
                                         </div>
                                         <div class="row">
                                             <div class="form-group col-md-12">
-                                                <label>Caption 2 - 3 *</label>
+                                                <label>Caption 2 - 3 <span class="text-danger">*</span></label>
                                                 <textarea class="form-control page-content" rows="5" name="caption_2_3">{{ $about->{'3_caption_2'} }}</textarea>
                                             </div>
                                         </div>
                                         <div class="row">
                                             <div class="form-group col-md-12">
-                                                <label>Caption 4 Head - 3 *</label>
+                                                <label>Caption 4 Head - 3 <span class="text-danger">*</span></label>
                                                 <input type="text" name="caption4_head3" class="form-control" value="{{ $about->{'3_year_1'} }}" required>
                                             </div>
                                         </div>
                                         <div class="row">
                                             <div class="form-group col-md-12">
-                                                <label>Caption 4 - 3 *</label>
+                                                <label>Caption 4 - 3 <span class="text-danger">*</span></label>
                                                 <textarea class="form-control page-content" rows="5" name="caption_4_3">{{ $about->{'3_year_1_details'} }}</textarea>
                                             </div>
                                         </div>
                                         <div class="row">
                                             <div class="form-group col-md-12">
-                                                <label>Slogan - Title *</label>
+                                                <label>Slogan - Title <span class="text-danger">*</span></label>
                                                 <textarea class="form-control page-content" rows="5" name="slogan_title">{{ $about->slogan_title }}</textarea>
                                             </div>
                                         </div>
                                         <div class="row">
                                             <div class="form-group col-md-12">
-                                                <label>Title 1 - 4 *</label>
+                                                <label>Title 1 - 4 <span class="text-danger">*</span></label>
                                                 <textarea class="form-control page-content" rows="5" name="title_1_4">{{ $about->{'4_title_1'} }}</textarea>
                                             </div>
                                         </div>
                                         <div class="row">
                                             <div class="form-group col-md-12">
-                                                <label>Caption 1 - 4 *</label>
+                                                <label>Caption 1 - 4 <span class="text-danger">*</span></label>
                                                 <textarea class="form-control page-content" rows="5" name="caption_1_4">{{ $about->{'4_caption_1'} }}</textarea>
                                             </div>
                                         </div>
@@ -184,9 +184,6 @@
                                             <small>Last modified by: {{ $about->last_modified_by }} - {{ $about->last_modified_at }}</small><br>
                                         </div>
                                     </div>
-                                    {{-- <div class="card-footer text-center">
-                                        <button type="submit" class="btn btn-primary btn-lg">SUBMIT</button>
-                                    </div> --}}
                                 </form>
                             </div>
                         </div>
@@ -199,10 +196,10 @@
                                     <div class="card-body">
                                         <div class="row">
                                             <div class="col-md-9">
-                                                <h4>Background Images</h4>
+                                                <h4><i class="fas fa-images"></i> Background Images</h4>
                                             </div>
                                             <div class="col-md-3 text-right">
-                                                <button type="submit" class="btn btn-primary">Submit</button>
+                                                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save</button>
                                             </div>
                                         </div>
                                         <div class="row">

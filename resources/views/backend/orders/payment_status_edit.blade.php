@@ -43,17 +43,17 @@
                                     <div class="row">
                                         <div class="col-9"><h4>Edit Payment Status</h4></div>
                                         <div class="col-3 text-right">
-                                            <button class="btn btn-primary">Submit</button>
+                                            <button class="btn btn-primary"><i class="fas fa-save "></i> Save</button>
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col-12">
-                                            <label>Status Name *</label>
+                                            <label>Status Name <span class="text-danger">*</span></label>
                                             <input type="text" class="form-control" name="status_name" value="{{ $status->status }}" placeholder="Status Name" required>
                                         </div>
                                         <br/>&nbsp;
                                         <div class="col-12">
-                                            <label>Status Description *</label>
+                                            <label>Status Description <span class="text-danger">*</span></label>
                                             <input type="text" class="form-control" name="status_description" placeholder="Status Description" value="{{ $status->status_description }}" required>
                                         </div>
                                         <br/>&nbsp;

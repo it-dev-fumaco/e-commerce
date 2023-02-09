@@ -59,7 +59,7 @@
 							</div>
 							<!-- /.card-body -->
 							<div class="card-footer">
-								<button type="submit" class="btn btn-primary">Submit</button>
+								<button type="submit" class="btn btn-primary"><i class="fas fa-check"></i> Submit</button>
 							</div>
 						</form>
 					</div>

@@ -53,7 +53,7 @@
                                                     <input type="text" class="form-control" name="q" placeholder="Search" value="{{request()->get('q')}}">
                                                 </div>
                                                 <div class="col-md-4">
-                                                    <button type="submit" class="btn btn-secondary">Search</button>
+                                                    <button type="submit" class="btn btn-info"><i class="fas fa-search"></i> Search</button>
                                                 </div>
                                             </div>
                                         </div>
@@ -92,7 +92,7 @@
                                                         <div class="modal-dialog" role="document">
                                                             <div class="modal-content">
                                                                 <div class="modal-header">
-                                                                    <h5 class="modal-title">Delete Price List</h5>
+                                                                    <h5 class="modal-title"><i class="fas fa-trash"></i> Delete Price List</h5>
                                                                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                                                         <span aria-hidden="true">&times;</span>
                                                                     </button>
@@ -101,8 +101,8 @@
                                                                     <p>Delete <b>{{ $row->price_list_name }}</b>?</p>
                                                                 </div>
                                                                 <div class="modal-footer">
-                                                                    <button type="submit" class="btn btn-primary">Confirm</button>
-                                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fas fa-times"></i> Close</button>
+                                                                    <button type="submit" class="btn btn-danger"><i class="fas fa-trash"></i> Delete</button>
                                                                 </div>
                                                             </div>
                                                         </div>

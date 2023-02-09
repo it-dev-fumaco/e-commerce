@@ -49,7 +49,7 @@
 											<input type="text" class="form-control" id="search-box" name="q" placeholder="Search" value="{{request()->get('q')}}">
 											</div>
 											<div class="col-md-4">
-												<button type="submit" class="btn btn-primary">Search</button>
+												<button type="submit" class="btn btn-info"><i class="fas fa-search"></i> Search</button>
 											</div>
 										</div>
 									</div>
@@ -86,10 +86,8 @@
 										<td class="text-center">{{ $row->min_leadtime . ' - ' . $row->max_leadtime }} day(s)</td>
 										<td class="text-center align-middle">{{ $row->shipping_calculation }}</td>
 										<td class="text-center align-middle">
-											<div class="btn-group" role="group" aria-label="Basic example">
-												<a href="/admin/shipping/{{ $row->shipping_service_id }}/edit" class="btn btn-outline-success btn-sm"><i class="fa fa-edit"></i></a>
-												<button type="button" class="btn btn-outline-danger btn-sm" data-toggle="modal" data-target="#delete-{{ $i }}"><i class="fa fa-trash"></i></button>
-											</div>
+											<a href="/admin/shipping/{{ $row->shipping_service_id }}/edit" class="btn btn-primary btn-sm"><i class="fa fa-edit"></i></a>
+											<button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#delete-{{ $i }}"><i class="fa fa-trash"></i></button>
 										</td>
 									</tr>
 	
@@ -101,7 +99,7 @@
 											<div class="modal-dialog" role="document">
 												<div class="modal-content">
 													<div class="modal-header">
-														<h5 class="modal-title">Delete Shipping Service</h5>
+														<h5 class="modal-title"><i class="fa fa-trash"></i> Delete Shipping Service</h5>
 														<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 															<span aria-hidden="true">&times;</span>
 														</button>
@@ -110,8 +108,8 @@
 														<h6 class="text-center">Delete Shipping Service <span class="font-weight-bold">{{ $row->shipping_service_name }}</span> ?</h6>
 													</div>
 													<div class="modal-footer">
-														<button type="submit" class="btn btn-primary">Confirm</button>
-														<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+														<button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>
+														<button type="submit" class="btn btn-danger"><i class="fa fa-trash"></i> Delete</button>
 													</div>
 												</div>
 											</div>

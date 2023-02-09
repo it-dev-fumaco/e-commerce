@@ -46,19 +46,19 @@
 								<table id="example2" data-pagination="true" class="table table-bordered table-hover">
 									<thead>
 										<tr>
-											<th>Code</th>
-											<th>Name</th>
-											<th>image</th>
-											<th>slug</th>
-											<th>Action</th>
-											<th class="text-center">Publish</th>
+											<th class="text-center align-middle">ID</th>
+											<th class="text-center align-middle">Name</th>
+											<th class="text-center align-middle">Image</th>
+											<th class="text-center align-middle">Slug</th>
+											<th class="text-center align-middle">Action</th>
+											<th class="text-center align-middle">Publish</th>
 										</tr>
 									</thead>
 									<tbody>
 										@foreach ($categories as $c)
 										<tr>
-											<td>{{ $c->id }}</td>
-											<td>
+											<td class="text-center align-middle">{{ $c->id }}</td>
+											<td class="text-center align-middle">
 												<div class="row">
 													@if ($c->banner_img)
 														<div class="col-3 text-center">
@@ -85,9 +85,9 @@
 													</div>
 												</div>
 											</td>
-											<td><img src="{{ asset('assets/site-img/icon/')."/".$c->image }}" width="30" ></td>
-											<td>{{ $c->slug }}</td>
-											<td>
+											<td class="text-center align-middle"><img src="{{ asset('assets/site-img/icon/')."/".$c->image }}" width="30" ></td>
+											<td class="text-center align-middle">{{ $c->slug }}</td>
+											<td class="align-middle">
 												<!-- Modal -->
 												<div class="modal fade" id="preview-banner-{{ $c->id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 													<div class="modal-dialog modal-xl modal-dialog-centered" role="document">
@@ -197,7 +197,7 @@
 																				</div>
 																				<!-- /.card-body -->
 																				<div>
-																					<center><input type="submit" class="btn btn-primary" value="Update"></center>
+																					<center><button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save</button></center>
 																				</div>
 																			</form>
 																		<!-- /.card -->
@@ -214,7 +214,7 @@
 													<a href="/admin/category/delete/{{ $c->id }}" class="btn btn-danger btn-sm active" role="button" aria-pressed="true"><i class="fa fa-trash"></i></a>
 												</center>
 											</td>
-											<td class="col-sm-1">
+											<td class="col-sm-1 align-middle">
 												<center>
 													<label class="switch">
 														<input type="checkbox" class="toggle" id="toggle_{{ $c->id }}" name="publish" {{ ($c->publish == 1) ? 'checked' : '' }} value="{{ $c->id }}"/>
@@ -292,7 +292,7 @@
 								</div>
 								<!-- /.card-body -->
 								<div class="card-footer">
-									<input type="submit" class="btn btn-primary" value="Add Category">
+									<button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save</button>
 								</div>
 							</form>
 						</div>

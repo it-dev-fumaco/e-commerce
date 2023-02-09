@@ -49,7 +49,7 @@
 											<input type="text" class="form-control" id="search-box" name="q" placeholder="Search" value="{{request()->get('q')}}">
 											</div>
 											<div class="col-md-4">
-												<button type="submit" class="btn btn-primary">Search</button>
+												<button type="submit" class="btn btn-info"><i class="fas fa-search"></i> Search</button>
 											</div>
 										</div>
 									</div>
@@ -93,10 +93,8 @@
                                         </td>
 										<td class="text-center align-middle">{{ \Carbon\Carbon::parse($row->last_modified_at)->format('M d, Y - h:i A') }}</td>
 										<td class="text-center align-middle">
-											<div class="btn-group" role="group" aria-label="Basic example">
-                                                <button type="button" class="btn btn-outline-success btn-sm" data-toggle="modal" data-target="#edit{{ $row->payment_method_id }}"><i class="fa fa-edit"></i></button>
-												<button type="button" class="btn btn-outline-danger btn-sm" data-toggle="modal" data-target="#delete{{ $row->payment_method_id }}"><i class="fa fa-trash"></i></button>
-											</div>
+											<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#edit{{ $row->payment_method_id }}"><i class="fa fa-edit"></i></button>
+											<button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#delete{{ $row->payment_method_id }}"><i class="fa fa-trash"></i></button>
 										</td>
 									</tr>
 	
@@ -108,7 +106,7 @@
 											<div class="modal-dialog" role="document">
 												<div class="modal-content">
 													<div class="modal-header">
-														<h5 class="modal-title">Delete Payment Method</h5>
+														<h5 class="modal-title"><i class="fa fa-trash"></i> Delete Payment Method</h5>
 														<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 															<span aria-hidden="true">&times;</span>
 														</button>
@@ -117,8 +115,8 @@
 														<h6 class="text-center">Delete Payment Method <span class="font-weight-bold">{{ $row->payment_method_name }}</span> ?</h6>
 													</div>
 													<div class="modal-footer">
-														<button type="submit" class="btn btn-primary">Confirm</button>
-														<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+														<button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>
+														<button type="submit" class="btn btn-danger"><i class="fa fa-trash"></i> Delete</button>
 													</div>
 												</div>
 											</div>
@@ -182,8 +180,8 @@
                                                         </div>
 													</div>
 													<div class="modal-footer">
-														<button type="submit" class="btn btn-primary">Save</button>
-														<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+														<button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>
+														<button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> Save</button>
 													</div>
 												</div>
 											</div>
@@ -265,8 +263,8 @@
 					</div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">Save</button>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>
+                    <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> Save</button>
                 </div>
             </div>
         </div>

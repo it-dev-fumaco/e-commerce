@@ -35,14 +35,14 @@
                                                         <input type="text" class="form-control" id="search-box" name="q" placeholder="Search" value="{{request()->get('q')}}">
                                                     </div>
                                                     <div class="col-md-4">
-                                                        <button type="submit" class="btn btn-secondary">Search</button>
+                                                        <button type="submit" class="btn btn-info"><i class="fa fa-search"></i> Search</button>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </form>
                                     <table class="table table-hover table-bordered">
-                                        <tr>
+                                        <thead>
                                             <th class="text-center" style="width: 5%;">ID</th>
                                             <th class="text-center" style="width: 25%;">Item Code</th>
                                             <th class="text-center" style="width: 10%;">Rating</th>
@@ -51,7 +51,7 @@
                                             <th class="text-center" style="width: 13%;">Date</th>
                                             <th class="text-center" style="width: 10%;">Show in Website</th>
                                             <th class="text-center" style="width: 7%;">Action</th>
-                                        </tr>
+                                        </thead>
                                         @forelse ($list as $row)
                                         <tr>
                                             <td class="text-center">{{ $row->rid }}</td>
@@ -78,7 +78,7 @@
                                             </td>
                                             <td>
                                                 <div class="text-center">
-                                                    <a href="#" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#v{{ $row->rid }}">View</a>
+                                                    <a href="#" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#v{{ $row->rid }}"><i class="fa fa-eye"></i></a>
                                                 </div>
                                                 <!-- Modal -->
                                                 <div class="modal fade" id="v{{ $row->rid }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -113,7 +113,7 @@
                                                             </dl>
                                                         </div>
                                                         <div class="modal-footer">
-                                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                            <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>
                                                         </div>
                                                         </div>
                                                     </div>
@@ -122,7 +122,7 @@
                                         </tr>
                                         @empty
                                         <tr>
-                                            <td colspan="8" class="text-center">No records found</td>
+                                            <td colspan="8" class="text-center text-uppercase text-muted">No records found</td>
                                         </tr>
                                         @endforelse
                                     </table>

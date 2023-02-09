@@ -44,37 +44,35 @@
                                             </div>
                                                 
                                             <div class="col-sm-3">
-                                                <button type="submit" class="btn btn-primary">Search</button>
+                                                <button type="submit" class="btn btn-info"><i class="fas fa-search"></i> Search</button>
                                             </div>
                                         </div>
                                     </form>
-                                    <table class="table table-bordered table-hover">
+                                    <table class="table table-bordered table-hover table-striped">
                                         <thead>
                                             <tr>
-                                                {{-- <th style="font-size: 10pt;">Blog</th> --}}
-                                                <th>Author</th>
-                                                <th style="width: 20%">Blog Title</th>
-                                                <th>Comment</th>
-                                                <th>Date</th>
-                                                <th>Approve</th>
-                                                <th>Action</th>
+                                                <th class="text-center align-middle" style="width: 15%">Author</th>
+                                                <th class="text-center align-middle" style="width: 24%">Blog Title</th>
+                                                <th class="text-center align-middle" style="width: 38%">Comment</th>
+                                                <th class="text-center align-middle" style="width: 10%">Date</th>
+                                                <th class="text-center align-middle" style="width: 8%">Approve</th>
+                                                <th class="text-center align-middle" style="width: 5%">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             @forelse($comments_arr as $c)
                                                 <tr>
-                                                    {{-- <td>{{ $c['blog_id'] }}</td> --}}
                                                     <td>
                                                         {{ $c['blog_name'] }}<br/>
                                                         {{ $c['blog_email'] }}<br/>
                                                         {{ $c['blog_ip'] }}
                                                     </td>
-                                                    <td>{{ $c['blog_title'] }}</td>
-                                                    <td>
+                                                    <td class="text-center align-middle">{{ $c['blog_title'] }}</td>
+                                                    <td class="text-justify align-middle">
                                                         {{ $c['blog_comments'] }}
                                                     </td>
-                                                    <td>{{ \Carbon\Carbon::parse($c['blog_date'])->format('M d, Y') }}</td>
-                                                    <td>
+                                                    <td class="text-center align-middle">{{ \Carbon\Carbon::parse($c['blog_date'])->format('M d, Y') }}</td>
+                                                    <td class="align-middle">
                                                         <center>
                                                             <label class="switch">
                                                                 <input type="checkbox" class="toggle" id="toggle_{{ $c['id']}}" name="approve" {{ ($c['blog_status'] == 0) ? '' : 'checked' }} value="{{ $c['id'] }}"/>
@@ -82,7 +80,7 @@
                                                             </label>
                                                         </center>
                                                     </td>
-                                                    <td>
+                                                    <td class="align-middle">
                                                         <center>
                                                             <a href="#" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#deleteComment-{{ $c['id'] }}"><i class="fa fa-trash"></i></a>
                                                         </center>
@@ -100,8 +98,8 @@
                                                                         Delete Comment?
                                                                     </div>
                                                                     <div class="modal-footer">
-                                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                                                    <a href="/admin/blog/comment/delete/{{ $c['id'] }}" type="button" class="btn btn-primary">Delete</a>
+                                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>
+                                                                    <a href="/admin/blog/comment/delete/{{ $c['id'] }}" type="button" class="btn btn-danger"><i class="fa fa-trash"></i> Delete</a>
                                                                     </div>
                                                                 </div>
                                                             </div>

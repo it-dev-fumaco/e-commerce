@@ -34,7 +34,7 @@
         <td class="text-center">₱ {{ number_format($order['grand_total'], 2) }}</td>
         <td class="text-center"><span class="badge" style="background-color: {{ $badge }}; font-size: 11pt;">{{ $order['order_status'] }}</span></td>
         <td class="text-center">
-            <button type="button" class="btn btn-sm btn-primary view-order" data-id="{{ $order['id'] }}">View</button>
+            <button type="button" class="btn btn-sm btn-primary view-order" data-id="{{ $order['id'] }}"><i class="fas fa-eye"></i></button>
         </td>
     </tr>
     @empty

@@ -59,7 +59,7 @@
                                             </div>
 
                                             <div class="col-sm-3">
-                                                <button type="submit" class="btn btn-primary">Search</button>
+                                                <button type="submit" class="btn btn-info"><i class="fas fa-search"></i> Search</button>
                                             </div>
                                             <div class="col-sm-3">
                                                 <a href="/admin/holiday/add_form" class="btn btn-primary float-right"><i class="fa fa-plus"></i>&nbsp;Register New Holiday</a>
@@ -121,7 +121,7 @@
                                                                                     <small>Created by: {{ $holiday['created_by'] }} - {{ $holiday['created_at'] }}</small>
                                                                                 </div>
                                                                                 <br>
-                                                                                <button type="submit" class="btn btn-primary float-right">Save</button>
+                                                                                <button type="submit" class="btn btn-primary float-right"><i class="fas fa-save"></i> Save</button>
                                                                             </div>
                                                                         </form>
                                                                     </div>

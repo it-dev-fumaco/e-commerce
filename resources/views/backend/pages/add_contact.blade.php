@@ -41,26 +41,26 @@
                                         <div class="row">
                                             <div class="col-md-9"><h4>Contact Us</h4></div>
                                             <div class="col-md-3 text-right">
-                                                <button class="btn btn-primary">Submit</button>
+                                                <button class="btn btn-primary"><i class="fas fa-save"></i> Save</button>
                                             </div>
                                         </div>
                                         @csrf
                                         <div class="row">
                                             <div class="form-group col-md-12">
-                                                <label>Office Title *</label>
+                                                <label>Office Title <span class="text-danger">*</span></label>
                                                 <input type="text" name="title" class="form-control" required>
                                             </div>
                                         </div>
                                         <div class="row">
                                             <div class="form-group col-md-12">
-                                                <label>Office Address *</label>
+                                                <label>Office Address <span class="text-danger">*</span></label>
                                                 <input type="text" name="address" class="form-control" required/>
                                             </div>
                                         </div>
                                         <div class="row">
                                             <div class="col-8 mx-auto">
-                                                <button class="btn btn-primary float-right m-2" id="add-contact-numbers-btn"><i class="fa fa-plus"></i> Add Contact Info</button>
-                                                <table class="table table-striped" id="contact-numbers-table">
+                                                <button class="btn btn-secondary float-right m-2" id="add-contact-numbers-btn"><i class="fa fa-plus"></i> Add Contact Info</button>
+                                                <table class="table table-striped table-bordered" id="contact-numbers-table">
                                                     <thead>
                                                         <tr>
                                                             <th class='text-center' style="width: 30%;">Type</th>
@@ -126,8 +126,8 @@
                         '<input type="text" name="contact[row-' + row_count + ']" class="form-control" required>' +
                         '<div id="row-' + row_count + '-msg-container" class="text-left p-2" style="display: none">' + clone_msg_platform + '</div>' + 
                     '</td>' +
-                    '<td>' +
-                        '<button type="button" class="btn btn-outline-danger w-100 remove-row" data-row="row-' + row_count + '">Remove</button>' +
+                    '<td class="text-center align-middle">' +
+                        '<button type="button" class="btn btn-danger btn-sm remove-row" data-row="row-' + row_count + '"><i class="fas fa-trash"></i></button>' +
                     '</td>' +
                 '</tr>';
 

@@ -44,7 +44,7 @@
                                             </div>
                                                 
                                             <div class="col-sm-3">
-                                                <button type="submit" class="btn btn-primary">Search</button>
+                                                <button type="submit" class="btn btn-info"><i class="fas fa-search"></i> Search</button>
                                             </div>
 
                                             <div class="col-sm-6">
@@ -55,25 +55,25 @@
                                     <table class="table table-bordered table-hover">
                                         <thead>
                                             <tr>
-                                                <th style="font-size: 10pt;">Title</th>
-                                                <th style="font-size: 10pt;">Type</th>
-                                                <th style="font-size: 10pt;">Author</th>
-                                                <th style="font-size: 10pt;">Date Created</th>
-                                                <th style="font-size: 10pt;">Created By</th>
-                                                <th style="font-size: 10pt;" class="text-center">Status</th>
-                                                <th style="font-size: 10pt;" class="text-center">Is featured</th>
-                                                <th style="font-size: 10pt;">Publish</th>
-                                                <th class="text-center" style="font-size: 10pt;">Action</th>
+                                                <th class="text-center align-middle" style="font-size: 10pt;">Title</th>
+                                                <th class="text-center align-middle" style="font-size: 10pt;">Type</th>
+                                                <th class="text-center align-middle" style="font-size: 10pt;">Author</th>
+                                                <th class="text-center align-middle" style="font-size: 10pt;">Date Created</th>
+                                                <th class="text-center align-middle" style="font-size: 10pt;">Created By</th>
+                                                <th class="text-center align-middle" style="font-size: 10pt;">Status</th>
+                                                <th class="text-center align-middle" style="font-size: 10pt;">Is featured</th>
+                                                <th class="text-center align-middle" style="font-size: 10pt;">Publish</th>
+                                                <th class="text-center align-middle" style="font-size: 10pt;">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             @forelse($blogs as $b)
                                                 <tr>
-                                                    <td>{{ $b->blogtitle }}</td>
-                                                    <td>{{ $b->blogtype }}</td>
-                                                    <td>{{ $b->blog_by }}</td>
-                                                    <td>{{ \Carbon\Carbon::parse($b->created_at)->format('M d, Y') }}</td>
-                                                    <td>{{ $b->created_by }}</td>
+                                                    <td class="text-justify align-middle">{{ $b->blogtitle }}</td>
+                                                    <td class="text-center align-middle">{{ $b->blogtype }}</td>
+                                                    <td class="text-center align-middle">{{ $b->blog_by }}</td>
+                                                    <td class="text-center align-middle">{{ \Carbon\Carbon::parse($b->created_at)->format('M d, Y') }}</td>
+                                                    <td class="text-center align-middle">{{ $b->created_by }}</td>
                                                     <td class="text-center">
                                                         <center>
                                                             <label class="switch">
@@ -83,7 +83,7 @@
                                                         </center>
                                                         <span class="badge badge-{{ $b->blog_status == 1 ? 'primary' : 'warning' }}">{{ $b->blog_status == 1 ? '' : 'NOT ' }}COMPLETE</span>
                                                     </td>
-                                                    <td>
+                                                    <td class="text-center align-middle">
                                                         <center>
                                                             <label class="switch">
                                                                 <input type="checkbox" class="toggle" data-function="feature" name="featured" {{ ($b->blog_featured == 1) ? 'checked' : '' }} value="{{ $b->id }}"/>
@@ -91,7 +91,7 @@
                                                             </label>
                                                         </center>
                                                     </td>
-                                                    <td>
+                                                    <td class="text-center align-middle">
                                                         <center>
                                                             <label class="switch">
                                                                 <input type="checkbox" class="toggle" data-function="publish" name="publish" {{ ($b->blog_enable == 1) ? 'checked' : '' }} value="{{ $b->id }}"/>
@@ -99,7 +99,7 @@
                                                             </label>
                                                         </center>
                                                     </td>
-                                                    <td>
+                                                    <td class="align-middle">
                                                         <center>
                                                             <a href="/admin/blog/edit/form/{{ $b->id }}" class="btn btn-sm btn-primary"><i class="fa fa-edit"></i></a>
                                                             <a href="#" data-toggle="modal" data-target="#deleteBlog-{{ $b->id }}" class="btn btn-sm btn-danger"><i class="fa fa-trash"></i></a>
@@ -109,17 +109,17 @@
                                                             <div class="modal-dialog" role="document">
                                                                 <div class="modal-content">
                                                                     <div class="modal-header">
-                                                                        <h5 class="modal-title" id="exampleModalLabel">Blog {{ $b->id }}</h5>
+                                                                        <h5 class="modal-title" id="exampleModalLabel"><i class="fa fa-trash"></i> Delete Blog</h5>
                                                                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                                                         <span aria-hidden="true">&times;</span>
                                                                     </button>
                                                                     </div>
                                                                     <div class="modal-body">
-                                                                        Delete Blog {{ $b->id }}?
+                                                                        Delete Blog "<b>{{ $b->blogtitle }}</b>"?
                                                                     </div>
                                                                     <div class="modal-footer">
-                                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                                                    <a href="/admin/blog/delete/{{ $b->id }}" type="button" class="btn btn-primary">Delete</a>
+                                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>
+                                                                    <a href="/admin/blog/delete/{{ $b->id }}" type="button" class="btn btn-danger"><i class="fa fa-trash"></i> Delete</a>
                                                                     </div>
                                                                 </div>
                                                             </div>

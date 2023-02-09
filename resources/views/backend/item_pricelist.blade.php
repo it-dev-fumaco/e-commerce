@@ -36,7 +36,7 @@
                                                     <input type="text" class="form-control" name="q" placeholder="Search" value="{{request()->get('q')}}">
                                                 </div>
                                                 <div class="col-md-4">
-                                                    <button type="submit" class="btn btn-secondary">Search</button>
+                                                    <button type="submit" class="btn btn-info"><i class="fas fa-search"></i> Search</button>
                                                 </div>
                                             </div>
                                         </div>

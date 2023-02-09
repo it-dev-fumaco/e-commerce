@@ -49,7 +49,7 @@
 											<input type="text" class="form-control" id="search-box" name="q" placeholder="Search" value="{{request()->get('q')}}">
 											</div>
 											<div class="col-md-4">
-												<button type="submit" class="btn btn-primary">Search</button>
+												<button type="submit" class="btn btn-info"><i class="fas fa-search"></i> Search</button>
 											</div>
 										</div>
 									</div>
@@ -78,10 +78,8 @@
 										<td class="text-center">{{ $row->address }}</td>
 										<td class="text-center">{{ date('h:i A', strtotime($row->available_from)) }} - {{ date('h:i A', strtotime($row->available_to)) }}</td>
 										<td class="text-center align-middle">
-											<div class="btn-group" role="group" aria-label="Basic example">
-												<a href="/admin/store/{{ $row->store_id }}/edit" class="btn btn-outline-success btn-sm"><i class="fa fa-edit"></i></a>
-												<button type="button" class="btn btn-outline-danger btn-sm" data-toggle="modal" data-target="#delete-{{ $i }}"><i class="fa fa-trash"></i></button>
-											</div>
+											<a href="/admin/store/{{ $row->store_id }}/edit" class="btn btn-primary btn-sm"><i class="fa fa-edit"></i></a>
+											<button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#delete-{{ $i }}"><i class="fa fa-trash"></i></button>
 										</td>
 									</tr>
 	
@@ -93,7 +91,7 @@
 											<div class="modal-dialog" role="document">
 												<div class="modal-content">
 													<div class="modal-header">
-														<h5 class="modal-title">Delete Store</h5>
+														<h5 class="modal-title"><i class="fas fa-trash"></i> Delete Store</h5>
 														<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 															<span aria-hidden="true">&times;</span>
 														</button>
@@ -102,8 +100,8 @@
 														<h6 class="text-center">Delete Store <span class="font-weight-bold">{{ $row->store_name }}</span> ?</h6>
 													</div>
 													<div class="modal-footer">
-														<button type="submit" class="btn btn-primary">Confirm</button>
-														<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+														<button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fas fa-times"></i> Close</button>
+														<button type="submit" class="btn btn-danger"><i class="fas fa-trash"></i> Delete</button>
 													</div>
 												</div>
 											</div>

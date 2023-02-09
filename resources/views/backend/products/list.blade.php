@@ -74,7 +74,7 @@
 												  </div>
 											</div>
 											<div class="col-md-1">
-												<button type="submit" class="btn btn-secondary">Search</button>
+												<button type="submit" class="btn btn-info"><i class="fas fa-search"></i> Search</button>
 											</div>
 										</div>
 									</div>

@@ -42,11 +42,11 @@
                                         @csrf
                                         <div class="row">
                                             <div class="form-group col-md-6">
-                                                <label>Page Name *</label>
+                                                <label>Page Name <span class="text-danger">*</span></label>
                                                 <input type="text" name="name" class="form-control" value="{{ $policy->page_name }}" required>
                                             </div>
                                             <div class="form-group col-md-6">
-                                                <label>Page Title *</label>
+                                                <label>Page Title <span class="text-danger">*</span></label>
                                                 <input type="text" name="title" class="form-control" value="{{ $policy->page_title }}" required/>
                                             </div>
                                         </div>
@@ -56,14 +56,14 @@
                                                 <input type="text" name="header" value="{{ $policy->header }}" class="form-control"/>
                                             </div>
                                             <div class="form-group col-md-6">
-                                                <label>Slug *</label>
+                                                <label>Slug <span class="text-danger">*</span></label>
                                                 <input type="text" name="slug" value="{{ $policy->slug }}" class="form-control" required/>
                                             </div>
                                         </div>
                                         <div class="row">
                                             <div class="form-group col-md-12">
                                                 <div class="form-group">
-                                                    <label for="content1">Content 1 *</label>
+                                                    <label for="content1">Content 1 <span class="text-danger">*</span></label>
                                                     <textarea class="form-control page-content" rows="10" name="content1">{{ $policy->content1 }}</textarea>
                                                 </div>
                                             </div>
@@ -96,7 +96,7 @@
                                         </div>
                                     </div>
                                     <div class="card-footer text-center">
-                                        <button type="submit" class="btn btn-primary btn-lg">SUBMIT</button>
+                                        <button type="submit" class="btn btn-primary btn-lg"><i class="fas fa-save"></i> Save</button>
                                     </div>
                                 </form>
                             </div>

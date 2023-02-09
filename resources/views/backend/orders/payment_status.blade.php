@@ -45,21 +45,21 @@
                                     </div>
                                 </div>
                                 <br/>
-                                <table class="table table-bordered">
-                                    <tr>
-                                        <th>Status ID</th>
-                                        <th>Status</th>
-                                        <th>Status Description</th>
-                                        <th>Updates Order Status</th>
-                                        <th>Action</th>
-                                    </tr>
+                                <table class="table table-bordered table-striped table-hover">
+                                    <thead>
+                                        <th class="text-center align-middle">Status ID</th>
+                                        <th class="text-center align-middle">Status</th>
+                                        <th class="text-center align-middle">Status Description</th>
+                                        <th class="text-center align-middle">Updates Order Status</th>
+                                        <th class="text-center align-middle">Action</th>
+                                    </thead>
                                     @forelse ($status_list as $status)
                                         <tr>
-                                            <td>{{ $status->id }}</td>
-                                            <td>{{ $status->status }}</td>
-                                            <td>{{ $status->status_description }}</td>
-                                            <td>{{ $status->updates_status ? 'Yes' : 'No' }}</td>
-                                            <td class="text-center">
+                                            <td class="text-center align-middle">{{ $status->id }}</td>
+                                            <td class="text-center align-middle">{{ $status->status }}</td>
+                                            <td class="text-justify align-middle">{{ $status->status_description }}</td>
+                                            <td class="text-center align-middle">{{ $status->updates_status ? 'Yes' : 'No' }}</td>
+                                            <td class="text-center align-middle">
                                                 <a href="/admin/payment/status/{{ $status->id }}/edit/form" class="btn btn-sm btn-primary"><i class="fa fa-eye"></i></a>
                                                 <a href="#" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#dm{{ $status->id }}"><i class="fa fa-trash"></i></a>
                                             </td>
@@ -69,7 +69,7 @@
                                             <div class="modal-dialog" role="document">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
-                                                        <h5 class="modal-title" id="exampleModalLabel">Delete</h5>
+                                                        <h5 class="modal-title" id="exampleModalLabel"><i class="fas fa-trash"></i> Delete</h5>
                                                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                                         <span aria-hidden="true">&times;</span>
                                                         </button>
@@ -78,8 +78,8 @@
                                                         Delete {{ $status->status }}?
                                                     </div>
                                                     <div class="modal-footer">
-                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                                        <a href="/admin/payment/status/{{ $status->id }}/delete" class="btn btn-danger">Delete</a>
+                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fas fa-times"></i> Close</button>
+                                                        <a href="/admin/payment/status/{{ $status->id }}/delete" class="btn btn-danger"><i class="fas fa-trash"></i> Delete</a>
                                                     </div>
                                                 </div>
                                             </div>

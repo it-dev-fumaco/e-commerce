@@ -122,7 +122,7 @@
 							<div class="card-header p-2">
 								<h5 class="mt-2 mb-3 ml-1">Customer Address</h5>
 								<div class="float-right">
-									<button class="btn btn-secondary btn-block" data-toggle="modal" data-target="#edit-details">Update Customer Group</button>
+									<button class="btn btn-secondary btn-block" data-toggle="modal" data-target="#edit-details"><i class="fas fa-edit"></i> Update Customer Group</button>
 								</div>
 								<ul class="nav nav-pills">
 									<li class="nav-item"><a class="nav-link active" href="#activity" data-toggle="tab">Shipping Address</a></li>

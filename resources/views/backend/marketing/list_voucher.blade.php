@@ -68,7 +68,7 @@
                                                                 <input type="text" class="form-control" id="search-box" name="q" placeholder="Search" value="{{request()->get('q')}}">
                                                             </div>
                                                             <div class="col-1">
-                                                                <button type="submit" class="btn btn-secondary mx-auto" style='width: 100%'>Search</button>
+                                                                <button type="submit" class="btn btn-info mx-auto" style='width: 100%'><i class="fas fa-search"></i> Search</button>
                                                             </div>
                                                             <div class="col-6"></div>
                                                             <div class="col-1">
@@ -136,7 +136,7 @@
                                                             <td class="text-center">{{ $c->validity_date_start ? date('M d, Y', strtotime($c->validity_date_start)).' - '.date('M d, Y', strtotime($c->validity_date_end)) : '' }}</td>
                                                             <td class="text-center">{{ $c->remarks }}</td>
                                                             <td class="text-center">
-                                                                <a href="/admin/marketing/voucher/{{ $c->id }}/edit_form" class="btn btn-sm btn-primary"><i class="fa fa-eye"></i></a>
+                                                                <a href="/admin/marketing/voucher/{{ $c->id }}/edit_form" class="btn btn-sm btn-primary"><i class="fa fa-edit"></i></a>
                                                                 <a href="#" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#delete{{ $c->id }}"><i class="fa fa-trash"></i></a>
                                                             </td>
                                                         </tr>
@@ -144,14 +144,14 @@
                                                             <div class="modal-dialog" role="document">
                                                                 <div class="modal-content">
                                                                     <div class="modal-header">
-                                                                        <h5 class="modal-title" id="exampleModalLabel">Delete "On Sale"</h5>
+                                                                        <h5 class="modal-title" id="exampleModalLabel"><i class="fas fa-trash"></i> Delete "On Sale"</h5>
                                                                     </div>
                                                                     <div class="modal-body">
                                                                         Delete {{ $c->name }}?
                                                                     </div>
                                                                     <div class="modal-footer">
-                                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                                                        <a href="/admin/marketing/voucher/{{ $c->id }}/delete" type="button" class="btn btn-danger">Delete</a>
+                                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fas fa-times"></i> Close</button>
+                                                                        <a href="/admin/marketing/voucher/{{ $c->id }}/delete" type="button" class="btn btn-danger"><i class="fas fa-trash"></i> Delete</a>
                                                                     </div>
                                                                 </div>
                                                             </div>

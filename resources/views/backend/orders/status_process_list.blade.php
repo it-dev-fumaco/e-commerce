@@ -41,25 +41,25 @@
                                 <div class="row">
                                     <div class="col-8">&nbsp;</div>
                                     <div class="col-4 text-right">
-                                        <a href="/admin/order/sequence_list/add_form" class="btn btn-primary">Add</a>
+                                        <a href="/admin/order/sequence_list/add_form" class="btn btn-primary"><i class="fas fa-plus"></i> Add</a>
                                     </div>
                                 </div>
                                 <br/>
                                 <div class="col-6">
                                     
                                 </div>
-                                <table class="table table-bordered">
-                                    <tr>
-                                        <th>Shipping Method</th>
-                                        <th>Sequence</th>
-                                        <th>Action</th>
-                                    </tr>
+                                <table class="table table-bordered table-striped table-hover">
+                                    <thead>
+                                        <th class="text-center align-middle">Shipping Method</th>
+                                        <th class="text-center align-middle">Sequence</th>
+                                        <th class="text-center align-middle">Action</th>
+                                    </thead>
                                     @forelse ($sequence_arr as $shipping)
                                         <tr>
-                                            <td>{{ $shipping['shipping_method'] }}</td>
-                                            <td class="text-center">
-                                                <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#view{{ Str::slug($shipping['shipping_method'], '-') }}Modal">
-                                                    View Sequence
+                                            <td class="text-center align-middle">{{ $shipping['shipping_method'] }}</td>
+                                            <td class="text-center align-middle">
+                                                <button type="button" class="btn btn-sm btn-info" data-toggle="modal" data-target="#view{{ Str::slug($shipping['shipping_method'], '-') }}Modal">
+                                                    <i class="fas fa-eye"></i> Sequence
                                                 </button>
                                                 {{--  --}}
                                                 <!-- Modal -->
@@ -74,7 +74,7 @@
                                                         </div>
                                                         <div class="modal-body">
                                                             <center>
-                                                                <table class="table-hover table-bordered">
+                                                                <table class="table table-hover table-bordered">
                                                                     <tr>
                                                                         <td>1</td>
                                                                         <td>Order Placed</td>
@@ -89,14 +89,14 @@
                                                             </center>
                                                         </div>
                                                         <div class="modal-footer">
-                                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                            <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fas fa-times"></i> Close</button>
                                                         </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td class="text-center">
-                                                <button class="btn btn-danger" data-toggle="modal" data-target="#dm{{ Str::slug($shipping['shipping_method'], '-') }}">Delete</button>
+                                            <td class="text-center align-middle">
+                                                <button class="btn btn-danger btn-sm" data-toggle="modal" data-target="#dm{{ Str::slug($shipping['shipping_method'], '-') }}"><i class="fas fa-trash"></i></button>
                                             </td>
                                         </tr>                                          
                                           <!-- Modal -->
@@ -104,7 +104,7 @@
                                             <div class="modal-dialog" role="document">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
-                                                        <h5 class="modal-title" id="exampleModalLabel">Delete</h5>
+                                                        <h5 class="modal-title" id="exampleModalLabel"><i class="fas fa-trash"></i> Delete</h5>
                                                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                                         <span aria-hidden="true">&times;</span>
                                                         </button>
@@ -113,8 +113,8 @@
                                                         Delete {{ $shipping['shipping_method'] }}?
                                                     </div>
                                                     <div class="modal-footer">
-                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                                        <a href="/admin/order/sequence_list/{{ $shipping['shipping_method'] }}/delete" class="btn btn-danger">Delete</a>
+                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fas fa-times"></i> Close</button>
+                                                        <a href="/admin/order/sequence_list/{{ $shipping['shipping_method'] }}/delete" class="btn btn-danger"><i class="fas fa-trash"></i> Delete</a>
                                                     </div>
                                                 </div>
                                             </div>

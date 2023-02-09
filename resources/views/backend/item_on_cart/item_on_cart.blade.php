@@ -53,7 +53,7 @@
                                                 </div>
                                             </div>
                                             <div class="col-md-4">
-                                                <button class="btn btn-secondary" type="button" id="search-btn">Search</button>
+                                                <button class="btn btn-info" type="button" id="search-btn"><i class="fas fa-search"></i> Search</button>
                                             </div>
                                         </div>
                                         <div id="aioc"></div>
