@@ -36,7 +36,24 @@
 												@foreach ($status_arr as $status)
 													<li class="nav-item">
 														<a class="nav-link pt-3 pb-3 nav-ctrl {{ $loop->first ? 'active' : null }}" data-status="{{ $status }}">
-															{{ $status == 'Order Placed' ? 'New Orders' : $status }}
+															@switch($status)
+																@case('Order Confirmed')
+																	To Deliver
+																	@break
+																@case('Ready for Pickup')
+																	For Pickup
+																	@break
+																@case('Order Completed')
+																	Completed
+																	@break
+																@default
+																	{{ $status }}
+															@endswitch
+															@if(in_array($status, ['Order Placed', 'Order Confirmed', 'Ready for Pickup']))
+																&nbsp;<span id="{{ Illuminate\Support\Str::slug($status, '-') }}-badge" class="badge badge-primary" style="font-size: 10pt;">
+																	{{ isset($count_arr[$status]) ? $count_arr[$status] : '0' }}
+																</span>
+															@endif
 														</a>
 													</li>
 												@endforeach

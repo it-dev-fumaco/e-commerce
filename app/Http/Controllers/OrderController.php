@@ -20,7 +20,7 @@ class OrderController extends Controller
     use GeneralTrait;
     use ProductTrait;
     public function orderList(Request $request, $status){
-        $status_arr = ['Order Placed', 'Order Confirmed', 'Order Delivered', 'Ready for Pickup', 'Order Completed', 'Cancelled'];
+        $status_arr = ['Order Placed', 'Order Confirmed', 'Ready for Pickup', 'Order Completed', 'Cancelled'];
 
         if($request->ajax()){
             $orders = DB::table('fumaco_order')
@@ -31,6 +31,9 @@ class OrderController extends Controller
                         ->orWhere('order_lastname', 'like', '%'.$request->search_str.'%');
                 });
             })->where('order_status', $status)
+            ->when($status == 'Order Completed', function ($q){
+                $q->orWhere('order_status', 'Order Delivered');
+            })
             ->orderBy('id', 'desc')->paginate(10);
     
             $order_items = DB::table('fumaco_order_items as order')
@@ -168,7 +171,15 @@ class OrderController extends Controller
             return view('backend.orders.order_tbl', compact('orders_arr', 'orders', 'status'));
         }
 
-        return view('backend.orders.order_list', compact('status_arr'));
+        $status_count = DB::table('fumaco_order')->select('order_status', DB::raw('count(order_status) as count'))->groupBy('order_status')->get();
+        $count_arr = [];
+        foreach($status_count as $count){
+            if(in_array($count->order_status, ['Order Placed', 'Order Confirmed', 'Ready for Pickup'])){
+                $count_arr[$count->order_status] = $count->count;
+            }
+        }
+
+        return view('backend.orders.order_list', compact('status_arr', 'count_arr'));
     }
 
     public function statusUpdate(Request $request){
