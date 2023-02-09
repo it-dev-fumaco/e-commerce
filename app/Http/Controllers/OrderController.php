@@ -13,179 +13,162 @@ use Carbon\Carbon;
 use Illuminate\Pagination\LengthAwarePaginator;
 use App\Http\Traits\GeneralTrait;
 use App\Http\Traits\ProductTrait;
+use Illuminate\Support\Str;
 
 class OrderController extends Controller
 {
     use GeneralTrait;
     use ProductTrait;
-    public function orderList(Request $request, $list){
-        $search_id = ($request->search) ? $request->search : '';
-        $order_status = ($request->order_status) ? $request->order_status : '';
-        $excluded_status = $included_status = [];
+    public function orderList(Request $request, $status){
+        $status_arr = ['Order Placed', 'Order Confirmed', 'Order Delivered', 'Ready for Pickup', 'Order Completed', 'Cancelled'];
 
-        switch ($list) {
-            case 'active':
-                $excluded_status = ['Cancelled', 'Delivered', 'Order Completed', 'Order Delivered'];
-                break;
-            case 'cancelled':
-                $included_status = ['Cancelled'];
-                break;
-            case 'completed':
-                $included_status = ['Order Completed', 'Order Delivered'];
-                break;
-            default:
-                Abort(404);
-                break;
-        }
-
-        $orders = DB::table('fumaco_order')
-        ->when($search_id, function ($q) use ($search_id){
-            $q->where('order_number', 'like', '%'.$search_id.'%');
-        })
-        ->when($order_status, function ($q) use ($order_status){
-            $q->where('order_status', $order_status);
-        })
-        ->when($list == 'active', function ($q) use ($excluded_status){
-            $q->whereNotIn('order_status', $excluded_status);
-        })
-        ->when(in_array($list, ['cancelled', 'completed']), function ($q) use ($included_status){
-            $q->whereIn('order_status', $included_status);
-        })
-        ->orderBy('id', 'desc')->paginate(10);
-
-        $order_items = DB::table('fumaco_order_items as order')
-            ->join('fumaco_items as item', 'order.item_code', 'item.f_idcode')
-            ->whereIn('order.order_number', collect($orders->items())->pluck('order_number'))
-            ->select('order.*', 'item.f_cat_id')
-            ->get();
-        $item_codes = collect($order_items)->pluck('item_code');
-        $order_items = collect($order_items)->groupBy('order_number');
-
-        $orders_arr = [];
-
-        $item_images = DB::table('fumaco_items_image_v1')->whereIn('idcode', $item_codes)->get();
-        $item_image = collect($item_images)->groupBy('idcode');
-
-        $voucher_details = DB::table('fumaco_voucher')->whereIn('code', collect($orders->items())->pluck('voucher_code')->unique())->get();
-        $voucher_details = collect($voucher_details)->groupBy('code');
-
-        foreach($orders as $o){
-            $items_arr = [];
-            $items = isset($order_items[$o->order_number]) ? $order_items[$o->order_number] : [];
-
-            foreach($items as $i){
-                $bundle_items = DB::table('fumaco_product_bundle_item')->where('parent_item_code', $i->item_code)->get();
-                $items_arr[] = [
-                    'order_number' => $i->order_number,
-                    'image' => isset($item_image[$i->item_code]) ? $item_image[$i->item_code][0]->imgprimayx : null,
-                    'orig' => isset($item_image[$i->item_code]) ? $item_image[$i->item_code][0]->imgoriginalx : null,
-                    'item_code' => $i->item_code,
-                    'item_name' => $i->item_name,
-                    'item_qty' => $i->item_qty,
-                    'item_price' => $i->item_price,
-                    'item_discount' => $i->item_discount,
-                    'discount_type' => $i->item_discount_type,
-                    'item_total' => $i->item_total_price,
-                    'bundle' => $bundle_items,
-                    // for price rules
-					'quantity' => $i->item_qty,
-					'category_id' => $i->f_cat_id,
-					'subtotal' => $i->item_total_price
+        if($request->ajax()){
+            $orders = DB::table('fumaco_order')
+            ->when($request->search_str, function ($query) use ($request){
+                $query->where(function ($q) use ($request){
+                    $q->where('order_number', 'like', '%'.$request->search_str.'%')
+                        ->orWhere('order_name', 'like', '%'.$request->search_str.'%')
+                        ->orWhere('order_lastname', 'like', '%'.$request->search_str.'%');
+                });
+            })->where('order_status', $status)
+            ->orderBy('id', 'desc')->paginate(10);
+    
+            $order_items = DB::table('fumaco_order_items as order')
+                ->join('fumaco_items as item', 'order.item_code', 'item.f_idcode')
+                ->whereIn('order.order_number', collect($orders->items())->pluck('order_number'))
+                ->select('order.*', 'item.f_cat_id')
+                ->get();
+            $item_codes = collect($order_items)->pluck('item_code');
+            $order_items = collect($order_items)->groupBy('order_number');
+    
+            $orders_arr = [];
+    
+            $item_images = DB::table('fumaco_items_image_v1')->whereIn('idcode', $item_codes)->get();
+            $item_image = collect($item_images)->groupBy('idcode');
+    
+            $voucher_details = DB::table('fumaco_voucher')->whereIn('code', collect($orders->items())->pluck('voucher_code')->unique())->get();
+            $voucher_details = collect($voucher_details)->groupBy('code');
+    
+            foreach($orders as $o){
+                $items_arr = [];
+                $items = isset($order_items[$o->order_number]) ? $order_items[$o->order_number] : [];
+    
+                foreach($items as $i){
+                    $bundle_items = DB::table('fumaco_product_bundle_item')->where('parent_item_code', $i->item_code)->get();
+                    $items_arr[] = [
+                        'order_number' => $i->order_number,
+                        'image' => isset($item_image[$i->item_code]) ? $item_image[$i->item_code][0]->imgprimayx : null,
+                        'orig' => isset($item_image[$i->item_code]) ? $item_image[$i->item_code][0]->imgoriginalx : null,
+                        'item_code' => $i->item_code,
+                        'item_name' => $i->item_name,
+                        'item_qty' => $i->item_qty,
+                        'item_price' => $i->item_price,
+                        'item_discount' => $i->item_discount,
+                        'discount_type' => $i->item_discount_type,
+                        'item_total' => $i->item_total_price,
+                        'bundle' => $bundle_items,
+                        // for price rules
+                        'quantity' => $i->item_qty,
+                        'category_id' => $i->f_cat_id,
+                        'subtotal' => $i->item_total_price
+                    ];
+                }
+    
+                $price_rule = $this->getPriceRules($items_arr, $o->order_date);
+                $price_rule = isset($price_rule['price_rule']['Any']) ? $price_rule['price_rule']['Any'] : [];
+                $gt_discount = $o->discount_amount;
+                if($price_rule){
+                    switch($price_rule['discount_type']){
+                        case 'Percentage':
+                            $pr_discount_amount = collect($items_arr)->sum('subtotal') * ($price_rule['discount_rate'] / 100);
+                            break;
+                        default:
+                            $pr_discount_amount = $price_rule['discount_rate'] < $o->order_subtotal ? $price_rule['discount_rate'] : 0;
+                            break;
+                    }
+    
+                    $gt_discount = $o->discount_amount > $pr_discount_amount ? $o->discount_amount - $pr_discount_amount : $o->discount_amount;
+                }
+    
+                $shipping_discount = DB::table('fumaco_on_sale as p')
+                    ->join('fumaco_on_sale_shipping_service as c', 'p.id', 'c.sale_id')->where('c.shipping_service', $o->order_shipping)
+                    ->where('status', 1)->where('p.apply_discount_to', 'Per Shipping Service')->whereDate('p.start_date', '<=', $o->order_date)->whereDate('p.end_date', '>=', $o->order_date)
+                    ->first();
+    
+                $store_address = null;
+                if($o->order_shipping == 'Store Pickup') {
+                    $store = DB::table('fumaco_store')->where('store_name', $o->store_location)->first();
+                    $store_address = ($store) ? $store->address : null;
+                }
+    
+                $order_status = DB::table('order_status as s')
+                    ->join('order_status_process as p', 's.order_status_id', 'p.order_status_id')
+                    ->where('shipping_method', $o->order_shipping)
+                    ->orderBy('order_sequence', 'asc')
+                    ->get();
+    
+                $orders_arr[] = [
+                    'order_id' => $o->id,
+                    'order_date' => $o->order_date,
+                    'order_no' => $o->order_number,
+                    'first_name' => $o->order_name,
+                    'last_name' => $o->order_lastname,
+                    'bill_contact_person' => $o->order_contactperson,
+                    'ship_contact_person' => $o->order_ship_contactperson,
+                    'email' => $o->order_email,
+                    'contact' => $o->order_contact == 0 ? '' : $o->order_contact ,
+                    'date' => Carbon::parse($o->order_date)->format('M d, Y - h:i A'),
+                    'ordered_items' => $items_arr,
+                    'order_tracker_code' => $o->tracker_code,
+                    'issuing_bank' => $o->issuing_bank,
+                    'cust_id' => $o->order_account,
+                    'bill_address1' => $o->order_bill_address1,
+                    'bill_address2' => $o->order_bill_address2,
+                    'bill_province' => $o->order_bill_prov,
+                    'bill_city' => $o->order_bill_city,
+                    'bill_brgy' => $o->order_bill_brgy,
+                    'bill_country' => $o->order_bill_country,
+                    'bill_postal' => $o->order_bill_postal,
+                    'bill_email' => $o->order_bill_email,
+                    'bill_contact' => $o->order_bill_contact,
+                    'ship_address1' => $o->order_ship_address1,
+                    'ship_address2' => $o->order_ship_address2,
+                    'ship_province' => $o->order_ship_prov,
+                    'ship_city' => $o->order_ship_city,
+                    'ship_brgy' => $o->order_ship_brgy,
+                    'ship_country' => $o->order_ship_country,
+                    'ship_postal' => $o->order_ship_postal,
+                    'shipping_name' => $o->order_shipping,
+                    'shipping_amount' => $o->order_shipping_amount,
+                    'grand_total' => $o->grand_total ? $o->grand_total : ($o->order_shipping_amount + $o->order_subtotal) - $gt_discount,
+                    'status' => $o->order_status,
+                    'estimated_delivery_date' => $o->estimated_delivery_date,
+                    'payment_id' => $o->payment_id,
+                    'payment_method' => $o->order_payment_method,
+                    'subtotal' => $o->order_subtotal,
+                    'order_type' => $o->order_type,
+                    'user_email' => $o->user_email,
+                    'billing_business_name' => $o->billing_business_name,
+                    'voucher_code' => $o->voucher_code,
+                    'voucher_details' => isset($voucher_details[$o->voucher_code]) ? $voucher_details[$o->voucher_code][0] : [],
+                    'shipping_discount' => $shipping_discount ? $shipping_discount : [],
+                    'discount_amount' => $o->discount_amount,
+                    'shipping_business_name' => $o->shipping_business_name,
+                    'pickup_date' => Carbon::parse($o->pickup_date)->format('M d, Y'),
+                    'store_address' => $store_address,
+                    'store' => $o->store_location,
+                    'order_status' => $order_status,
+                    'deposit_slip_image' => $o->deposit_slip_image,
+                    'payment_status' => $o->payment_status,
+                    'price_rule' => $price_rule
+                    // 'erp_sales_order' => $o->erp_sales_order
                 ];
             }
 
-            $price_rule = $this->getPriceRules($items_arr, $o->order_date);
-            $price_rule = isset($price_rule['price_rule']['Any']) ? $price_rule['price_rule']['Any'] : [];
-            $gt_discount = $o->discount_amount;
-            if($price_rule){
-                switch($price_rule['discount_type']){
-                    case 'Percentage':
-                        $pr_discount_amount = collect($items_arr)->sum('subtotal') * ($price_rule['discount_rate'] / 100);
-                        break;
-                    default:
-                        $pr_discount_amount = $price_rule['discount_rate'] < $o->order_subtotal ? $price_rule['discount_rate'] : 0;
-                        break;
-                }
-
-                $gt_discount = $o->discount_amount > $pr_discount_amount ? $o->discount_amount - $pr_discount_amount : $o->discount_amount;
-            }
-
-            $shipping_discount = DB::table('fumaco_on_sale as p')
-                ->join('fumaco_on_sale_shipping_service as c', 'p.id', 'c.sale_id')->where('c.shipping_service', $o->order_shipping)
-                ->where('status', 1)->where('p.apply_discount_to', 'Per Shipping Service')->whereDate('p.start_date', '<=', $o->order_date)->whereDate('p.end_date', '>=', $o->order_date)
-                ->first();
-
-            $store_address = null;
-			if($o->order_shipping == 'Store Pickup') {
-				$store = DB::table('fumaco_store')->where('store_name', $o->store_location)->first();
-				$store_address = ($store) ? $store->address : null;
-			}
-
-            $order_status = DB::table('order_status as s')
-                ->join('order_status_process as p', 's.order_status_id', 'p.order_status_id')
-                ->where('shipping_method', $o->order_shipping)
-                ->orderBy('order_sequence', 'asc')
-                ->get();
-
-            $orders_arr[] = [
-                'order_id' => $o->id,
-                'order_date' => $o->order_date,
-                'order_no' => $o->order_number,
-                'first_name' => $o->order_name,
-                'last_name' => $o->order_lastname,
-                'bill_contact_person' => $o->order_contactperson,
-                'ship_contact_person' => $o->order_ship_contactperson,
-                'email' => $o->order_email,
-                'contact' => $o->order_contact == 0 ? '' : $o->order_contact ,
-                'date' => Carbon::parse($o->order_date)->format('M d, Y - h:i A'),
-                'ordered_items' => $items_arr,
-                'order_tracker_code' => $o->tracker_code,
-                'issuing_bank' => $o->issuing_bank,
-                'cust_id' => $o->order_account,
-                'bill_address1' => $o->order_bill_address1,
-                'bill_address2' => $o->order_bill_address2,
-                'bill_province' => $o->order_bill_prov,
-                'bill_city' => $o->order_bill_city,
-                'bill_brgy' => $o->order_bill_brgy,
-                'bill_country' => $o->order_bill_country,
-                'bill_postal' => $o->order_bill_postal,
-                'bill_email' => $o->order_bill_email,
-                'bill_contact' => $o->order_bill_contact,
-                'ship_address1' => $o->order_ship_address1,
-                'ship_address2' => $o->order_ship_address2,
-                'ship_province' => $o->order_ship_prov,
-                'ship_city' => $o->order_ship_city,
-                'ship_brgy' => $o->order_ship_brgy,
-                'ship_country' => $o->order_ship_country,
-                'ship_postal' => $o->order_ship_postal,
-                'shipping_name' => $o->order_shipping,
-                'shipping_amount' => $o->order_shipping_amount,
-                'grand_total' => $o->grand_total ? $o->grand_total : ($o->order_shipping_amount + $o->order_subtotal) - $gt_discount,
-                'status' => $o->order_status,
-                'estimated_delivery_date' => $o->estimated_delivery_date,
-                'payment_id' => $o->payment_id,
-                'payment_method' => $o->order_payment_method,
-                'subtotal' => $o->order_subtotal,
-                'order_type' => $o->order_type,
-                'user_email' => $o->user_email,
-                'billing_business_name' => $o->billing_business_name,
-                'voucher_code' => $o->voucher_code,
-                'voucher_details' => isset($voucher_details[$o->voucher_code]) ? $voucher_details[$o->voucher_code][0] : [],
-                'shipping_discount' => $shipping_discount ? $shipping_discount : [],
-                'discount_amount' => $o->discount_amount,
-                'shipping_business_name' => $o->shipping_business_name,
-                'pickup_date' => Carbon::parse($o->pickup_date)->format('M d, Y'),
-                'store_address' => $store_address,
-                'store' => $o->store_location,
-                'order_status' => $order_status,
-                'deposit_slip_image' => $o->deposit_slip_image,
-                'payment_status' => $o->payment_status,
-                'price_rule' => $price_rule
-                // 'erp_sales_order' => $o->erp_sales_order
-            ];
+            return view('backend.orders.order_tbl', compact('orders_arr', 'orders', 'status'));
         }
 
-        return view('backend.orders.order_list', compact('orders_arr', 'orders', 'list'));
+        return view('backend.orders.order_list', compact('status_arr'));
     }
 
     public function statusUpdate(Request $request){
@@ -892,8 +875,6 @@ class OrderController extends Controller
                 'status_sequence' => $status_process
             ];
         }
-
-        // return $sequence_arr;
 
         return view('backend.orders.status_process_list', compact('shipping_method', 'sequence_arr'));
     }
