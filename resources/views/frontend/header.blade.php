@@ -6,7 +6,7 @@
         </div>    
     </main>
 @else
-    <div class="page-header">
+    <div class="page-header pt-2">
         <img src="{{ asset('assets/site-img/'.$banner_image) }}" width="100%">
     </div>   
 @endif
