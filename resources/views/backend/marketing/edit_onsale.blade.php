@@ -36,23 +36,23 @@
                                 <form action="/admin/marketing/on_sale/{{ $on_sale->id }}/edit" method="post" enctype="multipart/form-data" autocomplete="off">
                                     @csrf
                                     @php
-                                    switch ($on_sale->apply_discount_to) {
-                                        case 'Per Shipping Service':
-                                            $child_table = 'fumaco_on_sale_shipping_service';
-                                            break;
-                                        case 'Per Category':
-                                            $child_table = 'fumaco_on_sale_categories';
-                                            break;
-                                        case 'Per Customer Group':
-                                            $child_table = 'fumaco_on_sale_customer_group';
-                                            break;
-                                        case 'Selected Items':
-                                            $child_table = 'fumaco_on_sale_items';
-                                            break;
-                                        default:
-                                            $child_table = null;
-                                            break;
-                                    }
+                                        switch ($on_sale->apply_discount_to) {
+                                            case 'Per Shipping Service':
+                                                $child_table = 'fumaco_on_sale_shipping_service';
+                                                break;
+                                            case 'Per Category':
+                                                $child_table = 'fumaco_on_sale_categories';
+                                                break;
+                                            case 'Per Customer Group':
+                                                $child_table = 'fumaco_on_sale_customer_group';
+                                                break;
+                                            case 'Selected Items':
+                                                $child_table = 'fumaco_on_sale_items';
+                                                break;
+                                            default:
+                                                $child_table = null;
+                                                break;
+                                        }
                                     @endphp
                                     <input type="text" class="d-none" name="child_table" value="{{ $child_table }}">
                                     <div class="row">
@@ -76,7 +76,7 @@
                                         </div>
                                     </div>
                                     <div class="row mt-2">
-                                        <div class="col-6">
+                                        {{-- <div class="col-6">
                                             @php
                                                 $sale_types = ['Regular Sale', 'Clearance Sale'];
                                             @endphp
@@ -90,7 +90,8 @@
                                                 <option value="{{ $s_type }}" {{ $s_type == $selected_sale_type ? 'selected' : '' }}>{{ $s_type }}</option>
                                                 @endforeach
                                             </select>
-                                        </div>
+                                        </div> --}}
+                                        {{-- Desktop --}}
                                         @if ($on_sale->banner_image)
                                         <div class="col-1">
                                             <a href="#" data-toggle="modal" data-target="#bannerImg{{ $on_sale->id }}">
@@ -103,7 +104,6 @@
                                             <div class="modal-xl modal-dialog modal-dialog-centered" role="document">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
-                                                        {{-- <h5 class="modal-title" id="exampleModalLabel">Modal title</h5> --}}
                                                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                                             <span aria-hidden="true">&times;</span>
                                                         </button>
@@ -120,10 +120,63 @@
                                         <div class="col-{{ $on_sale->banner_image ? '5' : '6' }}">
                                             <label>Banner Image (1920 x 377)</label>
                                             <div class="custom-file mb-3">
-                                                <input type="file" class="custom-file-input" id="customFile" name="banner_img">
-                                                <label class="custom-file-label" for="customFile">{{ $on_sale->banner_image ? $on_sale->banner_image : 'Choose File' }}</label>
+                                                <input type="file" class="custom-file-input" name="banner_img">
+                                                <label class="custom-file-label">{{ $on_sale->banner_image ? $on_sale->banner_image : 'Choose File' }}</label>
                                             </div>
                                         </div>
+                                        {{-- Desktop --}}
+
+                                        {{-- Mobile --}}
+                                        @if ($on_sale->mob_banner_image)
+                                        <div class="col-1">
+                                            <a href="#" data-toggle="modal" data-target="#MobBannerImg{{ $on_sale->id }}">
+                                                <img class="img-thumbnail" src="{{ asset('/assets/site-img/'.$on_sale->mob_banner_image) }}" alt="" style="width: 100%">
+                                            </a>
+                                        </div>
+
+                                        <!-- Modal -->
+                                        <div class="modal fade" id="MobBannerImg{{ $on_sale->id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                            <div class="modal-xl modal-dialog modal-dialog-centered" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <div class="container">
+                                                            <img class="img-thumbnail" src="{{ asset('/assets/site-img/'.$on_sale->mob_banner_image) }}" alt="" style="width: 100%">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        @endif
+                                        <div class="col-{{ $on_sale->mob_banner_image ? '5' : '6' }}">
+                                            <label>Banner Image (428 x 100)</label>
+                                            <div class="custom-file mb-3">
+                                                <input type="file" class="custom-file-input" name="mob_banner_img">
+                                                <label class="custom-file-label">{{ $on_sale->mob_banner_image ? $on_sale->mob_banner_image : 'Choose File' }}</label>
+                                            </div>
+                                        </div>
+                                        {{-- Mobile --}}
+
+                                        <div class="col-6">
+                                            @php
+                                                $sale_types = ['Regular Sale', 'Clearance Sale'];
+                                            @endphp
+                                            <label>Sale Type <span class="text-danger">*</span></label>
+                                            <select class="form-control" name="sale_type" id="sale-type" required>
+                                                <option disabled selected value="">Sale Type</option>
+                                                @php
+                                                    $selected_sale_type = $on_sale->is_clearance_sale == 1 ? 'Clearance Sale' : 'Regular Sale';
+                                                @endphp
+                                                @foreach ($sale_types as $s_type)
+                                                <option value="{{ $s_type }}" {{ $s_type == $selected_sale_type ? 'selected' : '' }}>{{ $s_type }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+
                                         <div class="col-6">
                                             @php
                                                 $types = ['Per Customer Group', 'Per Shipping Service', 'Per Category', 'Selected Items', 'All Items'];

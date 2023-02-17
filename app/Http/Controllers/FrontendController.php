@@ -2932,7 +2932,7 @@ class FrontendController extends Controller
             ->join('fumaco_categories as ic', 'ic.id', 'i.f_cat_id')
             ->where('i.f_status', 1)->where('os.is_clearance_sale', 1)->where('os.status', 1)
             ->orderBy('ic.slug', 'asc')
-            ->select('os.start_date', 'os.end_date', 'os.ignore_sale_duration', 'ic.name', 'ic.id', 'banner_image')
+            ->select('os.start_date', 'os.end_date', 'os.ignore_sale_duration', 'ic.name', 'ic.id', 'banner_image', 'mob_banner_image')
             ->get();
         
         $category_filter = [];
@@ -2942,8 +2942,12 @@ class FrontendController extends Controller
             }
         }
 
-        $ignore_sale_duration = collect($category_query)->pluck('ignore_sale_duration')->first();
-        $banner_image = collect($category_query)->pluck('banner_image')->first();
+        $sale_arr = collect($category_query)->first();
+        $ignore_sale_duration = $sale_arr->ignore_sale_duration;
+        $banner_image = $sale_arr->banner_image;
+        if((new \Jenssegers\Agent\Agent())->isMobile()){
+            $banner_image = $sale_arr->mob_banner_image ? $sale_arr->mob_banner_image : $sale_arr->banner_image;
+        }
 
         if (count($category_filter) <= 0) {
             return redirect('/');

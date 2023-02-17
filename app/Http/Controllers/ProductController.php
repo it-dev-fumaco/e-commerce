@@ -1259,7 +1259,7 @@ class ProductController extends Controller
             DB::table('fumaco_on_sale')->where('id', $request->sale_id)->update(['status' => $request->status]);
             $sale_details = DB::table('fumaco_on_sale')->where('id', $request->sale_id)->select('id', 'apply_discount_to')->first();
 
-            if($request->status == 1 && !in_array($sale_details->apply_discount_to, ['All Items', 'Per Customer Service', 'Per Shipping Service'])){
+            if($request->status == 1 && !in_array($sale_details->apply_discount_to, ['All Items', 'Per Customer Group', 'Per Shipping Service'])){
                 $subscribers = DB::table('fumaco_subscribe')->where('status', 1)->pluck('email');
                 $categories = [];
                 switch ($sale_details->apply_discount_to) {
@@ -1704,32 +1704,26 @@ class ProductController extends Controller
 				return redirect()->back()->with('error', "Sorry, your file is too large.");
 			}
 
-            $allowed_extensions = array('jpg', 'png', 'jpeg', 'gif');
-            $extension_error = "Sorry, only JPG, JPEG, PNG and GIF files are allowed.";
-
             $destinationPath = public_path('/assets/site-img/');
 
             if($request->hasFile('banner_img')){
-                $banner_img = $request->file('banner_img');
+                $add_image = $this->addImage($request->file('banner_img'), $destinationPath);
 
-                $img_name = pathinfo($banner_img->getClientOriginalName(), PATHINFO_FILENAME);
-			    $img_ext = pathinfo($banner_img->getClientOriginalName(), PATHINFO_EXTENSION);
-
-                $img_name = Str::slug($img_name, '-');
-
-                $banner_image_name = $img_name.".".$img_ext;
-
-                if(!in_array($img_ext, $allowed_extensions)){
-                    return redirect()->back()->with('image_error', $extension_error);
+                if(isset($add_image['error'])){
+                    return redirect()->back()->with('error', $add_image['error']);
                 }
 
-                $webp_pr = Webp::make($banner_img);
+                $insert['banner_image'] = isset($add_image['image_name']) ? $add_image['image_name'] : null;
+            }
 
-                if($webp_pr->save(public_path('/assets/site-img/'.$img_name.'.webp'))) {
-                    $banner_img->move($destinationPath, $banner_image_name);
+            if($request->hasFile('mob_banner_img')){
+                $add_image = $this->addImage($request->file('mob_banner_img'), $destinationPath);
+
+                if(isset($add_image['error'])){
+                    return redirect()->back()->with('error', $add_image['error']);
                 }
 
-                $insert['banner_image'] = $banner_image_name;
+                $insert['mob_banner_image'] = isset($add_image['image_name']) ? $add_image['image_name'] : null;
             }
 
             // mailchimp
@@ -2104,41 +2098,35 @@ class ProductController extends Controller
 
             // Image upload
             $rules = array(
-				'uploadFile' => 'image|max:500000'
-			);
+                'uploadFile' => 'image|max:500000'
+            );
 
-			$validation = Validator::make($request->all(), $rules);
+            $validation = Validator::make($request->all(), $rules);
 
             if ($validation->fails()){
-				return redirect()->back()->with('error', "Sorry, your file is too large.");
-			}
-
-            $allowed_extensions = array('jpg', 'png', 'jpeg', 'gif');
-            $extension_error = "Sorry, only JPG, JPEG, PNG and GIF files are allowed.";
+                return redirect()->back()->with('error', "Sorry, your file is too large.");
+            }
 
             $destinationPath = public_path('/assets/site-img/');
 
             if($request->hasFile('banner_img')){
-                $banner_img = $request->file('banner_img');
+                $add_image = $this->addImage($request->file('banner_img'), $destinationPath);
 
-                $img_name = pathinfo($banner_img->getClientOriginalName(), PATHINFO_FILENAME);
-			    $img_ext = pathinfo($banner_img->getClientOriginalName(), PATHINFO_EXTENSION);
-
-                $img_name = Str::slug($img_name, '-');
-
-                $banner_image_name = $img_name.".".$img_ext;
-
-                if(!in_array($img_ext, $allowed_extensions)){
-                    return redirect()->back()->with('image_error', $extension_error);
+                if(isset($add_image['error'])){
+                    return redirect()->back()->with('error', $add_image['error']);
                 }
 
-                $webp_pr = Webp::make($banner_img);
+                $update['banner_image'] = isset($add_image['image_name']) ? $add_image['image_name'] : null;
+            }
 
-                if($webp_pr->save(public_path('/assets/site-img/'.$img_name.'.webp'))) {
-                    $banner_img->move($destinationPath, $banner_image_name);
+            if($request->hasFile('mob_banner_img')){
+                $add_image = $this->addImage($request->file('mob_banner_img'), $destinationPath);
+
+                if(isset($add_image['error'])){
+                    return redirect()->back()->with('error', $add_image['error']);
                 }
 
-                $update['banner_image'] = $banner_image_name;
+                $update['mob_banner_image'] = isset($add_image['image_name']) ? $add_image['image_name'] : null;
             }
 
             $list_id = env('MAILCHIMP_LIST_ID');
@@ -2224,6 +2212,32 @@ class ProductController extends Controller
             DB::rollback();
 
             return redirect()->back()->with('error', 'An error occured. Please try again.');
+        }
+    }
+
+    private function addImage($image, $path){
+        try {
+            $img_name = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME);
+            $img_ext = pathinfo($image->getClientOriginalName(), PATHINFO_EXTENSION);
+
+            $img_name = Str::slug($img_name, '-');
+
+            $image_name = $img_name.".".strtolower($img_ext);
+
+            if(!in_array($img_ext, ['jpg', 'png', 'jpeg', 'gif', 'JPG', 'PNG', 'JPEG', 'GIF'])){
+                return ['error' => "Sorry, only JPG, JPEG, PNG and GIF files are allowed."];
+            }
+
+            $webp_pr = Webp::make($image);
+
+            if($webp_pr->save($path.$img_name.'.webp')) {
+                $image->move($path, $image_name);
+            }
+
+            return ['image_name' => $image_name];
+        } catch (\Throwable $th) {
+            // throw $th;
+            return ['error' => 'An error occured. Please try again.'];
         }
     }
 

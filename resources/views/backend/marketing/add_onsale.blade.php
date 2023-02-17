@@ -56,6 +56,32 @@
                                         </div>
                                     </div>
                                     <div class="row mt-2">
+                                        {{-- <div class="col-6">
+                                            @php
+                                                $sale_types = ['Regular Sale', 'Clearance Sale'];
+                                            @endphp
+                                            <label>Sale Type <span class="text-danger">*</span></label>
+                                            <select class="form-control" name="sale_type" id="sale-type" required>
+                                                <option disabled selected value="">Sale Type</option>
+                                                @foreach ($sale_types as $s_type)
+                                                <option value="{{ $s_type }}">{{ $s_type }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div> --}}
+                                        <div class="col-6">
+                                            <label>Desktop Banner Image (1920 x 377)</label>
+                                            <div class="custom-file mb-3">
+                                                <input type="file" class="custom-file-input" id="customFile" name="banner_img">
+                                                <label class="custom-file-label" for="customFile">Choose File</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <label>Mobile Banner Image (428 x 100)</label>
+                                            <div class="custom-file mb-3">
+                                                <input type="file" class="custom-file-input" id="customFile2" name="mob_banner_img">
+                                                <label class="custom-file-label" for="customFile">Choose File</label>
+                                            </div>
+                                        </div>
                                         <div class="col-6">
                                             @php
                                                 $sale_types = ['Regular Sale', 'Clearance Sale'];
@@ -67,13 +93,6 @@
                                                 <option value="{{ $s_type }}">{{ $s_type }}</option>
                                                 @endforeach
                                             </select>
-                                        </div>
-                                        <div class="col-6">
-                                            <label>Banner Image (1920 x 377)</label>
-                                            <div class="custom-file mb-3">
-                                                <input type="file" class="custom-file-input" id="customFile" name="banner_img">
-                                                <label class="custom-file-label" for="customFile">Choose File</label>
-                                            </div>
                                         </div>
                                         <div class="col-6">
                                             @php

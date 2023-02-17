@@ -297,12 +297,13 @@
     <script>
         $(document).ready(function() {
             $(".toggle").change(function(){
+                var btn = $(this);
                 var data = {
                     'status': $(this).prop('checked') == true ? 1 : 0,
                     'sale_id': $(this).val(),
                     '_token': "{{ csrf_token() }}",
                 }
-                console.log(data);
+                // console.log(data);
                 $.ajax({
                     type:'POST',
                     url:'/admin/marketing/on_sale/set_status',
@@ -311,7 +312,8 @@
                         console.log('success');
                     },
                     error: function () {
-                        alert('An error occured.');
+                        // btn.prop('checked', false)
+                        // alert('An error occured.');
                     }
                 });
             });
