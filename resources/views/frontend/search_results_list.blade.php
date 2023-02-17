@@ -154,9 +154,7 @@
                         <small class="text-muted stylecap" style="color:#c4cad0 !important; font-weight:100 !important;">( {{ $item['total_reviews'] }} Reviews )</small>
                     </div>
                     @if ($item['on_stock'] == 1)
-                        <center>
-                            <span class="text-success" style="font-size: 8pt; font-weight: 600;">Available</span>
-                        </center>
+                        <span class="text-success p-0" style="font-size: 8pt; font-weight: 600;">Available</span>
                         <a href="#" class="btn btn-outline-primary text-center w-100 p-2 add-to-cart mt-2" role="button" style="font-weight: 600; margin-bottom: 10px; font-size: 10pt;" data-item-code="{{ $item['item_code'] }}">Add to Cart</a>
                     @else
                         <a href="#" class="btn btn-outline-primary text-center w-100 p-2 notify-me border-0" role="button" style="font-weight: 600; font-size: 10pt; margin-bottom: 10px;" data-logged="{{ Auth::check() ? 1 : 0 }}" data-item-code="{{ $item['item_code'] }}">
