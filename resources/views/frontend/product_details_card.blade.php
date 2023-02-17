@@ -66,7 +66,8 @@
         </div>
       </div>
       @if ($item['on_stock'])
-        <div class="row col-11 mx-auto text-center mt-5">
+        <div class="row col-11 mx-auto text-center mt-3 mt-xl-5">
+          <span class="mb-2 text-success" style="font-weight: 600;">Available</span>
           <a href="#" class="btn btn-outline-primary text-center w-100 p-2 add-to-cart" role="button" style="font-weight: 600; margin-bottom: 20px; font-size: 10pt;" data-item-code="{{ $item['item_code'] }}">Add to Cart</a>
         </div>
       @else
