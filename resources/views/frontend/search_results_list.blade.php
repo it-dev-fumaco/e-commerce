@@ -112,7 +112,7 @@
             </div>
             @endif
         </div>
-        <div class="card-body">
+        <div class="card-body pt-1 pb-0">
             <div class="row">
                 <div class="col-4">
                     @php
@@ -141,7 +141,7 @@
                         {{ $item['default_price'] }}
                         @endif
                     </p>
-                    <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex justify-content-between align-items-center pb-2">
                         <div class="btn-group stylecap">
                             @for ($i = 0; $i < 5; $i++)
                                 @if ($item['overall_rating'] <= $i)
@@ -150,18 +150,19 @@
                                 <span class="fa fa-star" style="color: #FFD600;"></span>
                                 @endif
                             @endfor
-                        
                         </div>
                         <small class="text-muted stylecap" style="color:#c4cad0 !important; font-weight:100 !important;">( {{ $item['total_reviews'] }} Reviews )</small>
                     </div>
-                    <br/>
                     @if ($item['on_stock'] == 1)
-                        <a href="#" class="btn btn-outline-primary text-center w-100 p-2 add-to-cart" role="button" style="font-weight: 600; margin-bottom: 20px; font-size: 10pt;" data-item-code="{{ $item['item_code'] }}">Add to Cart</a>
+                        <center>
+                            <span class="text-success" style="font-size: 8pt; font-weight: 600;">Available</span>
+                        </center>
+                        <a href="#" class="btn btn-outline-primary text-center w-100 p-2 add-to-cart mt-2" role="button" style="font-weight: 600; margin-bottom: 10px; font-size: 10pt;" data-item-code="{{ $item['item_code'] }}">Add to Cart</a>
                     @else
-                        <a href="#" class="btn btn-outline-primary text-center w-100 p-2 notify-me border-0" role="button" style="font-weight: 600; font-size: 10pt; margin-bottom: 5px;" data-logged="{{ Auth::check() ? 1 : 0 }}" data-item-code="{{ $item['item_code'] }}">
+                        <a href="#" class="btn btn-outline-primary text-center w-100 p-2 notify-me border-0" role="button" style="font-weight: 600; font-size: 10pt; margin-bottom: 10px;" data-logged="{{ Auth::check() ? 1 : 0 }}" data-item-code="{{ $item['item_code'] }}">
                             Notify me
                         </a>
-                        <a href="/login" class="btn w-100 text-center w-100 p-2 border-0 {{ Auth::check() ? 'add-to-wishlist' : '' }} btn-hover" role="button" data-item-code="{{ $item['item_code'] }}" style="background-color: #E6F0F8; color: #0F6EB5; font-weight: 600; font-size: 10pt;">
+                        <a href="/login" class="btn w-100 text-center w-100 p-2 mb-2 border-0 {{ Auth::check() ? 'add-to-wishlist' : '' }} btn-hover" role="button" data-item-code="{{ $item['item_code'] }}" style="background-color: #E6F0F8; color: #0F6EB5; font-weight: 600; font-size: 10pt;">
                             Add to Wishlist
                         </a>
                     @endif
