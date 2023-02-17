@@ -9,7 +9,7 @@
         $img = ($item['image']) ? '/storage/item_images/'. $item['item_code'] .'/gallery/preview/'. $item['image'] : '/storage/no-photo-available.png';
         $img_webp = ($item['image']) ? '/storage/item_images/'. $item['item_code'] .'/gallery/preview/'. explode(".", $item['image'])[0] . '.webp' : '/storage/no-photo-available.png';
         @endphp
-        <div class="hover-container product-card" style="position: relative">
+        <div class="hover-container product-card" style="position: relative; min-height: 275px;">
           <div class="pt-2" style="position: absolute; top: 0; right: 0; z-index: 10;">
             @if($item['is_new_item'])
             <div class="col-12 mb-2">
@@ -66,9 +66,11 @@
         </div>
       </div>
       @if ($item['on_stock'])
-        <div class="row col-11 mx-auto text-center mt-3 mt-xl-5">
-          <span class="mb-2 text-success" style="font-weight: 600;">Available</span>
-          <a href="#" class="btn btn-outline-primary text-center w-100 p-2 add-to-cart" role="button" style="font-weight: 600; margin-bottom: 20px; font-size: 10pt;" data-item-code="{{ $item['item_code'] }}">Add to Cart</a>
+        <div class="row col-11 mx-auto text-center">
+          <span class="mt-2 mb-2 text-success" style="font-weight: 600;">Available</span>
+          <div class="col-12 p-1">
+            <a href="#" class="btn btn-outline-primary text-center w-100 p-2 add-to-cart" role="button" style="font-weight: 600; margin-bottom: 14px; font-size: 10pt;" data-item-code="{{ $item['item_code'] }}">Add to Cart</a>
+          </div>
         </div>
       @else
         <div class="row col-11 mx-auto text-center">
