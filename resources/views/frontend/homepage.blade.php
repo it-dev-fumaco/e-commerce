@@ -105,9 +105,9 @@
             <div class="equal-column-content">
               <div class="hover-container">
                 @php
-                $image = $b->{'blogprimayimage-home'} ? '/storage/journals/'.$b->{'blogprimayimage-home'} : '/storage/no-photo-available.png';
-                $image_webp = $b->{'blogprimayimage-home'} ? '/storage/journals/'.explode(".", $b->{'blogprimayimage-home'})[0] .'.webp' : '/storage/no-photo-available.png';
-              @endphp
+                  $image = $b->{'blogprimayimage-home'} ? '/storage/journals/'.$b->{'blogprimayimage-home'} : '/storage/no-photo-available.png';
+                  $image_webp = $b->{'blogprimayimage-home'} ? '/storage/journals/'.explode(".", $b->{'blogprimayimage-home'})[0] .'.webp' : '/storage/no-photo-available.png';
+                @endphp
             
               <picture>
                 <source srcset="{{ asset($image_webp) }}" type="image/webp" class="card-img-top">
@@ -158,6 +158,9 @@
       </div>
     </div>
   </div>
+  @php
+      $activePage = 'homepage';
+  @endphp
   @if(count($best_selling_arr) > 0)
   <div class="container marketing" style=" position: relative !important">
     <section class="py-5 text-center container" style="padding-bottom: 0rem !important;">
