@@ -16,14 +16,14 @@
                     @endphp
                     <a href="/product/{{ $item['slug'] ? $item['slug'] : $item['id'] }}" class="search-link">
                         <div class="row search-row mb-2">
-                            <div class="col-{{ $search_arr['screen'] == 'desktop' ? '2' : '3' }} text-center">
+                            <div class="col-3 col-lg-2 text-center p-0">
                                 <picture>
                                     <source srcset="{{ asset($image_webp) }}" type="image/webp">
                                     <source srcset="{{ asset($image) }}" type="image/jpeg">
-                                    <img src="{{ asset($image) }}" alt="{{ Str::slug(explode(".", $item['image'])[0], '-') }}" class="autocomplete-image">
+                                    <img src="{{ asset($image) }}" alt="{{ Str::slug(explode(".", $item['image'])[0], '-') }}" class="autocomplete-image" style="width: 100%">
                                 </picture>
                             </div>
-                            <div class="col-{{ $search_arr['screen'] == 'desktop' ? '10' : '9' }} product-desc d-flex align-items-center">
+                            <div class="col-9 col-lg-10 product-desc d-flex align-items-center">
                                 <div class="box">
                                     <span class="search-name">{{ $item['name'] }}</span>
                                     @if ($item['is_discounted'] == 1)
