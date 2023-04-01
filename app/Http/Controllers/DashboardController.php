@@ -253,7 +253,6 @@ class DashboardController extends Controller
 				'order_status' => $order_details->order_status,
 				'estimated_delivery_date' => $order_details->estimated_delivery_date,
 				'payment_id' => $order_details->payment_id,
-				'payment_method' => $order_details->order_payment_method,
 				'subtotal' => $order_details->order_subtotal,
 				'order_type' => $order_details->order_type,
 				'user_email' => $order_details->user_email,

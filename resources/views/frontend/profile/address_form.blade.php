@@ -65,7 +65,6 @@
 
 							<div class="col">
 								<label for="mobile_no" class="myprofile-font-form">Mobile Number : <span class="text-danger">*</span></label>
-								{{-- <input type="text" class="form-control caption_1" id="mobile_no" name="mobile_no" value="" required/> --}}
 								<div class="row">
 									<div class="col-2 col-xl-1" style="display: flex; align-items: center">
 										+63
@@ -96,15 +95,16 @@
 						<div class="row">
 							<div class="col">
 								<label for="province" class="myprofile-font-form">Province : <span class="text-danger">*</span></label>
-								<input type="text" class="form-control caption_1" id="province" name="province" value="{{ old('province') }}" required>
+								<select class="form-control caption_1" id="province" name="province" value="{{ old('province') }}" required></select>
 							</div>
 							<div class="col">
 								<label for="city" class="myprofile-font-form">City / Municipality : <span class="text-danger">*</span></label>
-								<input type="text" class="form-control caption_1" id="city" name="city" value="{{ old('city') }}" required>
+								<select class="form-control caption_1" id="city" name="city" value="{{ old('city') }}" required></select>
+								
 							</div>
 							<div class="col">
 								<label for="barangay" class="myprofile-font-form">Barangay : <span class="text-danger">*</span></label>
-								<input type="text" class="form-control caption_1" id="barangay" name="barangay" value="{{ old('barangay') }}" required>
+								<select class="form-control caption_1" id="barangay" name="barangay" value="{{ old('barangay') }}" required></select>
 							</div>
 						</div>
 						<br>
@@ -163,82 +163,59 @@
 @section('script')
 <!-- Select2 -->
 <script src="{{ asset('/assets/admin/plugins/select2/js/select2.full.min.js') }}"></script>
-
 <script>
 	$(document).ready(function() {
-		var provinces = [];
-		$.getJSON("{{ asset('/json/provinces.json') }}", function(obj){
-			$.each(obj.results, function(e, i) {
-				provinces.push({
-					id: i.text,
-					code: i.provCode,
-					text: i.text
-				});
-			});
+		$('#city').select2({
+			placeholder: 'Select City',
+		});
 
-			$('#province').select2({
-				placeholder: 'Select Province',
-				data: provinces
-			});
+		$('#barangay').select2({
+			placeholder: 'Select Barangay',
+		});
 
+		$('#province').select2({
+			placeholder: 'Select Province',
+			ajax: {
+				url: '/getJson?list=provinces.json',
+				method: 'GET',
+				dataType: 'json',
+            }
+		});
+
+		function getCities(provCode) {
 			$('#city').select2({
 				placeholder: 'Select City',
+				ajax: {
+					url: '/getJson?list=cities.json&provCode=' + provCode,
+					method: 'GET',
+					dataType: 'json',
+				}
 			});
+		}
 
+		function getBrgy(cityCode) {
 			$('#barangay').select2({
 				placeholder: 'Select Barangay',
+				ajax: {
+					url: '/getJson?list=brgy.json&citymunCode=' + cityCode,
+					method: 'GET',
+					dataType: 'json',
+				}
 			});
-		});
+		}
 
 		$(document).on('select2:select', '#province', function(e){
 			var data = e.params.data;
 			var select_el = $('#city');
-			var cities = [];
-
 			select_el.empty();
-			$.getJSON("{{ asset('/json/cities.json') }}", function(obj){
-				var filtered_cities = $.grep(obj.results, function(v) {
-					return v.provCode === data.code;
-				});
-
-				$.each(filtered_cities, function(e, i) {
-					cities.push({
-						id: i.text,
-						code: i.citymunCode,
-						text: i.text,
-					});
-				});
-
-				select_el.select2({
-					placeholder: 'Select City',
-					data: cities
-				});
-			});
+			getCities(data.id);
 		});
 
 		$(document).on('select2:select', '#city', function(e){
 			var data = e.params.data;
 			var select_el = $('#barangay');
-			var brgy = [];
-
 			select_el.empty();
-			$.getJSON("{{ asset('/json/brgy.json') }}", function(obj){
-				var filtered = $.grep(obj.results, function(v) {
-					return v.citymunCode === data.code;
-				});
-
-				$.each(filtered, function(e, i) {
-					brgy.push({
-						id: i.brgyDesc,
-						text: i.brgyDesc
-					});
-				});
-
-				select_el.select2({
-					placeholder: 'Select Barangay',
-					data: brgy
-				});
-			});
+			getBrgy(data.id);
 		});
 
 		$('#address_type').change(function(){
