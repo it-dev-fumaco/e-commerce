@@ -90,7 +90,11 @@
 							<div class="col-md-4">
 								<div class="form-group" id="prov-parent">
 									<label for="ship_province1_1" class="formslabelfnt">Province : <span class="text-danger">*</span></label>
-									<select class="form-control" id="ship_province1_1" name="ship_province1_1"></select>
+									<select class="form-control" id="ship_province1_1" name="ship_province1_1">
+										@foreach ($provinces as $province)
+											<option value="{{ $province['text'] }}" data-code="{{ $province['provCode'] }}">{{ $province['text'] }}</option>	
+										@endforeach
+									</select>
 									<br class="d-lg-none d-xl-none"/>
 								</div>
 							</div>
@@ -218,7 +222,11 @@
 								<div class="col-md-4">
 									<div class="form-group">
 										<label for="province1_1" class="formslabelfnt">Province : <span class="text-danger">*</span></label>
-										<select class="form-control" id="province1_1" name="province1_1" value="{{ old('province1_1') }}"></select>
+										<select class="form-control" id="province1_1" name="province1_1" value="{{ old('province1_1') }}">
+											@foreach ($provinces as $province)
+												<option value="{{ $province['text'] }}" data-code="{{ $province['provCode'] }}">{{ $province['text'] }}</option>	
+											@endforeach
+										</select>
 									</div>
 								</div>
 								<div class="col-md-4">
@@ -545,22 +553,23 @@
 		var str = "{{ implode(',', $shipping_zones) }}";
 		var res = str.split(",");
 		var provinces = [];
-		
-		$('#ship_province1_1').select2({
-			placeholder: 'Select Province',
-			ajax: {
-				url: '/getJson?list=provinces.json',
-				method: 'GET',
-				dataType: 'json'
-			}
-		});
+
+		$('#ship_province1_1').select2().val("METRO MANILA").trigger('change.select2');
+		$('#province1_1').select2().val("METRO MANILA").trigger('change.select2');
+		loadCities(1339, '#ship_City_Municipality1_1');
+		loadCities(1339, '#City_Municipality1_1');
 
 		$(document).on('select2:select', '#ship_province1_1', function(e){
 			var data = e.params.data;
-			var id = data.code;
+			var id = $('#ship_province1_1 option:selected').data('code');
 
-			$('#ship_City_Municipality1_1').select2({
-				dropdownParent: $('#city-parent'),
+			$('#ship_City_Municipality1_1').empty().trigger('change');
+			$('#ship_Barangay1_1').empty().trigger('change');
+			loadCities(id, '#ship_City_Municipality1_1');
+		});
+
+		function loadCities(id, select) {
+			$(select).select2({
 				placeholder: 'Select City',
 				ajax: {
 					url: '/getJson?list=cities.json&provCode=' + id,
@@ -568,12 +577,12 @@
 					dataType: 'json'
 				}
 			});
-		});
-
+		}
 		$(document).on('select2:select', '#ship_City_Municipality1_1', function(e){
 			var data = e.params.data;
 			var id = data.code;
 
+			$('#ship_Barangay1_1').empty().trigger('change');
 			$('#ship_Barangay1_1').select2({
 				placeholder: 'Select Barangay',
 				ajax: {
@@ -584,34 +593,20 @@
 			});
 		});
 
-		$('#province1_1').select2({
-			placeholder: 'Select Province',
-			ajax: {
-				url: '/getJson?list=provinces.json',
-				method: 'GET',
-				dataType: 'json'
-			}
-		});
-
 		$(document).on('select2:select', '#province1_1', function(e){
 			var data = e.params.data;
-			var id = data.code;
+			var id = $('#province1_1 option:selected').data('code');
 
-			$('#City_Municipality1_1').select2({
-				dropdownParent: $('#city-parent'),
-				placeholder: 'Select City',
-				ajax: {
-					url: '/getJson?list=cities.json&provCode=' + id,
-					method: 'GET',
-					dataType: 'json'
-				}
-			});
+			$('#City_Municipality1_1').empty().trigger('change');
+			$('#Barangay1_1').empty().trigger('change');
+			loadCities(id, '#City_Municipality1_1');
 		});
 
 		$(document).on('select2:select', '#City_Municipality1_1', function(e){
 			var data = e.params.data;
 			var id = data.code;
 
+			$('#Barangay1_1').empty().trigger('change');
 			$('#Barangay1_1').select2({
 				placeholder: 'Select Barangay',
 				ajax: {
