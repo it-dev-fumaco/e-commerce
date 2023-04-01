@@ -8,6 +8,7 @@
 <link rel="stylesheet" href="{{ asset('/datepicker/datepicker3.css') }}">
 @php
 	$page_title = 'SHOPPING CART';
+	header('Access-Control-Allow-Origin: *');
 @endphp
 @include('frontend.header')
 
