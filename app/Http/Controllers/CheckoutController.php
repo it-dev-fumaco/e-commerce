@@ -74,7 +74,10 @@ class CheckoutController extends Controller
 			DB::table('fumaco_temp')->where('order_tracker_code', $order_no)->update(['last_transaction_page' => 'Billing & Shipping Form']);
 		}
 
-		return view('frontend.checkout.billing_address_form', compact('has_shipping_address', 'shipping_zones'));
+		$provinces = json_decode(file_get_contents(public_path('/json/provinces.json')), true);
+        $provinces = isset($provinces['results']) ? $provinces['results'] : [];
+
+		return view('frontend.checkout.billing_address_form', compact('has_shipping_address', 'shipping_zones', 'provinces'));
 	}
 
 	public function setBillingForm($item_code_buy = null, $qty_buy = null){

@@ -145,6 +145,7 @@ Route::post('/checkout/success/{id}', 'CheckoutController@orderSuccess');
 Route::get('/checkout/failed', 'CheckoutController@orderFailed');
 Route::post('/checkout/failed', 'CheckoutController@orderFailed');
 Route::post('/checkout/callback', 'CheckoutController@paymentCallback');
+Route::get('/getJson', 'FrontendController@getJson');
 // product reviews
 Route::post('/submit_review', 'ProductReviewController@submitProductReview');
 Route::get('/verify_email/{token}', 'FrontendController@verifyAccount')->name('account.verify');

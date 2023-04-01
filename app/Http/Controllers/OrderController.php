@@ -1005,7 +1005,6 @@ class OrderController extends Controller
             'status' => $orders->order_status,
             'estimated_delivery_date' => $orders->estimated_delivery_date,
             'payment_id' => $orders->payment_id,
-            'payment_method' => $orders->order_payment_method,
             'subtotal' => $orders->order_subtotal,
             'order_type' => $orders->order_type,
             'user_email' => $orders->user_email,
