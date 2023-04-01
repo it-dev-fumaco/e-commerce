@@ -3057,4 +3057,55 @@ class FrontendController extends Controller
 
         return view('frontend.clearance_sale', compact('products_arr', 'products', 'image_for_sharing', 'category_filter', 'banner_image'));
     }
+
+    public function getJson(Request $request)
+    {
+        $list = json_decode(file_get_contents(public_path('/json/' . $request->list)), true);
+        $list = isset($list['results']) ? $list['results'] : [];
+
+        switch ($request->list) {
+            case 'cities.json':
+                $parent = 'provCode';
+                $code = 'citymunCode';
+                break;
+            case 'brgy.json':
+                $parent = 'citymunCode';
+                $code = 'brgyCode';
+                break;
+            default:
+                $parent = null;
+                $code = 'provCode';
+                break;
+        }
+
+        if ($request->list != 'provinces.json') {
+            if($request->$parent){
+                $list = collect($list)->groupBy($parent);
+                $list = isset($list[$request->$parent]) ? $list[$request->$parent] : [];
+            }
+        }
+
+        if ($request->term) {
+            $list = collect($list)->filter(function ($q) use ($request) {
+                $search_arr = explode(' ', $request->term);
+                $search_arr = array_map('strtolower', $search_arr);
+
+                if (Str::of(strtolower($q[($request->list == 'brgy.json' ? 'brgyDesc' : 'text')]))->contains($search_arr)) {
+                    return $q;
+                }
+            })->values()->all();
+        }
+
+        $list = collect($list)->map(function ($q) use ($code, $request) {
+            return [
+                'id' => $q[($request->list == 'brgy.json' ? 'brgyDesc' : 'text')],
+                'text' => $q[($request->list == 'brgy.json' ? 'brgyDesc' : 'text')],
+                'code' => $q[$code]
+            ];
+        });
+
+        return response()->json([
+            'results' => $list
+        ]);
+    }
 }

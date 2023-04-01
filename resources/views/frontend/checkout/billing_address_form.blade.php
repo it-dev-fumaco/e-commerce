@@ -88,22 +88,23 @@
 						<br>
 						<div class="row">
 							<div class="col-md-4">
-								<div class="form-group">
+								<div class="form-group" id="prov-parent">
 									<label for="ship_province1_1" class="formslabelfnt">Province : <span class="text-danger">*</span></label>
-									<input type="text" class="form-control formslabelfnt" id="ship_province1_1" name="ship_province1_1" value="{{ old('ship_province1_1') }}">
+									<select class="form-control" id="ship_province1_1" name="ship_province1_1"></select>
+									<br class="d-lg-none d-xl-none"/>
+								</div>
+							</div>
+							<div class="col-md-4">
+								<div class="form-group" id="city-parent">
+									<label for="ship_City_Municipality1_1" class="formslabelfnt">City / Municipality : <span class="text-danger">*</span></label>
+									<select class="form-control formslabelfnt" id="ship_City_Municipality1_1" name="ship_City_Municipality1_1"></select>
 									<br class="d-lg-none d-xl-none"/>
 								</div>
 							</div>
 							<div class="col-md-4">
 								<div class="form-group">
-									<label for="ship_City_Municipality1_1" class="formslabelfnt">City / Municipality : <span class="text-danger">*</span></label>
-									<input type="text" class="form-control formslabelfnt" id="ship_City_Municipality1_1" name="ship_City_Municipality1_1" value="{{ old('ship_City_Municipality1_1') }}"><br class="d-lg-none d-xl-none"/>
-								</div>
-							</div>
-							<div class="col-md-4">
-								<div class="form-group">
 									<label for="ship_Barangay1_1" class="formslabelfnt">Barangay : <span class="text-danger">*</span></label>
-									<input type="text" class="form-control formslabelfnt" id="ship_Barangay1_1" name="ship_Barangay1_1" value="{{ old('ship_Barangay1_1') }}">
+									<select class="form-control formslabelfnt" id="ship_Barangay1_1" name="ship_Barangay1_1"></select>
 								</div>
 							</div>
 						</div>
@@ -217,19 +218,19 @@
 								<div class="col-md-4">
 									<div class="form-group">
 										<label for="province1_1" class="formslabelfnt">Province : <span class="text-danger">*</span></label>
-										<input type="text" class="form-control formslabelfnt" id="province1_1" name="province1_1" value="{{ old('province1_1') }}">
+										<select class="form-control" id="province1_1" name="province1_1" value="{{ old('province1_1') }}"></select>
 									</div>
 								</div>
 								<div class="col-md-4">
 									<div class="form-group">
 										<label for="City_Municipality1_1" class="formslabelfnt">City / Municipality : <span class="text-danger">*</span></label>
-										<input type="text" class="form-control formslabelfnt" id="City_Municipality1_1" name="City_Municipality1_1" value="{{ old('City_Municipality1_1') }}">
+										<select class="form-control formslabelfnt" id="City_Municipality1_1" name="City_Municipality1_1" value="{{ old('City_Municipality1_1') }}"></select>
 									</div>
 								</div>
 								<div class="col-md-4">
 									<div class="form-group">
 										<label for="Barangay1_1" class="formslabelfnt">Barangay : <span class="text-danger">*</span></label>
-										<input type="text" class="form-control formslabelfnt" id="Barangay1_1" name="Barangay1_1" value="{{ old('Barangay1_1') }}">
+										<select class="form-control formslabelfnt" id="Barangay1_1" name="Barangay1_1" value="{{ old('Barangay1_1') }}"></select>
 									</div>
 								</div>
 							</div>
@@ -541,93 +542,83 @@
 <script>
 	$(document).ready(function() {
 		$('input[type="checkbox"]').prop("checked", true);
-		$('#ship_province1_1').empty();
 		var str = "{{ implode(',', $shipping_zones) }}";
 		var res = str.split(",");
 		var provinces = [];
-		$.getJSON("{{ asset('/json/provinces.json') }}", function(obj){
-			var filtered_province = $.grep(obj.results, function(v) {
-				return $.inArray(v.text, res) > -1;
-			});
-
-			$.each(filtered_province, function(e, i) {
-				provinces.push({
-					id: i.text,
-					code: i.provCode,
-					text: i.text
-				});
-			});
-
-			$('#ship_province1_1').select2({
-				placeholder: 'Select Province',
-				data: provinces
-			});
-
-			$('#ship_City_Municipality1_1').select2({
-				placeholder: 'Select City',
-			});
-
-			$('#ship_Barangay1_1').select2({
-				placeholder: 'Select Barangay',
-			});
-		});
 		
-		$('#ship_province1_1').val('METRO MANILA');
-		$('#ship_province1_1').select2().trigger('change');
-		loadcities("1339");
-
-		function loadcities(code) {
-			var select_el = $('#ship_City_Municipality1_1');
-			var cities = [];
-
-			select_el.empty();
-			$.getJSON("{{ asset('/json/cities.json') }}", function(obj){
-				var filtered_cities = $.grep(obj.results, function(v) {
-					return v.provCode === code;
-				});
-
-				$.each(filtered_cities, function(e, i) {
-					cities.push({
-						id: i.text,
-						code: i.citymunCode,
-						text: i.text,
-					});
-				});
-
-				select_el.select2({
-					placeholder: 'Select City',
-					data: cities
-				});
-			});
-		}
+		$('#ship_province1_1').select2({
+			placeholder: 'Select Province',
+			ajax: {
+				url: '/getJson?list=provinces.json',
+				method: 'GET',
+				dataType: 'json'
+			}
+		});
 
 		$(document).on('select2:select', '#ship_province1_1', function(e){
 			var data = e.params.data;
-			loadcities(data.code);
+			var id = data.code;
+
+			$('#ship_City_Municipality1_1').select2({
+				dropdownParent: $('#city-parent'),
+				placeholder: 'Select City',
+				ajax: {
+					url: '/getJson?list=cities.json&provCode=' + id,
+					method: 'GET',
+					dataType: 'json'
+				}
+			});
 		});
 
 		$(document).on('select2:select', '#ship_City_Municipality1_1', function(e){
 			var data = e.params.data;
-			var select_el = $('#ship_Barangay1_1');
-			var brgy = [];
+			var id = data.code;
 
-			select_el.empty();
-			$.getJSON("{{ asset('/json/brgy.json') }}", function(obj){
-				var filtered = $.grep(obj.results, function(v) {
-					return v.citymunCode === data.code;
-				});
+			$('#ship_Barangay1_1').select2({
+				placeholder: 'Select Barangay',
+				ajax: {
+					url: '/getJson?list=brgy.json&citymunCode=' + id,
+					method: 'GET',
+					dataType: 'json'
+				}
+			});
+		});
 
-				$.each(filtered, function(e, i) {
-					brgy.push({
-						id: i.brgyDesc,
-						text: i.brgyDesc
-					});
-				});
+		$('#province1_1').select2({
+			placeholder: 'Select Province',
+			ajax: {
+				url: '/getJson?list=provinces.json',
+				method: 'GET',
+				dataType: 'json'
+			}
+		});
 
-				select_el.select2({
-					placeholder: 'Select Barangay',
-					data: brgy
-				});
+		$(document).on('select2:select', '#province1_1', function(e){
+			var data = e.params.data;
+			var id = data.code;
+
+			$('#City_Municipality1_1').select2({
+				dropdownParent: $('#city-parent'),
+				placeholder: 'Select City',
+				ajax: {
+					url: '/getJson?list=cities.json&provCode=' + id,
+					method: 'GET',
+					dataType: 'json'
+				}
+			});
+		});
+
+		$(document).on('select2:select', '#City_Municipality1_1', function(e){
+			var data = e.params.data;
+			var id = data.code;
+
+			$('#Barangay1_1').select2({
+				placeholder: 'Select Barangay',
+				ajax: {
+					url: '/getJson?list=brgy.json&citymunCode=' + id,
+					method: 'GET',
+					dataType: 'json'
+				}
 			});
 		});
 		
@@ -703,96 +694,6 @@
 		$('#ship_Address_type1_1').change(function(){
 			toggleShipBusinessName($(this).val());
 		});
-
-		var provinces_bill = [];
-		$.getJSON("{{ asset('/json/provinces.json') }}", function(obj){
-			var filtered_province_bill = $.grep(obj.results, function(v) {
-				return $.inArray(v.text, res) > -1;
-			});
-
-			$.each(filtered_province_bill, function(e, i) {
-				provinces_bill.push({
-					id: i.text,
-					code: i.provCode,
-					text: i.text
-				});
-			});
-
-			$('#province1_1').select2({
-				placeholder: 'Select Province',
-				data: provinces_bill
-			});
-
-			$('#City_Municipality1_1').select2({
-				placeholder: 'Select City',
-			});
-
-			$('#Barangay1_1').select2({
-				placeholder: 'Select Barangay',
-			});
-		});
-
-		$('#province1_1').val('METRO MANILA');
-		$('#province1_1').select2().trigger('change');
-		loadcities_bill("1339");
-
-		function loadcities_bill(code) {
-			var select_el = $('#City_Municipality1_1');
-			var cities = [];
-
-			select_el.empty();
-			$.getJSON("{{ asset('/json/cities.json') }}", function(obj){
-				var filtered_cities = $.grep(obj.results, function(v) {
-					return v.provCode === code;
-				});
-
-				$.each(filtered_cities, function(e, i) {
-					cities.push({
-						id: i.text,
-						code: i.citymunCode,
-						text: i.text,
-					});
-				});
-
-				select_el.select2({
-					placeholder: 'Select City',
-					data: cities
-				});
-			});
-		}
-
-		$(document).on('select2:select', '#province1_1', function(e){
-			var data = e.params.data;
-			loadcities_bill(data.code)
-		});
-
-		$(document).on('select2:select', '#City_Municipality1_1', function(e){
-			var data = e.params.data;
-			var select_el = $('#Barangay1_1');
-			var brgy_bill = [];
-
-			select_el.empty();
-			$.getJSON("{{ asset('/json/brgy.json') }}", function(obj){
-				var filtered = $.grep(obj.results, function(v) {
-					return v.citymunCode === data.code;
-				});
-
-				$.each(filtered, function(e, i) {
-					brgy_bill.push({
-						id: i.brgyDesc,
-						text: i.brgyDesc
-					});
-				});
-
-				select_el.select2({
-					placeholder: 'Select Barangay',
-					data: brgy_bill
-				});
-			});
-		});
-
-		$('#City_Municipality1_1').val(null).trigger('change');
-		$('#Barangay1_1').val(null).trigger('change');
 
 		$('#checkout-form').submit(function(e){
 			e.preventDefault();
