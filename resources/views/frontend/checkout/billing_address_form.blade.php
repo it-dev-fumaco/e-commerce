@@ -554,6 +554,22 @@
 		var res = str.split(",");
 		var provinces = [];
 
+		$('#ship_City_Municipality1_1').select2({
+			placeholder: 'Select City',
+		});
+		
+		$('#ship_Barangay1_1').select2({
+			placeholder: 'Select Barangay',
+		});
+
+		$('#City_Municipality1_1').select2({
+				placeholder: 'Select City',
+		});
+
+		$('#Barangay1_1').select2({
+			placeholder: 'Select Barangay',
+		});
+
 		$('#ship_province1_1').select2().val("METRO MANILA").trigger('change.select2');
 		$('#province1_1').select2().val("METRO MANILA").trigger('change.select2');
 		loadCities(1339, '#ship_City_Municipality1_1');
