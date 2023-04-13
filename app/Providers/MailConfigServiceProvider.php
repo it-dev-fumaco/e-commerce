@@ -48,7 +48,7 @@ class MailConfigServiceProvider extends ServiceProvider
             }
         });
 
-        Config::set('smtp', $config);
+        Config::set('mail', $config);
         
     }
 }
