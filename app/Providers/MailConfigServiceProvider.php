@@ -31,6 +31,7 @@ class MailConfigServiceProvider extends ServiceProvider
             $email_config = DB::table('email_config')->first();
             if ($email_config) {
                 return $config = array(
+                    'transport' => 'smtp',
                     'driver' => $email_config->driver,
                     'host' => $email_config->host,
                     'port' => $email_config->port,
