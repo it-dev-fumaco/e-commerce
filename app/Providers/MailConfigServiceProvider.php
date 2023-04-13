@@ -43,6 +43,7 @@ class MailConfigServiceProvider extends ServiceProvider
                     ],
                     'timeout' => null,
                     'auth_mode' => null,
+                    'verify_peer' => env('MAIL_VERIFY_PEER', true),
                 );
             }
         });
