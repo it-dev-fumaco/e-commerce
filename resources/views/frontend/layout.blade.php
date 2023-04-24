@@ -760,7 +760,7 @@
               setTimeout(function() {
                 // btn.addClass('add-to-cart').html('<i class="fas fa-shopping-cart"></i> Add to Cart');
                 btn.addClass('add-to-cart').html('Add to Cart');
-              }, 1800);
+              }, 300);
 
               countCartItems();
             }
