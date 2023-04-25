@@ -20,7 +20,7 @@ class OrderController extends Controller
     use GeneralTrait;
     use ProductTrait;
     public function orderList(Request $request, $status){
-        $status_arr = ['Order Placed', 'Order Confirmed', 'Out for Delivery', 'Ready for Pickup', 'Order Completed', 'Cancelled'];
+        $status_arr = ['Order Placed', 'Order Confirmed', 'Ready for Pickup', 'Order Completed', 'Cancelled'];
 
         if($request->ajax()){
             $orders = DB::table('fumaco_order')
