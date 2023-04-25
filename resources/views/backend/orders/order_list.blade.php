@@ -49,7 +49,7 @@
 																@default
 																	{{ $status }}
 															@endswitch
-															@if(in_array($status, ['Order Placed', 'Order Confirmed', 'Ready for Pickup']))
+															@if(in_array($status, ['Order Placed', 'Out for Delivery', 'Order Confirmed', 'Ready for Pickup']))
 																&nbsp;<span id="{{ Illuminate\Support\Str::slug($status, '-') }}-badge" class="badge badge-primary" style="font-size: 10pt;">
 																	{{ isset($count_arr[$status]) ? $count_arr[$status] : '0' }}
 																</span>

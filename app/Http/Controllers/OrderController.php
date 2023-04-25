@@ -20,7 +20,7 @@ class OrderController extends Controller
     use GeneralTrait;
     use ProductTrait;
     public function orderList(Request $request, $status){
-        $status_arr = ['Order Placed', 'Order Confirmed', 'Ready for Pickup', 'Order Completed', 'Cancelled'];
+        $status_arr = ['Order Placed', 'Order Confirmed', 'Out for Delivery', 'Ready for Pickup', 'Order Completed', 'Cancelled'];
 
         if($request->ajax()){
             $orders = DB::table('fumaco_order')
@@ -174,7 +174,7 @@ class OrderController extends Controller
         $status_count = DB::table('fumaco_order')->select('order_status', DB::raw('count(order_status) as count'))->groupBy('order_status')->get();
         $count_arr = [];
         foreach($status_count as $count){
-            if(in_array($count->order_status, ['Order Placed', 'Order Confirmed', 'Ready for Pickup'])){
+            if(in_array($count->order_status, ['Order Placed', 'Out for Delivery', 'Order Confirmed', 'Ready for Pickup'])){
                 $count_arr[$count->order_status] = $count->count;
             }
         }
