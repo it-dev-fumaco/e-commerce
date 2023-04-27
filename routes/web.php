@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::group(['middleware' => ['sanitation']], function(){
+Route::group(['middleware' => ['sanitation', 'throttle:global']], function(){
     Route::get('/', 'FrontendController@index')->name('website');
 
     // https://www.fumaco.com/products/category/luminaires/1469 - Troofers and Luminaires
@@ -162,13 +162,13 @@ Route::get('/admin', function () {
 
 Route::prefix('admin')->group(function () {
     Route::get('/login', 'Admin\Auth\LoginController@showLoginForm')->name('admin.login');
-    Route::post('/login_user', 'Admin\Auth\LoginController@login');
+    Route::middleware('throttle:global')->post('/login_user', 'Admin\Auth\LoginController@login');
     Route::get('/logout', 'Admin\Auth\LoginController@logout');
 
     Route::group(['middleware' => 'auth:admin'], function(){
         Route::get('/verify', 'DashboardController@verify')->name('verify');
         Route::get('/resend_otp', 'DashboardController@resendOTP');
-        Route::post('/verify_otp', 'DashboardController@verifyOTP');
+        Route::middleware('throttle:global')->post('/verify_otp', 'DashboardController@verifyOTP');
 
         Route::group(['middleware' => 'otp_status_check'], function(){ // Check for OTP
             Route::get('/dashboard', 'DashboardController@index');
