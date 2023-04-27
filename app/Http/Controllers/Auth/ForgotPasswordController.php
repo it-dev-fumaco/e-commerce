@@ -23,7 +23,7 @@ class ForgotPasswordController extends Controller
         ],
         ['exists' => 'Sorry, no existing account for this email.']);
 
-        $phone = DB::table('fumaco_user_add')->where('xcontactemail1', $request->username)->where('address_class', 'Billing')->where('xdefault', 1)->pluck('xmobile_number')->first();
+        $phone = DB::table('fumaco_users')->where('username', $request->username)->where('is_email_verified', 1)->pluck('f_mobilenumber')->first();
 
         $info_arr = [
             'email' => $request->username,
@@ -59,9 +59,9 @@ class ForgotPasswordController extends Controller
     public function sendResetLinkEmail(Request $request) {
         DB::beginTransaction();
         try {
+            $now = Carbon::now();
             if($request->has('otp')){
                 $otp = rand(111111, 999999);
-                $now = Carbon::now();
 
                 DB::table('fumaco_users')->where('username', $request->username)->update([
                     'f_temp_passcode' => $otp,
@@ -83,11 +83,11 @@ class ForgotPasswordController extends Controller
                     'to' => preg_replace("/[^0-9]/", "", $phone),
                     'text' => $message
                 ]);
-
+                
                 DB::table('password_resets')->insert([
                     'email' => $request->username, 
                     'token' => $otp, 
-                    'created_at' => Carbon::now()
+                    'created_at' => $now
                 ]);
 
                 session()->put('forOTP', $request->username);
@@ -109,7 +109,7 @@ class ForgotPasswordController extends Controller
                 DB::table('password_resets')->insert([
                     'email' => $request->username, 
                     'token' => $token, 
-                    'created_at' => Carbon::now()
+                    'created_at' => $now
                 ]);
 
                 Mail::send('emails.forgot_password', ['token' => $token], function($message) use($request){
@@ -123,7 +123,7 @@ class ForgotPasswordController extends Controller
         } catch (Exception $e) {
             DB::rollback();
 
-            return back()->with('error', 'An error occured. Please try again.');
+            return redirect()->route('password.request')->with('error', 'An error occured. Please try again.');
         }
     }
 }
