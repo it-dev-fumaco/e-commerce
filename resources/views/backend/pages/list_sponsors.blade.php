@@ -30,9 +30,9 @@
                                     {{ session()->get('success') }}
                                 </div>
                             @endif
-                            @if(session()->has('image_error'))
+                            @if(session()->has('error'))
                                 <div class="alert alert-warning fade show" role="alert">
-                                    {{ session()->get('image_error') }}
+                                    {{ session()->get('error') }}
                                 </div>
                             @endif
                             
@@ -103,7 +103,49 @@
                                                     </form>
                                                 </td>
                                                 <td class="text-center align-middle" style="width: 5%">
-                                                    <a href="#" class="btn btn-sm btn-danger" role="button" data-toggle="modal" data-target="#deleteModal{{ $sponsor->id }}"><i class="fas fa-trash-alt"></i></a>
+                                                    <div class="btn-group">
+                                                        <a href="#" class="btn btn-sm btn-primary" role="button" data-toggle="modal" data-target="#editModal{{ $sponsor->id }}"><i class="fas fa-edit"></i></a>&nbsp;
+                                                        <a href="#" class="btn btn-sm btn-secondary" role="button" data-toggle="modal" data-target="#deleteModal{{ $sponsor->id }}"><i class="fas fa-trash-alt"></i></a>
+                                                    </div>
+                                                    <div class="modal fade" id="editModal{{ $sponsor->id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                        <div class="modal-dialog" role="document">
+                                                            <div class="modal-content">
+                                                                <div class="modal-header">
+                                                                    <h5 class="modal-title" id="exampleModalLabel"><i class="fa fa-edit"></i> Edit {{ $sponsor->name_img }}</h5>
+                                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                        <span aria-hidden="true">&times;</span>
+                                                                    </button>
+                                                                </div>
+                                                                <form action="/admin/edit/page/about_us/sponsor/edit/{{ $sponsor->id }}" method="post" enctype="multipart/form-data">
+                                                                    @csrf
+                                                                    <div class="modal-body text-left">
+                                                                        <div class="col-4 mx-auto">
+                                                                            <img id="img-{{ $sponsor->id }}" src="{{ asset('/storage/sponsors/'.$sponsor->image) }}" alt="{{ $sponsor->name_img }}" width='100%'>
+                                                                        </div>
+                                                                        <div class="form-group">
+                                                                            <label>Sponsor Image</label>
+                                                                            <div class="custom-file">
+                                                                                <input type="file" class="custom-file-input" id="customFile" name="sponsor_img" data-preview="#img-{{ $sponsor->id }}">
+                                                                                <label class="custom-file-label" for="customFile">Choose File</label>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="form-group">
+                                                                            <label for="name">Name:</label>
+                                                                            <input type="text" class="form-control" name="sponsor_name" value="{{ $sponsor->name_img }}" required>
+                                                                        </div>
+                                                                        <div class="form-group">
+                                                                            <label for="name">URL:</label>
+                                                                            <input type="text" class="form-control" name="sponsor_url" value="{{ $sponsor->url }}" required>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="modal-footer">
+                                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fas fa-times"></i> Close</button>
+                                                                        <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> Submit</button>
+                                                                    </div>
+                                                                </form>
+                                                            </div>
+                                                        </div>
+                                                    </div>
 
                                                     <div class="modal fade" id="deleteModal{{ $sponsor->id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                                         <div class="modal-dialog" role="document">
@@ -192,8 +234,24 @@
 <script>
     // Add the following code if you want the name of the file appear on select
     $(".custom-file-input").change(function() {
-      var fileName = $(this).val().split("\\").pop();
-      $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+        var fileName = $(this).val().split("\\").pop();
+        $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+        if(typeof $(this).data('preview') !== 'undefined'){
+            readURL(this, $(this).data('preview'));
+        }
     });
- </script>
+
+    function readURL(input, previewId) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                console.log(e);
+                $(previewId).attr('src', e.target.result);
+                $(previewId).hide();
+                $(previewId).fadeIn(650);
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>
 @endsection

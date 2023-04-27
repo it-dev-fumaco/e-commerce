@@ -366,52 +366,20 @@ class PagesController extends Controller
     public function addSponsor(Request $request){
         DB::beginTransaction();
         try {
-            $image_error = '';
-
-			$rules = array(
-				'uploadFile' => 'image|max:500000'
-			);
-
-            $validation = Validator::make($request->all(), $rules);
-
-            $allowed_extensions = array('jpg', 'png', 'jpeg', 'gif');
-            $extension_error = "Sorry, only JPG, JPEG, PNG and GIF files are allowed.";
-
-            if ($validation->fails()){
-				$image_error = "Sorry, your file is too large.";
-				return redirect()->back()->with('image_error', $image_error);
-			}
-
             $destinationPath = storage_path('/app/public/sponsors/');
 
-            $sponsor_img = $request->file('sponsor_img');
-
-            $name_first = pathinfo($sponsor_img->getClientOriginalName(), PATHINFO_FILENAME);
-            $ext_first = pathinfo($sponsor_img->getClientOriginalName(), PATHINFO_EXTENSION);
-
-            $name_first = Str::slug($name_first, '-');
-
-            $sponsor_image_name = $name_first.".".$ext_first;
-
-            if(!in_array($ext_first, $allowed_extensions)){
-                return redirect()->back()->with('image_error', $extension_error);
+            $sponsor_image = $this->save_image($request->file('sponsor_img'), $destinationPath);
+            if(!$sponsor_image['success']){
+                return redirect()->back()->with('error', $sponsor_image['message']);
             }
 
-            $webp_first = Webp::make($request->file('sponsor_img'));
-
-            if ($webp_first->save(storage_path('/app/public/sponsors/'.$name_first.'.webp'))) {
-                $sponsor_img->move($destinationPath, $sponsor_image_name);
-            }
-
-            $insert = [
+            DB::table('fumaco_about_partners')->insert([
                 'name_img' => $request->sponsor_name,
                 'url' => $request->sponsor_url,
-                'image' => $sponsor_image_name,
+                'image' => $sponsor_image['image'],
                 'created_by' => Auth::user()->username,
                 'xstatus' => 1
-            ];
-
-            DB::table('fumaco_about_partners')->insert($insert);
+            ]);
 
             DB::commit();
             return redirect()->back()->with('success', 'Sponsor Added.');
@@ -421,10 +389,77 @@ class PagesController extends Controller
         }
     }
 
+    public function editSponsor(Request $request, $id){
+        DB::beginTransaction();
+        try {
+            $destinationPath = storage_path('/app/public/sponsors/');
+
+            $val = [
+                'name_img' => $request->sponsor_name,
+                'url' => $request->sponsor_url,
+                'created_by' => Auth::user()->username,
+                'xstatus' => 1
+            ];
+
+            if($request->has('sponsor_img')){
+                $sponsor_image = $this->save_image($request->file('sponsor_img'), $destinationPath);
+                if(!$sponsor_image['success']){
+                    return redirect()->back()->with('error', $sponsor_image['message']);
+                }
+
+                $val['image'] = $sponsor_image['image'];
+            }
+
+            DB::table('fumaco_about_partners')->where('id', $id)->update($val);
+
+            DB::commit();
+            return redirect()->back()->with('success', 'Sponsor Edited.');
+        } catch (Exception $e) {
+            DB::rollback();
+            return redirect()->back()->with('error', 'An error occured. Please try again.');
+        }
+    }
+
+    private function save_image($image, $destination){
+        try {
+            $name = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME);
+            $extension = pathinfo($image->getClientOriginalName(), PATHINFO_EXTENSION);
+
+            $name = Str::slug($name, '-');
+            $extension = strtolower($extension);
+
+            $image_name = $name.".".$extension;
+
+            if(!in_array($extension, ['jpg', 'png', 'jpeg', 'gif'])){
+                return [
+                    'success' => 0,
+                    'message' => 'Sorry, only JPG, JPEG, PNG and GIF files are allowed.'
+                ];
+            }
+
+            $webp = Webp::make($image);
+
+            if ($webp->save($destination.$name.'.webp')) {
+                $image->move($destination, $image_name);
+            }
+
+            return [
+                'success' => 1,
+                'image' => $image_name
+            ];
+        } catch (\Throwable $th) {
+            //throw $th;
+            return [
+                'success' => 0,
+                'message' => 'An error occured. Please try again.'
+            ];
+        }
+    }
+
     public function viewSponsors(){
         $sponsors = DB::table('fumaco_about_partners')->orderBy('partners_sort', 'asc')->paginate(10);
 
-        $sponsors_count = DB::table('fumaco_about_partners')->count();
+        $sponsors_count = $sponsors->total();
 
         $last_mod = DB::table('fumaco_about_partners')->orderBy('last_modified_at', 'desc')->first();
 
