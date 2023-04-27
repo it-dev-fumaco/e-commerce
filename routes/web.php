@@ -13,143 +13,145 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', 'FrontendController@index')->name('website');
+Route::group(['middleware' => ['sanitation']], function(){
+    Route::get('/', 'FrontendController@index')->name('website');
 
-// https://www.fumaco.com/products/category/luminaires/1469 - Troofers and Luminaires
-Route::get('/products/category/luminaires/1469', function() {
-    return redirect('/products/troffer-and-luminaires');
+    // https://www.fumaco.com/products/category/luminaires/1469 - Troofers and Luminaires
+    Route::get('/products/category/luminaires/1469', function() {
+        return redirect('/products/troffer-and-luminaires');
+    });
+    // https://www.fumaco.com/products/category/emergency-exit-lighting/1621 - Emergeny Light
+    Route::get('/products/category/emergency-exit-lighting/1621', function() {
+        return redirect('/products/emergency-light-and-exit-light');
+    });
+    // https://www.fumaco.com/products/category/downlights-and-uplights/5527 - Downlinghts
+    Route::get('/products/category/downlights-and-uplights/5527', function() {
+        return redirect('/products/downlights');
+    });
+    // https://www.fumaco.com/products/category/lighting-components/208 - Led Bulb
+    Route::get('/products/category/lighting-components/208', function() {
+        return redirect('/products/led-lamps-and-bulbs');
+    });
+
+    // https://www.fumaco.com/products/category/luminaires/1469 - Troofers and Luminaires
+    Route::get('/products/troffer-luminaires', function() {
+        return redirect('/products/troffers-and-louvers');
+    });
+
+    Route::namespace('Auth')->group(function(){
+        //Login Routes
+        Route::get('/login','LoginController@viewLoginPage')->name('login');
+        Route::post('/login','LoginController@login');
+        Route::get('/logout','LoginController@logout')->name('logout');
+
+        //Forgot Password Routes
+        Route::get('/password/reset','ForgotPasswordController@showLinkRequestForm')->name('password.request');
+        Route::get('/password/request_reset','ForgotPasswordController@resetOptions')->name('password.reset_options');
+        Route::post('/password/email','ForgotPasswordController@sendResetLinkEmail')->name('password.email');
+        Route::get('/password/otp_form','ForgotPasswordController@OTPform')->name('password.otp_form');
+        Route::post('/password/verify_otp','ForgotPasswordController@verifyOTP');
+
+        //Reset Password Routes
+        Route::get('/password/reset/{token}','ResetPasswordController@showResetForm')->name('password.reset');
+        Route::post('/password/reset','ResetPasswordController@reset')->name('password.update');
+
+        // facebook login
+        Route::post('/facebook/login', 'LoginController@loginFbSdk')->name('facebook.login');
+
+        // google login
+        Route::get('auth/google', 'LoginController@loginUsingGoogle')->name('google.login');
+        Route::get('auth/google/callback', 'LoginController@callbackFromGoogle')->name('google.callback');
+
+        // linkedin login
+        Route::get('auth/linkedin', 'LoginController@loginUsingLinkedin')->name('linkedin.login');
+        Route::get('auth/linkedin/callback', 'LoginController@callbackFromLinkedin')->name('linkedin.callback');
+
+        Route::post('/data_deletion_request', 'LoginController@fbDataDeletionCallback');
+        Route::get('/data_deletion_status', function(Request $request) {
+            return $request->all();
+        });
+    });
+
+    Route::get('/clearance_sale', 'FrontendController@clearanceSalePage');
+    Route::get('/signup', 'FrontendController@signupForm');
+    Route::post('/user_register', 'FrontendController@userRegistration');
+    Route::get('/about', 'FrontendController@viewAboutPage');
+    Route::get('/journals', 'FrontendController@viewJournalsPage');
+    Route::get('/terms_condition', 'FrontendController@viewTermsPage');
+    Route::get('/blog/{slug}', 'FrontendController@viewBlogPage')->name('blogs');
+    Route::post('/add_comment', 'BlogController@addComment');
+    Route::get('/contact', 'FrontendController@viewContactPage')->name('contact');
+    Route::post('/add_contact', 'FrontendController@addContact');
+    Route::get('/products/{slug}', 'FrontendController@viewProducts');
+    Route::post('/products/{slug}', 'FrontendController@viewProducts');
+    Route::get('/product/{slug}', 'FrontendController@viewProduct');
+    Route::get('/track_order/{order_number?}', 'FrontendController@viewOrderTracking')->name('track_order');
+    Route::get('/categories', 'FrontendController@getProductCategories');
+    Route::get('/website_settings', 'FrontendController@websiteSettings');
+    Route::post('/getvariantcode', 'FrontendController@getVariantItemCode');
+    Route::post('/subscribe', 'FrontendController@newsletterSubscription');
+    Route::get('/notify_me', 'FrontendController@notifyMe');
+    Route::get('/thankyou', 'FrontendController@subscribeThankyou');
+    Route::get('/search', 'FrontendController@getAutoCompleteData');
+    Route::get('/policy_pages', 'FrontendController@pagesList');
+    Route::get('/contact_information', 'FrontendController@contactInformation');
+    Route::get('/pages/{slug}', 'FrontendController@viewPage')->name('pages');
+    Route::get('/myprofile/verify/email', 'FrontendController@emailVerify');
+
+    Route::group(['middleware' => 'auth'], function(){
+        Route::get('/mywishlist', 'FrontendController@viewWishlist');
+        Route::delete('/mywishlist/{id}/delete', 'FrontendController@deleteWishlist');
+        Route::get('/myorders', 'FrontendController@viewOrders');
+        Route::get('/myorder/{order_id}', 'FrontendController@viewOrder');
+        Route::post('/myorder/cancel/{id}', 'OrderController@cancelOrder');
+        Route::get('/myprofile/account_details', 'FrontendController@viewAccountDetails');
+        Route::post('/myprofile/account_details/{id}/update', 'FrontendController@updateAccountDetails');
+        Route::get('/myprofile/change_password', 'FrontendController@viewChangePassword');
+        Route::post('/myprofile/change_password/{id}/update', 'FrontendController@updatePassword');
+        Route::get('/myprofile/address', 'FrontendController@viewAddresses');
+        Route::delete('/myprofile/address/{id}/{type}/delete', 'FrontendController@deleteAddress');
+        Route::post('/myprofile/address/{id}/{type}/update', 'FrontendController@updateAddress');
+        Route::get('/myprofile/address/{id}/{type}/change_default/{summary?}', 'FrontendController@setDefaultAddress');
+        Route::get('/myprofile/address/{type}/new', 'FrontendController@addAddressForm');
+        Route::post('/myprofile/address/{type}/save', 'FrontendController@saveAddress');
+        Route::get('/slip_buffer/{order_number}', 'FrontendController@DepositSlipBuffer');
+    });
+
+    Route::get('/upload_deposit_slip/{token}', 'FrontendController@uploadDepositSlipForm')->name('upload_deposit_slip');
+    Route::post('/upload_deposit_slip/{token}', 'FrontendController@submitUploadDepositSlip');
+    // SHOPPING CART ROUTES
+    Route::get('/cart', 'CartController@viewCart')->name('cart');
+    Route::post('/product_actions', 'CartController@productActions');
+    Route::patch('/updatecart', 'CartController@updateCart');
+    Route::delete('/removefromcart', 'CartController@removeFromCart');
+    Route::post('/addtowishlist', 'CartController@addToWishlist');
+    Route::get('/countcartitems', 'CartController@countCartItems');
+    Route::get('/countwishlist', 'CartController@countWishlist');
+    Route::get('/setdetails', 'CartController@setShippingBillingDetails');
+    Route::post('/setdetails', 'CartController@setShippingBillingDetails');
+    // CHECKOUT ROUTES
+    Route::get('/checkout/review_order', 'CheckoutController@reviewOrder');
+    Route::get('/checkout/billing/{item_code_buy?}/{qty_buy?}', 'CheckoutController@billingForm');
+    Route::get('/checkout/summary', 'CheckoutController@checkoutSummary');
+    Route::post('/checkout/set_address', 'CheckoutController@setAddress');
+    Route::post('/checkout/update_shipping', 'CheckoutController@updateShipping');
+    Route::post('/checkout/update_billing', 'CheckoutController@updateBilling');
+    Route::get('/checkout/set_billing_form/{item_code_buy?}/{qty_buy?}', 'CheckoutController@setBillingForm');
+    Route::post('/checkout/set_billing', 'CheckoutController@setBilling');
+    Route::get('/checkout/apply_voucher/{code}', 'CheckoutController@applyVoucher');
+    Route::get('/eghlform/{order_no}', 'CheckoutController@viewPaymentForm');
+    Route::post('/order/save', 'CheckoutController@saveOrder');
+    Route::get('/checkout/success/{id}', 'CheckoutController@orderSuccess');
+    Route::post('/checkout/success/{id}', 'CheckoutController@orderSuccess');
+    Route::get('/checkout/failed', 'CheckoutController@orderFailed');
+    Route::post('/checkout/failed', 'CheckoutController@orderFailed');
+    Route::post('/checkout/callback', 'CheckoutController@paymentCallback');
+    Route::get('/getJson', 'FrontendController@getJson');
+    // product reviews
+    Route::post('/submit_review', 'ProductReviewController@submitProductReview');
+    Route::get('/verify_email/{token}', 'FrontendController@verifyAccount')->name('account.verify');
+    Route::get('/resend_verification/{email}', 'FrontendController@resendVerification');
 });
-// https://www.fumaco.com/products/category/emergency-exit-lighting/1621 - Emergeny Light
-Route::get('/products/category/emergency-exit-lighting/1621', function() {
-    return redirect('/products/emergency-light-and-exit-light');
-});
-// https://www.fumaco.com/products/category/downlights-and-uplights/5527 - Downlinghts
-Route::get('/products/category/downlights-and-uplights/5527', function() {
-    return redirect('/products/downlights');
-});
-// https://www.fumaco.com/products/category/lighting-components/208 - Led Bulb
-Route::get('/products/category/lighting-components/208', function() {
-    return redirect('/products/led-lamps-and-bulbs');
-});
-
-// https://www.fumaco.com/products/category/luminaires/1469 - Troofers and Luminaires
-Route::get('/products/troffer-luminaires', function() {
-    return redirect('/products/troffers-and-louvers');
-});
-
-Route::namespace('Auth')->group(function(){
-    //Login Routes
-    Route::get('/login','LoginController@viewLoginPage')->name('login');
-    Route::post('/login','LoginController@login');
-    Route::get('/logout','LoginController@logout')->name('logout');
-
-    //Forgot Password Routes
-    Route::get('/password/reset','ForgotPasswordController@showLinkRequestForm')->name('password.request');
-    Route::get('/password/request_reset','ForgotPasswordController@resetOptions')->name('password.reset_options');
-    Route::post('/password/email','ForgotPasswordController@sendResetLinkEmail')->name('password.email');
-    Route::get('/password/otp_form','ForgotPasswordController@OTPform')->name('password.otp_form');
-    Route::post('/password/verify_otp','ForgotPasswordController@verifyOTP');
-
-    //Reset Password Routes
-    Route::get('/password/reset/{token}','ResetPasswordController@showResetForm')->name('password.reset');
-    Route::post('/password/reset','ResetPasswordController@reset')->name('password.update');
-
-    // facebook login
-    Route::post('/facebook/login', 'LoginController@loginFbSdk')->name('facebook.login');
-
-    // google login
-    Route::get('auth/google', 'LoginController@loginUsingGoogle')->name('google.login');
-    Route::get('auth/google/callback', 'LoginController@callbackFromGoogle')->name('google.callback');
-
-     // linkedin login
-     Route::get('auth/linkedin', 'LoginController@loginUsingLinkedin')->name('linkedin.login');
-     Route::get('auth/linkedin/callback', 'LoginController@callbackFromLinkedin')->name('linkedin.callback');
-
-     Route::post('/data_deletion_request', 'LoginController@fbDataDeletionCallback');
-     Route::get('/data_deletion_status', function(Request $request) {
-         return $request->all();
-     });
-});
-
-Route::get('/clearance_sale', 'FrontendController@clearanceSalePage');
-Route::get('/signup', 'FrontendController@signupForm');
-Route::post('/user_register', 'FrontendController@userRegistration');
-Route::get('/about', 'FrontendController@viewAboutPage');
-Route::get('/journals', 'FrontendController@viewJournalsPage');
-Route::get('/terms_condition', 'FrontendController@viewTermsPage');
-Route::get('/blog/{slug}', 'FrontendController@viewBlogPage')->name('blogs');
-Route::post('/add_comment', 'BlogController@addComment');
-Route::get('/contact', 'FrontendController@viewContactPage')->name('contact');
-Route::post('/add_contact', 'FrontendController@addContact');
-Route::get('/products/{slug}', 'FrontendController@viewProducts');
-Route::post('/products/{slug}', 'FrontendController@viewProducts');
-Route::get('/product/{slug}', 'FrontendController@viewProduct');
-Route::get('/track_order/{order_number?}', 'FrontendController@viewOrderTracking')->name('track_order');
-Route::get('/categories', 'FrontendController@getProductCategories');
-Route::get('/website_settings', 'FrontendController@websiteSettings');
-Route::post('/getvariantcode', 'FrontendController@getVariantItemCode');
-Route::post('/subscribe', 'FrontendController@newsletterSubscription');
-Route::get('/notify_me', 'FrontendController@notifyMe');
-Route::get('/thankyou', 'FrontendController@subscribeThankyou');
-Route::get('/search', 'FrontendController@getAutoCompleteData');
-Route::get('/policy_pages', 'FrontendController@pagesList');
-Route::get('/contact_information', 'FrontendController@contactInformation');
-Route::get('/pages/{slug}', 'FrontendController@viewPage')->name('pages');
-Route::get('/myprofile/verify/email', 'FrontendController@emailVerify');
-
-Route::group(['middleware' => 'auth'], function(){
-    Route::get('/mywishlist', 'FrontendController@viewWishlist');
-    Route::delete('/mywishlist/{id}/delete', 'FrontendController@deleteWishlist');
-    Route::get('/myorders', 'FrontendController@viewOrders');
-    Route::get('/myorder/{order_id}', 'FrontendController@viewOrder');
-    Route::post('/myorder/cancel/{id}', 'OrderController@cancelOrder');
-    Route::get('/myprofile/account_details', 'FrontendController@viewAccountDetails');
-    Route::post('/myprofile/account_details/{id}/update', 'FrontendController@updateAccountDetails');
-    Route::get('/myprofile/change_password', 'FrontendController@viewChangePassword');
-    Route::post('/myprofile/change_password/{id}/update', 'FrontendController@updatePassword');
-    Route::get('/myprofile/address', 'FrontendController@viewAddresses');
-    Route::delete('/myprofile/address/{id}/{type}/delete', 'FrontendController@deleteAddress');
-    Route::post('/myprofile/address/{id}/{type}/update', 'FrontendController@updateAddress');
-    Route::get('/myprofile/address/{id}/{type}/change_default/{summary?}', 'FrontendController@setDefaultAddress');
-    Route::get('/myprofile/address/{type}/new', 'FrontendController@addAddressForm');
-    Route::post('/myprofile/address/{type}/save', 'FrontendController@saveAddress');
-    Route::get('/slip_buffer/{order_number}', 'FrontendController@DepositSlipBuffer');
-});
-
-Route::get('/upload_deposit_slip/{token}', 'FrontendController@uploadDepositSlipForm')->name('upload_deposit_slip');
-Route::post('/upload_deposit_slip/{token}', 'FrontendController@submitUploadDepositSlip');
-// SHOPPING CART ROUTES
-Route::get('/cart', 'CartController@viewCart')->name('cart');
-Route::post('/product_actions', 'CartController@productActions');
-Route::patch('/updatecart', 'CartController@updateCart');
-Route::delete('/removefromcart', 'CartController@removeFromCart');
-Route::post('/addtowishlist', 'CartController@addToWishlist');
-Route::get('/countcartitems', 'CartController@countCartItems');
-Route::get('/countwishlist', 'CartController@countWishlist');
-Route::get('/setdetails', 'CartController@setShippingBillingDetails');
-Route::post('/setdetails', 'CartController@setShippingBillingDetails');
-// CHECKOUT ROUTES
-Route::get('/checkout/review_order', 'CheckoutController@reviewOrder');
-Route::get('/checkout/billing/{item_code_buy?}/{qty_buy?}', 'CheckoutController@billingForm');
-Route::get('/checkout/summary', 'CheckoutController@checkoutSummary');
-Route::post('/checkout/set_address', 'CheckoutController@setAddress');
-Route::post('/checkout/update_shipping', 'CheckoutController@updateShipping');
-Route::post('/checkout/update_billing', 'CheckoutController@updateBilling');
-Route::get('/checkout/set_billing_form/{item_code_buy?}/{qty_buy?}', 'CheckoutController@setBillingForm');
-Route::post('/checkout/set_billing', 'CheckoutController@setBilling');
-Route::get('/checkout/apply_voucher/{code}', 'CheckoutController@applyVoucher');
-Route::get('/eghlform/{order_no}', 'CheckoutController@viewPaymentForm');
-Route::post('/order/save', 'CheckoutController@saveOrder');
-Route::get('/checkout/success/{id}', 'CheckoutController@orderSuccess');
-Route::post('/checkout/success/{id}', 'CheckoutController@orderSuccess');
-Route::get('/checkout/failed', 'CheckoutController@orderFailed');
-Route::post('/checkout/failed', 'CheckoutController@orderFailed');
-Route::post('/checkout/callback', 'CheckoutController@paymentCallback');
-Route::get('/getJson', 'FrontendController@getJson');
-// product reviews
-Route::post('/submit_review', 'ProductReviewController@submitProductReview');
-Route::get('/verify_email/{token}', 'FrontendController@verifyAccount')->name('account.verify');
-Route::get('/resend_verification/{email}', 'FrontendController@resendVerification');
 
 Auth::routes();
 
@@ -377,4 +379,6 @@ Route::prefix('admin')->group(function () {
     });
 });
 
-Route::get('{code}', 'FrontendController@viewShortenLink');
+Route::group(['middleware' => 'sanitation'], function(){
+    Route::get('{code}', 'FrontendController@viewShortenLink');
+});
