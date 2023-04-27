@@ -17,6 +17,7 @@ use Adrianorosa\GeoLocation\GeoLocation;
 use Illuminate\Support\Facades\Http;
 use Newsletter;
 use Cache;
+use Exception;
 
 use App\Http\Traits\ProductTrait;
 use App\Http\Traits\GeneralTrait;
@@ -94,7 +95,7 @@ class FrontendController extends Controller
                 }
             } else {
                 if (in_array($search_by, ['products', 'all', ''])) {
-                    $product_list = DB::table('fumaco_items')
+                    $product_list = DB::table('fumaco_items')->where('f_status', 1)
                         ->where(function ($q) use ($search_str){
                             return $q->where('f_brand', 'LIKE', "%".$search_str."%")
                                 ->orWhere('f_parent_code', 'LIKE', "%".$search_str."%")
@@ -115,14 +116,13 @@ class FrontendController extends Controller
                         ->when(count($clearance_sale_item_codes) > 0, function($c) use ($clearance_sale_item_codes) {
                             $c->whereNotIn('f_idcode', $clearance_sale_item_codes);
                         })
-                        ->where('f_status', 1)
                         ->select('f_idcode', 'f_default_price', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_stock_uom', 'f_qty', 'f_reserved_qty', 'slug', 'f_name_name', 'f_item_name', 'f_category', 'id', 'image_alt')
                         ->orderBy($sortby, $orderby)->get();
 
                     if(count($request_data) > 0 or count($brand_filter) > 0){
                         $filtered_items = DB::table('fumaco_items as a')
                             ->join('fumaco_items_attributes as b', 'a.f_idcode', 'b.idcode')
-                            ->join('fumaco_attributes_per_category as c', 'c.id', 'b.attribute_name_id')
+                            ->join('fumaco_attributes_per_category as c', 'c.id', 'b.attribute_name_id')->where('a.f_status', 1)
                             ->when(count($brand_filter) > 0, function($c) use ($brand_filter) {
                                 $c->whereIn('a.f_brand', $brand_filter);
                             })
@@ -132,9 +132,9 @@ class FrontendController extends Controller
                             ->when(count($clearance_sale_item_codes) > 0, function($c) use ($clearance_sale_item_codes) {
                                 $c->whereNotIn('f_idcode', $clearance_sale_item_codes);
                             })
-                            ->where('a.f_status', 1)->select('c.slug', 'b.attribute_value', 'a.f_idcode', 'a.f_brand')->get();
+                            ->select('c.slug', 'b.attribute_value', 'a.f_idcode', 'a.f_brand')->get();
 
-                        if(count($brand_filter) > 0 and count($filtered_items) == 0){ // double check for item codes with "-A"
+                        if(count($brand_filter) > 0 and count($filtered_items) == 0){
                             $filtered_items = DB::table('fumaco_items')->whereIn('f_brand', $brand_filter)
                                 ->when(count($clearance_sale_item_codes) > 0, function($c) use ($clearance_sale_item_codes) {
                                     $c->whereNotIn('f_idcode', $clearance_sale_item_codes);
@@ -145,16 +145,17 @@ class FrontendController extends Controller
                         $filtered_item_codes = collect($filtered_items)->pluck('f_idcode');
 
                         $include_bulk_item_codes = [];
-                        if($filtered_item_codes){
+                        if($filtered_item_codes){ // double check for item codes with "-A"
                             $include_bulk_item_codes = DB::table('fumaco_items')
-                                ->when(count($clearance_sale_item_codes) > 0, function($c) use ($clearance_sale_item_codes) {
-                                    $c->whereNotIn('f_idcode', $clearance_sale_item_codes);
-                                })
                                 ->where(function($q) use ($filtered_item_codes){
                                     foreach($filtered_item_codes as $items){
                                         $q->orWhere('f_idcode', 'like', '%'.$items.'%');
                                     }
-                                })->pluck('f_idcode');
+                                })
+                                ->when(count($clearance_sale_item_codes) > 0, function($c) use ($clearance_sale_item_codes) {
+                                    $c->whereNotIn('f_idcode', $clearance_sale_item_codes);
+                                })
+                                ->pluck('f_idcode');
 
                             $filtered_item_codes = collect($include_bulk_item_codes);
                         }
@@ -455,21 +456,21 @@ class FrontendController extends Controller
             $filters = DB::table('fumaco_items as a')
                 ->join('fumaco_items_attributes as b', 'a.f_idcode', 'b.idcode')
                 ->join('fumaco_attributes_per_category as c', 'c.id', 'b.attribute_name_id')
+                ->where('a.f_status', 1)->where('c.status', 1)
                 ->when(count($item_code_array) > 0, function($c) use ($item_code_array) {
                     $c->whereIn('a.f_idcode', $item_code_array);
                 })
                 ->when(count($clearance_sale_item_codes) > 0, function($c) use ($clearance_sale_item_codes) {
                     $c->whereNotIn('a.f_idcode', $clearance_sale_item_codes);
                 })
-                ->where('a.f_status', 1)
-                ->where('c.status', 1)->select('c.attribute_name', 'b.attribute_value')
+                ->select('c.attribute_name', 'b.attribute_value')
                 ->groupBy('c.attribute_name', 'b.attribute_value')->get();
 
             $filters = collect($filters)->groupBy('attribute_name')->map(function($r, $d){
                 return array_unique(array_column($r->toArray(), 'attribute_value'));
             });
 
-            $brands = DB::table('fumaco_items')
+            $brands = DB::table('fumaco_items')->where('f_status', 1)->whereNotNull('f_brand')
                 ->when(count($request_data) > 1, function($c) use ($filtered_item_codes) {
                     $c->whereIn('f_idcode', $filtered_item_codes);
                 })
@@ -479,7 +480,7 @@ class FrontendController extends Controller
                 ->when(count($clearance_sale_item_codes) > 0, function($c) use ($clearance_sale_item_codes) {
                     $c->whereNotIn('f_idcode', $clearance_sale_item_codes);
                 })
-                ->where('f_status', 1)->whereNotNull('f_brand')->distinct('f_brand')->pluck('f_brand');
+                ->distinct()->pluck('f_brand');
 
             $filter_count = count($filters);
 
@@ -531,10 +532,10 @@ class FrontendController extends Controller
 
         $onsale_item_codes = $this->onSaleItems([]);
         $on_sale_query = DB::table('fumaco_items')->where('f_status', 1)
+            ->whereIn('f_idcode', array_keys($onsale_item_codes))
             ->when(count($clearance_sale_item_codes) > 0, function($c) use ($clearance_sale_item_codes) {
                 $c->whereNotIn('f_idcode', $clearance_sale_item_codes);
             })
-            ->whereIn('f_idcode', array_keys($onsale_item_codes))
             ->select('f_idcode', 'f_default_price', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_stock_uom', 'f_qty', 'f_reserved_qty', 'slug', 'f_name_name', 'f_item_name', 'image_alt')->get();
 
         $sale_per_category = [];
@@ -1168,20 +1169,16 @@ class FrontendController extends Controller
                 Newsletter::unsubscribe($user->username);
             }
 
-            try {
-                Mail::send('emails.verify_email', ['token' => $token], function($message) use($request){
-                    $message->to($request->username);
-                    $message->subject('Verify email from Fumaco.com');
-                });
-            } catch (\Swift_TransportException  $e) {
-
-            }
+            Mail::send('emails.verify_email', ['token' => $token], function($message) use($request){
+                $message->to($request->username);
+                $message->subject('Verify email from Fumaco.com');
+            });
 
             DB::commit();
-
             return redirect('/myprofile/verify/email')->with('email', $request->username);
         }catch(Exception $e){
             DB::rollback();
+            return redirect()->back()->with('error', 'An error occured. Please try again.');
         }
     }
 
@@ -1502,13 +1499,14 @@ class FrontendController extends Controller
         $filtered_items = DB::table('fumaco_items as a')
             ->join('fumaco_items_attributes as b', 'a.f_idcode', 'b.idcode')
             ->join('fumaco_attributes_per_category as c', 'c.id', 'b.attribute_name_id')
+            ->where('a.f_status', 1)
             ->when(count($brand_filter) > 0, function($c) use ($brand_filter) {
                 $c->whereIn('a.f_brand', $brand_filter);
             })
             ->when(count($request_data) > 0, function($c) use ($attribute_name_filter, $attribute_value_filter) {
                 $c->whereIn('c.slug', $attribute_name_filter)->whereIn('b.attribute_value', $attribute_value_filter);
             })
-            ->where('a.f_status', 1)->select('c.slug', 'b.attribute_value', 'a.f_idcode')->get();
+            ->select('c.slug', 'b.attribute_value', 'a.f_idcode')->get();
 
         $filtered_items = collect($filtered_items)->groupBy('f_idcode')->map(function($i, $q) use ($attribute_name_filter){
             $diff = array_diff($attribute_name_filter, array_column($i->toArray(), 'slug'));
@@ -1535,11 +1533,11 @@ class FrontendController extends Controller
         $filters = DB::table('fumaco_items as a')
             ->join('fumaco_items_attributes as b', 'a.f_idcode', 'b.idcode')
             ->join('fumaco_attributes_per_category as c', 'c.id', 'b.attribute_name_id')
+            ->where('a.f_cat_id', $product_category->id)->where('a.f_status', 1)->where('c.status', 1)
             ->when(count($request_data) > 0 || $brand_filter, function($c) use ($filtered_items) {
                 $c->whereIn('a.f_idcode', $filtered_items);
             })
-            ->where('a.f_cat_id', $product_category->id)->where('a.f_status', 1)
-            ->where('c.status', 1)->select('c.attribute_name', 'b.attribute_value')
+            ->select('c.attribute_name', 'b.attribute_value')
             ->groupBy('c.attribute_name', 'b.attribute_value')->get();
 
         $filters = collect($filters)->groupBy('attribute_name')->map(function($r, $d){
@@ -1547,11 +1545,10 @@ class FrontendController extends Controller
         });
 
         // get distinct brands for filtering
-        $brands = DB::table('fumaco_items')->where('f_cat_id', $product_category->id)
+        $brands = DB::table('fumaco_items')->where('f_cat_id', $product_category->id)->where('f_status', 1)->whereNotNull('f_brand')
             ->when(count($request_data) > 0 || $brand_filter, function($c) use ($filtered_items) {
                 $c->whereIn('f_idcode', $filtered_items);
-            })
-            ->where('f_status', 1)->whereNotNull('f_brand')->distinct('f_brand')->pluck('f_brand');
+            })->distinct()->pluck('f_brand');
 
         $filters['Brand'] = $brands;
 
@@ -1607,12 +1604,11 @@ class FrontendController extends Controller
         }
 
         // get items based on category id
-        $products = DB::table('fumaco_items')->where('f_cat_id', $product_category->id)
+        $products = DB::table('fumaco_items')->where('f_cat_id', $product_category->id)->where('f_status', 1)
             ->when(count($request_data) > 0 || $brand_filter, function($c) use ($filtered_items) {
                 $c->whereIn('f_idcode', $filtered_items);
             })
-            ->where('f_status', 1)->orderBy($sortby, $orderby)
-            ->select('id', 'f_idcode', 'f_default_price', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_stock_uom', 'f_qty', 'f_reserved_qty', 'slug', 'f_name_name', 'f_item_name', 'image_alt')->paginate(15);
+            ->select('id', 'f_idcode', 'f_default_price', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_stock_uom', 'f_qty', 'f_reserved_qty', 'slug', 'f_name_name', 'f_item_name', 'image_alt')->orderBy($sortby, $orderby)->paginate(15);
 
         // get sitewide sale
         $sale = DB::table('fumaco_on_sale')

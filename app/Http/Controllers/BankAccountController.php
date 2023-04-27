@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use Auth;
 use DB;
 use Illuminate\Support\Str;
+use Exception;
 
 class BankAccountController extends Controller
 {

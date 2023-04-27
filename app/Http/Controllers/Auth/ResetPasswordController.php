@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use DB;
 use Mail; 
 use Hash;
+use Exception;
 
 class ResetPasswordController extends Controller
 {

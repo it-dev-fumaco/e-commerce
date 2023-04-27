@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use Auth;
 use DB;
 use Validator;
+use Exception;
 
 class UserManagementController extends Controller
 {

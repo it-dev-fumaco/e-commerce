@@ -8,6 +8,7 @@ use DB;
 use Cache;
 use File;
 use Auth;
+use Exception;
 
 class SettingsController extends Controller
 {

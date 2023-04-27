@@ -9,6 +9,7 @@ use DB;
 use Webp;
 use Illuminate\Support\Str;
 use Auth;
+use Exception;
 
 class SocialImagesController extends Controller
 {

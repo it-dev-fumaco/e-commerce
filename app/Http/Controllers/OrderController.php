@@ -14,6 +14,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use App\Http\Traits\GeneralTrait;
 use App\Http\Traits\ProductTrait;
 use Illuminate\Support\Str;
+use Exception;
 
 class OrderController extends Controller
 {

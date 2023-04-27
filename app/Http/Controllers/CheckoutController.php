@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Auth;
 use DB;
+use Exception;
 
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
@@ -174,7 +175,6 @@ class CheckoutController extends Controller
 					'add_type' => $request->ship_Address_type1_1,
 					'xbusiness_name' => $request->ship_business_name,
 					'xtin_no' => $request->ship_tin,
-					'add_type' => $request->ship_Address_type1_1,
 					'xadd1' => $request->ship_Address1_1,
 					'xadd2' => ($request->ship_Address2_1) ? $request->ship_Address2_1 : " ",
 					'xprov' => $request->ship_province1_1,
@@ -632,10 +632,10 @@ class CheckoutController extends Controller
 				->select('payment_method_name', 'payment_type', 'issuing_bank', 'show_image', 'image')->get();
 
 			$available_voucher = DB::table('fumaco_voucher')
+				->where('minimum_spend', '<=', collect($cart_arr)->sum('subtotal'))->where('auto_apply', 1)
 				->when(!Auth::check(), function ($q){
 					return $q->where('require_signin', 0);
 				})
-				->where('minimum_spend', '<=', collect($cart_arr)->sum('subtotal'))->where('auto_apply', 1)
 				->orderByRaw('LENGTH(order_no)', 'ASC')->orderBy('order_no', 'ASC')->orderBy('created_at', 'ASC')
 				->get();
 
@@ -666,7 +666,7 @@ class CheckoutController extends Controller
 			DB::commit();
 
 			return view('frontend.checkout.check_out_summary', compact('shipping_details', 'billing_details', 'shipping_rates', 'order_no', 'cart_arr', 'shipping_add', 'billing_add', 'shipping_zones', 'payment_methods', 'free_shipping_remarks', 'shipping_service_discount', 'applicable_voucher', 'price_rule'));
-		}catch(Exception $e){
+		}catch(\Throwable $e){
 			DB::rollback();
 			return redirect()->back()->with('error', 'An error occured. Please try again.');
 		}		
@@ -1565,7 +1565,7 @@ class CheckoutController extends Controller
 				->select('f_idcode', 'f_default_price', 'b.qty', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_stock_uom', 'f_package_height', 'f_package_weight', 'f_package_length', 'f_package_width')->get();
 		}
 
-		$total_amount = $total_weight_of_items = $total_cubic_cm = 0;
+		$total_amount = $total_weight_of_items = $total_cubic_cm = $total_quantity_of_items = 0;
 
 		// get sitewide sale
 		$sale = DB::table('fumaco_on_sale')
@@ -1628,6 +1628,7 @@ class CheckoutController extends Controller
 			$item_qty = $row->qty;
 			$price = $item_price_data['discounted_price'];
 			$total_amount += ($price * $item_qty);
+			$total_quantity_of_items += $item_qty;
             $cubic_cm = ($row->f_package_length * $row->f_package_width * $row->f_package_height);
             $cubic_cm = $cubic_cm * $item_qty;
 

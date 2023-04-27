@@ -14,6 +14,7 @@ use Storage;
 use File;
 use ZipArchive;
 use Illuminate\Support\Str;
+use Exception;
 
 class PagesController extends Controller
 {

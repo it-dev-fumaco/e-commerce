@@ -8,6 +8,7 @@ use Auth;
 use Carbon\Carbon;
 use Adrianorosa\GeoLocation\GeoLocation;
 use App\Http\Traits\ProductTrait;
+use Exception;
 
 class CartController extends Controller
 {

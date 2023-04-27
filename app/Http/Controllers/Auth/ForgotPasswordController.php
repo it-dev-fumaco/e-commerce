@@ -9,6 +9,7 @@ use Illuminate\Support\Str;
 use Carbon\Carbon;
 use DB; 
 use Mail; 
+use Exception;
 
 class ForgotPasswordController extends Controller
 {

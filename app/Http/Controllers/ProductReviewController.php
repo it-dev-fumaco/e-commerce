@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use Auth;
 use DB;
 use Illuminate\Support\Facades\Mail;
+use Exception;
 
 class ProductReviewController extends Controller
 {

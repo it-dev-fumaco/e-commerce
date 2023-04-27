@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Http;
 use Carbon\Carbon;
 use Auth;
 use DB;
+use Exception;
 
 class PriceListController extends Controller
 {

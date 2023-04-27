@@ -15,6 +15,7 @@ use DB;
 use Mail;
 use Cache;
 use App\Http\Traits\ProductTrait;
+use Exception;
 
 class ProductController extends Controller
 {
@@ -261,7 +262,6 @@ class ProductController extends Controller
                 $request->validate(
                     [
                         'item_code' => 'required',
-                        'item_code' => 'required',
                         'product_name' => 'required',
                         'item_name' => 'required',
                         'product_category' => 'required',
@@ -289,7 +289,6 @@ class ProductController extends Controller
                     [
                         'item_code' => 'required',
                         'parent_item_code' => 'required',
-                        'item_code' => 'required',
                         'product_name' => 'required',
                         'item_name' => 'required',
                         'product_category' => 'required',
@@ -322,7 +321,8 @@ class ProductController extends Controller
                     return explode("-", $i)[0];
                 })->toArray();
    
-                $mismatch_attr_query = DB::table('fumaco_items_attributes as b', 'a.f_idcode', 'b.idcode')
+                $mismatch_attr_query = DB::table('fumaco_items as a')
+                    ->join('fumaco_items_attributes as b', 'a.f_idcode', 'b.idcode')
                     ->join('fumaco_attributes_per_category as c', 'c.id', 'b.attribute_name_id')
                     ->whereIn('b.idcode', $child_items)->whereNotIn('attribute_name', array_column($item['attributes'], 'attribute'))
                     ->distinct()->count();
@@ -911,10 +911,10 @@ class ProductController extends Controller
         $q_string = $request->q;
         $search_str = explode(' ', $q_string);
         $product_list = DB::table('fumaco_items')->where('f_brand', 'LIKE', "%".$request->brands."%")
+            ->where('f_cat_id', 'LIKE', "%".$request->category."%")
             ->when($request->parent_code, function ($query) use ($request) {
                 return $query->where('f_parent_code', 'LIKE', "%".$request->parent_code."%");
             })
-            ->where('f_cat_id', 'LIKE', "%".$request->category."%")
             ->when($request->is_featured, function($c) use ($request) {
                 $c->where('f_featured', $request->is_featured);
             })
@@ -2814,6 +2814,7 @@ class ProductController extends Controller
     }
 
     public function searchWebItems(Request $request) {
+        $result = [];
         if($request->ajax()) {
             $search_str = explode(' ', $request->q);
             $items = DB::table('fumaco_items')->where('f_status', 1)
@@ -2834,7 +2835,6 @@ class ProductController extends Controller
 
             $product_list_images = collect($product_list_images)->groupBy('idcode')->toArray();
     
-            $result = [];
             foreach($items as $item){
                 $image = null;
                 if (array_key_exists($item->f_idcode, $product_list_images)) {
