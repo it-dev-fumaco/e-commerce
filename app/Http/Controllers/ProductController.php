@@ -919,14 +919,19 @@ class ProductController extends Controller
                 $c->where('f_featured', $request->is_featured);
             })
             ->when($q_string, function ($query) use ($search_str, $q_string) {
-                return $query->where(function($q) use ($search_str, $q_string) {
-                    foreach ($search_str as $str) {
-                        $q->where('f_description', 'LIKE', "%".$str."%");
-                    }
+                return $query->where('f_brand', 'LIKE', "%".$q_string."%")
+                    ->orWhere('f_parent_code', 'LIKE', "%".$q_string."%")
+                    ->orWhere('f_name_name', 'LIKE', "%".$q_string."%")
+                    ->orWhere(function($q) use ($search_str, $q_string) {
+                        foreach ($search_str as $str) {
+                            $q->where('f_description', 'LIKE', "%".$str."%");
+                        }
 
-                    $q->orWhere('f_idcode', 'LIKE', "%".$q_string."%")
-                        ->orWhere('f_item_classification', 'LIKE', "%".$q_string."%")->orWhere('slug', 'LIKE', "%".$q_string."%");
-                });
+                        $q->orWhere('f_idcode', 'LIKE', "%".$q_string."%")
+                            ->orWhere('f_item_classification', 'LIKE', "%".$q_string."%")
+                            ->orWhere('keywords', 'LIKE', '%'.$q_string.'%');
+                    })
+                    ->orWhere('f_category', 'LIKE', "%".$q_string."%");
             })
             ->orderBy('f_date', 'desc')->paginate(15);
 
