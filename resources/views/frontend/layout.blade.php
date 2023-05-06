@@ -99,6 +99,7 @@
     </style>
     @endif
 
+    @if (env('APP_ENV') != 'local')
     @if ($activePage != 'error_page')
     <!-- Google Tag Manager -->
     <script async>
@@ -109,6 +110,7 @@
       })(window,document,'script','dataLayer','GTM-NZJWSRR');
     </script>
     <!-- End Google Tag Manager -->
+    @endif
     @endif
             <!-- Messenger Chat Plugin Code -->
 <div id="fb-root"></div>
