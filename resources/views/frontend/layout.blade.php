@@ -98,7 +98,7 @@
       }
     </style>
     @endif
-{{ env('APP_ENV') }}
+
     @if (env('APP_ENV') != 'local')
     @if ($activePage != 'error_page')
     <!-- Google Tag Manager -->
