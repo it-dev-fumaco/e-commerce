@@ -23,7 +23,12 @@ class ForgotPasswordController extends Controller
         ],
         ['exists' => 'Sorry, no existing account for this email.']);
 
-        $phone = DB::table('fumaco_users')->where('username', $request->username)->where('is_email_verified', 1)->pluck('f_mobilenumber')->first();
+        $user_details = DB::table('fumaco_users as user')
+            ->join('fumaco_user_add as add', 'user.id', 'add.user_idx')
+            ->where('user.username', $request->username)->where('user.is_email_verified', 1)->where('add.address_class', 'Billing')->where('xdefault', 1)
+            ->select('user.f_mobilenumber as user_contact', 'add.xmobile_number as address_contact')->first();
+
+        $phone = $user_details->user_contact ? $user_details->user_contact : $user_details->address_contact;
 
         $info_arr = [
             'email' => $request->username,
@@ -71,7 +76,14 @@ class ForgotPasswordController extends Controller
                 $sms_api = DB::table('api_setup')->where('type', 'sms_gateway_api')->first();
 
                 $message = 'RESET PASSWORD VERIFICATION: Your One-Time PIN is '.$otp.' to reset your password in Fumaco Website, valid only within 10 mins. For any help, please contact us at inquiries@fumaco.com';
-                $phone = $request->phone[0] == '0' ? '63'.substr($request->phone, 1) : $request->phone;
+
+                $user_details = DB::table('fumaco_users as user')
+                    ->join('fumaco_user_add as add', 'user.id', 'add.user_idx')
+                    ->where('user.username', $request->username)->where('user.is_email_verified', 1)->where('add.address_class', 'Billing')->where('xdefault', 1)
+                    ->select('user.f_mobilenumber as user_contact', 'add.xmobile_number as address_contact')->first();
+
+                $phone = $user_details->user_contact ? $user_details->user_contact : $user_details->address_contact;
+                $phone = $phone[0] == '0' ? '63'.substr($phone, 1) : $phone;
 
                 Http::asForm()->withHeaders([
                     'Accept' => 'application/json',
