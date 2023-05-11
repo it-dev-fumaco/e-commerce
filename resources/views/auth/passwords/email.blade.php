@@ -65,7 +65,7 @@
               @if ($info_arr['phone'])
                 <div class="form-check p-2">
                   <label class="form-check-label">
-                    <input type="radio" class="form-check-input" name="otp" id="otp-reset">Send an OTP to {{ substr($info_arr['phone'], 0, 2).'*****'.substr($info_arr['phone'], 7) }}
+                    <input type="radio" class="form-check-input" name="otp" id="otp-reset">Send an OTP to +{{ ($info_arr['phone'][0] == 0 ? 639 : substr($info_arr['phone'], 0, 3)).'*****'.substr($info_arr['phone'], 7) }}
                     <input type="text" name="phone" value="{{ $info_arr['phone'] }}" readonly hidden>
                   </label>
                 </div>

@@ -34,6 +34,9 @@
 										<div class="col-9">
 											<ul class="nav nav-tabs" id="tabs" role="tablist" style="cursor: pointer">
 												@foreach ($status_arr as $status)
+													@php
+														$count = isset($count_arr[$status]) ? $count_arr[$status] : 0;
+													@endphp
 													<li class="nav-item">
 														<a class="nav-link pt-3 pb-3 nav-ctrl {{ $loop->first ? 'active' : null }}" data-status="{{ $status }}">
 															@switch($status)
@@ -49,9 +52,9 @@
 																@default
 																	{{ $status }}
 															@endswitch
-															@if(in_array($status, ['Order Placed', 'Out for Delivery', 'Order Confirmed', 'Ready for Pickup']))
-																&nbsp;<span id="{{ Illuminate\Support\Str::slug($status, '-') }}-badge" class="badge badge-primary" style="font-size: 10pt;">
-																	{{ isset($count_arr[$status]) ? $count_arr[$status] : '0' }}
+															@if(in_array($status, ['Order Placed', 'Out for Delivery', 'Order Confirmed', 'Ready for Pickup']) && $count > 0)
+																&nbsp;<span id="{{ Illuminate\Support\Str::slug($status, '-') }}-badge" class="badge badge-danger" style="font-size: 10pt;">
+																	{{ $count }}
 																</span>
 															@endif
 														</a>

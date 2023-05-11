@@ -11,6 +11,7 @@ use DB;
 use Webp;
 use Mail;
 use Illuminate\Support\Str;
+use Exception;
 
 class BlogController extends Controller
 {
@@ -575,6 +576,7 @@ class BlogController extends Controller
             return redirect('/blog/'.$request->idcode.'#comments')->with('comment_message', 'Hello! Your comment has been received, please wait for approval.');
         }catch(Exception $e){
             DB::rollback();
+            return redirect('/blog/'.$request->idcode.'#comments')->with('error', 'An error occured. Please try again.');
         }
     }
 

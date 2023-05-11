@@ -11,6 +11,7 @@ use Carbon\Carbon;
 use Str;
 use Webp;
 use Storage;
+use Exception;
 
 class CategoryController extends Controller
 {

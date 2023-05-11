@@ -9,6 +9,7 @@ use Illuminate\Support\Str;
 use Carbon\Carbon;
 use DB; 
 use Mail; 
+use Exception;
 
 class ForgotPasswordController extends Controller
 {
@@ -22,7 +23,12 @@ class ForgotPasswordController extends Controller
         ],
         ['exists' => 'Sorry, no existing account for this email.']);
 
-        $phone = DB::table('fumaco_user_add')->where('xcontactemail1', $request->username)->where('address_class', 'Billing')->where('xdefault', 1)->pluck('xmobile_number')->first();
+        $user_details = DB::table('fumaco_users as user')
+            ->join('fumaco_user_add as add', 'user.id', 'add.user_idx')
+            ->where('user.username', $request->username)->where('user.is_email_verified', 1)->where('add.address_class', 'Billing')->where('xdefault', 1)
+            ->select('user.f_mobilenumber as user_contact', 'add.xmobile_number as address_contact')->first();
+
+        $phone = $user_details->user_contact ? $user_details->user_contact : $user_details->address_contact;
 
         $info_arr = [
             'email' => $request->username,
@@ -58,9 +64,9 @@ class ForgotPasswordController extends Controller
     public function sendResetLinkEmail(Request $request) {
         DB::beginTransaction();
         try {
+            $now = Carbon::now();
             if($request->has('otp')){
                 $otp = rand(111111, 999999);
-                $now = Carbon::now();
 
                 DB::table('fumaco_users')->where('username', $request->username)->update([
                     'f_temp_passcode' => $otp,
@@ -70,7 +76,14 @@ class ForgotPasswordController extends Controller
                 $sms_api = DB::table('api_setup')->where('type', 'sms_gateway_api')->first();
 
                 $message = 'RESET PASSWORD VERIFICATION: Your One-Time PIN is '.$otp.' to reset your password in Fumaco Website, valid only within 10 mins. For any help, please contact us at inquiries@fumaco.com';
-                $phone = $request->phone[0] == '0' ? '63'.substr($request->phone, 1) : $request->phone;
+
+                $user_details = DB::table('fumaco_users as user')
+                    ->join('fumaco_user_add as add', 'user.id', 'add.user_idx')
+                    ->where('user.username', $request->username)->where('user.is_email_verified', 1)->where('add.address_class', 'Billing')->where('xdefault', 1)
+                    ->select('user.f_mobilenumber as user_contact', 'add.xmobile_number as address_contact')->first();
+
+                $phone = $user_details->user_contact ? $user_details->user_contact : $user_details->address_contact;
+                $phone = $phone[0] == '0' ? '63'.substr($phone, 1) : $phone;
 
                 Http::asForm()->withHeaders([
                     'Accept' => 'application/json',
@@ -82,11 +95,11 @@ class ForgotPasswordController extends Controller
                     'to' => preg_replace("/[^0-9]/", "", $phone),
                     'text' => $message
                 ]);
-
+                
                 DB::table('password_resets')->insert([
                     'email' => $request->username, 
                     'token' => $otp, 
-                    'created_at' => Carbon::now()
+                    'created_at' => $now
                 ]);
 
                 session()->put('forOTP', $request->username);
@@ -108,7 +121,7 @@ class ForgotPasswordController extends Controller
                 DB::table('password_resets')->insert([
                     'email' => $request->username, 
                     'token' => $token, 
-                    'created_at' => Carbon::now()
+                    'created_at' => $now
                 ]);
 
                 Mail::send('emails.forgot_password', ['token' => $token], function($message) use($request){
@@ -122,7 +135,7 @@ class ForgotPasswordController extends Controller
         } catch (Exception $e) {
             DB::rollback();
 
-            return back()->with('error', 'An error occured. Please try again.');
+            return redirect()->route('password.request')->with('error', 'An error occured. Please try again.');
         }
     }
 }

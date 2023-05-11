@@ -10,6 +10,7 @@ use DB;
 use Carbon\Carbon;
 use Auth;
 use DateTime;
+use Exception;
 
 class ShippingController extends Controller
 {

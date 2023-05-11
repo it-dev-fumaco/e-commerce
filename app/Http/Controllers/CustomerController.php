@@ -8,7 +8,7 @@ use Carbon\Carbon;
 use Auth;
 use DB;
 use Newsletter;
-
+use Exception;
 class CustomerController extends Controller
 {
     public function viewCustomers(Request $request){

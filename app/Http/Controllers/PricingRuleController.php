@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Auth;
 use DB;
+use Exception;
 
 class PricingRuleController extends Controller
 {

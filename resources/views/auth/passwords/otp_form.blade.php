@@ -56,9 +56,9 @@
         $(document).ready(function(){
             $('#resend-otp').click(function(){
                 var data = {
-                    '_token' : "{{ csrf_token() }}",
-                    'username' : $('#email').val(),
-                    'otp' : 'on'
+                    _token : "{{ csrf_token() }}",
+                    username : $('#email').val(),
+                    otp : 'on'
                 }
                 $.ajax({
                     type:'post',

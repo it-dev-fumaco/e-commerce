@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use DB;
 use Carbon\Carbon;
 use Auth;
+use Exception;
 
 class StoreController extends Controller
 {

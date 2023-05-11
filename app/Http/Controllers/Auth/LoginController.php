@@ -12,6 +12,7 @@ use Laravel\Socialite\Facades\Socialite;
 use App\Models\User;
 use Carbon\Carbon;
 use Session;
+use Exception;
 
 class LoginController extends Controller
 {
@@ -169,7 +170,7 @@ class LoginController extends Controller
                 Auth::loginUsingId($newUser->id);
 
                 $this->updateCartItemOwner();
-                $this->saveLoginDetails();
+                $this->saveLoginDetails('Google');
 
                 $user_check = $this->checkEmail('Google');
                 $soc_used = collect($user_check)->implode(', ');
@@ -234,7 +235,7 @@ class LoginController extends Controller
                 Auth::loginUsingId($newUser->id);
 
                 $this->updateCartItemOwner();
-                $this->saveLoginDetails();
+                $this->saveLoginDetails('LinkedIn');
 
                 $user_check = $this->checkEmail('LinkedIn');
                 $soc_used = collect($user_check)->implode(', ');
@@ -334,7 +335,7 @@ class LoginController extends Controller
                 Auth::loginUsingId($newUser->id);
 
                 $this->updateCartItemOwner();
-                $this->saveLoginDetails();
+                $this->saveLoginDetails('Facebook');
 
                 $user_check = $this->checkEmail('Facebook');
                 $soc_used = collect($user_check)->implode(', ');

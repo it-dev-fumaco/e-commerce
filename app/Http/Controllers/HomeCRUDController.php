@@ -10,7 +10,7 @@ use Illuminate\Support\Str;
 use Auth;
 use Webp;
 use DB;
-
+use Exception;
 
 class HomeCRUDController extends Controller
 {

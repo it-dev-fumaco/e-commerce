@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use DB;
 use Webp;
 use Illuminate\Support\Str;
+use Exception;
 
 class MediaController extends Controller
 {

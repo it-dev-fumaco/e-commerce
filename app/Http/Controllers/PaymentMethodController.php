@@ -9,6 +9,7 @@ use Auth;
 use DB;
 use Webp;
 use Illuminate\Support\Str;
+use Exception;
 
 class PaymentMethodController extends Controller
 {
