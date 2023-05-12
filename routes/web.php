@@ -162,10 +162,10 @@ Route::get('/admin', function () {
 
 Route::prefix('admin')->group(function () {
     Route::get('/login', 'Admin\Auth\LoginController@showLoginForm')->name('admin.login');
-    Route::middleware('throttle:global')->post('/login_user', 'Admin\Auth\LoginController@login');
+    Route::middleware('rate_limit')->post('/login_user', 'Admin\Auth\LoginController@login');
     Route::get('/logout', 'Admin\Auth\LoginController@logout');
 
-    Route::group(['middleware' => 'auth:admin'], function(){
+    Route::group(['middleware' => ['auth:admin', 'user_status']], function(){
         Route::get('/verify', 'DashboardController@verify')->name('verify');
         Route::get('/resend_otp', 'DashboardController@resendOTP');
         Route::middleware('throttle:global')->post('/verify_otp', 'DashboardController@verifyOTP');

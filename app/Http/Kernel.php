@@ -65,5 +65,7 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'otp_status_check' => \App\Http\Middleware\OTPStatusMiddleware::class,
         'sanitation' => \App\Http\Middleware\SanitationMiddleware::class,
+        'rate_limit' => \App\Http\Middleware\RateLimitMiddleware::class,
+        'user_status' => \App\Http\Middleware\CheckUserStatusMiddleware::class,
     ];
 }

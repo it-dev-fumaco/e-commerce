@@ -68,7 +68,12 @@
                                             @foreach($admin as $a)
                                                 <tr>
                                                     <td>{{ $a->id }}</td>
-                                                    <td>{{ $a->username }}</td>
+                                                    <td>
+                                                        {{ $a->username }}<br/>
+                                                        @if (!$a->xstatus && $a->remarks == 'Locked Out')
+                                                            <span class="badge badge-secondary" style="font-size: 7pt;">{{ $a->remarks }}</span>
+                                                        @endif
+                                                    </td>
                                                     <td>{{ $a->user_type }}</td>
                                                     <td>{{ $a->account_name }}</td>
                                                     <td>{{ date('M d, Y h:i A', strtotime($a->last_login)) }}</td>
@@ -83,14 +88,6 @@
                                                     </td>
                                                     <td>
                                                         <center>
-                                                            {{-- <div class="dropdown">
-                                                                <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Action
-                                                                </button>
-                                                                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
-                                                                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#adminModal-{{ $a->id }}">Edit Details</a>
-                                                                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#changePassModal-{{ $a->id }}">Change Password</a>
-                                                                </div>
-                                                            </div> --}}
                                                             <a href="#" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#adminModal-{{ $a->id }}"><i class="fa fa-edit"></i></a>
                                                             <a href="#" class="btn btn-sm btn-info" data-toggle="modal" data-target="#changePassModal-{{ $a->id }}"><i class="fas fa-unlock"></i>&nbsp;Change Password</a>
                                                         </center>
