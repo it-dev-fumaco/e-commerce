@@ -50,6 +50,12 @@ class SettingsController extends Controller
 		return view('backend.settings.transportify_api_setup', compact('api_details'));
     }
 
+    public function lalamoveApiSetup () {
+        $api_details = DB::table('api_setup')->where('type', 'lalamove_api')->first();
+
+		return view('backend.settings.lalamove_api_setup', compact('api_details'));
+    }
+
     public function saveApiCredentials(Request $request) {
         DB::beginTransaction();
         try {
@@ -97,9 +103,11 @@ class SettingsController extends Controller
 
                 Cache::forget('google_api_config');
             } else {
-                $request->validate([
-                    'base_url' => 'required|url',
-                ]);
+                if ($request->api_type != 'lalamove_api') {
+                    $request->validate([
+                        'base_url' => 'required|url',
+                    ]);
+                }
             
                 $row = DB::table('api_setup')->where('type', $request->api_type)->first();
                 if ($row) {
