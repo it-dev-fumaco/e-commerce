@@ -46,9 +46,9 @@
 											'Standard Delivery',
 											'Express Delivery',
 											'Store Pickup',
-											'Free Delivery'
+											'Free Delivery',
+											'Transportify'
 										];
-										$shipping_options = collect($shipping_options)->merge($third_party_shipping);
 									@endphp
 									<div class="form-group">
 										<label for="shipping-service-type" class="form-label">* Shipping Rules</label>
@@ -326,11 +326,18 @@
 				add_tbl_row('#stores-table', '#store-location');
 				// add_shipping_category();
 				add_tbl_row('#product-category-table', '#product-categories');
-				add_tbl_row('#stock-availability-table', '#product-categories');
 				$('#shipping-method').closest('.form-group').addClass('d-none');
 				$('.store-locations').removeClass('d-none');
 				$('.shipping-category').removeClass('d-none');
-				$('.stock-availability').removeClass('d-none');
+				$('#label-cat').text('Override leadtime for the following product categories');
+			} else  if (shipping_service_type == 'Transportify'){
+				// add_store_row('#stores-table tbody');
+				// add_tbl_row('#stores-table', '#store-location');
+				// add_shipping_category();
+				add_tbl_row('#product-category-table', '#product-categories');
+				$('.shipping-category').removeClass('d-none');
+				$('#shipping-method').closest('.form-group').addClass('d-none');
+				$('.store-locations').addClass('d-none');
 				$('#label-cat').text('Override leadtime for the following product categories');
 			} else {
 				if (shipping_service_type != 'Express Delivery'){
@@ -343,10 +350,8 @@
 				$('#shipping-method').closest('.form-group').removeClass('d-none');
 				$('.store-locations').addClass('d-none');
 				$('.shipping-category').removeClass('d-none');
-				$('.stock-availability').removeClass('d-none');
 				// add_shipping_category();
 				add_tbl_row('#product-category-table', '#product-categories');
-				add_tbl_row('#stock-availability-table', '#product-categories');
 			}
 		});
 

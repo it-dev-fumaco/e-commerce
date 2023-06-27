@@ -19,9 +19,7 @@ class ShippingController extends Controller
 
         $categories = DB::table('fumaco_categories')->pluck('name', 'id');
 
-        $third_party_shipping = DB::table('api_setup')->whereIn('type', ['transportify_api', 'lalamove_api'])->where('is_enabled', 1)->pluck('name');
-
-        return view('backend.shipping.add', compact('stores', 'categories', 'third_party_shipping'));
+        return view('backend.shipping.add', compact('stores', 'categories'));
     }
 
     public function viewList() {
@@ -225,7 +223,7 @@ class ShippingController extends Controller
     public function saveShipping(Request $request) {
         DB::beginTransaction();
         try {
-            if($request->shipping_service_type != 'Store Pickup'){
+            if(!in_array($request->shipping_service_type, ['Store Pickup', 'Transportify', 'Lalamove'])){
                 $shipping_calculation = $request->shipping_calculation;
                 if(!$shipping_calculation) {
                     return response()->json([
@@ -418,15 +416,14 @@ class ShippingController extends Controller
         $categories = DB::table('fumaco_categories as a')->join('fumaco_shipping_product_category as b', 'a.id', 'b.category_id')->where('b.shipping_service_id', $id)->get();
 
         $product_categories = DB::table('fumaco_categories')->pluck('name', 'id');
-        $third_party_shipping = DB::table('api_setup')->whereIn('type', ['transportify_api', 'lalamove_api'])->where('is_enabled', 1)->pluck('name');
 
-        return view('backend.shipping.view', compact('details', 'shipping_zone_rates', 'shipping_conditions', 'stores', 'shipping_service_stores', 'categories', 'product_categories', 'third_party_shipping'));
+        return view('backend.shipping.view', compact('details', 'shipping_zone_rates', 'shipping_conditions', 'stores', 'shipping_service_stores', 'categories', 'product_categories'));
     }
 
     public function updateShipping($id, Request $request){
         DB::beginTransaction();
         try {
-            if($request->shipping_service_type != 'Store Pickup'){
+            if(!in_array($request->shipping_service_type, ['Store Pickup', 'Transportify', 'Lalamove'])){
                 $shipping_calculation = $request->shipping_calculation;
                 
                 if($shipping_calculation == 'Flat Rate'){

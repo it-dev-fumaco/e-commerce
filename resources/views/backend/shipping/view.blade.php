@@ -51,9 +51,9 @@
 												'Standard Delivery',
 												'Express Delivery',
 												'Store Pickup',
-												'Free Delivery'
+												'Free Delivery',
+												'Transportify'
 											];
-											$shipping_options = collect($shipping_options)->merge($third_party_shipping);
 										@endphp
 										<label for="shipping-service-type" class="form-label">* Shipping Rules</label>
 										<select name="shipping_service_type" id="shipping-service-type" class="form-control" required>
@@ -83,7 +83,7 @@
 									</div>
 								</div>
 								<div class="col-md-6">
-									<div class="form-group {{ ($details->shipping_service_name == 'Store Pickup') ? 'd-none' : ''  }}">
+									<div class="form-group {{ in_array($details->shipping_service_name, ['Store Pickup', 'Transportify', 'Lalamove']) ? 'd-none' : ''  }}">
 										<label for="shipping-method" class="form-label">* Shipping Condition</label>
 										<select name="shipping_calculation" id="shipping-method" class="form-control">
 											<option value="">-</option>
@@ -102,13 +102,13 @@
 											</div>
 										</div>
 										<div class="col-md-6">
-											<div class="form-group {{ ($details->shipping_calculation == 'Flat Rate' || $details->shipping_service_name == 'Store Pickup') ? 'd-none' : ''  }}">
+											<div class="form-group {{ ($details->shipping_calculation == 'Flat Rate' || in_array($details->shipping_service_name, ['Store Pickup', 'Transportify', 'Lalamove'])) ? 'd-none' : ''  }}">
 												<label for="min-charge-amount" class="form-label">* Min. Charge Amount</label>
 												<input type="text" class="form-control" id="min-charge-amount" name="min_charge_amount" placeholder="0.00" value="{{ $details->min_charge_amount }}" >
 											</div>
 										</div>
 										<div class="col-md-6">
-											<div class="form-group {{ ($details->shipping_calculation == 'Flat Rate' || $details->shipping_service_name == 'Store Pickup') ? 'd-none' : ''  }}">
+											<div class="form-group {{ ($details->shipping_calculation == 'Flat Rate' || in_array($details->shipping_service_name, ['Store Pickup', 'Transportify', 'Lalamove'])) ? 'd-none' : ''  }}">
 												<label for="max-charge-amount" class="form-label">* Max. Charge Amount</label>
 												<input type="text" class="form-control" id="max-charge-amount" name="max_charge_amount" placeholder="0.00" value="{{ $details->max_charge_amount }}" >
 											</div>
@@ -389,6 +389,13 @@
 				add_tbl_row('#stores-table', '#store-location');
 				$('#shipping-method').closest('.form-group').addClass('d-none');
 				$('.store-locations').removeClass('d-none');
+				$('#label-cat').text('Override leadtime for the following product categories');
+			} else  if (shipping_service_type == 'Transportify'){
+				// add_store_row('#stores-table tbody');
+				add_tbl_row('#product-category-table', '#product-categories');
+				$('.shipping-category').removeClass('d-none');
+				$('#shipping-method').closest('.form-group').addClass('d-none');
+				$('.store-locations').addClass('d-none');
 				$('#label-cat').text('Override leadtime for the following product categories');
 			} else {
 				if (shipping_service_type != 'Express Delivery'){
