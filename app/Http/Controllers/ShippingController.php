@@ -19,7 +19,9 @@ class ShippingController extends Controller
 
         $categories = DB::table('fumaco_categories')->pluck('name', 'id');
 
-        return view('backend.shipping.add', compact('stores', 'categories'));
+        $third_party_shipping = DB::table('api_setup')->whereIn('type', ['transportify_api', 'lalamove_api'])->where('is_enabled', 1)->pluck('name');
+
+        return view('backend.shipping.add', compact('stores', 'categories', 'third_party_shipping'));
     }
 
     public function viewList() {
@@ -372,12 +374,15 @@ class ShippingController extends Controller
                     $category_arr[] = [
                         'shipping_service_id' => $shipping_service->shipping_service_id,
                         'category_id' => $category,
+                        'condition' => isset($request->c_conditional_op[$i]) ? $request->c_conditional_op[$i] : null,
+                        'qty' => isset($request->c_value[$i]) ? $request->c_value[$i] : null,
                         'min_leadtime' => $request->c_min_leadtime[$i],
                         'max_leadtime' => $request->c_max_leadtime[$i],
-                        'created_by' => Auth::user()->username
+                        'created_by' => Auth::user()->username,
+                        'last_modified_by' => Auth::user()->username
                     ];
                 }
-    
+
                 DB::table('fumaco_shipping_product_category')->insert($category_arr);
             }
 
@@ -413,8 +418,9 @@ class ShippingController extends Controller
         $categories = DB::table('fumaco_categories as a')->join('fumaco_shipping_product_category as b', 'a.id', 'b.category_id')->where('b.shipping_service_id', $id)->get();
 
         $product_categories = DB::table('fumaco_categories')->pluck('name', 'id');
+        $third_party_shipping = DB::table('api_setup')->whereIn('type', ['transportify_api', 'lalamove_api'])->where('is_enabled', 1)->pluck('name');
 
-        return view('backend.shipping.view', compact('details', 'shipping_zone_rates', 'shipping_conditions', 'stores', 'shipping_service_stores', 'categories', 'product_categories'));
+        return view('backend.shipping.view', compact('details', 'shipping_zone_rates', 'shipping_conditions', 'stores', 'shipping_service_stores', 'categories', 'product_categories', 'third_party_shipping'));
     }
 
     public function updateShipping($id, Request $request){
@@ -596,12 +602,15 @@ class ShippingController extends Controller
                     $category_arr[] = [
                         'shipping_service_id' => $id,
                         'category_id' => $category,
+                        'condition' => isset($request->c_conditional_op[$i]) ? $request->c_conditional_op[$i] : null,
+                        'qty' => isset($request->c_value[$i]) ? $request->c_value[$i] : null,
                         'min_leadtime' => $request->c_min_leadtime[$i],
                         'max_leadtime' => $request->c_max_leadtime[$i],
-                        'created_by' => Auth::user()->username
+                        'created_by' => Auth::user()->username,
+                        'last_modified_by' => Auth::user()->username
                     ];
                 }
-    
+
                 DB::table('fumaco_shipping_product_category')->insert($category_arr);
             }
                         

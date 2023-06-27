@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreatePasswordResetsTable extends Migration
+class AddingApiSetupColumns extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,9 @@ class CreatePasswordResetsTable extends Migration
      */
     public function up()
     {
-        if(Schema::hasTable('password_resets')) return;
-        Schema::create('password_resets', function (Blueprint $table) {
-            $table->string('email')->index();
-            $table->string('token');
-            $table->timestamp('created_at')->nullable();
+        if (Schema::hasColumn('api_setup', 'name')) return;
+        Schema::table('api_setup', function($table) {
+            $table->string('name')->nullable();
         });
     }
 
@@ -28,6 +26,8 @@ class CreatePasswordResetsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('password_resets');
+        Schema::table('api_setup', function($table) {
+            $table->dropColumn('name');
+        });
     }
 }

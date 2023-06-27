@@ -41,14 +41,22 @@
 							<hr>
 							<div class="row">
 								<div class="col-md-6">
+									@php
+										$shipping_options = [
+											'Standard Delivery',
+											'Express Delivery',
+											'Store Pickup',
+											'Free Delivery'
+										];
+										$shipping_options = collect($shipping_options)->merge($third_party_shipping);
+									@endphp
 									<div class="form-group">
 										<label for="shipping-service-type" class="form-label">* Shipping Rules</label>
 										<select name="shipping_service_type" id="shipping-service-type" class="form-control" required>
 											<option value="">-</option>
-											<option value="Standard Delivery">Standard Delivery</option>
-											<option value="Express Delivery">Express Delivery</option>
-											<option value="Store Pickup">Store Pickup</option>
-											<option value="Free Delivery">Free Delivery</option>
+											@foreach ($shipping_options as $shipping)
+												<option value="{{ $shipping }}">{{ $shipping }}</option>
+											@endforeach
 										</select>
 									</div>
 									<div class="row">
@@ -71,15 +79,22 @@
 									</div>
 								</div>
 								<div class="col-md-6">
+									@php
+										$shipping_conditions = [
+											'Flat Rate',
+											'Per Amount',
+											'Per Quantity',
+											'Per Weight',
+											'Per Cubic cm'
+										];
+									@endphp
 									<div class="form-group d-none">
 										<label for="shipping-method" class="form-label">* Shipping Condition</label>
 										<select name="shipping_calculation" id="shipping-method" class="form-control">
 											<option value="">-</option>
-											<option value="Flat Rate">Flat Rate</option>
-											<option value="Per Amount">Per Amount</option>
-											<option value="Per Quantity">Per Quantity</option>
-											<option value="Per Weight">Per Weight</option>
-											<option value="Per Cubic cm">Per Cubic cm</option>
+											@foreach ($shipping_conditions as $condition)
+												<option value="{{ $condition }}">{{ $condition }}</option>												
+											@endforeach
 										</select>
 									</div>
 									<div class="row">
@@ -109,7 +124,7 @@
 							<div class="row store-locations d-none">
 								<div class="col-md-8 offset-md-2">
 									<div class="float-right mt-2">
-										 <button class="btn btn-outline-primary btn-sm mb-2" type="button" id="add-store-btn">Add Store</button>
+										 <button class="btn btn-outline-primary btn-sm mb-2 add-tbl-row" type="button" data-table="#stores-table" data-select="#store-location">Add Store</button>
 									</div>
 									<table class="table table-bordered" id="stores-table">
 										 <thead>
@@ -142,7 +157,7 @@
 							<div class="row shipping-conditions d-none">
 								<div class="col-md-10 offset-md-1">
 									<div class="float-right">
-										 <button class="btn btn-outline-primary btn-sm mb-2" type="button" id="add-shipping-condition-btn">Add Shipping Condition</button>
+										 <button class="btn btn-outline-primary btn-sm mb-2 add-tbl-row" type="button" data-table="#shipping-condition-table">Add Shipping Condition</button>
 									</div>
 									<table class="table table-bordered" id="shipping-condition-table">
 										 <thead>
@@ -164,7 +179,7 @@
 								<div class="col-md-10 offset-md-1">
 									<label>Allow shipping rule to these region/city only.</label>
 									<div class="float-right">
-										 <button class="btn btn-outline-primary btn-sm mb-2" id="add-shipping-zone-btn">Add Shipping Zone</button>
+										 <button type="button" class="btn btn-outline-primary btn-sm mb-2 add-tbl-row" data-table="#shipping-zone-table">Add Shipping Zone</button>
 									</div>
 									<table class="table table-bordered" id="shipping-zone-table">
 										 <thead>
@@ -181,24 +196,49 @@
 							<h5 class="shipping-category d-none mt-3">Product Category</h5>
 							<hr class="shipping-category d-none">
 							<div class="row shipping-category d-none">
-								<div class="col-md-6 offset-md-3">
+								<div class="col-12">
 									<label id="label-cat">Allowed product categories</label>
 									<div class="float-right">
-										 <button class="btn btn-outline-primary btn-sm mb-2" id="add-product-category-btn">Add Product Category</button>
+										 <button type="button" class="btn btn-outline-primary btn-sm mb-2 add-tbl-row" data-table="#product-category-table" data-select='#product-categories'>Add Product Category</button>
 									</div>
 									<table class="table table-bordered" id="product-category-table">
 										 <thead>
 											<tr>
 												<th style="width: 40%;" scope="col" class="text-center">Product Category Name</th>
-												<th style="width: 25%;" scope="col" class="text-center">Min. Leadtime</th>
-												<th style="width: 25%;" scope="col" class="text-center">Max. Leadtime</th>
+												<th style="width: 10%;" scope="col" class="text-center">Condition</th>
+												<th style="width: 10%;" scope="col" class="text-center">Qty</th>
+												<th style="width: 15%;" scope="col" class="text-center">Min. Leadtime</th>
+												<th style="width: 15%;" scope="col" class="text-center">Max. Leadtime</th>
 												<th style="width: 10%;"></th>
 										  </tr>
 										 </thead>
 										 <tbody></tbody>
 									</table>
-							  </div>
+							  	</div>
 							</div>
+							{{-- <h5 class="stock-availability d-none mt-3">Stock Availability</h5>
+							<hr class="stock-availability d-none">
+							<div class="row stock-availability d-none">
+								<div class="col-12 mx-auto">
+									<label>Override leadtime based on stock availability</label>
+									<div class="float-right">
+										 <button type="button" class="btn btn-outline-primary btn-sm mb-2 add-tbl-row" data-table="#stock-availability-table" data-select='#product-categories'>Add Stock Availability</button>
+									</div>
+									<table class="table table-bordered" id="stock-availability-table">
+										 <thead>
+											<tr>
+												<th style="width: 40%;" scope="col" class="text-center">Product Category Name</th>
+												<th style="width: 10%;" scope="col" class="text-center">Condition</th>
+												<th style="width: 10%;" scope="col" class="text-center">Value</th>
+												<th style="width: 15%;" scope="col" class="text-center">Min. Leadtime</th>
+												<th style="width: 15%;" scope="col" class="text-center">Max. Leadtime</th>
+												<th style="width: 10%;"></th>
+										  </tr>
+										 </thead>
+										 <tbody></tbody>
+									</table>
+							  	</div>
+							</div> --}}
 						</div>
 						<!-- /.card-body -->
 						<div class="card-footer text-center">
@@ -268,22 +308,29 @@
 			$('.shipping-conditions').addClass('d-none');
 			$('.shipping-zone-rates').addClass('d-none');
 			$('.shipping-category').addClass('d-none');
+			$('.stock-availability').addClass('d-none');
 
 			$('#shipping-method').val("");
 
-			$('#shipping-zone-table tbody').empty();
-			$('#shipping-condition-table tbody').empty();
-			$('#stores-table tbody').empty();
-			$('#product-category-table tbody').empty();
+			// $('#shipping-zone-table tbody').empty();
+			// $('#shipping-condition-table tbody').empty();
+			// $('#stores-table tbody').empty();
+			// $('#product-category-table tbody').empty();
+			$('table tbody').empty();
+
 
 			if (shipping_service_type == '') {
 				$('#shipping-method').closest('.form-group').addClass('d-none');
 			} else  if (shipping_service_type == 'Store Pickup'){
-				add_store_row('#stores-table tbody');
-				add_shipping_category();
+				// add_store_row('#stores-table tbody');
+				add_tbl_row('#stores-table', '#store-location');
+				// add_shipping_category();
+				add_tbl_row('#product-category-table', '#product-categories');
+				add_tbl_row('#stock-availability-table', '#product-categories');
 				$('#shipping-method').closest('.form-group').addClass('d-none');
 				$('.store-locations').removeClass('d-none');
 				$('.shipping-category').removeClass('d-none');
+				$('.stock-availability').removeClass('d-none');
 				$('#label-cat').text('Override leadtime for the following product categories');
 			} else {
 				if (shipping_service_type != 'Express Delivery'){
@@ -291,11 +338,15 @@
 				} else {
 					$('#label-cat').text('Not applicable for the following product categories');
 				}
-				add_shipping_zone_rate_row('#shipping-zone-table tbody');
+				// add_shipping_zone_rate_row('#shipping-zone-table tbody');
+				add_tbl_row('#shipping-zone-table');
 				$('#shipping-method').closest('.form-group').removeClass('d-none');
 				$('.store-locations').addClass('d-none');
 				$('.shipping-category').removeClass('d-none');
-				add_shipping_category();
+				$('.stock-availability').removeClass('d-none');
+				// add_shipping_category();
+				add_tbl_row('#product-category-table', '#product-categories');
+				add_tbl_row('#stock-availability-table', '#product-categories');
 			}
 		});
 
@@ -314,7 +365,8 @@
 
 				$('.shipping-zone-rates').removeClass('d-none');
 			}else if($(this).val() && $(this).val() != 'Flat Rate'){
-				add_shipping_condition_row('#shipping-condition-table tbody');
+				// add_shipping_condition_row('#shipping-condition-table tbody');
+				add_tbl_row('#shipping-condition-table');
 				$('#flat-rate-amount').closest('.col-md-6').addClass('d-none');
 				$('#min-charge-amount').closest('.form-group').removeClass('d-none');
 				$('#max-charge-amount').closest('.form-group').removeClass('d-none');
@@ -329,105 +381,249 @@
 			}
 		});
 		
-		$('#add-store-btn').click(function(e){
+		$(document).on('click', '.add-tbl-row', function(e){
 			e.preventDefault();
-			
-			add_store_row('#stores-table tbody');
+			var table = $(this).data('table');
+			var select = (typeof $(this).data('select') !== 'undefined') ? $(this).data('select') : '';
+			add_tbl_row(table, select);
 		});
 
-		$('#add-shipping-zone-btn').click(function(e){
-			e.preventDefault();
+		function add_tbl_row(table, select){
+			var clone_select = $(select).html();
+			switch (table) {
+				case '#stores-table': // add_store_row
+					var row = '<tr>' +
+						'<td class="p-2">' + 
+							'<select name="store[]" class="form-control w-100" style="width: 100%;" required>' + clone_select + '</select>' +
+						'</td>' +
+						'<td class="p-2"">' +
+							'<input type="text" name="allowed_hours[]" class="form-control" placeholder="0.00" required>' +
+						'</td>' +
+						'<td class="text-center">' +
+							'<button class="btn btn-outline-danger btn-sm remove-td-row">Remove</button>' +
+						'</td>' +
+					'</tr>';
+					break;
+				case '#shipping-zone-table': // add_shipping_zone_rate_row
+					var row = '<tr>' +
+						'<td class="p-2">' + 
+							'<input type="hidden" class="selected-province-text" name="province_text[]">' +
+							'<input type="hidden" class="selected-city-text" name="city_text[]">' +
+							'<select name="province[]" class="form-control province-select w-100" style="width: 100%;" required><option value=""></option></select>' +
+						'</td>' +
+						'<td class="p-2">' +
+							'<select name="city[]" class="form-control city-select w-100" style="width: 100%;" required><option value=""></option></select>' +
+						'</td>' +
+						'<td class="text-center">' +
+							'<button class="btn btn-outline-danger btn-sm remove-td-row">Remove</button>' +
+						'</td>' +
+					'</tr>';
 
-			add_shipping_zone_rate_row('#shipping-zone-table tbody');
-		});
+					var provinces = [];
+					$.getJSON("{{ asset('/json/provinces.json') }}", function(obj){
+						$.each(obj.results, function(e, i) {
+							provinces.push({
+								id: i.provCode,
+								text: i.text
+							});
+						});
 
-		$('#add-shipping-condition-btn').click(function(e){
-			e.preventDefault();
-
-			add_shipping_condition_row('#shipping-condition-table tbody');
-		});
-
-		function add_store_row(table){
-			var clone_select = $('#store-location').html();
-			var row = '<tr>' +
-				'<td class="p-2">' + 
-					'<select name="store[]" class="form-control w-100" style="width: 100%;" required>' + clone_select + '</select>' +
-				'</td>' +
-				'<td class="p-2"">' +
-					'<input type="text" name="allowed_hours[]" class="form-control" placeholder="0.00" required>' +
-				'</td>' +
-				'<td class="text-center">' +
-					'<button class="btn btn-outline-danger btn-sm remove-td-row">Remove</button>' +
-				'</td>' +
-			'</tr>';
-
-			$(table).append(row);
-		}
-			
-		function add_shipping_zone_rate_row(table){
-			var row = '<tr>' +
-				'<td class="p-2">' + 
-					'<input type="hidden" class="selected-province-text" name="province_text[]">' +
-					'<input type="hidden" class="selected-city-text" name="city_text[]">' +
-					'<select name="province[]" class="form-control province-select w-100" style="width: 100%;" required><option value=""></option></select>' +
-				'</td>' +
-				'<td class="p-2">' +
-					'<select name="city[]" class="form-control city-select w-100" style="width: 100%;" required><option value=""></option></select>' +
-				'</td>' +
-				'<td class="text-center">' +
-					'<button class="btn btn-outline-danger btn-sm remove-td-row">Remove</button>' +
-				'</td>' +
-			'</tr>';
-
-			$(table).append(row);
-			
-			var provinces = [];
-			$.getJSON("{{ asset('/json/provinces.json') }}", function(obj){
-				$.each(obj.results, function(e, i) {
-					provinces.push({
-						id: i.provCode,
-						text: i.text
+						$('.province-select').select2({
+							placeholder: 'Select Province',
+							data: provinces
+						});
 					});
-				});
 
-				$('.province-select').select2({
-					placeholder: 'Select Province',
-					data: provinces
-				});
-			});
-
-			$('.city-select').select2({
-				placeholder: 'Select City',
-			});
+					$('.city-select').select2({
+						placeholder: 'Select City',
+					});
+					break;
+				case '#product-category-table': // add_shipping_category
+					var row = '<tr>' +
+						'<td class="p-2">' +
+							'<select name="product_category[]" class="form-control w-100" style="width: 100%;" required>' + clone_select + '</select>' +
+						'</td>' +
+						'<td class="p-2">' + 
+							'<select class="form-control" name="c_conditional_op[]" required>' +
+								'<option value=">">></option>' +
+								'<option value=">=">>=</option>' +
+								'<option value="==">==</option>' +
+								'<option value="<"><</option>' +
+								'<option value="<="><=</option>' +
+							'</select>' +
+						'</td>' +
+						'<td class="p-2">' +
+							'<input type="text" class="form-control" name="c_value[]" required>' +
+						'</td>' +
+						'<td class="p-2">' +
+							'<input type="text" name="c_min_leadtime[]" class="form-control" placeholder="0 Day(s)" required>' +
+						'</td>' +
+						'<td class="p-2">' +
+							'<input type="text" name="c_max_leadtime[]" class="form-control" placeholder="0 Day(s)" required>' +
+						'</td>' +
+						'<td class="text-center">' +
+							'<button class="btn btn-outline-danger btn-sm remove-td-row">Remove</button>' +
+						'</td>' +
+					'</tr>';
+					break;
+				case '#shipping-condition-table': // add_shipping_condition_row
+					var row = '<tr>' +
+						'<td class="p-2">' +
+							'<input type="text" class="form-control" name="condition[]" value="' + $('#shipping-method').val() + '" readonly required>' +
+						'</td>' +
+						'<td class="p-2">' + 
+							'<select class="form-control" name="conditional_op[]" required>' +
+								'<option value=">">></option>' +
+								'<option value=">=">>=</option>' +
+								'<option value="==">==</option>' +
+								'<option value="<"><</option>' +
+								'<option value="<="><=</option>' +
+							'</select>' +
+						'</td>' +
+						'<td class="p-2">' +
+							'<input type="text" class="form-control" name="value[]" required>' +
+						'</td>' +
+						'<td class="p-2">' +
+							'<input type="text" name="shipping_amount[]" class="form-control" placeholder="0.00" required>' +
+						'</td>' +
+						'<td class="text-center">' +
+							'<button type="button" class="btn btn-outline-danger btn-sm remove-td-row">Remove</button>' +
+						'</td>' +
+					'</tr>';
+					break;
+				
+				default:
+					return false;
+					break;
+			}
+			
+			$(table + ' tbody').append(row);
 		}
+		
+		// $('#add-store-btn').click(function(e){
+		// 	e.preventDefault();
+			
+		// 	add_store_row('#stores-table tbody');
+		// });
 
-		function add_shipping_condition_row(table){
-			var row = '<tr>' +
-				'<td class="p-2">' +
-					'<input type="text" class="form-control" name="condition[]" value="' + $('#shipping-method').val() + '" readonly required>' +
-				'</td>' +
-				'<td class="p-2">' + 
-					'<select class="form-control" name="conditional_op[]" required>' +
-						'<option value=">">></option>' +
-						'<option value=">=">>=</option>' +
-						'<option value="==">==</option>' +
-						'<option value="<"><</option>' +
-						'<option value="<="><=</option>' +
-						'</select>' +
-				'</td>' +
-				'<td class="p-2">' +
-					'<input type="text" class="form-control" name="value[]" required>' +
-				'</td>' +
-				'<td class="p-2">' +
-					'<input type="text" name="shipping_amount[]" class="form-control" placeholder="0.00" required>' +
-				'</td>' +
-				'<td class="text-center">' +
-					'<button type="button" class="btn btn-outline-danger btn-sm remove-td-row">Remove</button>' +
-				'</td>' +
-			'</tr>';
+		// $('#add-shipping-zone-btn').click(function(e){
+		// 	e.preventDefault();
 
-			$(table).append(row);
-		}
+		// 	add_shipping_zone_rate_row('#shipping-zone-table tbody');
+		// });
+
+		// $('#add-shipping-condition-btn').click(function(e){
+		// 	e.preventDefault();
+
+		// 	add_shipping_condition_row('#shipping-condition-table tbody');
+		// });
+
+		// function add_store_row(table){
+		// 	var clone_select = $('#store-location').html();
+		// 	var row = '<tr>' +
+		// 		'<td class="p-2">' + 
+		// 			'<select name="store[]" class="form-control w-100" style="width: 100%;" required>' + clone_select + '</select>' +
+		// 		'</td>' +
+		// 		'<td class="p-2"">' +
+		// 			'<input type="text" name="allowed_hours[]" class="form-control" placeholder="0.00" required>' +
+		// 		'</td>' +
+		// 		'<td class="text-center">' +
+		// 			'<button class="btn btn-outline-danger btn-sm remove-td-row">Remove</button>' +
+		// 		'</td>' +
+		// 	'</tr>';
+
+		// 	$(table).append(row);
+		// }
+			
+		// function add_shipping_zone_rate_row(table){
+		// 	var row = '<tr>' +
+		// 		'<td class="p-2">' + 
+		// 			'<input type="hidden" class="selected-province-text" name="province_text[]">' +
+		// 			'<input type="hidden" class="selected-city-text" name="city_text[]">' +
+		// 			'<select name="province[]" class="form-control province-select w-100" style="width: 100%;" required><option value=""></option></select>' +
+		// 		'</td>' +
+		// 		'<td class="p-2">' +
+		// 			'<select name="city[]" class="form-control city-select w-100" style="width: 100%;" required><option value=""></option></select>' +
+		// 		'</td>' +
+		// 		'<td class="text-center">' +
+		// 			'<button class="btn btn-outline-danger btn-sm remove-td-row">Remove</button>' +
+		// 		'</td>' +
+		// 	'</tr>';
+
+		// 	$(table).append(row);
+			
+		// 	var provinces = [];
+		// 	$.getJSON("{{ asset('/json/provinces.json') }}", function(obj){
+		// 		$.each(obj.results, function(e, i) {
+		// 			provinces.push({
+		// 				id: i.provCode,
+		// 				text: i.text
+		// 			});
+		// 		});
+
+		// 		$('.province-select').select2({
+		// 			placeholder: 'Select Province',
+		// 			data: provinces
+		// 		});
+		// 	});
+
+		// 	$('.city-select').select2({
+		// 		placeholder: 'Select City',
+		// 	});
+		// }
+
+		// function add_shipping_condition_row(table){
+		// 	var row = '<tr>' +
+		// 		'<td class="p-2">' +
+		// 			'<input type="text" class="form-control" name="condition[]" value="' + $('#shipping-method').val() + '" readonly required>' +
+		// 		'</td>' +
+		// 		'<td class="p-2">' + 
+		// 			'<select class="form-control" name="conditional_op[]" required>' +
+		// 				'<option value=">">></option>' +
+		// 				'<option value=">=">>=</option>' +
+		// 				'<option value="==">==</option>' +
+		// 				'<option value="<"><</option>' +
+		// 				'<option value="<="><=</option>' +
+		// 				'</select>' +
+		// 		'</td>' +
+		// 		'<td class="p-2">' +
+		// 			'<input type="text" class="form-control" name="value[]" required>' +
+		// 		'</td>' +
+		// 		'<td class="p-2">' +
+		// 			'<input type="text" name="shipping_amount[]" class="form-control" placeholder="0.00" required>' +
+		// 		'</td>' +
+		// 		'<td class="text-center">' +
+		// 			'<button type="button" class="btn btn-outline-danger btn-sm remove-td-row">Remove</button>' +
+		// 		'</td>' +
+		// 	'</tr>';
+
+		// 	$(table).append(row);
+		// }
+
+		// $('#add-product-category-btn').click(function(e){
+		// 	e.preventDefault();
+		// 	add_shipping_category();
+		// });
+
+		// function add_shipping_category() {
+		// 	var clone_select = $('#product-categories').html();
+		// 	var row = '<tr>' +
+		// 		'<td class="p-2">' +
+		// 			'<select name="product_category[]" class="form-control w-100" style="width: 100%;" required>' + clone_select + '</select>' +
+		// 		'</td>' +
+		// 		'<td class="p-2">' +
+		// 			'<input type="text" name="c_min_leadtime[]" class="form-control" placeholder="0 Day(s)" required>' +
+		// 		'</td>' +
+		// 		'<td class="p-2">' +
+		// 			'<input type="text" name="c_max_leadtime[]" class="form-control" placeholder="0 Day(s)" required>' +
+		// 		'</td>' +
+		// 		'<td class="text-center">' +
+		// 			'<button class="btn btn-outline-danger btn-sm remove-td-row">Remove</button>' +
+		// 		'</td>' +
+		// 	'</tr>';
+
+		// 	$('#product-category-table tbody').append(row);
+		// }
 
 		$(document).on('select2:select', '.province-select', function(e){
 			var data = e.params.data;
@@ -492,31 +688,6 @@
 				}
 			});
 		});
-
-		$('#add-product-category-btn').click(function(e){
-			e.preventDefault();
-			add_shipping_category();
-		});
-
-		function add_shipping_category() {
-			var clone_select = $('#product-categories').html();
-			var row = '<tr>' +
-				'<td class="p-2">' +
-					'<select name="product_category[]" class="form-control w-100" style="width: 100%;" required>' + clone_select + '</select>' +
-				'</td>' +
-				'<td class="p-2">' +
-					'<input type="text" name="c_min_leadtime[]" class="form-control" placeholder="0 Day(s)" required>' +
-				'</td>' +
-				'<td class="p-2">' +
-					'<input type="text" name="c_max_leadtime[]" class="form-control" placeholder="0 Day(s)" required>' +
-				'</td>' +
-				'<td class="text-center">' +
-					'<button class="btn btn-outline-danger btn-sm remove-td-row">Remove</button>' +
-				'</td>' +
-			'</tr>';
-
-			$('#product-category-table tbody').append(row);
-		}
 	})();
 
 </script>
