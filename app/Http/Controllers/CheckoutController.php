@@ -837,7 +837,7 @@ class CheckoutController extends Controller
 			session()->forget('fumVoucher');
 
 			return response()->json(['status' => 1, 'id' => $order_no, 'code' => $existing_order_temp->xtempcode]);
-		} catch (Exception $e) {
+		} catch (\Throwable $e) {
 			DB::rollback();
 
 			return response()->json(['status' => 2, 'message' => 'An error occured. Please try again.']);
@@ -1327,7 +1327,7 @@ class CheckoutController extends Controller
 			$leadtime_arr = [];
 			foreach($ordered_items as $item){
 				$category_id = DB::table('fumaco_items')->where('f_idcode', $item)->pluck('f_cat_id')->first();
-				if($temp->shipping_name != 'Store Pickup') {
+				if(!in_array($temp->shipping_name, ['Store Pickup', 'Transportify', 'Lalamove'])) {
 					$shipping = DB::table('fumaco_shipping_service as shipping_service')
 						->join('fumaco_shipping_zone_rate as zone_rate', 'shipping_service.shipping_service_id', 'zone_rate.shipping_service_id')
 						->where('shipping_service.shipping_service_name', $temp->shipping_name)
@@ -1336,7 +1336,7 @@ class CheckoutController extends Controller
 				} else {
 					$shipping = DB::table('fumaco_shipping_service')->where('shipping_service_name', $temp->shipping_name)->first();
 				}
-				
+
 				$lead_time_per_category = DB::table('fumaco_shipping_product_category')->where('shipping_service_id', $shipping->shipping_service_id)
 					->where('category_id', $category_id)->select('min_leadtime', 'max_leadtime')->first();
 
@@ -1423,7 +1423,7 @@ class CheckoutController extends Controller
 			DB::commit();
 
 			return view($view, compact('order_details', 'items', 'loggedin', 'store_address', 'bank_accounts', 'shipping_discount', 'voucher_details', 'price_rule'));
-		} catch (Exception $e) {
+		} catch (\Throwable $e) {
 			DB::rollback();
 
 			return view('error');
@@ -1726,6 +1726,7 @@ class CheckoutController extends Controller
 
       	$shipping_services = ShippingService::join('fumaco_shipping_condition as a', 'fumaco_shipping_service.shipping_service_id', 'a.shipping_service_id')
             ->whereIn('a.shipping_service_id', $shipping_services_arr)
+			->whereNotIn('fumaco_shipping_service.shipping_service_name', ['Transportify', 'Lalamove'])
 			->select('shipping_calculation', 'shipping_amount', 'conditional_operator', 'value', 'min_charge_amount', 'max_charge_amount', 'a.shipping_service_id', 'min_leadtime', 'max_leadtime', 'shipping_service_name')->get();
 
         foreach($shipping_services as $row){
@@ -1758,11 +1759,71 @@ class CheckoutController extends Controller
 			if($shipping_cost !== false) {
 				$max_leadtime = DB::table('fumaco_shipping_product_category')
 					->whereIn('category_id', array_column($order_items->toArray(), 'f_cat_id'))
-					->where('shipping_service_id', $row->shipping_service_id)->max('max_leadtime');
+					->where('shipping_service_id', $row->shipping_service_id)
+					// ->max('max_leadtime');
+					->get();
+
+				$max_leadtime = collect($max_leadtime)->map(function ($q) use ($order_items){
+					$order_by_cat = $order_items->groupBy('f_cat_id');
+					$total_qty_per_category = isset($order_by_cat[$q->category_id]) ? collect($order_by_cat[$q->category_id])->sum('qty') : 0;
+
+					$qty = (float)$q->qty;
+					switch ($q->condition) {
+						case '>':
+							$bool = $total_qty_per_category > $qty ? true : false;
+							break;
+						case '>=':
+							$bool = $total_qty_per_category >= $qty ? true : false;
+							break;
+						case '==':
+							$bool = $total_qty_per_category == $qty ? true : false;
+							break;
+						case '<':
+							$bool = $total_qty_per_category < $qty ? true : false;
+							break;
+						case '<=':
+							$bool = $total_qty_per_category <= $qty ? true : false;
+							break;
+						default:
+							$bool = true; // if condition is not set
+							break;
+					}
+					return $bool ? $q->max_leadtime : false;
+				})->filter()->values()->max();
 
 				$min_leadtime = DB::table('fumaco_shipping_product_category')
 					->whereIn('category_id', array_column($order_items->toArray(), 'f_cat_id'))
-					->where('shipping_service_id', $row->shipping_service_id)->max('min_leadtime');
+					->where('shipping_service_id', $row->shipping_service_id)
+					// ->max('min_leadtime');
+					->get();
+
+				$min_leadtime = collect($min_leadtime)->map(function ($q) use ($order_items){
+					$order_by_cat = $order_items->groupBy('f_cat_id');
+					$total_qty_per_category = isset($order_by_cat[$q->category_id]) ? collect($order_by_cat[$q->category_id])->sum('qty') : 0;
+
+					$qty = (float)$q->qty;
+					switch ($q->condition) {
+						case '>':
+							$bool = $total_qty_per_category > $qty ? true : false;
+							break;
+						case '>=':
+							$bool = $total_qty_per_category >= $qty ? true : false;
+							break;
+						case '==':
+							$bool = $total_qty_per_category == $qty ? true : false;
+							break;
+						case '<':
+							$bool = $total_qty_per_category < $qty ? true : false;
+							break;
+						case '<=':
+							$bool = $total_qty_per_category <= $qty ? true : false;
+							break;
+						default:
+							$bool = true; // if condition is not set
+							break;
+					}
+					return $bool ? $q->min_leadtime : false;
+				})->filter()->values()->max();
 
 				$min = ($min_leadtime > 0) ? $min_leadtime : $row->min_leadtime;
 				$max = ($max_leadtime > 0) ? $max_leadtime : $row->max_leadtime;
@@ -1827,6 +1888,8 @@ class CheckoutController extends Controller
 			}
 		}
 
+		$third_party_shipping_services = ShippingService::whereIn('shipping_service_name', ['Transportify', 'Lalamove'])->get()->groupBy('shipping_service_name');
+
 		$transportify_api = DB::table('api_setup')->where('type', 'transportify_api')->where('is_enabled', 1)->first();
 		if ($transportify_api) {
 			$package_total_cubic_m = $total_cubic_cm / 1000000;
@@ -1842,6 +1905,71 @@ class CheckoutController extends Controller
                     "longitude" => (float)$shipping_address_arr['lng'],
                 ]
             ];
+
+			$transportify_details = isset($third_party_shipping_services['Transportify']) ? $third_party_shipping_services['Transportify'] : [];
+
+			$categories_condition = DB::table('fumaco_shipping_product_category')->whereIn('category_id', collect($order_items)->pluck('f_cat_id'))->whereIn('shipping_service_id', collect($transportify_details)->pluck('shipping_service_id'))->get();
+
+			$max_leadtime = collect($categories_condition)->map(function ($q) use ($order_items){
+				$order_by_cat = $order_items->groupBy('f_cat_id');
+				$total_qty_per_category = isset($order_by_cat[$q->category_id]) ? collect($order_by_cat[$q->category_id])->sum('qty') : 0;
+
+				$qty = (float)$q->qty;
+				switch ($q->condition) {
+					case '>':
+						$bool = $total_qty_per_category > $qty ? true : false;
+						break;
+					case '>=':
+						$bool = $total_qty_per_category >= $qty ? true : false;
+						break;
+					case '==':
+						$bool = $total_qty_per_category == $qty ? true : false;
+						break;
+					case '<':
+						$bool = $total_qty_per_category < $qty ? true : false;
+						break;
+					case '<=':
+						$bool = $total_qty_per_category <= $qty ? true : false;
+						break;
+					default:
+						$bool = true; // if condition is not set
+						break;
+				}
+				return $bool ? $q->max_leadtime : false;
+			})->filter()->values()->max();
+
+			$max_leadtime = $max_leadtime ? $max_leadtime : collect($transportify_details)->max('max_leadtime');
+
+			$min_leadtime = collect($categories_condition)->map(function ($q) use ($order_items){
+				$order_by_cat = $order_items->groupBy('f_cat_id');
+				$total_qty_per_category = isset($order_by_cat[$q->category_id]) ? collect($order_by_cat[$q->category_id])->sum('qty') : 0;
+
+				$qty = (float)$q->qty;
+				switch ($q->condition) {
+					case '>':
+						$bool = $total_qty_per_category > $qty ? true : false;
+						break;
+					case '>=':
+						$bool = $total_qty_per_category >= $qty ? true : false;
+						break;
+					case '==':
+						$bool = $total_qty_per_category == $qty ? true : false;
+						break;
+					case '<':
+						$bool = $total_qty_per_category < $qty ? true : false;
+						break;
+					case '<=':
+						$bool = $total_qty_per_category <= $qty ? true : false;
+						break;
+					default:
+						$bool = true; // if condition is not set
+						break;
+				}
+				return $bool ? $q->min_leadtime : false;
+			})->filter()->values()->max();
+
+			$min_leadtime = $min_leadtime ? $min_leadtime : collect($transportify_details)->max('min_leadtime');
+			$expected_delivery_date = $this->delivery_leadtime($min_leadtime, $max_leadtime);
 
 			$api_vehicle_types = Http::withHeaders([
                 'Content-Type' => 'application/json',
@@ -1869,9 +1997,9 @@ class CheckoutController extends Controller
 			if (!is_string($shipping_cost)) {
 				$shipping_offer_rates[] = [
 					'shipping_service_name' => 'Transportify',
-					'expected_delivery_date' => null,
-					'min_lead_time' => 0,
-					'max_lead_time' => 0,
+					'expected_delivery_date' => $expected_delivery_date,
+					'min_lead_time' => $min_leadtime,
+					'max_lead_time' => $max_leadtime,
 					'shipping_cost' => $shipping_cost,
 					'external_carrier' => true,
 					'allow_delivery_after' => 0,

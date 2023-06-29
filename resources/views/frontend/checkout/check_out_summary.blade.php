@@ -316,7 +316,17 @@
 								@endphp
 								<div class="d-flex justify-content-between" style="padding: 0 15px 0 15px;">
 									<div class="form-check">
-										<input class="form-check-input" type="radio" name="shipping_fee" id="{{ 'sr' . $l }}" value="{{ $shipping_cost }}" data-sname="{{ $srate['shipping_service_name'] }}" data-est="{{ $srate['expected_delivery_date'] }}" data-pickup="{{ $srate['pickup'] }}" required {{ $defaul_selected }} data-lead="{{ $srate['max_lead_time'] }}" data-discount-type="{{ $shipping_discount_type }}" data-discount-rate={{ $shipping_discount_rate }} data-capped-amount='{{ $shipping_capped_amount }}' data-discount-name="{{ $shipping_discount_name }}">
+										<input class="form-check-input" type="radio" name="shipping_fee" id="{{ 'sr' . $l }}" value="{{ $shipping_cost }}" 
+										data-sname="{{ $srate['shipping_service_name'] }}" 
+										data-est="{{ $srate['expected_delivery_date'] }}" 
+										data-pickup="{{ $srate['pickup'] }}" 
+										data-external="{{ $srate['external_carrier'] }}" 
+										data-lead="{{ $srate['max_lead_time'] }}" 
+										data-discount-type="{{ $shipping_discount_type }}" 
+										data-discount-rate={{ $shipping_discount_rate }} 
+										data-capped-amount='{{ $shipping_capped_amount }}' 
+										data-discount-name="{{ $shipping_discount_name }}" 
+										required {{ $defaul_selected }}>
 										<label class="form-check-label" for="{{ 'sr' . $l }}">{{ $srate['shipping_service_name'] }} <br class="d-xl-none"/>
 											@if (count($srate['stores']) <= 0 && !$srate['external_carrier'])<small class="fst-italic">({{ $srate['min_lead_time'] . " - ". $srate['max_lead_time'] . " Days" }})</small>@endif</label>
 									</div>
@@ -367,6 +377,24 @@
 											<label for="pickup-timeslot">Pickup Time</label>
 											<select class="form-control no-click-outline" style="text-align: center;" id="pickup-timeslot">
 												<option value="">Please select store</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								@endif
+								@if ($srate['external_carrier'])
+								<div class="row d-none" id="for-external-carriers">
+									<div class="col-md-6 mx-auto bootstrap-timepicker">
+										<div class="form-group">
+											<label for="pickup-time">Delivery Date</label>
+											<input type="text" class="form-control no-click-outline" data-leadtime="{{ $srate['max_lead_time'] }}" id="ex-delivery-date" style="text-align: center;" placeholder="Choose a date">
+										</div>
+									</div>
+									<div class="col-md-6 mx-auto">
+										<div class="form-group">
+											<label for="pickup-timeslot">Delivery Time</label>
+											<select class="form-control no-click-outline" style="text-align: center;" id="ex-delivery-timeslot">
+												<option value="">Please select a delivery date</option>
 											</select>
 										</div>
 									</div>
@@ -1505,8 +1533,13 @@
 			var estimated_del = $("input[name='shipping_fee']:checked").data('est');
 
 			var ispick = $("input[name='shipping_fee']:checked").data('pickup');
-			var picktime = $('#pickup-time').val();
-			var timeslot = $('#pickup-timeslot').val();
+			var external = $("input[name='shipping_fee']:checked").data('external');
+			var picktime = '';
+			var timeslot = '';
+			if(ispick || external){
+				picktime = ispick ? $('#pickup-time').val() : $('#ex-delivery-date').val();
+				timeslot = ispick ? $('#pickup-timeslot').val() : $('#ex-delivery-timeslot').val();
+			}
 			var storeloc = $("#store-selection").val();
 
 			var pay_name = $("input[name='payment_method']:checked").val();
@@ -1524,8 +1557,10 @@
 				$('#alert-box').removeClass('d-none').text('Please select payment method.');
 			} else if(ispick && (!storeloc || !picktime || !timeslot)) {
 				$('#alert-box').removeClass('d-none').text('Please select store and pickup date & time');
+			} else if(external && (!picktime || !timeslot)) {
+				$('#alert-box').removeClass('d-none').text('Please select the delivery date & time');
 			} else {
-				$('#custom-overlay').fadeIn();
+				// $('#custom-overlay').fadeIn();
 
 				$.ajax({
 					url: '/order/save',
@@ -1609,11 +1644,25 @@
 					'required': true,
 					'disabled': true
 				});
+			}else if($("input[name='shipping_fee']:checked").data('external')) {
+				$('#for-external-carriers').removeClass('d-none');
+				$('#store-selection').removeAttr('required');
+				$('#ex-delivery-date').attr({
+					'required': true,
+					'placeholder': 'Please select store'
+				});
+				$('#ex-delivery-timeslot').attr({
+					'required': true,
+					'disabled': true
+				});
 			}else{
 				$('#for-store-pickup').addClass('d-none');
+				$('#for-external-carriers').addClass('d-none');
 				$('#store-selection').removeAttr('required');
 				$('#pickup-time').removeAttr('required');
 				$('#pickup-timeslot').removeAttr('required');
+				$('#ex-delivery-timeslot').removeAttr('required');
+				$('#ex-delivery-date').removeAttr('required');
 				$('#available-time').text('');
 				$('#store-address').text('');
 			}
@@ -2065,6 +2114,40 @@
 				});
 			});
 		});
+
+		if($("#ex-delivery-date")[0]){
+			var leadtime = $("#ex-delivery-date").data('leadtime');
+			var options = [
+				'8:00 AM',
+				'9:00 AM',
+				'10:00 AM',
+				'11:00 AM',
+				'12:00 PM',
+				'1:00 PM',
+				'2:00 PM',
+				'3:00 PM',
+				'4:00 PM',
+				'5:00 PM'
+			];
+
+			$("#ex-delivery-date").datepicker({
+				showInputs: false,
+				startDate: '+'+ (leadtime) +'d',
+				format: 'D, M. dd, yyyy',
+				autoclose: true,
+				daysOfWeekDisabled: [0],
+			}).on('changeDate', function(e) {
+				var opt = '<option value="">Select timeslot</option>';
+				$.each(options, function(i, d){
+					opt += '<option value="' + d + '">' + d + '</option>';
+				});
+
+				$('#ex-delivery-timeslot').attr('disabled', false);
+				$('#ex-delivery-timeslot').empty();
+				$('#ex-delivery-timeslot').append(opt);
+			});
+		}
+		
 
 		$('#store-selection').on('change', function(e){
 			$('#pickup-timeslot').empty();
