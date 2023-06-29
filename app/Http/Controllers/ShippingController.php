@@ -220,6 +220,22 @@ class ShippingController extends Controller
         }
     }
 
+    public function updateStatus($id, $status){
+        DB::beginTransaction();
+        try {
+            ShippingService::where('shipping_service_id', $id)->update([
+                'status' => $status,
+                'updated_at' => Carbon::now()->toDateTimeString(),
+                'last_modified_by' => Auth::user()->username
+            ]);
+            DB::commit();
+            return response()->json(['status' => 1, 'message' => 'Status Updated.']);
+        } catch (\Throwable $th) {
+            DB::rollback();
+            return response()->json(['status' => 0, 'message' => 'An error occured. Please try again.']);
+        }
+    }
+
     public function saveShipping(Request $request) {
         DB::beginTransaction();
         try {
@@ -452,6 +468,7 @@ class ShippingController extends Controller
             $shipping_service->min_charge_amount = $min_charge_amount;
             $shipping_service->max_charge_amount = $max_charge_amount;
             $shipping_service->last_modified_by = Auth::user()->username;
+            $shipping_service->status = $request->status ? 1 : 0;
             $shipping_service->save();
 
             $shipping_zone_rate_id = (!$request->shipping_zone_rate_id) ? [] : $request->shipping_zone_rate_id;

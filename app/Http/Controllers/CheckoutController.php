@@ -1888,10 +1888,11 @@ class CheckoutController extends Controller
 			}
 		}
 
-		$third_party_shipping_services = ShippingService::whereIn('shipping_service_name', ['Transportify', 'Lalamove'])->get()->groupBy('shipping_service_name');
+		$third_party_shipping_services = ShippingService::whereIn('shipping_service_name', ['Transportify', 'Lalamove'])->where('status', 1)->get()->groupBy('shipping_service_name');
 
 		$transportify_api = DB::table('api_setup')->where('type', 'transportify_api')->where('is_enabled', 1)->first();
-		if ($transportify_api) {
+		if ($transportify_api && isset($third_party_shipping_services['Transportify'])) {
+			$transportify_details = $third_party_shipping_services['Transportify'];
 			$package_total_cubic_m = $total_cubic_cm / 1000000;
 			$locations = [
                 [
@@ -1905,8 +1906,6 @@ class CheckoutController extends Controller
                     "longitude" => (float)$shipping_address_arr['lng'],
                 ]
             ];
-
-			$transportify_details = isset($third_party_shipping_services['Transportify']) ? $third_party_shipping_services['Transportify'] : [];
 
 			$categories_condition = DB::table('fumaco_shipping_product_category')->whereIn('category_id', collect($order_items)->pluck('f_cat_id'))->whereIn('shipping_service_id', collect($transportify_details)->pluck('shipping_service_id'))->get();
 

@@ -55,6 +55,9 @@
 												'Transportify'
 											];
 										@endphp
+										<label for="shipping-service-type" class="form-label">
+											<input type="checkbox" name="status" {{ $details->status ? 'checked' : null }}> Enabled
+										</label><br>
 										<label for="shipping-service-type" class="form-label">* Shipping Rules</label>
 										<select name="shipping_service_type" id="shipping-service-type" class="form-control" required>
 											<option value="">-</option>
@@ -559,106 +562,6 @@
 			
 			$(table + ' tbody').append(row);
 		}
-		
-		// $('#add-store-btn').click(function(e){
-		// 	e.preventDefault();
-			
-		// 	add_store_row('#stores-table tbody');
-		// });
-
-		// $('#add-shipping-zone-btn').click(function(e){
-		// 	e.preventDefault();
-
-		// 	add_shipping_zone_rate_row('#shipping-zone-table tbody');
-		// });
-
-		// $('#add-shipping-condition-btn').click(function(e){
-		// 	e.preventDefault();
-
-		// 	add_shipping_condition_row('#shipping-condition-table tbody');
-		// });
-
-		// function add_store_row(table){
-		// 	var clone_select = $('#store-location').html();
-		// 	var row = '<tr>' +
-		// 		'<td class="p-2">' + 
-		// 			'<select name="store[]" class="form-control w-100" style="width: 100%;" required>' + clone_select + '</select>' +
-		// 		'</td>' +
-		// 		'<td class="p-2"">' +
-		// 			'<input type="text" name="allowed_hours[]" class="form-control" placeholder="0.00" required>' +
-		// 		'</td>' +
-		// 		'<td class="text-center">' +
-		// 			'<button class="btn btn-outline-danger btn-sm remove-td-row"><i class="fa fa-trash"></i></button>' +
-		// 		'</td>' +
-		// 	'</tr>';
-
-		// 	$(table).append(row);
-		// }
-			
-		// function add_shipping_zone_rate_row(table){
-		// 	var row = '<tr>' +
-		// 		'<td class="p-2">' + 
-		// 			'<input type="hidden" class="selected-province-text" name="province_text[]">' +
-		// 			'<input type="hidden" class="selected-city-text" name="city_text[]">' +
-		// 			'<select name="province[]" class="form-control province-select w-100" style="width: 100%;" required><option value=""></option></select>' +
-		// 		'</td>' +
-		// 		'<td class="p-2">' +
-		// 			'<select name="city[]" class="form-control city-select w-100" style="width: 100%;" required><option value=""></option></select>' +
-		// 		'</td>' +
-		// 		'<td class="text-center">' +
-		// 			'<button class="btn btn-outline-danger btn-sm remove-td-row"><i class="fa fa-trash"></i></button>' +
-		// 		'</td>' +
-		// 	'</tr>';
-
-		// 	$(table).append(row);
-			
-		// 	var provinces = [];
-		// 	$.getJSON("{{ asset('/json/provinces.json') }}", function(obj){
-		// 		$.each(obj.results, function(e, i) {
-		// 			provinces.push({
-		// 				id: i.provCode,
-		// 				text: i.text
-		// 			});
-		// 		});
-
-		// 		$('.province-select').select2({
-		// 			placeholder: 'Select Province',
-		// 			data: provinces
-		// 		});
-		// 	});
-
-		// 	$('.city-select').select2({
-		// 		placeholder: 'Select City',
-		// 	});
-		// }
-
-		// function add_shipping_condition_row(table){
-		// 	var row = '<tr>' +
-		// 		'<td class="p-2">' +
-		// 			'<input type="text" class="form-control" name="condition[]" value="' + $('#shipping-method').val() + '" readonly required>' +
-		// 		'</td>' +
-		// 		'<td class="p-2">' + 
-		// 			'<select class="form-control" name="conditional_op[]" required>' +
-		// 				'<option value=">">></option>' +
-		// 				'<option value=">=">>=</option>' +
-		// 				'<option value="==">==</option>' +
-		// 				'<option value="<"><</option>' +
-		// 				'<option value="<="><=</option>' +
-		// 				'</select>' +
-		// 		'</td>' +
-		// 		'<td class="p-2">' +
-		// 			'<input type="text" class="form-control" name="value[]" required>' +
-		// 		'</td>' +
-		// 		'<td class="p-2">' +
-		// 			'<input type="text" name="shipping_amount[]" class="form-control" placeholder="0.00" required>' +
-		// 		'</td>' +
-		// 		'<td class="text-center">' +
-		// 			'<button type="button" class="btn btn-outline-danger btn-sm remove-td-row"><i class="fa fa-trash"></i></button>' +
-		// 		'</td>' +
-		// 	'</tr>';
-
-		// 	$(table).append(row);
-		// }
 
 		$(document).on('select2:select', '.province-select', function(e){
 			var data = e.params.data;
