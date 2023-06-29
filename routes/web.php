@@ -355,6 +355,7 @@ Route::prefix('admin')->group(function () {
             Route::post('/shipping/save', 'ShippingController@saveShipping');
             Route::post('/shipping/{id}/update', 'ShippingController@updateShipping');
             Route::get('/shipping/{id}/edit', 'ShippingController@viewShipping');
+            Route::get('/shipping/{id}/update_status/{status}', 'ShippingController@updateStatus');
             Route::delete('/shipping/{id}/delete', 'ShippingController@deleteShipping');
             Route::get('/holiday/list', 'ShippingController@viewHolidays');
             Route::post('/holiday/new', 'ShippingController@addHoliday');
