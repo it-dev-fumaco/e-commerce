@@ -199,18 +199,18 @@
 							<div class="row">
 								<div class="col-md-6">
 									<label for="fname" class="formslabelfnt">First Name : <span class="text-danger">*</span></label>
-									<input type="text" class="form-control formslabelfnt" id="bill_fname" name="bill_fname" value="{{ (old('bill_fname')) ? old('bill_fname') : (Auth::check() ? Auth::user()->f_name : '') }}">
+									<input type="text" class="form-control formslabelfnt required-field" id="bill_fname" name="bill_fname" value="{{ (old('bill_fname')) ? old('bill_fname') : (Auth::check() ? Auth::user()->f_name : '') }}">
 								</div>
 								<div class="col-md-6">
 									<label for="lname" class="formslabelfnt">Last Name : <span class="text-danger">*</span></label>
-									<input type="text" class="form-control formslabelfnt" id="bill_lname" name="bill_lname" value="{{ (old('bill_lname')) ? old('bill_lname') : (Auth::check() ? Auth::user()->f_lname : '') }}">
+									<input type="text" class="form-control formslabelfnt required-field" id="bill_lname" name="bill_lname" value="{{ (old('bill_lname')) ? old('bill_lname') : (Auth::check() ? Auth::user()->f_lname : '') }}">
 								</div>
 							</div>
 							<br/>
 							<div class="row">
 								<div class="col-md-6">
 									<label for="Address1_1" class="formslabelfnt">Address Line 1 : <span class="text-danger">*</span></label>
-									<input type="text" class="form-control formslabelfnt" id="Address1_1" name="Address1_1" value="{{ old('Address1_1') }}">
+									<input type="text" class="form-control formslabelfnt required-field" id="Address1_1" name="Address1_1" value="{{ old('Address1_1') }}">
 								</div>
 								<div class="col-md-6">
 									<label for="Address2_1" class="formslabelfnt">Address Line 2 : </label>
@@ -222,7 +222,7 @@
 								<div class="col-md-4">
 									<div class="form-group">
 										<label for="province1_1" class="formslabelfnt">Province : <span class="text-danger">*</span></label>
-										<select class="form-control" id="province1_1" name="province1_1" value="{{ old('province1_1') }}">
+										<select class="form-control required-field" id="province1_1" name="province1_1" value="{{ old('province1_1') }}">
 											@foreach ($provinces as $province)
 												<option value="{{ $province['text'] }}" data-code="{{ $province['provCode'] }}">{{ $province['text'] }}</option>	
 											@endforeach
@@ -232,13 +232,13 @@
 								<div class="col-md-4">
 									<div class="form-group">
 										<label for="City_Municipality1_1" class="formslabelfnt">City / Municipality : <span class="text-danger">*</span></label>
-										<select class="form-control formslabelfnt" id="City_Municipality1_1" name="City_Municipality1_1" value="{{ old('City_Municipality1_1') }}"></select>
+										<select class="form-control formslabelfnt required-field" id="City_Municipality1_1" name="City_Municipality1_1" value="{{ old('City_Municipality1_1') }}"></select>
 									</div>
 								</div>
 								<div class="col-md-4">
 									<div class="form-group">
 										<label for="Barangay1_1" class="formslabelfnt">Barangay : <span class="text-danger">*</span></label>
-										<select class="form-control formslabelfnt" id="Barangay1_1" name="Barangay1_1" value="{{ old('Barangay1_1') }}"></select>
+										<select class="form-control formslabelfnt required-field" id="Barangay1_1" name="Barangay1_1" value="{{ old('Barangay1_1') }}"></select>
 									</div>
 								</div>
 							</div>
@@ -246,11 +246,11 @@
 							<div class="row">
 								<div class="col-md-4">
 									<label for="postal1_1" class="formslabelfnt">Postal Code : <span class="text-danger">*</span></label>
-									<input type="text" class="form-control formslabelfnt" id="postal1_1" name="postal1_1" value="{{ old('postal1_1') }}">
+									<input type="text" class="form-control formslabelfnt required-field" id="postal1_1" name="postal1_1" value="{{ old('postal1_1') }}">
 								</div>
 								<div class="col-md-4">{{-- Country Select --}}
 									<label for="country_region1_1" class="formslabelfnt">Country / Region : <span class="text-danger">*</span></label>
-									<select class="form-control formslabelfnt" id="country_region1_1" name="country_region1_1">
+									<select class="form-control formslabelfnt required-field" id="country_region1_1" name="country_region1_1">
 										<option disabled value="">Choose...</option>
 										@foreach ($countries as $country)
 										@php
@@ -266,7 +266,7 @@
 								</div>
 								<div class="col-md-4">
 									<label for="Address_type1_1" class="formslabelfnt">Address Type : <span class="text-danger">*</span></label>
-									<select class="form-control formslabelfnt" id="Address_type1_1" name="Address_type1_1">
+									<select class="form-control formslabelfnt required-field" id="Address_type1_1" name="Address_type1_1">
 										<option value="">Choose...</option>
 										<option value="Business Address" {{ old('ship_Address_type1_1') == 'Business Address' ? 'selected' : '' }}>Business Address</option>
 										<option value="Home Address" {{ old('ship_Address_type1_1') == 'Home Address' ? 'selected' : '' }}>Home Address</option>
@@ -288,16 +288,16 @@
 							<div class="row">
 								<div class="col-md-6">
 									<label for="email1_1" class="formslabelfnt">Email Address : <span class="text-danger">*</span></label>
-									<input type="email" class="form-control formslabelfnt" id="email" name="email" value="{{ (old('email')) ? old('email') : (Auth::check() ? Auth::user()->username : '') }}">
+									<input type="email" class="form-control formslabelfnt required-field" id="email" name="email" value="{{ (old('email')) ? old('email') : (Auth::check() ? Auth::user()->username : '') }}">
 								</div>
 								<div class="col-md-6">
-									<label for="mobilenumber1_1" class="formslabelfnt">Mobile Number : <span class="text-danger">*</span></label>
+									<label for="mobilenumber1_1" class="formslabelfnt required-field">Mobile Number : <span class="text-danger">*</span></label>
 									<div class="row">
 										<div class="col-1 col-md-2 col-xl-1" style="display: flex; align-items: center">
 											+63
 										</div>
 										<div class="col-11 col-md-10 col-xl-11">
-											<input type="text" class="form-control formslabelfnt d-inline" id="mobilenumber1_1" name="mobilenumber1_1" required value="{{ old('mobilenumber1_1') }}"><br class="d-lg-none d-xl-none"/>
+											<input type="text" class="form-control formslabelfnt required-field d-inline" id="mobilenumber1_1" name="mobilenumber1_1" required value="{{ old('mobilenumber1_1') }}"><br class="d-lg-none d-xl-none"/>
 										</div>
 									</div>
 								</div>
@@ -579,6 +579,8 @@
 			var data = e.params.data;
 			var id = $('#ship_province1_1 option:selected').data('code');
 
+			$(this).parent('.form-group').removeClass('is-invalid')
+
 			$('#ship_City_Municipality1_1').empty().trigger('change');
 			$('#ship_Barangay1_1').empty().trigger('change');
 			loadCities(id, '#ship_City_Municipality1_1');
@@ -598,6 +600,8 @@
 			var data = e.params.data;
 			var id = data.code;
 
+			$(this).parent('.form-group').removeClass('is-invalid')
+
 			$('#ship_Barangay1_1').empty().trigger('change');
 			$('#ship_Barangay1_1').select2({
 				placeholder: 'Select Barangay',
@@ -613,6 +617,8 @@
 			var data = e.params.data;
 			var id = $('#province1_1 option:selected').data('code');
 
+			$(this).parent('.form-group').removeClass('is-invalid')
+
 			$('#City_Municipality1_1').empty().trigger('change');
 			$('#Barangay1_1').empty().trigger('change');
 			loadCities(id, '#City_Municipality1_1');
@@ -621,6 +627,8 @@
 		$(document).on('select2:select', '#City_Municipality1_1', function(e){
 			var data = e.params.data;
 			var id = data.code;
+
+			$(this).parent('.form-group').removeClass('is-invalid')
 
 			$('#Barangay1_1').empty().trigger('change');
 			$('#Barangay1_1').select2({
@@ -635,41 +643,76 @@
 		
 		$(document).on('click', '#form-submit', function (e){
 			e.preventDefault();
-			$('#checkout-form').submit();
+			
+			var form = $('#checkout-form');
+			var reportValidity = form[0].reportValidity();
+
+			var s1 = $('#ship_province1_1');
+			var s2 = $('#ship_City_Municipality1_1');
+			var s3 = $('#ship_Barangay1_1');
+
+			s1.parent('.form-group').removeClass('is-invalid');
+			if (!s1.val()) {
+				s1.parents('.form-group').addClass('is-invalid');
+				return false;
+			}
+			s2.parent('.form-group').removeClass('is-invalid');
+			if (!s2.val()) {
+				s2.parents('.form-group').addClass('is-invalid');
+				return false;
+			}
+			s3.parent('.form-group').removeClass('is-invalid');
+			if (!s3.val()) {
+				s3.parents('.form-group').addClass('is-invalid');
+				return false;
+			}
+
+			if ($('input[type="checkbox"]').prop("checked") == false) {
+				var s4 = $('#province1_1');
+				var s5 = $('#City_Municipality1_1');
+				var s6 = $('#Barangay1_1');
+
+				s4.parent('.form-group').removeClass('is-invalid');
+				if (!s4.val()) {
+					s4.parents('.form-group').addClass('is-invalid');
+					return false;
+				}
+				s5.parent('.form-group').removeClass('is-invalid');
+				if (!s5.val()) {
+					s5.parents('.form-group').addClass('is-invalid');
+					return false;
+				}
+				s6.parent('.form-group').removeClass('is-invalid');
+				if (!s6.val()) {
+					s6.parents('.form-group').addClass('is-invalid');
+					return false;
+				}
+			}
+
+			if(reportValidity){
+				$('#checkout-form').submit();
+			}
 		});
+
+		same_billing_and_shipping_address()
 
 		$('#ship_City_Municipality1_1').val(null).trigger('change');
 		$('#ship_Barangay1_1').val(null).trigger('change');
 
-		$('input[type="checkbox"]').click(function() {
-			if($(this).prop("checked") == false) {
+		function same_billing_and_shipping_address(){
+			if($('input[type="checkbox"]').prop("checked") == false) {
 				$('#billAddress').slideDown();
-				$("#Address1_1").prop('required',true);
-				$("#email").prop('required',true);
-				$("#postal1_1").prop('required',true);
-				$("#country_region1_1").prop('required',true);
-				$("#Address_type1_1").prop('required',true);
-				$("#email").prop('required',true);
-				$("#mobilenumber1_1").prop('required',true);
-				$("#bill_fname").prop('required',true);
-				$("#bill_lname").prop('required',true);
+				$('#billAddress .required-field').prop('required', true)
 			}else{
 				$('#billAddress').slideUp();
-				$("#Address1_1").prop('required',false);
-				$("#email").prop('required',false);
-				$("#province1_1").prop('required',false);
-				$("#City_Municipality1_1").prop('required',false);
-				$("#Barangay1_1").prop('required',false);
-				$("#postal1_1").prop('required',false);
-				$("#country_region1_1").prop('required',false);
-				$("#Address_type1_1").prop('required',false);
-				$("#email").prop('required',false);
-				$("#mobilenumber1_1").prop('required',false);
-				$("#bill_fname").prop('required',false);
-				$("#bill_lname").prop('required',false);
+				$('#billAddress .required-field').prop('required', false)
 			}
 
 			toggleBillBusinessName($('#Address_type1_1').val());
+		}
+
+		$('input[type="checkbox"]').click(function() {
+			same_billing_and_shipping_address()
 		});
 
 		$('#Address_type1_1').change(function(){
@@ -709,60 +752,12 @@
 		$('#checkout-form').submit(function(e){
 			e.preventDefault();
 
-			var s1 = $('#ship_province1_1');
-			var s2 = $('#ship_City_Municipality1_1');
-			var s3 = $('#ship_Barangay1_1');
-
-			s1.parent('.form-group').removeClass('is-invalid');
-			if (s1.val() === '') {
-				s1.parents('.form-group').addClass('is-invalid');
-				e.preventDefault();
-				return false;
-			}
-			s2.parent('.form-group').removeClass('is-invalid');
-			if (s2.val() === '') {
-				s2.parents('.form-group').addClass('is-invalid');
-				e.preventDefault();
-				return false;
-			}
-			s3.parent('.form-group').removeClass('is-invalid');
-			if (s3.val() === '') {
-				s3.parents('.form-group').addClass('is-invalid');
-				e.preventDefault();
-				return false;
-			}
-
-			if ($('input[type="checkbox"]').prop("checked") == false) {
-				var s4 = $('#province1_1');
-				var s5 = $('#City_Municipality1_1');
-				var s6 = $('#Barangay1_1');
-
-				s4.parent('.form-group').removeClass('is-invalid');
-				if (s4.val() === '') {
-					s4.parents('.form-group').addClass('is-invalid');
-					e.preventDefault();
-					return false;
-				}
-				s5.parent('.form-group').removeClass('is-invalid');
-				if (s5.val() === '') {
-					s5.parents('.form-group').addClass('is-invalid');
-					e.preventDefault();
-					return false;
-				}
-				s6.parent('.form-group').removeClass('is-invalid');
-				if (s6.val() === '') {
-					s6.parents('.form-group').addClass('is-invalid');
-					e.preventDefault();
-					return false;
-				}
-			}
-
 			$('#custom-overlay').fadeIn();
 			$.ajax({
 				type:"POST",
 				url: $(this).attr('action'),
 				data: $(this).serialize(),
-				success:function(response){
+				success:(response) => {
 					if (response.status == 'error'){
 						$('#alert-message').removeClass('d-none').html(response.message);
 						$('#custom-overlay').fadeOut();

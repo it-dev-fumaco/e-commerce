@@ -128,7 +128,7 @@ Route::group(['middleware' => ['sanitation', 'throttle:global']], function(){
     Route::get('/countcartitems', 'CartController@countCartItems');
     Route::get('/countwishlist', 'CartController@countWishlist');
     Route::get('/setdetails', 'CartController@setShippingBillingDetails');
-    Route::post('/setdetails', 'CartController@setShippingBillingDetails');
+    Route::post('/setdetails', 'CartController@setGuestShippingBillingDetails');
     // CHECKOUT ROUTES
     Route::get('/checkout/review_order', 'CheckoutController@reviewOrder');
     Route::get('/checkout/billing/{item_code_buy?}/{qty_buy?}', 'CheckoutController@billingForm');

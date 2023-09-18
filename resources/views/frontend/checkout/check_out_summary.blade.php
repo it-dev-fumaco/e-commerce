@@ -25,7 +25,7 @@
 		$shipping_address1 = ucwords(strtolower($shipping_details['address_line1']));
 		$shipping_address2 = ucwords(strtolower($shipping_details['address_line2']));
 		$shipping_province = ucwords(strtolower($shipping_details['province']));
-		$shipping_city = ucwords(strtolower($shipping_details['city']));
+		$shipping_city = ucwords(utf8_encode(strtolower($shipping_details['city'])));
 		$shipping_brgy = ucwords(strtolower($shipping_details['brgy']));
 		$shipping_postal = $shipping_details['postal_code'];
 		$shipping_country = ucwords(strtolower($shipping_details['country']));

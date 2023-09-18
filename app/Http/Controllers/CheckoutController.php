@@ -245,7 +245,7 @@ class CheckoutController extends Controller
 			
 		}catch(Exception $e){
 			DB::rollback();
-			return redirect()->back()->with('error', 'An error occured. Please try again.');
+			return response()->json(['status' => 0, 'message' => 'An error occured. Please try again']);
 		}	
 	}
 
@@ -507,7 +507,6 @@ class CheckoutController extends Controller
 					];
 				}
 			}
-			
 			DB::table('fumaco_order_items')->insert($order_cart);
 
 			$shipping_rates = $this->getShippingRates();
@@ -605,7 +604,24 @@ class CheckoutController extends Controller
 
 			$is_on_payment_page = DB::table('fumaco_temp')->where('order_tracker_code', $order_no)->where('last_transaction_page', 'Payment Page')->exists();
 			if (!$is_on_payment_page) {
-				DB::table('fumaco_temp')->where('order_tracker_code', $order_no)->update(['last_transaction_page' => 'Checkout Page']);
+				$temp_details = ['last_transaction_page' => 'Checkout Page'];
+				if($shipping_details){
+					$temp_details = collect($temp_details)->merge([
+						'xshippadd1' => $shipping_details['address_line1'],
+						'xshippadd2' => $shipping_details['address_line2'],
+						'xshiprov' => $shipping_details['province'],
+						'xshipcity' => $shipping_details['city'],
+						'xshipbrgy' => $shipping_details['brgy'],
+						'xshippostalcode' => $shipping_details['postal_code'],
+						'xshipcountry' => $shipping_details['country'],
+						'xshiptype' => $shipping_details['address_type'],
+						'xdateupdate' => Carbon::now()->toDateTimeString(),
+						'xemail_shipping' => $shipping_details['email_address'],
+						'shipping_same_as_billing' => $shipping_details['same_as_billing']
+					])->toArray();
+				}
+
+				DB::table('fumaco_temp')->where('order_tracker_code', $order_no)->update($temp_details);
 			}
 
 			$shipping_zones = DB::table('fumaco_shipping_zone_rate')->distinct()->pluck('province_name')->toArray();
@@ -1404,7 +1420,7 @@ class CheckoutController extends Controller
 					]);
 				}
 			}
-			
+
 			// send email to fumaco staff
 			$email_recipient = DB::table('email_config')->first();
 			$email_recipient = ($email_recipient) ? explode(",", $email_recipient->email_recipients) : [];
@@ -1642,6 +1658,7 @@ class CheckoutController extends Controller
             ];
         }
 
+		$address = utf8_encode($address);
 		$intersect_array_counts = [];
 		$address = utf8_encode($address);
        	$shipping_address_arr = $this->getAddressDetails($address);
