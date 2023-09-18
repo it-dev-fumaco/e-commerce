@@ -1643,6 +1643,7 @@ class CheckoutController extends Controller
         }
 
 		$intersect_array_counts = [];
+		$address = utf8_encode($address);
        	$shipping_address_arr = $this->getAddressDetails($address);
 
         // get shipping zone based on selected address
