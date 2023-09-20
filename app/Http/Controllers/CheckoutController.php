@@ -336,7 +336,23 @@ class CheckoutController extends Controller
 				$cart_items = DB::table('fumaco_items as a')->join('fumaco_cart as b', 'a.f_idcode', 'b.item_code')
 					->where('user_type', 'member')->where('user_email', Auth::user()->username)
 					->select('f_idcode', 'f_default_price', 'b.qty', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_stock_uom', 'slug', 'f_name_name', 'f_item_name', 'f_qty', 'f_reserved_qty', 'f_item_type')->get();
+
+				$has_address = DB::table('fumaco_user_add')->where('user_idx', Auth::user()->id)->where('address_class','Delivery')->exists();
+
+				if(!$has_address){
+					return redirect('/checkout/billing');
+				}
 			}else{
+				$temp_data = DB::table('fumaco_temp')->where('order_tracker_code', $order_no)->first();
+				if(!$temp_data){
+					return redirect('/cart');
+				}
+
+				$has_address = collect([$temp_data->xfname, $temp_data->xlname, $temp_data->xadd1, $temp_data->xadd2, $temp_data->xprov, $temp_data->xcity, $temp_data->xbrgy, $temp_data->xpostal, $temp_data->xcountry, $temp_data->xaddresstype])->filter()->count();
+				if(!$has_address){
+					return redirect('/checkout/billing');
+				}
+
 				$cart_items = DB::table('fumaco_items as a')->join('fumaco_cart as b', 'a.f_idcode', 'b.item_code')
 					->where('user_type', 'guest')->where('transaction_id', $order_no)
 					->select('f_idcode', 'f_default_price', 'b.qty', 'f_new_item', 'f_new_item_start', 'f_new_item_end', 'f_cat_id', 'f_stock_uom', 'slug', 'f_name_name', 'f_item_name', 'f_qty', 'f_reserved_qty', 'f_item_type')->get();
