@@ -200,21 +200,9 @@
   
   
     @if(in_array($activePage, ['contact', 'signup']))
-    <script>
-      const activePage = '{{ $activePage }}'
-      if(activePage == 'contact'){
-        function enableSubmit(response){
-          $('#submitBtn').removeClass('disabled-btn').prop('disabled', false)
-        }
-    
-        function disableSubmit(response){
-          $('#submitBtn').addClass('disabled-btn').prop('disabled', true)
-        }
-      }
-    </script>
       {!! ReCaptcha::htmlScriptTagJsApi([
-        'callback_then' => 'enableSubmit',
-        'callback_catch' => 'disableSubmit'
+        'callback_then' => 'captchaSuccess',
+        'callback_catch' => 'captchaFail'
       ]) !!}
     @endif
   </head>

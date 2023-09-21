@@ -172,12 +172,12 @@
         }
     }
 
-    function enableSubmit(response){ // CAPTCHA RESPONSE
+    function captchaSuccess(response){
         captcha_error = 0
         validateSubmit();
     }
 
-    function disableSubmit(response){ // CAPTCHA RESPONSE
+    function captchaFail(response){
         captcha_error = 1
         validateSubmit();
     }
