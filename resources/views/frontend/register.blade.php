@@ -116,7 +116,7 @@
 @endsection
 
 @section('script')
-<script>
+<script type="text/javascript">
     var terms_error = 1;
     var input_error = 1;
     var captcha_error = 1;

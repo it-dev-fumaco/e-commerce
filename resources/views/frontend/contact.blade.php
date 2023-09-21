@@ -166,7 +166,7 @@
 @endsection
 
 @section('script')
-  <script>
+  <script type="text/javascript">
     function captchaSuccess(response){
       $('#submitBtn').removeClass('disabled-btn').prop('disabled', false)
     }
