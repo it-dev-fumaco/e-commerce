@@ -164,3 +164,13 @@
     }
   </style>
 @endsection
+
+<script>
+  function captchaSuccess(response){
+    $('#submitBtn').removeClass('disabled-btn').prop('disabled', false)
+  }
+
+  function captchaFail(response){
+    $('#submitBtn').addClass('disabled-btn').prop('disabled', true)
+  }
+</script>
