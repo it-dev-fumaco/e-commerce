@@ -202,11 +202,11 @@
     @if($activePage == 'contact')
     <script>
       function enableSubmit(response){
-        $('#submitBtn').removeClass('disabled-btn').attr('disabled', false)
+        $('#submitBtn').removeClass('disabled-btn').prop('disabled', false)
       }
   
       function disableSubmit(response){
-        $('#submitBtn').addClass('disabled-btn').attr('disabled', true)
+        $('#submitBtn').addClass('disabled-btn').prop('disabled', true)
       }
     </script>
       {!! ReCaptcha::htmlScriptTagJsApi([
