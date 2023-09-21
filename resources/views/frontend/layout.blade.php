@@ -199,14 +199,17 @@
 
   
   
-    @if($activePage == 'contact')
+    @if(in_array($activePage, ['contact', 'signup']))
     <script>
-      function enableSubmit(response){
-        $('#submitBtn').removeClass('disabled-btn').prop('disabled', false)
-      }
-  
-      function disableSubmit(response){
-        $('#submitBtn').addClass('disabled-btn').prop('disabled', true)
+      const activePage = '{{ $activePage }}'
+      if(activePage == 'contact'){
+        function enableSubmit(response){
+          $('#submitBtn').removeClass('disabled-btn').prop('disabled', false)
+        }
+    
+        function disableSubmit(response){
+          $('#submitBtn').addClass('disabled-btn').prop('disabled', true)
+        }
       }
     </script>
       {!! ReCaptcha::htmlScriptTagJsApi([

@@ -39,7 +39,7 @@
                         <br>
                         <center>
                             <div class="col-lg-7" style="text-align: left;">
-                                <input type="hidden" name="g-recaptcha-response" id="recaptcha_v3">
+                                {{-- <input type="hidden" name="g-recaptcha-response" id="recaptcha_v3"> --}}
                                 <div class="row">
                                     <label for="mobile_1" class="myprofile-font-form login_1">First Name : <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control caption_1" id="fname" name="first_name" value="{{ old('first_name') }}" required>
@@ -73,7 +73,11 @@
                                 <div class="row">
                                     <p style="font-size: 9pt; display: inline-block"><input type="checkbox" name="subscribe"> &nbsp;Yes, I want to receive email updates and notifications.</p>
                                     <p class="reg_link" style=""><input type="checkbox" id="terms_checkbox"> I agree to <a href="/pages/privacy_policy" style="display: inline-block !important;">Privacy Policy</a> and <a href="/pages/terms_condition" style="display: inline-block !important;">Terms</a>.</p>
-                                    <input type="submit" id="reg_btn" class="btn btn-primary" value="REGISTER" disabled><br/>
+                                    <center>
+                                        {!! htmlFormSnippet() !!}
+                                        <br>
+                                    </center>
+                                    <input type="submit" id="submitBtn" class="btn btn-primary" value="REGISTER" disabled><br/>
                                 </div>
                             </div>
                         </center>
@@ -112,21 +116,12 @@
 @endsection
 
 @section('script')
-<script src="https://www.google.com/recaptcha/api.js?render={{ config('recaptcha.api_site_key') }}"></script>
-<script> 
-  grecaptcha.ready(function() {
-    grecaptcha.execute("{{ config('recaptcha.api_site_key') }}", {action: 'homepage'}).then(function(token) {
-      if(token) {
-        $("#recaptcha_v3").val(token); 
-      } 
-    });
-  });
-</script> 
 <script>
-    var pass_length_error = 0;
-    var pass_confirm_error = 0;
-    var terms_error = 0;
-    var input_error = 0;
+    var terms_error = 1;
+    var input_error = 1;
+    var captcha_error = 1;
+    var pass_length_error = 1;
+    var pass_confirm_error = 1;
 
     function passwordLengthCheck(){
         if(parseInt($('#password').val().length) > 0 && parseInt($('#password').val().length) < 6){
@@ -161,43 +156,42 @@
     }
 
     function termsCheck(){
-        if($('#terms_checkbox').prop("checked") == false) {
-            terms_error = 1;
+        terms_error = $('#terms_checkbox').is(':checked') ? 0 : 1
+    }
+
+    function validateSubmit(){
+        checkPasswordIfEmpty();
+        passwordLengthCheck();
+        confirmPasswordCheck();
+        termsCheck();
+
+        if(pass_confirm_error === 0 && pass_length_error === 0 && terms_error === 0  && input_error === 0 && captcha_error === 0){
+            $("#submitBtn").prop('disabled',false);
         }else{
-            terms_error = 0;
+            $("#submitBtn").prop('disabled',true);
         }
     }
 
-    function enableSubmit(){
-        if(pass_confirm_error === 0 && pass_length_error === 0 && terms_error === 0  && input_error === 0){
-            $("#reg_btn").prop('disabled',false);
-        }else{
-            $("#reg_btn").prop('disabled',true);
-        }
+    function enableSubmit(response){ // CAPTCHA RESPONSE
+        captcha_error = 0
+        validateSubmit();
+    }
+
+    function disableSubmit(response){ // CAPTCHA RESPONSE
+        captcha_error = 1
+        validateSubmit();
     }
 
     $('#password').keyup(function(){
-        checkPasswordIfEmpty();
-        passwordLengthCheck();
-        confirmPasswordCheck();
-        termsCheck();
-        enableSubmit();
+        validateSubmit();
     });
 
     $('#confirm_password').keyup(function(){
-        checkPasswordIfEmpty();
-        confirmPasswordCheck();
-        passwordLengthCheck();
-        termsCheck();
-        enableSubmit();
+        validateSubmit();
     });
 
     $('#terms_checkbox').click(function() {
-        checkPasswordIfEmpty();
-        confirmPasswordCheck();
-        passwordLengthCheck();
-        termsCheck();
-        enableSubmit();
+        validateSubmit();
     });
 
     function toggleResetPswd(e){
