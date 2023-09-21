@@ -200,7 +200,19 @@
   
   
     @if($activePage == 'contact')
-      {!! ReCaptcha::htmlScriptTagJsApi() !!}
+    <script>
+      function enableSubmit(response){
+        $('#submitBtn').removeClass('disabled-btn').attr('disabled', false)
+      }
+  
+      function disableSubmit(response){
+        $('#submitBtn').addClass('disabled-btn').attr('disabled', true)
+      }
+    </script>
+      {!! ReCaptcha::htmlScriptTagJsApi([
+        'callback_then' => 'enableSubmit',
+        'callback_catch' => 'disableSubmit'
+      ]) !!}
     @endif
   </head>
   <body>

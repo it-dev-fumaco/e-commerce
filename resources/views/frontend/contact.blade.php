@@ -146,9 +146,9 @@
           </div>
         </div>
         <br>
-        <input type="hidden" name="g-recaptcha-response" id="recaptcha_v3">
-       <center>
-          <button type="submit" class="btn btn-primary mt-3 fumacoFont_btn animated animatedFadeInUp fadeInUp" id="submitBtn">Submit</button>
+        {!! htmlFormSnippet() !!}
+        <center>
+          <button type="submit" class="btn btn-primary mt-3 fumacoFont_btn animated animatedFadeInUp fadeInUp disabled-btn" id="submitBtn" disabled>Submit</button>
         </center>
       </form>
       &nbsp;<br>&nbsp;<br>
@@ -157,15 +157,10 @@
 </main>
 @endsection
 
-@section('script')
-<script src="https://www.google.com/recaptcha/api.js?render={{ config('recaptcha.api_site_key') }}"></script>
-<script> 
-  grecaptcha.ready(function() {
-    grecaptcha.execute("{{ config('recaptcha.api_site_key') }}", {action: 'homepage'}).then(function(token) {
-      if(token) {
-        $("#recaptcha_v3").val(token); 
-      } 
-    });
-  });
-</script> 
+@section('style')
+  <style>
+    .disabled-btn{
+      opacity: .5 !important;
+    }
+  </style>
 @endsection
