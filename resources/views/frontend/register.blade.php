@@ -55,6 +55,11 @@
                                     <input type="email" name="username" id="username" class="form-control caption_1" value="{{ old('username') }}" required>
                                     <span class="help-block"></span>
                                 </div>
+                                <div class="row required-field">
+                                    <label class="login_1">Email address <span class="text-danger">*</span></label>
+                                    <input type="email" name="secondary_email" class="form-control caption_1">
+                                    <span class="help-block"></span>
+                                </div>
                                 <br/>
                                 <div class="row">
                                     <label class="login_1">Password <span class="text-danger">*</span></label>
@@ -62,12 +67,22 @@
                                     <span class="help-block"></span>
                                     <span class="password-warning-text d-none">* Password must be at least 6 characters</span>
                                 </div>
+                                <div class="row required-field">
+                                    <label class="login_1">Phone <span class="text-danger">*</span></label>
+                                    <input type="text" name="secondary_phone" class="form-control caption_1">
+                                    <span class="help-block"></span>
+                                </div>
                                 <br/>
                                 <div class="row">
                                     <label class="login_1">Confirm Password <span class="text-danger">*</span></label>
                                     <input type="password" name="password_confirmation" id="confirm_password"  class="form-control caption_1" value="" required>
                                     <span class="help-block"></span>
                                     <span class="confirm-password-warning-text d-none">* Passwords do not match</span>
+                                </div>
+                                <div class="row required-field">
+                                    <label class="login_1">Additional Notes <span class="text-danger">*</span></label>
+                                    <input type="text" name="additional_notes" class="form-control caption_1">
+                                    <span class="help-block"></span>
                                 </div>
                                 <br>
                                 <div class="row">
@@ -214,11 +229,14 @@
         $('#logreg-forms #cancel_signup').click(toggleSignUp);
     })
 
-	</script>
+</script>
 @endsection
 
 @section('style')
 <style>
+    .required-field{
+        display: none;
+    }
     .password-warning{
         border: 1px solid #FF0000;
     }
@@ -399,5 +417,5 @@
         font-size: 16px !important;
         color: red !important;
     }
-    </style>
+</style>
 @endsection

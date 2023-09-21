@@ -1106,6 +1106,12 @@ class FrontendController extends Controller
     public function userRegistration(Request $request){
         DB::beginTransaction();
         try{
+            $isBot = $this->botChecker($request->all());
+
+            if($isBot){
+                return redirect()->back()->with('error', 'Something went wrong.');
+            }
+
             $request->validate([
                 'first_name' => 'required',
                 'last_name' => 'required',
@@ -1387,9 +1393,20 @@ class FrontendController extends Controller
         return view('frontend.contact', compact('fumaco_contact', 'fumaco_map', 'image_for_sharing', 'contact_info'));
     }
 
+    private function botChecker($data){
+        $validate = [$data['secondary_email'], $data['secondary_phone'], $data['additional_notes']];
+        return array_filter($validate) ? true : false;
+    }
+
     public function addContact(Request $request){
         DB::beginTransaction();
         try{
+            $isBot = $this->botChecker($request->all());
+
+            if($isBot){
+                return redirect()->back()->with('error', 'Something went wrong.');
+            }
+
             $request->validate([
                 'name' => ['required', 'string', 'max:255'],
                 'email' => ['required', 'string', 'email', 'max:255'],

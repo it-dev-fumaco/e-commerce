@@ -129,14 +129,25 @@
             <input type="email" class="form-control caption_1" placeholder="Email *" name="email" value="{{ old('email') }}" required>
             <br>
           </div>
+          <div class="col-lg-4 animated animatedFadeInUp fadeInUp required-field">
+            <input type="text" class="form-control caption_1" placeholder="Secondary Email" name="secondary_email">
+            <br>
+          </div>
           <div class="col-lg-4 animated animatedFadeInUp fadeInUp">
             <input type="text" class="form-control caption_1" placeholder="Phone" name="phone" value="{{ old('phone') }}" required>
+            <br>
+          </div>
+          <div class="col-lg-4 animated animatedFadeInUp fadeInUp required-field">
+            <input type="text" class="form-control caption_1" placeholder="Secondary Phone" name="secondary_phone">
             <br>
           </div>
         </div>
         <div class="row animated animatedFadeInUp fadeInUp">
           <div class="col">
             <input type="text" class="form-control caption_1" placeholder="Subject" name="subject" value="{{ old('subject') }}" required>
+          </div>
+          <div class="col required-field">
+            <input type="text" class="form-control caption_1" placeholder="Additional Notes" name="additional_notes">
           </div>
         </div>
         <br>
@@ -161,6 +172,9 @@
   <style>
     .disabled-btn{
       opacity: .5 !important;
+    }
+    .required-field{
+      display: none;
     }
   </style>
 @endsection
