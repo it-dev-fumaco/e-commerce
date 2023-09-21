@@ -1185,6 +1185,7 @@ class FrontendController extends Controller
             return redirect('/myprofile/verify/email')->with('email', $request->username);
         }catch(Exception $e){
             DB::rollback();
+            throw $e;
             return redirect()->back()->with('error', 'An error occured. Please try again.');
         }
     }
