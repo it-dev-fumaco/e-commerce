@@ -55,18 +55,18 @@ class LoginController extends Controller
 
             $phone = $checker->mobile_number[0] == '0' ? '63'.substr($checker->mobile_number, 1) : $checker->mobile_number;
 
-            // $sms = Http::asForm()->withHeaders([
-            //     'Accept' => 'application/json',
-            //     'Content-Type' => 'application/x-www-form-urlencoded',
-            // ])->post($api->base_url, [
-            //     'api_key' => $api->api_key,
-            //     'api_secret' => $api->api_secret_key,
-            //     'from' => 'FUMACO',
-            //     'to' => preg_replace("/[^0-9]/", "", $phone),
-            //     'text' => 'TWO-FACTOR AUTHENTICATION: Your One-Time PIN is '.$otp.' to login in Fumaco Website Admin Page, valid only within 10 mins. For any help, please contact us at it@fumaco.com'
-            // ]);
+            $sms = Http::asForm()->withHeaders([
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/x-www-form-urlencoded',
+            ])->post($api->base_url, [
+                'api_key' => $api->api_key,
+                'api_secret' => $api->api_secret_key,
+                'from' => 'FUMACO',
+                'to' => preg_replace("/[^0-9]/", "", $phone),
+                'text' => 'TWO-FACTOR AUTHENTICATION: Your One-Time PIN is '.$otp.' to login in Fumaco Website Admin Page, valid only within 10 mins. For any help, please contact us at it@fumaco.com'
+            ]);
 
-            // $sms_response = json_decode($sms, true);
+            $sms_response = json_decode($sms, true);
 
             $sms = $sms_response = [];
 
