@@ -117,7 +117,7 @@
                             $('.resend').removeClass('text-secondary').addClass('text-primary');
                             $('#countdown').addClass('d-none');
                             localStorage['resend'] = 0;
-                            localStorage['time'] = 1 * 60
+                            localStorage['time'] = 10 * 60
                         }
                     }, 1000);
                 }
