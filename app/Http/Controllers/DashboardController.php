@@ -22,7 +22,7 @@ class DashboardController extends Controller
 	}
 
 	public function resendOTP(Request $request){
-		$otp = rand(111111, 999999);
+		$otp = rand(11111, 99999);
 		$api = DB::table('api_setup')->where('type', 'sms_gateway_api')->first();
 		$phone = Auth::user()->mobile_number[0] == '0' ? '63'.substr(Auth::user()->mobile_number, 1) : Auth::user()->mobile_number;
 

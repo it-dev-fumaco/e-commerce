@@ -100,17 +100,49 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
         <script>
             $(document).ready(function(){
+                const resendTimer = (duration, display) => {
+                    var timer = duration, minutes, seconds;
+                    setInterval(() => {
+                        minutes = parseInt(timer / 60, 10)
+                        seconds = parseInt(timer % 60, 10);
+                        localStorage['time'] = (minutes > 0 ? (minutes * 60) : 0) + seconds
+
+                        minutes = minutes < 10 ? "0" + minutes : minutes;
+                        seconds = seconds < 10 ? "0" + seconds : seconds;
+
+                        display.textContent = '(' + minutes + ":" + seconds + ')';
+
+                        if (--timer < 0) {
+                            timer = duration;
+                            $('.resend').removeClass('text-secondary').addClass('text-primary');
+                            $('#countdown').addClass('d-none');
+                            localStorage['resend'] = 0;
+                            localStorage['time'] = 1 * 60
+                        }
+                    }, 1000);
+                }
+
+                if('resend' in localStorage && localStorage['resend'] > 0){
+                    $('#countdown').removeClass('d-none');
+                    $('.resend').addClass('text-secondary').removeClass('text-primary');
+                    resendTimer(localStorage['time'], document.querySelector('#countdown'))
+                }
+
                 $('.resend').click(function(){
                     var channel = $(this).data('channel');
                     var btn = $(this);
                     if(channel == 'sms'){
                         $(this).removeClass('text-primary').addClass('text-secondary');
-                        $(this).prop('disabled', true);
                         $('#countdown').removeClass('d-none');
                         $('#resend-error').addClass('d-none');
                     }else{
                         $('.email-text').addClass('d-none');
                         $('.spinner').removeClass('d-none');
+                    }
+
+                    var sms_sent = 'resend' in localStorage ? localStorage['resend'] : 0;
+                    if(channel == 'sms' && sms_sent > 0){
+                        return false;
                     }
 
                     $.ajax({
@@ -119,28 +151,9 @@
                         success:function(response){
                             if(response.status == 1){
                                 if (channel == 'sms') {
-                                    // var timer2 = "00:03";
-                                    var timer2 = "10:01";
-                                    var interval = setInterval(function() {
-                                        var timer = timer2.split(':');
-                                        //by parsing integer, I avoid all extra string processing
-                                        var minutes = parseInt(timer[0], 10);
-                                        var seconds = parseInt(timer[1], 10);
-                                        --seconds;
-                                        minutes = (seconds < 0) ? --minutes : minutes;
-                                        seconds = (seconds < 0) ? 59 : seconds;
-                                        seconds = (seconds < 10) ? '0' + seconds : seconds;
-                                        $('#countdown').html("("+minutes + ':' + seconds+")");
-                                        if (minutes < 0) clearInterval(interval);
-                                        //check if both minutes and seconds are 0
-                                        if ((seconds <= 0) && (minutes <= 0)){
-                                            clearInterval(interval);
-                                            btn.removeClass('text-secondary').addClass('text-primary');
-                                            btn.prop('disabled', false);
-                                            $('#countdown').addClass('d-none');
-                                        }
-                                        timer2 = minutes + ':' + seconds;
-                                    }, 1000);
+                                    localStorage['resend'] = 1
+                                    $('#countdown').removeClass('d-none');
+                                    resendTimer(1 * 60, document.querySelector('#countdown'))
                                 }
                             }else{
                                 $('#resend-error').addClass('d-none');
@@ -148,6 +161,7 @@
                                     btn.removeClass('text-secondary').addClass('text-primary');
                                     btn.prop('disabled', false);
                                     $('#countdown').addClass('d-none');
+                                    localStorage['resend'] = 0;
                                 }
                             }
                             $('.email-text').removeClass('d-none');
@@ -160,6 +174,7 @@
                                 btn.removeClass('text-secondary').addClass('text-primary');
                                 btn.prop('disabled', false);
                                 $('#countdown').addClass('d-none');
+                                localStorage['resend'] = 0;
                             }else{
                                 $('.email-text').removeClass('d-none');
                                 $('.spinner').addClass('d-none');
