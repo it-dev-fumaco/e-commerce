@@ -68,8 +68,6 @@ class LoginController extends Controller
 
             $sms_response = json_decode($sms, true);
 
-            $sms = $sms_response = [];
-
             if(isset($sms_response['error'])){
                 Auth::guard('admin')->logout();
                 $error = $sms['error']['code'] == 409 ? 'No mobile number not found. ' : 'Mobile number is invalid. ';
