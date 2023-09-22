@@ -1457,6 +1457,11 @@ class FrontendController extends Controller
 
             }
 
+            // check for failures
+            if (Mail::failures()) {
+                return redirect()->back()->with('error', 'An error occured. Please try again.');
+            }
+
             DB::commit();
             
             return redirect()->back()->with('success', 'Thank you for contacting us! We have recieved your message.');
