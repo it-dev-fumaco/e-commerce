@@ -153,7 +153,7 @@
                                 if (channel == 'sms') {
                                     localStorage['resend'] = 1
                                     $('#countdown').removeClass('d-none');
-                                    resendTimer(1 * 60, document.querySelector('#countdown'))
+                                    resendTimer(10 * 60, document.querySelector('#countdown'))
                                 }
                             }else{
                                 $('#resend-error').addClass('d-none');
