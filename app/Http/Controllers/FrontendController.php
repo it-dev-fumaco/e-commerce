@@ -1106,27 +1106,34 @@ class FrontendController extends Controller
     public function userRegistration(Request $request){
         DB::beginTransaction();
         try{
+            $isBot = $this->botChecker($request->all());
+
+            if($isBot){
+                return redirect()->back()->with('error', 'Something went wrong.');
+            }
+
             $request->validate([
                 'first_name' => 'required',
                 'last_name' => 'required',
                 'username' => 'required|email|unique:fumaco_users,username',
                 'password' => 'required|confirmed|min:6',
-                'g-recaptcha-response' => ['required',function ($attribute, $value, $fail) {
-                    $secret_key = config('recaptcha.api_secret_key');
-                    $response = $value;
-                    $userIP = $_SERVER['REMOTE_ADDR'];
-                    $url = "https://www.google.com/recaptcha/api/siteverify?secret=$secret_key&response=$response&remoteip=$userIP";
-                    $response = \file_get_contents($url);
-                    $response = json_decode($response);
-                    if (!$response->success) {
-                        $fail('ReCaptcha failed.');
-                    }
-                }],
+                'g-recaptcha-response' => 'recaptcha',
+                // 'g-recaptcha-response' => ['required',function ($attribute, $value, $fail) {
+                //     $secret_key = config('recaptcha.api_secret_key');
+                //     $response = $value;
+                //     $userIP = $_SERVER['REMOTE_ADDR'];
+                //     $url = "https://www.google.com/recaptcha/api/siteverify?secret=$secret_key&response=$response&remoteip=$userIP";
+                //     $response = \file_get_contents($url);
+                //     $response = json_decode($response);
+                //     if (!$response->success) {
+                //         $fail('ReCaptcha failed.');
+                //     }
+                // }],
             ],
             [
                 'password.confirmed' => 'Password does not match.',
                 'g-recaptcha-response' => [
-                    'required' => 'Please check ReCaptcha.'
+                    'required' => 'ReCaptcha failed.'
                 ],
                 'username.unique' => 'The email address has already been taken.',
             ]);
@@ -1386,30 +1393,31 @@ class FrontendController extends Controller
         return view('frontend.contact', compact('fumaco_contact', 'fumaco_map', 'image_for_sharing', 'contact_info'));
     }
 
+    private function botChecker($data){
+        $validate = [$data['secondary_email'], $data['secondary_phone'], $data['additional_notes']];
+        return array_filter($validate) ? true : false;
+    }
+
     public function addContact(Request $request){
         DB::beginTransaction();
         try{
+            $isBot = $this->botChecker($request->all());
+
+            if($isBot){
+                return redirect()->back()->with('error', 'Something went wrong.');
+            }
+
             $request->validate([
                 'name' => ['required', 'string', 'max:255'],
                 'email' => ['required', 'string', 'email', 'max:255'],
                 'phone' => ['required', 'string', 'max:255'],
                 'subject' => ['required', 'string', 'max:255'],
                 'comment' => ['required', 'string', 'max:255'],
-                'g-recaptcha-response' => ['required',function ($attribute, $value, $fail) {
-                    $secret_key = config('recaptcha.api_secret_key');
-                    $response = $value;
-                    $userIP = $_SERVER['REMOTE_ADDR'];
-                    $url = "https://www.google.com/recaptcha/api/siteverify?secret=$secret_key&response=$response&remoteip=$userIP";
-                    $response = \file_get_contents($url);
-                    $response = json_decode($response);
-                    if (!$response->success) {
-                        $fail('ReCaptcha failed.');
-                    }
-                }],
+                'g-recaptcha-response' => 'recaptcha',
             ],
             [
                 'g-recaptcha-response' => [
-                    'required' => 'Please check ReCaptcha.'
+                    'required' => 'ReCaptcha failed.'
                 ]
             ]);
 
@@ -1453,7 +1461,7 @@ class FrontendController extends Controller
             if (Mail::failures()) {
                 return redirect()->back()->with('error', 'An error occured. Please try again.');
             }
-            
+
             DB::commit();
             
             return redirect()->back()->with('success', 'Thank you for contacting us! We have recieved your message.');

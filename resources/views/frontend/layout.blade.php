@@ -199,8 +199,11 @@
 
   
   
-    @if($activePage == 'contact')
-      {!! ReCaptcha::htmlScriptTagJsApi() !!}
+    @if(in_array($activePage, ['contact', 'signup']))
+      {!! ReCaptcha::htmlScriptTagJsApi([
+        'callback_then' => 'captchaSuccess',
+        'callback_catch' => 'captchaFail'
+      ]) !!}
     @endif
   </head>
   <body>

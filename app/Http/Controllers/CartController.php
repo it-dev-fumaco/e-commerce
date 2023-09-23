@@ -588,266 +588,263 @@ class CartController extends Controller
         return 0;
     }
 
+    private function formatPhone($number){
+        $formatted = preg_replace("/[^0-9]/", "", $number);
+        if($formatted[0] == 0){
+            $formatted = '63'.substr($formatted, 1);
+        }else if(substr($formatted, 0, 2) != '63' || $formatted[0] == '9'){
+            $formatted = '63'.$formatted;
+        }
+
+        return $formatted;
+    }
+
+    private function getOrderNumber($data){
+        $order_no = session()->get('fumOrderNo');
+        $existing_order_temp = DB::table('fumaco_temp')->where('order_tracker_code', $order_no)->first();
+        if(!$existing_order_temp){
+            if ($order_no) {
+                $existing_temp = DB::table('fumaco_temp')->where('xlogs', $order_no)->first();
+                if(!$existing_temp) {
+                    $loc = GeoLocation::lookup($data->ip());
+                    DB::table('fumaco_temp')->insert([
+                        'xtempcode' => uniqid(),
+                        'xlogs' => $order_no,
+                        'order_tracker_code' => $order_no,
+                        'order_ip' => $data->ip(),
+                        'ip_city' => $loc->getCity(),
+                        'ip_region' => $loc->getRegion(),
+                        'ip_country' => $loc->getCountry(), 
+                        'xusertype' => Auth::check() ? 'Member' : 'Guest',
+                        'xusernamex' => Auth::check() ? Auth::user()->username : null,
+                        'xuser_id' => Auth::check() ? Auth::user()->id : null,
+                    ]);
+                }
+            }
+        }
+
+        return $order_no;
+    }
+
+    private function saveTempData($data){
+        DB::beginTransaction();
+        try {
+            $shipping_details = $data['shipping_details'];
+            $billing_details = $data['billing_details'];
+            $temp_data = [
+                'xfname' => (Auth::check()) ? Auth::user()->f_name : $shipping_details['fname'],
+                'xlname' => (Auth::check()) ? Auth::user()->f_lname : $shipping_details['lname'],
+                'xcontact_person' => $billing_details['fname']. " " . $billing_details['lname'],
+                'xshipcontact_person' => $shipping_details['fname']. " " . $shipping_details['lname'],
+                'xadd1' => $billing_details['address_line1'],
+                'xadd2' => $billing_details['address_line2'],
+                'xprov' => $billing_details['province'],
+                'xcity' => $billing_details['city'],
+                'xbrgy' => $billing_details['brgy'],
+                'xpostal' => $billing_details['postal_code'],
+                'xcountry' => $billing_details['country'],
+                'xaddresstype' => $billing_details['address_type'],
+                'xbusiness_name' => $billing_details['business_name'],
+                'xtin_no' => $billing_details['tin'],
+                'xemail' => $billing_details['email_address'],
+                'xemail_shipping' => $shipping_details['email_address'],
+                'xmobile' => $billing_details['mobile_no'],
+                'xcontact' => $shipping_details['mobile_no'],
+                'xshippadd1' => $shipping_details['address_line1'],
+                'xshippadd2' => $shipping_details['address_line2'],
+                'xshiprov' => $shipping_details['province'],
+                'xshipcity' => $shipping_details['city'],
+                'xshipbrgy' => $shipping_details['brgy'],
+                'xshippostalcode' => $shipping_details['postal_code'],
+                'xshipcountry' => $shipping_details['country'],
+                'xshiptype' => $shipping_details['address_type'],
+                'xship_business_name' => $shipping_details['business_name'],
+                'xship_tin' => $shipping_details['tin'],
+                'order_status' => 'Order Pending',
+                'order_shipping_type' => null, 
+                'xusertype' => (Auth::check()) ? 'Member' : 'Guest',
+                'xusernamex' => (Auth::check()) ? Auth::user()->username : null,
+                'xstatus' => 2,
+                'xuser_id' => (Auth::check()) ? Auth::user()->id : null,
+                'shipping_same_as_billing' => ($data['same_as_billing']) ? 1 : 0,
+            ];
+
+            DB::table('fumaco_temp')->where('order_tracker_code', $data['order_no'])->update($temp_data);
+            DB::commit();
+            return $temp_data;
+        } catch (\Throwable $th) {
+            //throw th;
+            DB::rollBack();
+            return [];
+        }
+    }
+
+    // /setdetails
     public function setShippingBillingDetails(Request $request) {
         DB::beginTransaction();
         try {
-            $order_no = session()->get('fumOrderNo');
-            $existing_order_temp = DB::table('fumaco_temp')->where('order_tracker_code', $order_no)->first();
-            if(!$existing_order_temp){
-                if ($order_no) {
-                    $existing_temp = DB::table('fumaco_temp')->where('xlogs', $order_no)->first();
-                    if(!$existing_temp) {
-                        $loc = GeoLocation::lookup($request->ip());
-                        DB::table('fumaco_temp')->insert([
-                            'xtempcode' => uniqid(),
-                            'xlogs' => $order_no,
-                            'order_tracker_code' => $order_no,
-                            'order_ip' => $request->ip(),
-                            'ip_city' => $loc->getCity(),
-                            'ip_region' => $loc->getRegion(),
-                            'ip_country' => $loc->getCountry(), 
-                            'xusertype' => Auth::check() ? 'Member' : 'Guest',
-                            'xusernamex' => Auth::check() ? Auth::user()->username : null,
-                            'xuser_id' => Auth::check() ? Auth::user()->id : null,
-                        ]);
-                    }
-                }
+            $order_no = $this->getOrderNumber($request);
+
+            $user_id = Auth::user()->id;
+            // $user = DB::table('fumaco_users')->where('id', $user_id)->first();
+
+            $shipping_address = DB::table('fumaco_user_add')->where('xdefault', 1)
+                ->where('user_idx', $user_id)->where('address_class', 'Delivery')->first();
+
+            if(!$shipping_address){
+                return redirect('/checkout/billing');
             }
 
-            if(Auth::check()) {
-                $user_id = Auth::user()->id;
-                $user = DB::table('fumaco_users')->where('id', $user_id)->first();
+            $mobile = $shipping_address->xmobile_number ? $this->formatPhone($shipping_address->xmobile_number) : null;
+            $contact = $shipping_address->xcontactnumber1 ? $this->formatPhone($shipping_address->xcontactnumber1) : null;
 
-                $shipping_address = DB::table('fumaco_user_add')->where('xdefault', 1)
-                    ->where('user_idx', $user_id)->where('address_class', 'Delivery')->first();
-
-                $mobile = null;
-                if($shipping_address->xmobile_number){
-                    $mobile = preg_replace("/[^0-9]/", "", $shipping_address->xmobile_number);
-                    if($mobile[0] == 0){
-                        $mobile = '63'.substr($mobile, 1);
-                    }else if(substr($mobile, 0, 2) != '63' || $mobile[0] == '9'){
-                        $mobile = '63'.$mobile;
-                    }
-                    // $mobile = $mobile[0] == 0 ? '63'.substr($mobile, 1) : '63'.$mobile;
-                }
-
-                $contact = null;
-                if($shipping_address->xcontactnumber1){
-                    $contact = preg_replace("/[^0-9]/", "", $shipping_address->xcontactnumber1);
-                    // $contact = $contact[0] == 0 ? '63'.substr($contact, 1) : '63'.$contact;
-                    if($contact[0] == 0){
-                        $contact = '63'.substr($contact, 1);
-                    }else if(substr($contact, 0, 2) != '63' || $contact[0] == '9'){
-                        $contact = '63'.$contact;
-                    }
-                }
-
-                $bill_mobile = $mobile;
-                $bill_contact = $contact;
-                
-                $shipping_details = [
-                    'fname' => $shipping_address->xcontactname1,
-                    'lname' => $shipping_address->xcontactlastname1,
-                    'address_line1' => $shipping_address->xadd1,
-                    'address_line2' => $shipping_address->xadd2,
-                    'province' => $shipping_address->xprov,
-                    'city' => $shipping_address->xcity,
-                    'brgy' => $shipping_address->xbrgy,
-                    'postal_code' => $shipping_address->xpostal,
-                    'country' => $shipping_address->xcountry,
-                    'address_type' => $shipping_address->add_type,
-                    'business_name' => $shipping_address->xbusiness_name,
-                    'tin' => $shipping_address->xtin_no,
-                    'email_address' => $shipping_address->xcontactemail1,
-                    'mobile_no' => $mobile,
-                    'contact_no' => $contact,
-                    'same_as_billing' => 0
-                ];
-
-                $billing_address = DB::table('fumaco_user_add')->where('xdefault', 1)
-                    ->where('user_idx', $user_id)->where('address_class', 'Billing')->first();
-                if ($billing_address) {
-                    $bill_mobile = null;
-                    if($billing_address->xmobile_number){
-                        $bill_mobile = preg_replace("/[^0-9]/", "", $billing_address->xmobile_number);
-                        // $bill_mobile = $bill_mobile[0] == 0 ? '63'.substr($bill_mobile, 1) : '63'.$bill_mobile;
-                        if($bill_mobile[0] == 0){
-                            $bill_mobile = '63'.substr($bill_mobile, 1);
-                        }else if(substr($bill_mobile, 0, 2) != '63' || $bill_mobile[0] == '9'){
-                            $bill_mobile = '63'.$bill_mobile;
-                        }
-                    }
-
-                    $bill_contact = null;
-                    if($billing_address->xcontactnumber1){
-                        $bill_contact = preg_replace("/[^0-9]/", "", $billing_address->xcontactnumber1);
-                        // $bill_contact = $bill_contact[0] == 0 ? '63'.substr($bill_contact, 1) : '63'.$bill_contact;
-                        if($bill_contact[0] == 0){
-                            $bill_contact = '63'.substr($bill_contact, 1);
-                        }else if(substr($bill_contact, 0, 2) != '63' || $bill_contact[0] == '9'){
-                            $bill_contact = '63'.$bill_contact;
-                        }
-                    }
-
-                    $billing_details = [
-                        'fname' => $billing_address->xcontactname1,
-                        'lname' => $billing_address->xcontactlastname1,
-                        'address_line1' => $billing_address->xadd1,
-                        'address_line2' => $billing_address->xadd2,
-                        'province' => $billing_address->xprov,
-                        'city' => $billing_address->xcity,
-                        'brgy' => $billing_address->xbrgy,
-                        'postal_code' => $billing_address->xpostal,
-                        'country' => $billing_address->xcountry,
-                        'address_type' => $billing_address->add_type,
-                        'business_name' => $billing_address->xbusiness_name,
-                        'tin' => $billing_address->xtin_no,
-                        'email_address' => $billing_address->xcontactemail1,
-                        'mobile_no' => $bill_mobile,
-                        'contact_no' => $bill_contact,
-                    ];
-                }
-            }
+            $bill_mobile = $mobile;
+            $bill_contact = $contact;
             
-            if($request->isMethod('POST')) {
-                if ($request->ajax()) {
-                    if (!Auth::check()) {
-                        $existing_account = DB::table('fumaco_users')->where('username', $request->ship_email)->exists();
-                        if ($existing_account) {
-                            return response()->json(['status' => 'error', 'message' => 'Email already exists, please <a href="'. route('login') .'">login</a>.']);
-                        }
-                    }
+            $shipping_details = [
+                'fname' => $shipping_address->xcontactname1,
+                'lname' => $shipping_address->xcontactlastname1,
+                'address_line1' => $shipping_address->xadd1,
+                'address_line2' => $shipping_address->xadd2,
+                'province' => $shipping_address->xprov,
+                'city' => $shipping_address->xcity,
+                'brgy' => $shipping_address->xbrgy,
+                'postal_code' => $shipping_address->xpostal,
+                'country' => $shipping_address->xcountry,
+                'address_type' => $shipping_address->add_type,
+                'business_name' => $shipping_address->xbusiness_name,
+                'tin' => $shipping_address->xtin_no,
+                'email_address' => $shipping_address->xcontactemail1,
+                'mobile_no' => $mobile,
+                'contact_no' => $contact,
+                'same_as_billing' => 0
+            ];
 
-                    $ship_mobile = null;
-                    if($request->ship_mobilenumber1_1){
-                        $ship_mobile = preg_replace("/[^0-9]/", "", $request->ship_mobilenumber1_1);
-                        // $ship_mobile = $ship_mobile[0] == 0 ? '63'.substr($ship_mobile, 1) : '63'.$ship_mobile;
-                        if($ship_mobile[0] == 0){
-                            $ship_mobile = '63'.substr($ship_mobile, 1);
-                        }else if(substr($ship_mobile, 0, 2) != '63' || $ship_mobile[0] == '9'){
-                            $ship_mobile = '63'.$ship_mobile;
-                        }
-                    }
+            $billing_address = DB::table('fumaco_user_add')->where('xdefault', 1)->where('user_idx', $user_id)->where('address_class', 'Billing')->first();
 
-                    $ship_contact = null;
-                    if($request->contactnumber1_1){
-                        $ship_contact = preg_replace("/[^0-9]/", "", $request->contactnumber1_1);
-                        // $ship_contact = $ship_contact[0] == 0 ? '63'.substr($ship_contact, 1) : '63'.$ship_contact;
-                        if($ship_contact[0] == 0){
-                            $ship_contact = '63'.substr($ship_contact, 1);
-                        }else if(substr($ship_contact, 0, 2) != '63' || $ship_contact[0] == '9'){
-                            $ship_contact = '63'.$ship_contact;
-                        }
-                    }
+            if ($billing_address) {
+                $bill_mobile = $billing_address->xmobile_number ? $this->formatPhone($billing_address->xmobile_number) : null;
+                $bill_contact = $billing_address->xcontactnumber1 ? $this->formatPhone($billing_address->xcontactnumber1) : null;
 
-                    $bill_mobile = $ship_mobile;
-                
-                    $shipping_details = [
-                        'fname' => $request->fname,
-                        'lname' => $request->lname,
-                        'address_line1' => $request->ship_Address1_1,
-                        'address_line2' => $request->ship_Address2_1,
-                        'province' => $request->ship_province1_1,
-                        'city' => $request->ship_City_Municipality1_1,
-                        'brgy' => $request->ship_Barangay1_1,
-                        'postal_code' => $request->ship_postal1_1,
-                        'country' => $request->ship_country_region1_1,
-                        'address_type' => $request->ship_Address_type1_1,
-                        'business_name' => $request->ship_business_name,
-                        'tin' => $request->ship_tin,
-                        'email_address' => $request->ship_email,
-                        'mobile_no' => $ship_mobile,
-                        'contact_no' => $ship_contact,
-                        'same_as_billing' => ($request->same_as_billing) ? 1 : 0
-                    ];
-                    
-                    $billing_details = [];
-                    if(!$request->same_as_billing) {
-                        $bill_mobile = null;
-                        if($request->mobilenumber1_1){
-                            $bill_mobile = preg_replace("/[^0-9]/", "", $request->mobilenumber1_1);
-                            // $bill_mobile = $bill_mobile[0] == 0 ? '63'.substr($bill_mobile, 1) : '63'.$bill_mobile;
-                            if($bill_mobile[0] == 0){
-                                $bill_mobile = '63'.substr($bill_mobile, 1);
-                            }else if(substr($bill_mobile, 0, 2) != '63' || $bill_mobile[0] == '9'){
-                                $bill_mobile = '63'.$bill_mobile;
-                            }
-                        }
-                        
-                        $billing_details = [
-                            'fname' => $request->bill_fname,
-                            'lname' => $request->bill_lname,
-                            'address_line1' => $request->Address1_1,
-                            'address_line2' => $request->Address2_1,
-                            'province' => $request->province1_1,
-                            'city' => $request->City_Municipality1_1,
-                            'brgy' => $request->Barangay1_1,
-                            'postal_code' => $request->postal1_1,
-                            'country' => $request->country_region1_1,
-                            'address_type' => $request->Address_type1_1,
-                            'business_name' => $request->bill_business_name,
-                            'tin' => $request->bill_tin,
-                            'email_address' => $request->email,
-                            'mobile_no' => $bill_mobile,
-                        ];
-                    }
-                }
+                $billing_details = [
+                    'fname' => $billing_address->xcontactname1,
+                    'lname' => $billing_address->xcontactlastname1,
+                    'address_line1' => $billing_address->xadd1,
+                    'address_line2' => $billing_address->xadd2,
+                    'province' => $billing_address->xprov,
+                    'city' => $billing_address->xcity,
+                    'brgy' => $billing_address->xbrgy,
+                    'postal_code' => $billing_address->xpostal,
+                    'country' => $billing_address->xcountry,
+                    'address_type' => $billing_address->add_type,
+                    'business_name' => $billing_address->xbusiness_name,
+                    'tin' => $billing_address->xtin_no,
+                    'email_address' => $billing_address->xcontactemail1,
+                    'mobile_no' => $bill_mobile,
+                    'contact_no' => $bill_contact,
+                ];
+            }else{
+                $billing_details = $shipping_details;
             }
 
-            if ($order_no) {
-                $temp_data = [
-                    'xfname' => (Auth::check()) ? Auth::user()->f_name : $shipping_details['fname'],
-                    'xlname' => (Auth::check()) ? Auth::user()->f_lname : $shipping_details['lname'],
-                    'xcontact_person' => ($billing_details) ? $billing_details['fname']. " " . $billing_details['lname'] : $shipping_details['fname']. " " . $shipping_details['lname'],
-                    'xshipcontact_person' => $shipping_details['fname']. " " . $shipping_details['lname'],
-                    'xadd1' => ($billing_details) ? $billing_details['address_line1'] : $shipping_details['address_line1'],
-                    'xadd2' => ($billing_details) ? $billing_details['address_line2'] : $shipping_details['address_line2'],
-                    'xprov' => ($billing_details) ? $billing_details['province'] : $shipping_details['province'],
-                    'xcity' => ($billing_details) ? $billing_details['city'] : $shipping_details['city'],
-                    'xbrgy' => ($billing_details) ? $billing_details['brgy'] : $shipping_details['brgy'],
-                    'xpostal' => ($billing_details) ? $billing_details['postal_code'] : $shipping_details['postal_code'],
-                    'xcountry' => ($billing_details) ? $billing_details['country'] : $shipping_details['country'],
-                    'xaddresstype' => ($billing_details) ? $billing_details['address_type'] : $shipping_details['address_type'],
-                    'xbusiness_name' => ($billing_details) ? $billing_details['business_name'] : $shipping_details['business_name'],
-                    'xtin_no' => ($billing_details) ? $billing_details['tin'] : $shipping_details['tin'],
-                    'xemail' => ($billing_details) ? $billing_details['email_address'] : $shipping_details['email_address'],
-                    'xemail_shipping' => $shipping_details['email_address'],
-                    'xmobile' => ($billing_details) ? $billing_details['mobile_no'] : null,
-                    'xcontact' => $shipping_details['mobile_no'],
-                    'xshippadd1' => $shipping_details['address_line1'],
-                    'xshippadd2' => $shipping_details['address_line2'],
-                    'xshiprov' => $shipping_details['province'],
-                    'xshipcity' => $shipping_details['city'],
-                    'xshipbrgy' => $shipping_details['brgy'],
-                    'xshippostalcode' => $shipping_details['postal_code'],
-                    'xshipcountry' => $shipping_details['country'],
-                    'xshiptype' => $shipping_details['address_type'],
-                    'xship_business_name' => $shipping_details['business_name'],
-                    'xship_tin' => $shipping_details['tin'],
-                    'order_status' => 'Order Pending',
-                    'order_shipping_type' => null, 
-                    'xusertype' => (Auth::check()) ? 'Member' : 'Guest',
-                    'xusernamex' => (Auth::check()) ? Auth::user()->username : null,
-                    'xstatus' => 2,
-                    'xuser_id' => (Auth::check()) ? Auth::user()->id : null,
-                    'shipping_same_as_billing' => ($request->same_as_billing) ? 1 : 0,
-                ];
+            $data = [
+                'shipping_details' => $shipping_details,
+                'billing_details' => $billing_details,
+                'same_as_billing' => isset($request->same_as_billing) ? 1 : 0,
+                'order_no' => $order_no
+            ];
 
-                DB::table('fumaco_temp')->where('order_tracker_code', $order_no)->update($temp_data);
+            $save_temp = $this->saveTempData($data);
+
+            if(!$save_temp){
+                return redirect()->back()->with('error', 'An error occured. Please try again');
+            }
+
+            DB::commit();
+            return redirect('/checkout/summary');
+        } catch (\Throwable $e) {
+            DB::rollback();
+            return redirect()->back()->with('error', 'An error occured. Please try again.'); 
+        }
+    }
+
+    public function setGuestShippingBillingDetails(Request $request) {
+        DB::beginTransaction();
+        try {
+            $existing_account = DB::table('fumaco_users')->where('username', $request->ship_email)->exists();
+            if ($existing_account) {
+                return response()->json(['status' => 'error', 'message' => 'Email already exists, please <a href="#" class="open-modal" data-target="#loginModal">login</a>.']);
+            }
+
+            $order_no = $this->getOrderNumber($request);
+
+            $ship_mobile = $request->ship_mobilenumber1_1 ? $this->formatPhone($request->ship_mobilenumber1_1) : null;
+            $ship_contact = $request->contactnumber1_1 ? $this->formatPhone($request->contactnumber1_1) : null;
+
+            $bill_mobile = $ship_mobile;
+        
+            $shipping_details = [
+                'fname' => $request->fname,
+                'lname' => $request->lname,
+                'address_line1' => $request->ship_Address1_1,
+                'address_line2' => $request->ship_Address2_1,
+                'province' => $request->ship_province1_1,
+                'city' => $request->ship_City_Municipality1_1,
+                'brgy' => $request->ship_Barangay1_1,
+                'postal_code' => $request->ship_postal1_1,
+                'country' => $request->ship_country_region1_1,
+                'address_type' => $request->ship_Address_type1_1,
+                'business_name' => $request->ship_business_name,
+                'tin' => $request->ship_tin,
+                'email_address' => $request->ship_email,
+                'mobile_no' => $ship_mobile,
+                'contact_no' => $ship_contact,
+                'same_as_billing' => ($request->same_as_billing) ? 1 : 0
+            ];
+            
+            $billing_details = [];
+            if(!$request->same_as_billing) {
+                $bill_mobile = $request->mobilenumber1_1 ? $this->formatPhone($request->mobilenumber1_1) : null;
+                
+                $billing_details = [
+                    'fname' => $request->bill_fname,
+                    'lname' => $request->bill_lname,
+                    'address_line1' => $request->Address1_1,
+                    'address_line2' => $request->Address2_1,
+                    'province' => $request->province1_1,
+                    'city' => $request->City_Municipality1_1,
+                    'brgy' => $request->Barangay1_1,
+                    'postal_code' => $request->postal1_1,
+                    'country' => $request->country_region1_1,
+                    'address_type' => $request->Address_type1_1,
+                    'business_name' => $request->bill_business_name,
+                    'tin' => $request->bill_tin,
+                    'email_address' => $request->email,
+                    'mobile_no' => $bill_mobile,
+                ];
+            }else{
+                $billing_details = $shipping_details;
+            }
+
+            $data = [
+                'shipping_details' => $shipping_details,
+                'billing_details' => $billing_details,
+                'same_as_billing' => isset($request->same_as_billing) ? 1 : 0,
+                'order_no' => $order_no
+            ];
+
+            $save_temp = $this->saveTempData($data);
+
+            if(!$save_temp){
+                return response()->json(['status' => 'error', 'message' => 'An error occured. Please try again.']);
             }
 
             DB::commit();
 
-            if($request->isMethod('POST')) {
-                return response()->json(['status' => 'success', 'message' => '/checkout/summary']);
-            }
-
-            return redirect('/checkout/summary');
-        } catch (Exception $e) {
-            DB::rollback();
-
-            return redirect()->back()->with('error', 'An error occured. Please try again.'); 
+            return response()->json(['status' => 'success', 'message' => '/checkout/summary']);
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return response()->json(['status' => 'error', 'message' => 'An error occured. Please try again.']);
         }
     }
 }

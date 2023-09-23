@@ -45,7 +45,7 @@ class LoginController extends Controller
                 return redirect('/admin/login')->withInput()->with('d_info','Your admin account is deactivated.');
             }
 
-            $otp = rand(111111, 999999);
+            $otp = rand(11111, 99999);
             $api = DB::table('api_setup')->where('type', 'sms_gateway_api')->first();
             if(!$api or !$checker->mobile_number){
                 $error_message = !$checker->mobile_number ? 'Your account does not have a registered mobile number. ' : 'OTP cannot be sent. ';
