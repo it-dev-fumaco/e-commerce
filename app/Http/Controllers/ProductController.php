@@ -259,59 +259,61 @@ class ProductController extends Controller
             $item = $this->getItemDetails($request->item_code, $request->item_type, $request->uom_conversion);
 
             if($request->item_type == 'product_bundle') {
-                $request->validate(
-                    [
-                        'item_code' => 'required',
-                        'product_name' => 'required',
-                        'item_name' => 'required',
-                        'product_category' => 'required',
-                        'brand' => 'required',
-                        'item_classification' => 'required',
-                        'stock_uom' => 'required',
-                        'weight_per_unit' => 'required',
-                        'weight_uom' => 'required',
-                        'package_dimension_uom' => 'required',
-                        'package_length' => 'required',
-                        'package_width' => 'required',
-                        'package_height' => 'required',
-                        'package_weight' => 'required',
-                        'warehouse' => 'required',
-                        'stock_qty' => 'required|integer',
-                        'alert_qty' => 'required|integer',
-                        'item_description' => 'required',
-                        'website_caption' => 'required',
-                        'price' => 'required|numeric',
-                        'slug' => 'required'
-                    ]
-                );
+                $rules = [
+                    'item_code' => 'required',
+                    'product_name' => 'required',
+                    'item_name' => 'required',
+                    'product_category' => 'required',
+                    'brand' => 'required',
+                    'item_classification' => 'required',
+                    'stock_uom' => 'required',
+                    'weight_per_unit' => 'required',
+                    'weight_uom' => 'required',
+                    'package_dimension_uom' => 'required',
+                    'package_length' => 'required',
+                    'package_width' => 'required',
+                    'package_height' => 'required',
+                    'package_weight' => 'required',
+                    'warehouse' => 'required',
+                    'stock_qty' => 'required|integer',
+                    'alert_qty' => 'required|integer',
+                    'item_description' => 'required',
+                    'website_caption' => 'required',
+                    'price' => 'required|numeric',
+                    'slug' => 'required'
+                ];
             } else {
-                $request->validate(
-                    [
-                        'item_code' => 'required',
-                        'parent_item_code' => 'required',
-                        'product_name' => 'required',
-                        'item_name' => 'required',
-                        'product_category' => 'required',
-                        'brand' => 'required',
-                        'item_classification' => 'required',
-                        'stock_uom' => 'required',
-                        'uom_conversion' => 'required',
-                        'weight_per_unit' => 'required',
-                        'weight_uom' => 'required',
-                        'package_dimension_uom' => 'required',
-                        'package_length' => 'required',
-                        'package_width' => 'required',
-                        'package_height' => 'required',
-                        'package_weight' => 'required',
-                        'warehouse' => 'required',
-                        'stock_qty' => 'required|integer',
-                        'alert_qty' => 'required|integer',
-                        'item_description' => 'required',
-                        'website_caption' => 'required',
-                        'price' => 'required|numeric',
-                        'slug' => 'required'
-                    ]
-                );
+                $rules = [
+                    'item_code' => 'required',
+                    'parent_item_code' => 'required',
+                    'product_name' => 'required',
+                    'item_name' => 'required',
+                    'product_category' => 'required',
+                    'brand' => 'required',
+                    'item_classification' => 'required',
+                    'stock_uom' => 'required',
+                    'uom_conversion' => 'required',
+                    'weight_per_unit' => 'required',
+                    'weight_uom' => 'required',
+                    'package_dimension_uom' => 'required',
+                    'package_length' => 'required',
+                    'package_width' => 'required',
+                    'package_height' => 'required',
+                    'package_weight' => 'required',
+                    'warehouse' => 'required',
+                    'stock_qty' => 'required|integer',
+                    'alert_qty' => 'required|integer',
+                    'item_description' => 'required',
+                    'website_caption' => 'required',
+                    'price' => 'required|numeric',
+                    'slug' => 'required'
+                ];
+            }
+
+            $validator = Validator::make($request->all(), $rules);
+
+            if($validator->fails()){
+                return redirect()->back()->with('error', 'All fields with * are required.');
             }
 
             // validate if item attributes matches the current attributes registered in database based on parent item code
