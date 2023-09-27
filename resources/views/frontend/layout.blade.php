@@ -199,7 +199,7 @@
 
   
   
-    @if(in_array($activePage, ['contact', 'signup']))
+    @if(in_array($activePage, ['contact', 'signup', 'blog']))
       {!! ReCaptcha::htmlScriptTagJsApi([
         'callback_then' => 'captchaSuccess',
         'callback_catch' => 'captchaFail'

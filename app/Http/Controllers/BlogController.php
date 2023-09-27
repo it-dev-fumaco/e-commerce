@@ -540,23 +540,20 @@ class BlogController extends Controller
             }
 
             $request->validate([
-                'g-recaptcha-response' => ['required',function ($attribute, $value, $fail) {
-                    $secret_key = config('recaptcha.api_secret_key');
-                    $response = $value;
-                    $userIP = $_SERVER['REMOTE_ADDR'];
-                    $url = "https://www.google.com/recaptcha/api/siteverify?secret=$secret_key&response=$response&remoteip=$userIP";
-                    $response = \file_get_contents($url);
-                    $response = json_decode($response);
-                    if (!$response->success) {
-                        $fail('ReCaptcha failed.');
-                    }
-                }],
-            ],
-            [
-                'g-recaptcha-response' => [
-                    'required' => 'Please check ReCaptcha.'
-                ]
+                'comment' => ['required', 'string', 'max:255']
             ]);
+
+            if(!Auth::check()){
+                $request->validate([
+                    'fullname' => ['required', 'string', 'max:255'],
+                    'fullemail' => ['required', 'email', 'max:255'],
+                    'g-recaptcha-response' => 'recaptcha'
+                ],[
+                    'g-recaptcha-response' => [
+                        'required' => 'ReCaptcha failed.'
+                    ]
+                ]);
+            }
 
             $add_comment = [
                 'blog_type' => $request->reply_replyId ? 2 : 1,
@@ -565,13 +562,14 @@ class BlogController extends Controller
                 'blog_name' => $name,
                 'blog_email' => $email,
                 'blog_ip' => $request->ip(),
-                'blog_comments' => $request->comment
+                'blog_comments' => utf8_encode($request->comment)
             ];
 
-            $insert = DB::table('fumaco_comments')->insert($add_comment);
+            DB::table('fumaco_comments')->insert($add_comment);
             if($request->reply_replyId){
                 DB::table('fumaco_comments')->where('id', $request->reply_replyId)->update(['blog_reply_date' => Carbon::now()]);
             }
+
             DB::commit();
             return redirect('/blog/'.$request->idcode.'#comments')->with('comment_message', 'Hello! Your comment has been received, please wait for approval.');
         }catch(Exception $e){

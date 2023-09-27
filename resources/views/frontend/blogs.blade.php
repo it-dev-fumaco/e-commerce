@@ -218,6 +218,11 @@
                             </div>
                         @endif
                         <input type="text" class="form-control caption_1 animated animatedFadeInUp fadeInUp" name="idcode" id="idcode" value="{{ $id }}" required hidden>
+                        @if (!Auth::check())
+                            <br>
+                            {!! htmlFormSnippet() !!}
+                            <br>
+                        @endif
                         <input class="btn btn-primary mt-3 caption_1 animated animatedFadeInUp fadeInUp" type="submit" value="POST COMMENT">
                         <br>&nbsp;
                     </form>
@@ -366,16 +371,15 @@
 @endsection
 
 @section('script')
-<script src="https://www.google.com/recaptcha/api.js?render={{ config('recaptcha.api_site_key') }}"></script>
-<script> 
-  grecaptcha.ready(function() {
-    grecaptcha.execute("{{ config('recaptcha.api_site_key') }}", {action: 'homepage'}).then(function(token) {
-      if(token) {
-        $("#recaptcha_v3").val(token); 
-      } 
-    });
-  });
-</script> 
+  <script type="text/javascript">
+    function captchaSuccess(response){
+      $('#submitBtn').removeClass('disabled-btn').prop('disabled', false)
+    }
+
+    function captchaFail(response){
+      $('#submitBtn').addClass('disabled-btn').prop('disabled', true)
+    }
+  </script>
     <script>
         $(document).ready(function(){
             $('.reply').click(function(){
