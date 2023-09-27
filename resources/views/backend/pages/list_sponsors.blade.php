@@ -175,7 +175,7 @@
                                         @endforelse
                                     </table>
                                     <div class="float-right font-italic">
-                                        <small>Last modified by: {{ $last_mod->last_modified_by }} - {{ $last_mod->last_modified_at }}</small><br>
+                                        <small>Last modified by: {{ $last_mod ? $last_mod->last_modified_by.' - '.$last_mod->last_modified_at : '-' }}</small><br>
                                     </div>
                                     <br/>
                                     <div class="float-right mt-4">

@@ -77,7 +77,6 @@ Route::group(['middleware' => ['sanitation', 'throttle:global']], function(){
     Route::post('/user_register', 'FrontendController@userRegistration');
     Route::get('/about', 'FrontendController@viewAboutPage');
     Route::get('/journals', 'FrontendController@viewJournalsPage');
-    Route::get('/terms_condition', 'FrontendController@viewTermsPage');
     Route::get('/blog/{slug}', 'FrontendController@viewBlogPage')->name('blogs');
     Route::post('/add_comment', 'BlogController@addComment');
     Route::get('/contact', 'FrontendController@viewContactPage')->name('contact');

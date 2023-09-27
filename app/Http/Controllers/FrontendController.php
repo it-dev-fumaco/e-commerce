@@ -373,9 +373,9 @@ class FrontendController extends Controller
                 $search_data = [
                     'search_term' => str_replace('"', "'", $request->s),
                     'ip' => $request->ip(),
-                    'city' => $loc->getCity(),
-                    'region' => $loc->getRegion(),
-                    'country' => $loc->getCountry(),
+                    'city' => utf8_encode($loc->getCity()),
+                    'region' => utf8_encode($loc->getRegion()),
+                    'country' => utf8_encode($loc->getCountry()),
                     'latitude' => $loc->getLatitude(),
                     'longtitude' => $loc->getLongitude(),
                     'date_last_searched' => Carbon::now()
@@ -1314,6 +1314,10 @@ class FrontendController extends Controller
     public function viewBlogPage($slug) {
         $blog = DB::table('fumaco_blog')->where('slug', $slug)->orWhere('id', $slug)
             ->select('blogprimaryimage', 'id', 'blog_caption', 'blogtitle', 'datepublish', 'blogtype', 'blogcontent')->first();
+
+        if(!$blog){
+            abort(404);
+        }
 
         $blog_comment = DB::table('fumaco_comments')->where('blog_id', $blog->id)->where('blog_type', 1)->where('blog_status', 1)
             ->select('id', 'blog_email', 'blog_name', 'blog_comments', 'blog_date')->get()->toArray();
@@ -2733,7 +2737,7 @@ class FrontendController extends Controller
             ->where('o.order_number', $order_number)
             ->select('o.*', 'i.f_cat_id')
             ->get();
-        $items = $payment_statuses = $status = $order_status = [];
+        $items = $payment_statuses = $status = $order_status = $shipping_discount = [];
         $payment_status_sequence = $status_sequence = null;
         if($order_details){
             $order_status = DB::table('order_status as s')
