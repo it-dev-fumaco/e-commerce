@@ -86,56 +86,46 @@ class DashboardController extends Controller
 	public function index(Request $request) {
 		$users = DB::table('fumaco_users')->where('is_email_verified', 1)->count();
 
-		$orders = DB::table('fumaco_order')->get();
-		$excluded_statuses = DB::table('order_status')->where('update_stocks', 1)->get();
+		$excluded_statuses = DB::table('order_status')->where('update_stocks', 1)->pluck('status');
+		$excluded_statuses = collect($excluded_statuses)->push('Cancelled');
 
-		$new_orders = collect($orders)->whereNotIn('order_status', collect($excluded_statuses)->pluck('status'))->where('order_status', '!=', 'Cancelled')->count();
+		$excluded_statuses_imploded = $excluded_statuses->implode('","');
+		$orders = DB::table('fumaco_order')->select('fumaco_order.*', DB::raw('(case when (order_status in ("'.$excluded_statuses_imploded.'")) then order_status else "New Order" end) as ref_status'), DB::raw('YEAR(order_date) year, MONTH(order_date) month'))->get();
+
+		$orders_by_status = collect($orders)->groupBy('ref_status');
+		$new_orders_arr = isset($orders_by_status['New Order']) ? $orders_by_status['New Order'] : [];
+		$ordered_items_query = DB::table('fumaco_order_items')->whereIn('order_number', collect($new_orders_arr)->pluck('order_number'))->orderBy('update_date', 'desc')->get()->groupBy('order_number');
+
+		$new_orders = count($new_orders_arr);
 		$total_sales = collect($orders)->where('order_status', '!=', 'Cancelled')->sum('amount_paid');
 		$total_orders = collect($orders)->count();
 
-		$most_searched = DB::table(DB::raw('(SELECT search_term, COUNT(*) as count FROM fumaco_search_terms GROUP BY search_term) AS subquery'))
-			->select('search_term', 'count')
-			->orderBy('count', 'desc')
-			->limit(10)
-			->get();
-
-		$search_terms = [];
-		foreach($most_searched as $search){
-			$location = DB::table(DB::raw('(SELECT search_term, city, region, country, COUNT(*) as count FROM fumaco_search_terms where search_term = "'.$search->search_term.'" GROUP BY search_term, city, region, country ) AS subquery'))
-				->select('search_term', 'city', 'region', 'country', 'count')
-				->orderBy('count', 'desc')
-				->get();
-
-			$search_terms[] = [
-				'search_term' => $search->search_term,
-				'search_term_count' => $search->count,
-				'location' => $location,
-			];
-		}
-
 		// sales per month
 		$sales_arr = [];
+		$year = $request->year ? $request->year : Carbon::now()->format('Y');
+
+		$sales_per_month = collect($orders)->map(function ($q) {
+			$q->month_year = Carbon::parse($q->order_date)->format('M-Y');
+			return $q;
+		})->groupBy('month_year');
 
 		for($month = 1; $month <= 12; $month++){
-			if($request->year){
-				$sales = DB::table('fumaco_order')->where('order_status', '!=', 'Cancelled')->whereMonth('order_date', $month)->whereYear('order_date', $request->year)->sum('amount_paid');
-			}else{
-				$sales = DB::table('fumaco_order')->where('order_status', '!=', 'Cancelled')->whereMonth('order_date', $month)->whereYear('order_date', Carbon::now()->format('Y'))->sum('amount_paid');
-			}
-			
 			$month_name = DateTime::createFromFormat('!m', $month);
+			$month_name = $month_name->format('M');
+
+			$sales = isset($sales_per_month[$month_name.'-'.$year]) ? collect($sales_per_month[$month_name.'-'.$year])->sum('amount_paid') : 0;
 
 			$sales_arr[] = [
 				'month' => $month,
 				'sales' => number_format((float)$sales, 2, '.', ''),
-				'month_name' => "'".$month_name->format('M')."'",
-				'js_month_name' => $month_name->format('M')
+				'month_name' => "'".$month_name."'",
+				'js_month_name' => $month_name
 			];
 		}
-		
-		$sales_year = DB::table('fumaco_order')->distinct()->pluck(DB::raw('YEAR(order_date)'));
-		$sales_year = collect($sales_year)->sort();	
-		$sales_year = $sales_year->values()->all();
+
+		$sales_year = collect($orders)->map(function ($q) {
+			return Carbon::parse($q->order_date)->format('Y');
+		})->unique()->sort()->values()->all();
 
 		if($request->ajax()){
 			$sales_data = collect($sales_arr)->pluck('sales')->implode(',');
@@ -144,13 +134,16 @@ class DashboardController extends Controller
 		}
 
 		// items on cart
-		$cart_transactions = DB::table('fumaco_cart')->select('transaction_id', 'user_email', 'user_type')
-			->groupBy('transaction_id', 'user_email', 'user_type')->get();
+		$cart_transactions = DB::table('fumaco_cart')->get();
+
+		$item_codes = collect($new_orders_arr->pluck('item_code'))->merge(collect($cart_transactions)->pluck('item_code'))->filter()->unique()->values()->all();
+
+		$item_details = DB::table('fumaco_items')->whereIn('f_idcode', $item_codes)->get()->groupBy('f_idcode');
+		$cart_transactions = $cart_transactions->groupBy('transaction_id');
 		$cart_arr = [];
 
-		foreach($cart_transactions as $cart){
-			$items = DB::table('fumaco_cart')->where('transaction_id', $cart->transaction_id)->orderBy('last_modified_at', 'desc')->get();
-			$last_online = collect($items)->pluck('last_modified_at')->first();
+		foreach($cart_transactions as $transaction_id => $cart){
+			$last_online = collect($cart)->pluck('last_modified_at')->first();
 			$status = 'Abandoned';
 			if(Carbon::parse($last_online)->format('M d') == Carbon::now()->format('M d')){
 				$time_difference = Carbon::parse($last_online)->diff(Carbon::now());
@@ -160,8 +153,8 @@ class DashboardController extends Controller
 			}
 			
 			$items_arr = [];
-			foreach($items as $item){
-				$slug = DB::table('fumaco_items')->where('f_idcode', $item->item_code)->pluck('slug')->first();
+			foreach($cart as $item){
+				$slug = isset($item_details[$item->item_code]) ? $item_details[$item->item_code][0]->slug : null;
 
 				$items_arr[] = [
 					'item_code' => $item->item_code,
@@ -171,9 +164,9 @@ class DashboardController extends Controller
 			}
 
 			$cart_arr[] = [
-				'transaction_id' => $cart->transaction_id,
-				'owner' => $cart->user_email,
-				'user_type' => $cart->user_type,
+				'transaction_id' => $transaction_id,
+				'owner' => $cart[0]->user_email,
+				'user_type' => $cart[0]->user_type,
 				'total_qty' => collect($items_arr)->sum('qty'),
 				'items' => $items_arr,
 				'last_online' => $last_online,
@@ -181,24 +174,21 @@ class DashboardController extends Controller
 			]; 
 		}
 
-		$orders = DB::table('fumaco_order')->whereNotIn('order_status', collect($excluded_statuses)->pluck('status'))->where('order_status', '!=', 'Cancelled')->select('order_number', 'order_email')->distinct()->get();
-
 		$converted_orders = [];
+		$stores = DB::table('fumaco_store')->pluck('address', 'store_name');
 
-		foreach($orders as $order){
-			$order_details = DB::table('fumaco_order')->where('order_number', $order->order_number)->first();
-			$ordered_items = DB::table('fumaco_order_items')->where('order_number', $order->order_number)->orderBy('update_date', 'desc')->get();
+		foreach($new_orders_arr as $order){
+			$ordered_items = isset($ordered_items_query[$order->order_number]) ? $ordered_items_query[$order->order_number] : [];
 			$last_online = collect($ordered_items)->pluck('update_date')->first();
 			$orders_arr = [];
 
 			$store_address = null;
-			if($order_details->order_shipping == 'Store Pickup') {
-				$store = DB::table('fumaco_store')->where('store_name', $order_details->store_location)->first();
-				$store_address = ($store) ? $store->address : null;
+			if($order->order_shipping == 'Store Pickup') {
+				$store_address = isset($stores[$order->store_location]) ? $stores[$order->store_location] : null;
 			}
 
 			foreach($ordered_items as $items){
-				$slug = DB::table('fumaco_items')->where('f_idcode', $item->item_code)->pluck('slug')->first();
+				$slug = isset($item_details[$items->item_code]) ? $item_details[$items->item_code][0]->slug : null;
 
 				$orders_arr[] = [
 					'order_number' => $items->order_number,
@@ -219,52 +209,53 @@ class DashboardController extends Controller
 				'items' => $orders_arr,
 				'last_online' => $last_online,
 				'status' => 'Converted',
-				'first_name' => $order_details->order_name,
-				'last_name' => $order_details->order_lastname,
-				'bill_contact_person' => $order_details->order_contactperson,
-				'ship_contact_person' => $order_details->order_ship_contactperson,
-				'email' => $order_details->order_email,
-				'contact' => $order_details->order_contact == 0 ? '' : $order_details->order_contact ,
-				'date' => Carbon::parse($order_details->order_update)->format('M d, Y - h:m A'),
+				'first_name' => $order->order_name,
+				'last_name' => $order->order_lastname,
+				'bill_contact_person' => $order->order_contactperson,
+				'ship_contact_person' => $order->order_ship_contactperson,
+				'email' => $order->order_email,
+				'contact' => $order->order_contact == 0 ? '' : $order->order_contact ,
+				'date' => Carbon::parse($order->order_update)->format('M d, Y - h:m A'),
 				'total_qty' => collect($orders_arr)->sum('qty'),
-				'ordered_items' => $items_arr,
-				'order_tracker_code' => $order_details->tracker_code,
-				'payment_method' => $order_details->order_payment_method,
-				'cust_id' => $order_details->order_account,
-				'bill_address1' => $order_details->order_bill_address1,
-				'bill_address2' => $order_details->order_bill_address2,
-				'bill_province' => $order_details->order_bill_prov,
-				'bill_city' => $order_details->order_bill_city,
-				'bill_brgy' => $order_details->order_bill_brgy,
-				'bill_country' => $order_details->order_bill_country,
-				'bill_postal' => $order_details->order_bill_postal,
-				'bill_email' => $order_details->order_bill_email,
-				'bill_contact' => $order_details->order_bill_contact,
-				'ship_address1' => $order_details->order_ship_address1,
-				'ship_address2' => $order_details->order_ship_address2,
-				'ship_province' => $order_details->order_ship_prov,
-				'ship_city' => $order_details->order_ship_city,
-				'ship_brgy' => $order_details->order_ship_brgy,
-				'ship_country' => $order_details->order_ship_country,
-				'ship_postal' => $order_details->order_ship_postal,
-				'shipping_name' => $order_details->order_shipping,
-				'shipping_amount' => $order_details->order_shipping_amount,
-				'grand_total' => ($order_details->order_shipping_amount + ($order_details->order_subtotal - $order_details->discount_amount)),
-				'order_status' => $order_details->order_status,
-				'estimated_delivery_date' => $order_details->estimated_delivery_date,
-				'payment_id' => $order_details->payment_id,
-				'subtotal' => $order_details->order_subtotal,
-				'order_type' => $order_details->order_type,
-				'user_email' => $order_details->user_email,
-				'billing_business_name' => $order_details->billing_business_name,
-				'shipping_business_name' => $order_details->shipping_business_name,
-				'pickup_date' => Carbon::parse($order_details->pickup_date)->format('M d, Y'),
+				'ordered_items' => $orders_arr,
+				'order_tracker_code' => $order->tracker_code,
+				'payment_method' => $order->order_payment_method,
+				'cust_id' => $order->order_account,
+				'bill_address1' => $order->order_bill_address1,
+				'bill_address2' => $order->order_bill_address2,
+				'bill_province' => $order->order_bill_prov,
+				'bill_city' => $order->order_bill_city,
+				'bill_brgy' => $order->order_bill_brgy,
+				'bill_country' => $order->order_bill_country,
+				'bill_postal' => $order->order_bill_postal,
+				'bill_email' => $order->order_bill_email,
+				'bill_contact' => $order->order_bill_contact,
+				'ship_address1' => $order->order_ship_address1,
+				'ship_address2' => $order->order_ship_address2,
+				'ship_province' => $order->order_ship_prov,
+				'ship_city' => $order->order_ship_city,
+				'ship_brgy' => $order->order_ship_brgy,
+				'ship_country' => $order->order_ship_country,
+				'ship_postal' => $order->order_ship_postal,
+				'shipping_name' => $order->order_shipping,
+				'shipping_amount' => $order->order_shipping_amount,
+				'grand_total' => ($order->order_shipping_amount + ($order->order_subtotal - $order->discount_amount)),
+				'order_status' => $order->order_status,
+				'estimated_delivery_date' => $order->estimated_delivery_date,
+				'payment_id' => $order->payment_id,
+				'subtotal' => $order->order_subtotal,
+				'order_type' => $order->order_type,
+				'user_email' => $order->user_email,
+				'billing_business_name' => $order->billing_business_name,
+				'shipping_business_name' => $order->shipping_business_name,
+				'pickup_date' => Carbon::parse($order->pickup_date)->format('M d, Y'),
 				'store_address' => $store_address,
-				'store' => $order_details->store_location,
-				'voucher_code' => $order_details->voucher_code,
-				'discount_amount' => $order_details->discount_amount
+				'store' => $order->store_location,
+				'voucher_code' => $order->voucher_code,
+				'discount_amount' => $order->discount_amount
 			]; 
 		}
+
 		$merged = collect($cart_arr)->merge($converted_orders);
 		$cart_collection = $merged->sortBy('last_online', SORT_REGULAR, true)->values()->all();
 
@@ -293,9 +284,7 @@ class DashboardController extends Controller
 			->select('ft.order_tracker_code', 'ft.xdateupdate')->groupBy('ft.order_tracker_code', 'ft.xdateupdate')
 			->unionAll($abandoned_cart_query1)->orderBy('xdateupdate', 'desc')->paginate(10, ['*'], 'abandoned_page');
 
-		$abandoned_order_numbers = collect($abandoned_cart->items())->map(function($result){
-			return $result->order_tracker_code;
-		});
+		$abandoned_order_numbers = collect($abandoned_cart->items())->pluck('order_tracker_code');
 
 		$abandoned_carts = DB::table('fumaco_temp')->whereIn('order_tracker_code', $abandoned_order_numbers)->orderBy('xdateupdate', 'desc')->get();
 
@@ -379,6 +368,26 @@ class DashboardController extends Controller
 			];
 		}
 
+		// Get top 10 most searched terms
+		$most_searched = DB::table('fumaco_search_terms')->select('search_term', DB::raw('COUNT(*) as count'))->groupBy('search_term')->orderBy('count', 'desc')->limit(10)->get();
+		$locations = DB::table('fumaco_search_terms')->whereIn('search_term', collect($most_searched)->pluck('search_term'))
+			->select(DB::raw('lower(search_term) as search_term'), 'city', 'region', 'country', DB::raw('COUNT(*) as count'))
+			->groupBy('search_term', 'city', 'region', 'country')
+			->orderBy('count', 'desc')
+			->get()->groupBy('search_term');
+
+		$search_terms = [];
+		foreach ($most_searched as $search) {
+			$term = strtolower($search->search_term);
+
+			$search_terms[] = [
+				'search_term' => $search->search_term,
+				'search_term_count' => $search->count,
+				'location' => isset($locations[$term]) ? $locations[$term] : []
+			];
+		}
+
+		// Get the 10 most recent searches of the week
 		$today = Carbon::now()->format('Y-m-d');
 		$weekbefore = Carbon::now()->subDays(7)->format('Y-m-d');
 		$recent_searches_query = DB::table('fumaco_search_terms')->whereBetween('created_at', [$weekbefore, $today])
