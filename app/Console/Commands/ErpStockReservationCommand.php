@@ -100,7 +100,6 @@ class ErpStockReservationCommand extends Command
 
                     if ($insert_response->successful()) {
                         DB::table('fumaco_order')->where('id', $order->id)->update(['stock_reserve_status' => 1]);
-                        info('success (product bundle)');
                     }
                 }
             }
@@ -130,8 +129,6 @@ class ErpStockReservationCommand extends Command
 
                     if ($insert_response->successful()) {
                         DB::table('fumaco_order')->where('id', $order->id)->update(['stock_reserve_status' => 1]);
-                        info('success (simple product)');
-                        info($new_stock_reservations);
                     }
                 }
             }
@@ -146,10 +143,7 @@ class ErpStockReservationCommand extends Command
                 $params = $fields . '' . $filter;
                 $response = Http::withHeaders($headers)->get($erp_api->base_url . '/api/resource/Stock Reservation' . $params);
                 if ($response->successful() && isset($response['data']) && count($response['data']) > 0) {
-                    $delete_response = Http::withHeaders($headers)->delete($erp_api->base_url . '/api/resource/Stock Reservation/' . $response['data'][0]['name']);
-                    if ($delete_response->successful()) {
-                        info('delete success');
-                    }
+                    Http::withHeaders($headers)->delete($erp_api->base_url . '/api/resource/Stock Reservation/' . $response['data'][0]['name']);
                 }
             }
 
