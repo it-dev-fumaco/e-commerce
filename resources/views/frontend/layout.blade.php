@@ -414,6 +414,10 @@
                   <td class="tdfooter footer2nd" style="border-style: unset !important;">&nbsp;</td>
                 </tr>
                 <tr id="policy-pages-footer"></tr>{{-- Policy Pages --}}
+                <tr>
+                  <td class="tdfooter footer2nd" style="border-style: unset !important;"><a href="/track_order" style="text-decoration: none; color: #9B999B;">Track My Order</a></td>
+                  <td class="tdfooter footer2nd" style="border-style: unset !important;">&nbsp;</td>
+                </tr>
               </tbody>
             </table>
           </div>

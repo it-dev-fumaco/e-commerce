@@ -2737,7 +2737,7 @@ class FrontendController extends Controller
             ->where('o.order_number', $order_number)
             ->select('o.*', 'i.f_cat_id')
             ->get();
-        $items = $payment_statuses = $status = $order_status = $shipping_discount = [];
+        $items = $payment_statuses = $status = $order_status = $shipping_discount = $price_rule = $voucher_details = [];
         $payment_status_sequence = $status_sequence = null;
         if($order_details){
             $order_status = DB::table('order_status as s')
