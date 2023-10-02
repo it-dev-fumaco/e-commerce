@@ -141,7 +141,7 @@
 
   
 
-    @if (in_array($activePage, ['login','checkout_customer_form']))
+    {{-- @if (in_array($activePage, ['login','checkout_customer_form']))
     <script>
       function statusChangeCallback(response) {  // Called with the results from FB.getLoginStatus().
         if (response.status === 'connected') {   // Logged into your webpage and Facebook.
@@ -195,7 +195,7 @@
         }, {scope: 'email'});
       }
     </script>
-    @endif
+    @endif --}}
 
   
   
