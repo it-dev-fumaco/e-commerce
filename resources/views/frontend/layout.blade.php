@@ -160,7 +160,7 @@
           appId      : '435536724607670',
           cookie     : true,                     // Enable cookies to allow the server to access the session.
           xfbml      : true,                     // Parse social plugins on this webpage.
-          version    : 'v12.0'           // Use this Graph API version for this call.
+          version    : 'v18.0'           // Use this Graph API version for this call.
         });
       };
 
