@@ -186,6 +186,7 @@ class LoginController extends Controller
                 }
             }
         } catch (\Throwable $th) {
+            throw $th;
             return redirect('/login')->with('error', 'Your email address or password is incorrect, please try again');
         }
     }
