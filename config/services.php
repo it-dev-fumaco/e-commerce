@@ -37,9 +37,11 @@ return [
     ],
 
     'google' => [
-        'client_id' => '794522382369-0pdu3n5j2ofohbae2hcbtgtfqiu898a2.apps.googleusercontent.com',
-        'client_secret' => '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',
-        'redirect' => 'https://fumaco.com/auth/google/callback',
+        // 'client_id' => '794522382369-0pdu3n5j2ofohbae2hcbtgtfqiu898a2.apps.googleusercontent.com',
+        // 'client_secret' => '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',
+        'client_id' => '461557894965-g8rtlfv4ngmnsc6g19v93abuqaok09id.apps.googleusercontent.com',
+        'client_secret' => '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',
+        'redirect' => 'http://test301.fumaco.com/auth/google/callback',
     ],
 
     'linkedin' => [
