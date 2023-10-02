@@ -57,7 +57,8 @@ Route::group(['middleware' => ['sanitation', 'throttle:global']], function(){
 
         // facebook login
         Route::post('/facebook/login', 'LoginController@loginFbSdk')->name('facebook.login');
-
+        Route::get('/facebook/callback', 'LoginController@handleFacebookCallback');
+        
         // google login
         Route::get('auth/google', 'LoginController@loginUsingGoogle')->name('google.login');
         Route::get('auth/google/callback', 'LoginController@callbackFromGoogle')->name('google.callback');
