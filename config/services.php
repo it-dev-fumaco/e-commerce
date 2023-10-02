@@ -31,8 +31,8 @@ return [
     ],
 
     'facebook' => [
-        'client_id' => env('FACEBOOK_CLIENT_ID'),
-        'client_secret' => env('FACEBOOK_CLIENT_SECRET'),
+        'client_id' => env('FACEBOOK_CLIENT_ID', '596451285825362'),
+        'client_secret' => env('FACEBOOK_CLIENT_SECRET', '702a848cdcf9017d0c107692ae91fc9e'),
         'redirect' => 'https://test301.fumaco.com/login/facebook/callback',
     ],
     
