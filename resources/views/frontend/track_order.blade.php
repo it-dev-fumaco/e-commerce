@@ -35,20 +35,20 @@
 				@if($track_order_details and $order_details)
 				<div class="col-lg-10 col-xl-8 mx-auto">
 					<div class="row mb-2">
-						<div class="col-md-6 mt-4">Order No. : <b>{{ $order_details->order_number }}</b>
+						<div class="col-6 mt-4 font-responsive">Order No. : <b>{{ $order_details->order_number }}</b>
 							@if($order_details->order_status == "Cancelled")
 								<span class="badge" style="background-color: #DC3545; font-size: 0.9rem;">{{ $order_details->order_status }}</span>
 							@endif
 						</div>
 						@if($order_details->order_shipping != 'Store Pickup')
-							<div class="col-md-6 mt-4 track-order-eta" style="text-align: right;">Estimated Delivery Date : <br class="d-lg-none"/><b>{{ $order_details->estimated_delivery_date }}</b></div>
+							<div class="col-6 mt-4 track-order-eta font-responsive" style="text-align: right;">Estimated Delivery Date : <br class="d-lg-none"/><b>{{ $order_details->estimated_delivery_date }}</b></div>
 						@else
-							<div class="col-md-6 mt-4 track-order-eta" style="text-align: right;">Pickup Date : <br class="d-lg-none"/><b>{{ $order_details->pickup_date }}</b></div>
+							<div class="col-6 mt-4 track-order-eta font-responsive" style="text-align: right;">Pickup Date : <br class="d-lg-none"/><b>{{ $order_details->pickup_date }}</b></div>
 						@endif
 					</div>
 				</div>
 				<div class="row">
-					<div class="col-lg-12 col-xl-10 mx-auto" style="margin-bottom: 100px !important">
+					<div class="col-12 col-xl-10 mx-auto" style="margin-bottom: 100px !important">
 						<div class="card-body">
 							<div class="card-body p-1">
 								<div class="row">
@@ -142,103 +142,7 @@
 										<br><br>
 									</div>
 									{{-- Desktop Tracker --}}
-									
-									<div class="container mt-5">
-										<table class="table" style="border-top: 1px solid #000">
-											<thead>
-												<tr class="tr-font">
-													<th colspan=2 class="text-center">ITEM DESCRIPTION</th>
-													<th class="text-center">QTY</th>
-													<th class="text-center">PRICE</th>
-													<th class="text-center">TOTAL</th>
-												</tr>
-											</thead>
-											<tbody>
-												@forelse ($items as $item)
-												<tr style="font-size: 11pt;">
-													<td class="text-center">
-														@php
-															$img = '/storage/item_images/'. $item['item_code'] .'/gallery/preview/'.$item['image'];
-															$webp = '/storage/item_images/'. $item['item_code'] .'/gallery/preview/'.explode('.', $item['image'])[0].'.webp';
-														@endphp
-														<picture>
-															<source srcset="{{ asset($webp) }}" type="image/webp">
-															<source srcset="{{ asset($img) }}" type="image/jpeg">
-															<img src="{{ asset('/storage/item_images/'. $item['item_code'] .'/gallery/preview/'.$item['image']) }}" class="img-responsive" alt="" width="50" height="50" loading='lazy'>
-														</picture>
-														{{-- <img src="{{ asset('/storage/item_images/'. $item['item_code'] .'/gallery/preview/'.$item['image']) }}" class="img-responsive" alt="" width="50" height="50"> --}}
-													</td>
-													<td>{{ $item['item_name'] }}</td>
-													<td class="text-center">{{ $item['quantity'] }}</td>
-													<td class="text-center" style="white-space: nowrap !important;">{{ '₱ ' . number_format($item['price'], 2) }}</td>
-													<td class="text-center" style="white-space: nowrap !important;">{{ '₱ ' . number_format($item['amount'], 2) }}</td>
-												</tr>
-												@empty
-												<tr>
-													<td colspan="6" class="text-center">No items found.</td>
-												</tr>
-												@endforelse
-												<tr style="border-bottom: rgba(0,0,0,0) !important; font-size: 10pt;">
-													<td colspan="4" class="table-text p-1" style="text-align: right;">Subtotal : </td>
-													<td class="table-text p-1" style="text-align: right; white-space: nowrap !important">₱ {{ number_format($order_details->order_subtotal, 2) }}</td>
-												</tr>
-												@if ($order_details->voucher_code)
-												@php
-													if($voucher_details){
-														switch ($voucher_details->discount_type) {
-															case 'By Percentage':
-																$voucher_discount_amount = ($voucher_details->discount_rate / 100) * $order_details->order_subtotal;
-																break;
-															default:
-																$voucher_discount_amount = $voucher_details->discount_rate;
-																break;
-														}
-													}
-												@endphp
-												<tr style="border-bottom: rgba(0,0,0,0) !important; font-size: 10pt;">
-													<td colspan="4" class="table-text p-1" style="text-align: right;">Discount :
-														<span class="text-white" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833;">{{ $order_details->voucher_code }}</span>
-														</td>
-													<td class="table-text p-1" style="text-align: right; white-space: nowrap !important">- ₱ {{ number_format($voucher_discount_amount, 2) }}</td>
-												</tr>
-												@endif 
-												@if ($price_rule)
-													@php
-														$pr_discount_amount = $order_details->discount_amount > ($shipping_discount_amount + $voucher_discount_amount) ? $order_details->discount_amount - ($shipping_discount_amount + $voucher_discount_amount) : 0;
-													@endphp
-													@if ($pr_discount_amount > 0)
-														<tr style="border-bottom: rgba(0,0,0,0) !important; font-size: 10pt;">
-															<td colspan="4" class="table-text p-1" style="text-align: right;">Discount :
-																<span class="text-white" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833;">{{ $price_rule['discount_name'] }}</span>
-																</td>
-															<td class="table-text p-1" style="text-align: right; white-space: nowrap !important">- ₱ {{ number_format($pr_discount_amount, 2) }}</td>
-														</tr>
-													@endif
-												@endif
-												<tr style="border-bottom: rgba(0,0,0,0) !important; font-size: 10pt;">
-													<td colspan="4" class="table-text p-1" style="text-align: right;">{{ $order_details->order_shipping }} : </td>
-													<td class="table-text p-1" style="text-align: right; white-space: nowrap !important">
-														@if ($order_details->order_shipping_amount > 0)
-														₱ {{ number_format($order_details->order_shipping_amount, 2) }}
-														@else
-														FREE
-														@endif
-													</td>
-												</tr>
-												<tr style="border-bottom: rgba(0,0,0,0) !important; font-size: 11pt; font-weight: 700 !important">
-													@php
-														$grand_total = $order_details->order_shipping_amount + ($order_details->order_subtotal - $order_details->discount_amount);
-													@endphp
-													<td colspan="4" class="table-text p-1" style="text-align: right;">Grand Total : </td>
-													<td class="table-text p-1" style="text-align: right; white-space: nowrap !important">₱ {{ number_format($grand_total, 2) }}</td>
-												</tr>
-												<tr style="border-bottom: rgba(0,0,0,0) !important; font-size: 11pt;">
-													<td colspan="4" class="table-text p-1" style="text-align: right;">Payment Method : </td>
-													<td class="table-text p-1" style="text-align: right; white-space: nowrap !important">{{ $order_details->order_payment_method }}</td>
-												</tr>
-											</tbody>
-										</table>
-									</div>
+
 									{{-- Mobile/Tablet Tracker --}}
 									<div class="container-fluid d-block d-lg-none">
 										<ul class="list-group vertical-steps">
@@ -353,6 +257,171 @@
 										</ul>  
 									</div>
 									{{-- Mobile/Tablet Tracker --}}
+									
+									<div class="container mt-5">
+										<table class="table" style="border-top: 1px solid #000">
+											<col style="width: 50%">
+											<col class="d-none d-sm-table-cell" style="width: 30%">
+											<col class="d-none d-sm-table-cell" style="width: 10%">
+											<col class="d-none d-sm-table-cell" style="width: 10%">
+											<thead>
+												<tr class="tr-font">
+													<th class="text-center">ITEM</th>
+													<th class="text-center d-none d-sm-table-cell">QTY</th>
+													<th class="text-center d-none d-sm-table-cell">PRICE</th>
+													<th class="text-center d-none d-sm-table-cell">TOTAL</th>
+												</tr>
+											</thead>
+											<tbody>
+												@forelse ($items as $item)
+												<tr style="font-size: 11pt;">
+													<td>
+														<div class="row">
+															<div class="col-3 col-xl-2">
+																@php
+																	$img = '/storage/item_images/'. $item['item_code'] .'/gallery/preview/'.$item['image'];
+																	$webp = '/storage/item_images/'. $item['item_code'] .'/gallery/preview/'.explode('.', $item['image'])[0].'.webp';
+																@endphp
+																<picture>
+																	<source srcset="{{ asset($webp) }}" type="image/webp">
+																	<source srcset="{{ asset($img) }}" type="image/jpeg">
+																	<img src="{{ asset('/storage/item_images/'. $item['item_code'] .'/gallery/preview/'.$item['image']) }}" class="img-responsive w-100" alt="" loading='lazy'>
+																</picture>
+															</div>
+															<div class="col-9 col-xl-10 text-left font-responsive">
+																<div class="col-12 d-xl-none">
+																	<div class="row">
+																		<div class="col-4 p-2 d-flex justify-content-center align-items-center">
+																			<div class="text-center">
+																				<b>{{ $item['quantity'] }}</b><br>
+																				{{ $item['uom'] }}
+																			</div>
+																		</div>
+																		<div class="col-4 p-2 d-flex justify-content-center align-items-center">
+																			<b>{{ '₱ ' . number_format($item['price'], 2) }}</b>
+																		</div>
+																		<div class="col-4 p-2 d-flex justify-content-center align-items-center">
+																			<b>{{ '₱ ' . number_format($item['amount'], 2) }}</b>
+																		</div>
+																	</div>
+																</div>
+																{{ $item['item_name'] }}
+															</div>
+														</div>
+													</td>
+													<td class="text-center d-none d-sm-table-cell">
+														{{ $item['quantity'] }}
+													</td>
+													<td class="text-center d-none d-sm-table-cell" style="white-space: nowrap !important;">
+														{{ '₱ ' . number_format($item['price'], 2) }}
+													</td>
+													<td class="text-center d-none d-sm-table-cell" style="white-space: nowrap !important;">
+														{{ '₱ ' . number_format($item['amount'], 2) }}
+													</td>
+												</tr>
+												@empty
+												<tr>
+													<td colspan="6" class="text-center">No items found.</td>
+												</tr>
+												@endforelse
+											</tbody>
+										</table>
+										<div class="col-12 mb-5 offset-xl-9 col-xl-3 font-responsive" style="font-size: 11pt; text-align: right !important">
+											{{-- Subtotal --}}
+											<div class="row">
+												<div class="col-6 col-xl-8">
+													Subtotal :
+												</div>
+												<div class="col-6 col-xl-4">
+													₱ {{ number_format($order_details->order_subtotal, 2) }}
+												</div>
+											</div>
+											{{-- Subtotal --}}
+
+											{{-- Voucher --}}
+											@if ($order_details->voucher_code)
+												@php
+													if($voucher_details){
+														switch ($voucher_details->discount_type) {
+															case 'By Percentage':
+																$voucher_discount_amount = ($voucher_details->discount_rate / 100) * $order_details->order_subtotal;
+																break;
+															default:
+																$voucher_discount_amount = $voucher_details->discount_rate;
+																break;
+														}
+													}
+												@endphp
+												<div class="row">
+													<div class="col-6 col-xl-8">
+														Discount <span class="text-white" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833;">{{ $order_details->voucher_code }}</span> :
+													</div>
+													<div class="col-6 col-xl-4">
+														- ₱ {{ number_format($voucher_discount_amount, 2) }}
+													</div>
+												</div>
+											@endif
+											{{-- Voucher --}}
+
+											{{-- Price Rules --}}
+											@if ($price_rule)
+												@php
+													$pr_discount_amount = $order_details->discount_amount > ($shipping_discount_amount + $voucher_discount_amount) ? $order_details->discount_amount - ($shipping_discount_amount + $voucher_discount_amount) : 0;
+												@endphp
+												@if ($pr_discount_amount > 0)
+													<div class="row">
+														<div class="col-6 col-xl-8">
+															Discount : <span class="text-white" style="border: 1px dotted #ffff; padding: 3px 8px; margin: 2px; font-size: 7pt; background-color:#1c2833;">{{ $price_rule['discount_name'] }}</span>
+														</div>
+														<div class="col-6 col-xl-4">
+															- ₱ {{ number_format($pr_discount_amount, 2) }}
+														</div>
+													</div>
+												@endif
+											@endif
+											{{-- Price Rules --}}
+
+											{{-- Shipping Type --}}
+											<div class="row">
+												<div class="col-6 col-xl-8">
+													{{ $order_details->order_shipping }} :
+												</div>
+												<div class="col-6 col-xl-4">
+													@if ($order_details->order_shipping_amount > 0)
+														₱ {{ number_format($order_details->order_shipping_amount, 2) }}
+													@else
+														FREE
+													@endif
+												</div>
+											</div>
+											{{-- Shipping Type --}}
+
+											{{-- Grand Total --}}
+											<div class="row">
+												@php
+													$grand_total = $order_details->order_shipping_amount + ($order_details->order_subtotal - $order_details->discount_amount);
+												@endphp
+												<div class="col-6 col-xl-8">
+													<b>Grand Total :</b>
+												</div>
+												<div class="col-6 col-xl-4">
+													<b>₱ {{ number_format($grand_total, 2) }}</b>
+												</div>
+											</div>
+											{{-- Grand Total --}}
+
+											{{-- Payment Method --}}
+											<div class="row">
+												<div class="col-6 col-xl-8">
+													Payment Method :
+												</div>
+												<div class="col-6 col-xl-4">
+													{{ $order_details->order_payment_method }}
+												</div>
+											</div>
+											{{-- Payment Method --}}
+										</div>
+									</div>
 								</div>
 							</div>
 						</div>
@@ -647,6 +716,10 @@ p {
 		.tr-font{
 			font-size: 10pt !important;
 		}
+
+		.font-responsive{
+			font-size: 9pt;
+		}
     }
 
     @media (max-width: 767.98px) {
@@ -668,6 +741,10 @@ p {
 		}
 		.tr-font{
 			font-size: 10pt !important;
+		}
+
+		.font-responsive{
+			font-size: 9pt;
 		}
     }
 

@@ -2735,7 +2735,7 @@ class FrontendController extends Controller
         $ordered_items = DB::table('fumaco_order_items as o')
             ->join('fumaco_items as i', 'i.f_idcode', 'o.item_code')
             ->where('o.order_number', $order_number)
-            ->select('o.*', 'i.f_cat_id')
+            ->select('o.*', 'i.f_cat_id', 'i.f_stock_uom')
             ->get();
         $items = $payment_statuses = $status = $order_status = $shipping_discount = $price_rule = $voucher_details = [];
         $payment_status_sequence = $status_sequence = null;
@@ -2783,6 +2783,7 @@ class FrontendController extends Controller
                     'image' => ($item_image) ? $item_image->imgprimayx : null,
                     'quantity' => $item->item_qty,
                     'price' => $item->item_price,
+                    'uom' => $item->f_stock_uom,
                     'amount' => $item->item_total_price
                 ];
             }
