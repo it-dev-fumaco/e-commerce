@@ -180,6 +180,7 @@ Route::prefix('admin')->group(function () {
                 Route::post('/api_setup/save', 'SettingsController@saveApiCredentials');
                 Route::post('/email_setup/save', 'SettingsController@saveEmailSetup');
                 Route::post('/email_recipients/save', 'SettingsController@saveEmailRecipients');
+                Route::post('/email_setup/send_test_mail', 'SettingsController@sendTestMail');
                 Route::post('/attribute_status/{cat_id}/update', 'ProductController@updateCategoryAttr');
                 Route::post('/product/save', 'ProductController@saveItem');
                 Route::post('/add_product_images', 'ProductController@uploadImages');

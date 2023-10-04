@@ -4,10 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Config;
 use DB;
-use Cache;
-use File;
+use Mail;
 use Auth;
+use Cache;
 use Exception;
 
 class SettingsController extends Controller
@@ -147,6 +148,72 @@ class SettingsController extends Controller
         }
         
         return view('backend.settings.email_setup', compact('details'));
+    }
+
+    public function sendTestMail(Request $request){
+        try {
+            // Set the configuration for testing
+            $test_config = array(
+                'driver' => $request->driver,
+                'host' => $request->host,
+                'port' => $request->port,
+                'encryption' => $request->encryption,
+                'username' => $request->username,
+                'password' => $request->password,
+                'from' => [
+                    'address' => $request->address,
+                    'name' => $request->name,
+                ],
+                'timeout' => null,
+                'auth_mode' => null,
+                'stream' => [
+                    'ssl' => [
+                        'allow_self_signed' => true,
+                        'verify_peer' => false,
+                        'verify_peer_name' => false,
+                    ]
+                ],
+            );
+
+            Config::set('mail', $test_config);
+
+            Mail::send('emails.test_mail', [], function($message){
+                $message->to(trim(Auth::user()->username));
+                $message->subject('Test E-mail - FUMACO');
+            });
+
+            // Restore original configuration
+            $email_config = DB::table('email_config')->first();
+            if ($email_config) {
+                $config = array(
+                    'driver' => $email_config->driver,
+                    'host' => $email_config->host,
+                    'port' => $email_config->port,
+                    'encryption' => $email_config->encryption,
+                    'username' => $email_config->username,
+                    'password' => $email_config->password,
+                    'from' => [
+                        'address' => $email_config->address,
+                        'name' => $email_config->name,
+                    ],
+                    'timeout' => null,
+                    'auth_mode' => null,
+                    'stream' => [
+                        'ssl' => [
+                            'allow_self_signed' => true,
+                            'verify_peer' => false,
+                            'verify_peer_name' => false,
+                        ]
+                    ],
+                );
+                
+                Config::set('mail', $config);
+            }
+
+            return response()->json(['success' => 1, 'message' => 'E-mail Sent!']);
+        } catch (\Throwable $th) {
+            return response()->json(['success' => 0, 'message' => 'An error occured. E-mail not sent!']);
+        }
     }
 
     public function saveEmailSetup(Request $request) {
