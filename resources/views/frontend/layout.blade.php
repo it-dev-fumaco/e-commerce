@@ -197,6 +197,14 @@
     </script> --}}
     <script>
 
+  (function(d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s); js.id = id;
+      js.src = "//connect.facebook.net/en_US/sdk.js";
+      fjs.parentNode.insertBefore(js, fjs);
+  }(document, 'script', 'facebook-jssdk'));
+
       function statusChangeCallback(response) {  // Called with the results from FB.getLoginStatus().
         console.log('statusChangeCallback');
         console.log('response', response);                   // The current login status of the person.
@@ -979,7 +987,6 @@
       $('#header-filler').css('margin-top', $('#navbar').height() + 'px');
     });
   </script>
-<script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
   @yield('script')
 </body>
 </html>
