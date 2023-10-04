@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
+Route::get('/testing_sso', 'FrontendController@testing_sso');
 
 Route::group(['middleware' => ['sanitation', 'throttle:global']], function(){
     Route::get('/', 'FrontendController@index')->name('website');
@@ -58,7 +59,7 @@ Route::group(['middleware' => ['sanitation', 'throttle:global']], function(){
         // facebook login login/facebook/callback
         // Route::post('/facebook/login', 'LoginController@loginFbSdk')->name('facebook.login');
         Route::get('login/facebook', 'LoginController@redirectToFacebook');
-        Route::get('login/facebook/callback', 'LoginController@loginFbSdk');
+        Route::get('auth/facebook/callback', 'LoginController@loginFbSdk');
 
         // google login
         Route::get('auth/google', 'LoginController@loginUsingGoogle')->name('google.login');
