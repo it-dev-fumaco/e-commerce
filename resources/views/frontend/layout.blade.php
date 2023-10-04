@@ -979,7 +979,7 @@
       $('#header-filler').css('margin-top', $('#navbar').height() + 'px');
     });
   </script>
-
+<script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
   @yield('script')
 </body>
 </html>
