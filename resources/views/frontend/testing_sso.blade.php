@@ -34,10 +34,15 @@
       version    : 'v18.0'           // Use this Graph API version for this call.
     });
 
+    FB.login(function(response) {
+    // handle the response
+    console.log(response)
+    }, {scope: 'public_profile,email'});
 
-    FB.getLoginStatus(function(response) {   // Called after the JS SDK has been initialized.
-      statusChangeCallback(response);        // Returns the login status.
-    });
+    // FB.Login(function(response) {   // Called after the JS SDK has been initialized.
+    //     console.log(response)
+    // //   statusChangeCallback(response);        // Returns the login status.
+    // });
   };
  
   function testAPI() {                      // Testing Graph API after login.  See statusChangeCallback() for when this call is made.
