@@ -138,116 +138,6 @@
         fjs.parentNode.insertBefore(js, fjs);
       }(document, 'script', 'facebook-jssdk'));
     </script>
-
-  
-
-    @if (in_array($activePage, ['login','checkout_customer_form']))
-    {{-- <script>
-      function statusChangeCallback(response) {  // Called with the results from FB.getLoginStatus().
-        if (response.status === 'connected') {   // Logged into your webpage and Facebook.
-          loginUser();
-        }
-      }
-
-      function checkLoginState() {               // Called when a person is finished with the Login Button.
-        FB.getLoginStatus(function(response) {   // See the onlogin handler
-          statusChangeCallback(response);
-        });
-      }
-
-      window.fbAsyncInit = function() {
-        FB.init({
-          appId      : 596451285825362,//'435536724607670',
-          cookie     : true,                     // Enable cookies to allow the server to access the session.
-          xfbml      : true,                     // Parse social plugins on this webpage.
-          version    : 'v18.0'           // Use this Graph API version for this call.
-        });
-      };
-
-      function loginUser () {
-        FB.api('/me?fields=id,email,first_name,last_name', function(response) {
-          var data = {
-            'id': response.id,
-            'email': response.email,
-            'first_name': response.first_name,
-            'last_name': response.last_name,
-            '_token': "{{ csrf_token() }}",
-          }
-
-          $.ajax({
-            type:'POST',
-            url:'/facebook/login',
-            data: data,
-            success: function (res) {
-              if (res.status == 200) {
-                window.location.href="{{ route('website') }}";
-              } else {
-                $('#login-fb').removeClass('d-none').text(res.message);
-              }
-            }
-          });
-        });
-      }
-
-      function triggerLogin() {
-        FB.login(function(response) {
-          checkLoginState();
-        }, {scope: 'email'});
-      }
-    </script> --}}
-    <script>
-
-  (function(d, s, id) {
-      var js, fjs = d.getElementsByTagName(s)[0];
-      if (d.getElementById(id)) return;
-      js = d.createElement(s); js.id = id;
-      js.src = "//connect.facebook.net/en_US/sdk.js";
-      fjs.parentNode.insertBefore(js, fjs);
-  }(document, 'script', 'facebook-jssdk'));
-
-      function statusChangeCallback(response) {  // Called with the results from FB.getLoginStatus().
-        console.log('statusChangeCallback');
-        console.log('response', response);                   // The current login status of the person.
-        if (response.status === 'connected') {   // Logged into your webpage and Facebook.
-          testAPI();  
-        }
-      }
-    
-    
-      function checkLoginState() {               // Called when a person is finished with the Login Button.
-        FB.getLoginStatus(function(response) {   // See the onlogin handler
-          statusChangeCallback(response);
-        });
-      }
-    
-    
-      window.fbAsyncInit = function() {
-        FB.init({
-          appId      : 596451285825362,
-          cookie     : true,                     // Enable cookies to allow the server to access the session.
-          xfbml      : true,                     // Parse social plugins on this webpage.
-          version    : 'v18.0'           // Use this Graph API version for this call.
-        });
-    
-    
-        FB.getLoginStatus(function(response) {   // Called after the JS SDK has been initialized.
-          statusChangeCallback(response);        // Returns the login status.
-        });
-      };
-     
-      function testAPI() {                      // Testing Graph API after login.  See statusChangeCallback() for when this call is made.
-        console.log('Welcome!  Fetching your information.... ');
-        FB.api('/me', function(response) {
-          console.log('Successful login for: ' + response.name);
-          document.getElementById('status').innerHTML =
-            'Thanks for logging in, ' + response.name + '!';
-        });
-      }
-    
-    </script>
-    @endif
-
-  
   
     @if(in_array($activePage, ['contact', 'signup', 'blog']))
       {!! ReCaptcha::htmlScriptTagJsApi([
@@ -987,6 +877,27 @@
       $('#header-filler').css('margin-top', $('#navbar').height() + 'px');
     });
   </script>
+  @if (in_array($activePage, ['login','checkout_customer_form']))
+    <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
+    <script>  
+        function statusChangeCallback(response) {  // Called with the results from FB.getLoginStatus().
+            console.log('statusChangeCallback');
+            console.log(response);                   // The current login status of the person.
+            if (response.status === 'connected') {   // Logged into your webpage and Facebook.
+            testAPI();  
+            } else {                                 // Not logged into your webpage or we are unable to tell.
+            document.getElementById('status').innerHTML = 'Please log ' +
+                'into this webpage.';
+            }
+        }
+    
+        function checkLoginState() {
+            FB.getLoginStatus(function(response) {
+                statusChangeCallback(response);
+            });
+        }
+    </script>
+  @endif
   @yield('script')
 </body>
 </html>
