@@ -35,6 +35,7 @@ return [
         'client_secret' => env('FACEBOOK_CLIENT_SECRET', '702a848cdcf9017d0c107692ae91fc9e'),
         // 'redirect' => 'https://test301.fumaco.com/login/facebook/callback',
         'redirect' => 'https://test301.fumaco.com/auth/facebook/callback',
+        'version' => 'v18.0'
     ],
     
 
