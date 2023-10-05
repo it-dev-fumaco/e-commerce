@@ -881,7 +881,7 @@
   </script>
   @yield('script')
 
-  @if (in_array($activePage, ['login','checkout_customer_form']))
+  {{-- @if (in_array($activePage, ['login','checkout_customer_form']))
       <script>  
           function statusChangeCallback(response) {  // Called with the results from FB.getLoginStatus().
               console.log('statusChangeCallback');
@@ -900,6 +900,6 @@
               });
           }
       </script>
-    @endif
+    @endif --}}
 </body>
 </html>

@@ -114,50 +114,68 @@
 </main>
 
 <style>
-.effect {
-  width: 100%;
-}
-.effect .buttons {
-  display: flex;
-  justify-content: center;
-}
-.effect a {
-  text-align: center;
-  margin: 3px 8px;
-  text-decoration: none !important;
-  color: white !important;
-  width: 50px;
-  height: 50px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 10px;
-  font-size: 20px;
-  overflow: hidden;
-  position: relative;
-  box-shadow: 0 0 7px 0 #404040;
-}
-.effect a i {
-  position: relative;
-  z-index: 3;
-}
-.effect a.fb {
-  background-color: #3b5998;
-}
-.effect a.tw {
-  background-color: #aeb5c5;
-}
-.effect a.g-plus {
-  background-color: #fff;
-}
-.effect a.in {
-  background-color: #007bb6;
-}
+  .effect {
+    width: 100%;
+  }
+  .effect .buttons {
+    display: flex;
+    justify-content: center;
+  }
+  .effect a {
+    text-align: center;
+    margin: 3px 8px;
+    text-decoration: none !important;
+    color: white !important;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    font-size: 20px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 0 7px 0 #404040;
+  }
+  .effect a i {
+    position: relative;
+    z-index: 3;
+  }
+  .effect a.fb {
+    background-color: #3b5998;
+  }
+  .effect a.tw {
+    background-color: #aeb5c5;
+  }
+  .effect a.g-plus {
+    background-color: #fff;
+  }
+  .effect a.in {
+    background-color: #007bb6;
+  }
 </style>
 @endsection
 
 @section('script')
 <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
+<script>  
+  function statusChangeCallback(response) {  // Called with the results from FB.getLoginStatus().
+      console.log('statusChangeCallback');
+      console.log(response);                   // The current login status of the person.
+      if (response.status === 'connected') {   // Logged into your webpage and Facebook.
+      testAPI();  
+      } else {                                 // Not logged into your webpage or we are unable to tell.
+      document.getElementById('status').innerHTML = 'Please log ' +
+          'into this webpage.';
+      }
+  }
+
+  function checkLoginState() {
+      FB.getLoginStatus(function(response) {
+          statusChangeCallback(response);
+      });
+  }
+</script>
 @endsection
 
 @section('style')
