@@ -140,7 +140,7 @@
 <div id="fb-customer-chat" class="fb-customerchat">
 </div>
 
-    <script async>
+    {{-- <script async>
       var chatbox = document.getElementById('fb-customer-chat');
       chatbox.setAttribute("page_id", "276044345867555");
       chatbox.setAttribute("attribution", "biz_inbox");
@@ -159,7 +159,7 @@
         js.src = 'https://connect.facebook.net/en_US/sdk/xfbml.customerchat.js';
         fjs.parentNode.insertBefore(js, fjs);
       }(document, 'script', 'facebook-jssdk'));
-    </script>
+    </script> --}}
   
     @if(in_array($activePage, ['contact', 'signup', 'blog']))
       {!! ReCaptcha::htmlScriptTagJsApi([
