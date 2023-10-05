@@ -113,34 +113,13 @@
     @endif
     @endif
 
-    @if (in_array($activePage, ['login','checkout_customer_form']))
-      <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
-      <script>  
-          function statusChangeCallback(response) {  // Called with the results from FB.getLoginStatus().
-              console.log('statusChangeCallback');
-              console.log(response);                   // The current login status of the person.
-              if (response.status === 'connected') {   // Logged into your webpage and Facebook.
-              testAPI();  
-              } else {                                 // Not logged into your webpage or we are unable to tell.
-              document.getElementById('status').innerHTML = 'Please log ' +
-                  'into this webpage.';
-              }
-          }
-      
-          function checkLoginState() {
-              FB.getLoginStatus(function(response) {
-                  statusChangeCallback(response);
-              });
-          }
-      </script>
-    @endif
             <!-- Messenger Chat Plugin Code -->
 <div id="fb-root"></div>
 <!-- Your Chat Plugin code -->
 <div id="fb-customer-chat" class="fb-customerchat">
 </div>
 
-    {{-- <script async>
+    <script async>
       var chatbox = document.getElementById('fb-customer-chat');
       chatbox.setAttribute("page_id", "276044345867555");
       chatbox.setAttribute("attribution", "biz_inbox");
@@ -159,7 +138,7 @@
         js.src = 'https://connect.facebook.net/en_US/sdk/xfbml.customerchat.js';
         fjs.parentNode.insertBefore(js, fjs);
       }(document, 'script', 'facebook-jssdk'));
-    </script> --}}
+    </script>
   
     @if(in_array($activePage, ['contact', 'signup', 'blog']))
       {!! ReCaptcha::htmlScriptTagJsApi([
@@ -443,7 +422,8 @@
   <div class="alert alert-success alert-dismissible mx-auto col-11 col-md-5 text-center fade" id="notify-me-alert" role="alert" style="position: absolute; top: 20px; left: 50%; display: inline-block; -webkit-transform: translateX(-50%); transform: translateX(-50%);">
     We will notify you via email once stock is available
   </div>
-  <script src="https://kit.fontawesome.com/ec0415ab92.js"></script> 
+    <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
+    <script src="https://kit.fontawesome.com/ec0415ab92.js"></script> 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> 
   @if($activePage == 'contact')
   <script src="https://www.google.com/recaptcha/api.js" async defer></script>
@@ -475,6 +455,26 @@
   <script type="text/javascript" src="{{ asset('/item/magnific-popup/js/magnific-popup.js') }}"></script>
   <script src="{{ asset('/slick/slick.js') }}" type="text/javascript" charset="utf-8"></script>
   @endif
+  @if (in_array($activePage, ['login','checkout_customer_form']))
+      <script>  
+          function statusChangeCallback(response) {  // Called with the results from FB.getLoginStatus().
+              console.log('statusChangeCallback');
+              console.log(response);                   // The current login status of the person.
+              if (response.status === 'connected') {   // Logged into your webpage and Facebook.
+              testAPI();  
+              } else {                                 // Not logged into your webpage or we are unable to tell.
+              document.getElementById('status').innerHTML = 'Please log ' +
+                  'into this webpage.';
+              }
+          }
+      
+          function checkLoginState() {
+              FB.getLoginStatus(function(response) {
+                  statusChangeCallback(response);
+              });
+          }
+      </script>
+    @endif
   <script>
     $(document).ready(function() {
       websiteSettings();
