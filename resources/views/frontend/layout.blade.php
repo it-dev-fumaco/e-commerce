@@ -455,26 +455,6 @@
   <script type="text/javascript" src="{{ asset('/item/magnific-popup/js/magnific-popup.js') }}"></script>
   <script src="{{ asset('/slick/slick.js') }}" type="text/javascript" charset="utf-8"></script>
   @endif
-  @if (in_array($activePage, ['login','checkout_customer_form']))
-      <script>  
-          function statusChangeCallback(response) {  // Called with the results from FB.getLoginStatus().
-              console.log('statusChangeCallback');
-              console.log(response);                   // The current login status of the person.
-              if (response.status === 'connected') {   // Logged into your webpage and Facebook.
-              testAPI();  
-              } else {                                 // Not logged into your webpage or we are unable to tell.
-              document.getElementById('status').innerHTML = 'Please log ' +
-                  'into this webpage.';
-              }
-          }
-      
-          function checkLoginState() {
-              FB.getLoginStatus(function(response) {
-                  statusChangeCallback(response);
-              });
-          }
-      </script>
-    @endif
   <script>
     $(document).ready(function() {
       websiteSettings();
@@ -900,5 +880,26 @@
     });
   </script>
   @yield('script')
+
+  @if (in_array($activePage, ['login','checkout_customer_form']))
+      <script>  
+          function statusChangeCallback(response) {  // Called with the results from FB.getLoginStatus().
+              console.log('statusChangeCallback');
+              console.log(response);                   // The current login status of the person.
+              if (response.status === 'connected') {   // Logged into your webpage and Facebook.
+              testAPI();  
+              } else {                                 // Not logged into your webpage or we are unable to tell.
+              document.getElementById('status').innerHTML = 'Please log ' +
+                  'into this webpage.';
+              }
+          }
+      
+          function checkLoginState() {
+              FB.getLoginStatus(function(response) {
+                  statusChangeCallback(response);
+              });
+          }
+      </script>
+    @endif
 </body>
 </html>
