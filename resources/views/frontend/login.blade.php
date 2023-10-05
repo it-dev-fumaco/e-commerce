@@ -157,7 +157,6 @@
 @endsection
 
 @section('script')
-<script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
 <script>  
   function statusChangeCallback(response) {  // Called with the results from FB.getLoginStatus().
       console.log('statusChangeCallback');

@@ -36,6 +36,7 @@
 
     <link rel="preload" href="{{ asset('/page_css/layout.min.css') }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="{{ asset('/page_css/layout.min.css') }}"></noscript>
+    <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
 
     @yield('style')
 
