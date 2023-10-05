@@ -63,9 +63,9 @@
                             <div class="effect">
                               <div class="buttons">
                                 {{-- <a href="#" class="fb" title="Sign in with Facebook" onclick="triggerLogin();"><i class="fa fa-facebook" aria-hidden="true"></i></a> --}}
-                                {{-- <a href="#" class="fb" title="Sign in with Facebook" onclick="checkLoginState();"><i class="fa fa-facebook" aria-hidden="true"></i></a> --}}
+                                <a href="#" class="fb fb-signin" title="Sign in with Facebook"><i class="fa fa-facebook" aria-hidden="true"></i></a>
                                 {{-- <a href="/login/facebook" class="fb" title="Sign in with Facebook"><i class="fa fa-facebook" aria-hidden="true"></i></a> --}}
-                                <fb:login-button scope="public_profile,email" onlogin="checkLoginState();"></fb:login-button>
+                                {{-- <fb:login-button scope="public_profile,email" onlogin="checkLoginState();"></fb:login-button> --}}
                                 <a href="{{ route('google.login') }}" class="g-plus" title="Sign in with Google">
                                   <img src="{{ asset('assets/google.svg') }}" width="25">
                                 </a>

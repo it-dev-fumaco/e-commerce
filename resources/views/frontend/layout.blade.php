@@ -466,6 +466,7 @@
   <script type="text/javascript" src="{{ asset('/item/fancybox/source/jquery.fancybox.js') }}"></script>
   <script type="text/javascript" src="{{ asset('/item/magnific-popup/js/magnific-popup.js') }}"></script>
   <script src="{{ asset('/slick/slick.js') }}" type="text/javascript" charset="utf-8"></script>
+  <script src="{{ asset(url('/assets/minified-js/bootstrap-notify.js')) }}"></script>
   @endif
   <script>
     $(document).ready(function() {
@@ -895,6 +896,21 @@
 
   @if (in_array($activePage, ['login','checkout_customer_form']))
     <script> 
+      function showNotification(color, message, icon){
+				$.notify({
+				  icon: icon,
+				  message: message
+				},{
+				  type: color,
+				  timer: 500,
+				  z_index: 1060,
+				  placement: {
+					from: 'top',
+					align: 'center'
+				  }
+				});
+			}
+
       window.fbAsyncInit = function() {
         FB.init({
           appId: '596451285825362',
@@ -902,34 +918,53 @@
           xfbml: true,
           version: 'v18.0' // Specify the desired Facebook Graph API version
         });
-      };
-      // function statusChangeCallback(response) {  // Called with the results from FB.getLoginStatus().
-      //     console.log('statusChangeCallback');
-      //     console.log(response);                   // The current login status of the person.
-      //     if (response.status === 'connected') {   // Logged into your webpage and Facebook.
-            
-      //     } else {                                 // Not logged into your webpage or we are unable to tell.
-      //     document.getElementById('status').innerHTML = 'Please log ' +
-      //         'into this webpage.';
-      //     }
-      // }
-    
-      function checkLoginState() {
-        FB.getLoginStatus(function(response) {
-            // statusChangeCallback(response);
-            console.log(response)
-            FB.api('/me', 'GET', { fields: 'email,first_name,last_name' }, function(profile) {
-              // Access email, first name, and last name from the profile object
-              var email = profile.email;
-              var firstName = profile.first_name;
-              var lastName = profile.last_name;
 
-              // Now you can use the email, first name, and last name as needed
-              console.log('User email: ' + email);
-              console.log('User first name: ' + firstName);
-              console.log('User last name: ' + lastName);
-            });
-        });
+        $(document).on('click', '.fb-signin', (e) => {
+          e.preventDefault();
+          FB.login(function(response) {
+              if(response.status === 'connected'){
+                FB.api('/me', 'GET', { fields: 'email,first_name,last_name' }, function(profile) {
+                  // Access email, first name, and last name from the profile object
+                  var email = profile.email;
+                  var firstName = profile.first_name;
+                  var lastName = profile.last_name;
+
+                  console.log('User email: ' + email);
+                  console.log('User first name: ' + firstName);
+                  console.log('User last name: ' + lastName);
+                });
+              } else if (response.status === 'not_authorized') {
+                showNotification("danger", 'User has not authorized the app.', "fa fa-info")
+              } else {
+                showNotification("danger", 'User is not logged in to Facebook.', "fa fa-info")
+              }
+              
+          });
+        })
+      };
+    
+      // function checkLoginState() {
+      //   FB.getLoginStatus(function(response) {
+      //       // statusChangeCallback(response);
+      //       // console.log(response)
+      //       if(response.status === 'connected'){
+      //         FB.api('/me', 'GET', { fields: 'email,first_name,last_name' }, function(profile) {
+      //           // Access email, first name, and last name from the profile object
+      //           var email = profile.email;
+      //           var firstName = profile.first_name;
+      //           var lastName = profile.last_name;
+
+      //           // console.log('User email: ' + email);
+      //           // console.log('User first name: ' + firstName);
+      //           // console.log('User last name: ' + lastName);
+      //         });
+      //       } else if (response.status === 'not_authorized') {
+			// 			  showNotification("danger", 'User has not authorized the app.', "fa fa-info")
+      //       } else {
+			// 			  showNotification("danger", 'User is not logged in to Facebook.', "fa fa-info")
+      //       }
+            
+      //   });
       }
     </script>
     @endif
