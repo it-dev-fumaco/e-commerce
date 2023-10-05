@@ -31,10 +31,6 @@ class FrontendController extends Controller
     use ProductTrait;
     use GeneralTrait;
 
-    public function testing_sso(){
-        return view('frontend.testing_sso');
-    }
-
     public function signupForm() {
         return view('frontend.register');
     }

@@ -308,9 +308,9 @@ class LoginController extends Controller
 
 
     public function loginFbSdk(Request $request) {
+        DB::beginTransaction();
         try {
-            $user = Socialite::driver('facebook')->user();
-            $finduser = User::where('facebook_id', $request->id)->orWhere('username', $request->email)->first();
+            $finduser = User::where('facebook_id', $request->fb_id)->orWhere('username', $request->email)->first();
 
             if($finduser){
                 Auth::loginUsingId($finduser->id);
@@ -318,8 +318,8 @@ class LoginController extends Controller
                 $this->updateCartItemOwner();
                 $this->saveLoginDetails('Facebook');
 
-                if($finduser->facebook_id == null or $finduser->facebook_id == ''){
-                    DB::table('fumaco_users')->where('id', $finduser->id)->update(['facebook_id' => $request->id]);
+                if(!$finduser->facebook_id){
+                    DB::table('fumaco_users')->where('id', $finduser->id)->update(['facebook_id' => $request->fb_id]);
                 }
 
                 $user_check = $this->checkEmail('Facebook');
@@ -330,10 +330,10 @@ class LoginController extends Controller
             }else{
                 $newUser = new User;
                 $newUser->username = trim($request->email);
-                $newUser->password = password_hash($request->email.'@'.$request->id, PASSWORD_DEFAULT);
+                $newUser->password = password_hash($request->email.'@'.$request->fb_id, PASSWORD_DEFAULT);
                 $newUser->f_name = $request->first_name;
                 $newUser->f_lname = $request->last_name;
-                $newUser->facebook_id = $request->id;
+                $newUser->facebook_id = $request->fb_id;
                 $newUser->f_email = 'fumacoco_dev';
                 $newUser->f_temp_passcode = 'fumaco12345';
                 $newUser->is_email_verified = 1;
@@ -346,7 +346,9 @@ class LoginController extends Controller
 
                 $user_check = $this->checkEmail('Facebook');
                 $soc_used = collect($user_check)->implode(', ');
-                session()->flash('accounts', $soc_used); 
+                session()->flash('accounts', $soc_used);
+
+                DB::commit();
 
                 return response()->json(['status' => 200, 'message' => 'Logged in new user']);
             }

@@ -466,7 +466,6 @@
   <script type="text/javascript" src="{{ asset('/item/fancybox/source/jquery.fancybox.js') }}"></script>
   <script type="text/javascript" src="{{ asset('/item/magnific-popup/js/magnific-popup.js') }}"></script>
   <script src="{{ asset('/slick/slick.js') }}" type="text/javascript" charset="utf-8"></script>
-  <script src="{{ asset(url('/assets/minified-js/bootstrap-notify.js')) }}"></script>
   @endif
   <script>
     $(document).ready(function() {
@@ -895,25 +894,10 @@
   @yield('script')
 
   @if (in_array($activePage, ['login','checkout_customer_form']))
-    <script> 
-      function showNotification(color, message, icon){
-				$.notify({
-				  icon: icon,
-				  message: message
-				},{
-				  type: color,
-				  timer: 500,
-				  z_index: 1060,
-				  placement: {
-					from: 'top',
-					align: 'center'
-				  }
-				});
-			}
-
+    <script>
       window.fbAsyncInit = function() {
         FB.init({
-          appId: '596451285825362',
+          appId: ENV('FACEBOOK_CLIENT_ID', '596451285825362'),
           autoLogAppEvents: true,
           xfbml: true,
           version: 'v18.0' // Specify the desired Facebook Graph API version
@@ -922,50 +906,43 @@
         $(document).on('click', '.fb-signin', (e) => {
           e.preventDefault();
           FB.login(function(response) {
-              if(response.status === 'connected'){
-                FB.api('/me', 'GET', { fields: 'email,first_name,last_name' }, function(profile) {
-                  // Access email, first name, and last name from the profile object
-                  var email = profile.email;
-                  var firstName = profile.first_name;
-                  var lastName = profile.last_name;
+            const fb_id = response.authResponse.userID
+            if(response.status === 'connected'){
+              FB.api('/me', 'GET', { fields: 'email,first_name,last_name' }, function(profile) {
+                const { email, first_name, last_name } = profile
 
-                  console.log('User email: ' + email);
-                  console.log('User first name: ' + firstName);
-                  console.log('User last name: ' + lastName);
+                $.ajax({
+                  type:'POST',
+                  url: 'login/facebook',
+                  data: {
+                    _token: '{{ csrf_token() }}',
+                    fb_id,
+                    email,
+                    first_name,
+                    last_name
+                  },
+                  success: (success) => {
+                    if(success.status === 200){
+                      $('#response-message').addClass('d-none')
+                      window.location.href = '{{ url("/") }}'
+                      return false
+                    }
+                  
+                    $('#response-message').removeClass('d-none').addClass('alert-danger').addClass('show').html(success.message)
+                  },
+                  error: (error) => {
+                    $('#response-message').removeClass('d-none').addClass('alert-danger').addClass('show').html(error.message)
+                  }
                 });
-              } else if (response.status === 'not_authorized') {
-                showNotification("danger", 'User has not authorized the app.', "fa fa-info")
-              } else {
-                showNotification("danger", 'User is not logged in to Facebook.', "fa fa-info")
-              }
-              
+              });
+            } else if (response.status === 'not_authorized') {
+              $('#response-message').removeClass('d-none').addClass('alert-danger').addClass('show').html('User has not authorized the app.')
+            } else {
+              $('#response-message').removeClass('d-none').addClass('alert-danger').addClass('show').html('User is not logged in to Facebook.')
+            }
           });
         })
       };
-    
-      // function checkLoginState() {
-      //   FB.getLoginStatus(function(response) {
-      //       // statusChangeCallback(response);
-      //       // console.log(response)
-      //       if(response.status === 'connected'){
-      //         FB.api('/me', 'GET', { fields: 'email,first_name,last_name' }, function(profile) {
-      //           // Access email, first name, and last name from the profile object
-      //           var email = profile.email;
-      //           var firstName = profile.first_name;
-      //           var lastName = profile.last_name;
-
-      //           // console.log('User email: ' + email);
-      //           // console.log('User first name: ' + firstName);
-      //           // console.log('User last name: ' + lastName);
-      //         });
-      //       } else if (response.status === 'not_authorized') {
-			// 			  showNotification("danger", 'User has not authorized the app.', "fa fa-info")
-      //       } else {
-			// 			  showNotification("danger", 'User is not logged in to Facebook.', "fa fa-info")
-      //       }
-            
-      //   });
-      // }
     </script>
     @endif
 </body>
