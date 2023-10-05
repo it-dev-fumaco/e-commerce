@@ -902,23 +902,6 @@
           xfbml: true,
           version: 'v18.0' // Specify the desired Facebook Graph API version
         });
-
-        function checkLoginState() {
-          FB.getLoginStatus(function(response) {
-              // statusChangeCallback(response);
-              FB.api('/me', 'GET', { fields: 'email,first_name,last_name' }, function(profile) {
-                // Access email, first name, and last name from the profile object
-                var email = profile.email;
-                var firstName = profile.first_name;
-                var lastName = profile.last_name;
-
-                // Now you can use the email, first name, and last name as needed
-                console.log('User email: ' + email);
-                console.log('User first name: ' + firstName);
-                console.log('User last name: ' + lastName);
-              });
-          }, { scope: 'email' });
-        }
       };
       // function statusChangeCallback(response) {  // Called with the results from FB.getLoginStatus().
       //     console.log('statusChangeCallback');
@@ -931,7 +914,23 @@
       //     }
       // }
     
-      
+      function checkLoginState() {
+        FB.getLoginStatus(function(response) {
+            // statusChangeCallback(response);
+            console.log(response)
+            // FB.api('/me', 'GET', { fields: 'email,first_name,last_name' }, function(profile) {
+            //   // Access email, first name, and last name from the profile object
+            //   var email = profile.email;
+            //   var firstName = profile.first_name;
+            //   var lastName = profile.last_name;
+
+            //   // Now you can use the email, first name, and last name as needed
+            //   console.log('User email: ' + email);
+            //   console.log('User first name: ' + firstName);
+            //   console.log('User last name: ' + lastName);
+            // });
+        });
+      }
     </script>
     @endif
 </body>
