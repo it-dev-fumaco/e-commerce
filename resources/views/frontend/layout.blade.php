@@ -145,7 +145,19 @@
         'callback_catch' => 'captchaFail'
       ]) !!}
     @endif
-    <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
+    {{-- <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script> --}}
+    {{-- <script async>
+      window.fbAsyncInit = function() {
+        window.fbAsyncInit = function() {
+          FB.init({
+            appId: '596451285825362',
+            autoLogAppEvents: true,
+            xfbml: true,
+            version: 'v18.0' // Specify the desired Facebook Graph API version
+          });
+        };
+      };
+    </script> --}}
   </head>
   <body>
     @if ($activePage != 'product_page')
