@@ -897,7 +897,7 @@
     <script>
       window.fbAsyncInit = function() {
         FB.init({
-          appId: ENV('FACEBOOK_CLIENT_ID', '596451285825362'),
+          appId: "{{ ENV('FACEBOOK_CLIENT_ID', '596451285825362') }}",
           autoLogAppEvents: true,
           xfbml: true,
           version: 'v18.0' // Specify the desired Facebook Graph API version
