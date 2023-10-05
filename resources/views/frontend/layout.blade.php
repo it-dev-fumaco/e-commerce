@@ -37,7 +37,15 @@
     <link rel="preload" href="{{ asset('/page_css/layout.min.css') }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="{{ asset('/page_css/layout.min.css') }}"></noscript>
     <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
-    <script>  
+    <script> 
+      window.fbAsyncInit = function() {
+        FB.init({
+          appId: '596451285825362',
+          autoLogAppEvents: true,
+          xfbml: true,
+          version: 'v18.0' // Specify the desired Facebook Graph API version
+        });
+      };
       function statusChangeCallback(response) {  // Called with the results from FB.getLoginStatus().
           console.log('statusChangeCallback');
           console.log(response);                   // The current login status of the person.
