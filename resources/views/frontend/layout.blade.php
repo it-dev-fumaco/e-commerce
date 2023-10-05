@@ -903,9 +903,9 @@
         }
       
         function checkLoginState() {
-            FB.getLoginStatus(function(response) {
+            FB.getLoginStatus({ fields: 'email,first_name,last_name' }, function(response) {
                 statusChangeCallback(response);
-            });
+            }, { scope: 'email' });
         }
       </script>
     @endif
