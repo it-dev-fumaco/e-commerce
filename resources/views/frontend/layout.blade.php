@@ -913,7 +913,7 @@
 
                 $.ajax({
                   type:'POST',
-                  url: 'login/facebook',
+                  url: '/login/facebook',
                   data: {
                     _token: '{{ csrf_token() }}',
                     fb_id,
