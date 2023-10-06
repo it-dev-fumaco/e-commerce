@@ -923,6 +923,7 @@
                   },
                   success: (success) => {
                     if(success.status === 200){
+                      console.log(success)
                       $('#response-message').addClass('d-none')
                       if(window.location.pathname.includes('/checkout/')){
                         window.location.href = '{{ url("/checkout/summary") }}'
