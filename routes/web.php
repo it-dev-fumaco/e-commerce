@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
-Route::get('/testing_sso', 'FrontendController@testing_sso');
 
 Route::group(['middleware' => ['sanitation', 'throttle:global']], function(){
     Route::get('/', 'FrontendController@index')->name('website');
