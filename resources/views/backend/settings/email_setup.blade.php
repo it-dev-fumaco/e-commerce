@@ -46,6 +46,10 @@
 							@endforeach 
 						</div>
 					@endif
+					{{-- General Success/Error Message --}}
+					<div id="response-message" class="d-none alert alert-dismissible fade text-center" role="alert"></div>
+					{{-- General Success/Error Message --}}
+
 					<!-- general form elements -->
 					<div class="card card-primary">
 						<div class="card-header">
@@ -170,21 +174,6 @@
 @section('script')
 	<script>
 		$(document).ready(function (){
-			function showNotification(color, message, icon){
-				$.notify({
-				  icon: icon,
-				  message: message
-				},{
-				  type: color,
-				  timer: 500,
-				  z_index: 1060,
-				  placement: {
-					from: 'top',
-					align: 'center'
-				  }
-				});
-			}
-
 			const sendTestMail = () => {
 				$('.spinner-border').removeClass('d-none')
 				$.ajax({
@@ -193,13 +182,17 @@
 					data: $('#email-form').serialize(),
 					success: (response) => {
 						const status = response.success ? 'success' : 'danger'
-						showNotification(status, response.message, "fa fa-info")
+						$('#response-message').removeClass('d-none')
+							.removeClass('alert-danger').removeClass('alert-success')
+							.addClass('show').addClass('alert-' + status)
+							.html(response.message)
 						$('.spinner-border').addClass('d-none')
 						$('#sendTestMail').modal('hide')
 					},
 					error: (xhr) => {
-						showNotification("danger", 'An error occured. E-mail not sent!', "fa fa-info")
+						$('#response-message').removeClass('d-none').removeClass('alert-success').addClass('show').addClass('alert-danger').html('An error occured. E-mail not sent!')
 						$('.spinner-border').addClass('d-none')
+						$('#sendTestMail').modal('hide')
 					}
 				});
 			}
