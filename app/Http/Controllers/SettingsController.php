@@ -153,29 +153,10 @@ class SettingsController extends Controller
     public function sendTestMail(Request $request){
         try {
             // Set the configuration for testing
-            $test_config = array(
-                'driver' => $request->driver,
-                'host' => $request->host,
-                'port' => $request->port,
-                'encryption' => $request->encryption,
-                'username' => $request->username,
-                'password' => $request->password,
-                'from' => [
-                    'address' => $request->address,
-                    'name' => $request->name,
-                ],
-                'timeout' => null,
-                'auth_mode' => null,
-                'stream' => [
-                    'ssl' => [
-                        'allow_self_signed' => true,
-                        'verify_peer' => false,
-                        'verify_peer_name' => false,
-                    ]
-                ],
-            );
-
-            Config::set('mail', $test_config);
+            $save_config = $this->saveEmailConfig($request);
+            if(!$save_config){
+                throw new \ErrorException;
+            }
 
             Mail::send('emails.test_mail', [], function($message){
                 $message->to(trim(Auth::user()->username));
@@ -185,34 +166,46 @@ class SettingsController extends Controller
             // Restore original configuration
             $email_config = DB::table('email_config')->first();
             if ($email_config) {
-                $config = array(
-                    'driver' => $email_config->driver,
-                    'host' => $email_config->host,
-                    'port' => $email_config->port,
-                    'encryption' => $email_config->encryption,
-                    'username' => $email_config->username,
-                    'password' => $email_config->password,
-                    'from' => [
-                        'address' => $email_config->address,
-                        'name' => $email_config->name,
-                    ],
-                    'timeout' => null,
-                    'auth_mode' => null,
-                    'stream' => [
-                        'ssl' => [
-                            'allow_self_signed' => true,
-                            'verify_peer' => false,
-                            'verify_peer_name' => false,
-                        ]
-                    ],
-                );
-                
-                Config::set('mail', $config);
+                $save_config = $this->saveEmailConfig($email_config);
+                if(!$save_config){
+                    throw new \ErrorException;
+                }
             }
 
             return response()->json(['success' => 1, 'message' => 'E-mail Sent!']);
         } catch (\Throwable $th) {
             return response()->json(['success' => 0, 'message' => 'An error occured. E-mail not sent!']);
+        }
+    }
+
+    private function saveEmailConfig($data){
+        try {
+            Config::set('mail', [
+                'driver' => $data->driver,
+                'host' => $data->host,
+                'port' => $data->port,
+                'encryption' => $data->encryption,
+                'username' => $data->username,
+                'password' => $data->password,
+                'from' => [
+                    'address' => $data->address,
+                    'name' => $data->name,
+                ],
+                'timeout' => null,
+                'auth_mode' => null,
+                'stream' => [
+                    'ssl' => [
+                        'allow_self_signed' => true,
+                        'verify_peer' => false,
+                        'verify_peer_name' => false,
+                    ]
+                ]
+            ]);
+
+            return 1;
+        } catch (\Throwable $th) {
+            //throw $th;
+            return 0;
         }
     }
 
