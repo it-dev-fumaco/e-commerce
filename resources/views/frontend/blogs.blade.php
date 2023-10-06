@@ -216,13 +216,11 @@
                                     <input type="email" class="form-control caption_1 animated animatedFadeInUp fadeInUp" placeholder="Email *" name="fullemail" id="fullemail" required>
                                 </div>
                             </div>
-                        @endif
-                        <input type="text" class="form-control caption_1 animated animatedFadeInUp fadeInUp" name="idcode" id="idcode" value="{{ $id }}" required hidden>
-                        @if (!Auth::check())
                             <br>
                             {!! htmlFormSnippet() !!}
                             <br>
                         @endif
+                        <input type="text" class="form-control caption_1 animated animatedFadeInUp fadeInUp" name="idcode" id="idcode" value="{{ $id }}" required hidden>
                         <input class="btn btn-primary mt-3 caption_1 animated animatedFadeInUp fadeInUp" type="submit" value="POST COMMENT">
                         <br>&nbsp;
                     </form>
