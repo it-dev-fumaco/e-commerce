@@ -26,11 +26,11 @@ class CheckERPStatusMiddleware
                     'error' => 1,
                     'status' => 0,
                     'success' => 0,
-                    'message' => 'An error occured. Please contact IT Department.'
+                    'message' => 'Error: Cannot connect to ERP. Please contact the IT Department.'
                 ]);
             }
 
-            return redirect()->back()->with('error', 'An error occured. Please contact IT Department.');
+            return redirect()->back()->with('error', 'Error: Cannot connect to ERP. Please contact the IT Department.');
         }
     }
 }
