@@ -4,10 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Config;
 use DB;
-use Cache;
-use File;
+use Mail;
 use Auth;
+use Cache;
 use Exception;
 
 class SettingsController extends Controller
@@ -147,6 +148,65 @@ class SettingsController extends Controller
         }
         
         return view('backend.settings.email_setup', compact('details'));
+    }
+
+    public function sendTestMail(Request $request){
+        try {
+            // Set the configuration for testing
+            $save_config = $this->saveEmailConfig($request);
+            if(!$save_config){
+                throw new \ErrorException;
+            }
+
+            Mail::send('emails.test_mail', [], function($message){
+                $message->to(trim(Auth::user()->username));
+                $message->subject('Test E-mail - FUMACO');
+            });
+
+            // Restore original configuration
+            $email_config = DB::table('email_config')->first();
+            if ($email_config) {
+                $save_config = $this->saveEmailConfig($email_config);
+                if(!$save_config){
+                    throw new \ErrorException;
+                }
+            }
+
+            return response()->json(['success' => 1, 'message' => 'E-mail Sent!']);
+        } catch (\Throwable $th) {
+            return response()->json(['success' => 0, 'message' => 'An error occured. E-mail not sent!']);
+        }
+    }
+
+    private function saveEmailConfig($data){
+        try {
+            Config::set('mail', [
+                'driver' => $data->driver,
+                'host' => $data->host,
+                'port' => $data->port,
+                'encryption' => $data->encryption,
+                'username' => $data->username,
+                'password' => $data->password,
+                'from' => [
+                    'address' => $data->address,
+                    'name' => $data->name,
+                ],
+                'timeout' => null,
+                'auth_mode' => null,
+                'stream' => [
+                    'ssl' => [
+                        'allow_self_signed' => true,
+                        'verify_peer' => false,
+                        'verify_peer_name' => false,
+                    ]
+                ]
+            ]);
+
+            return 1;
+        } catch (\Throwable $th) {
+            //throw $th;
+            return 0;
+        }
     }
 
     public function saveEmailSetup(Request $request) {

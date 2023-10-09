@@ -83,7 +83,6 @@ class SyncErpStockCommand extends Command
 
                 if ($response->successful()) {
                     if (isset($response['data']) && count($response['data']) > 0) {
-                        info($item_code);
                         DB::table('fumaco_items')->where('f_idcode', $item_code)->where('f_warehouse', $warehouse)
                             ->update([
                                 'f_default_price' => $response['data'][0]['price_list_rate'],
@@ -106,8 +105,6 @@ class SyncErpStockCommand extends Command
                     'last_sync_date' => Carbon::now()->toDateTimeString()
                 ]
             ];
-            
-            info('stocks updated');
         }else{
             $system_logs = [
                 [

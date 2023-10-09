@@ -36,7 +36,6 @@
 
     <link rel="preload" href="{{ asset('/page_css/layout.min.css') }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="{{ asset('/page_css/layout.min.css') }}"></noscript>
-
     @yield('style')
 
     @if (!in_array($activePage, ['homepage', 'product_page']))
@@ -112,6 +111,7 @@
     <!-- End Google Tag Manager -->
     @endif
     @endif
+
             <!-- Messenger Chat Plugin Code -->
 <div id="fb-root"></div>
 <!-- Your Chat Plugin code -->
@@ -138,73 +138,26 @@
         fjs.parentNode.insertBefore(js, fjs);
       }(document, 'script', 'facebook-jssdk'));
     </script>
-
   
-
-    @if (in_array($activePage, ['login','checkout_customer_form']))
-    <script>
-      function statusChangeCallback(response) {  // Called with the results from FB.getLoginStatus().
-        if (response.status === 'connected') {   // Logged into your webpage and Facebook.
-          loginUser();
-        }
-      }
-
-      function checkLoginState() {               // Called when a person is finished with the Login Button.
-        FB.getLoginStatus(function(response) {   // See the onlogin handler
-          statusChangeCallback(response);
-        });
-      }
-
-      window.fbAsyncInit = function() {
-        FB.init({
-          appId      : '435536724607670',
-          cookie     : true,                     // Enable cookies to allow the server to access the session.
-          xfbml      : true,                     // Parse social plugins on this webpage.
-          version    : 'v12.0'           // Use this Graph API version for this call.
-        });
-      };
-
-      function loginUser () {
-        FB.api('/me?fields=id,email,first_name,last_name', function(response) {
-          var data = {
-            'id': response.id,
-            'email': response.email,
-            'first_name': response.first_name,
-            'last_name': response.last_name,
-            '_token': "{{ csrf_token() }}",
-          }
-
-          $.ajax({
-            type:'POST',
-            url:'/facebook/login',
-            data: data,
-            success: function (res) {
-              if (res.status == 200) {
-                window.location.href="{{ route('website') }}";
-              } else {
-                $('#login-fb').removeClass('d-none').text(res.message);
-              }
-            }
-          });
-        });
-      }
-
-      function triggerLogin() {
-        FB.login(function(response) {
-          checkLoginState();
-        }, {scope: 'email'});
-      }
-    </script>
-    @endif
-
-  
-  
-    @if(in_array($activePage, ['contact', 'signup']))
+    @if(in_array($activePage, ['contact', 'signup', 'blog']))
       {!! ReCaptcha::htmlScriptTagJsApi([
         'callback_then' => 'captchaSuccess',
         'callback_catch' => 'captchaFail'
       ]) !!}
     @endif
+    {{-- <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script> --}}
+    {{-- <script async>
+      window.fbAsyncInit = function() {
+        window.fbAsyncInit = function() {
+          FB.init({
+            appId: '596451285825362',
+            autoLogAppEvents: true,
+            xfbml: true,
+            version: 'v18.0' // Specify the desired Facebook Graph API version
+          });
+        };
+      };
+    </script> --}}
   </head>
   <body>
     @if ($activePage != 'product_page')
@@ -414,6 +367,10 @@
                   <td class="tdfooter footer2nd" style="border-style: unset !important;">&nbsp;</td>
                 </tr>
                 <tr id="policy-pages-footer"></tr>{{-- Policy Pages --}}
+                <tr>
+                  <td class="tdfooter footer2nd" style="border-style: unset !important;"><a href="/track_order" style="text-decoration: none; color: #9B999B;">Track My Order</a></td>
+                  <td class="tdfooter footer2nd" style="border-style: unset !important;">&nbsp;</td>
+                </tr>
               </tbody>
             </table>
           </div>
@@ -477,7 +434,8 @@
   <div class="alert alert-success alert-dismissible mx-auto col-11 col-md-5 text-center fade" id="notify-me-alert" role="alert" style="position: absolute; top: 20px; left: 50%; display: inline-block; -webkit-transform: translateX(-50%); transform: translateX(-50%);">
     We will notify you via email once stock is available
   </div>
-  <script src="https://kit.fontawesome.com/ec0415ab92.js"></script> 
+    <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
+    <script src="https://kit.fontawesome.com/ec0415ab92.js"></script> 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> 
   @if($activePage == 'contact')
   <script src="https://www.google.com/recaptcha/api.js" async defer></script>
@@ -933,7 +891,64 @@
       $('#header-filler').css('margin-top', $('#navbar').height() + 'px');
     });
   </script>
-
   @yield('script')
+
+  @if (in_array($activePage, ['login','checkout_customer_form']))
+    <script>
+      window.fbAsyncInit = function() {
+        FB.init({
+          appId: "{{ ENV('FACEBOOK_CLIENT_ID', '596451285825362') }}",
+          autoLogAppEvents: true,
+          xfbml: true,
+          version: 'v18.0' // Specify the desired Facebook Graph API version
+        });
+
+        $(document).on('click', '.fb-signin', (e) => {
+          e.preventDefault();
+          FB.login(function(response) {
+            const fb_id = response.authResponse.userID
+            if(response.status === 'connected'){
+              FB.api('/me', 'GET', { fields: 'email,first_name,last_name' }, function(profile) {
+                const { email, first_name, last_name } = profile
+
+                $.ajax({
+                  type:'POST',
+                  url: '/login/facebook',
+                  data: {
+                    _token: '{{ csrf_token() }}',
+                    fb_id,
+                    email,
+                    first_name,
+                    last_name
+                  },
+                  success: (success) => {
+                    if(success.status === 200){
+                      console.log(success)
+                      $('#response-message').addClass('d-none')
+                      if(window.location.pathname.includes('/checkout/')){
+                        window.location.href = '{{ url("/checkout/summary") }}'
+                      }else{
+                        window.location.href = '{{ url("/") }}'
+                      }
+                      return false
+                    }
+                  
+                    $('#response-message').removeClass('d-none').addClass('alert-danger').addClass('show').html(success.message)
+                  },
+                  error: (error) => {
+                    $('#response-message').removeClass('d-none').addClass('alert-danger').addClass('show').html(error.message)
+                  }
+                });
+              });
+            } else if (response.status === 'not_authorized') {
+              $('#response-message').removeClass('d-none').addClass('alert-danger').addClass('show').html('User has not authorized the app.')
+            } else {
+              $('#response-message').removeClass('d-none').addClass('alert-danger').addClass('show').html('User is not logged in to Facebook.')
+            }
+          });
+        })
+      };
+    </script>
+    @endif
 </body>
 </html>

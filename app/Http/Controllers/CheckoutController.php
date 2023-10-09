@@ -48,10 +48,10 @@ class CheckoutController extends Controller
 	
         if(Auth::check()) {
             $cart_items = DB::table('fumaco_items as a')->join('fumaco_cart as b', 'a.f_idcode', 'b.item_code')
-				->where('user_type', 'member')->where('user_email', Auth::user()->username)->select('qty', 'f_qty')->get();
+				->where('user_type', 'member')->where('user_email', Auth::user()->username)->select('qty', 'f_qty', 'a.f_name_name')->get();
         } else {
             $cart_items = DB::table('fumaco_items as a')->join('fumaco_cart as b', 'a.f_idcode', 'b.item_code')
-				->where('user_type', 'guest')->where('transaction_id', $order_no)->select('qty', 'f_qty')->get();
+				->where('user_type', 'guest')->where('transaction_id', $order_no)->select('qty', 'f_qty', 'a.f_name_name')->get();
         }
 
         $cart_arr = [];

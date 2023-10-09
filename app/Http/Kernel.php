@@ -65,5 +65,6 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'otp_status_check' => \App\Http\Middleware\OTPStatusMiddleware::class,
         'sanitation' => \App\Http\Middleware\SanitationMiddleware::class,
+        'check_erp_status' => \App\Http\Middleware\CheckERPStatusMiddleware::class,
     ];
 }

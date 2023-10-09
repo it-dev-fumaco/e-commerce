@@ -46,6 +46,10 @@
 							@endforeach 
 						</div>
 					@endif
+					{{-- General Success/Error Message --}}
+					<div id="response-message" class="d-none alert alert-dismissible fade text-center" role="alert"></div>
+					{{-- General Success/Error Message --}}
+
 					<!-- general form elements -->
 					<div class="card card-primary">
 						<div class="card-header">
@@ -53,7 +57,7 @@
 						</div>
 						<!-- /.card-header -->
 						<!-- form start -->
-						<form action="/admin/email_setup/save" method="POST" autocomplete="off">
+						<form action="/admin/email_setup/save" id="email-form" method="POST" autocomplete="off">
 							@csrf
 							<div class="card-body">
 								<div class="form-group">
@@ -93,8 +97,34 @@
 								</div>
 							</div>
 							<!-- /.card-body -->
-							<div class="card-footer">
+							<div class="card-footer text-right">
+								<button type="button" class="btn btn-info" data-toggle="modal" data-target="#sendTestMail"><i class="fas fa-save"></i>&nbsp;Send Test E-mail</button>
 								<button type="submit" class="btn btn-primary"><i class="fas fa-save"></i>&nbsp;Save</button>
+
+								<div class="modal fade text-center" id="sendTestMail" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+									<div class="modal-dialog" role="document">
+										<div class="modal-content">
+											<div class="modal-header bg-primary">
+												<h5 class="modal-title" id="exampleModalLabel">Send Test E-mail</h5>
+												<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+													<span aria-hidden="true">&times;</span>
+												</button>
+											</div>
+											<div class="modal-body">
+												Test E-mail will be sent to <b>{{ Auth::user()->username }}</b>. Continue?
+											</div>
+											<div class="modal-footer">
+												<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+												<button type="button" class="btn btn-primary send-test-mail">
+													Send
+													<div class="spinner-border spinner-border-sm d-none" role="status">
+														<span class="sr-only">Loading...</span>
+													</div>
+												</button>
+											</div>
+										</div>
+									</div>
+								</div>
 							</div>
 						</form>
 					</div>
@@ -139,4 +169,39 @@
 	</section>
 	<!-- /.content -->
  </div>
+@endsection
+
+@section('script')
+	<script>
+		$(document).ready(function (){
+			const sendTestMail = () => {
+				$('.spinner-border').removeClass('d-none')
+				$.ajax({
+					type:'POST',
+					url:'/admin/email_setup/send_test_mail',
+					data: $('#email-form').serialize(),
+					success: (response) => {
+						const status = response.success ? 'success' : 'danger'
+						$('#response-message').removeClass('d-none')
+							.removeClass('alert-danger').removeClass('alert-success')
+							.addClass('show').addClass('alert-' + status)
+							.html(response.message)
+						$('.spinner-border').addClass('d-none')
+						$('#sendTestMail').modal('hide')
+					},
+					error: (xhr) => {
+						$('#response-message').removeClass('d-none').removeClass('alert-success').addClass('show').addClass('alert-danger').html('An error occured. E-mail not sent!')
+						$('.spinner-border').addClass('d-none')
+						$('#sendTestMail').modal('hide')
+					}
+				});
+			}
+
+			$(document).on('click', '.send-test-mail', (e) => {
+				e.preventDefault()
+
+				sendTestMail()
+			})
+		});
+	</script>
 @endsection

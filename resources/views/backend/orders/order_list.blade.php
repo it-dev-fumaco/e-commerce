@@ -23,6 +23,11 @@
 		</section>
 		
 		<section class="content">
+			@if (session()->has('error'))
+				<div class="alert alert-danger p-2 w-100">
+					{{ session()->get('error') }}
+				</div>
+			@endif
 			<div class="container-fluid">
 				<div class="row">
 					<div class="col-md-12">

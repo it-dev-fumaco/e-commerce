@@ -19,21 +19,17 @@
 
                     <form class="form-signin" action="/login" method="POST" style="max-width: 600px !important; border-color: #efefef; border-style: solid; border-width: 1px; border-top: 8px solid #186eaa; ">
                         @if(session()->has('success'))
-                        <div class="alert alert-success alert-dismissible fade show" role="alert">
-                            {{ session()->get('success') }}
-                        </div>
-                    @endif
-                    <div class="alert alert-danger alert-dismissible fade show d-none" role="alert" id="login-fb"></div>
-                    @if(session()->has('error'))
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            {!! session()->get('error') !!}
-                        </div>
-                    @endif
-                    @if (session()->has('resend'))
-                    <div class="alert alert-success alert-dismissible fade show text-center" role="alert">
-                        Email has been resent
-                    </div>
-                    @endif
+                          <div class="alert alert-success alert-dismissible fade show" role="alert">
+                              {{ session()->get('success') }}
+                          </div>
+                        @endif
+                        @if(session()->has('error'))
+                          <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                              {!! session()->get('error') !!}
+                          </div>
+                        @endif
+                        {{-- General Success/Error Message --}}
+                        <div id="response-message" class="d-none alert alert-dismissible fade" role="alert"></div>
                         @csrf
                         <h4 style="color: #404040; border-bottom: 2px solid  #e59866 ; padding-bottom: 8px; text-align: center;">Sign In</h4>
                         <center>
@@ -62,12 +58,11 @@
                             <small class="text-muted"> or sign in with</small>
                             <div class="effect">
                               <div class="buttons">
-                                <a href="#" class="fb" title="Sign in with Facebook" onclick="triggerLogin();"><i class="fa fa-facebook" aria-hidden="true"></i></a>
+                                <a href="#" class="fb fb-signin" title="Sign in with Facebook"><i class="fa fa-facebook" aria-hidden="true"></i></a>
                                 <a href="{{ route('google.login') }}" class="g-plus" title="Sign in with Google">
                                   <img src="{{ asset('assets/google.svg') }}" width="25">
                                 </a>
                                 <a href="{{ route('linkedin.login') }}" class="in" title="Sign in with Linked In"><i class="fa fa-linkedin" aria-hidden="true"></i></a>
-                                {{-- <a href="#" class="tw" title="Sign in with Apple"><i class="fab fa-apple" aria-hidden="true"></i></a> --}}
                               </div>
                             </div>
                             <label for="InputPassword" class="status-1"></label>
@@ -111,51 +106,48 @@
 </main>
 
 <style>
-.effect {
-  width: 100%;
-}
-.effect .buttons {
-  display: flex;
-  justify-content: center;
-}
-.effect a {
-  text-align: center;
-  margin: 3px 8px;
-  text-decoration: none !important;
-  color: white !important;
-  width: 50px;
-  height: 50px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 10px;
-  font-size: 20px;
-  overflow: hidden;
-  position: relative;
-  box-shadow: 0 0 7px 0 #404040;
-}
-.effect a i {
-  position: relative;
-  z-index: 3;
-}
-.effect a.fb {
-  background-color: #3b5998;
-}
-.effect a.tw {
-  background-color: #aeb5c5;
-}
-.effect a.g-plus {
-  background-color: #fff;
-}
-.effect a.in {
-  background-color: #007bb6;
-}
+  .effect {
+    width: 100%;
+  }
+  .effect .buttons {
+    display: flex;
+    justify-content: center;
+  }
+  .effect a {
+    text-align: center;
+    margin: 3px 8px;
+    text-decoration: none !important;
+    color: white !important;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    font-size: 20px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 0 7px 0 #404040;
+  }
+  .effect a i {
+    position: relative;
+    z-index: 3;
+  }
+  .effect a.fb {
+    background-color: #3b5998;
+  }
+  .effect a.tw {
+    background-color: #aeb5c5;
+  }
+  .effect a.g-plus {
+    background-color: #fff;
+  }
+  .effect a.in {
+    background-color: #007bb6;
+  }
 </style>
 @endsection
 
-@section('script')
-<script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
-@endsection
 
 @section('style')
 <style>

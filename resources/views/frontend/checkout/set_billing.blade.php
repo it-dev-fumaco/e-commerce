@@ -43,7 +43,7 @@
 											<small class="text-muted">
 												<span class="open-modal" data-target="#loginModal" style="color: #0D6EFD; text-decoration: underline; cursor: pointer">Sign in</span> with
 											</small>
-											<a href="#" class="fb" title="Sign in with Facebook" onclick="triggerLogin();" style="height: 25px !important; width: 25px !important; border-radius: 8px;">
+											<a href="#" class="fb fb-signin" title="Sign in with Facebook" style="height: 25px !important; width: 25px !important; border-radius: 8px;">
 												<i class="fa fa-facebook" aria-hidden="true" style="font-size: 10pt;"></i>
 											</a>
 											<a href="{{ route('google.login').'?checkout=1' }}" class="g-plus" title="Sign in with Google" style="height: 25px !important; width: 25px !important; border-radius: 8px;">

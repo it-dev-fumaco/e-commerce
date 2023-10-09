@@ -2358,6 +2358,10 @@ class ProductController extends Controller
         DB::beginTransaction();
 		try{
             $img = DB::table('fumaco_items_image_v1')->where('id', $id)->first();
+            
+            if(!$img){
+			    return redirect()->back()->with('image_error', 'Image already deleted.');
+            }
 
             $primary_img = explode(".", $img->imgprimayx)[0];
             $original_img = explode(".", $img->imgoriginalx)[0];

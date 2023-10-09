@@ -378,12 +378,7 @@ class OrderController extends Controller
                         } catch (\Swift_TransportException  $e) {
                             DB::rollback();
                             
-                            return redirect()->back()->with('error', 'An error occured. Please try again.');
-                        }
-
-                        if(Mail::failures()){
-                            DB::rollback();
-                            return redirect()->back()->with('error', 'An error occured. Please try again.');
+                            return redirect()->back()->with('error', 'An error occured while sending an email!');
                         }
 
                         DB::table('fumaco_order')->where('order_number', $request->order_number)->update(['amount_paid' => $total_amount]);
@@ -442,13 +437,7 @@ class OrderController extends Controller
                         });
                     } catch (\Swift_TransportException  $e) {
                         DB::rollback();
-                        
-                        return redirect()->back()->with('error', 'An error occured. Please try again.');
-                    }
-
-                    if(Mail::failures()){
-                        DB::rollback();
-                        return redirect()->back()->with('error', 'An error occured. Please try again.');
+                        return redirect()->back()->with('error', 'An error occured while sending an email!');
                     }
 
                     $message = 'Hi '.$order_details->order_name . ' ' . $order_details->order_lastname.'!, your order '.$request->order_number.' with an amount of P '.number_format($total_amount, 2).' is now shipped out. Click '.$sms_short_url.' to track your order.';
@@ -465,12 +454,7 @@ class OrderController extends Controller
                     } catch (\Swift_TransportException  $e) {
                         DB::rollback();
                         
-                        return redirect()->back()->with('error', 'An error occured. Please try again.');
-                    }
-
-                    if(Mail::failures()){
-                        DB::rollback();
-                        return redirect()->back()->with('error', 'An error occured. Please try again.');
+                        return redirect()->back()->with('error', 'An error occured while sending an email!');
                     }
 
                     $message = 'Hi '.$order_details->order_name . ' ' . $order_details->order_lastname.'!, your order '.$request->order_number.' with an amount of P '.number_format($total_amount, 2).' has been delivered. Click '.$sms_short_url.' to track your order.';
