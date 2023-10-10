@@ -4,19 +4,14 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Mail;
-use App\Mail\WelcomeEmail;
 use DB;
 use Auth;
 use App\Models\User;
 use App\Models\UserVerify;
 use Illuminate\Support\Str;
 use Adrianorosa\GeoLocation\GeoLocation;
-use Illuminate\Support\Facades\Http;
-use Newsletter;
-use Cache;
 use Exception;
 
 use App\Http\Traits\ProductTrait;
@@ -849,22 +844,12 @@ class FrontendController extends Controller
         try{
             $request->validate([
                 'email' => ['required', 'string', 'email', 'max:255'],
-                'g-recaptcha-response' => ['required',function ($attribute, $value, $fail) {
-                    $secret_key = config('recaptcha.api_secret_key');
-                    $response = $value;
-                    $userIP = $_SERVER['REMOTE_ADDR'];
-                    $url = "https://www.google.com/recaptcha/api/siteverify?secret=$secret_key&response=$response&remoteip=$userIP";
-                    $response = \file_get_contents($url);
-                    $response = json_decode($response);
-                    if (!$response->success) {
-                        $fail('ReCaptcha failed.');
-                    }
-                }],
+                'g-recaptcha-response' => 'recaptcha',
             ],
             [
                 'g-recaptcha-response' => [
-                    'required' => 'Please check ReCaptcha.'
-                ]
+                    'required' => 'ReCaptcha failed.'
+                ],
             ]);
 
             $checker = DB::table('fumaco_subscribe')->where('email', $request->email)->exists();
@@ -873,19 +858,11 @@ class FrontendController extends Controller
                 return redirect()->back()->with('error_subscribe', 'Email already subscribed!');
             }
 
-            $insert = [
+            DB::table('fumaco_subscribe')->insert([
                 'email' => $request->email,
                 'status' => 1,
                 'ip_logs' => $request->ip()
-            ];
-
-            DB::table('fumaco_subscribe')->insert($insert);
-
-            if(Newsletter::isSubscribed($request->email) == 0){
-                Newsletter::subscribeOrUpdate($request->email);
-            }else{
-                Newsletter::subscribe($request->email);
-            }
+            ]);
 
             $featured_items = DB::table('fumaco_items')->where('f_status', 1)->where('f_featured', 1)->limit(4)->get();
             $featured = [];
@@ -1119,17 +1096,6 @@ class FrontendController extends Controller
                 'username' => 'required|email|unique:fumaco_users,username',
                 'password' => 'required|confirmed|min:6',
                 'g-recaptcha-response' => 'recaptcha',
-                // 'g-recaptcha-response' => ['required',function ($attribute, $value, $fail) {
-                //     $secret_key = config('recaptcha.api_secret_key');
-                //     $response = $value;
-                //     $userIP = $_SERVER['REMOTE_ADDR'];
-                //     $url = "https://www.google.com/recaptcha/api/siteverify?secret=$secret_key&response=$response&remoteip=$userIP";
-                //     $response = \file_get_contents($url);
-                //     $response = json_decode($response);
-                //     if (!$response->success) {
-                //         $fail('ReCaptcha failed.');
-                //     }
-                // }],
             ],
             [
                 'password.confirmed' => 'Password does not match.',
@@ -1154,27 +1120,15 @@ class FrontendController extends Controller
                 'token' => $token
             ]);
 
-            $customer_group_id = DB::table('fumaco_users')->where('id', $user->id)->pluck('customer_group')->first();
-            $customer_group = DB::table('fumaco_customer_group')->where('id', $customer_group_id)->pluck('customer_group_name')->first();
-
-            if(!Newsletter::hasMember($user->username)){
-                Newsletter::subscribe($user->username, ['FNAME' => $user->f_name, 'LNAME' => $user->f_lname]);
-                Newsletter::addTags([$customer_group], $user->username);
-            }
-
             if(isset($request->subscribe)){
-                $checker = DB::table('fumaco_subscribe')->where('email', $request->username)->count();
-                if($checker == 0){
-                    $newsletter = [
+                $checker = DB::table('fumaco_subscribe')->where('email', $request->username)->exists();
+                if(!$checker){
+                    DB::table('fumaco_subscribe')->insert([
                         'email' => $request->username,
                         'status' => 1,
                         'ip_logs' => $request->ip()
-                    ];
-        
-                    DB::table('fumaco_subscribe')->insert($newsletter);
+                    ]);
                 }
-            }else{
-                Newsletter::unsubscribe($user->username);
             }
 
             Mail::send('emails.verify_email', ['token' => $token], function($message) use($request){

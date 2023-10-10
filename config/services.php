@@ -31,26 +31,22 @@ return [
     ],
 
     'facebook' => [
-        'client_id' => ENV('FACEBOOK_CLIENT_ID', '596451285825362'),
-        'client_secret' => ENV('FACEBOOK_CLIENT_SECRET', '702a848cdcf9017d0c107692ae91fc9e'),
-        // 'redirect' => 'https://test301.fumaco.com/login/facebook/callback',
-        'redirect' => 'https://test301.fumaco.com/auth/facebook/callback',
-        'version' => 'v18.0'
+        'client_id' => ENV('FACEBOOK_CLIENT_ID', ''),
+        'client_secret' => ENV('FACEBOOK_CLIENT_SECRET', ''),
+        'redirect' => env('BASE_URL', 'https://fumaco.com').'/auth/facebook/callback',
+        'version' => env('FACEBOOK_CLIENT_VERSION', 'v18.0')
     ],
     
-
     'google' => [
-        // 'client_id' => '794522382369-0pdu3n5j2ofohbae2hcbtgtfqiu898a2.apps.googleusercontent.com',
-        // 'client_secret' => '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',
-        'client_id' => '461557894965-g8rtlfv4ngmnsc6g19v93abuqaok09id.apps.googleusercontent.com',
-        'client_secret' => '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',
-        'redirect' => 'https://test301.fumaco.com/auth/google/callback',
+        'client_id' => env('GOOGLE_CLIENT_ID', ''),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET', ''),
+        'redirect' => env('BASE_URL', 'https://fumaco.com').'/auth/google/callback',
     ],
 
     'linkedin' => [
-        'client_id' => '86qae63bbvyy22',
-        'client_secret' => '5bC4dey0d7vAqwgH',
-        'redirect' => 'https://www.fumaco.com/auth/linkedin/callback'
-    ],
+        'client_id' => env('LINKEDIN_CLIENT_ID', ''),
+        'client_secret' => env('LINKEDIN_CLIENT_SECRET', ''),
+        'redirect' => env('BASE_URL', 'https://fumaco.com').'/auth/linkedin/callback'
+    ]
 
 ];
