@@ -897,10 +897,10 @@
     <script>
       window.fbAsyncInit = function() {
         FB.init({
-          appId: "{{ ENV('FACEBOOK_CLIENT_ID', '596451285825362') }}",
+          appId: "{{ ENV('FACEBOOK_CLIENT_ID') }}",
           autoLogAppEvents: true,
           xfbml: true,
-          version: 'v18.0' // Specify the desired Facebook Graph API version
+          version: "{{ ENV('FACEBOOK_CLIENT_VERSION') }}" // Specify the desired Facebook Graph API version
         });
 
         $(document).on('click', '.fb-signin', (e) => {
@@ -923,7 +923,6 @@
                   },
                   success: (success) => {
                     if(success.status === 200){
-                      console.log(success)
                       $('#response-message').addClass('d-none')
                       if(window.location.pathname.includes('/checkout/')){
                         window.location.href = '{{ url("/checkout/summary") }}'
