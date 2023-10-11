@@ -145,14 +145,26 @@
         <div class="row">
             <div class="col-lg-12">
                 <br>
+                @if(session()->has('g-recaptcha-response'))
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        {{ session()->get('g-recaptcha-response') }}
+                    </div>
+                @endif
+
+                @if(session()->has('error'))
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        {{ session()->get('error') }}
+                    </div>
+                @endif
+
                 @if(session()->has('comment_message'))
-                    <div class="alert alert-warning alert-dismissible fade show" role="alert" id="status">
+                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
                         {{ session()->get('comment_message') }}
                     </div>
                 @endif
 
                 @if(session()->has('reply_message'))
-                    <div class="alert alert-warning alert-dismissible fade show" role="alert" id="status">
+                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
                         {{ session()->get('reply_message') }}
                     </div>
                 @endif
@@ -162,7 +174,7 @@
         <div class="row" style="background-color:#f4f4f4;">
             <div class="col-lg-12">
                 <div class="row">
-                    <form action="/add_comment" method="post">
+                    <form action="/add_comment" id="comment-form" method="post">
                         @csrf
                         <input type="hidden" name="g-recaptcha-response" id="recaptcha_v3">
                         <div class="row">
@@ -221,7 +233,7 @@
                             <br>
                         @endif
                         <input type="text" class="form-control caption_1 animated animatedFadeInUp fadeInUp" name="idcode" id="idcode" value="{{ $id }}" required hidden>
-                        <input class="btn btn-primary mt-3 caption_1 animated animatedFadeInUp fadeInUp" type="submit" value="POST COMMENT">
+                        <button type="submit" id="submitBtn" class="btn btn-primary" {{ !Auth::check() ? 'disabled' : null }}>POST COMMENT</button>
                         <br>&nbsp;
                     </form>
 
