@@ -507,7 +507,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <br>
+                                    {{-- <br>
                                     <hr>
                                     <div class="row mt-3">
                                         <div class="col-12">
@@ -541,7 +541,7 @@
                                             <label>Email Notification Schedule</label>
                                             <input type="text" class="form-control" id="notif-schedule" name="notif_schedule" required/>
                                         </div>
-                                    </div>
+                                    </div> --}}
                                     <div class="row mt-3">
                                         <div class="col-12">
                                             <div class="float-right font-italic">

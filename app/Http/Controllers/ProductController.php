@@ -1163,15 +1163,15 @@ class ProductController extends Controller
         $shipping_services = DB::table('fumaco_shipping_service')->where('shipping_service_name', '!=', 'Free Delivery')
             ->select('shipping_service_name')->distinct()->orderBy('shipping_service_name', 'asc')->pluck('shipping_service_name');
 
-        $list_id = env('MAILCHIMP_LIST_ID');
-        if (!isset($list_id)) {
-            return redirect()->back()->with('error', 'Mailchimp not configured.');
-        }
+        // $list_id = env('MAILCHIMP_LIST_ID');
+        // if (!isset($list_id)) {
+        //     return redirect()->back()->with('error', 'Mailchimp not configured.');
+        // }
 
-        $templates = Newsletter::getTemplatesList();
-        $tags = Newsletter::getSegmentsList($list_id);
+        // $templates = Newsletter::getTemplatesList();
+        // $tags = Newsletter::getSegmentsList($list_id);
 
-        return view('backend.marketing.add_onsale', compact('categories', 'customer_groups', 'templates', 'tags', 'shipping_services', 'items'));
+        return view('backend.marketing.add_onsale', compact('categories', 'customer_groups', 'shipping_services', 'items'));
     }
 
     public function editOnsaleForm($id){
@@ -1241,20 +1241,20 @@ class ProductController extends Controller
 
         $customer_groups = DB::table('fumaco_customer_group')->get();
 
-        $list_id = env('MAILCHIMP_LIST_ID');
-        if (!isset($list_id)) {
-            return redirect()->back()->with('error', 'Mailchimp not configured.');
-        }
+        // $list_id = env('MAILCHIMP_LIST_ID');
+        // if (!isset($list_id)) {
+        //     return redirect()->back()->with('error', 'Mailchimp not configured.');
+        // }
 
-        $templates = Newsletter::getTemplatesList();
-        $tags = Newsletter::getSegmentsList($list_id);
+        // $templates = Newsletter::getTemplatesList();
+        // $tags = Newsletter::getSegmentsList($list_id);
 
-        $campaign = $on_sale->mailchimp_campaign_id ? Newsletter::campaignInfo($on_sale->mailchimp_campaign_id) : [];
+        // $campaign = $on_sale->mailchimp_campaign_id ? Newsletter::campaignInfo($on_sale->mailchimp_campaign_id) : [];
         
-        $selected_tag = $campaign ? $campaign['recipients']['segment_opts']['saved_segment_id'] : null;
-        $selected_template = $campaign ? $campaign['settings']['template_id'] : null;
+        // $selected_tag = $campaign ? $campaign['recipients']['segment_opts']['saved_segment_id'] : null;
+        // $selected_template = $campaign ? $campaign['settings']['template_id'] : null;
 
-        return view('backend.marketing.edit_onsale', compact('on_sale', 'categories', 'discounted_categories', 'customer_groups', 'discounted_customer_group', 'templates', 'tags', 'selected_template', 'selected_tag', 'shipping_services', 'discounted_shipping_services', 'discounted_selected_items', 'items'));
+        return view('backend.marketing.edit_onsale', compact('on_sale', 'categories', 'discounted_categories', 'customer_groups', 'discounted_customer_group', 'shipping_services', 'discounted_shipping_services', 'discounted_selected_items', 'items'));
     }
 
     public function setOnSaleStatus(Request $request){
@@ -1734,36 +1734,36 @@ class ProductController extends Controller
             }
 
             // mailchimp
-            $list_id = env('MAILCHIMP_LIST_ID');
-            if (!isset($list_id)) {
-                return redirect()->back()->with('error', 'Mailchimp not configured.');
-            }
+            // $list_id = env('MAILCHIMP_LIST_ID');
+            // if (!isset($list_id)) {
+            //     return redirect()->back()->with('error', 'Mailchimp not configured.');
+            // }
 
-            $campaign = Newsletter::createCampaign(
-                'FUMACO',           // from - name,
-                'it@fumaco.com',    // from - email,
-                $request->sale_name,// subject,
-                '',                 // content - html (would be replaced by email template),
-                'subscribers',
-                [
-                    'settings' => [
-                        'title' => $request->sale_name,
-                        'subject_line' => $request->sale_name,
-                        'from_name' => 'FUMACO',
-                        'from_email' => 'it@fumaco.com',
-                        'reply_to' => 'it@fumaco.com',
-                        'template_id' => (int)$request->email_template,
-                    ],
-                    'recipients' => [
-                        'list_id' => $list_id,
-                        'segment_opts' => [
-                            'saved_segment_id' => (int)$request->email_tag,
-                        ],
-                    ],
-                ],
-            );
+            // $campaign = Newsletter::createCampaign(
+            //     'FUMACO',           // from - name,
+            //     'it@fumaco.com',    // from - email,
+            //     $request->sale_name,// subject,
+            //     '',                 // content - html (would be replaced by email template),
+            //     'subscribers',
+            //     [
+            //         'settings' => [
+            //             'title' => $request->sale_name,
+            //             'subject_line' => $request->sale_name,
+            //             'from_name' => 'FUMACO',
+            //             'from_email' => 'it@fumaco.com',
+            //             'reply_to' => 'it@fumaco.com',
+            //             'template_id' => (int)$request->email_template,
+            //         ],
+            //         'recipients' => [
+            //             'list_id' => $list_id,
+            //             'segment_opts' => [
+            //                 'saved_segment_id' => (int)$request->email_tag,
+            //             ],
+            //         ],
+            //     ],
+            // );
 
-            $insert['mailchimp_campaign_id'] = $campaign['id'];
+            // $insert['mailchimp_campaign_id'] = $campaign['id'];
 
             $id = DB::table('fumaco_on_sale')->insertGetId($insert);
 
@@ -2136,35 +2136,35 @@ class ProductController extends Controller
                 $update['mob_banner_image'] = isset($add_image['image_name']) ? $add_image['image_name'] : null;
             }
 
-            $list_id = env('MAILCHIMP_LIST_ID');
-            $campaign_id = DB::table('fumaco_on_sale')->where('id', $id)->pluck('mailchimp_campaign_id')->first();
+            // $list_id = env('MAILCHIMP_LIST_ID');
+            // $campaign_id = DB::table('fumaco_on_sale')->where('id', $id)->pluck('mailchimp_campaign_id')->first();
 
-            if($campaign_id){
-                Newsletter::editCampaign(
-                    $campaign_id,       // Campaign ID
-                    'FUMACO',           // from - name,
-                    'it@fumaco.com',    // from - email,
-                    $request->sale_name,// subject,
-                    '',                 // content - html (would be replaced by email template),
-                    'subscribers',
-                    [
-                        'settings' => [
-                            'title' => $request->sale_name,
-                            'subject_line' => $request->sale_name,
-                            'from_name' => 'FUMACO',
-                            'from_email' => 'it@fumaco.com',
-                            'reply_to' => 'it@fumaco.com',
-                            'template_id' => (int)$request->email_template,
-                        ],
-                        'recipients' => [
-                            'list_id' => $list_id,
-                            'segment_opts' => [
-                                'saved_segment_id' => (int)$request->email_tag,
-                            ],
-                        ],
-                    ],
-                );
-            }
+            // if($campaign_id){
+            //     Newsletter::editCampaign(
+            //         $campaign_id,       // Campaign ID
+            //         'FUMACO',           // from - name,
+            //         'it@fumaco.com',    // from - email,
+            //         $request->sale_name,// subject,
+            //         '',                 // content - html (would be replaced by email template),
+            //         'subscribers',
+            //         [
+            //             'settings' => [
+            //                 'title' => $request->sale_name,
+            //                 'subject_line' => $request->sale_name,
+            //                 'from_name' => 'FUMACO',
+            //                 'from_email' => 'it@fumaco.com',
+            //                 'reply_to' => 'it@fumaco.com',
+            //                 'template_id' => (int)$request->email_template,
+            //             ],
+            //             'recipients' => [
+            //                 'list_id' => $list_id,
+            //                 'segment_opts' => [
+            //                     'saved_segment_id' => (int)$request->email_tag,
+            //                 ],
+            //             ],
+            //         ],
+            //     );
+            // }
 
             DB::table('fumaco_on_sale')->where('id', $id)->update($update);
 
