@@ -310,7 +310,11 @@ class LoginController extends Controller
     public function loginFbSdk(Request $request) {
         DB::beginTransaction();
         try {
-            $finduser = User::where('facebook_id', $request->fb_id)->orWhere('username', $request->email)->first();
+            $user = Socialite::driver('facebook')->user();
+            $fb_id = $user->id;
+
+            $finduser = User::where('facebook_id', $fb_id)->orWhere('username', $user->email)->first();
+            $url = str_contains($request->url(), 'checkout') ? '/checkout/summary' : '/';
 
             if($finduser){
                 Auth::loginUsingId($finduser->id);
@@ -319,21 +323,22 @@ class LoginController extends Controller
                 $this->saveLoginDetails('Facebook');
 
                 if(!$finduser->facebook_id){
-                    DB::table('fumaco_users')->where('id', $finduser->id)->update(['facebook_id' => $request->fb_id]);
+                    DB::table('fumaco_users')->where('id', $finduser->id)->update(['facebook_id' => $fb_id]);
                 }
 
                 $user_check = $this->checkEmail('Facebook');
                 $soc_used = collect($user_check)->implode(', ');
                 session()->flash('accounts', $soc_used); 
 
-                return response()->json(['status' => 200, 'message' => 'Logged in']);
+                // return response()->json(['status' => 200, 'message' => 'Logged in']);
+                return redirect($url);
             }else{
                 $newUser = new User;
-                $newUser->username = trim($request->email);
-                $newUser->password = password_hash($request->email.'@'.$request->fb_id, PASSWORD_DEFAULT);
-                $newUser->f_name = $request->first_name;
-                $newUser->f_lname = $request->last_name;
-                $newUser->facebook_id = $request->fb_id;
+                $newUser->username = trim($user->email);
+                $newUser->password = password_hash($user->email.'@'.$fb_id, PASSWORD_DEFAULT);
+                $newUser->f_name = trim($user->email);
+                $newUser->f_lname = null;
+                $newUser->facebook_id = $fb_id;
                 $newUser->f_email = 'fumacoco_dev';
                 $newUser->f_temp_passcode = 'fumaco12345';
                 $newUser->is_email_verified = 1;
@@ -350,10 +355,14 @@ class LoginController extends Controller
 
                 DB::commit();
 
-                return response()->json(['status' => 200, 'message' => 'Logged in new user']);
+                // return response()->json(['status' => 200, 'message' => 'Logged in new user']);
+                return redirect($url);
             }
         } catch (\Throwable $th) {
-            return response()->json(['status' => 500, 'message' => 'Incorrect username and/or password.']);
+            // return response()->json(['status' => 500, 'message' => 'Incorrect username and/or password.']);
+            session()->flash('status', 500);
+            session()->flash('message', 'Incorrect username and/or password!');
+            return redirect()->back();
         }
     }
 

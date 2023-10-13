@@ -56,9 +56,9 @@ Route::group(['middleware' => ['sanitation', 'throttle:global']], function(){
         Route::post('/password/reset','ResetPasswordController@reset')->name('password.update');
 
         // facebook login login/facebook/callback
-        Route::post('login/facebook', 'LoginController@loginFbSdk')->name('facebook.login');
+        // Route::post('login/facebook', 'LoginController@loginFbSdk')->name('facebook.login');
         Route::get('login/facebook', 'LoginController@redirectToFacebook');
-        // Route::get('auth/facebook/callback', 'LoginController@loginFbSdk');
+        Route::get('auth/facebook/callback', 'LoginController@loginFbSdk');
 
         // google login
         Route::get('auth/google', 'LoginController@loginUsingGoogle')->name('google.login');
