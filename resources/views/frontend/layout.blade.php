@@ -145,24 +145,31 @@
         'callback_catch' => 'captchaFail'
       ]) !!}
     @endif
-    {{-- <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script> --}}
-    {{-- <script async>
-      window.fbAsyncInit = function() {
-        window.fbAsyncInit = function() {
-          FB.init({
-            appId: '596451285825362',
-            autoLogAppEvents: true,
-            xfbml: true,
-            version: 'v18.0' // Specify the desired Facebook Graph API version
-          });
-        };
-      };
-    </script> --}}
   </head>
   <body>
     @if ($activePage != 'product_page')
       <div class="spinner-wrapper">
         <div class="spinner"></div>
+      </div>
+    @endif
+    @if (session()->has('success'))
+      <div role="alert" id="element" aria-live="assertive" aria-atomic="true" class="toast" data-autohide="false" style="position: absolute; left: 40px; top: 40px; z-index: 9999 !important">
+        <div class="toast-header">
+          <strong class="mr-auto">Fumaco Inc.</strong>
+        </div>
+        <div class="toast-body">
+          {{ session()->get('success') }}
+        </div>
+      </div>
+    @endif
+    @if (session()->has('error'))
+      <div role="alert" id="element" aria-live="assertive" aria-atomic="true" class="toast" data-autohide="false" style="position: absolute; left: 40px; top: 40px; z-index: 9999 !important">
+        <div class="toast-header">
+          <strong class="mr-auto">Fumaco Inc.</strong>
+        </div>
+        <div class="toast-body">
+          {{ session()->get('error') }}
+        </div>
       </div>
     @endif
     <header style="min-height: 1px;">
@@ -469,6 +476,7 @@
   @endif
   <script>
     $(document).ready(function() {
+      $('#element').toast('show')
       websiteSettings();
       productCategories();
       countCartItems();

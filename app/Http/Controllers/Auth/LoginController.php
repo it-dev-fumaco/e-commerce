@@ -326,12 +326,11 @@ class LoginController extends Controller
                     DB::table('fumaco_users')->where('id', $finduser->id)->update(['facebook_id' => $fb_id]);
                 }
 
-                $user_check = $this->checkEmail('Facebook');
-                $soc_used = collect($user_check)->implode(', ');
-                session()->flash('accounts', $soc_used); 
+                // $user_check = $this->checkEmail('Facebook');
+                // $soc_used = collect($user_check)->implode(', ');
 
                 // return response()->json(['status' => 200, 'message' => 'Logged in']);
-                return redirect($url);
+                return redirect($url)->with('success', 'Logged in as '.$finduser->f_name.' '.$finduser->f_lname);
             }else{
                 $newUser = new User;
                 $newUser->username = trim($user->email);
@@ -349,20 +348,18 @@ class LoginController extends Controller
                 $this->updateCartItemOwner();
                 $this->saveLoginDetails('Facebook');
 
-                $user_check = $this->checkEmail('Facebook');
-                $soc_used = collect($user_check)->implode(', ');
-                session()->flash('accounts', $soc_used);
+                // $user_check = $this->checkEmail('Facebook');
+                // $soc_used = collect($user_check)->implode(', ');
 
                 DB::commit();
 
                 // return response()->json(['status' => 200, 'message' => 'Logged in new user']);
-                return redirect($url);
+                return redirect($url)->with('success', 'Logged in as '.trim($user->email));
             }
         } catch (\Throwable $th) {
             // return response()->json(['status' => 500, 'message' => 'Incorrect username and/or password.']);
-            session()->flash('status', 500);
-            session()->flash('message', 'Incorrect username and/or password!');
-            return redirect()->back();
+            throw $th; // remove this after testing
+            return redirect()->back()->with('error', 'Incorrect username and/or password');
         }
     }
 
