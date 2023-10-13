@@ -58,7 +58,7 @@
                             <small class="text-muted"> or sign in with</small>
                             <div class="effect">
                               <div class="buttons">
-                                <a href="/login/facebook" class="fb fb-signin" title="Sign in with Facebook"><i class="fa fa-facebook" aria-hidden="true"></i></a>
+                                {{-- <a href="/login/facebook" class="fb fb-signin" title="Sign in with Facebook"><i class="fa fa-facebook" aria-hidden="true"></i></a> --}}
                                 <a href="{{ route('google.login') }}" class="g-plus" title="Sign in with Google">
                                   <img src="{{ asset('assets/google.svg') }}" width="25">
                                 </a>
