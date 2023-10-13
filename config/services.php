@@ -33,20 +33,20 @@ return [
     'facebook' => [
         'client_id' => ENV('FACEBOOK_CLIENT_ID', ''),
         'client_secret' => ENV('FACEBOOK_CLIENT_SECRET', ''),
-        'redirect' => env('BASE_URL', 'https://fumaco.com').'/auth/facebook/callback',
+        'redirect' => env('BASE_URL', 'https://www.fumaco.com').'/auth/facebook/callback',
         'version' => env('FACEBOOK_CLIENT_VERSION', 'v18.0')
     ],
     
     'google' => [
         'client_id' => env('GOOGLE_CLIENT_ID', ''),
         'client_secret' => env('GOOGLE_CLIENT_SECRET', ''),
-        'redirect' => env('BASE_URL', 'https://fumaco.com').'/auth/google/callback',
+        'redirect' => env('BASE_URL', 'https://www.fumaco.com').'/auth/google/callback',
     ],
 
     'linkedin' => [
         'client_id' => env('LINKEDIN_CLIENT_ID', ''),
         'client_secret' => env('LINKEDIN_CLIENT_SECRET', ''),
-        'redirect' => env('BASE_URL', 'https://fumaco.com').'/auth/linkedin/callback'
+        'redirect' => env('BASE_URL', 'https://www.fumaco.com').'/auth/linkedin/callback'
     ]
 
 ];

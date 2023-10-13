@@ -303,14 +303,14 @@ class LoginController extends Controller
 
     public function redirectToFacebook()
     {
-        return Socialite::driver('facebook')->redirect();
+        return Socialite::driver('facebook')->stateless()->redirect();
     }
 
 
     public function loginFbSdk(Request $request) {
         DB::beginTransaction();
         try {
-            $user = Socialite::driver('facebook')->user();
+            $user = Socialite::driver('facebook')->stateless()->user();
             $fb_id = $user->id;
 
             $finduser = User::where('facebook_id', $fb_id)->orWhere('username', $user->email)->first();
@@ -358,7 +358,6 @@ class LoginController extends Controller
             }
         } catch (\Throwable $th) {
             // return response()->json(['status' => 500, 'message' => 'Incorrect username and/or password.']);
-            throw $th; // remove this after testing
             return redirect()->back()->with('error', 'Incorrect username and/or password');
         }
     }
