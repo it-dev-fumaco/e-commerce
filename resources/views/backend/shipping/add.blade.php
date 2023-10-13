@@ -51,7 +51,7 @@
 											<option value="Free Delivery">Free Delivery</option>
 										</select>
 									</div>
-									<div class="row">
+									<div class="row" id="leadtimes">
 										<div class="col-md-6">
 											<div class="form-group">
 												<label for="min-leadtime" class="form-label">* Min. Leadtime in Day(s)</label>
@@ -271,10 +271,20 @@
 
 			$('#shipping-method').val("");
 
+			$('#leadtimes').addClass('d-none');
+			$('#min-leadtime').removeAttr('required');
+			$('#max-leadtime').removeAttr('required');
+
 			$('#shipping-zone-table tbody').empty();
 			$('#shipping-condition-table tbody').empty();
 			$('#stores-table tbody').empty();
 			$('#product-category-table tbody').empty();
+
+			if (shipping_service_type !== 'Store Pickup') {
+				$('#leadtimes').removeClass('d-none');
+				$('#min-leadtime').attr('required', true);
+				$('#max-leadtime').attr('required', true);
+			}
 
 			if (shipping_service_type == '') {
 				$('#shipping-method').closest('.form-group').addClass('d-none');
