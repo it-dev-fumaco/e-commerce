@@ -342,12 +342,26 @@
 											<label for="store-selection">Select Store *</label>
 											<select id="store-selection" class="form-control no-click-outline formslabelfnt" style="text-align: center;">
 												<option value="">Select Store</option>
+												@php
+													$start = \Carbon\Carbon::now();
+												@endphp
 												@foreach ($srate['stores'] as $store)
 												@php
-													$leadtime = $srate['max_lead_time'];
-													if ($srate['max_lead_time'] <= 0) {
-														$leadtime = $store->allowance_in_hours / 24;
+													$leadtime = $store->allowance_in_hours / 24;
+
+													$end = \Carbon\Carbon::now()->addDays($leadtime);
+													$period = \Carbon\CarbonPeriod::create($start, $end);
+
+													$ds = [];
+													foreach ($period as $d) {
+														array_push($ds, $d->format('l'));
 													}
+
+													$no_of_sundays = collect($ds)->filter(function ($item) {
+														return $item === 'Sunday';
+													})->count();
+
+													$leadtime += $no_of_sundays;
 												@endphp
 												<option value="{{ $store->store_name }}" data-address="{{ $store->address }}" data-available-time="Available Time: <br>{{ date("h:i A", strtotime($store->available_from)) . ' - ' . date("h:i A", strtotime($store->available_to)) }}" data-start="{{ $store->available_from }}" data-end="{{ $store->available_to }}" data-leadtime="{{ $leadtime }}">{{ $store->store_name }}</option>
 												@endforeach

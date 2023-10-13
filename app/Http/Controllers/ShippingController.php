@@ -250,10 +250,13 @@ class ShippingController extends Controller
                 $max_charge_amount = 0;
             }
 
+            $min_leadtime = $request->min_leadtime ? $request->min_leadtime : 0;
+            $max_leadtime = $request->max_leadtime ? $request->max_leadtime : 0;
+
             $shipping_service = new ShippingService;
             $shipping_service->shipping_service_name = $request->shipping_service_type;
-            $shipping_service->min_leadtime = $request->min_leadtime;
-            $shipping_service->max_leadtime = $request->max_leadtime;
+            $shipping_service->min_leadtime = $min_leadtime;
+            $shipping_service->max_leadtime = $max_leadtime;
             $shipping_service->shipping_service_description = $request->shipping_service_description;
             $shipping_service->shipping_calculation = $shipping_calculation;
             $shipping_service->amount = $amount;
@@ -438,11 +441,14 @@ class ShippingController extends Controller
                 $min_charge_amount = 0;
                 $max_charge_amount = 0;
             }
+
+            $min_leadtime = $request->min_leadtime ? $request->min_leadtime : 0;
+            $max_leadtime = $request->max_leadtime ? $request->max_leadtime : 0;
             
             $shipping_service = ShippingService::find($id);
             $shipping_service->shipping_service_name = $request->shipping_service_type;
-            $shipping_service->min_leadtime = $request->min_leadtime;
-            $shipping_service->max_leadtime = $request->max_leadtime;
+            $shipping_service->min_leadtime = $min_leadtime;
+            $shipping_service->max_leadtime = $max_leadtime;
             $shipping_service->shipping_service_description = $request->shipping_service_description;
             $shipping_service->shipping_calculation = $shipping_calculation;
             $shipping_service->amount = $amount;
