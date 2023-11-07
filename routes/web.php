@@ -173,15 +173,7 @@ Route::prefix('admin')->group(function () {
         Route::middleware('throttle:global')->post('/verify_otp', 'DashboardController@verifyOTP');
 
         Route::group(['middleware' => 'otp_status_check'], function(){ // Check for OTP
-            Route::middleware(['check_erp_status'])->group(function () { // Check ERP API status
-                Route::get('/product/search', 'ProductController@searchItem');
-                Route::get('/warehouse/search', 'ProductController@searchWarehouse');
-                Route::get('/get_price_list', 'PriceListController@getErpPriceList');
-                Route::get('/sync_price_list', 'PriceListController@syncItemPrices');
-                Route::get('/product/{item_code}/{item_type}', 'ProductController@getItemDetails');
-                Route::post('/price_list/create', 'PriceListController@savePriceList');
-                Route::post('/product/{id}/update', 'ProductController@updateItem');
-            });
+           
 
             Route::post('/add_carousel', 'HomeCRUDController@add_header_carousel');
             Route::post('/edit_carousel/{id}', 'HomeCRUDController@edit_header_carousel');
@@ -383,6 +375,16 @@ Route::prefix('admin')->group(function () {
             Route::get('/payment_method/list', 'PaymentMethodController@viewList');
             Route::get('/bank_account/list', 'BankAccountController@list');
             // Route::get('/erp_sales_order_status/{sales_order}', 'OrderController@getErpSalesOrderStatus');
+
+            Route::middleware(['check_erp_status'])->group(function () { // Check ERP API status
+                Route::get('/product/search', 'ProductController@searchItem');
+                Route::get('/warehouse/search', 'ProductController@searchWarehouse');
+                Route::get('/get_price_list', 'PriceListController@getErpPriceList');
+                Route::get('/sync_price_list', 'PriceListController@syncItemPrices');
+                Route::get('/product/{item_code}/{item_type}', 'ProductController@getItemDetails');
+                Route::post('/price_list/create', 'PriceListController@savePriceList');
+                Route::post('/product/{id}/update', 'ProductController@updateItem');
+            });
         });
     });
 });
