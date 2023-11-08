@@ -1687,7 +1687,7 @@ class CheckoutController extends Controller
         $shipping_services_arr = [];
         foreach($shipping_zones as $row){
             $sz_address = ($row->city_code > -1) ? $row->city_name . ' ' . $row->province_name : $row->province_name;
-            $address_details = $this->getAddressDetails($sz_address);
+            $address_details = $this->getAddressDetails($sz_address . ' philippines');
 
             $address_arr_intersect = array_intersect($shipping_address_arr, $address_details);
 
