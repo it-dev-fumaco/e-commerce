@@ -542,6 +542,7 @@ class ProductController extends Controller
     public function updateItem($id, Request $request) {
         DB::beginTransaction();
         try {
+            $slug = null;
             $detail = DB::table('fumaco_items')->where('id', $id)->first();
             if(!$detail) {
                 return redirect()->back()->with('error', 'Item not found.');
