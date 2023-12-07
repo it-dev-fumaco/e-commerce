@@ -705,7 +705,7 @@ class ProductController extends Controller
 
             $erp_api = DB::table('api_setup')->where('type', 'erp_api')->first();
             if ($erp_api) {
-                $item_code = $detail->f_idcode;
+                $item_code = explode('-', $detail->f_idcode)[0];
                 $warehouse = $request->warehouse;
 
                 $api_header = [
