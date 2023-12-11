@@ -750,7 +750,7 @@ class ProductController extends Controller
                 
                 $response = Http::withHeaders($api_header)->get($erp_api->base_url . '/api/resource/Bin' . $params);
 
-                if ($response->successful()) {
+                if ($response->successful() && $detail->f_item_type != 'product_bundle') {
                     $qty = 0;
                     if (isset($response['data']) && count($response['data']) > 0) {
                         $qty = $response['data'][0]['actual_qty'];
