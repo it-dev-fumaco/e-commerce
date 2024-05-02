@@ -668,7 +668,9 @@ class CheckoutController extends Controller
 				->when(!Auth::check(), function ($q){
 					return $q->where('require_signin', 0);
 				})
-				->orderByRaw('LENGTH(order_no)', 'ASC')->orderBy('order_no', 'ASC')->orderBy('created_at', 'ASC')
+				->orderByRaw('LENGTH(order_no)')
+				->orderBy('order_no', 'ASC')
+				->orderBy('created_at', 'ASC')
 				->get();
 
 			$applicable_voucher = null;
