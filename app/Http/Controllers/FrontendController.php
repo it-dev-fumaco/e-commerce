@@ -1082,6 +1082,21 @@ class FrontendController extends Controller
 
     // /user_register
     public function userRegistration(Request $request){
+        $request->validate([
+            'first_name' => 'required',
+            'last_name' => 'required',
+            'username' => 'required|email|unique:fumaco_users,username',
+            'password' => 'required|confirmed|min:6',
+            // 'g-recaptcha-response' => 'recaptcha',
+        ],
+        [
+            'password.confirmed' => 'Password does not match.',
+            // 'g-recaptcha-response' => [
+            //     'required' => 'ReCaptcha failed.'
+            // ],
+            'username.unique' => 'The email address has already been taken.',
+        ]);
+        
         DB::beginTransaction();
         try{
             $isBot = $this->botChecker($request->all());
@@ -1089,21 +1104,6 @@ class FrontendController extends Controller
             if($isBot){
                 return redirect()->back()->with('error', 'Something went wrong.');
             }
-
-            $request->validate([
-                'first_name' => 'required',
-                'last_name' => 'required',
-                'username' => 'required|email|unique:fumaco_users,username',
-                'password' => 'required|confirmed|min:6',
-                'g-recaptcha-response' => 'recaptcha',
-            ],
-            [
-                'password.confirmed' => 'Password does not match.',
-                'g-recaptcha-response' => [
-                    'required' => 'ReCaptcha failed.'
-                ],
-                'username.unique' => 'The email address has already been taken.',
-            ]);
 
             $user = new User;
             $user->username = trim($request->username);
